@@ -44,7 +44,7 @@ function pendingOrder(h,url='https://pay.xiaofengnet.com/ws4-payments/checkout?o
  h.emit('survival_payment_result',{ok:true,action:'catalog',request_id:req.payload.request_id,products:[product],categories:[],wechat:true,alipay:true,real_money_enabled:true});
  h.cfg.SurvivalPayments.Checkout(product.sku);if(provider==='alipay')h.ctx.PaymentChannel(provider);h.ctx.PaymentBuy();req=h.paymentRequests().at(-1);assert.equal(req.payload.action,'create');
  h.emit('survival_payment_result',{ok:true,action:'create',request_id:req.payload.request_id,sku:product.sku,title:product.title,provider,quantity:1,unit_amount_fen:100,amount_fen:100,state:'pending',order_id:(provider==='alipay'?'AL':'WX')+'1'.repeat(30),
-  checkout_url:url,qr_matrix:Array(29).fill('0'.repeat(29)).join('|')});
+  checkout_url:url,qr_matrix:Array.from({length:29},(_,y)=>'0'.repeat(14)+(y===14?'1':'0')+'0'.repeat(14)).join('|')});
  assert.equal(h.$('#PaymentQR').style.visibility,expected?'visible':'collapse');if(expected)assert(h.$('#PaymentQR').children.length>0);
 }
 test('Production requests only a private capability before authenticating and never infers payment from a cached startup row',()=>{

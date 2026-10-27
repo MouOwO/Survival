@@ -4,6 +4,7 @@ release.all_difficulties_unlocked = false
 
 local time, humans, disconnected, profiles, pending, requests, listeners, published, thinker
 local engine_state, authenticated, profile_pending, profile_requests, responses, history
+local expected_roster_ready, expected_roster_throws
 -- Only this fixture's synthetic roster is admitted, independent of local IDs.
 local function fixture_actor(id) return humans ~= nil and humans[id] ~= nil end
 package.loaded["core/test_access_policy"] = {
@@ -21,6 +22,7 @@ local function fixture(count, settings)
     time, humans, disconnected, profiles, pending, requests, listeners = 0, {}, {}, {}, {}, {}, {}
     authenticated, profile_pending, profile_requests, responses, history = {}, {}, {}, {}, {}
     engine_state = 2
+    expected_roster_ready, expected_roster_throws = true, false
     asset, mode, asset_retry_calls = { total = 10, ready = 0, failed = 0, progress = 0, complete = false }, "async", 0
     asset_retry_result = { ok = true }
     for id = 0, count - 1 do
@@ -119,6 +121,10 @@ local function fixture(count, settings)
         is_disconnected = function(id) return disconnected[id] == true end,
     }
     package.loaded["systems/player_profile_service"] = modules.profiles
+    package.loaded["systems/native_cloud_roster"] = {complete_roster=function()
+        if expected_roster_throws then error("unavailable server roster") end
+        return expected_roster_ready, expected_roster_ready and "not_required" or "waiting_expected_roster"
+    end}
     package.loaded["systems/multiplayer_player_service"] = modules.multiplayer
     package.loaded["systems/startup_asset_preload_service"] = {
         snapshot = function() return asset end,
@@ -811,6 +817,65 @@ profile_success(profile_requests[2]);automatic.tick();assert(automatic.is_gamepl
 assert(load_dispatches==1)
 IsServer=previous_is_server
 print('STARTUP_AUTOMATIC_COOP_GATE_PASS: slow second player, automatic native transition, two independent auth/profile receipts, assets/UI gates and once-only release')
+
+-- The target VM can initially expose only the host and report native count=1.
+-- The entry server's expected-account contract must win until the late guest
+-- is present; auth and profile completion must independently retain that gate.
+local expected_admitted, expected_playable = 0, 0
+local expected_service=fixture(1,{native_team_setup=true,on_ready=function()expected_admitted=expected_admitted+1 end})
+expected_service.gameplay_gate(function()expected_playable=expected_playable+1 end)
+local expected_mode={SetContextThink=function(_,name,callback)
+    assert(name=='SurvivalNativeSetupAutoStart');automatic_think=callback
+end}
+GameRules.GetGameModeEntity=function()return expected_mode end
+local actual_native_count=1
+GameRules.GetCustomGamePlayerCount=function()return actual_native_count end
+GameRules.EnableCustomGameSetupAutoLaunch=function(_,value)automatic_enabled=value end
+GameRules.SetCustomGameSetupAutoLaunchDelay=function(_,value)assert(value==1)end
+GameRules.SetCustomGameSetupRemainingTime=function(_,value)
+    automatic_remaining=value;if value==1 then automatic_countdowns=automatic_countdowns+1 end
+end
+modules.multiplayer.assign_to_survival_team=function(id)humans[id].team=2;return true end
+modules.multiplayer.mark_connected=function()end
+expected_roster_ready=false
+IsServer=function()return true end
+package.loaded['systems/native_setup_auto_start']=nil
+local expected_auto=require('systems/native_setup_auto_start')
+automatic_countdowns=0
+assert(expected_auto.init())
+for index=1,120 do time=time+0.1;automatic_think();expected_service.tick() end
+assert(actual_native_count==1 and not automatic_enabled and automatic_remaining==-1 and automatic_countdowns==0
+    and expected_auto.snapshot().status=='waiting_expected_roster' and #requests==0 and not expected_service.is_ready(),
+    'host-only new VM cannot advance native setup while the entry-declared guest is missing')
+local late_player={id=1,GetPlayerID=function(self)return self.id end,IsNull=function()return false end}
+humans[1]={valid=true,fake=false,account=1001,player=late_player,state=2}
+actual_native_count,expected_roster_ready=2,true
+automatic_think();time=time+2;automatic_think()
+assert(automatic_enabled and automatic_remaining==1 and automatic_countdowns==1)
+expected_roster_throws=true;automatic_think()
+assert(not automatic_enabled and automatic_remaining==-1,'an unavailable roster cancels an armed countdown')
+expected_roster_throws=false
+automatic_think();time=time+2;automatic_think()
+engine_state=3;expected_service.tick()
+assert(#requests==2)
+assets_done();ui(expected_service,0);ui(expected_service,1)
+success(requests[1]);success(requests[2]);expected_roster_ready=false;expected_service.tick()
+assert(not expected_service.is_ready() and expected_admitted==0,
+    'complete per-player auth and assets cannot bypass an incomplete expected roster')
+expected_roster_ready=true;expected_service.tick()
+assert(expected_service.is_ready() and expected_admitted==1)
+select_mode(expected_service,'standard');assert(#profile_requests==2)
+profile_success(profile_requests[1]);profile_success(profile_requests[2])
+expected_roster_ready=false;expected_service.tick()
+assert(not expected_service.is_gameplay_ready() and expected_playable==0,
+    'roster loss after mode profiles finish must still withhold gameplay release')
+expected_roster_throws=true;expected_service.tick()
+assert(not expected_service.is_gameplay_ready() and expected_playable==0)
+expected_roster_throws=false;expected_roster_ready=true;expected_service.tick()
+assert(expected_service.is_gameplay_ready() and expected_playable==1 and expected_admitted==1)
+expected_service.tick();assert(expected_playable==1)
+IsServer=previous_is_server
+print('STARTUP_EXPECTED_CROSS_MAP_ROSTER_PASS: host-only native count, 12s late guest, countdown cancel, all auth and post-profile roster gates')
 
 -- Exercise the actual addon lifecycle callback against the real loading
 -- service. Native GAME_IN_PROGRESS must not emit gameplay start early.

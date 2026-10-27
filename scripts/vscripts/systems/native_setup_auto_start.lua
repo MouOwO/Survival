@@ -2,6 +2,7 @@
 -- Authentication, assets, UI readiness and mode profiles remain separate gates.
 local multiplayer = require("systems/multiplayer_player_service")
 local rules = require("config/generated/multiplayer_rules")
+local native_cloud_roster = require("systems/native_cloud_roster")
 local M = {}
 local world, generation, initialized, stable_since, fingerprint, enabled
 local assignments, latest = {}, { status = "not_started", players = {} }
@@ -20,6 +21,11 @@ end
 
 local function current_world()
     return call(GameRules, "GetGameModeEntity")
+end
+
+local function expected_roster_complete()
+    local ok, complete = pcall(native_cloud_roster.complete_roster)
+    return ok and complete == true
 end
 
 local function maximum()
@@ -93,6 +99,7 @@ function M.tick()
         return waiting("waiting_lobby_roster", ids)
     end
     if waiting_for_player then return waiting("waiting_connection", ids) end
+    if not expected_roster_complete() then return waiting("waiting_expected_roster", ids) end
     local key = table.concat(keys, "|")
     if fingerprint ~= key then
         fingerprint, stable_since = key, now()

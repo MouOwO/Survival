@@ -85,8 +85,15 @@ def require_production(root: Path) -> None:
         values.pop()
     if len(values) == 7 and values[-2] == ",":
         values.pop(-2)
-    if (len(values) != 6 or values[:4] != ["return", "{", "channel", "="]
-            or values[-1] != "}" or values[4] not in {'"production"', "'production'"}):
+    legacy = (len(values) == 6 and values[:4] == ["return", "{", "channel", "="]
+              and values[-1] == "}" and values[4] in {'"production"', "'production'"})
+    native_values = list(values)
+    if len(native_values) == 11 and native_values[-2] == ",":
+        native_values.pop(-2)
+    native = (len(native_values) == 10 and native_values[:4] == ["return", "{", "channel", "="]
+              and native_values[4] in {'"production"', "'production'"}
+              and native_values[5:] == [",", "native_cloud_roster_required", "=", "true", "}"])
+    if not legacy and not native:
         raise ValueError("Release profile must explicitly select production")
 
 

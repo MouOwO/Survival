@@ -214,6 +214,18 @@ class Steam:
         raise RuntimeError('Steam owner query exceeded bounded page count')
 
 
+def validate_payment_declaration(listing, lobby_map, lobby_capacity):
+    """Run after the common signed entry guard; describe cash tests truthfully.
+
+    Only the reviewed four-player cloud entry may declare real payments. The
+    common entry4 guard independently checks its production identity/provider
+    configuration, immutable reviewed modules and four-account restrictions.
+    """
+    expected = lobby_map == 'ws4_entry' and lobby_capacity == 4
+    if listing.get('real_money_payments') is not expected:
+        raise ValueError('Payment declaration differs from the reviewed entry mode')
+
+
 def validate_upload(candidate: Path, vpk: Path, listing_path: Path, build_report: Path):
     """Independently recheck signed bytes; a build report alone is insufficient."""
     candidate = pack.handoff.regular_path(candidate)
@@ -236,7 +248,8 @@ def validate_upload(candidate: Path, vpk: Path, listing_path: Path, build_report
     addon = pack.handoff.kv((candidate / 'addoninfo.txt').read_text(encoding='utf-8-sig'))['addoninfo']
     lobby_map = addon['maps']
     lobby_capacity = int(addon[lobby_map]['maxplayers'])
-    if (listing['real_money_payments'] is not False or listing['visibility_requested'] not in ('private', 'unlisted')
+    validate_payment_declaration(listing, lobby_map, lobby_capacity)
+    if (listing['visibility_requested'] not in ('private', 'unlisted')
             or sorted(listing['tester_steamids64']) != ids or OWNER not in ids
             or listing['map'] != lobby_map or listing['max_players'] != lobby_capacity
             or listing['runtime_content_sha256'] != manifest['content_sha256']
@@ -389,7 +402,7 @@ def publish(steam: Steam, listing, cover, vpk, facts, state_path, *, apply=False
     state.update(status='SUBMIT_REQUEST_PENDING', package=str(vpk), uploaded=False)
     journal(state_path, state)
     call = steam.ug('SubmitItemUpdate', C.c_uint64, [C.c_uint64, C.c_char_p], handle,
-                    ('Private four-account noncommercial test; signed runtime sequence '
+                    ('Restricted four-account test; signed runtime sequence '
                      + str(facts['release_sequence']) + '.').encode('ascii'))
     def progress():
         done, total = C.c_uint64(), C.c_uint64()

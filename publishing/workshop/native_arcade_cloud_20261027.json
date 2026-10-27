@@ -1,0 +1,250 @@
+{
+  "schema": 1,
+  "kind": "NATIVE_ARCADE_CLOUD_TEST",
+  "status": "FIX_UPLOADED_PENDING_RESTART_OFFICIAL_DOWNLOAD_AND_GUEST_SCAN",
+  "workshop_id": "3824360109",
+  "visibility": "unlisted",
+  "release_sequence": 2026102709,
+  "revision": "WS4-NATIVE-CLOUD-03",
+  "content_sha256": "1262cbe5905d760c6c15400e4051038613c6a78bffb99b64d9d2d5d609d3cf40",
+  "vpk_sha256": "b09f36be87db6dc3c8f055e06a9c18438236437d0167c7634effba6707b37278",
+  "package_bytes": 3767362385,
+  "file_count": 6658,
+  "full_view_canonical_guard": "PASS",
+  "protected_modules_preserved": 180,
+  "four_account_restriction_preserved": true,
+  "online_cheats_allowed": false,
+  "authentication_before_mode_and_gameplay": true,
+  "cloud_archive_scope": "isolated_four_account_test",
+  "real_money_code_enabled": true,
+  "workshop_upload_performed": true,
+  "native_automatic_entry_acceptance": "NOT_RUN_THIS_QR_REVISION",
+  "two_player_native_auth_commerce_acceptance": "NOT_RUN_THIS_QR_REVISION_SEE_VERIFIED_NATIVE08_HISTORY",
+  "manual_two_player_transport": "TWO_REAL_ACCOUNTS_AND_HTTP_200_CLIENT_OBSERVATION_INCONCLUSIVE_EARLY_USER_EXIT",
+  "source_gameplay_preserved": true,
+  "unpublished_root_gameplay_backported": false,
+  "package_report_sha256": "041b7b4fd90500ef15e48e7fa475731455cafbe8da132499d38d6e520004fff8",
+  "previous_release_record": "publishing/workshop/arcade_cleanup_20261027.json",
+  "workshop_upload_succeeded": true,
+  "actual_engine_api_validation": {
+    "status": "PASS_TOOLS_OFFLINE_API_AND_OPTION_ROUNDTRIP_ONLY",
+    "actual_process_id": 29380,
+    "process_exited_normally": true,
+    "tools": true,
+    "offline": true,
+    "cheats_enabled": true,
+    "actual_connected_players": 1,
+    "player_resource_get_player_count": {
+      "type": "function",
+      "observed_value": 1
+    },
+    "game_rules_get_custom_game_player_count": "nil",
+    "game_rules_get_game_session_config_value": {
+      "type": "function",
+      "required_call": "GameRules:GetGameSessionConfigValue(key, default)",
+      "key_only_rejected": true,
+      "global_function": "nil"
+    },
+    "startup_roster_option": "885195478",
+    "after_changelevel_roster_option": "885195478_1014036256",
+    "after_changelevel_probe_option": "changelevel_verified",
+    "production_acceptance": "NOT_RUN",
+    "ordinary_arcade_two_player_acceptance": "NOT_RUN",
+    "authentication_payment_acceptance": "NOT_RUN",
+    "evidence": [
+      "output/native_engine_api_20261027/root_actual_result.json",
+      "output/native_engine_api_20261027/root_after_changelevel_result.json"
+    ]
+  },
+  "failed_native07": {
+    "release_sequence": 2026102707,
+    "revision": "WS4-NATIVE-CLOUD-01",
+    "content_sha256": "13953ffb33dd94d4de4f681a5d8c05bddacf89ee8e98c7d38939b157a17c3dd1",
+    "vpk_sha256": "ed088f86586b23f9097cfc17190c18e7872213ef8f2e3f92ebbcad1c5c9ed7a5",
+    "package_bytes": 3767358855,
+    "package_report_sha256": "5d8b9ffce2fbaecbf8d3131a0bfcb2249600124d810fcf447abbd13e410f21f1",
+    "upload_callback_id": 3404,
+    "upload_callback_result": 2,
+    "failed_native_api": "GameRules.GetCustomGamePlayerCount",
+    "status": "FAILED_MANIFEST_UPLOAD_TIMEOUT",
+    "uploaded": false,
+    "local_pending_reconciled_after_fresh_official_native05_download": true,
+    "recovery_evidence": "output/native_arcade_cloud_20261027/native07_recovery_apply.log"
+  },
+  "signed": true,
+  "download_verified": false,
+  "native_cloud_roster_required": true,
+  "root_development_profile_modified": false,
+  "changed_runtime_paths": [
+    "panorama/scripts/custom_game/payment_test.vjs_c"
+  ],
+  "payment_acceptance": "NOT_PASS_NATIVE09_GUEST_QR_AND_PHONE_SCAN_NOT_RUN",
+  "paid_entitlement_delivery_acceptance": "NOT_TESTED_THIS_NATIVE_REVISION",
+  "guest_payment_qr": {
+    "status": "FIX_UPLOADED_PENDING_RESTART_OFFICIAL_DOWNLOAD_AND_GUEST_SCAN",
+    "record": "docs/guest_payment_qr_20261027.md",
+    "native_guest_scan": "NOT_RUN",
+    "phone_payment_performed_by_agent": false
+  },
+  "verified_native08": {
+    "release_sequence": 2026102708,
+    "revision": "WS4-NATIVE-CLOUD-02",
+    "content_sha256": "55d9e63ea1c95bed2456c739c0cf0e3148030e91a43f3a0d72aeaf64ab540e26",
+    "vpk_sha256": "a2d87c0daf0100af0fecce2b9056a20041ce84a38b53af62ae00f7a9bca31e91",
+    "package_bytes": 3767360950,
+    "native_automatic_entry_acceptance": "PASS_TWO_REAL_ACCOUNTS_AUTOMATIC_HANDOFF",
+    "two_player_native_auth_commerce_acceptance": "PASS_TWO_ACCOUNT_LOGIN_AND_CLOUD_READBACK_PAYMENT_NOT_ACCEPTED",
+    "transport_auth_evidence": "output/native_cloud_v02_native_20261027/native08_transport_auth_acceptance.json",
+    "historical_only": true,
+    "file_count": 6658,
+    "protected_modules_preserved": 180,
+    "download_verified": true,
+    "workshop_upload_succeeded": true,
+    "download_manifest": "976725920376391555",
+    "official_download": {
+      "log": "output/native_arcade_cloud_20261027/native_cloud_v02_official_download.log",
+      "exit_code": 0,
+      "status": "OFFICIAL_REFRESH_NATIVE_DOWNLOAD_FULLY_VERIFIED",
+      "verified_utc": "2026-10-27T13:12:26.438839+00:00",
+      "steam_manifest": "976725920376391555",
+      "download_callback_id": 3406,
+      "download_callback_result": 1,
+      "signed_resources_verified": 6658,
+      "protected_modules_verified": 180,
+      "vpk_files_verified": 5,
+      "reviewed_trusted_files_verified": 14,
+      "signature_valid": true,
+      "evidence": "output/native_arcade_cloud_20261027/download_evidence_v02/20261027T131226Z_47475f709b284ebfa099237868d7e53a/verification.json"
+    },
+    "upload": {
+      "log": "output/native_arcade_cloud_20261027/native_cloud_v02_upload.log",
+      "exit_code": 0,
+      "status": "SUBMITTED_UNLISTED_PENDING_DOWNLOAD_AND_NATIVE_TEST",
+      "uploaded": true,
+      "legal_agreement_required": false
+    },
+    "native_test_preparation": {
+      "fresh_room_created": true,
+      "second_computer_updated_and_available": true,
+      "two_players_same_party_confirmed": true,
+      "automatic_entry_loaded_this_revision": true,
+      "status": "COMPLETE_NATIVE_TWO_PLAYER_LOGIN_AND_CLOUD_READBACK_PASS"
+    },
+    "native08_acceptance": {
+      "status": "PASS_AUTO_ENTRY_TWO_PLAYERS_LOGIN_AND_CLOUD_READBACK",
+      "process_id": 5688,
+      "tools": false,
+      "dev": false,
+      "sv_cheats": 0,
+      "entry_map": "ws4_entry",
+      "gameplay_map": "template_map",
+      "automatic_handoff_count": 1,
+      "handoff_local_time": "2026-10-27 22:01:59 +08:00",
+      "both_players_team": 2,
+      "http_callbacks_200_per_api": 7,
+      "aggregate_authentication_and_assets_ready": true,
+      "admission_ready_local_time": "2026-10-27 22:06:13 +08:00",
+      "user_confirmed_login": true,
+      "cloud_profile_provider": "http_fishing",
+      "cloud_profile_revisions": {
+        "885195478": [
+          223,
+          230
+        ],
+        "1014036256": [
+          7,
+          10
+        ]
+      },
+      "per_account_pwa_database_approval_time_audited": false,
+      "original_gc_lobby_object_destroyed_on_handoff": true,
+      "evidence": "output/native_cloud_v02_native_20261027/native08_transport_auth_acceptance.json",
+      "evidence_sha256": "daf5e2db2ec345f35779ad30ef6d4ba2c0ffc56c0163a2addf6cc3ef3b9519f2"
+    },
+    "manual_guest_assignment_issue": "FIX_NATIVE08_ACCEPTED_BOTH_PLAYERS_ASSIGNED_TEAM2",
+    "transport_auth_evidence_sha256": "daf5e2db2ec345f35779ad30ef6d4ba2c0ffc56c0163a2addf6cc3ef3b9519f2",
+    "package_files": [
+      {
+        "name": "3824360109.vpk",
+        "bytes": 274380,
+        "sha256": "a2d87c0daf0100af0fecce2b9056a20041ce84a38b53af62ae00f7a9bca31e91"
+      },
+      {
+        "name": "3824360109_000.vpk",
+        "bytes": 1073603659,
+        "sha256": "6abf1929b6c448ba2933235e8020e8a68e390880d3d90bb29e02f7820baa51e1"
+      },
+      {
+        "name": "3824360109_001.vpk",
+        "bytes": 1068730788,
+        "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+      },
+      {
+        "name": "3824360109_002.vpk",
+        "bytes": 1072379183,
+        "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+      },
+      {
+        "name": "3824360109_003.vpk",
+        "bytes": 552372940,
+        "sha256": "7383f8f065b0adde28a9a0ad0560419add35d150fcf92f7d6776268b8d3cc1e4"
+      }
+    ],
+    "package_report_sha256": "0eada1ac04619d99330595b878139757802627d0aff948bd460dccf05a5f6ba4",
+    "download_receipt": "output/native_arcade_cloud_20261027/download_evidence_v02/20261027T131226Z_47475f709b284ebfa099237868d7e53a/verification.json",
+    "listing_download_receipt": "output/native_arcade_cloud_20261027/download_evidence_v02/20261027T131226Z_47475f709b284ebfa099237868d7e53a/verification.json",
+    "listing_native_acceptance_evidence": "output/native_cloud_v02_native_20261027/native08_transport_auth_acceptance.json",
+    "listing_native_acceptance_evidence_sha256": "daf5e2db2ec345f35779ad30ef6d4ba2c0ffc56c0163a2addf6cc3ef3b9519f2",
+    "listing_cloud_profile_readback_acceptance": "PASS_BOTH_ACCOUNTS_HTTP_FISHING"
+  },
+  "qr_fix_source_sha256": "2ee90ef3ca2454aa7c5e37af1473d17cc776e5117b99ec69ea764cf1906706dd",
+  "qr_fix_compiled_sha256": "8cca589085ff74459f17cee9cf620a450364eb22b4395b0458a0db4cf72ed566",
+  "native_guest_qr_scan": "NOT_RUN",
+  "authentication_core_identical_to_verified_native08": true,
+  "orders_created_by_agent": 0,
+  "package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 274380,
+      "sha256": "b09f36be87db6dc3c8f055e06a9c18438236437d0167c7634effba6707b37278"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1073605094,
+      "sha256": "5237ed97e661a93b40045f7297b7dee695bcd6eb3369622897f863202a015982"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1068730788,
+      "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379183,
+      "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 552372940,
+      "sha256": "7383f8f065b0adde28a9a0ad0560419add35d150fcf92f7d6776268b8d3cc1e4"
+    }
+  ],
+  "upload": {
+    "log": "output/native_arcade_cloud_20261027/native_cloud_v03_upload.log",
+    "log_sha256": "d77244694ff58621cefb862912cade840ba9297bb037795da8cb6708d642c48c",
+    "status": "SUBMITTED_UNLISTED_PENDING_DOWNLOAD_AND_NATIVE_TEST",
+    "uploaded": true,
+    "legal_agreement_required": false,
+    "release_sequence": 2026102709
+  },
+  "official_download_status": "NOT_RUN_WAITING_FOR_OLD_NATIVE08_MATCH_EXIT_AND_RESTART",
+  "native_test_preparation": {
+    "status": "WAITING_OLD_NATIVE08_PAUSED_N1_MATCH_EXIT_BEFORE_NATIVE09_DOWNLOAD_TEST",
+    "current_match_release_sequence": 2026102708,
+    "current_match_state_reported_by_root": "paused_N1",
+    "user_exit_reply_pending": true,
+    "native09_loaded": false,
+    "native09_room_created": false
+  },
+  "phone_payment_performed_by_agent": false
+}

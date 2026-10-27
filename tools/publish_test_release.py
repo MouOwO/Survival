@@ -45,6 +45,25 @@ ENTRY_GATE_FILES = (
     "scripts/vscripts/systems/workshop_entry.lua",
     "scripts/vscripts/addon_game_mode_client.lua",
 )
+NATIVE_CLOUD_ENTRY_GATE_FILES = (
+    "scripts/vscripts/systems/native_cloud_handoff.lua",
+    "scripts/vscripts/systems/native_cloud_roster.lua",
+    "scripts/vscripts/addon_game_mode_client.lua",
+)
+# Explicitly reviewed runtime sources, not hashes supplied by a candidate.
+# Changing either module requires another source review and pin update here.
+NATIVE_CLOUD_ENTRY_PINS = {
+    NATIVE_CLOUD_ENTRY_GATE_FILES[0]: "74525fecec2367d9af5a49073e357b6024eb20a8e6dd44be96123c2e9f64ebf1",
+    NATIVE_CLOUD_ENTRY_GATE_FILES[1]: "cc3f4a5f753749d8ee184a8862adc50061e00282ac9a7b2aed352b894adeb0e7",
+    "scripts/vscripts/config/generated/multiplayer_rules.lua": "ca025ed911a17295fa6c081e660836b9256e5b04ec8b91d3a172e9cff4cca2d1",
+}
+NATIVE_CLOUD_ENTRY_LAYOUT = {"addoninfo": {
+    "maps": "ws4_entry", "isplayable": "1", "enablepickrules": "0",
+    "ws4_entry": {"maxplayers": "4"}, "template_map": {"maxplayers": "4"},
+}}
+NATIVE_CLOUD_INERT_CLIENT = b"-- The native entry handoff is owned by the server; never launch a local map here.\nreturn {}\n"
+NATIVE_CLOUD_TESTERS = sorted(("76561198424163156", "76561198845461206", "76561198104787442", "76561198974301984"))
+NATIVE_CLOUD_BASE = "https://pay.xiaofengnet.com/ws4-web"
 STEAM_BASE = 76561197960265728
 WINDOWS_PUBLISH_PATH_MAX = 259  # MAX_PATH includes its terminating NUL.
 
@@ -136,11 +155,116 @@ def require_single_map(candidate: Path) -> None:
     if not isinstance(info.get("template_map"), dict) or info["template_map"].get("maxplayers") != "4":
         raise ValueError("template_map must declare MaxPlayers 4")
     if info["maps"] == "ws4_entry":
-        if not isinstance(info.get("ws4_entry"), dict) or info["ws4_entry"].get("maxplayers") != "1":
-            raise ValueError("ws4_entry must declare MaxPlayers 1")
+        if not isinstance(info.get("ws4_entry"), dict):
+            raise ValueError("ws4_entry must declare its reviewed capacity")
+        if info["ws4_entry"].get("maxplayers") == "4":
+            require_native_cloud_entry(candidate, data)
+            return
+        if info["ws4_entry"].get("maxplayers") != "1":
+            raise ValueError("ws4_entry must declare MaxPlayers 1 or the reviewed native-cloud layout")
         for relative in ("maps/ws4_entry.vpk", "maps/template_map.vpk", *ENTRY_GATE_FILES):
             if not protect_data.source_path(candidate, relative).is_file():
                 raise ValueError("Workshop entry runtime is missing: " + relative)
+
+
+def literal_flat_config(candidate: Path, relative: str) -> dict:
+    """Small bounded literal grammar; no Lua execution or dynamic expressions."""
+    path = protect_data.source_path(candidate, relative)
+    if not path.is_file() or path.stat().st_size > 8192:
+        raise ValueError("Native-cloud literal configuration missing or oversized: " + relative)
+    raw = path.read_text(encoding="utf-8-sig")
+    pattern = re.compile(r'''\s+|--[^\r\n]*|"[^"\\\r\n]*"|'[^'\\\r\n]*'|[A-Za-z_][A-Za-z_0-9]*|[{}=,;]''')
+    values, offset = [], 0
+    while offset < len(raw):
+        match = pattern.match(raw, offset)
+        if match is None:
+            raise ValueError("Native-cloud configuration must be literal: " + relative)
+        offset = match.end(); token = match.group()
+        if token.startswith("--"):
+            if token.startswith("--["):
+                raise ValueError("Native-cloud configuration block comments are unsupported")
+        elif not token.isspace(): values.append(token)
+    if values[-1:] == [";"]: values.pop()
+    if values[:2] != ["return", "{"] or values[-1:] != ["}"]:
+        raise ValueError("Native-cloud configuration must be one literal table: " + relative)
+    result, index, end = {}, 2, len(values) - 1
+    while index < end:
+        if index + 2 >= end or not re.fullmatch(r"[A-Za-z_][A-Za-z_0-9]*", values[index]) or values[index + 1] != "=":
+            raise ValueError("Invalid native-cloud literal field: " + relative)
+        key, token = values[index], values[index + 2]
+        if key in result: raise ValueError("Duplicate native-cloud configuration field")
+        if token in {"true", "false"}: value = token == "true"
+        elif token.startswith(('"', "'")): value = token[1:-1]
+        else: raise ValueError("Dynamic native-cloud configuration is forbidden")
+        result[key], index = value, index + 3
+        if index < end:
+            if values[index] not in {",", ";"}: raise ValueError("Invalid native-cloud field separator")
+            index += 1
+    return result
+
+
+def require_native_cloud_entry(candidate: Path, data: dict) -> None:
+    """Additional low-level guard shared by packing and official uploading.
+
+    This is not a substitute for manifest signatures, reviewed-source binding,
+    complete inventory hashes, or native acceptance in the calling pipeline.
+    """
+    if data != NATIVE_CLOUD_ENTRY_LAYOUT:
+        raise ValueError("Native-cloud requires exact entry4/template4 layout")
+    required = {"maps/ws4_entry.vpk", "maps/template_map.vpk", *NATIVE_CLOUD_ENTRY_GATE_FILES,
+                *NATIVE_CLOUD_ENTRY_PINS, "scripts/vscripts/addon_game_mode.lua", ACCESS_FILE,
+                "scripts/vscripts/config/player_web_auth.lua", "scripts/vscripts/config/session_multiplayer_test.lua",
+                "scripts/vscripts/config/commerce_payment_access.lua", runtime.RELEASE_PROFILE}
+    for relative in required:
+        if not protect_data.source_path(candidate, relative).is_file():
+            raise ValueError("Native-cloud required runtime missing: " + relative)
+    vpks = set()
+    for current, folders, files in os.walk(candidate / "maps", followlinks=False):
+        for name in (*folders, *files):
+            if protect_data.linked(Path(current) / name):
+                raise ValueError("Native-cloud maps cannot contain links or junctions")
+        for name in files:
+            if name.casefold().endswith(".vpk"):
+                vpks.add((Path(current) / name).relative_to(candidate).as_posix())
+    if vpks - runtime.SCENE_MAPS != {"maps/ws4_entry.vpk", "maps/template_map.vpk"}:
+        raise ValueError("Native-cloud contains an extra or missing gameplay map")
+    client = protect_data.source_path(candidate, NATIVE_CLOUD_ENTRY_GATE_FILES[2])
+    if client.stat().st_size != len(NATIVE_CLOUD_INERT_CLIENT) or client.read_bytes() != NATIVE_CLOUD_INERT_CLIENT:
+        raise ValueError("Native-cloud entry client must be the exact inert source; no local launch")
+    for relative, pin in NATIVE_CLOUD_ENTRY_PINS.items():
+        if runtime.digest(protect_data.source_path(candidate, relative)) != pin:
+            raise ValueError("Native-cloud reviewed runtime pin differs: " + relative)
+    main_path = protect_data.source_path(candidate, "scripts/vscripts/addon_game_mode.lua")
+    if main_path.stat().st_size > 1024 * 1024:
+        raise ValueError("Native-cloud MAIN exceeds bounded source size")
+    main = main_path.read_bytes().replace(b"\r\n", b"\n")
+    block = (b'if type(GetMapName) == "function" and GetMapName() == "ws4_entry" then\n'
+             b'    local entry = require("systems/native_cloud_handoff")\n'
+             b'    function Precache() end\n'
+             b'    function Activate()\n'
+             b'        local ok, reason = entry.activate()\n'
+             b'        if not ok then print("[WS4-ENTRY-05] server_unavailable reason=" .. tostring(reason)) end\n'
+             b'    end\n    return\nend\n')
+    start = main.find(block)
+    prefix = main[:start] if start >= 0 else b""
+    if (main.count(block) != 1 or main.count(b'require("systems/native_cloud_handoff")') != 1
+            or start > 4096 or start > 0 and main[start - 1:start] != b"\n" or b"--[" in prefix
+            or re.sub(rb"--[^\n]*", b"", prefix).strip()):
+        raise ValueError("Native-cloud MAIN must activate the reviewed server handoff in its entry branch")
+    runtime.require_production(candidate)
+    if literal_flat_config(candidate, runtime.RELEASE_PROFILE) != {"channel": "production", "native_cloud_roster_required": True}:
+        raise ValueError("Native-cloud production profile must explicitly require its original roster")
+    if configured_ids(candidate) != NATIVE_CLOUD_TESTERS:
+        raise ValueError("Native-cloud requires the four agreed test accounts")
+    if literal_flat_config(candidate, "scripts/vscripts/config/player_web_auth.lua") != {"enabled": True, "base_url": NATIVE_CLOUD_BASE}:
+        raise ValueError("Native-cloud web authentication must be enabled at the fixed origin")
+    if literal_flat_config(candidate, "scripts/vscripts/config/session_multiplayer_test.lua") != {"enabled": False, "expected_map": "template_map"}:
+        raise ValueError("Native-cloud session-only storage must be disabled")
+    cash = literal_flat_config(candidate, "scripts/vscripts/config/commerce_payment_access.lua")
+    if (set(cash) != {"enabled", "connection_helper", "expected_map", "base_url"}
+            or type(cash["enabled"]) is not bool or cash["connection_helper"] is not False
+            or cash["expected_map"] != "template_map" or cash["base_url"] != NATIVE_CLOUD_BASE):
+        raise ValueError("Native-cloud payment configuration must preserve the native authenticated boundary")
 
 
 def configured_ids(candidate: Path) -> list[str]:
@@ -213,7 +337,11 @@ def require_reviewed_gate(candidate: Path, manifest: dict) -> None:
     """
     entries = {row["path"]: row for row in manifest["files"]}
     info = kv(protect_data.source_path(candidate, "addoninfo.txt").read_text(encoding="utf-8-sig"))["addoninfo"]
-    gates = (*GATE_FILES, *ENTRY_GATE_FILES) if info.get("maps") == "ws4_entry" else GATE_FILES
+    if info.get("maps") == "ws4_entry":
+        entry_gates = NATIVE_CLOUD_ENTRY_GATE_FILES if info.get("ws4_entry", {}).get("maxplayers") == "4" else ENTRY_GATE_FILES
+        gates = (*GATE_FILES, *entry_gates)
+    else:
+        gates = GATE_FILES
     for relative in (*gates, ACCESS_FILE):
         if relative not in entries:
             raise ValueError("Signed candidate is missing an admission guard: " + relative)

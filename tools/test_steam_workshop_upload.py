@@ -37,6 +37,16 @@ class FakeSteam:
 
 
 class UploadGuards(unittest.TestCase):
+    def test_cash_declaration_matches_the_reviewed_entry_mode(self):
+        for map_name, capacity in [('template_map', 4), ('ws4_entry', 1)]:
+            api.validate_payment_declaration({'real_money_payments': False}, map_name, capacity)
+            with self.assertRaisesRegex(ValueError, 'Payment declaration'):
+                api.validate_payment_declaration({'real_money_payments': True}, map_name, capacity)
+        api.validate_payment_declaration({'real_money_payments': True}, 'ws4_entry', 4)
+        for value in [False, None, 0, 1, 'true', 'false']:
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, 'Payment declaration'):
+                api.validate_payment_declaration({'real_money_payments': value}, 'ws4_entry', 4)
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.root = Path(self.tmp.name)

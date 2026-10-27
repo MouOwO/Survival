@@ -6,6 +6,7 @@ local assets = require("systems/startup_asset_preload_service")
 local match_setup = require("systems/match_setup_service")
 local test_access_policy = require("core/test_access_policy")
 local web_auth = require("systems/player_web_auth")
+local native_cloud_roster = require("systems/native_cloud_roster")
 local offline_onboarding = require("debug/offline_onboarding_test")
 
 local M = {}
@@ -78,6 +79,11 @@ local function connected(id)
     return state == nil or state == (DOTA_CONNECTION_STATE_CONNECTED or 2)
 end
 
+local function expected_roster_complete()
+    local ok, complete = pcall(native_cloud_roster.complete_roster)
+    return ok and complete == true
+end
+
 local function lobby_roster_available()
     local minimum = tonumber(DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP)
     if not minimum or not GameRules or type(GameRules.State_Get) ~= "function" then return false end
@@ -85,7 +91,7 @@ local function lobby_roster_available()
     state = ok and tonumber(state) or nil
     -- Before custom setup the first client's loading screen can already send
     -- its handshake, while other lobby humans have no PlayerResource slot yet.
-    return state ~= nil and state >= minimum
+    return state ~= nil and state >= minimum and expected_roster_complete()
 end
 
 local function discover()
@@ -349,7 +355,7 @@ local function tick_profiles()
             entry.profile_inflight, entry.profile_error = false, nil
         end
     end
-    all_loaded = all_loaded and count > 0
+    all_loaded = all_loaded and count > 0 and expected_roster_complete()
     local state = copy(latest)
     state.admission_complete, state.all_ready, state.phase, state.error = true, true, "ready", nil
     state.profiles_ready, state.setup = all_loaded, setup_snapshot()

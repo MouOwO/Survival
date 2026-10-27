@@ -13,8 +13,10 @@ local function fixture(server, client, map)
         setup_calls = 0, think_calls = 0, forbidden_calls = 0 }
     local env = setmetatable({}, {__index = _G})
     env._G = env
+    env.package = {loaded = {}}
     env.IsServer = function() return server end
     env.IsClient = function() return client end
+    env.IsInToolsMode = function() return false end
     env.GetMapName = function() return map end
     state.map = function(value) map = value end
     env.DOTA_MAX_TEAM_PLAYERS = 4
@@ -46,6 +48,13 @@ local function fixture(server, client, map)
     env.require = function(name)
         state.requires[#state.requires + 1] = name
         if name == "config/test_access" then return state.config end
+        if name == "config/release_profile" then return {channel = "production"} end
+        if name == "debug/offline_onboarding_test" or name == "core/release_policy" then
+            if not env.package.loaded[name] then
+                env.package.loaded[name] = load("scripts/vscripts/" .. name .. ".lua", env)
+            end
+            return env.package.loaded[name]
+        end
         check(name == "core/test_access_policy", "entry cannot import gameplay, profile, HTTP, cheat or generated modules")
         if not state.access then state.access = load("scripts/vscripts/core/test_access_policy.lua", env) end
         return state.access
@@ -108,85 +117,40 @@ for _, kind in ipairs({"disabled", "malformed", "disconnect_missing", "loader_er
         "an invalid entry guard fails closed without entering gameplay or throwing a protection error")
 end
 
--- Execute the real root prefix with a separate require-module scope. This
--- catches callbacks accidentally defined only inside workshop_entry.lua.
+-- The real root prefix must delegate to the server-owned handoff before any
+-- gameplay/cloud module. Its engine/roster behavior is exercised separately by
+-- test_native_cloud_handoff.lua against the real module and admission policy.
 env, state = fixture(true, false, "ws4_entry")
-local module_env = setmetatable({}, {__index = env})
-local module_entry = load(SERVER, module_env)
-local original_require = env.require
+local activation_count = 0
 env.require = function(name)
-    if name == "systems/workshop_entry" then
-        state.requires[#state.requires + 1] = name
-        return module_entry
-    end
-    return original_require(name)
+    check(name == "systems/native_cloud_handoff", "only server handoff may load in the entry prefix")
+    state.requires[#state.requires + 1] = name
+    return {activate = function() activation_count = activation_count + 1; return true end}
 end
 local main_file = assert(io.open("scripts/vscripts/addon_game_mode.lua", "rb"))
 local main_source = main_file:read("*a"); main_file:close()
-local prefix_end = assert(main_source:find("\nlocal SURVIVAL_FORCE_HERO", 1, true), "real entry prefix missing")
-local prefix = assert(loadstring(main_source:sub(1, prefix_end), "@real_addon_entry_prefix"))
-setfenv(prefix, env)
-prefix()
-check(type(rawget(env, "Precache")) == "function" and type(rawget(env, "Activate")) == "function",
-    "the addon main scope owns the native callbacks")
-check(rawget(module_env, "Precache") == nil and rawget(module_env, "Activate") == nil)
-check(#state.requires == 1 and state.requires[1] == "systems/workshop_entry" and state.setup_calls == 0,
-    "the entry prefix returns before requiring any gameplay or cloud module")
+local prefix_end = assert(main_source:find("\nlocal SURVIVAL_FORCE_HERO", 1, true))
+local chunk = assert(loadstring(main_source:sub(1, prefix_end), "@real_addon_entry_prefix"))
+setfenv(chunk, env); chunk()
+check(type(env.Precache) == "function" and type(env.Activate) == "function")
+check(#state.requires == 1 and #state.commands == 0 and activation_count == 0)
 env.Precache({}); env.Activate()
-check(state.think_calls == 1 and state.setup_calls > 0 and state.forbidden_calls == 0,
-    "the native main-scope Activate reaches the lightweight server module")
-env.Activate()
-check(state.think_calls == 1)
+check(activation_count == 1 and state.forbidden_calls == 0)
 
--- The client route is deliberately not an identity grant. Its immutable target
--- still has the original server-owned four-account and web-auth barriers.
-env, state = fixture(false, true, "ws4_entry")
-env.command, env.workshop_id, env.target_map = "sv_cheats 1", "attacker", "injected_map"
-local client = load(CLIENT, env)
-check(#state.commands == 1 and state.commands[1] == "dota_launch_custom_game 3824360109 template_map")
-check(client.init({command = "exec injected", workshop_id = "other", map = "other"}))
-env.Activate(); env.ActivateClient(); load(CLIENT, env)
-check(#state.commands == 1 and #state.requires == 0 and state.setup_calls == 0 and state.think_calls == 0,
-    "client execution and repeated loads cannot import server systems or issue a second command")
-check(state.forbidden_calls == 0)
-env, state = fixture(false, true, "maps/ws4_entry.vpk")
-client = load(CLIENT, env)
-check(#state.commands == 1 and state.commands[1] == "dota_launch_custom_game 3824360109 template_map",
-    "the exact map VPK path returned by the native client routes successfully")
-env.Activate(); env.ActivateClient(); load(CLIENT, env)
-check(#state.commands == 1, "the native VPK map form also routes only once per VM")
-for _, row in ipairs({{true, false, "ws4_entry"}, {true, true, "ws4_entry"}, {false, false, "ws4_entry"},
-                      {false, 1, "ws4_entry"}, {false, true, "template_map"},
-                      {false, true, "offline_logic_test"}, {false, true, "WS4_ENTRY"},
-                      {false, true, "maps/template_map.vpk"}, {false, true, "maps/offline_logic_test.vpk"},
-                      {false, true, "prefix/maps/ws4_entry.vpk"}, {false, true, "maps/ws4_entry.vpk.bak"},
-                      {false, true, "maps/../maps/ws4_entry.vpk"}, {false, true, "maps/ws4_entry.vpk; exec injected"}}) do
-    env, state = fixture(unpack(row))
-    local original = function() end
-    env.Activate, env.ActivateClient = original, original
-    client = load(CLIENT, env)
-    check(client.init() == false and #state.commands == 0 and #state.requires == 0)
-    check(env.Activate == original and env.ActivateClient == original,
-        "ordinary template/offline maps keep their existing client lifecycle")
+-- Entry clients follow the server's multiplayer changelevel. In particular,
+-- neither reloads, hostile globals nor missing APIs may create solo servers.
+for _, map in ipairs({"ws4_entry", "maps/ws4_entry.vpk", "template_map", "offline_logic_test", "ws4_entry; exec injected"}) do
+    for _, side in ipairs({{false, true}, {true, false}, {true, true}, {false, false}}) do
+        env, state = fixture(side[1], side[2], map)
+        local original = function() end
+        env.Activate, env.ActivateClient = original, original
+        env.command, env.workshop_id, env.target_map = "sv_cheats 1", "attacker", "injected_map"
+        for iteration = 1, 3 do
+            local client = load(CLIENT, env)
+            check(type(client) == "table" and next(client) == nil)
+            check(#state.commands == 0 and #state.requires == 0 and state.forbidden_calls == 0)
+            check(env.Activate == original and env.ActivateClient == original)
+        end
+    end
 end
-for _, unavailable in ipairs({"IsServer", "IsClient", "GetMapName"}) do
-    env, state = fixture(false, true, "ws4_entry")
-    env[unavailable] = function() error("native unavailable") end
-    client = load(CLIENT, env)
-    check(client.init() == false and #state.commands == 0)
-end
-env, state = fixture(false, true, "ws4_entry")
-env.SendToConsole = false
-client = load(CLIENT, env)
-check(#state.commands == 0 and client.init() == false)
-env.SendToConsole = function(command) state.commands[#state.commands + 1] = command end
-env.ActivateClient()
-check(#state.commands == 1, "activation may recover only before a command has been attempted")
-env, state = fixture(false, true, "ws4_entry")
-env.SendToConsole = function(command) state.commands[#state.commands + 1] = command; error("native dispatch failed") end
-client = load(CLIENT, env)
-env.Activate(); env.ActivateClient(); client.init(); load(CLIENT, env)
-check(#state.commands == 1, "even a failed native dispatch is attempted only once per VM")
-check(state.forbidden_calls == 0)
-
-print("WORKSHOP_ENTRY_PASS checks=" .. checks .. ": real four-account gate, lightweight server, exact client map/VM, fixed same-item command, once-per-VM, ordinary/offline untouched")
+print("WORKSHOP_ENTRY_PASS checks=" .. checks .. ": legacy admission retained; server handoff prefix; clients never launch solo maps")

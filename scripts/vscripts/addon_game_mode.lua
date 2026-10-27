@@ -11,7 +11,7 @@ end
 
 -- Keep the Workshop entry independent of gameplay and cloud initialization.
 if type(GetMapName) == "function" and GetMapName() == "ws4_entry" then
-    local entry = require("systems/workshop_entry")
+    local entry = require("systems/native_cloud_handoff")
     function Precache() end
     function Activate()
         local ok, reason = entry.activate()
