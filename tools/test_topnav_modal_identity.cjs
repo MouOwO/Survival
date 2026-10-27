@@ -18,9 +18,9 @@ test("the actual market modal highlights its navigation entry and blocks backgro
     f.click(f.entry("shop")); assert.deepEqual(f.actions, ["shop"]);
 });
 
-test("wallet and cash confirmation layers retain their market navigation owner", () => {
+test("wallet result and cash checkout layers retain their market navigation owner", () => {
     const f = makeFixture();
-    for (const id of ["commerce_exchange", "payment_shop"]) {
+    for (const id of ["commerce_result", "payment_shop"]) {
         f.stack.push(id); f.advance(1200);
         assert.equal(f.entry("shop").BHasClass("HandoffNavActive"), true, id);
         f.click(f.entry("shop")); assert.deepEqual(f.actions, []);

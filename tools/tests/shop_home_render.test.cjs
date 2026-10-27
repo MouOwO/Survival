@@ -203,30 +203,36 @@ assert.equal(cards(h).filter(card => card.__observedProduct.home_unavailable).le
 select(h, 'all'); assert.deepEqual(allRows(h).ids, expectedGroup('all', [ownedSku, delistedSku]));
 
 // The last real product in the full list can only open its existing checkout. An order still
-// requires the explicit confirmation button and must carry that exact SKU.
+// uses the explicit storefront exchange button and must carry that exact SKU.
 const buyer = makeHarness();
 buyer.walletSnapshot(products, {u_coin: 0, shop_points: Math.max(...products.map(item => item.price)) + 1, shop_gold: 0});
 select(buyer, 'home');
+buyer.walletSnapshot(products, {u_coin: 0, shop_points: Math.max(...products.map(item => item.price)) + 1, shop_gold: 0});
 const homeTarget = cards(buyer).find(card => !card.__observedProduct.home_unavailable);
 buyer.descendants(homeTarget, 'BLMarketBuy')[0].events.onactivate();
-assert.equal(purchaseRequests(buyer).length, 0, 'A real homepage product opens confirmation without ordering');
-let homeConfirmation = buyer.menus().find(menu => menu.panel.BHasClass('MenuV10Exchange'));
-assert(homeConfirmation && homeConfirmation.IsOpen()); homeConfirmation.Close();
+assert.equal(purchaseRequests(buyer).length, 1, 'The explicit homepage exchange submits that product once');
+const firstPurchase = purchaseRequests(buyer)[0];
+assert.equal(firstPurchase.payload.sku, homeTarget.__observedProduct.sku);
+assert(buyer.root.FindChildTraverse('CommerceResultDialog').visible);
+assert.equal(buyer.descendants(buyer.root, 'CommerceConfirmBuy').length, 0);
+buyer.emit('survival_commerce_result', {action: 'purchase', request_id: firstPurchase.payload.request_id,
+    ok: 1, terminal: 1, currency: 'shop_points', balance: 99999});
+buyer.cfg.SurvivalCommerceWallet.CloseResult();
 select(buyer, 'all');
 // Reopening the market legitimately refreshes ownership; finish that real
-// catalog request before exercising the confirmation's purchase action.
+// catalog request before exercising the next explicit exchange action.
 buyer.walletSnapshot(products, {u_coin: 0, shop_points: Math.max(...products.map(item => item.price)) + 1, shop_gold: 0});
 assert.equal(allRows(buyer).count, 114);
 const target = cards(buyer).at(-1), sku = target.__observedProduct.sku;
 assert.equal(sku, expectedGroups.all.at(-1), 'The final formal SKU is available beyond the old page boundary');
 assert(products.some(item => item.sku === sku));
 buyer.descendants(target, 'BLMarketBuy')[0].events.onactivate();
-assert.equal(purchaseRequests(buyer).length, 0);
-const confirmation = buyer.menus().find(menu => menu.panel.BHasClass('MenuV10Exchange'));
-assert(confirmation && confirmation.IsOpen());
-buyer.descendants(confirmation.actions, 'CommerceConfirmBuy')[0].events.onactivate();
-assert.equal(purchaseRequests(buyer).length, 1);
-assert.equal(purchaseRequests(buyer)[0].payload.sku, sku);
+assert.equal(purchaseRequests(buyer).length, 2);
+assert(buyer.root.FindChildTraverse('CommerceResultDialog').visible);
+assert.equal(purchaseRequests(buyer)[1].payload.sku, sku);
+assert.notEqual(purchaseRequests(buyer)[1].payload.request_id, firstPurchase.payload.request_id);
+for (const request of purchaseRequests(buyer))
+    assert.deepEqual(Object.keys(request.payload).sort(), ['action', 'request_id', 'sku'], 'Only server-owned SKU identity and idempotency enter the exchange request');
 assert.equal(buyer.paidCheckouts.length, 0);
 assert.equal(JSON.stringify(products), originalProducts);
 const report = {status: 'PASS', reviewedOrder: expectedIds, homeCount: 15, unavailableCount: 0,

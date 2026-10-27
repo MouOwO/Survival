@@ -22,8 +22,8 @@ test('distributed checkout sends no cash events and keeps G-coin and points wall
     view.SelectPurchaseType('u_coin');assert.deepEqual(Array.from(view.Inspect().visibleSkus),['g_coin_item']);
     const row=h.cardList()[0];assert.equal(h.descendants(row,'BLMarketPriceMain')[0].text,'15 G币');
     h.descendants(row,'BLMarketBuy')[0].events.onactivate();
-    const confirm=h.descendants(h.root,'CommerceConfirmBuy')[0];assert(confirm&&confirm.enabled);
-    confirm.events.onactivate();
+    assert(h.root.FindChildTraverse('CommerceResultDialog'));
+    assert.equal(h.descendants(h.root,'CommerceConfirmBuy').length,0);
     const request=h.requests.at(-1);assert.equal(request.name,'survival_commerce_request');
     assert.equal(request.payload.action,'purchase');assert.equal(request.payload.sku,'g_coin_item');
     assert(!('amount_fen' in request.payload)&&!('price' in request.payload));
@@ -58,7 +58,10 @@ test('missing and older payment APIs never redirect a wallet product to cash',()
         assert.deepEqual(Array.from(h.cfg.SurvivalCommerceView.Inspect().visibleSkus),['startup_coin']);
         const row=h.cardList()[0];assert.equal(h.descendants(row,'BLMarketPriceMain')[0].text,'12 G币');
         h.descendants(row,'BLMarketBuy')[0].events.onactivate();
-        assert.equal(h.descendants(h.root,'CommerceConfirmBuy').length,1);
+        assert(h.root.FindChildTraverse('CommerceResultDialog'));
+        assert.equal(h.descendants(h.root,'CommerceConfirmBuy').length,0);
+        const purchases=h.requests.filter(row=>row.payload.action==='purchase');
+        assert.equal(purchases.length,1);assert.equal(purchases[0].payload.sku,'startup_coin');
         assert.equal(h.paidCheckouts.length,0);
     }
 });

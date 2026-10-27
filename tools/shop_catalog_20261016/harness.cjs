@@ -91,13 +91,24 @@ function harness(options = {}) {
     load('commerce_remaining_5d5c1152eb.js');
     function emit(name, data) { for (const fn of subscriptions.get(name) || []) fn(JSON.parse(JSON.stringify(data))); }
     function walletSnapshot(products, balances = {u_coin:12,shop_points:500,shop_gold:9}) {
-        cfg.SurvivalCommerceWallet.Refresh();
-        const request = requests.findLast(r => r.name === 'survival_commerce_request' && r.payload.action === 'catalog');
-        assert(request, 'The existing catalog request must be used');
-        const base = {request_id: request.payload.request_id, action:'catalog',ok:1};
-        emit('survival_commerce_result', {...base,part:'begin',count:products.length,categories:[{id:'item',label:'道具与材料'}],balances});
-        products.forEach((product, i) => emit('survival_commerce_result', {...base,part:'product',index:i+1,product}));
-        emit('survival_commerce_result', {...base,part:'end'});
+        const started = cfg.SurvivalCommerceWallet.Refresh();
+        const latest = () => requests.findLast(r => r.name === 'survival_commerce_request');
+        function respond(request) {
+            assert(request && request.payload.action === 'catalog', 'The fixture only completes an actual catalog request');
+            const base = {request_id: request.payload.request_id, action:'catalog',ok:1};
+            emit('survival_commerce_result', {...base,part:'begin',count:products.length,categories:[{id:'item',label:'道具与材料'}],balances});
+            products.forEach((product, i) => emit('survival_commerce_result', {...base,part:'product',index:i+1,product}));
+            emit('survival_commerce_result', {...base,part:'end'});
+        }
+        const request = latest(); respond(request);
+        if (!started) {
+            // Opening an already loading shop invalidates that older read.
+            // Finish it, then answer the controller's queued authoritative read.
+            advanceTimers(1.1); advanceTimers(3);
+            const followup = latest();
+            assert.notEqual(followup.payload.request_id, request.payload.request_id, 'A stale read queues a fresh catalog request');
+            respond(followup);
+        }
     }
     const menus = () => cfg.SurvivalMenuV10.Entries();
     const store = () => cfg.SurvivalBlackLionMarket.GetWindow();

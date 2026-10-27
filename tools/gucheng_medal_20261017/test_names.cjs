@@ -183,10 +183,10 @@ test('Actual payment quote and saved receipt render canonical names without muta
     }
 });
 
-test('Actual wallet confirmation normalizes legacy display text and retains HTML escaping and authoritative data', () => {
+test('Actual wallet result normalizes legacy display text with plain labels and authoritative data', () => {
     const h = harness(); h.load('commerce_wallet.js');
     const product = freeze({...legacyProduct(1), sku: 'legacy_medal_points', currency: 'shop_points',
-        purchase_method: 'wallet', price: 6800, description: '僵尸岛V1勋章 & <b>VIP10勋章</b>\n英雄最终伤害+1%'});
+        purchase_method: 'wallet', price: 6800, title:'僵尸岛V1勋章 & <b>VIP10勋章</b>', description: '僵尸岛V1勋章 & <b>VIP10勋章</b>\n英雄最终伤害+1%'});
     const original = JSON.stringify(product);
     h.cfg.SurvivalCommerceWallet.Refresh();
     const request = h.requests.at(-1).body;
@@ -195,11 +195,12 @@ test('Actual wallet confirmation normalizes legacy display text and retains HTML
     h.emit('survival_commerce_result', {...base, part: 'product', index: 1, product});
     h.emit('survival_commerce_result', {...base, part: 'end'});
     assert(h.cfg.SurvivalCommerceWallet.Checkout(product.sku));
-    const copy = h.panels.find(row => row.BHasClass('CommerceConfirmCopy'));
-    assert(copy.text.includes('孤城V1勋章 &amp; &lt;b&gt;孤城V10勋章&lt;/b&gt;<br>'));
+    const copy = h.panels.find(row => row.BHasClass('CommerceResultCopy'));
+    assert(copy.text.includes('孤城V1勋章 & <b>孤城V10勋章</b>'));assert.notEqual(copy.html,true,'Server text is a plain label and cannot inject HTML');
     assert(copy.text.includes('售价：6800 商城积分'));
     assert(!copy.text.includes('僵尸岛'));
     assert.equal(h.cfg.SurvivalCommerceWallet.GetCatalog().products[0], product);
     assert.equal(JSON.stringify(product), original);
-    assert.equal(h.requests.filter(row => row.body.action === 'purchase').length, 0);
+    assert.equal(h.requests.filter(row => row.body.action === 'purchase').length, 1);
+    assert.deepEqual(Object.keys(h.requests.at(-1).body).sort(),['action','request_id','sku']);
 });

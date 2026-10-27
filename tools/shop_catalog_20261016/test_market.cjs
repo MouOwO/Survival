@@ -48,7 +48,7 @@ test('All five group counts and explicit video order follow the visible real cat
 test('VIP restriction states the actual level, disables the row action and never guesses a missing level',()=>{
  const h=setup([cash('vip7',{required_vip_level:7,enabled:false,disabled_reason:'vip_level_insufficient',product_type:'bundle'})]);choose(h,'vip');
  const row=h.cardList()[0],button=rowBuy(h,row);assert.equal(button.enabled,false);assert.equal(rowReason(h,row).text,'需要 VIP 7 才可购买');
- button.events.onactivate();row.events.onactivate();assert.equal(h.paidCheckouts.length,0);assert.equal(buyRequests(h).length,0,'Tooltip/disabled callback cannot create an order');
+ button.events.onactivate();row.__menuCell.iconPanel.events.onactivate();assert.equal(h.paidCheckouts.length,0);assert.equal(buyRequests(h).length,0,'Tooltip/disabled callback cannot create an order');
  const K=h.cfg.SurvivalBlackLionMarketModel;
  assert.equal(K.DisabledMessage(cash('unknown-vip',{product_type:'bundle',enabled:false,disabled_reason:'vip_level_required'})),'VIP 等级不足');
  assert.equal(K.DisabledMessage(cash('message',{disabled_message:'服务端资格说明'})),'服务端资格说明','Server-supplied explanations remain authoritative');
@@ -56,22 +56,23 @@ test('VIP restriction states the actual level, disables the row action and never
  assert.equal(rowBuy(h,h.cardList()[0]).enabled,true,'A later authenticated VIP change enables the same item');
 });
 
-test('Insufficient points keep exchange centered and show only a native error on click',()=>{
+test('Insufficient points keep exchange centered and show the owned failure result without purchase',()=>{
  for(const disabled_reason of ['commerce_balance_insufficient','insufficient_balance']){
   const h=setup();choose(h);h.walletSnapshot([{...walletItem('short'),enabled:false,disabled_reason}],{u_coin:0,shop_points:0,shop_gold:0});
   const row=h.cardList()[0],button=rowBuy(h,row);assert.equal(button.enabled,true);
   assert.equal(rowReason(h,row).visible,false);assert.equal(rowReason(h,row).text,'');
-  assert.equal(row.style.height,'64px');assert.equal(button.style.position,'932px 14px 0px','Exchange aligns with the ordinary purchase button');
+  assert.equal(row.style.height,'96px');assert.equal(button.style.verticalAlign,'center','Exchange stays centered within the original market row');
   button.events.onactivate();
   assert(!h.menus().some(m=>m.panel.BHasClass('MenuV10Exchange')&&m.IsOpen()),'No disabled confirmation opens');
-  assert.deepEqual(array(h.clientEvents),[{name:'dota_hud_error_message',payload:{reason:80,message:'您的积分不足'}}]);
-  assert(h.cfg.SurvivalCommerceView.IsOpen(),'The store remains open after the native error');
+  assert.equal(h.cfg.SurvivalCommerceWallet.Inspect().result,'failure');
+  assert(h.root.FindChildTraverse('CommerceResultStatus').text.includes('积分不足'));assert.equal(h.clientEvents.length,0);
+  assert(h.cfg.SurvivalCommerceView.IsOpen(),'The store remains open under the result');
   assert.equal(buyRequests(h).length,0);assert.equal(h.paidCheckouts.length,0);
  }
 });
 
 test('Changing only purchase_limit invalidates the list while numeric previews preserve a hovered card',()=>{
- const item=cash('limit',{owned:1,purchase_limit:0}),h=setup([item]);choose(h);const stable=h.cardList()[0];stable.events.onmouseover();
+ const item=cash('limit',{owned:1,purchase_limit:0}),h=setup([item]);choose(h);const stable=h.cardList()[0];stable.__menuCell.iconPanel.events.onmouseover();
  h.updatePaid({catalog_hash:'OFFLINE_ONLY',products:[{...item,stat_preview:[{value:999}]}],categories:[]});
  assert.equal(h.cardList()[0],stable,'Numeric preview changes do not destroy hovered rows');
  h.updatePaid({catalog_hash:'OFFLINE_ONLY',products:[{...item,purchase_limit:1}],categories:[]});
@@ -81,8 +82,8 @@ test('Changing only purchase_limit invalidates the list while numeric previews p
 
 test('Successful wallet purchase plus fresh catalog removes the unique product and updates all counts',()=>{
  const unique={...walletItem('one-off'),purchase_limit:1},h=setup();choose(h);h.walletSnapshot([unique]);const before=JSON.stringify(unique);
- const stale=rowBuy(h,h.cardList()[0]).events.onactivate;stale();assert.equal(buyRequests(h).length,0,'List action only opens confirmation');
- const confirm=h.menus().find(m=>m.panel.BHasClass('MenuV10Exchange'));h.descendants(confirm.actions,'CommerceConfirmBuy')[0].events.onactivate();
+ const stale=rowBuy(h,h.cardList()[0]).events.onactivate;stale();assert.equal(buyRequests(h).length,1,'The explicit row action submits directly');
+ assert(h.root.FindChildTraverse('CommerceResultDialog'));assert(!h.menus().some(m=>m.panel.BHasClass('MenuV10Exchange')));
  const purchase=buyRequests(h).at(-1);assert(purchase);assert.equal(purchase.payload.sku,unique.sku);
  h.emit('survival_commerce_result',{ok:true,terminal:true,action:'purchase',request_id:purchase.payload.request_id,currency:'shop_points',balance:490});
  h.walletSnapshot([{...unique,enabled:false,owned:1,disabled_reason:'already_owned'}]);

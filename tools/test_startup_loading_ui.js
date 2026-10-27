@@ -551,125 +551,36 @@ for (const phase of ["LoadingScreen", "GameSetup", "HeroSelection", "PregameStra
     assert.equal(ui.requests.at(-1).payload.session_id, "reloaded-session");
 }
 const manifest = fs.readFileSync("panorama/src/layout/custom_game/custom_ui_manifest.xml", "utf8");
-// Hiding our loading overlay is insufficient when the engine's GameSetup
-// container has no child UI. Mount the runtime loader, which loads Valve's
-// compiled layout without recompiling incomplete Workshop CSS source files.
+// Native assignment/countdown run on the server. The former manual loader
+// stays registered but must remain inert, hidden, and free of client commands.
 const nativeTeamSelection = [...manifest.matchAll(/<CustomUIElement\b[^>]*>/g)].filter(match =>
     /\blayoutfile="file:\/\/\{resources\}\/layout\/custom_game\/native_team_setup\.xml"/.test(match[0]));
-assert.equal(nativeTeamSelection.length, 1, "manifest must mount exactly one native team-selection loader");
-assert(/\btype="GameSetup"/.test(nativeTeamSelection[0][0]),
-    "official team selection must mount only during GameSetup, after native player resources exist");
-assert(!/\blayoutfile="file:\/\/\{resources\}\/layout\/custom_game\/team_select\.xml"/.test(manifest),
-    "manifest must not force source recompilation of Valve's shipped layout");
-const nativeWrapperXml = fs.readFileSync("panorama/src/layout/custom_game/native_team_setup.xml", "utf8");
-const nativeWrapperScript = fs.readFileSync("panorama/src/scripts/custom_game/native_team_setup.js", "utf8");
-const nativeWrapperIncludes = [...nativeWrapperXml.matchAll(/<include\b[^>]*src="([^"]+)"/g)].map(match => match[1]);
-assert.deepEqual(nativeWrapperIncludes, ["file://{resources}/scripts/custom_game/native_team_setup.js"],
-    "GameSetup loader must execute the runtime mounting script");
-
-// Execute the actual loader IIFE against a native-layout boundary stub. These
-// cases validate the loader's behavior only, never pretend to execute Valve's
-// scripts, team assignment, host privileges, countdown, or native rendering.
-function nativeTeamHarness(outcomes = ["success"]) {
-    const nodes = {}, calls = [], messages = [], forbiddenNativeCalls = [];
-    let cleanups = 0;
-    class Panel {
-        constructor(type, parent, id) {
-            this.type = type; this.parent = parent; this.id = id || "";
-            this.children = []; this.events = {}; this.visible = true; this.enabled = true; this.valid = true;
-            if (parent) parent.children.push(this);
-            if (id) nodes[id] = this;
-        }
-        IsValid() { return this.valid; }
-        SetPanelEvent(name, handler) { this.events[name] = handler; }
-        RemoveAndDeleteChildren() { cleanups++; this.children = []; }
-        FindChildTraverse(id) {
-            for (const child of this.children) {
-                if (child.id === id) return child;
-                const result = child.FindChildTraverse(id); if (result) return result;
-            }
-            return null;
-        }
-        BLoadLayout(...args) {
-            calls.push(args);
-            const outcome = outcomes[Math.min(calls.length - 1, outcomes.length - 1)];
-            if (outcome === "throw") throw new Error("fixture native resource failure");
-            if (outcome === "false") return false;
-            const container = outcome === "missing_container" ? this
-                : new Panel("Panel", this, "TeamSelectContainer");
-            if (outcome !== "missing_start") new Panel("Button", container, "LockAndStartButton");
-            return true;
-        }
-    }
-    const stack = [];
-    let root;
-    for (const match of nativeWrapperXml.replace(/<!--[\s\S]*?-->/g, "").matchAll(/<\/?(Panel|Label|Button)\b[^>]*>/g)) {
-        const tag = match[0];
-        if (tag.startsWith("</")) { assert(stack.length); stack.pop(); continue; }
-        const attrs = Object.fromEntries([...tag.matchAll(/([\w-]+)="([^"]*)"/g)].map(row => [row[1], row[2]]));
-        const panel = new Panel(match[1], stack.at(-1), attrs.id);
-        if (!root) root = panel;
-        if (attrs.visible !== undefined) panel.visible = attrs.visible !== "false";
-        if (attrs.text !== undefined) panel.text = attrs.text;
-        if (attrs.hittest !== undefined) panel.hittest = attrs.hittest !== "false";
-        if (attrs.hittestchildren !== undefined) panel.hittestchildren = attrs.hittestchildren !== "false";
-        if (!tag.endsWith("/>")) stack.push(panel);
-    }
-    assert(root && stack.length === 0, "native team loader XML balances");
-    function $(selector) { return nodes[selector.slice(1)]; }
-    $.GetContextPanel = () => root;
-    $.Msg = message => messages.push(message);
-    const forbidden = new Proxy({}, {get: (target, property) => {
-        forbiddenNativeCalls.push(String(property));
-        throw new Error("loader must leave native engine state and team controls to Valve");
-    }});
-    vm.runInNewContext(nativeWrapperScript, {$, Game: forbidden, GameRules: forbidden,
-        GameEvents: forbidden, GameUI: forbidden});
-    return {nodes, root, calls, messages, forbiddenNativeCalls, cleanups: () => cleanups,
-        retry: () => nodes.NativeTeamSetupRetry.events.onactivate()};
-}
+assert.equal(nativeTeamSelection.length,1);assert(/\btype="GameSetup"/.test(nativeTeamSelection[0][0]));
+const nativeWrapperXml=fs.readFileSync("panorama/src/layout/custom_game/native_team_setup.xml","utf8");
+const nativeWrapperScript=fs.readFileSync("panorama/src/scripts/custom_game/native_team_setup.js","utf8");
+assert(!/<Button\b/.test(nativeWrapperXml),'No manual start/retry or team selection buttons remain');
+assert(!/BLoadLayout|team_select\.xml/.test(nativeWrapperScript),'The old native layout is never mounted');
+assert(/<Panel\b[^>]*visible="false"[^>]*hittest="false"[^>]*hittestchildren="false"/.test(nativeWrapperXml),'The obsolete wrapper starts hidden before JS');
 {
-    const ui = nativeTeamHarness();
-    assert.deepEqual(ui.calls, [["file://{resources}/layout/custom_game/team_select.xml", false, false]],
-        "loader mounts the shipped layout once with the standard runtime API");
-    assert.equal(ui.nodes.NativeTeamSetupHost.visible, true);
-    assert.equal(ui.nodes.NativeTeamSetupFallback.visible, false);
-    assert.equal(ui.nodes.NativeTeamSetupRetry.enabled, false);
-    assert.equal(ui.root.hittest, false);
-    assert.equal(ui.root.hittestchildren, true);
-    assert(ui.messages.some(message => message.includes("event=mounted")));
-    assert.deepEqual(ui.forbiddenNativeCalls, []);
-    ui.nodes.NativeTeamSetupHost.valid = false; ui.retry();
-    assert.equal(ui.calls.length, 1, "deleted GameSetup context does not reload resources");
+    const calls=[],foreign={visible:true,hittest:true,hittestchildren:true,style:{}},scope={visible:true,hittest:true,hittestchildren:true,style:{},IsValid:()=>true};
+    const host={...scope,style:{},GetParent:()=>scope},fallback={...scope,style:{}},nodes={NativeTeamSetupHost:host,NativeTeamSetupFallback:fallback};
+    const $=selector=>nodes[selector.slice(1)];
+    const forbidden=new Proxy({}, {get(_target,key){calls.push(key);throw Error('client must not drive native setup');}});
+    vm.runInNewContext(nativeWrapperScript,{$,Game:forbidden,GameRules:forbidden,GameEvents:forbidden,GameUI:forbidden});
+    for(const panel of [scope,host,fallback]){assert.equal(panel.visible,false);assert.equal(panel.hittest,false);assert.equal(panel.hittestchildren,false);assert.equal(panel.style.visibility,'collapse');}
+    assert.equal(foreign.visible,true,'No engine sibling is hidden');assert.deepEqual(calls,[]);
+    host.IsValid=()=>false;vm.runInNewContext(nativeWrapperScript,{$,Game:forbidden,GameRules:forbidden,GameEvents:forbidden,GameUI:forbidden});
 }
-for (const failure of ["false", "throw", "missing_container", "missing_start"]) {
-    const ui = nativeTeamHarness([failure, "success"]);
-    assert.equal(ui.nodes.NativeTeamSetupHost.visible, false, failure + ": failed/partial native content hidden");
-    assert.equal(ui.nodes.NativeTeamSetupFallback.visible, true, failure + ": failure is visible instead of a black screen");
-    assert(ui.nodes.NativeTeamSetupError.text.includes("重试"));
-    assert.equal(ui.nodes.NativeTeamSetupRetry.enabled, true, failure + ": manual retry is available");
-    assert.equal(ui.calls.length, 1, failure + ": no automatic start or retry loop");
-    ui.retry();
-    assert.equal(ui.calls.length, 2, failure + ": manual retry re-enters actual loader");
-    assert.equal(ui.cleanups(), 2, failure + ": partial layout cleared before retry");
-    assert.equal(ui.nodes.NativeTeamSetupHost.children.length, 1, failure + ": one native container after recovery");
-    assert.equal(ui.nodes.NativeTeamSetupHost.visible, true);
-    assert.equal(ui.nodes.NativeTeamSetupFallback.visible, false, failure + ": fallback hides after successful recovery");
-    assert.equal(ui.nodes.NativeTeamSetupRetry.enabled, false);
-    assert(ui.messages.some(message => message.includes("event=failed")));
-    assert(ui.messages.some(message => message.includes("event=mounted")));
-    assert.deepEqual(ui.forbiddenNativeCalls, [], failure + ": no team start command or engine state access");
-}
-console.log("NATIVE_TEAM_SETUP_LOADER_PASS: runtime mount, false/exception/partial-layout failures, visible manual retry, recovery and no custom team-start calls; Valve scripts not executed by this fixture");
+console.log("NATIVE_TEAM_SETUP_AUTOMATIC_UI_PASS: obsolete authored subtree hidden, no manual buttons, runtime mount or client setup calls; server assignment is validated separately");
 assert(manifest.includes('type="GameSetup" layoutfile="file://{resources}/layout/custom_game/startup_team_setup_loading.xml"'),
-    "GameSetup must declare its own transparent-to-native loading context");
+    "GameSetup must declare its own opaque automatic-team loading context");
 assert(!manifest.includes('type="GameSetup" layoutfile="file://{resources}/layout/custom_game/startup_loading.xml"'),
     "later phases cannot inherit the native-team-setup visibility policy");
 for (const type of ["HeroSelection", "PregameStrategy", "Hud"]) {
     assert(manifest.includes('type="' + type + '" layoutfile="file://{resources}/layout/custom_game/startup_loading.xml"'));
 }
-// Only the actual GameSetup layout may yield before admission. Merely finding
-// engine-owned team-selection panels cannot establish this phase's identity.
+// The dedicated setup layout covers even its no-snapshot first frame.
+// Engine siblings never establish admission or drive client team commands.
 assert(teamSetupXml.includes("StartupNativeTeamSetupContext"));
 assert(!xml.includes("StartupNativeTeamSetupContext"));
 assert(!loadingXml.includes("StartupNativeTeamSetupContext"));
@@ -688,8 +599,8 @@ for (const [name, source] of [["startup_loading", xml]]) {
 }
 {
     const teamTag = teamSetupXml.match(/<Panel\b[^>]*>/)[0];
-    assert(/\bvisible="false"/.test(teamTag) && /\bStartupLoadingHidden\b/.test(teamTag),
-        "GameSetup begins hidden so Valve's host/team controls remain available");
+    assert(/\bvisible="true"/.test(teamTag) && !/\bStartupLoadingHidden\b/.test(teamTag),
+        "GameSetup begins covered while the server prepares teams");
     const css = fs.readFileSync("panorama/src/styles/custom_game/startup_loading.css", "utf8");
     const surfaceRule = css.match(/\.StartupLoadingSurface\s*\{([^}]+)\}/)[1];
     assert(/opacity:\s*1\s*;/.test(surfaceRule) && /visibility:\s*visible\s*;/.test(surfaceRule),
@@ -722,21 +633,24 @@ for (const [name, source] of [["startup_loading", xml]]) {
         "number must not shrink or clip with fill width");
     assertShown(ui, "opaque first-frame XML stays covered for real pending work");
 }
-// Engine team assignment and its host Start button remain visible and receive
-// input. Loading keeps its real image handshake without recreating a lobby.
+// Opaque loading covers automatic assignment without altering engine siblings.
+// The client only acknowledges the real image; it cannot start or admit players.
 for (const engineWrapper of [false, true]) {
     for (const pending of [{phase: "team_setup"}, {phase: "loading", native_team_setup: true}]) {
         const ui = harness({teamSetup: true, engineWrapper, nativeSetup: true,
             state: loading({...pending, players: [{player_id: 0, status: "team_setup"}]})});
-        assertHidden(ui, "official team selection owns the screen");
-        assert.equal(ui.nodes.StartupLoadingSurface.hittest, false);
-        assert.equal(ui.nodes.StartupLoadingSurface.hittestchildren, false);
-        assert.equal(ui.nodes.StartupLoadingBackground.style.opacity, "0");
+        assertShown(ui, "own loading covers automatic native team setup");
+        assert.equal(ui.nodes.StartupLoadingSurface.hittest, true);
+        assert.equal(ui.nodes.StartupLoadingSurface.hittestchildren, true);
+        assert.equal(ui.nodes.StartupLoadingStage.text,"正在准备队伍…");
+        assert.equal(ui.nodes.StartupLoadingProgressFill.style.width,"0.0%");
+        assert(ui.nodes.StartupLoadingRetry.BHasClass("StartupLoadingHidden"));
         assert(ui.nodes.StartupLoadingBackground.image.includes("dawnward_citadel_background"),
             "official setup still preloads the actual loading image");
         ui.imageLoaded(); ui.advance(90);
-        assertHidden(ui, "official setup never auto-starts a custom lobby");
-        noVisibleWrite(ui, 0, "official setup cannot flash custom loading surfaces");
+        assertShown(ui, "slow players stay covered without fabricating admission");
+        const requestsBeforeRetry=ui.requests.length;ui.retry();assert.equal(ui.requests.length,requestsBeforeRetry,"No manual setup retry is sent");
+        assert(ui.nodes.StartupLoadingErrorBox.BHasClass("StartupLoadingHidden"),"A slow setup alone is not a loading failure");
         assert.equal(ui.nodes.TeamSelectContainer.visible, true);
         assert.equal(ui.nodes.TeamsList.visible, true);
         assert.equal(ui.nodes.GameAndPlayersRoot.visible, false);
@@ -763,8 +677,9 @@ for (const phase of ["GameSetup", "HeroSelection", "PregameStrategy", "Hud"]) {
     const ui = harness({engineWrapper: true, nativeSetup: true, teamSetup});
     ui.imageLoaded(); ui.advance(25);
     if (teamSetup) {
-        assertHidden(ui, phase + ": dedicated context leaves official setup visible without a snapshot");
-        noVisibleWrite(ui, 0, phase + ": official host controls never receive a loading flash");
+        assertShown(ui, phase + ": setup stays covered without a snapshot");
+        assert.equal(ui.nodes.StartupLoadingStage.text,"正在准备队伍…");
+        assert(ui.nodes.StartupLoadingRetry.BHasClass("StartupLoadingHidden"));
     } else {
         assertShown(ui, phase + ": missing snapshot cannot reveal the game after team setup");
         assert.equal(ui.authoredFirstFrame.rootVisible, true);
@@ -786,7 +701,7 @@ for (const phase of ["HeroSelection", "PregameStrategy", "Hud"]) {
         const before = harness({teamSetup: true, nativeSetup: true, engineWrapper: true,
             sharedConfig: config, state: loading({phase: "team_setup"})});
         before.imageLoaded();
-        assertHidden(before, phase + ": native team selection owns its own context");
+        assertShown(before, phase + ": own loading covers team preparation before phase handoff");
         assert(before.requests.some(request => request.name === "survival_loading_client_ready"));
         assert.equal(config.SurvivalStartupCompletion, undefined, "a team-phase image handshake is never admission");
         const previousRequests = before.requests.length;

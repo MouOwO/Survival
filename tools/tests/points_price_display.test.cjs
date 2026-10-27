@@ -21,11 +21,12 @@ function fixture(items) {
 function card(h, sku) { return h.cardList().find(row => row.__menuCell && row.__menuCell.namePanel.text === sku); }
 const label = (h, row, cls) => h.descendants(row, cls)[0];
 const purchases = h => h.requests.filter(row => row.payload.action === 'purchase');
-function confirmation(h, sku) {
+function checkout(h, sku) {
     label(h, card(h, sku), 'BLMarketBuy').events.onactivate();
-    const menu = h.menus().find(row => row.panel.BHasClass('MenuV10Exchange'));
-    assert(menu && menu.IsOpen());
-    return {menu, buy: label(h, menu.actions, 'CommerceConfirmBuy'), copy: label(h, menu.content, 'CommerceConfirmCopy'), status: label(h, menu.content, 'CommerceConfirmStatus')};
+    const panel = h.root.FindChildTraverse('CommerceResultDialog');
+    assert(panel && panel.visible);
+    assert.equal(h.descendants(h.root, 'CommerceConfirmBuy').length, 0);
+    return {panel, retry: h.root.FindChildTraverse('CommerceResultRetry'), status: h.root.FindChildTraverse('CommerceResultStatus')};
 }
 
 test('Fixed-quality points prices display authoritative amounts without historical or inferred discounts', () => {
@@ -61,24 +62,21 @@ test('Unpublished quality prices never replace an older server quote, and policy
     assert.equal(purchases(h).length, 0, 'Catalog reads never buy anything');
 });
 
-test('A terminal old-price rejection refreshes 94 to 200 and requires a new explicit confirmation', () => {
+test('A terminal old-price rejection refreshes 94 to 200 and requires another explicit storefront exchange', () => {
     const old = points('changed_equipment', 94), h = fixture([old]);
-    const view = confirmation(h, old.sku);
-    assert.match(view.copy.text, /售价：94 商城积分/);
-    view.buy.events.onactivate(); const first = purchases(h).at(-1);
+    const view = checkout(h, old.sku);
+    const first = purchases(h).at(-1); assert(first);
     h.emit('survival_commerce_result', {action: 'purchase', request_id: first.payload.request_id, ok: 0, terminal: 1, error: 'commerce_price_changed'});
     assert.equal(h.cfg.SurvivalCommercePending, null);
     assert.equal(h.requests.at(-1).payload.action, 'catalog', 'Only the catalog is requested after a changed quote');
-    assert.equal(view.buy.enabled, false);
-    assert.match(view.status.text, /商品价格已更新，请重新确认/);
-    view.buy.events.onactivate(); assert.equal(purchases(h).length, 1, 'A stale native callback cannot buy the old quote');
+    assert.equal(view.retry.enabled, false); assert.equal(view.retry.visible, false);
+    assert.match(view.status.text, /商品价格已更新/);
+    view.retry.events.onactivate(); assert.equal(purchases(h).length, 1, 'A stale retry callback cannot buy after a terminal result');
     h.walletSnapshot([{...old, price: 200, price_policy: policy}], {shop_points: 1000, u_coin: 120, shop_gold: 0});
-    assert.match(view.copy.text, /售价：200 商城积分/);
-    assert.match(view.copy.text, /商城余额：1000 商城积分/);
     assert.equal(label(h, card(h, old.sku), 'BLMarketPriceMain').text, '200 积分');
-    assert.equal(view.buy.enabled, true); assert.match(view.status.text, /请重新确认/);
-    assert.equal(purchases(h).length, 1, 'Refreshing and reopening never retry the purchase');
-    view.buy.events.onactivate(); const second = purchases(h).at(-1);
+    assert.equal(view.retry.enabled, false); assert.equal(view.retry.visible, false);
+    assert.equal(purchases(h).length, 1, 'Refreshing never retries the purchase');
+    h.cfg.SurvivalCommerceWallet.CloseResult(); checkout(h, old.sku); const second = purchases(h).at(-1);
     assert.equal(purchases(h).length, 2); assert.notEqual(second.payload.request_id, first.payload.request_id);
     assert.equal(second.payload.sku, old.sku);
     for (const field of ['price', 'quality', 'price_policy', 'original_price', 'amount_fen']) assert(!Object.hasOwn(second.payload, field));
@@ -87,20 +85,22 @@ test('A terminal old-price rejection refreshes 94 to 200 and requires a new expl
 });
 
 test('Changed-price goods missing from the refreshed catalog stay blocked without an automatic retry', () => {
-    const item = points('removed_equipment', 94), h = fixture([item]), view = confirmation(h, item.sku);
-    view.buy.events.onactivate(); const request = purchases(h).at(-1);
+    const item = points('removed_equipment', 94), h = fixture([item]), view = checkout(h, item.sku);
+    const request = purchases(h).at(-1);
     h.emit('survival_commerce_result', {action: 'purchase', request_id: request.payload.request_id, ok: 0, terminal: true, error: 'commerce_price_changed'});
     h.walletSnapshot([]);
-    assert.equal(view.buy.enabled, false); view.buy.events.onactivate();
+    assert.equal(view.retry.enabled, false); view.retry.events.onactivate();
+    assert.equal(h.cfg.SurvivalCommerceWallet.Checkout(item.sku), false);
     assert.equal(purchases(h).length, 1);
 });
 
 test('Nonterminal purchase failures retain the original idempotency token', () => {
-    const item = points('uncertain_equipment', 200, {price_policy: policy}), h = fixture([item]), view = confirmation(h, item.sku);
-    view.buy.events.onactivate(); const first = purchases(h).at(-1);
+    const item = points('uncertain_equipment', 200, {price_policy: policy}), h = fixture([item]), view = checkout(h, item.sku);
+    const first = purchases(h).at(-1);
     h.emit('survival_commerce_result', {action: 'purchase', request_id: first.payload.request_id, ok: 0, terminal: 0, error: 'backend_unavailable'});
     assert.equal(h.cfg.SurvivalCommercePending.id, first.payload.request_id);
-    view.buy.events.onactivate(); assert.equal(purchases(h).at(-1).payload.request_id, first.payload.request_id);
+    assert.equal(view.retry.visible, true); assert.equal(view.retry.enabled, true);
+    view.retry.events.onactivate(); assert.equal(purchases(h).at(-1).payload.request_id, first.payload.request_id);
 });
 
 test('P147 and P151 share the confirmed UR display grade while their artwork and aliases remain intact', () => {

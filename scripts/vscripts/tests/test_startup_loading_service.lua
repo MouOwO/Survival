@@ -765,6 +765,53 @@ late.tick()
 assert(late_dispatch == 1 and #requests == 1)
 print('STARTUP_NATIVE_TEAM_SETUP_PASS: Valve lifecycle, no custom party event, all-player auth/assets/UI/profile gates, disconnect/reconnect, host mode, once-only startup')
 
+-- Automatic co-op setup must preserve the actual all-player loading barrier.
+local load_dispatches=0
+local automatic=fixture(2,{native_team_setup=true,on_load_start=function()load_dispatches=load_dispatches+1 end})
+local automatic_think,automatic_enabled,automatic_remaining,automatic_countdowns=nil,nil,nil,0
+local host={SetContextThink=function(_,name,callback)
+    assert(name=='SurvivalNativeSetupAutoStart');automatic_think=callback
+end}
+GameRules.GetGameModeEntity=function()return host end
+GameRules.GetCustomGamePlayerCount=function()return 2 end
+GameRules.EnableCustomGameSetupAutoLaunch=function(_,value)automatic_enabled=value end
+GameRules.SetCustomGameSetupAutoLaunchDelay=function(_,value)assert(value==1)end
+GameRules.SetCustomGameSetupRemainingTime=function(_,value)
+    assert(value==1 or value==-1);automatic_remaining=value
+    if value==1 then automatic_countdowns=automatic_countdowns+1 end
+end
+GameRules.FinishCustomGameSetup=function()error('automatic assignment must not bypass native or loading gates')end
+modules.multiplayer.assign_to_survival_team=function(id)humans[id].team=2;return true end
+modules.multiplayer.mark_connected=function()end
+local second_entity=humans[1].player
+humans[1].player=nil;humans[1].state=0
+local previous_is_server=IsServer
+IsServer=function()return true end
+package.loaded['systems/native_setup_auto_start']=nil
+local native_auto=require('systems/native_setup_auto_start')
+assert(native_auto.init())
+time=1000;automatic_think();automatic.tick()
+assert(not automatic_enabled and automatic_remaining==-1 and automatic_countdowns==0 and #requests==0 and load_dispatches==0,
+    'a slow second lobby player cannot be dropped or start HTTP/assets through player0')
+humans[1].player=second_entity;humans[1].state=2
+automatic_think();time=time+2;automatic_think();automatic.tick()
+assert(automatic_enabled and automatic_remaining==1 and automatic_countdowns==1 and #requests==0 and load_dispatches==0,
+    'native auto-launch still waits for the actual native state transition')
+for index=1,10 do time=time+0.1;automatic_think() end
+assert(automatic_countdowns==1,'the native remaining countdown must be armed once instead of reset each tick')
+engine_state=3;assert(automatic_think()==nil);automatic.tick()
+assert(#requests==2 and load_dispatches==1 and not automatic.is_ready())
+success(requests[1]);assets_done();ui(automatic,0);ui(automatic,1);automatic.tick()
+assert(not automatic.is_ready() and not automatic.is_gameplay_ready(),
+    'first-player authorization cannot release the second player or gameplay')
+success(requests[2]);automatic.tick();assert(automatic.is_ready() and not automatic.is_gameplay_ready())
+select_mode(automatic,'standard');assert(#profile_requests==2)
+profile_success(profile_requests[1]);automatic.tick();assert(not automatic.is_gameplay_ready())
+profile_success(profile_requests[2]);automatic.tick();assert(automatic.is_gameplay_ready())
+assert(load_dispatches==1)
+IsServer=previous_is_server
+print('STARTUP_AUTOMATIC_COOP_GATE_PASS: slow second player, automatic native transition, two independent auth/profile receipts, assets/UI gates and once-only release')
+
 -- Exercise the actual addon lifecycle callback against the real loading
 -- service. Native GAME_IN_PROGRESS must not emit gameplay start early.
 local addon_file = assert(io.open('scripts/vscripts/addon_game_mode.lua', 'rb'))
@@ -827,20 +874,41 @@ for element in manifest:gmatch('<CustomUIElement%s+.-/>') do
     end
 end
 assert(native_team_views == 1,
-    'an infinite native setup phase needs exactly one registered official team-select wrapper')
+    'retain exactly one inactive legacy setup context so hot-reload remnants can be retired')
 assert(handshake_views == 1,
-    'keep the separate loading handshake context alongside the visible official setup')
+    'automatic native setup needs exactly one owned loading/handshake context')
 local native_layout_file = assert(io.open('panorama/src/layout/custom_game/native_team_setup.xml', 'rb'))
 local native_layout = native_layout_file:read('*a')
 native_layout_file:close()
 assert(native_layout:find('file://{resources}/scripts/custom_game/native_team_setup.js', 1, true),
-    'the registered native setup wrapper must include its real loader script')
+    'the retired setup context must still run its scoped cleanup script')
 assert(not native_layout:find('layout/custom_game/team_select.xml', 1, true),
-    'keep native XML out of static compile dependencies: Valve only ships its compiled CSS tree')
+    'the retired setup context must not statically mount the manual Valve team picker')
+assert(native_layout:find('visible="false" hittest="false" hittestchildren="false"', 1, true)
+    and not native_layout:find('<Button', 1, true),
+    'the obsolete authored subtree is hidden and cannot accept manual start/team input')
 local native_script_file = assert(io.open('panorama/src/scripts/custom_game/native_team_setup.js', 'rb'))
 local native_script = native_script_file:read('*a')
 native_script_file:close()
-assert(native_script:find('file://{resources}/layout/custom_game/team_select.xml', 1, true)
-    and native_script:find('BLoadLayout', 1, true),
-    'the real setup loader must mount Valve team_select.xml at runtime')
-print('STARTUP_NATIVE_SETUP_MANIFEST_PASS: official host start view and loading handshake are both mounted')
+assert(not native_script:find('layout/custom_game/team_select.xml', 1, true)
+    and not native_script:find('BLoadLayout', 1, true)
+    and not native_script:find('Game.', 1, true)
+    and native_script:find('panel.visible = false', 1, true)
+    and native_script:find('panel.hittest = false', 1, true)
+    and native_script:find('panel.hittestchildren = false', 1, true),
+    'retire only this layout subtree; the client cannot mount manual controls or issue native game commands')
+local team_loading_file = assert(io.open('panorama/src/layout/custom_game/startup_team_setup_loading.xml', 'rb'))
+local team_loading = team_loading_file:read('*a')
+team_loading_file:close()
+assert(team_loading:find('StartupNativeTeamSetupContext" visible="true" hittest="true" hittestchildren="true"', 1, true)
+    and team_loading:find('id="StartupLoadingSurface"', 1, true)
+    and team_loading:find('text="正在准备队伍…"', 1, true),
+    'the owned loading artwork covers native setup from its initial frame')
+local startup_script_file = assert(io.open('panorama/src/scripts/custom_game/startup_loading.js', 'rb'))
+local startup_script = startup_script_file:read('*a')
+startup_script_file:close()
+assert(startup_script:find('function preparingTeams()', 1, true)
+    and startup_script:find('state.phase === "team_setup"', 1, true)
+    and startup_script:find('retryControl.button.enabled = !nativeTeamSetup', 1, true),
+    'team setup remains covered without a manual retry/start action; later authentication gates still own release')
+print('STARTUP_NATIVE_SETUP_MANIFEST_PASS: scoped legacy hide and owned automatic-setup loading are both registered')

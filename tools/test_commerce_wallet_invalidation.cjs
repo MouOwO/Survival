@@ -19,8 +19,8 @@ respond({ok:0,terminal:0,error:'commerce_busy'});const retryBefore=requests.leng
 respond({ok:0,terminal:0,error:'commerce_busy'});advance(4);respond({ok:0,terminal:0,error:'commerce_busy'});
 const bounded=requests.length;advance(30);assert.equal(requests.length,bounded,'failure retries are bounded');
 assert(cfg.SurvivalCommerceWallet.Refresh());catalogResult(10800);assert.equal(snapshot.balances.shop_points,10800,'manual refresh recovers after bounded retries');
-product.enabled=0;product.disabled_reason='shop_gold_not_open';product.currency='shop_gold';cfg.SurvivalCommerceWallet.Refresh();catalogResult(10800);assert(cfg.SurvivalCommerceWallet.Checkout(product.sku));
-const status=panels.find(p=>p.classes.has('CommerceConfirmStatus')&&!p.deleted);assert(status.text.includes('商城金币暂未开放'),'closed currency gets explicit Chinese message');
+product.enabled=0;product.disabled_reason='shop_gold_not_open';product.currency='shop_gold';cfg.SurvivalCommerceWallet.Refresh();catalogResult(10800);assert.equal(cfg.SurvivalCommerceWallet.Checkout(product.sku),false);
+const status=panels.find(p=>p.classes.has('CommerceResultStatus')&&!p.deleted);assert(status.text.includes('商城金币暂未开放'),'closed currency gets explicit Chinese message');
 cfg.SurvivalCommerceWallet.Invalidate('dispose_pending');const stopped=requests.length;cfg.SurvivalCommerceWallet.Dispose();advance(60);assert.equal(requests.length,stopped,'dispose cancels dirty maintenance');
 console.log('COMMERCE_WALLET_INVALIDATION_PASS: busy API compatibility, coalescing, stale rejection, retry bounds, manual recovery, gold gate and dispose');
 `;

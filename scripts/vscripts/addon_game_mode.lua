@@ -40,8 +40,9 @@ local function configure_survival_launch_rules()
     -- During module loading the GameModeEntity can still be unavailable; an
     -- early return before these calls would leave the default All Pick phase
     -- active whenever a later gameplay require is slow or fails.
-    -- Keep Valve's team selection open until its host Start button finishes
-    -- the native countdown. The addon loading barrier gates gameplay after it.
+    -- Hold native setup until the server assigns every connected co-op human.
+    -- Its auto-launch service starts Valve's countdown; the loading barrier
+    -- still gates authentication, assets and gameplay after that transition.
     GameRules:SetCustomGameSetupTimeout(-1)
     GameRules:SetHeroSelectionTime(0)
     GameRules:SetShowcaseTime(0)
@@ -1155,8 +1156,8 @@ function M.activate()
     ListenToGameEvent("npc_spawned", on_npc_spawned, nil)
     ListenToGameEvent("entity_killed", on_entity_killed, nil)
     ListenToGameEvent("dota_item_picked_up", on_item_picked_up, nil)
-    -- Valve's team-selection controls own the native setup/countdown. Once
-    -- the host starts, authentication, assets and mode profiles must still all
+    -- Valve owns the native setup/countdown, with automatic co-op assignment.
+    -- After it starts, authentication, assets and mode profiles must still all
     -- complete before heroes/builders or GAME_STARTED are released.
     multiplayer_player_service.assign_connected_players("before_finish_setup")
     require("systems/startup_loading_service").init({
@@ -1172,6 +1173,7 @@ function M.activate()
             print("[MULTIPLAYER_SESSION] admission_finished authentication_and_assets_ready=true")
         end,
     })
+    require("systems/native_setup_auto_start").init()
     logger.info(
         "Addon",
         "initialized V1.6 logical weapon growth core"

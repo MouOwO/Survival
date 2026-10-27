@@ -1,0 +1,247 @@
+{
+  "schema": 1,
+  "status": "PUBLISHED_DOWNLOADED_NATIVE_AND_HELPER_HOST_ACCEPTANCE_VERIFIED",
+  "release_revision": "WS4-REFRESH-NATIVE-02",
+  "release_sequence": 2026102705,
+  "workshop_id": "3824360109",
+  "runtime_content_sha256": "8a01a5b66603804c683b879043c220e4f9496d7cca75f304ac5d9da210794cf6",
+  "runtime_files": 6655,
+  "uploaded": true,
+  "download_verified": true,
+  "steam_manifest": "3674261806658465753",
+  "download_manifest": "3674261806658465753",
+  "vpk_sha256": "31a7a2a2bde5e82510f5f353cff830aea4815b24ccbb7a3450ff371eae2329a0",
+  "package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 274275,
+      "sha256": "31a7a2a2bde5e82510f5f353cff830aea4815b24ccbb7a3450ff371eae2329a0"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1073604924,
+      "sha256": "4bc9faf1688e0ae3fb7cfd51f4272ac44d51becd67114584837d9b40ca1fc27c"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1068730788,
+      "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379183,
+      "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 552202968,
+      "sha256": "b0b35246011e92994bf738556c59f3f03169eaacec8b1f6cf3c9d3565d037084"
+    }
+  ],
+  "ready_for_public_release": false,
+  "session_only": true,
+  "cloud_archive_enabled": false,
+  "real_money_payments": false,
+  "connection_helper": false,
+  "online_cheats_allowed": false,
+  "max_players": 4,
+  "base_release": {
+    "revision": "WS4-SHOP-02",
+    "sequence": 2026102604,
+    "content_sha256": "b38b10b76aaa4674c8a2d0ffc436922723a793f4b71665916956b4323f40b744",
+    "runtime_files": 6637,
+    "record": "publishing/workshop/native_shop_qr_20261026.json"
+  },
+  "helper_release": {
+    "revision": "WS4-REFRESH-HELPER-04",
+    "release_sequence": 2026102706,
+    "runtime_content_sha256": "c7264a14a09a8bc9961578213b85c4e7c1b829e16eacc045e4fe4672f71a7872",
+    "runtime_files": 6655,
+    "cloud_archive_enabled": true,
+    "session_only": false,
+    "cash_code_enabled": true,
+    "connection_helper": true,
+    "online_cheats_allowed": false,
+    "max_players": 4,
+    "signed_thin_overlay_built": true,
+    "alias_installation": "FULL_6655_FILE_VERIFICATION_PASS",
+    "native_acceptance": "HELPER04_REAL_AUTH_CLOUD_PROFILE_AND_POINTS_FAILURE_NAVIGATION_PASS",
+    "real_order_created": false,
+    "payment_delivery_acceptance": "NOT_REPEATED_THIS_REVISION",
+    "workshop_upload_intended": false,
+    "note": "Earlier helper payment acceptance does not prove this new revision's installed runtime or checkout."
+  },
+  "change_scope": {
+    "ui_compilation_records": 12,
+    "wallet_exchange": "Direct authoritative request, pending-click guard and owned compact result panel; no legacy purple exchange window.",
+    "wallet_recovery": "Unknown result retries retain the original request identity; late replies do not reopen a closed result; changed prices require a new explicit purchase.",
+    "cash_checkout": "Retain the owned QR checkout and per-player authenticated capability gates; native session-only release remains cash-disabled.",
+    "automatic_native_setup": "Server assigns the real connected roster, waits for one stable second, then changes the native countdown once at the state edge; a changed roster cancels it.",
+    "native_setup_ui": "Retire the manual team-select authored subtree and cover setup with the owned loading artwork and preparing-team caption.",
+    "admission_gates": "Keep every player's independent authentication, profile, asset and UI readiness gates; native countdown does not release gameplay by itself.",
+    "environment": "Restore portal positioning/simulation/FoW/replay behavior and include all fifteen rich-portal native particle resources.",
+    "main_patch": "One native_setup_auto_start.init() call inserted into the authenticated base MAIN.",
+    "native_setup_service_sha256": "f47fb858b108d88460273112f61559b55784826f882b4ad248cd4399018a1c22",
+    "main_sha256": "15c273c95e778bd1dd803583846458f472de34daece1baed41be11d31bce0e40",
+    "environment_service_sha256": "2c242f2348e3394910bc4e7a6ad56ca694b6fbbe3cbd012b613fcda00e1361e9",
+    "commerce_release_policy_sha256": "6da29c9e100c9bb7c591d7a44b7a333dacad2a7895b98fdf4d1c1415e8afe1c2",
+    "added_runtime_files": 19,
+    "removed_runtime_files": [
+      "panorama/styles/custom_game/commerce_wallet.vcss_c"
+    ],
+    "native_thin_runtime_files": 39,
+    "helper_thin_runtime_files": 41,
+    "protected_modules_preserved": 180,
+    "protected_modules_rebuilt": 0,
+    "four_account_roster_preserved": true,
+    "production_profile_preserved": true,
+    "frozen_profile_http_provider_preserved": true,
+    "all_other_base_files_preserved": true,
+    "unpublished_worktree_gameplay_included": false,
+    "human_wave_architecture_backported": false,
+    "private_key_or_service_credentials_packaged": false
+  },
+  "evidence": {
+    "compile": {
+      "path": "output/arcade_cleanup_20261027/compile_v02.json",
+      "sha256": "bf0f525a44cc271e42b9660e66515fbe7f73617f936cf1ec15d0d4ed33978774",
+      "records": 12,
+      "original_102_bytes_preserved": true
+    },
+    "native_overlay_build": {
+      "path": "output/arcade_cleanup_20261027/native_overlay_build_v02.json",
+      "sha256": "6c468cc8df7706b8a802de29c2304b619caf880c755e117830ef3463041d8744"
+    },
+    "helper_overlay_build": {
+      "path": "output/arcade_cleanup_20261027/helper_overlay_build_v04.json",
+      "sha256": "3ff7e8051f31e70172979826c8e86b037f8587af8ad62ca6f9be94b4591372cf"
+    },
+    "remaining_time_api_probe": {
+      "path": "output/arcade_cleanup_20261027/actual_setup_remaining_api_probe.json",
+      "sha256": "5a8a4de8a4d5add2066fb18c69cf044aa719de72d6c3cd2ff8332c392c67b580"
+    },
+    "offline_runtime_log": {
+      "path": "output/test_entry_runtime/offline_20261027_015146_800021.log",
+      "process_id": 35568,
+      "environment": "Real local Dota tools-mode Survival source runtime, offline logic testing, sv_cheats=1.",
+      "setup_time_local": "2026-10-27 09:52:33",
+      "pregame_time_local": "2026-10-27 09:52:35",
+      "in_progress_time_local": "2026-10-27 09:52:41",
+      "timezone": "Asia/Shanghai",
+      "automatic_setup_without_console_injection": "PASS_REPORTED_BY_RELEASE_OPERATOR",
+      "authority_scope": "LOCAL_OFFLINE_ONLY_NOT_ORIGINAL_ARCADE_OR_NEW_SIGNED_HELPER"
+    },
+    "offline_portal_screenshot": {
+      "path": "output/arcade_cleanup_20261027/offline_ui/offline_normal_selected.png",
+      "sha256": "7ceeaa33f50ed1c16d228cf7ea7c7ca84f6914a11703ba915f4923146ff0dfd3",
+      "observation": "Glowing standard-mode portals visible in the real local offline game."
+    },
+    "native_package_build": {
+      "path": "output/arcade_cleanup_20261027/native_package_build_v02.json",
+      "sha256": "ef0ca02e81345d71f4839ec1ab0f730d5a5c83f29d1648734eb4c4998baca886"
+    },
+    "official_download": {
+      "path": "output/arcade_cleanup_20261027/download_v02_result.jsonl",
+      "sha256": "c23196275cb064198fc399136b4b17a264534fdb8f17ae3061e5a779d2b0488d"
+    },
+    "native_acceptance": {
+      "path": "output/arcade_cleanup_20261027/native_acceptance_v02.json",
+      "sha256": "19ba46ab23f82dea45ca0ba2398ee573d2f138caf4dcaa7f82f3dbf0ef5096af"
+    },
+    "helper_acceptance": {
+      "path": "output/arcade_cleanup_20261027/helper_acceptance_v04.json",
+      "sha256": "e5211b7f5def323447264f6aa55b2ef34e185eed7f8c5f4c01f2ada6d9206784"
+    },
+    "wallet_result_fix_tests": {
+      "path": "output/arcade_cleanup_20261027/wallet_result_fix_tests.json",
+      "sha256": "bb1fa78d50f92d16904195775d6c60483299d960684695190df74582c965024a"
+    },
+    "baseline_controls": {
+      "path": "output/arcade_cleanup_20261027/final_ui_baseline_controls.json",
+      "sha256": "bee142ba9de6e6c517c61bd2cd62c2e15844dbb65dddd7144bf5b2e82e737bb8"
+    },
+    "final_release_tool_tests": {
+      "path": "output/arcade_cleanup_20261027/final_release_tool_tests.json",
+      "sha256": "868f2c59d916689e2b9cb201f37314d5edd72a75240b183b39d77ae20e98c42c"
+    }
+  },
+  "automated_checks": {
+    "thin_builder": {
+      "command": "python -B -X utf8 tools/arcade_cleanup_20261027/test_build_refresh.py",
+      "status": "PASS",
+      "test_groups": 10,
+      "scope": "Temporary fixtures and exact local signed-baseline projection; not live multiplayer/payment acceptance."
+    },
+    "startup_loading": {
+      "command": "lua5.1 scripts/vscripts/tests/test_startup_loading_service.lua",
+      "status": "PASS",
+      "markers": [
+        "STARTUP_LOADING_SERVICE_PASS",
+        "STARTUP_NATIVE_TEAM_SETUP_PASS",
+        "STARTUP_AUTOMATIC_COOP_GATE_PASS",
+        "STARTUP_NATIVE_GAMEPLAY_LIFECYCLE_PASS",
+        "STARTUP_NATIVE_SETUP_MANIFEST_PASS"
+      ],
+      "scope": "Lua fixtures, real callback execution and authored UI contract checks; two real computers still pending."
+    },
+    "known_baseline_failures": {
+      "commands": 9,
+      "same_failures_on_previous_head": true,
+      "baseline_head": "0e077ad86841c6ddf27eb1f60d53863d3806399b",
+      "scope": "Historical tests outside this runtime change; not claimed passing."
+    },
+    "final_release_tools": {
+      "status": "PASS",
+      "independent_commands": 5,
+      "tests": 49,
+      "actual_online_entry_check": "PASS_CHEATS_DISABLED",
+      "original_102_bytes_preserved": true
+    }
+  },
+  "native_checks": {
+    "local_offline_auto_setup_f47": "PASS",
+    "local_offline_standard_portals": "PASS",
+    "new_native_vpk_full_build": "PASS",
+    "workshop_upload": "PASS",
+    "official_complete_download": "PASS",
+    "original_arcade_single_account": "PASS_NORMAL_N1_AUTO_SETUP_PORTALS_CATALOG",
+    "original_arcade_two_accounts": "NOT_RUN_THIS_REVISION",
+    "helper04_alias_installation": "PASS",
+    "helper04_cloud_login_readback": "PASS_REAL_WEB_AUTH_PROFILE_REVISION_223",
+    "helper04_points_failure_result_navigation": "PASS_REAL_UI_AND_BALANCE_PRECHECK",
+    "helper04_wallet_success": "NOT_RUN_INSUFFICIENT_BALANCE",
+    "helper04_cash_qr_and_delivery": "NOT_REPEATED"
+  },
+  "superseded_projection": {
+    "reason": "Auto-launch=true alone stalled the real engine in CUSTOM_GAME_SETUP; f47 adds the required one-shot RemainingTime countdown.",
+    "rejected_service_sha256": "a3f0a015c72745aeebc0a44f3e578c337a3ac69c543e323116217c6551a4269f",
+    "native_content_sha256": "32f9ada7e68f5c959909a4346908f0b381b60000abac9093c11b3f03d5533d39",
+    "helper_content_sha256": "5317a54274815802ff8860d17f901a81419e9b885a69894941f894ba0191b015",
+    "must_not_build_or_install": true
+  },
+  "remaining_acceptance": [
+    "Two-account original Arcade regression on this exact revision.",
+    "Real wallet successful purchase/delivery requires adequate test balance; result success/retry/idempotency branches have fixture coverage.",
+    "New-revision cash QR/payment/delivery and two-account isolation were not charged again; earlier 0.50 yuan acceptance belongs to helper2702."
+  ],
+  "superseded_attempts": [
+    {
+      "native_sequence": 2026102703,
+      "helper_sequence": 2026102704,
+      "native_publication": "MANIFEST_TIMEOUT_NOT_PUBLISHED_OFFICIAL_OLD_VERSION_RECOVERY_COMPLETED",
+      "helper_ui": "REAL_TEST_FOUND_RESULT_UPSCALE_AND_RETURN_NAVIGATION_BUGS_FIXED_IN_2706",
+      "failure_evidence": {
+        "path": "output/arcade_cleanup_20261027/upload_recovery_attempt_20261027_101903/evidence.json",
+        "sha256": "6479ce916c8af73d3d0198ca1022418ba047364e21630e9f4e730f1e9fd0de4b"
+      },
+      "recovery": {
+        "path": "output/arcade_cleanup_20261027/upload_recover_apply.json",
+        "sha256": "559eeab53af2578538aa762b7fd13a3cb9ae387c868e0b6e2ca1faecf6ea4b17"
+      },
+      "helper_rollback": {
+        "path": "output/arcade_cleanup_20261027/helper03_rollback.json",
+        "sha256": "c454f91fc4979c2958627d8aa071d14f44cb004efafbbc0819d74916a4586717"
+      }
+    }
+  ]
+}

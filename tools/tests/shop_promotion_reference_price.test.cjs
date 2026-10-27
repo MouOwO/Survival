@@ -68,8 +68,8 @@ test('Reference labels refresh with actual prices and the purchase routes still 
  const updated=card(h,'promo_odd');assert.equal(h.descendants(updated,'BLMarketPriceMain')[0].text,'5 积分');
  assert.equal(references(h,updated)[0].text,'7.5 积分');
  h.descendants(updated,'BLMarketBuy')[0].events.onactivate();
- const confirmation=h.menus().find(menu=>menu.panel.BHasClass('MenuV10Exchange'));
- assert(confirmation&&confirmation.IsOpen());h.descendants(confirmation.actions,'CommerceConfirmBuy')[0].events.onactivate();
+ assert(h.root.FindChildTraverse('CommerceResultDialog').visible);
+ assert.equal(h.descendants(h.root,'CommerceConfirmBuy').length,0);
  const request=h.requests.findLast(value=>value.payload.action==='purchase');assert(request);assert.equal(request.payload.sku,'promo_odd');
  for(const field of['price','original_price','reference_price','u_coin_price','amount_fen'])assert(!Object.hasOwn(request.payload,field),field+' is not a client-authorized charge');
  h.cfg.SurvivalCommerceView.Open();h.cfg.SurvivalCommerceView.SelectCategory('all');

@@ -206,22 +206,20 @@ test('Inline selection survives reopening and disposed controls cannot change th
     assertNoPurchase(h);
 });
 
-test('Filtered product buttons keep the loaded market open through wallet confirmation and both original cash checkout callbacks', () => {
+test('Filtered product buttons keep the loaded market open through a direct exchange result and both original cash checkout callbacks', () => {
     const {h, view} = makeFixture();
     tab(h, 'all'); choose(h, 'shop_points');
     assertNoPurchase(h);
     const pointsRows = h.cardList().slice();
     buyRow(h, 'points_b');
-    assert.equal(view.IsOpen(), true, 'Wallet confirmation keeps the market underneath open');
+    assert.equal(view.IsOpen(), true, 'Wallet results keep the market underneath open');
     assert.equal(view.Inspect().purchaseType, 'shop_points');
     assert.equal(h.cardList().length, pointsRows.length);
-    pointsRows.forEach((row, index) => assert.equal(h.cardList()[index], row, 'Confirmation retains the loaded filtered rows'));
-    assertNoPurchase(h);
-    const confirm = h.menus().find(menu => menu.panel.BHasClass('MenuV10Exchange'));
-    assert(confirm && confirm.IsOpen());
-    assert.match(h.descendants(confirm.content, 'CommerceConfirmCopy')[0].text, /售价：10 (?:商城)?积分/);
-    const confirmBuy = h.descendants(confirm.actions, 'CommerceConfirmBuy')[0];
-    confirmBuy.events.onactivate(); confirmBuy.events.onactivate();
+    pointsRows.forEach((row, index) => assert.equal(h.cardList()[index], row, 'The result retains the loaded filtered rows'));
+    const result = h.root.FindChildTraverse('CommerceResultDialog');
+    assert(result && result.visible);
+    assert.equal(h.descendants(h.root, 'CommerceConfirmBuy').length, 0);
+    buyRow(h, 'points_b'); buyRow(h, 'points_b');
     const purchases = h.requests.filter(r => r.payload.action === 'purchase');
     assert.equal(purchases.length, 1);
     assert.equal(purchases[0].payload.sku, 'points_b');

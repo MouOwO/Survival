@@ -21,27 +21,25 @@
   "map": "template_map",
   "gameplay_map": "template_map",
   "gameplay_map_capacity": 4,
-  "release_revision": "WS4-SHOP-02",
-  "release_sequence": 2026102604,
+  "release_revision": "WS4-REFRESH-NATIVE-02",
+  "release_sequence": 2026102705,
   "workshop_id": "3824360109",
-  "runtime_content_sha256": "b38b10b76aaa4674c8a2d0ffc436922723a793f4b71665916956b4323f40b744",
-  "steam_manifest": "6642037826174811075",
-  "download_manifest": "6642037826174811075",
+  "runtime_content_sha256": "8a01a5b66603804c683b879043c220e4f9496d7cca75f304ac5d9da210794cf6",
   "uploaded": true,
   "download_verified": true,
-  "vpk_sha256": "75a90c772844287890f58c156d08aba1680e3fba8ed69d89fc7a638e8c53845b",
-  "package_bytes": 3767101843,
-  "runtime_files": 6637,
+  "vpk_sha256": "31a7a2a2bde5e82510f5f353cff830aea4815b24ccbb7a3450ff371eae2329a0",
+  "package_bytes": 3767192138,
+  "runtime_files": 6655,
   "package_files": [
     {
       "name": "3824360109.vpk",
-      "bytes": 273555,
-      "sha256": "75a90c772844287890f58c156d08aba1680e3fba8ed69d89fc7a638e8c53845b"
+      "bytes": 274275,
+      "sha256": "31a7a2a2bde5e82510f5f353cff830aea4815b24ccbb7a3450ff371eae2329a0"
     },
     {
       "name": "3824360109_000.vpk",
-      "bytes": 1073593907,
-      "sha256": "22ab8ca03f51d2a522bbcc676fc26b03647215cbcc05e3feaa932d23f03c17ab"
+      "bytes": 1073604924,
+      "sha256": "4bc9faf1688e0ae3fb7cfd51f4272ac44d51becd67114584837d9b40ca1fc27c"
     },
     {
       "name": "3824360109_001.vpk",
@@ -55,8 +53,8 @@
     },
     {
       "name": "3824360109_003.vpk",
-      "bytes": 552124410,
-      "sha256": "c813a8b6a25e19a9d38dcb6a5e05421bc115d0b2d9af4869071ea18c1ca078a7"
+      "bytes": 552202968,
+      "sha256": "b0b35246011e92994bf738556c59f3f03169eaacec8b1f6cf3c9d3565d037084"
     }
   ],
   "session_only": true,
@@ -65,11 +63,13 @@
   "online_cheats_allowed": false,
   "max_players": 4,
   "ready_for_public_release": false,
-  "status": "ORIGINAL_ARCADE_NATIVE_MARKETPLACE_UI_VERIFIED_PAYMENT_CLOSED",
-  "release_record": "publishing/workshop/native_shop_qr_20261026.json",
-  "native_test": "SINGLE_ACCOUNT_ORIGINAL_ARCADE_FISHING_NATIVE_MARKET_UI_PASS",
-  "native_new_ui_two_account_regression": "NOT_RUN",
+  "status": "ORIGINAL_ARCADE_AUTO_SETUP_PORTALS_CATALOG_VERIFIED_CLOUD_VIA_HELPER",
+  "release_record": "publishing/workshop/arcade_cleanup_20261027.json",
+  "native_test": "ORIGINAL_ARCADE_SINGLE_ACCOUNT_NORMAL_N1_AUTO_SETUP_PORTALS_AND_CATALOG_PASS",
+  "native_new_ui_two_account_regression": "NOT_RUN_THIS_REVISION",
   "payment_acceptance": "DISABLED_NOT_TESTED",
   "cloud_delivery": "NOT_PASSED",
-  "previous_release_record": "publishing/workshop/arcade_shop_20261026.json"
+  "previous_release_record": "publishing/workshop/native_shop_qr_20261026.json",
+  "steam_manifest": "3674261806658465753",
+  "download_manifest": "3674261806658465753"
 }

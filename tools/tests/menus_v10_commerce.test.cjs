@@ -80,12 +80,12 @@ test('Real catalogs append twenty rows at a time without pages and retain both p
     assert.equal(h.descendants(card, 'BLMarketPriceMain')[0].text, '10 积分', 'The actual product row retains its authoritative price');
     const purchaseControl = h.descendants(card, 'BLMarketBuy')[0] || card;
     purchaseControl.events.onactivate();
-    assert.equal(h.cfg.SurvivalCommerceView.IsOpen(), true,'Confirmation leaves the storefront underneath');
-    assert.equal(h.requests.filter(r => r.payload.action === 'purchase').length, 0, 'Inspecting the item only opens existing confirmation');
-    const confirm = h.menus().find(m => m.panel.BHasClass('MenuV10Exchange'));
-    assert(confirm && confirm.IsOpen(), 'Wallet checkout is inside the same V10 geometry');
-    assert.match(h.descendants(confirm.content, 'CommerceConfirmCopy')[0].text, /售价：10 (?:商城)?积分/);
-    h.descendants(confirm.actions, 'CommerceConfirmBuy')[0].events.onactivate();
+    assert.equal(h.cfg.SurvivalCommerceView.IsOpen(), true,'The exchange result leaves the storefront underneath');
+    assert.equal(h.requests.filter(r => r.payload.action === 'purchase').length, 1, 'The explicit exchange control submits once');
+    const result = h.root.FindChildTraverse('CommerceResultDialog');
+    assert(result && result.visible, 'Wallet checkout opens the compact result panel');
+    assert.equal(h.descendants(h.root, 'CommerceConfirmBuy').length, 0);
+    assert.equal(h.menus().filter(m => m.panel.BHasClass('MenuV10Exchange')).length, 0);
     const buy = h.requests.findLast(r => r.payload.action === 'purchase');
     assert.equal(buy.payload.sku, 'wallet_49');
     h.cfg.SurvivalCommerceView.Open();

@@ -127,7 +127,7 @@ test("retirement closes stacked selectors from top down through their accepted c
 });
 
 test("a broken close callback cannot strand an input shield or leak native exception details", () => {
-    const f = fixture(), old = f.load(), window = f.modal("commerce_exchange", f.archive, {throwOnClose: true});
+    const f = fixture(), old = f.load(), window = f.modal("commerce_result", f.archive, {throwOnClose: true});
     window.open(); f.remove(f.payment); old.Dispose(); const fresh = f.load(f.archive);
     assert.equal(fresh.Top(), null);
     assert.equal(window.panel.visible, false); assert.equal(window.scrim.visible, false);
@@ -234,7 +234,7 @@ test("explicit retirement is idempotent and a subsequent include creates one usa
     assert.equal(f.load(f.archive), next, "a further live include does not retire the new modal");
 });
 
-test("real exchange shell reopens after shared navigation without retiring its controller or pending intent", () => {
+test("real result shell reopens after shared navigation without retiring its controller or pending intent", () => {
     const f = fixture(); f.loadComponents(); const layers = f.load();
     const pending = {sku: "local-wallet-fixture", id: "local-uncertain-request"};
     f.cfg.SurvivalCommercePending = pending;
@@ -244,7 +244,7 @@ test("real exchange shell reopens after shared navigation without retiring its c
             width: 1672, height: 941, onClose() { shell.Close(); }});
         return {panel, scrim, shell};
     }
-    const exchange = sharedModal("commerce_exchange", f.payment);
+    const exchange = sharedModal("commerce_result", f.payment);
     const targets = {treasure: ["SurvivalTreasure", "Toggle"], archive: ["SurvivalArchive", "Open"],
         lottery: ["SurvivalLottery", "Open"], commerce: ["SurvivalCommerceView", "Open"],
         daily_rewards: ["SurvivalDaily", "Open"]};
@@ -256,20 +256,20 @@ test("real exchange shell reopens after shared navigation without retiring its c
     f.loadProduction("common/purple_shell.js");
     for (let round = 0; round < 3; round++) for (const id of Object.keys(targets)) {
         exchange.shell.Open();
-        assert.equal(layers.Top(), "commerce_exchange");
+        assert.equal(layers.Top(), "commerce_result");
         assert.equal(exchange.panel.visible, true); assert.equal(exchange.scrim.visible, true);
         assert.equal(exchange.panel.BHasClass("UIClosed"), false);
         assert.equal(f.cfg.SurvivalPurpleShell.Navigate(id), true);
         assert.equal(layers.Top(), id); assert.equal(destinations[id].shell.IsOpen(), true);
         assert.equal(exchange.shell.IsOpen(), false); assert.equal(exchange.panel.visible, false);
         assert.equal(exchange.panel.BHasClass("UIClosed"), true);
-        assert.equal(f.cfg.SurvivalUI.ModalManager.Get("commerce_exchange"), exchange.shell,
+        assert.equal(f.cfg.SurvivalUI.ModalManager.Get("commerce_result"), exchange.shell,
             "normal navigation preserves the reusable shared controller");
         assert.equal(f.cfg.SurvivalCommercePending, pending,
-            "closing and reopening a confirmation never replaces an uncertain transaction");
+            "closing and reopening a result panel never replaces an uncertain transaction");
         layers.CloseTop(); assert.equal(f.jobs.size, 0, "closed menus retain no fit timers");
     }
-    exchange.shell.Open(); assert.equal(layers.Top(), "commerce_exchange");
+    exchange.shell.Open(); assert.equal(layers.Top(), "commerce_result");
     assert.equal(exchange.shell.IsOpen(), true); assert.equal(f.jobs.size, 1);
     exchange.shell.Close(); assert.equal(f.jobs.size, 0);
 });

@@ -88,13 +88,22 @@ function harness({legacyXML = false, market = false} = {}) {
         paymentReply({ok:1,catalog_hash:'live-v1',wechat:1,alipay:1,categories,products,...extra});
     }
     function walletSnapshot(products) {
-        if (!lastRequest('survival_commerce_request')) cfg.SurvivalCommerceWallet.Refresh();
-        const request = lastRequest('survival_commerce_request');
-        assert.equal(request.payload.action, 'catalog');
-        const base = {request_id:request.payload.request_id,action:'catalog',ok:1};
-        emit('survival_commerce_result', {...base,part:'begin',count:products.length,categories,balances:{u_coin:0,shop_points:500,shop_gold:90}});
-        products.forEach((product, i) => emit('survival_commerce_result', {...base,part:'product',index:i+1,product}));
-        emit('survival_commerce_result', {...base,part:'end'});
+        const started = cfg.SurvivalCommerceWallet.Refresh();
+        function respond(request) {
+            assert.equal(request.payload.action, 'catalog', 'The fixture only completes a live wallet catalog request');
+            const base = {request_id:request.payload.request_id,action:'catalog',ok:1};
+            emit('survival_commerce_result', {...base,part:'begin',count:products.length,categories,balances:{u_coin:0,shop_points:500,shop_gold:90}});
+            products.forEach((product, i) => emit('survival_commerce_result', {...base,part:'product',index:i+1,product}));
+            emit('survival_commerce_result', {...base,part:'end'});
+        }
+        const request = lastRequest('survival_commerce_request'); respond(request);
+        if (!started) {
+            for (const delay of [1.1, 3]) for (const timer of timers.slice())
+                if (!timer.ran && !timer.cancelled && timer.delay === delay) { timer.ran = true; timer.fn(); }
+            const followup = lastRequest('survival_commerce_request');
+            assert.notEqual(followup.payload.request_id, request.payload.request_id, 'Invalidated reads require the queued fresh catalog');
+            respond(followup);
+        }
     }
     const descendants = (p, cls) => [p, ...p.Children().flatMap(c => descendants(c, cls))].filter(n => !cls || n.BHasClass(cls));
     const menu = cls => cfg.SurvivalMenuV10.Entries().find(m => m.panel.BHasClass(cls));
@@ -199,17 +208,18 @@ test('Returning from a standalone checkout still opens the market when no store 
     assert(!h.cfg.SurvivalPayments.Inspect().opened);assert.equal(h.requests.filter(r=>r.payload.action==='create'||r.payload.action==='purchase').length,0);
 });
 
-test('Both wallet return controls leave the existing market intact, and a rejected checkout keeps it visible',()=>{
+test('Wallet result back and escape leave the existing market intact, and a rejected checkout keeps it visible',()=>{
     const h=harness({market:true}),product={...walletItem('shop_points','overlay_points'),enabled:1,owned:0,price:10,disabled_reason:''};
-    h.paidSnapshot([]);h.walletSnapshot([product]);h.cfg.SurvivalCommerceView.Open();h.cfg.SurvivalCommerceView.SelectCategory('all');h.cfg.SurvivalCommerceView.SelectPurchaseType('shop_points');
+    h.paidSnapshot([]);h.walletSnapshot([product]);h.cfg.SurvivalCommerceView.Open();h.walletSnapshot([product]);h.cfg.SurvivalCommerceView.SelectCategory('all');h.cfg.SurvivalCommerceView.SelectPurchaseType('shop_points');
     const view=h.cfg.SurvivalCommerceView,card=h.cards()[0];let reopen=0;const open=view.Open;view.Open=function(){reopen++;return open.apply(view,arguments);};
-    for(const action of ['footer','sidebar']){
-        h.buyCard(card);const exchange=h.menu('MenuV10Exchange');assert(exchange.IsOpen());assert(view.IsOpen());
+    for(const action of ['footer','escape']){
+        h.buyCard(card);const result=h.$('#CommerceResultDialog');assert(result.visible);assert(view.IsOpen());
         const reads=h.requests.length;
-        if(action==='footer')h.descendants(exchange.actions,'CommerceConfirmBack')[0].events.onactivate();
-        else exchange.sidebar.Children().find(p=>p.id.endsWith('Section_back')).events.onactivate();
-        assert(!exchange.IsOpen());assert.equal(h.cfg.SurvivalUILayers.Top(),'commerce');assert.equal(reopen,0);assert.equal(h.requests.length,reads);assert.equal(h.cards()[0],card);
+        if(action==='footer')h.$('#CommerceResultBack').events.onactivate();
+        else h.cfg.SurvivalUILayers.CloseTop();
+        assert(!result.visible);assert.equal(h.cfg.SurvivalUILayers.Top(),'commerce');assert.equal(reopen,0);assert.equal(h.requests.length,reads);assert.equal(h.cards()[0],card);
     }
+    assert.equal(h.requests.filter(row=>row.payload.action==='purchase').length,1,'Reopening an inflight result cannot duplicate its exchange');
     h.cfg.SurvivalCommerceWallet.Checkout=()=>false;h.buyCard(card);assert(view.IsOpen());assert.equal(h.cards()[0],card);
 });
 
@@ -238,7 +248,7 @@ test('G币 products need an authenticated enabled payment row and valid G币 met
     h.context.PaymentBuy(); assert.equal(h.requests.filter(r => r.payload.action === 'create').length, 0);
 });
 
-test('积分 and 商城金币 retain wallet confirmation while legacy cash retains RMB display', () => {
+test('积分 and 商城金币 exchange directly while legacy cash retains RMB confirmation', () => {
     const h = harness(); h.cfg.SurvivalCommerceView.Open();
     const points = {...walletItem('shop_points','points_item'),price:20,enabled:1,owned:0,disabled_reason:''};
     const gold = {...walletItem('shop_gold','gold_item'),price:10,enabled:1,owned:0,disabled_reason:''};
@@ -247,8 +257,8 @@ test('积分 and 商城金币 retain wallet confirmation while legacy cash retai
     assert.equal(h.cfg.SurvivalCommerceView.Inspect().productCount, 3);
     for (const [category, sku] of [['points','points_item'],['gold','gold_item']]) {
         h.cfg.SurvivalCommerceView.Open(); h.walletSnapshot([points,gold]); h.category(category); h.buyCard(h.cards()[0]);
-        const exchange = h.menu('MenuV10Exchange'); assert(exchange.IsOpen());
-        h.descendants(exchange.actions, 'CommerceConfirmBuy')[0].events.onactivate();
+        assert(h.$('#CommerceResultDialog').visible);
+        assert.equal(h.descendants(h.root, 'CommerceConfirmBuy').length, 0);
         const request = h.lastRequest('survival_commerce_request');
         assert.equal(request.payload.sku, sku); assert.equal(request.payload.action, 'purchase');
         const currency = category === 'points'?'shop_points':'shop_gold';
