@@ -16,6 +16,13 @@ GAME = ROOT.parents[1]
 RUNTIME = ROOT / "output/test_entry_runtime"
 ONLINE_ADDON = "svt_w24"
 ONLINE_POLICY_RECORD = ROOT / "publishing/workshop/online_cheat_policy_20261025.json"
+PAYMENT_HELPER_RECORD = ROOT / "publishing/workshop/payment_helper_20261027.json"
+PAYMENT_HELPER_PINS = frozenset((
+    "scripts/vscripts/core/release_policy.lua", "scripts/vscripts/config/release_profile.lua",
+    "scripts/vscripts/config/player_web_auth.lua", "scripts/vscripts/config/session_multiplayer_test.lua",
+    "scripts/vscripts/config/commerce_payment_access.lua", "scripts/vscripts/core/commerce_release_policy.lua",
+    "scripts/vscripts/systems/payment_service.lua", "scripts/vscripts/systems/player_web_auth.lua",
+))
 
 
 def need(value, code):
@@ -80,6 +87,25 @@ def launch_arguments(mode, log, *, onboarding=False):
 
 def check_online_policy(addon):
     """Refuse a stale online copy that predates the reviewed server cheat gate."""
+    if PAYMENT_HELPER_RECORD.is_file():
+        record = json.loads(PAYMENT_HELPER_RECORD.read_text(encoding="utf-8"))
+        if record.get("enabled") is True:
+            need(record.get("kind") == "VERIFIED_WS4_PAYMENT_HELPER"
+                 and record.get("online_cheats_allowed") is False
+                 and record.get("cloud_login_required") is True, "payment_helper_record_invalid")
+            candidate = record["candidate"]
+            installation = json.loads((addon / "_online_policy_install.json").read_text(encoding="utf-8"))
+            need(installation.get("content_sha256") == candidate["content_sha256"]
+                 and installation.get("release_sequence") == candidate["release_sequence"]
+                 and installation.get("signature_valid") is True
+                 and installation.get("online_cheats_allowed") is False
+                 and installation.get("full_after_verification") is True, "online_payment_helper_outdated")
+            hashes = candidate.get("runtime_hashes")
+            need(isinstance(hashes, dict) and set(hashes) == PAYMENT_HELPER_PINS, "payment_helper_pins_invalid")
+            for name, expected in hashes.items():
+                need(hashlib.sha256((addon / name).read_bytes()).hexdigest() == expected,
+                     "online_payment_helper_bytes_changed")
+            return
     record = json.loads(ONLINE_POLICY_RECORD.read_text(encoding="utf-8"))
     need(record.get("online_cheats_allowed") is False, "online_cheat_policy_not_verified")
     candidate = record["candidate"]

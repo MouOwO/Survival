@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "kind": "VERIFIED_WS4_PAYMENT_HELPER",
+  "enabled": true,
+  "revision": "WS4-PAYMENT-HELPER-02",
+  "online_cheats_allowed": false,
+  "cloud_login_required": true,
+  "candidate": {
+    "content_sha256": "8f7c7956fc4e50a2c5865442dbfc379e43d3c3de513a4e921a241d8206cfb664",
+    "release_sequence": 2026102702,
+    "runtime_hashes": {
+      "scripts/vscripts/config/commerce_payment_access.lua": "16a07a6ff22578f1aa20cdfe73811a7aeb453348e4776c962770c101c5790e79",
+      "scripts/vscripts/config/player_web_auth.lua": "0c9b391bcdaaf8a99ace305f1f062c3a6e9902c1c8d6b18eaa1ccf7ab3d18729",
+      "scripts/vscripts/config/release_profile.lua": "f217f9a3a893433aa38d1b76afdb6b3dd319056cffec2ff9a9d37beaee7aa746",
+      "scripts/vscripts/config/session_multiplayer_test.lua": "68781cf8bfc5d0f599dd2dd6fa048d9205be2aa14c6b305d0f22a9356ef6572b",
+      "scripts/vscripts/core/commerce_release_policy.lua": "6da29c9e100c9bb7c591d7a44b7a333dacad2a7895b98fdf4d1c1415e8afe1c2",
+      "scripts/vscripts/core/release_policy.lua": "9527373a7a27e7396e4e4418b38ce20045a60e1efb5eb320f9463259d2639061",
+      "scripts/vscripts/systems/payment_service.lua": "ecd829bb8d43d8c8546436efa29d5f330be701c3cbcee6a0005a558e8cb6afd1",
+      "scripts/vscripts/systems/player_web_auth.lua": "c35acb19d20f2d7734969748cce6b4cdeb4755e0a2305d392d14b2870ddfded5"
+    },
+    "base_content_sha256": "b854dc178d76dce6231350b7bdf833178a1d2460da3a63e00f0140e5045fdf4d",
+    "one_file_policy_patch": true
+  },
+  "installation": {
+    "full_file_count": 6639,
+    "signature_valid": true,
+    "full_after_verification": true
+  },
+  "route": "approved_local_connection_helper",
+  "original_arcade_multiplayer_replaced": false,
+  "backend_payments_enabled": true,
+  "native_login_verified": true,
+  "real_payment_verified": true,
+  "status": "REAL_GOODS_PAYMENT_AND_HELPER_PROFILE_REFRESH_VERIFIED",
+  "limitations": [
+    "Native Arcade HTTP factory remains unavailable in the separately recorded real test.",
+    "This helper requires Steam and temporary host Steam TLS relay connectivity.",
+    "WeChat native QR is the first acceptance route; Alipay remains page_pay.",
+    "Expired or revoked four-hour web grants require a new match.",
+    "Frozen helper excludes later redwing wave HP/attack patches."
+  ],
+  "production_without_optional_debug_boot_test": true,
+  "ready_for_public_release": false,
+  "cash_scope": "four approved test accounts; isolated WS4 database",
+  "native_arcade_cloud_payments_verified": false,
+  "acceptance": {
+    "product": "video_p033",
+    "amount_fen": 50,
+    "provider": "wechat",
+    "quantity": 1,
+    "state": "delivered",
+    "grant_ledger_item": "commerce_p033",
+    "grant_ledger_quantity": 1,
+    "game_refreshed_revision": 218,
+    "account_wallet_control_unchanged": true,
+    "actual_u_coin_recharge_tested": false,
+    "qr_visual_captured_by_agent": false,
+    "paid_at_utc": "2026-10-27T00:30:53Z",
+    "private_acceptance_record_sha256": "e387c1392c205566e8f210ce0ac1f10364d617cd11e1e41f757e0b52b5e4efa2",
+    "user_confirmed_payment_and_effect": true
+  },
+  "backend": {
+    "public_auth_base": "https://pay.xiaofengnet.com/ws4-web",
+    "public_checkout_base": "https://pay.xiaofengnet.com/ws4-payments",
+    "activation_review_sha256": "9cc5a4e583f1ce0de1b1832bca6b804a5ad29a172d21e679070643b59e713700",
+    "unit_repair_sha256": "4bcb5a4fcc5bd4399240745383e6b5acff87204038b33808926be42f8de7b993",
+    "cash_enabled_products": 48,
+    "wallet_enabled_products": 125,
+    "reset_enabled": false
+  }
+}

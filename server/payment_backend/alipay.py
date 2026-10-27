@@ -18,6 +18,7 @@ from urllib.parse import parse_qs, urlencode
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from .wechat import PaymentError, NoRedirect, ORIGIN, decode_json
+from .endpoints import DEFAULT_PUBLIC_BASE, PaymentEndpoints
 
 APPID = '2021007102660118'
 GATEWAY = 'https://openapi.alipay.com/gateway.do'
@@ -68,7 +69,8 @@ def response_content(raw, key):
 
 
 class Alipay:
-    def __init__(self, directory, seller_id=None):
+    def __init__(self, directory, seller_id=None, *, public_base=DEFAULT_PUBLIC_BASE):
+        self.endpoints = PaymentEndpoints(public_base)
         directory = Path(directory)
         self.app_id, self.seller_id = APPID, seller_id
         if seller_id is not None and not re.fullmatch(r'2088[0-9]{12}', seller_id):
@@ -136,7 +138,7 @@ class Alipay:
         # Requires separately granted alipay.trade.precreate permission. Never
         # replace a failed call with a page-pay URL disguised as a payment QR.
         result = self.request('alipay.trade.precreate', self.business(order),
-            notify_url=ORIGIN+'/v1/payments/alipay/notify')
+            notify_url=self.endpoints.url('/v1/payments/alipay/notify'))
         if result.get('out_trade_no') != order['order_id'] or not is_qr_code(result.get('qr_code')):
             raise PaymentError('alipay_qr_invalid', 502)
         return result['qr_code']
@@ -144,16 +146,16 @@ class Alipay:
     def page_params(self, order):
         return self.params('alipay.trade.page.pay', dict(self.business(order),
             product_code='FAST_INSTANT_TRADE_PAY', qr_pay_mode='4', qrcode_width=256),
-            notify_url=ORIGIN+'/v1/payments/alipay/notify', return_url=ORIGIN+'/checkout/return')
+            notify_url=self.endpoints.url('/v1/payments/alipay/notify'), return_url=self.endpoints.url('/checkout/return'))
 
     def page(self, order):
         fields = ''.join('<input type="hidden" name="'+html.escape(k, quote=True)+'" value="'+html.escape(v, quote=True)+'">' for k,v in self.page_params(order).items())
         return ('<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>支付宝收银台</title>'
-            '<link rel="stylesheet" href="/checkout.css"><main><h1>正在打开支付宝</h1><p>请在支付宝页面核对商品和金额后付款。</p>'
+            '<link rel="stylesheet" href="'+self.endpoints.public_path('/checkout.css')+'"><main><h1>正在打开支付宝</h1><p>请在支付宝页面核对商品和金额后付款。</p>'
             # HTML form POSTs omit charset in Content-Type. Alipay requires the
             # decoding charset in the URL before it can verify Chinese fields.
             '<form id="alipay-form" method="post" accept-charset="UTF-8" action="'+GATEWAY+'?charset=utf-8">'+fields+
-            '<button type="submit">继续到支付宝</button></form></main><script src="/alipay-redirect.js"></script></html>')
+            '<button type="submit">继续到支付宝</button></form></main><script src="'+self.endpoints.public_path('/alipay-redirect.js')+'"></script></html>')
 
     def notice(self, raw):
         try:

@@ -401,9 +401,11 @@ class ServiceTest(unittest.TestCase):
 
     def test_default_does_not_expose_battle_payment_rank_or_arbitrary_proxy(self):
         _, approved, _ = self.approved()
-        for path in ("/v1/archive/command", "/v1/rewards/grant", "/v1/payments/create", "/v1/archive/endless-leaderboard",
+        for path in ("/v1/archive/command", "/v1/rewards/grant", "/v1/payments/reset", "/v1/archive/endless-leaderboard",
                      "/v1/archive/endless-batch", "/v1/online-time/checkpoint", "/admin/pins", "https://evil.invalid/"):
             self.fail_code("player_route_not_allowed", lambda: self.service.proxy(path, approved["access_token"], self.identity, "peer"))
+        self.fail_code("payments_disabled", lambda: self.service.proxy("/v1/payments/create", approved["access_token"],
+                                                                       dict(self.identity, sku="video_p001"), "peer"))
         self.assertFalse(self.forward_calls)
 
     def test_isolated_progress_flag_allows_only_fixed_extra_paths(self):
@@ -412,7 +414,7 @@ class ServiceTest(unittest.TestCase):
         _, approved, _ = self.approved()
         self.assertTrue(approved["local_progress_unverified"])
         self.service.proxy("/v1/archive/command", approved["access_token"], dict(self.identity, command={"kind": "boss_kill"}), "peer")
-        self.fail_code("player_route_not_allowed", lambda: self.service.proxy("/v1/payments/create", approved["access_token"], self.identity, "peer"))
+        self.fail_code("payments_disabled", lambda: self.service.proxy("/v1/payments/create", approved["access_token"], dict(self.identity, sku="video_p001"), "peer"))
         self.fail_code("player_route_not_allowed", lambda: self.service.proxy("/v1/archive/endless-leaderboard", approved["access_token"], self.identity, "peer"))
         self.fail_code("player_route_not_allowed", lambda: self.service.proxy("/v1/rewards/grant", approved["access_token"], self.identity, "peer"))
         self.assertEqual(len(self.forward_calls), 1)

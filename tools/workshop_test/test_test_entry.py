@@ -107,7 +107,8 @@ class TestEntryBoundaryTest(unittest.TestCase):
                 "runtime_policy_sha256": hashlib.sha256(policy.read_bytes()).hexdigest(),
                 "release_profile_sha256": hashlib.sha256(profile.read_bytes()).hexdigest()}}
             receipt.write_text(json.dumps(record), encoding="utf-8")
-            with patch.object(entry, "ONLINE_POLICY_RECORD", receipt):
+            with patch.object(entry, "ONLINE_POLICY_RECORD", receipt), \
+                    patch.object(entry, "PAYMENT_HELPER_RECORD", addon / "no_helper.json"):
                 entry.check_online_policy(addon)
                 manifest.write_text(json.dumps({"content_sha256": "old_release"}), encoding="utf-8")
                 with self.assertRaisesRegex(RuntimeError, "online_release_policy_outdated"):
@@ -123,6 +124,43 @@ class TestEntryBoundaryTest(unittest.TestCase):
                 record["online_cheats_allowed"] = True
                 receipt.write_text(json.dumps(record), encoding="utf-8")
                 with self.assertRaisesRegex(RuntimeError, "online_cheat_policy_not_verified"):
+                    entry.check_online_policy(addon)
+
+    def test_verified_payment_helper_pins_cannot_enable_cheats_or_stale_installs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            addon = Path(directory)
+            hashes = {}
+            for name in entry.PAYMENT_HELPER_PINS:
+                path = addon / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(("reviewed:" + name).encode())
+                hashes[name] = hashlib.sha256(path.read_bytes()).hexdigest()
+            installation = {"content_sha256": "helper_release", "release_sequence": 2026102701,
+                            "signature_valid": True, "online_cheats_allowed": False,
+                            "full_after_verification": True}
+            marker = addon / "_online_policy_install.json"
+            marker.write_text(json.dumps(installation), encoding="utf-8")
+            record = {"kind": "VERIFIED_WS4_PAYMENT_HELPER", "enabled": True,
+                      "online_cheats_allowed": False, "cloud_login_required": True,
+                      "candidate": {"content_sha256": "helper_release", "release_sequence": 2026102701,
+                                    "runtime_hashes": hashes}}
+            receipt = addon / "helper.json"
+            receipt.write_text(json.dumps(record), encoding="utf-8")
+            with patch.object(entry, "PAYMENT_HELPER_RECORD", receipt), \
+                    patch.object(entry, "ONLINE_POLICY_RECORD", addon / "missing_legacy.json"):
+                entry.check_online_policy(addon)
+                marker.write_text(json.dumps({**installation, "signature_valid": False}), encoding="utf-8")
+                with self.assertRaisesRegex(RuntimeError, "online_payment_helper_outdated"):
+                    entry.check_online_policy(addon)
+                marker.write_text(json.dumps(installation), encoding="utf-8")
+                record["online_cheats_allowed"] = True
+                receipt.write_text(json.dumps(record), encoding="utf-8")
+                with self.assertRaisesRegex(RuntimeError, "payment_helper_record_invalid"):
+                    entry.check_online_policy(addon)
+                record["online_cheats_allowed"] = False
+                receipt.write_text(json.dumps(record), encoding="utf-8")
+                (addon / "scripts/vscripts/systems/payment_service.lua").write_bytes(b"stale service")
+                with self.assertRaisesRegex(RuntimeError, "online_payment_helper_bytes_changed"):
                     entry.check_online_policy(addon)
 
 

@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 from .http_api import BoundedServer, handler
-from .service import Service, Settings
+from .service import PAYMENT_UPSTREAM, Service, Settings
 
 
 def settings_from_environment(env):
@@ -13,6 +13,9 @@ def settings_from_environment(env):
     relay = env.get("PLAYER_WEB_AUTH_STEAM_TLS_RELAY", "0")
     if relay not in ("0", "1"):
         raise ValueError("steam_tls_relay_invalid")
+    payments = env.get("PLAYER_WEB_AUTH_PAYMENTS_ENABLED", "0")
+    if payments not in ("0", "1"):
+        raise ValueError("payments_enabled_invalid")
     return Settings(
         database=Path(env["PLAYER_WEB_AUTH_DATABASE"]),
         secret=env["PLAYER_WEB_AUTH_SECRET"],
@@ -23,7 +26,10 @@ def settings_from_environment(env):
         bind=env.get("PLAYER_WEB_AUTH_BIND", "127.0.0.1"),
         port=int(env.get("PLAYER_WEB_AUTH_PORT", "18767")),
         isolated_local_progress=progress == "1",
-        steam_tls_relay=relay == "1")
+        steam_tls_relay=relay == "1",
+        payments_enabled=payments == "1",
+        payment_upstream=env.get("PLAYER_WEB_AUTH_PAYMENT_UPSTREAM", PAYMENT_UPSTREAM),
+        payment_bearer=env.get("PLAYER_WEB_AUTH_PAYMENT_BEARER", ""))
 
 
 def lobby_from_environment(service, env):

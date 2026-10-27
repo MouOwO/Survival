@@ -5,7 +5,7 @@ The existing privileged WS4 bearer remains exclusively in this server's environm
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 import hashlib
 import hmac
@@ -22,7 +22,7 @@ import sqlite3
 import stat
 import threading
 import time
-from urllib.parse import urlencode, urlsplit
+from urllib.parse import parse_qs, urlencode, urlsplit
 import urllib.error
 import urllib.request
 
@@ -42,6 +42,16 @@ READ_PATHS = frozenset("/v1/" + name for name in (
     "lottery/snapshot", "archive/config"))
 LOCAL_PROGRESS_PATHS = frozenset("/v1/" + name for name in (
     "archive/command", "archive/endless-batch", "online-time/checkpoint"))
+PAYMENT_UPSTREAM = "http://127.0.0.1:18769"
+PAYMENT_PUBLIC_BASE = "https://pay.xiaofengnet.com/ws4-payments"
+PAYMENT_PATHS = frozenset("/v1/payments/" + action for action in ("catalog", "create", "status", "cancel"))
+PAYMENT_ORDER = re.compile(r"(?:WX|AL)[0-9a-f]{30}\Z")
+PAYMENT_FIELDS = frozenset(("ok", "error", "products", "categories", "catalog_hash", "wechat", "alipay",
+    "alipay_checkout_mode", "u_coin_per_yuan", "sku", "title", "description", "reward_lines", "effects",
+    "effect_labels", "amount_fen", "currency", "order_id", "provider", "state", "expires_at", "expired",
+    "effect_changes", "checkout_url", "checkout_mode", "quantity", "unit_amount_fen", "unit_u_coin_price",
+    "original_u_coin_price", "unit_original_u_coin_price", "u_coin_price", "recharge_u_coin_per_unit",
+    "recharge_u_coin_total", "product_type", "max_quantity", "warning", "qr_matrix"))
 BODY_LIMIT = 16384
 PENDING_TTL = 600
 SESSION_TTL = 4 * 3600
@@ -90,10 +100,23 @@ class Settings:
     port: int = 18767
     isolated_local_progress: bool = False
     steam_tls_relay: bool = False
+    payments_enabled: bool = False
+    payment_upstream: str = PAYMENT_UPSTREAM
+    payment_bearer: str = field(default="", repr=False)
 
     def validate(self):
         if type(self.steam_tls_relay) is not bool:
             raise ValueError("steam_tls_relay_invalid")
+        if type(self.payments_enabled) is not bool:
+            raise ValueError("payments_enabled_invalid")
+        if self.payment_upstream != PAYMENT_UPSTREAM:
+            raise ValueError("isolated_payment_loopback_required")
+        if (self.payments_enabled or self.payment_bearer) and (
+                not isinstance(self.payment_bearer, str)
+                or not re.fullmatch(r"[A-Za-z0-9_+/=-]{32,256}", self.payment_bearer)
+                or self.payment_bearer.startswith("pwa1_")
+                or self.payment_bearer in (self.secret, self.upstream_bearer)):
+            raise ValueError("independent_payment_bearer_required")
         public = urlsplit(self.public_base)
         if (public.scheme != "https" or not public.hostname or public.username or public.password
                 or public.query or public.fragment or public.path != "/ws4-web"
@@ -211,12 +234,13 @@ def steam_check(fields, *, tls_relay=False):
 
 
 class Service:
-    def __init__(self, settings, *, clock=time.time, verify_steam=None, forward=None):
+    def __init__(self, settings, *, clock=time.time, verify_steam=None, forward=None, forward_payment=None):
         settings.validate()
         self.settings, self.clock = settings, clock
         self.verify_steam = verify_steam if verify_steam is not None else (
             lambda fields: steam_check(fields, tls_relay=settings.steam_tls_relay))
         self.forward = forward or self._forward
+        self.forward_payment = forward_payment or self._forward_payment
         self.lock = threading.RLock()
         target = settings.database
         target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -267,6 +291,12 @@ class Service:
         self.db.execute("CREATE TABLE IF NOT EXISTS browser_preferences("
                         "sid_hash TEXT PRIMARY KEY REFERENCES browsers(sid_hash) ON DELETE CASCADE,"
                         "remembered INTEGER NOT NULL CHECK(remembered=1))")
+        # The existing payment API validates account ownership and a live match
+        # but does not store the match on its order. Preserve this narrower
+        # player-session binding across sidecar restarts; never reassign orders.
+        self.db.execute("CREATE TABLE IF NOT EXISTS payment_order_bindings("
+                        "order_id TEXT PRIMARY KEY, account TEXT NOT NULL,"
+                        "match_id TEXT NOT NULL, created INTEGER NOT NULL)")
         self.db.commit()
 
     def close(self):
@@ -547,6 +577,8 @@ class Service:
         return row
 
     def proxy(self, path, bearer, payload, peer):
+        if path in PAYMENT_PATHS:
+            return self.payment_proxy(path, bearer, payload, peer)
         allowed = READ_PATHS | (LOCAL_PROGRESS_PATHS if self.settings.isolated_local_progress else frozenset())
         if path not in allowed:
             raise AuthError("player_route_not_allowed", 403)
@@ -575,6 +607,138 @@ class Service:
                              {"Authorization": "Bearer " + self.settings.upstream_bearer,
                               "Content-Type": "application/json; charset=utf-8"}, 8 * 1024 * 1024, 30)
 
+    def _forward_payment(self, path, raw):
+        if not self.settings.payments_enabled or path not in PAYMENT_PATHS:
+            raise AuthError("player_route_not_allowed", 403)
+        return fixed_request(PAYMENT_UPSTREAM + path, raw,
+                             {"Authorization": "Bearer " + self.settings.payment_bearer,
+                              "Content-Type": "application/json; charset=utf-8"}, 8 * 1024 * 1024, 30)
+
+    def _payment_order_binding(self, order_id, row):
+        with self.lock:
+            bound = self.db.execute("SELECT account,match_id FROM payment_order_bindings WHERE order_id=?",
+                                    (order_id,)).fetchone()
+        if bound is None or bound["account"] != row["account"] or bound["match_id"] != row["match_id"]:
+            raise AuthError("payment_order_not_in_session", 403)
+
+    def _payment_checkout(self, result):
+        """Only an order-scoped capability on the independent WS4 cashier."""
+        if "checkout_url" not in result:
+            return
+        value = result["checkout_url"]
+        provider, order_id = result.get("provider"), result.get("order_id")
+        if (not isinstance(value, str) or len(value) > 2048
+                or not value.startswith(PAYMENT_PUBLIC_BASE + "/checkout")
+                or any(ord(character) <= 32 for character in value) or provider not in ("wechat", "alipay")
+                or not isinstance(order_id, str) or not PAYMENT_ORDER.fullmatch(order_id)):
+            raise AuthError("payment_upstream_response_invalid", 502)
+        try:
+            url = urlsplit(value)
+            query = parse_qs(url.query, keep_blank_values=True, strict_parsing=True, max_num_fields=2)
+            expected = PAYMENT_PUBLIC_BASE + ("/checkout/alipay" if provider == "alipay" else "/checkout")
+            if (url.scheme + "://" + url.netloc + url.path != expected or url.fragment
+                    or set(query) != {"order", "token"} or any(len(values) != 1 for values in query.values())
+                    or query["order"][0] != order_id or not re.fullmatch(r"[a-f0-9]{64}", query["token"][0])):
+                raise ValueError()
+        except ValueError:
+            raise AuthError("payment_upstream_response_invalid", 502) from None
+
+    def payment_proxy(self, path, bearer, payload, peer):
+        if path not in PAYMENT_PATHS:
+            raise AuthError("player_route_not_allowed", 403)
+        row = self.principal(bearer, payload)
+        if row["match_id"].startswith("lobby_"):
+            raise AuthError("player_route_not_allowed", 403)
+        if row["account"] not in self.settings.accounts:
+            raise AuthError("test_account_not_allowed", 403)
+        action = path.rsplit("/", 1)[1]
+        identity = {"account_id", "match_session_id"}
+        required = identity | ({"sku"} if action == "create" else {"order_id"} if action in ("status", "cancel") else set())
+        optional = {"provider", "quantity"} if action == "create" else set()
+        if not required <= set(payload) or set(payload) - required - optional:
+            raise AuthError("payment_fields_invalid")
+        if action == "create":
+            if not isinstance(payload["sku"], str) or not re.fullmatch(r"[a-z0-9_]{4,64}", payload["sku"]):
+                raise AuthError("payment_sku_invalid")
+            if payload.get("provider", "wechat") not in ("wechat", "alipay"):
+                raise AuthError("payment_provider_invalid")
+            maximum = 999999 if payload["sku"] == "u_coin_recharge" else 100
+            quantity = payload.get("quantity", 1)
+            if type(quantity) is not int or not 1 <= quantity <= maximum:
+                raise AuthError("payment_quantity_invalid")
+        if action in ("status", "cancel"):
+            if not isinstance(payload["order_id"], str) or not PAYMENT_ORDER.fullmatch(payload["order_id"]):
+                raise AuthError("payment_order_invalid")
+            if self.settings.payments_enabled:
+                self._payment_order_binding(payload["order_id"], row)
+        self.rate("payment-" + action, row["account"], {"catalog": 60, "create": 12, "status": 240, "cancel": 24}[action])
+        if not self.settings.payments_enabled:
+            # An authenticated player keeps cloud access while commerce is
+            # staged off. Disabled commerce is not a rejected player grant.
+            if action == "catalog":
+                return 200, json.dumps({"ok": True, "real_money_enabled": False, "products": [], "categories": [],
+                                        "wechat": False, "alipay": False, "test_reset_enabled": False},
+                                       separators=(",", ":")).encode()
+            raise AuthError("payments_disabled", 409)
+        # Both identity values come from the persisted, approved grant. No URL,
+        # merchant, amount, reward, token, or recipient can be supplied by callers.
+        forwarded = {**payload, "account_id": row["account"], "match_session_id": row["match_id"]}
+        raw = json.dumps(forwarded, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+        if len(raw) > BODY_LIMIT:
+            raise AuthError("request_body_too_large", 413)
+        status, body = self.forward_payment(path, raw)
+        if type(status) is not int or not 200 <= status <= 599 or 300 <= status < 400:
+            raise AuthError("payment_upstream_response_invalid", 502)
+        if not isinstance(body, bytes) or len(body) > 8 * 1024 * 1024:
+            raise AuthError("payment_upstream_response_invalid", 502)
+        # Reject private material even if a future upstream accidentally echoes
+        # it in an error/title. Never relay arbitrary upstream objects verbatim.
+        for private in (self.settings.secret, self.settings.upstream_bearer, self.settings.payment_bearer, bearer):
+            if private and private.encode() in body:
+                raise AuthError("payment_upstream_response_invalid", 502)
+        try:
+            def pairs(values):
+                result = {}
+                for key, value in values:
+                    if key in result:
+                        raise ValueError()
+                    result[key] = value
+                return result
+            def invalid_constant(value):
+                raise ValueError()
+            result = json.loads(body, object_pairs_hook=pairs, parse_constant=invalid_constant)
+            if not isinstance(result, dict) or type(result.get("ok")) is not bool:
+                raise ValueError()
+            if result["ok"] and status != 200:
+                raise ValueError()
+            decoded = json.dumps(result, ensure_ascii=False, allow_nan=False)
+        except (ValueError, UnicodeError, RecursionError):
+            raise AuthError("payment_upstream_response_invalid", 502) from None
+        if any(private and private in decoded for private in (
+                self.settings.secret, self.settings.upstream_bearer, self.settings.payment_bearer, bearer)):
+            raise AuthError("payment_upstream_response_invalid", 502)
+        self._payment_checkout(result)
+        public = {key: value for key, value in result.items() if key in PAYMENT_FIELDS}
+        # A new approval, expiry, or revocation during an upstream call cannot
+        # publish an order capability to the retired player grant.
+        with self.lock, self.db:
+            self.principal(bearer, payload)
+            if result["ok"] and status == 200 and action != "catalog":
+                order_id = result.get("order_id")
+                if not isinstance(order_id, str) or not PAYMENT_ORDER.fullmatch(order_id):
+                    raise AuthError("payment_upstream_response_invalid", 502)
+                if action == "create":
+                    if result.get("sku") != payload["sku"]:
+                        raise AuthError("payment_upstream_response_invalid", 502)
+                    self.db.execute("INSERT OR IGNORE INTO payment_order_bindings VALUES(?,?,?,?)",
+                                    (order_id, row["account"], row["match_id"], int(self.clock())))
+                elif order_id != payload["order_id"]:
+                    raise AuthError("payment_upstream_response_invalid", 502)
+                self._payment_order_binding(order_id, row)
+        if action == "catalog":
+            public["test_reset_enabled"] = False
+        return status, json.dumps(public, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+
     def page(self, code, sid):
         row = self.challenge(code)
         sid, browser, fresh = self.browser(sid)
@@ -589,7 +753,10 @@ class Service:
             text += "<p>确认后，本次游戏可以读取并保存你的独立测试进度。本地主机进度可能被房主修改，不作为可信战果。</p>"
         else:
             text += "<p>确认后，本次游戏可以读取你的测试存档和已有权益，不能上传战斗进度。</p>"
-        text += "<p>本测试不开放正式排行和真实支付。</p>"
+        if self.settings.payments_enabled and not row["match_id"].startswith("lobby_"):
+            text += "<p>本测试不开放正式排行。本次授权允许为本账号、本局查询商城和创建、查询、取消真实支付订单；付款结果以支付服务与云端到账为准。</p>"
+        else:
+            text += "<p>本测试不开放正式排行和真实支付。</p>"
         if browser["steam"]:
             text += "<p>已登录 Steam 尾号：" + escape(browser["steam"][-4:]) + "</p>"
             if browser["steam"] != self.settings.accounts[row["account"]]:

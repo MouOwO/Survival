@@ -1,4 +1,5 @@
-"""Payment service on loopback :8766, exposed only through scoped Nginx routes."""
+"""Legacy/isolated WS4 payments on fixed loopback ports and public namespaces."""
+import argparse
 from datetime import datetime, timezone
 from functools import lru_cache
 import hashlib
@@ -21,6 +22,7 @@ import qrcode.image.svg
 
 from .wechat import APPID, MCHID, ORIGIN, SKU, TITLE, WeChat, PaymentError, decode_json, validate_success
 from .alipay import Alipay, is_qr_code
+from .endpoints import LEGACY_CONFIG, WS4_CONFIG, PaymentEndpoints, runtime_binding, key_directory
 from .ucoin_catalog import U_COIN_PER_YUAN
 from .ucoin_pricing import quote, snapshot_rate
 from .order_quantity import MAX_ORDER_QUANTITY,quantity,snapshot_units,pricing_original
@@ -49,7 +51,22 @@ def qr_matrix(code):
 
 
 class Database:
-    def __init__(self, dsn):
+    def __init__(self, dsn, *, isolated=False):
+        self.isolated = isolated
+        if isolated:
+            try:
+                fields = psycopg.conninfo.conninfo_to_dict(dsn)
+                allowed = {'host','hostaddr','port','dbname','user','password','sslmode','connect_timeout','application_name'}
+                if (set(fields) - allowed or fields.get('host') != '127.0.0.1'
+                        or fields.get('hostaddr', '127.0.0.1') != '127.0.0.1'
+                        or fields.get('port') != '15432' or fields.get('dbname') != 'goufayu_ws4'
+                        or fields.get('user') != 'goufayu_payment'):
+                    raise ValueError()
+                # Explicit hostaddr prevents a libpq environment variable from
+                # changing the connection's TCP destination behind its hostname.
+                dsn = psycopg.conninfo.make_conninfo(dsn, hostaddr='127.0.0.1')
+            except (psycopg.Error, TypeError, ValueError):
+                raise ValueError('payment_isolated_dsn_invalid') from None
         self.dsn = dsn
 
     def call(self, name, *values):
@@ -60,6 +77,9 @@ class Database:
                     options='-c statement_timeout=4000 -c lock_timeout=2000 -c search_path=pg_catalog') as conn:
                 if conn.info.user!='goufayu_payment':
                     raise PaymentError('database_role_invalid',503)
+                if self.isolated and (conn.info.dbname!='goufayu_ws4'
+                        or conn.info.host!='127.0.0.1' or conn.info.port!=15432):
+                    raise PaymentError('payment_database_identity_invalid',503)
                 query = 'SELECT payments.'+name+'('+','.join(['%s']*len(values))+')'
                 result = conn.execute(query,values).fetchone()[0]
             if isinstance(result,dict) and result.get('error'):
@@ -81,6 +101,10 @@ def native_qr(order):
 class Payments:
     def __init__(self, config, database, wechat, alipay=None):
         self.config, self.db, self.wechat = config, database, wechat
+        self.endpoints = PaymentEndpoints(config.get('public_base', ORIGIN))
+        for gateway in (wechat, alipay):
+            if isinstance(gateway, (WeChat, Alipay)) and gateway.endpoints != self.endpoints:
+                raise ValueError('payment_gateway_namespace_mismatch')
         self.alipay = alipay
         self.alipay_mode = config.get('alipay_checkout_mode','page_pay')
         if self.alipay_mode not in ('page_pay','precreate'):raise ValueError('alipay_checkout_mode_invalid')
@@ -102,7 +126,10 @@ class Payments:
         return hashed,session,catalog
 
     def token(self, order_id):
-        return hmac.new(self.config['checkout_key'].encode(),('checkout:'+order_id).encode(),hashlib.sha256).hexdigest()
+        # Legacy tokens keep their exact message. Isolated checkout capabilities
+        # cannot be replayed to the old instance even if a key/order ID is reused.
+        namespace = self.endpoints.prefix + ':' if self.endpoints.isolated else ''
+        return hmac.new(self.config['checkout_key'].encode(),('checkout:'+namespace+order_id).encode(),hashlib.sha256).hexdigest()
 
     def public(self, order):
         count,unit_amount=snapshot_units(order)
@@ -115,9 +142,9 @@ class Payments:
             'amount_fen':order['amount'],'currency':order['currency'],
             'order_id':order['order_id'],'provider':order.get('provider','wechat'),'state':order['state'],'expires_at':order['expires_at'],
             'expired':expired(order), 'effect_changes':order.get('effect_changes',{}),
-            'checkout_url':ORIGIN+'/checkout?order='+order['order_id']+'&token='+self.token(order['order_id'])}
+            'checkout_url':self.endpoints.url('/checkout')+'?order='+order['order_id']+'&token='+self.token(order['order_id'])}
         if result['provider']=='alipay':
-            result['checkout_url']=ORIGIN+'/checkout/alipay?order='+order['order_id']+'&token='+self.token(order['order_id'])
+            result['checkout_url']=self.endpoints.url('/checkout/alipay')+'?order='+order['order_id']+'&token='+self.token(order['order_id'])
         result['checkout_mode']='qr' if native_qr(order) else 'page_pay' if order.get('code_url')=='alipay:page_pay' else 'preparing'
         # Existing orders retain their stored amount even after a catalog edit.
         recharge=ucoin_recharge.is_recharge(order)
@@ -267,7 +294,7 @@ class Payments:
                     'wechat':True,'alipay':self.alipay is not None,'alipay_checkout_mode':self.alipay_mode}
         if path=='reset':
             # TODO(PAYMENT_TEST_ONLY): disabled by default, both HTTP and SQL gates required.
-            if self.config.get('test_reset_enabled') is not True:
+            if self.endpoints.isolated or self.config.get('test_reset_enabled') is not True:
                 raise PaymentError('test_reset_disabled',403)
             kind,request=body['kind'],body['request_id']
             if kind not in ('refreshdata','refreshmoney') or not isinstance(request,str) or not re.fullmatch(r'[A-Za-z0-9_.:-]{8,128}',request):
@@ -388,20 +415,20 @@ def handler(app):
         def get(self):
             url=urlsplit(self.path)
             if url.path=='/health':return self.send(200,{'ok':True,'service':'payments'})
-            if url.path=='/checkout.js':return self.send(200,JS,'application/javascript; charset=utf-8')
+            if url.path=='/checkout.js':return self.send(200,app.endpoints.render_template(JS),'application/javascript; charset=utf-8')
             if url.path=='/checkout.css':return self.send(200,CSS,'text/css; charset=utf-8')
-            if url.path=='/checkout/return':return self.send(200,RETURN_PAGE,'text/html; charset=utf-8')
+            if url.path=='/checkout/return':return self.send(200,app.endpoints.render_template(RETURN_PAGE),'text/html; charset=utf-8')
             if url.path=='/alipay-redirect.js':return self.send(200,'document.getElementById("alipay-form").submit();','application/javascript; charset=utf-8')
             if url.path not in ('/checkout','/checkout/status','/checkout/qr','/checkout/alipay'):
                 raise PaymentError('route_not_found',404)
             order=app.checkout(url.query)
             if url.path=='/checkout/alipay':
                 if order.get('provider')!='alipay' or not app.alipay:raise PaymentError('payment_channel_unavailable',409)
-                if order['state'] not in ('created','pending') or expired(order):return self.send(200,RETURN_PAGE,'text/html; charset=utf-8')
-                if native_qr(order):return self.send(200,PAGE,'text/html; charset=utf-8')
-                if order.get('code_url')!='alipay:page_pay':return self.send(200,RETURN_PAGE,'text/html; charset=utf-8')
+                if order['state'] not in ('created','pending') or expired(order):return self.send(200,app.endpoints.render_template(RETURN_PAGE),'text/html; charset=utf-8')
+                if native_qr(order):return self.send(200,app.endpoints.render_template(PAGE),'text/html; charset=utf-8')
+                if order.get('code_url')!='alipay:page_pay':return self.send(200,app.endpoints.render_template(RETURN_PAGE),'text/html; charset=utf-8')
                 return self.send(200,app.alipay.page(order),'text/html; charset=utf-8',alipay_form=True)
-            if url.path=='/checkout':return self.send(200,PAGE,'text/html; charset=utf-8')
+            if url.path=='/checkout':return self.send(200,app.endpoints.render_template(PAGE),'text/html; charset=utf-8')
             if url.path=='/checkout/status':return self.send(200,app.public(order))
             if not native_qr(order) or order['state']!='pending' or expired(order):
                 raise PaymentError('qr_unavailable',409)
@@ -410,7 +437,8 @@ def handler(app):
             self.send(200,output.getvalue(),'image/svg+xml')
         def do_POST(self):self.run(self.post)
         def post(self):
-            paths={x:'/v1/payments/'+x for x in ('catalog','create','status','cancel','reset')}
+            actions=('catalog','create','status','cancel') if app.endpoints.isolated else ('catalog','create','status','cancel','reset')
+            paths={x:'/v1/payments/'+x for x in actions}
             is_alipay=self.path=='/v1/payments/alipay/notify'
             is_notice=self.path=='/v1/payments/wechat/notify' or is_alipay
             if not is_notice:
@@ -439,9 +467,11 @@ def handler(app):
 class Server(ThreadingHTTPServer):
     daemon_threads=True
     request_queue_size=16
-    def __init__(self,app):
+    def __init__(self,app,port=8766):
+        if type(port) is not int or port != (18769 if app.endpoints.isolated else 8766):
+            raise ValueError('payment_loopback_port_invalid')
         self.slots=threading.BoundedSemaphore(12)
-        super().__init__(('127.0.0.1',8766),handler(app))
+        super().__init__(('127.0.0.1',port),handler(app))
     def process_request(self,request,address):
         if not self.slots.acquire(False):
             self.shutdown_request(request);return
@@ -453,16 +483,31 @@ class Server(ThreadingHTTPServer):
     def handle_error(self,*args):LOG.error('http_connection_failed')
 
 
-def main():
+def arguments(argv=None):
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--config',default=LEGACY_CONFIG,choices=(LEGACY_CONFIG,WS4_CONFIG))
+    parser.add_argument('--port',type=int,default=8766,choices=(8766,18769))
+    args=parser.parse_args(argv)
+    if (args.config,args.port) not in ((LEGACY_CONFIG,8766),(WS4_CONFIG,18769)):
+        parser.error('config and port must identify the same fixed payment instance')
+    return args
+
+
+def main(argv=None):
     logging.basicConfig(level=logging.INFO,format='[Payments] %(message)s')
-    config=json.loads(Path('/etc/goufayu-payment/config.json').read_text())
+    args=arguments(argv)
+    config=decode_json(Path(args.config).read_bytes())
+    endpoints=runtime_binding(args.config,args.port,config)
     if len(config['checkout_key'])<32 or len(config['game_token'])<24 or len(config['pepper'])<24:
         raise RuntimeError('payment_configuration_invalid')
-    alipay=Alipay('/etc/goufayu-payment/alipay',config['alipay_seller_id']) if config.get('alipay_enabled') is True else None
-    app=Payments(config,Database(config['dsn']),WeChat('/etc/goufayu-payment/wechat'),alipay)
+    wechat_keys=key_directory(config,'wechat')
+    alipay_keys=key_directory(config,'alipay')
+    database=Database(config['dsn'],isolated=endpoints.isolated)
+    alipay=Alipay(alipay_keys,config['alipay_seller_id'],public_base=endpoints.public_base) if config.get('alipay_enabled') is True else None
+    app=Payments(config,database,WeChat(wechat_keys,public_base=endpoints.public_base),alipay)
     app.db.call('pending')
     threading.Thread(target=app.worker,daemon=True).start()
-    Server(app).serve_forever()
+    Server(app,port=args.port).serve_forever()
 
 
 if __name__=='__main__':main()

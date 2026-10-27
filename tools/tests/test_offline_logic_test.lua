@@ -51,6 +51,8 @@ assert(not pcall(offline.configure), "online web authorization and offline provi
 web_config.enabled = web_enabled
 
 assert(offline.configure())
+assert(not require("core/commerce_release_policy").real_money_allowed(),
+    "the real loaded offline arena must close developer cash without network access")
 local options = assert(offline.profile_options())
 assert(options.offline_logic_test and offline.is_provider(options.provider))
 local original_open = io.open

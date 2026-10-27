@@ -16,12 +16,13 @@ import urllib.request
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from .endpoints import DEFAULT_PUBLIC_BASE, PaymentEndpoints
 
 APPID = 'wx164e25a570fb636a'
 MCHID = '1117928493'
 PUBLIC_ID = 'PUB_KEY_ID_0111179284932026092700191743000600'
 SERIAL = '65884C7F0CD3A17924257A1EFEC6BC786E8FC9E5'
-ORIGIN = 'https://pay.xiaofengnet.com'
+ORIGIN = DEFAULT_PUBLIC_BASE
 SKU = 'monkey_test_010_v1'
 TITLE = '齐天大圣存档奖励 ×1（测试商品）'
 
@@ -57,7 +58,8 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 
 
 class WeChat:
-    def __init__(self, directory):
+    def __init__(self, directory, *, public_base=DEFAULT_PUBLIC_BASE):
+        self.endpoints = PaymentEndpoints(public_base)
         directory = Path(directory)
         self.private = serialization.load_pem_private_key((directory/'apiclient_key.pem').read_bytes(), None)
         self.public = serialization.load_pem_public_key((directory/'pub_key.pem').read_bytes())
@@ -116,7 +118,7 @@ class WeChat:
     def create(self, order):
         result = self.request('POST','/v3/pay/transactions/native',{
             'appid':APPID,'mchid':MCHID,'description':order['reward']['title'],'out_trade_no':order['order_id'],
-            'notify_url':ORIGIN+'/v1/payments/wechat/notify',
+            'notify_url':self.endpoints.url('/v1/payments/wechat/notify'),
             'time_expire':datetime.fromisoformat(order['expires_at']).isoformat(timespec='seconds'),
             'amount':{'total':order['amount'],'currency':order['currency']}})
         code = result.get('code_url','')

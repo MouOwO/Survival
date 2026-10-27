@@ -105,6 +105,8 @@ def process_identity(pid, *, terminate=False, expected=None, kernel=None,
     kernel.OpenProcess.argtypes = (wintypes.DWORD, wintypes.BOOL, wintypes.DWORD)
     kernel.OpenProcess.restype = wintypes.HANDLE
     kernel.CloseHandle.argtypes = (wintypes.HANDLE,)
+    kernel.GetExitCodeProcess.argtypes = (wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD))
+    kernel.GetExitCodeProcess.restype = wintypes.BOOL
     kernel.GetProcessTimes.argtypes = (wintypes.HANDLE, *([ctypes.POINTER(wintypes.FILETIME)] * 4))
     kernel.QueryFullProcessImageNameW.argtypes = (wintypes.HANDLE, wintypes.DWORD, wintypes.LPWSTR, ctypes.POINTER(wintypes.DWORD))
     kernel.TerminateProcess.argtypes = (wintypes.HANDLE, wintypes.UINT)
@@ -117,6 +119,14 @@ def process_identity(pid, *, terminate=False, expected=None, kernel=None,
             raise RuntimeError("relay_process_not_found")
         raise RuntimeError("relay_process_access_failed")
     try:
+        exit_code = wintypes.DWORD()
+        if not kernel.GetExitCodeProcess(handle, ctypes.byref(exit_code)):
+            raise RuntimeError("relay_process_identity_unavailable")
+        # A completed process may retain an open kernel object after CIM no
+        # longer lists it. Its image is then unavailable, but it is safe to
+        # retire its receipt without terminating any process or reusing a PID.
+        if exit_code.value != 259:  # STILL_ACTIVE
+            raise RuntimeError("relay_process_not_found")
         values = [wintypes.FILETIME() for _ in range(4)]
         if not kernel.GetProcessTimes(handle, *[ctypes.byref(value) for value in values]):
             raise RuntimeError("relay_process_identity_unavailable")

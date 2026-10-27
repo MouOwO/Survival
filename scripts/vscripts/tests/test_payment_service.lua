@@ -17,8 +17,14 @@ package.loaded['systems/player_profile_service']={get_provider=function()return 
  load_player=function()error("payment must use non-destructive refresh")end,
  refresh_player=function(id,reason,done)refreshed=refreshed+1;done();return {ok=true} end}
 package.loaded['systems/match_setup_service']={get_session_id=function()return 'safe_session' end}
+local players={}
+for id=0,1 do
+ local entity={id=id};function entity:GetPlayerID()return self.id end;function entity:IsNull()return false end
+ players[id]=entity
+end
+EntIndexToHScript=function(index)return players[index-200]end
 PlayerResource={IsValidPlayerID=function(_,id)return id==0 or id==1 end,IsFakeClient=function()return false end,
- GetPlayer=function(_,id)return {id=id} end}
+ GetPlayer=function(_,id)return players[id] end}
 CustomGameEventManager={RegisterListener=function(_,name,f)handlers[name]=f end,
  Send_ServerToPlayer=function(_,player,name,body)sent[#sent+1]=body end}
 Convars={GetStr=function()return 'server_only_test_token' end}
@@ -34,7 +40,7 @@ CreateHTTPRequestScriptVM=function(method,url)
  return r
 end
 local service=require('systems/payment_service');service.init();service.init()
-local handle=handlers.survival_payment_request
+local function handle(_,payload) return handlers.survival_payment_request(200+payload.PlayerID,payload) end
 handle(0,{PlayerID=0,action='create',sku='wood_100_test_50_v3',account_id='attacker',amount=1,u_coin_price=1,u_coin_per_yuan=1,amount_fen=1})
 local body=require('core/json_decoder').decode(requests[1].body)
 assert(body.account_id=='123' and body.amount==nil and body.match_session_id=='safe_session')

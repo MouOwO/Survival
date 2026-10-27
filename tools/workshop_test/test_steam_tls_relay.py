@@ -23,7 +23,8 @@ class NativeCall:
 
 class KernelFixture:
     """No real process is opened; emulate the values written by Win32 APIs."""
-    def __init__(self, executable, *, found=True, created=42, terminate=True, wait=0):
+    def __init__(self, executable, *, found=True, created=42, terminate=True, wait=0,
+                 exit_code=259, exit_query=True):
         self.calls = []
         self.handle = 123
         def opened(flags, inherit, pid):
@@ -46,6 +47,11 @@ class KernelFixture:
             self.calls.append(("wait", handle, timeout))
             return wait
         self.OpenProcess = NativeCall(opened)
+        def exited(handle, value):
+            self.calls.append(("exit", handle))
+            value._obj.value = exit_code
+            return int(exit_query)
+        self.GetExitCodeProcess = NativeCall(exited)
         self.GetProcessTimes = NativeCall(times)
         self.QueryFullProcessImageNameW = NativeCall(image)
         self.TerminateProcess = NativeCall(terminated)
@@ -123,6 +129,23 @@ class TemporaryRelayTest(unittest.TestCase):
         with receipt, identity:
             self.assertTrue(relay.stop()["ok"])
         self.assertFalse(self.receipt.exists())
+
+    def test_exited_process_object_clears_stale_receipt_without_termination(self):
+        kernel = KernelFixture(self.executable, exit_code=0)
+        receipt, identity = self.prepared_stop(kernel)
+        with receipt, identity:
+            self.assertTrue(relay.stop()["ok"])
+        self.assertFalse(self.receipt.exists())
+        self.assertFalse(any(call[0] in ("terminate", "times", "image") for call in kernel.calls))
+        self.assertEqual(kernel.calls[-1], ("close", kernel.handle))
+
+    def test_unknown_exit_status_keeps_receipt_and_never_terminates(self):
+        kernel = KernelFixture(self.executable, exit_query=False)
+        receipt, identity = self.prepared_stop(kernel)
+        with receipt, identity, self.assertRaisesRegex(RuntimeError, "relay_process_identity_unavailable"):
+            relay.stop()
+        self.assertTrue(self.receipt.exists())
+        self.assertFalse(any(call[0] == "terminate" for call in kernel.calls))
 
     def test_reused_pid_or_other_executable_is_not_stopped(self):
         for kernel in (KernelFixture(self.executable, created=43),
