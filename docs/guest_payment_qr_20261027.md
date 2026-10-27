@@ -1,8 +1,8 @@
 # 加入方购买二维码几何修复（2026-10-27）
 
-状态：**FIX_UPLOADED_PENDING_RESTART_OFFICIAL_DOWNLOAD_AND_GUEST_SCAN**。历史08双人登录和云档已通过，用户另报加入方二维码错位；最小修复已真实封包上传为09，官方下载、原生加入方画面复测及手机扫码均为 `NOT_RUN`，支付和到账不能标记PASS。
+状态：**VERIFIED_NATIVE_GUEST_SCAN**。修复版09已通过官方完整下载校验。2026-10-28，加入方用手机实测后明确确认“可以识别，商品和金额正确”，本轮二维码目标验收通过；实际付款、到账和权益刷新仍未验收。
 
-用户提供的189×188像素裁图中，左上定位块不同扫描行的宽度为32、33、34像素，垂直跨度35像素，证明几何并非单一等比缩放。行流式布局的宽度舍入或挤压是候选原因，仍需原生几何复核；裁图边距不足以判断完整界面的静区，后端配置仍为4模块静区。未解码、输出或发送二维码载荷。
+用户提供的189×188像素裁图中，左上定位块不同扫描行的宽度为32、33、34像素，垂直跨度35像素，证明几何并非单一等比缩放。行流式布局的宽度舍入或挤压是候选原因；固定画布修复后，加入方手机已能识别。尚未独立测量修复后客户端每个色块的像素边界；原裁图边距不足以判断完整界面的静区，后端配置仍为4模块静区。未解码、输出或发送二维码载荷。
 
 最小修复在 `payment_test.js` 中改用固定白色画布和黑色区段绝对定位，不再依赖行流式布局；付款、身份与原矩阵限制不变。缓存和子节点清理失败时不保留已完成二维码状态。
 
@@ -16,6 +16,10 @@
 
 封包报告原始SHA256为 `041b7b4fd90500ef15e48e7fa475731455cafbe8da132499d38d6e520004fff8`。实际上传日志已返回 `uploaded=true`、`legal_agreement_required=false`，最终状态为 `SUBMITTED_UNLISTED_PENDING_DOWNLOAD_AND_NATIVE_TEST`。
 
-记录时主机仍在暂停的N1旧08对局，等待退出与重启；不能把该对局或08的manifest `976725920376391555` 记为09验证结果。09尚无经官方下载核验的manifest，代理未进行手机付款。
+2026-10-28 07:05:07（UTC+08）完成09官方完整下载校验，实际manifest为字符串 `3869894305253699960`；6658份签名资源、180份受保护模块、5个VPK及签名核验通过，官方回调为 `3406 / result=1`。08的manifest `976725920376391555` 仍仅作为历史证据。
 
-证据：`output/native_arcade_cloud_20261027/guest_qr_raster_audit.json`、`qr_fix_source_tests.json`、`qr_fix_compile.log`、`native_cloud_v03_package.json`、`native_cloud_v03_upload.log`。修复上传不等于加入方二维码、手机扫码或到账验收完成。
+下载回执：`output/native_arcade_cloud_20261027/download_evidence_v03/20261027T230507Z_68b94b8d9b024315b779eca43305e5e3/verification.json`，原始SHA256为 `15177b4c943afa61619ea8be892b431fa8bbf6c50a4a2a7e480c5bd84d212f45`。下载日志 `native_cloud_v03_official_download_20261028.log` 实际退出码为0，下载器未改写发布日志。
+
+编译与发布证据：`output/native_arcade_cloud_20261027/guest_qr_raster_audit.json`、`qr_fix_source_tests.json`、`qr_fix_compile.log`、`native_cloud_v03_package.json`、`native_cloud_v03_upload.log`。
+
+本轮主机实际观察到原工坊房间2/4，两名玩家为“是无话吖”和“天才琪露诺”；随后同一普通Dota进程35164已进入N1正式游戏并打开商城。加入方手机扫码和商品、金额正确由用户确认，独立回执为 `output/native_cloud_v03_native_20261028/native09_guest_scan_acceptance.json`。本轮进程没有原生日志，未重新核验自动入口执行次数、HTTP计数或逐人云档；这些结果不沿用08数据。代理未创建订单、未操作支付；用户本轮是否创建新订单及订单总数未知。扫码通过不等于实际付款、云端到账或重启权益读回通过。

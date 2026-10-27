@@ -1,14 +1,18 @@
 # 原游廊登录与商城通信排查（2026-10-27）
 
-原工坊条目 `3824360109` 的历史08已通过原生双人自动入口、网页登录和独立测试云档读回验收。修复加入方二维码的09已真实封包并上传，当前状态为 `FIX_UPLOADED_PENDING_RESTART_OFFICIAL_DOWNLOAD_AND_GUEST_SCAN`；09尚未完成官方下载校验或玩家端复测，支付和到账不能标记通过。
+原工坊条目 `3824360109` 的历史08已通过原生双人自动入口、网页登录和独立测试云档读回验收。修复加入方二维码的09已真实封包、上传并通过官方完整下载校验；2026-10-28加入方手机扫码后，用户明确确认“可以识别，商品和金额正确”，当前二维码状态为 `VERIFIED_NATIVE_GUEST_SCAN`。实际付款、到账和权益刷新仍未验收。
 
-## 当前09：已上传，等待重启、官方下载和加入方扫码
+## 当前09：官方下载和加入方手机扫码已通过
 
 `WS4-NATIVE-CLOUD-03`／`2026102709` 的内容摘要为 `1262cbe5905d760c6c15400e4051038613c6a78bffb99b64d9d2d5d609d3cf40`，索引摘要 `b09f36be87db6dc3c8f055e06a9c18438236437d0167c7634effba6707b37278`，总字节数3767362385、6658份资源。仅替换二维码UI编译文件，180份受保护模块和入口／认证核心保持原字节。
 
 真实封包报告 `output/native_arcade_cloud_20261027/native_cloud_v03_package.json` 的原始SHA256为 `041b7b4fd90500ef15e48e7fa475731455cafbe8da132499d38d6e520004fff8`。`native_cloud_v03_upload.log` 已实际返回 `SUBMITTED_UNLISTED_PENDING_DOWNLOAD_AND_NATIVE_TEST`、`uploaded=true`、`legal_agreement_required=false`。
 
-本次记录时主机仍在暂停的N1旧08对局，已询问用户退出。09的 `download_verified=false`，加入方原生二维码及手机扫码均为 `NOT_RUN`，代理未进行手机付款。08的manifest和完整下载／登录证据只保存在 `verified_native08` 历史对象，不能沿用为09的下载或实机结果。
+09的 `download_verified=true`：2026-10-28 07:05:07（UTC+08）完成新鲜官方查询、订阅回调 `1313 / result=1`、下载回调 `3406 / result=1`、安装manifest和完整签名资源核验，manifest为字符串 `3869894305253699960`。6658份资源、180份受保护模块、5个VPK及签名校验通过；下载器未改写发布日志。08的manifest和完整下载／登录证据只保存在 `verified_native08` 历史对象，不能沿用为09实机结果。
+
+新09下载日志为 `output/native_arcade_cloud_20261027/native_cloud_v03_official_download_20261028.log`，实际退出码0；回执为 `output/native_arcade_cloud_20261027/download_evidence_v03/20261027T230507Z_68b94b8d9b024315b779eca43305e5e3/verification.json`，原始SHA256为 `15177b4c943afa61619ea8be892b431fa8bbf6c50a4a2a7e480c5bd84d212f45`。
+
+本轮主机实际观察到原工坊房间2/4，两名玩家为“是无话吖”和“天才琪露诺”；随后同一普通Dota进程35164已进入N1正式游戏并打开商城。加入方手机扫码由用户确认通过，且商品和金额正确，安全摘要为 `output/native_cloud_v03_native_20261028/native09_guest_scan_acceptance.json`。该进程由用户重开、没有本轮原生日志，自动入口执行次数、HTTP计数和逐人云档未重新审计；本轮不得复制08的这些计数。代理未创建订单、未操作支付，用户是否创建新订单及订单总数未知，支付和到账继续保持未验收。
 
 ## 历史08真实验收（PASS）
 
@@ -21,14 +25,14 @@
 
 证据：`output/native_cloud_v02_native_20261027/native08_transport_auth_acceptance.json`，SHA256 `daf5e2db2ec345f35779ad30ef6d4ba2c0ffc56c0163a2addf6cc3ef3b9519f2`。活跃原始日志仅记录读取时的前缀长度与摘要，导出的验收文件不包含授权链接、短码、令牌或订单正文。
 
-[二维码修复记录](guest_payment_qr_20261027.md)已记录本地编译及46项检查通过；加入方原生画面和手机扫码验收仍为 `NOT_RUN`。08发行摘要保持不变；修复现已封包上传为09，但09尚未完成官方下载与原生加入方验收。
+[二维码修复记录](guest_payment_qr_20261027.md)已记录本地编译及46项检查通过，以及09官方下载和加入方手机扫码通过。08发行摘要及历史实机记录保持不变，09的扫码通过不代表已完成真实付款或权益到账验证。
 
 ## 固定对照基线（历史05）
 
 - 此前用于对照并已重新完整校验的工坊包：`WS4-REFRESH-NATIVE-02`，序号 `2026102705`；历史08下载结果见下文。
 - 内容摘要：`8a01a5b66603804c683b879043c220e4f9496d7cca75f304ac5d9da210794cf6`。
 - 5 个 VPK、6655 份资源，签名及资源 CRC/MD5/SHA256 校验通过。不存在同数字 ID 的本地 addon 覆盖。
-- 四测试账号限制及 `sv_cheats=0` 保持不变。测试不创建订单、不付款、不改云存档。
+- 四测试账号限制及 `sv_cheats=0` 保持不变。历史05对照测试未创建订单、未付款、未修改云存档。
 
 ## 已完成的实机对照
 
@@ -100,7 +104,7 @@ changelevel template_map gamemode=15 customgamemode=3824360109 nomapvalidation=1
 
 `native_cloud_v02_official_download.log` 实际退出码为0；2026-10-27 13:12:26 UTC的新鲜官方回调 `3406 / result=1` 对应manifest `976725920376391555`。下载后的6658份签名资源、180份受保护模块、5个VPK、14份受审可信文件和签名校验均通过。完整证据为 `output/native_arcade_cloud_20261027/download_evidence_v02/20261027T131226Z_47475f709b284ebfa099237868d7e53a/verification.json`。下载证据本身只证明安装版本正确；原生自动换图、双人登录及云档读回的独立实机证据见本文开头。
 
-历史08版本自动入口和双人登录／云档读回状态为 `PASS`，不自动转移为09实机结果。支付、二维码修复后的手机扫码与购买到账未通过本次验收，不以已显示商城或二维码代替支付成功。本地代码检查记录仍为 `native_cloud_v02_plan.json` 与 `native_cloud_v02_required_flag_tests.json`。
+历史08版本自动入口和双人登录／云档读回状态为 `PASS`，不自动转移为09实机结果。08当时未通过加入方扫码验收，后续09已单独完成手机扫码及商品、金额核对；实际支付与购买到账仍未验收，不以已显示商城或二维码代替支付成功。本地代码检查记录仍为 `native_cloud_v02_plan.json` 与 `native_cloud_v02_required_flag_tests.json`。
 
 ## 开局前认证的边界
 
@@ -110,7 +114,7 @@ changelevel template_map gamemode=15 customgamemode=3824360109 nomapvalidation=1
 
 ## 后续验收要求
 
-1. 在修复后的真实加入方画面检查二维码几何，再用手机扫码核对商品、金额与支付页面；目前均未验收。
+1. 加入方手机扫码、商品及金额核对已通过；继续覆盖其他分辨率和界面缩放，必要时补充实际像素几何检查。
 2. 单独验证实际支付、云端到账、权益刷新与重启读回；不能从HTTP、登录或档案版本递增推断付款完成。
 3. 继续验证断线重连、后加入和不同网络。原 GC 房间对象销毁已知，现有双人同行结果不能代替这些场景。
 
