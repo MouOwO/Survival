@@ -233,6 +233,8 @@
         "DOTA_Tooltip_ability_ability_build_main_city_Description" "Builds the Main City, which can be upgraded and can train Lumberjacks."
         "DOTA_Tooltip_ability_ability_build_research_lab" "Build Research Lab"
         "DOTA_Tooltip_ability_ability_build_research_lab_Description" "Unlocked after the main city is completed. Construction costs are read from the building CSV."
+        "DOTA_Tooltip_ability_ability_build_advanced_research_lab" "Build Advanced Research Lab"
+        "DOTA_Tooltip_ability_ability_build_advanced_research_lab_Description" "Replaces the W-slot build skill after the standard Research Lab is completed. Available at Main City Level 4, costs 100 wood, and displays ARS-01 through ARS-10 in a two-row ability grid."
         "DOTA_Tooltip_ability_ability_build_wall_Description" "Builds a wall at the target location. Only one wall can be built, and it can be selected and upgraded."
         "DOTA_Tooltip_ability_ability_building_blink" "Building Blink"
         "DOTA_Tooltip_ability_ability_building_blink_Description" "Moves the selected building to the target location."

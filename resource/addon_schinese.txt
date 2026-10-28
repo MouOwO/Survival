@@ -365,6 +365,8 @@
         "DOTA_Tooltip_ability_ability_build_main_city_Description" "建造主城。主城拥有升级和训练伐木工两个技能。"
         "DOTA_Tooltip_ability_ability_build_research_lab" "建造研究所"
         "DOTA_Tooltip_ability_ability_build_research_lab_Description" "主城建成后解锁；建造费用读取建筑配置表。"
+        "DOTA_Tooltip_ability_ability_build_advanced_research_lab" "建造高级研究所"
+        "DOTA_Tooltip_ability_ability_build_advanced_research_lab_Description" "普通研究所建成后替换W槽技能；主城达到4级后可用，消耗100木材。建成后在两行技能栏显示ARS-01至ARS-10。"
         "DOTA_Tooltip_ability_ability_build_wall_Description" "在指定位置建造城墙。城墙整局只能建造一次，且可以被选中并继续升级。"
         "DOTA_Tooltip_ability_ability_building_blink" "移动建筑"
         "DOTA_Tooltip_ability_ability_building_blink_Description" "将选中的建筑移动到指定位置。"
