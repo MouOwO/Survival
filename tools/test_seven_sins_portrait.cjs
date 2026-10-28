@@ -89,3 +89,60 @@ for(const [,rank,unit,asset] of rebirths){
  t.api.shutdown('rebirth_done');assert.equal(t.jobs.size,0);
 }
 console.log('SEVEN_SINS_PORTRAIT_PASS: 12 existing split portraits and all 10 configured native rebirth portraits; pending/late snapshots, 64 stable updates, selection, multiselect and Juggernaut restoration');
+
+// The native fallback above remains available without the outfit module. With
+// its real generated data loaded, all ten use the official slot/item/style API.
+const config={};require('vm').runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/rebirth_portrait_outfits.js','utf8'),{GameUI:{CustomUIConfig:()=>config}});
+const outfits=config.SurvivalRebirthPortraitOutfits;
+assert.equal(Object.keys(outfits).length,10);
+let totalItems=0;
+for(const [,rank,unit,asset] of rebirths){
+ const outfit=outfits[asset];assert(outfit);
+ const t=setup({portrait:true,config:{SurvivalRebirthPortraitOutfits:outfits}});
+ t.select(8,unit);t.api.portraitTransition('pending_snapshot');
+ assert.equal(t.overlay.values.visibility,'collapse','native stays visible while metadata is pending');
+ const snapshot={entindex:8,refresh_version:1,model_asset_id:asset,portrait_unit_name:outfit.source_unit};
+ t.api.updateSnapshot(snapshot);
+ const scene=t.overlay.FindChildTraverse('SurvivalRebirthOutfitPortraitSceneV1');assert(scene);
+ assert.equal(scene.attributes.drawbackground,'true');assert.equal(scene.attributes.deferredalpha,'false');
+ assert.equal(scene.values.width,'100%');assert.equal(scene.values.height,'100%');
+ assert.equal(scene.hittest,false);assert.equal(scene.hittestchildren,false);
+ assert.equal(t.overlay.values.visibility,'visible');
+ assert.deepEqual(t.metrics.setUnit.map(c=>c.args),[[outfit.unit,'default',false]]);
+ assert.deepEqual(t.metrics.econItem.map(c=>c.args),JSON.parse(JSON.stringify(outfit.items)));
+ assert.equal(t.metrics.econHero.length,0,'no account loadout binding');
+ assert.equal(scene.values.transform,'scale3d(1, 1, 1)','rebirth uses its native portrait framing');
+ for(let frame=0;frame<64;frame++)t.api.updateSnapshot({...snapshot,refresh_version:frame+2});
+ assert.equal(t.metrics.setUnit.length,1);assert.equal(t.metrics.econItem.length,outfit.items.length,'stable updates do not re-equip');
+ t.setMulti(true);t.api.cosmeticPortraitSentinel();assert.equal(t.overlay.values.visibility,'collapse');
+ t.setMulti(false);t.api.cosmeticPortraitSentinel();assert.equal(t.overlay.values.visibility,'visible');
+ assert.equal(t.metrics.setUnit.length,1,'multiselect round trip reuses the dressed scene');
+ scene.alive=false;
+ t.api.updateSnapshot({...snapshot,refresh_version:100});
+ assert.equal(t.metrics.setUnit.length,2);assert.equal(t.metrics.econItem.length,outfit.items.length*2,'a rebuilt scene must equip again');
+ t.select(7,'npc_dota_hero_juggernaut');
+ t.api.updateSnapshot({entindex:7,refresh_version:101,model_asset_id:'hero_permanent_hero_blademaster',portrait_unit_name:'npc_dota_hero_juggernaut'});
+ assert.equal(t.metrics.econItem.length,outfit.items.length*2,'player Juggernaut retains its prior path');
+ t.api.updateSnapshot({...snapshot,refresh_version:999});assert.equal(t.api.portraitState().entity,7,'late outfit cannot dress the wrong unit');
+ totalItems+=outfit.items.length;t.api.shutdown('outfit_done');assert.equal(t.jobs.size,0);
+}
+// Unsupported or rejected native methods must restore Valve's live portrait,
+// clear partial cosmetics once and never retry every 0.1 seconds or mask it.
+for(const failure of ['missing','throw','false']){
+ const t=setup({portrait:true,config:{SurvivalRebirthPortraitOutfits:outfits}});
+ const [,rank,unit,asset]=rebirths[0],outfit=outfits[asset];t.select(8,unit);
+ const create=t.panorama.CreatePanel;
+ t.panorama.CreatePanel=(...args)=>{const scene=create(...args);
+  if(scene.id==='SurvivalRebirthOutfitPortraitSceneV1'){
+   if(failure==='missing')scene.ReplaceEconItemSlot=null;else scene.econItemFailure=failure;
+  }return scene;
+ };
+ const snapshot={entindex:8,refresh_version:1,model_asset_id:asset,portrait_unit_name:outfit.unit};
+ t.api.updateSnapshot(snapshot);
+ for(let frame=0;frame<64;frame++){t.api.updateSnapshot({...snapshot,refresh_version:frame+2});t.api.portraitTransition('same_selection');}
+ assert.equal(t.overlay.values.visibility,'collapse');assert.equal(t.overlay.GetParent(),t.context);
+ assert.equal(t.native().values.opacity,'0.35');assert.equal(t.metrics.clearScene,1);
+ assert.equal(t.metrics.econItem.length,failure==='missing'?0:1);
+ assert.equal(t.metrics.econHero.length,0);t.api.shutdown('failure_done');
+}
+console.log('REBIRTH_OUTFIT_SCENE_PASS: ten real outfits, '+totalItems+' official slot replacements, stable reuse/rebuild, no account loadouts, native fallback on missing/false/throw');

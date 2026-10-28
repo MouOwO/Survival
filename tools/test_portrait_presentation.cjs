@@ -147,6 +147,8 @@ for(let rank=1;rank<=10;rank++){
  selected=790+rank;unitName='npc_survival_named_rebirth_boss_'+String(rank).padStart(2,'0');
  cfg.SurvivalPortraitPresentation.Refresh(nativeRebirth.group);
  assert.equal(cfg.SurvivalPortraitPresentation.InspectBackdrop().nativeRebirth,true);
+ assert.equal(nativeRebirth.custom.style.backgroundColor,'transparent','native outfit scene keeps its own authored backdrop');
+ assert.equal(nativeRebirth.custom.style.backgroundImage,'none');
  for(const key of ['backgroundColor','backgroundImage','backgroundSize','backgroundPosition','backgroundRepeat'])
   assert.equal(nativeRebirth.container.style[key],'','native rebirth clears custom '+key);
  for(const parent of [nativeRebirth.container,nativeRebirth.custom])

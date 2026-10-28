@@ -27,7 +27,7 @@ const instrumented=source.replace(seam,`    __test({applyAbilityRuntime:applyAbi
 function setup(options={}){
  const cfg=options.config||{},jobs=new Map(),messages=[],subscriptions=new Map();let serial=0,api,time=0,selected=options.portrait?7:-1,multi=false;
  const runtime={},unitNames=new Map([[7,'npc_dota_hero_doom_bringer']]);
- const metrics={setUnit:[],econHero:[],econItem:[],sceneCalls:[],created:[],parents:0,order:0,geometryWrites:0,visibilityTransitions:0,nativeWashWrites:0,builderInlineLayoutWrites:0};
+ const metrics={setUnit:[],econHero:[],econItem:[],sceneCalls:[],clearScene:0,created:[],parents:0,order:0,geometryWrites:0,visibilityTransitions:0,nativeWashWrites:0,builderInlineLayoutWrites:0};
  class Panel{
   constructor(id,parent,type='Panel'){
    this.id=id;this.parent=parent;this.paneltype=type;this.children=[];this.alive=true;this.visible=true;
@@ -69,6 +69,7 @@ function setup(options={}){
   SetUnit(...args){assert(this.alive===true);const call={panel:this,args};metrics.setUnit.push(call);metrics.sceneCalls.push({...call,method:'SetUnit'});if(this.setUnitFailure==='throw')throw Error('SetUnit unavailable');if(this.setUnitFailure==='false')return false}
   SetScenePanelToLocalHero(...args){assert(this.alive===true);const call={panel:this,args};metrics.econHero.push(call);metrics.sceneCalls.push({...call,method:'SetScenePanelToLocalHero'});if(this.econHeroFailure==='throw')throw Error('econ hero unavailable');if(this.econHeroFailure==='false')return false}
   ReplaceEconItemSlot(...args){assert(this.alive===true);const call={panel:this,args};metrics.econItem.push(call);metrics.sceneCalls.push({...call,method:'ReplaceEconItemSlot'});if(this.econItemFailure==='throw')throw Error('econ item unavailable');if(this.econItemFailure==='false')return false}
+  ClearScene(){assert(this.alive===true);metrics.clearScene++}
   AddClass(name){(this.classNames||(this.classNames=new Set())).add(name)}SetHasClass(name,value){this.classes=this.classes||{};this.classes[name]=value}SetImage(uri){this.image=uri}
   GetChildCount(){return this.children.length}GetChild(i){return this.children[i]}
  }
