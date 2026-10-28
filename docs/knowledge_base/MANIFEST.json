@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 3038,
-      "sha256": "1b0e9ad7ddc14c97bcfc8353c948f57bab5e2f150e57ab119bff325cc928bae6"
+      "bytes": 3251,
+      "sha256": "8503d8a5d5ae086a09cbc7539c8a93ae09865925926e13a1fd62ae232dd27c30"
     },
     {
       "path": "01_architecture_and_workflow.md",

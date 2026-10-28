@@ -14,6 +14,6 @@
 
 先按任务读取一个模块：玩法 [02](02_core_gameplay.md)，存档 [03](03_progression_save_contract.md)，联机认证 [04](04_network_auth_official.md)，支付 [05](05_payments_commerce_delivery.md)，发行 [06](06_build_release_ops.md)，故障待办 [07](07_decisions_incidents_pending.md)。完整目录见 [README](README.md)，完成工作索引见 [11](11_completed_work_catalog.md)。
 
-两仓独立：game在 `game/dota_addons/survival`，content在 `content/dota_addons/Survival`。每次交付都检查两仓，按 stash→pull→pop→commit→push，仅提交任务文件；无改动不创建空提交。原有102份game资源/UI/缓存/bundle改动仍需保留。地图源码现已按LFS提交，不能把历史“地图未提交”当当前状态。
+两仓独立：game在 `game/dota_addons/survival`，content在 `content/dota_addons/Survival`。每次交付都检查两仓，按 stash→pull→pop→commit→push，仅提交任务文件；无改动不创建空提交。2026-10-28用户已明确要求提交此前保留的开发改动：100份编译资源纳入版本控制，两项本机Python缓存/bundle运行指针继续留在工作区。波次统一近战/128基础距离已另行提交；Git提交不代表上传工坊或实机验收。地图源码现已按LFS提交，不能把历史“地图未提交”当当前状态。
 
 新会话不会自动加载这个文件夹；使用 [新会话提示词](NEW_CHAT_PROMPT.txt) 指定入口。旧10/24内容只在 `history/20261024/` 作为历史材料，当前状态以上述新模块和真实证据为准。
