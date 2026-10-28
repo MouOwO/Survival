@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "status": "MAP2802_UPLOADED_OFFICIAL_DOWNLOAD_VERIFIED_HOST_MAP_LOADED",
+  "workshop_id": "3824360109",
+  "visibility": "unlisted",
+  "release_sequence": 2026102802,
+  "revision": "WS4-MAP-RESOURCES-01",
+  "content_sha256": "310aad0a33116f29304d9ea7251524b4c1721bd5fb2b7952610d63cca2ac09d5",
+  "vpk_sha256": "b3dbe2351798561cd8d585449a7e304822d62f0706689527285c7f41658359f8",
+  "package_bytes": 3767361725,
+  "package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 274380,
+      "sha256": "b3dbe2351798561cd8d585449a7e304822d62f0706689527285c7f41658359f8"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1073604434,
+      "sha256": "419160879971c9c6a0e775d44caa48c52e7d98e66649084ad55cb9b6e4df15eb"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1068730788,
+      "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379183,
+      "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 552372940,
+      "sha256": "7383f8f065b0adde28a9a0ad0560419add35d150fcf92f7d6776268b8d3cc1e4"
+    }
+  ],
+  "file_count": 6658,
+  "source_sha256": "4e62350c1bf08e663f5217885f26652918c2e09296a829f29a987ba8a14dccdc",
+  "compiled_map_sha256": "f868f295a01b78f63dbeb9fe9edfc6a7591b3889ace84f0892f595ac46f22186",
+  "source_crc32": 3557144492,
+  "map_crc_entries_verified": 307,
+  "changed_runtime_paths": [
+    "maps/template_map.vpk"
+  ],
+  "download_manifest": "2226754158672105621",
+  "download_receipt_sha256": "5babf60a6c7c06bd3867dfb45f9defae57d477ac3728bedea66394ab03f3b948",
+  "uploaded": true,
+  "download_verified": true,
+  "native_map_acceptance": "PASS_HOST_ORDINARY_ARCADE_MAP_LOADED",
+  "ready_for_public_release": false,
+  "source_record": "publishing/workshop/map_resources_20261028.json",
+  "source_record_sha256": "5fa9f92dfc11c7a6208a19cd82566c859c022641bb96734f52207dfa8dff1501"
+}

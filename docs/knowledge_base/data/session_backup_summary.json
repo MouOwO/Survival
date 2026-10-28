@@ -1,0 +1,17 @@
+{
+  "status": "VERIFIED_ACTIVE_ROLLOUT_PREFIX_CAPTURE_NOT_FINAL_CHAT_BACKUP",
+  "destination": "D:\\CodexData\\maintenance-archives\\20261028_survival_context_014909Z_e7d2bc0bdcee411c911d45d11b2bc323",
+  "manifest": "D:\\CodexData\\maintenance-archives\\20261028_survival_context_014909Z_e7d2bc0bdcee411c911d45d11b2bc323\\manifest.json",
+  "zip_bytes": 2071962100,
+  "zip_sha256": "6324ea3e43cc35065c7dff78547301edeb6b32e94f49f71db39be910bf9f001b",
+  "captured_members": 30,
+  "captured_prefix_bytes": 2946354736,
+  "source_files_changed_by_tool": false,
+  "complete_chat_backup": false,
+  "stationary_snapshot": false,
+  "atomic_snapshot": false,
+  "private_raw_data_local_D_only": true,
+  "sqlite_or_credential_files_copied": false,
+  "raw_transcripts_redacted": false,
+  "zip_encrypted": false
+}

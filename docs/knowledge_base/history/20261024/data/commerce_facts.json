@@ -1,0 +1,323 @@
+{
+  "schema_version": 1,
+  "audited_on": "2026-10-24",
+  "language": "zh-CN",
+  "scope": "本地源码与既有脱敏验证记录；没有远端查询、下单、查单或本轮支付测试",
+  "environments": {
+    "general_commerce": "已有通用钱包商城与独立支付服务的实现和历史部署记录",
+    "ws4": {
+      "database": "goufayu_ws4",
+      "allowed_account_count": 4,
+      "payment_mode": "test",
+      "real_money_enabled": false,
+      "trusted_rankings_enabled": false,
+      "host_results_trusted": false
+    },
+    "offline_logic": "只使用本局内存；现金支付零HTTP；不回写云端",
+    "current_development_acceptance": {
+      "flag": "all_difficulties_unlocked",
+      "value_at_audit": true,
+      "writes": "account_writes_isolated_for_entire_match",
+      "normal_persistent_contracts_apply_to_this_acceptance_match": false,
+      "frozen_v05_mode_configuration_inferred_from_development_flag": false
+    }
+  },
+  "identity": {
+    "game_account": "Steam AccountID十进制字符串，由游戏服务器读取，不是SteamID64",
+    "database_account": "服务端HMAC映射；不可在迁移已有档案时随意换映射密钥",
+    "scope_fields": [
+      "account_id",
+      "match_session_id"
+    ],
+    "client_supplied_identity_trusted": false,
+    "profile_schema_version": 1,
+    "revision": "账号权威版本；snapshot不得低于已应用高水位；增量严格+1",
+    "business_profile_field": "account_profile",
+    "pure_mode": "持久化baseline不可变；战斗视图为默认值加本局变化；永久业务档案分离"
+  },
+  "currency_contracts": [
+    {
+      "id": "u_coin",
+      "display_aliases": [
+        "U币",
+        "G币"
+      ],
+      "storage": "save.archive.commerce.balances.u_coin"
+    },
+    {
+      "id": "shop_points",
+      "display": "积分",
+      "storage": "save.archive.commerce.balances.shop_points"
+    },
+    {
+      "id": "shop_gold",
+      "display": "商城金币",
+      "purchase_enabled": false,
+      "error": "shop_gold_not_open"
+    },
+    {
+      "id": "lottery_ticket",
+      "display": "普通抽奖券",
+      "storage": "save.content_inventory",
+      "source": "玩法及已实现福利"
+    },
+    {
+      "id": "special_lottery_ticket",
+      "display": "金色抽奖券",
+      "storage": "save.content_inventory",
+      "source": "已验证支付交付或专门福利结算；不能由客户端模拟"
+    }
+  ],
+  "pricing": {
+    "current_u_coin_per_yuan": 100,
+    "accepted_historical_snapshot_rates": [
+      100,
+      1000
+    ],
+    "cash_amount_unit": "CNY整数分",
+    "ordinary_quantity_max": 100,
+    "ordinary_order_amount_fen_max": 1000000,
+    "wallet_safe_integer_max": 9007199254740991,
+    "recharge": {
+      "sku": "u_coin_recharge",
+      "unit_amount_fen": 100,
+      "credited_u_coin_per_unit": 100,
+      "quantity_max": 999999
+    },
+    "monthly_pass": {
+      "sku": "archive_pass_monthly",
+      "entitlement": "archive_pass",
+      "amount_fen": 5800,
+      "duration_days": 30,
+      "price_policy": "monthly_fixed_58_20261017"
+    },
+    "immutable_order_fields": [
+      "amount",
+      "currency",
+      "provider",
+      "reward",
+      "reward.quantity",
+      "reward.unit_amount_fen",
+      "reward.unit_pricing",
+      "reward.grants",
+      "reward.catalog_hash"
+    ],
+    "note": "现价不能重算旧单；充值到账不由展示报价推导；月卡历史20元基准不参与再次五折"
+  },
+  "sources_of_truth": {
+    "cash_csv": [
+      "商城支付系统/payment_categories.csv",
+      "商城支付系统/payment_products.csv",
+      "商城支付系统/payment_rewards.csv"
+    ],
+    "wallet_csv": [
+      "商城兑换系统/commerce_products.csv",
+      "商城兑换系统/commerce_rewards.csv",
+      "商城兑换系统/commerce_bundle_members.csv"
+    ],
+    "prefix": "data/csv/",
+    "compilers": [
+      "server/payment_backend/csv_catalog.py",
+      "server/payment_backend/commerce_bundles.py",
+      "server/payment_backend/ucoin_catalog.py"
+    ],
+    "derived_not_authoritative": [
+      "生成Lua",
+      "前端展示",
+      "本地目录缓存"
+    ]
+  },
+  "routes": [
+    {
+      "path": "/v1/payments/catalog",
+      "method": "POST",
+      "extra_fields": []
+    },
+    {
+      "path": "/v1/payments/create",
+      "method": "POST",
+      "extra_fields": [
+        "sku",
+        "provider?",
+        "quantity?"
+      ]
+    },
+    {
+      "path": "/v1/payments/status",
+      "method": "POST",
+      "extra_fields": [
+        "order_id"
+      ]
+    },
+    {
+      "path": "/v1/payments/cancel",
+      "method": "POST",
+      "extra_fields": [
+        "order_id"
+      ]
+    },
+    {
+      "path": "/v1/payments/reset",
+      "method": "POST",
+      "extra_fields": [
+        "kind",
+        "request_id"
+      ],
+      "test_only": true
+    },
+    {
+      "path": "/v1/payments/wechat/notify",
+      "method": "POST",
+      "authentication": "平台签名与APIv3资源解密"
+    },
+    {
+      "path": "/v1/payments/alipay/notify",
+      "method": "POST",
+      "authentication": "RSA2签名表单"
+    },
+    {
+      "path": "/v1/archive/command",
+      "method": "POST",
+      "wallet_command": "commerce_purchase",
+      "extra_fields": [
+        "config_hash",
+        "command.id",
+        "command.sku",
+        "command.request_id"
+      ]
+    }
+  ],
+  "events": {
+    "cash_request": "survival_payment_request",
+    "cash_result": "survival_payment_result",
+    "wallet_request": "survival_commerce_request",
+    "wallet_result": "survival_commerce_result",
+    "benefit_claim": "survival_benefit_claim"
+  },
+  "tables": {
+    "public": [
+      "survival_players",
+      "player_gameplay_stats",
+      "player_archive_state",
+      "archive_entitlements",
+      "match_profile_sessions",
+      "archive_operations",
+      "archive_config_sets",
+      "archive_online_outbox"
+    ],
+    "payments": [
+      "orders",
+      "products",
+      "providers",
+      "catalog_state",
+      "test_accounts",
+      "vip_recharge_levels",
+      "vip_recharge_credits"
+    ]
+  },
+  "order_states": {
+    "created": "数据库已建不可变意图",
+    "pending": "网关待确认",
+    "delivered": "付款验证且奖励事务完成",
+    "paid_review": "已收款但需人工处理",
+    "closed": "已核对关闭"
+  },
+  "delivery_guards": [
+    "平台验签先于通知信任；金额、币种、商户、应用、订单、渠道及成功状态全部匹配",
+    "同渠道transaction_id唯一；同单重复通知不重复发放",
+    "属性行、玩家行、订单行锁顺序一致；奖励与revision同事务",
+    "异步回包匹配账号、session、generation；到账后刷新权威profile",
+    "未知网络状态保留原单；禁止超时后换单重复付款",
+    "退款不等于测试重置；没有自动退款与全链撤销能力"
+  ],
+  "timing": {
+    "order_ttl_minutes": 30,
+    "reconciliation_interval_seconds": 10,
+    "wechat_signature_window_seconds": 300,
+    "profile_refresh_guard_seconds": 35,
+    "daily_reset_timezone": "Asia/Shanghai",
+    "daily_reset_hour": 5
+  },
+  "entitlements_and_rewards": {
+    "monthly_renewal": "有效期内从旧到期时间追加；到期后从交付时间算；永久权益保留",
+    "vip_progress": "只由已验证delivered订单触发；vip_recharge_credits按订单及渠道交易去重；测试重置账号与历史单不自动回填",
+    "vip_free_privileges": "VipProgression.reconcile按已有进度使用固定receipt补领，不重新收款",
+    "daily_login_current_local": {
+      "tier_id": "daily_time_0",
+      "monthly_only": true,
+      "auto_claim": false,
+      "item_id": "special_lottery_ticket",
+      "count": 1,
+      "general_service_publication": "既有记录仍为待发布；不得由本地表推断所有线上环境"
+    },
+    "stackable_exceptions": {
+      "lottery_ember_of_legacy": "可叠加",
+      "welfare_zongzi": {
+        "max_owned": 150
+      }
+    },
+    "unique_ownership": "永久身份跨别名、抽奖、付费、兑换共享，其他唯一道具不改为可叠加",
+    "monthly_temporary_attribute_projection": {
+      "source": "scripts/vscripts/systems/archive_monthly_effects.lua",
+      "caller": "scripts/vscripts/systems/permanent_reward_effect_service.lua",
+      "expiry": "scripts/vscripts/systems/archive_calendar.lua",
+      "runtime": "Dota_server_Lua",
+      "scope": "extra_monthly_work_item_and_work_level_attributes_only",
+      "writes_permanent_attributes": false,
+      "earned_online_and_benefit_rewards_can_still_be_persistent": true,
+      "v05_and_development_module_sha256": "1675c968a74b601b73ec35da764780e58ba97ce32ce0468dc53a720a572bfe67"
+    }
+  },
+  "evidence": [
+    {
+      "source": "docs/payments/payment_acceptance_20260928.json",
+      "verified": "历史微信0.10元真实回调、一次永久交付及游戏刷新",
+      "scope_limit": "不覆盖其他商品或支付宝；不携带订单及玩家数据"
+    },
+    {
+      "source": "docs/payments/alipay_native_qr_20260930.md",
+      "verified": "历史原生扫码权限被拒；page_pay与precreate能力分开",
+      "scope_limit": "当前扫码权限及真实支付宝付款未重新核实"
+    },
+    {
+      "source": "validation/20261017/shop_half_price.json",
+      "verified": "100报价比例与相关目录部署验证",
+      "real_orders_created": 0
+    },
+    {
+      "source": "validation/20261017/monthly_pass_58.json",
+      "verified": "58元30天月卡已部署；合成数据库回滚验收",
+      "real_orders_created": 0
+    },
+    {
+      "source": "validation/20261021/benefits.json",
+      "verified": "基础福利版本已部署验证"
+    },
+    {
+      "source": "validation/20261021/benefit_login_manual.json",
+      "verified": "手动月卡登录赠券本地验证",
+      "scope_limit": "普通服务发布待完成"
+    },
+    {
+      "source": "publishing/workshop/test_listing.json",
+      "verified": "WS4隔离四账号测试；真实支付及可信排行关闭"
+    }
+  ],
+  "reuse_requirements": [
+    "保留不可变订单快照与幂等receipt",
+    "分别配置游戏和支付最小权限角色",
+    "合成测试使用回滚事务",
+    "核对真实远端基线后发布",
+    "同快照备份游戏与payments",
+    "自托管战斗结果不进入正式可信经济"
+  ],
+  "excluded_from_bundle": [
+    "真实玩家账号",
+    "订单号及网关流水",
+    "令牌和Cookie",
+    "数据库DSN",
+    "私钥与证书正文",
+    "原始支付通知",
+    "任何.env或secret文件内容"
+  ]
+}

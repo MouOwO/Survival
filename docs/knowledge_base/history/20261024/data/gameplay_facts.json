@@ -1,0 +1,1038 @@
+{
+  "schema": 1,
+  "module": "core_gameplay",
+  "audit_date": "2026-10-24",
+  "language": "zh-CN",
+  "workspace_root": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival",
+  "path_base": "game_repository_root",
+  "audit_method": {
+    "current_source_read": true,
+    "configuration_read": true,
+    "release_receipt_read": true,
+    "game_run": false,
+    "tests_run": false,
+    "deployment": false,
+    "frozen_v05_runtime_reextracted": false
+  },
+  "verification_levels": {
+    "source_verified": "只读核对当前开发源码/配置；不是本次游戏实测。",
+    "release_receipt_verified": "只读核对已记录发布回执；本次未重跑其现场验证。",
+    "historical_document_only": "历史说明，仅用于解释背景，不能替代当前实现。",
+    "not_verified": "当前审计没有足够证据，不得据此承诺。"
+  },
+  "sources": {
+    "release_receipt": {
+      "path": "publishing/workshop/workshop_entry_release_20261024.json",
+      "sha256_at_audit": "6008c9050e740a90a51aa1878eacb099436e0ea7c2d23e3e7ae4f4bed7608816",
+      "role": "release_receipt"
+    },
+    "release_modes": {
+      "path": "scripts/vscripts/config/mode_release_config.lua",
+      "sha256_at_audit": "488711159e258bb52ed8f270732a7ff05be555e193be3a2c92420bc5593959b6",
+      "role": "source_or_configuration"
+    },
+    "release_profile": {
+      "path": "scripts/vscripts/config/release_profile.lua",
+      "sha256_at_audit": "573c8a6731e67c9b51a3839cd6a60b66695dfe11f3a7bf08d7f5cf729895881e",
+      "role": "source_or_configuration"
+    },
+    "release_policy": {
+      "path": "scripts/vscripts/core/release_policy.lua",
+      "sha256_at_audit": "eb617e2954b1beb0dc63690bfb081ee4f8346eabd8c94255c4ba2dc1012e169f",
+      "role": "source_or_configuration"
+    },
+    "web_auth_config": {
+      "path": "scripts/vscripts/config/player_web_auth.lua",
+      "sha256_at_audit": "f21d23d40188a7e49f8e43675ee05fe8af2e533929a8e769d28cd556ab89a630",
+      "role": "source_or_configuration"
+    },
+    "mode_acceptance": {
+      "path": "scripts/vscripts/debug/mode_unlock_test.lua",
+      "sha256_at_audit": "6d696377571601f120f96d093da4a4892a3270f1df6a7b3ad8fcafd182c092fb",
+      "role": "source_or_configuration"
+    },
+    "offline_logic": {
+      "path": "scripts/vscripts/debug/offline_logic_test.lua",
+      "sha256_at_audit": "bc3042ce151f74d1bccaf04ef5c611be2f6a5e9f8955bedc9fe578894a67f34f",
+      "role": "source_or_configuration"
+    },
+    "main": {
+      "path": "scripts/vscripts/addon_game_mode.lua",
+      "sha256_at_audit": "ed267043700d47d2c7f72ff81989255c28b0fdf0c9401f9d0daaa8268df64cc9",
+      "role": "source_or_configuration"
+    },
+    "startup": {
+      "path": "scripts/vscripts/systems/startup_loading_service.lua",
+      "sha256_at_audit": "00959e70772c32e101b234c8ebb4fe79f1902635f70af3c06e33ac80446aa68d",
+      "role": "source_or_configuration"
+    },
+    "match_setup": {
+      "path": "scripts/vscripts/systems/match_setup_service.lua",
+      "sha256_at_audit": "9492f4c0e51fc38e52fe9d63ef143aa6be61d0e24eb46ac64c92e367511cfbf2",
+      "role": "source_or_configuration"
+    },
+    "mode_progression": {
+      "path": "scripts/vscripts/config/mode_progression.lua",
+      "sha256_at_audit": "1584a1556aa3ced801c40e3cca441ef695c5da8717e7b37569ff1d6762253bfe",
+      "role": "source_or_configuration"
+    },
+    "team_difficulty": {
+      "path": "scripts/vscripts/systems/team_difficulty_service.lua",
+      "sha256_at_audit": "057850ad79f3b28a63151f12363e15be9a0c2ccdb45a901c7139b81be63832db",
+      "role": "source_or_configuration"
+    },
+    "profile_service": {
+      "path": "scripts/vscripts/systems/player_profile_service.lua",
+      "sha256_at_audit": "e38ba5a09903e0b83ab5b45b5cf4cccaee8ad83d43499126925fdb9baa4f54b3",
+      "role": "source_or_configuration"
+    },
+    "http_profile_provider": {
+      "path": "scripts/vscripts/systems/player_profile_providers/http_fishing_provider.lua",
+      "sha256_at_audit": "b9715c9039781a0a7fc4e621c1d94b559c6261dcfb359e1dd959026e4f27d423",
+      "role": "source_or_configuration"
+    },
+    "human_spec_json": {
+      "path": "data/balance/human_spec_v3/human_spec.json",
+      "sha256_at_audit": "425c732f61670d21013ad5da83c419ffaa8ff7576c3f1abf894e7d9c9ea6d1c0",
+      "role": "source_or_configuration"
+    },
+    "human_spec_workbook": {
+      "path": "data/balance/human_spec_v3/接入规格_人话版_v3.xlsx",
+      "sha256_at_audit": "39241c3c99c0477ff42b91114a197f449c4f9b9f93d232c1d680e74782156582",
+      "role": "source_or_configuration"
+    },
+    "human_spec_normalized": {
+      "path": "data/balance/human_spec_v3/normalized.json",
+      "sha256_at_audit": "f4aef83457254d23727ae42048fe1a66776fff5296d8069bdc05043a83734083",
+      "role": "source_or_configuration"
+    },
+    "human_spec_generated": {
+      "path": "scripts/vscripts/config/generated/human_monster_spec.lua",
+      "sha256_at_audit": "66ae4b89c83539fd30ab1274871c4444026eab2aa44699e20fc1d0df739c741e",
+      "role": "source_or_configuration"
+    },
+    "human_spec_importer": {
+      "path": "tools/import_human_monster_spec.py",
+      "sha256_at_audit": "18224951425407118920babf1152f2b117c60362f5bd869059d7029df0ac080c",
+      "role": "source_or_configuration"
+    },
+    "human_rules": {
+      "path": "scripts/vscripts/config/human_monster_rules.lua",
+      "sha256_at_audit": "b2a4b952078aaeac36866c38eb1ee8efd58c3e8399264bcb09eff1ade7656392",
+      "role": "source_or_configuration"
+    },
+    "difficulty_config": {
+      "path": "scripts/vscripts/config/difficulty_config.lua",
+      "sha256_at_audit": "90ff551c8fcd167aaaad4d575d0f887889317fe0801c653fb84273ca9a440ef4",
+      "role": "source_or_configuration"
+    },
+    "waves_config": {
+      "path": "scripts/vscripts/config/waves_config.lua",
+      "sha256_at_audit": "25a874a2ae661d1f8f6e5cddf3af04b87646413699707e5bf04012f0fe4e485d",
+      "role": "source_or_configuration"
+    },
+    "csv_builder": {
+      "path": "tools/build_configs.py",
+      "sha256_at_audit": "9fbdf16dbbf01f47605e3cf17c9b78ac4359a84a10a5d0a49f85ce2a4e6c8f47",
+      "role": "source_or_configuration"
+    },
+    "building_definitions": {
+      "path": "scripts/vscripts/config/generated/building_definitions.lua",
+      "sha256_at_audit": "e54d4f79c10cc0312f83bd5a41f5a29c50363d767a1131e0cf2de00cf022f889",
+      "role": "source_or_configuration"
+    },
+    "building_system": {
+      "path": "scripts/vscripts/systems/building_system.lua",
+      "sha256_at_audit": "90b2f95b123f55f20401e1d9716a751a2148c5725c5cd67380ef14cf6f85fb06",
+      "role": "source_or_configuration"
+    },
+    "building_population": {
+      "path": "scripts/vscripts/systems/building_population_service.lua",
+      "sha256_at_audit": "2f487f874d1292cd4775a7d945e8dcee17226ed435df9a52354f42df53923392",
+      "role": "source_or_configuration"
+    },
+    "tower_limit": {
+      "path": "scripts/vscripts/systems/player_tower_limit_service.lua",
+      "sha256_at_audit": "47b09e0936cb5d278501ec3947821b763b91ecc4a04e82e664368cce944fc1e1",
+      "role": "source_or_configuration"
+    },
+    "resources": {
+      "path": "scripts/vscripts/systems/resource_system.lua",
+      "sha256_at_audit": "38a870104081407083fd9871d51220e25495b334b17f783e4e00f727b8ca8075",
+      "role": "source_or_configuration"
+    },
+    "worker_queue": {
+      "path": "scripts/vscripts/systems/worker_training_queue_service.lua",
+      "sha256_at_audit": "84807513f8ecea969d765eda83b45fa5c209826077b8810edab88833a85ecf0d",
+      "role": "source_or_configuration"
+    },
+    "worker_system": {
+      "path": "scripts/vscripts/systems/worker_system.lua",
+      "sha256_at_audit": "7b72d6a06e30cdddd27d866a1bde927c83a66e9e3a6c5afe5115aa64852c8baa",
+      "role": "source_or_configuration"
+    },
+    "training_csv": {
+      "path": "data/csv/建筑与工人系统/training_definitions.csv",
+      "sha256_at_audit": "f3ea514c767e94b91ec4274c01159f37281781cea4713c3f88f76da9ff6f1c67",
+      "role": "source_or_configuration"
+    },
+    "worker_fusion": {
+      "path": "scripts/vscripts/systems/lumberjack_fusion_service.lua",
+      "sha256_at_audit": "fe2df3f6708518bf8e0e02e9bb56fd9a3776ec6ab0998e379c9ace8e5a692f9d",
+      "role": "source_or_configuration"
+    },
+    "worker_fusion_definitions": {
+      "path": "scripts/vscripts/config/generated/lumberjack_fusion_definitions.lua",
+      "sha256_at_audit": "5ebff49c9a0a9f0cf49ce48660933245e9844041fcabae10545e60adfac4fa8a",
+      "role": "source_or_configuration"
+    },
+    "mine": {
+      "path": "scripts/vscripts/systems/gold_mine_system.lua",
+      "sha256_at_audit": "a8d0c3355a9de37e595be36b7cadc418f83ed3bb1a512d11e7251204a2d6b12b",
+      "role": "source_or_configuration"
+    },
+    "research": {
+      "path": "scripts/vscripts/research/research_technology_service.lua",
+      "sha256_at_audit": "79832d3f5ccf8b7f7adb39ba8b6b445289fbdfff5f4971f0017d84c869eee3a4",
+      "role": "source_or_configuration"
+    },
+    "tower_routes": {
+      "path": "scripts/vscripts/config/tower_route_config.lua",
+      "sha256_at_audit": "41f6711a6444dad3130f532a765286620dcae3e7b0c82c5eb399272be24bd581",
+      "role": "source_or_configuration"
+    },
+    "tower_fusion": {
+      "path": "scripts/vscripts/systems/tower_fusion_service.lua",
+      "sha256_at_audit": "cdeabaf14176fcdbafc5767cb9ed8b05305b07d4965a5daa59ece416d345a29f",
+      "role": "source_or_configuration"
+    },
+    "tower_fusion_config": {
+      "path": "scripts/vscripts/config/generated/tower_fusion_runtime.lua",
+      "sha256_at_audit": "319871f9b6fca6c9854594dd15f16c4c31404aec07546454d6da457e0d814b8f",
+      "role": "source_or_configuration"
+    },
+    "tower_targeting": {
+      "path": "scripts/vscripts/systems/tower_targeting.lua",
+      "sha256_at_audit": "5efc3c3101f957469a60e77660b69c012846cad8033965600524ee2db30b5b06",
+      "role": "source_or_configuration"
+    },
+    "tower_combat": {
+      "path": "scripts/vscripts/config/tower_combat_rules.lua",
+      "sha256_at_audit": "1c3cef1bc73180adb051b53d93252661a56d5160dbd949af9bb7e5413a038be7",
+      "role": "source_or_configuration"
+    },
+    "anti_air": {
+      "path": "scripts/vscripts/systems/anti_air_rules.lua",
+      "sha256_at_audit": "d382c242005697bac20f3e41ae42cc40e692be7fbb09fc4a257a6b14a6cbe148",
+      "role": "source_or_configuration"
+    },
+    "attack_cadence": {
+      "path": "scripts/vscripts/combat/attack_cadence.lua",
+      "sha256_at_audit": "f3402b8388baf5df90a439c20de8d2788d8b89bfb0ddf168530d6a123c401c45",
+      "role": "source_or_configuration"
+    },
+    "damage_service": {
+      "path": "scripts/vscripts/combat/damage_service.lua",
+      "sha256_at_audit": "92342e520b57acbc474a995545b6cdefb550138dfb07d92ad733b9910e4ace05",
+      "role": "source_or_configuration"
+    },
+    "damage_filter": {
+      "path": "scripts/vscripts/combat/damage_filter_service.lua",
+      "sha256_at_audit": "344f7d9b2ea0c9f32f704288d425d2ecddfd4870e106bb4ac8bb13d86d6607b9",
+      "role": "source_or_configuration"
+    },
+    "armor": {
+      "path": "scripts/vscripts/config/armor_balance.lua",
+      "sha256_at_audit": "94ca2bc73cf4a3fc0eaea65f6d2b532fd4db129b0512a91911521bd833b32f17",
+      "role": "source_or_configuration"
+    },
+    "hero_summon": {
+      "path": "scripts/vscripts/systems/hero_summon_system.lua",
+      "sha256_at_audit": "e6cabacd4572a4306e026de13011cc8882701eb45d5c7d3f74462886f1c77a4b",
+      "role": "source_or_configuration"
+    },
+    "hero_summon_rules": {
+      "path": "scripts/vscripts/config/generated/hero_summon_rules.lua",
+      "sha256_at_audit": "267885b98b56e40f3a55cc9f75f1b6c11734c8982f8b2cf0dc0d3b28a75a9ced",
+      "role": "source_or_configuration"
+    },
+    "hero_definitions": {
+      "path": "scripts/vscripts/config/generated/hero_definitions.lua",
+      "sha256_at_audit": "00b9dcc07136bc3180bd4b6e3695a63b16db433d9a9297e45e825db6c02cab35",
+      "role": "source_or_configuration"
+    },
+    "hero_access": {
+      "path": "scripts/vscripts/systems/hero_summon_access.lua",
+      "sha256_at_audit": "6d1e160b4decae2a3df2899821c0476998c900f1a55aea74b7dd11336c6336cb",
+      "role": "source_or_configuration"
+    },
+    "inventory": {
+      "path": "scripts/vscripts/systems/content_inventory_service.lua",
+      "sha256_at_audit": "8d492500b3f6b716efa869e2737f79cf2a839a6cd9d4a9f06633a1847d7388b3",
+      "role": "source_or_configuration"
+    },
+    "inventory_transaction": {
+      "path": "scripts/vscripts/systems/inventory_transaction_service.lua",
+      "sha256_at_audit": "9704e3579acf31c8e0ed22d79471907948561804af0a53d8c22823fab10933ba",
+      "role": "source_or_configuration"
+    },
+    "weapon_synthesis": {
+      "path": "scripts/vscripts/systems/weapon_synthesis_service.lua",
+      "sha256_at_audit": "f6af1f020ec05ec444ed97e5ef5f6c13f8f00ebdfb67c6d015611e26a3633b7f",
+      "role": "source_or_configuration"
+    },
+    "weapon_equipment": {
+      "path": "scripts/vscripts/systems/weapon_equipment_service.lua",
+      "sha256_at_audit": "b244e15e4b9f81c8c137caa0dfc13aa672ace20803abd92d8ad4ba67293d987e",
+      "role": "source_or_configuration"
+    },
+    "equipment_instance": {
+      "path": "scripts/vscripts/systems/equipment_instance_service.lua",
+      "sha256_at_audit": "0f348d5f97e06fb0f153d75aee269af8e76f19311b67ec24ed4eee760278175c",
+      "role": "source_or_configuration"
+    },
+    "equipment_aggregate": {
+      "path": "scripts/vscripts/systems/equipment_stat_aggregation_service.lua",
+      "sha256_at_audit": "92165c7f164a2b44e1438705c186f65ec6cb85a0bce089292f29317367984a00",
+      "role": "source_or_configuration"
+    },
+    "rebirth_csv": {
+      "path": "data/csv/挑战与奖励系统/rebirth_challenges.csv",
+      "sha256_at_audit": "416276a746e4c261e4599ad6dbbbab57971b2846b81e2dc02692842b424d34d9",
+      "role": "source_or_configuration"
+    },
+    "hero_progression": {
+      "path": "scripts/vscripts/systems/hero_progression_system.lua",
+      "sha256_at_audit": "de1d972b3e4bf122730c181bde55fee8e06c1800c6a965574fe18aa4a5714ca5",
+      "role": "source_or_configuration"
+    },
+    "skill_choices": {
+      "path": "scripts/vscripts/config/generated/hero_skill_choice_rules.lua",
+      "sha256_at_audit": "8b177805503ba60ebe81410d4435f22ee93d83a8e1d1144c69712e8804279226",
+      "role": "source_or_configuration"
+    },
+    "rogue_rewards": {
+      "path": "scripts/vscripts/systems/rogue_reward_service.lua",
+      "sha256_at_audit": "d5143446658cf7301af72add149fdb79458032360d00578eec9af7726142bd03",
+      "role": "source_or_configuration"
+    },
+    "rogue_effects": {
+      "path": "scripts/vscripts/systems/rogue_effect_runtime_service.lua",
+      "sha256_at_audit": "c56626252c7dc885d781f4e003c541b0e4b64d90d7ec6cac703d4599bb829a92",
+      "role": "source_or_configuration"
+    },
+    "training_rooms": {
+      "path": "scripts/vscripts/systems/training_room_service.lua",
+      "sha256_at_audit": "b637b44415ffce8503d348a818b10e101f24f3b7a48ffbe4d67bafd068bd15d3",
+      "role": "source_or_configuration"
+    },
+    "altar_actions": {
+      "path": "scripts/vscripts/config/generated/altar_actions.lua",
+      "sha256_at_audit": "be8127fb207d66811425614887d75069eb12c15acfc9d83138100d963148387e",
+      "role": "source_or_configuration"
+    },
+    "room_locations": {
+      "path": "scripts/vscripts/systems/player_room_locations.lua",
+      "sha256_at_audit": "806c811555cdc949f630a07547552789717d1db3240a0f71ff9c5557e55b8bdd",
+      "role": "source_or_configuration"
+    },
+    "wave_system": {
+      "path": "scripts/vscripts/systems/wave_system.lua",
+      "sha256_at_audit": "9d2af35f1c64c162d6771f2033f15156bb5a0b5ef7e724d393fc6d12d62e8b5f",
+      "role": "source_or_configuration"
+    },
+    "global_rules": {
+      "path": "scripts/vscripts/config/generated/global_rules.lua",
+      "sha256_at_audit": "2a1ce9506d1f77b28025b3c38e915910669f45772cc6aabdb42cd63b43d67fb4",
+      "role": "source_or_configuration"
+    },
+    "multiplayer": {
+      "path": "scripts/vscripts/systems/multiplayer_player_service.lua",
+      "sha256_at_audit": "55aef4d45f1a2ad12fce95437547230f398455424c5244c9ae67f386deec0f29",
+      "role": "source_or_configuration"
+    },
+    "player_context": {
+      "path": "scripts/vscripts/systems/player_context_service.lua",
+      "sha256_at_audit": "f6d5fa4254f8c8d34b5fbae5ec39e1412935382347b2d298c4a842d4a0f64278",
+      "role": "source_or_configuration"
+    },
+    "wall_defeat": {
+      "path": "scripts/vscripts/systems/building_defeat_rules.lua",
+      "sha256_at_audit": "079e7f70e1d11f14fb3534d22df1d7960b8a32afe6f94cefb4efc1a6c05201c8",
+      "role": "source_or_configuration"
+    },
+    "wall_navigation": {
+      "path": "scripts/vscripts/systems/wall_navigation_service.lua",
+      "sha256_at_audit": "e37c394b31dce0499c2ffbb238fad22696dc13d5bb4f6e267a40b6c8362566d9",
+      "role": "source_or_configuration"
+    },
+    "wall_contact": {
+      "path": "scripts/vscripts/systems/wall_melee_contact.lua",
+      "sha256_at_audit": "f01df4311ee4f88933bb9a5ccaa3321a996198fe4b8fbc310851b3af8edbab5c",
+      "role": "source_or_configuration"
+    },
+    "wall_ai": {
+      "path": "scripts/vscripts/modifiers/modifier_enemy_wall_ai.lua",
+      "sha256_at_audit": "dd0af3891fbc6765e9d2d1f5d2640c2dd9b0370e301a9d600b98f2ae34b780d3",
+      "role": "source_or_configuration"
+    },
+    "archive_service": {
+      "path": "scripts/vscripts/systems/archive_service.lua",
+      "sha256_at_audit": "d85e2c6b692c17962908d4302d42412ab1101c0d6f6a4977d57e97f919bff504",
+      "role": "source_or_configuration"
+    },
+    "archive_challenges": {
+      "path": "scripts/vscripts/systems/archive_challenge_service.lua",
+      "sha256_at_audit": "02382381c96f5a500ad605279e8e7a939e0d4403a40e4e6b93b215b2f33e71c3",
+      "role": "source_or_configuration"
+    },
+    "archive_cooperative": {
+      "path": "scripts/vscripts/systems/archive_cooperative_reward_service.lua",
+      "sha256_at_audit": "717c7748d2def56f5abc5bb59776b8d2838594480e1371572769fb019f17ae5e",
+      "role": "source_or_configuration"
+    },
+    "archive_cooperative_rules": {
+      "path": "scripts/vscripts/config/generated/archive_cooperative_reward_rules.lua",
+      "sha256_at_audit": "bb7203fe2072d18450868c823879fedcee7d1ffb5ac703b649c1c5614341e4c1",
+      "role": "source_or_configuration"
+    },
+    "old_mode_doc": {
+      "path": "docs/MATCH_SETUP_AND_MODES.md",
+      "sha256_at_audit": "0a718805e7cc2da17d5c3b79065278ddb0b0d3ca337278a3409e22254efddf83",
+      "role": "historical_document"
+    },
+    "old_cooperative_doc": {
+      "path": "docs/COOPERATIVE_REWARD_RULES_20261011.md",
+      "sha256_at_audit": "85aee7848bd59d6bfb29a1f5e10ba82d4ffe4bf562d5cb96ae62500fb57f750e",
+      "role": "historical_document"
+    }
+  },
+  "facts": [
+    {
+      "id": "dev_scope",
+      "section": "release_boundary",
+      "claim": "当前工作区是 development，网页登录配置关闭；不能据此推断冻结线上包配置。",
+      "verification": "source_verified",
+      "source_ids": [
+        "release_profile",
+        "web_auth_config",
+        "release_receipt"
+      ],
+      "configured_values_at_2026_10_24": {
+        "development_channel": "development",
+        "development_web_auth_enabled": false
+      }
+    },
+    {
+      "id": "published_v05",
+      "section": "release_boundary",
+      "claim": "v05原游廊入口已验证单人授权、读档、游戏和检查点；多人托管未验证，未具备公开发行条件。",
+      "verification": "release_receipt_verified",
+      "source_ids": [
+        "release_receipt"
+      ],
+      "configured_values_at_2026_10_24": {
+        "workshop_id": "3824360109",
+        "revision": "WS4-ENTRY-05",
+        "release_sequence": 2026102405,
+        "content_sha256": "b4750e433bdd1b1ea2fab0de98d13b3660ed5d3ef80a10c63c46512eab10bc60",
+        "default_map": "ws4_entry",
+        "target_map": "template_map",
+        "entry_max_players": 1,
+        "target_declared_capacity": 4,
+        "published_mode": "single_player_cloud_save",
+        "four_account_only": true,
+        "real_money_payments": false,
+        "trusted_rankings": false,
+        "author_pc_tls_relay_required": true,
+        "multiplayer_hosting_verified": false,
+        "ready_for_public_release": false
+      },
+      "limits_or_notes": "本次只读发布回执，未重新抽取v05冻结模式配置；不得把当前开发规则自动视为线上行为。"
+    },
+    {
+      "id": "startup_dual_gate",
+      "section": "startup",
+      "claim": "先完成真实人类名单、认证、资源和客户端握手；选模式后再加载模式档案，gameplay_gate才释放玩法初始化和业务GAME_STARTED。",
+      "verification": "source_verified",
+      "source_ids": [
+        "main",
+        "startup",
+        "match_setup",
+        "profile_service"
+      ],
+      "limits_or_notes": "业务门禁不暂停引擎阶段；GAME_IN_PROGRESS不是业务已放行的证据。"
+    },
+    {
+      "id": "host_and_session",
+      "section": "startup",
+      "claim": "房主由引擎权限判断，模式锁定本局；异步档案请求检查账号、模式与session，普通运行不得靠首个玩家代替房主。",
+      "verification": "source_verified",
+      "source_ids": [
+        "match_setup",
+        "startup",
+        "profile_service"
+      ],
+      "limits_or_notes": "仅Tools有受控选择者回退；客户端提交的身份和解锁标志不是权限依据。"
+    },
+    {
+      "id": "read_only_acceptance",
+      "section": "modes",
+      "claim": "当前可信配置为全难度只读验收；按session锁定，隔离持久写入并绕过已发布模式的进度与限额。",
+      "verification": "source_verified",
+      "source_ids": [
+        "release_modes",
+        "mode_acceptance",
+        "match_setup",
+        "http_profile_provider",
+        "profile_service",
+        "archive_service"
+      ],
+      "configured_values_at_2026_10_24": {
+        "all_difficulties_unlocked": true
+      },
+      "limits_or_notes": "关闭配置后需新开局才恢复正常进度与结算；未发布模式仍禁止。"
+    },
+    {
+      "id": "mode_release",
+      "section": "modes",
+      "claim": "仅四种模式通过当前发布开关；其余模式即使有战斗表也不能作为已上线玩法。",
+      "verification": "source_verified",
+      "source_ids": [
+        "release_modes",
+        "human_spec_normalized",
+        "difficulty_config"
+      ],
+      "configured_values_at_2026_10_24": {
+        "released": [
+          "standard",
+          "pure",
+          "rich",
+          "cold"
+        ],
+        "known_unreleased": [
+          "scourge",
+          "ruins",
+          "celestial",
+          "fishing"
+        ],
+        "configured_difficulty_rows": {
+          "standard": 10,
+          "pure": 10,
+          "rich": 30,
+          "cold": 50,
+          "scourge": 50,
+          "ruins": 50,
+          "celestial": 35
+        }
+      }
+    },
+    {
+      "id": "normal_progression",
+      "section": "modes",
+      "claim": "正常入场按认证永久进度判断：高级模式阈值可由任意战斗模式持久通关满足；N5起要求所选模式前一难度通关。",
+      "verification": "source_verified",
+      "source_ids": [
+        "mode_progression",
+        "match_setup",
+        "team_difficulty"
+      ],
+      "configured_values_at_2026_10_24": {
+        "entry_required_any_battle_clear": {
+          "rich": 3,
+          "cold": 5,
+          "scourge": 9,
+          "ruins": 9,
+          "celestial": 11
+        },
+        "initial_open_tiers_after_mode_entry": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "limits_or_notes": "未发布模式的阈值只是已实现配置；缺独立进度表视为后端未就绪，显式空表不得继承其他模式成绩。当前验收开关临时绕过这些限制。"
+    },
+    {
+      "id": "team_permission_and_daily_quota",
+      "section": "modes",
+      "claim": "队伍难度取完整参局人类名单的解锁交集；掉线不悄悄移除。入场同时受全局清关日限额和对应模式日限额约束。",
+      "verification": "source_verified",
+      "source_ids": [
+        "startup",
+        "team_difficulty",
+        "match_setup"
+      ],
+      "limits_or_notes": "验收场临时绕过日限额；普通模式限额值由认证档案/后端配置决定，本事实不固定额度。"
+    },
+    {
+      "id": "mode_profile_projection",
+      "section": "profiles",
+      "claim": "已发布的丰饶/极寒沿用常规战斗投影并保留独立模式进度；纯净使用去永久加成的战斗视图，资格仍读认证永久进度。",
+      "verification": "source_verified",
+      "source_ids": [
+        "match_setup",
+        "profile_service",
+        "http_profile_provider"
+      ],
+      "limits_or_notes": "get_profile_mode的标准投影与持久game_mode不同；未发布派生模式不能据此声称后端已完整支持。"
+    },
+    {
+      "id": "economic_ownership",
+      "section": "economy",
+      "claim": "木材、金币、已用人口和人口上限账户按player_id隔离；初始木材为完整起始数，重复档案刷新应用差额。",
+      "verification": "source_verified",
+      "source_ids": [
+        "resources",
+        "building_population"
+      ],
+      "limits_or_notes": "不要把generated/global_rules.lua中队伍开局字样推断成共享经济，也不要将档案initial_wood再加一遍基础资源。"
+    },
+    {
+      "id": "building_dependencies",
+      "section": "economy",
+      "claim": "建造由本人有效建造者发起，先核前置、归属、占位和资源，再在实际创建时复核；高级研究所/挑战建筑要求已完成研究所。",
+      "verification": "source_verified",
+      "source_ids": [
+        "building_system",
+        "building_definitions",
+        "building_population"
+      ],
+      "configured_values_at_2026_10_24": {
+        "base_max_counts": {
+          "wall": 1,
+          "main_city": 1,
+          "building_farm": 1,
+          "building_research_lab": 1,
+          "building_advanced_research_lab": 1,
+          "building_challenge": 1,
+          "hero_altar": 1,
+          "gold_mine": 5
+        },
+        "city_level": {
+          "arrow_tower": 1,
+          "gold_mine": 3,
+          "hero_altar": 4,
+          "building_advanced_research_lab": 4
+        },
+        "gold_mine_base_population_cost": 2
+      },
+      "limits_or_notes": "金矿权益和特效可改上限；建筑表notes不是精确现行费用的单独权威。墙通常每局只能建一次，特定无尽重建规则例外。"
+    },
+    {
+      "id": "tower_count_reservations",
+      "section": "economy",
+      "claim": "防御塔总上限包含基础、转职和终极塔，订单/施工预占；转职不释放，死亡或销毁后释放。每路线限制另算。",
+      "verification": "source_verified",
+      "source_ids": [
+        "building_definitions",
+        "tower_limit",
+        "global_rules",
+        "building_system"
+      ],
+      "configured_values_at_2026_10_24": {
+        "per_player_all_tower_cap": 7,
+        "per_class_cap": 5
+      }
+    },
+    {
+      "id": "worker_queue",
+      "section": "workers",
+      "claim": "每主城串行训练队列；排队预占数量额度，队首才付货币和人口，已付订单取消/失败只退款一次，代际标识阻止旧计时回调。",
+      "verification": "source_verified",
+      "source_ids": [
+        "worker_queue",
+        "worker_system",
+        "training_csv"
+      ],
+      "configured_values_at_2026_10_24": {
+        "lumberjack_lv1": {
+          "wood": 10,
+          "gold": 0,
+          "population": 1,
+          "training_seconds": 1,
+          "base_max_count": 5,
+          "wood_per_hit": 1
+        }
+      },
+      "limits_or_notes": "这里只固定本日CSV示例；不要引用旧workers_config回退数值当现行成本。"
+    },
+    {
+      "id": "worker_fusion",
+      "section": "workers",
+      "claim": "普通伐木工按同阶材料合成对应超级工人，校验同玩家、主城和费用；不是自动合成下一阶。",
+      "verification": "source_verified",
+      "source_ids": [
+        "worker_fusion",
+        "worker_fusion_definitions",
+        "training_csv"
+      ],
+      "configured_values_at_2026_10_24": {
+        "worker_tiers": 8,
+        "required_count_lv1": 5,
+        "required_count_lv2_to_lv8": 3,
+        "personality_pool_size_lv1_to_lv7": 11,
+        "lv8_personality": false
+      }
+    },
+    {
+      "id": "mine_research",
+      "section": "economy",
+      "claim": "金矿有独立产出任务并写所属玩家资源，产量/效率/暴击/周期与永久修正分层计算；科技状态与效果按玩家管理。",
+      "verification": "source_verified",
+      "source_ids": [
+        "mine",
+        "research",
+        "resources"
+      ],
+      "limits_or_notes": "不要把所有效率直接相乘或把每矿收入写到全队账户；失败交易需恢复相应花费与状态。"
+    },
+    {
+      "id": "tower_routes_and_population",
+      "section": "towers",
+      "claim": "基础塔阶段后分七路线；显示品级与实际路线索引分离，跨级累加货币成本而人口只付当前到目标的差额。",
+      "verification": "source_verified",
+      "source_ids": [
+        "tower_routes"
+      ],
+      "configured_values_at_2026_10_24": {
+        "base_stage_end_level": 5,
+        "route_module_names": {
+          "class_1": "tower_class_death",
+          "class_2": "tower_class_mystery",
+          "class_3": "tower_class_lightning",
+          "class_4": "tower_class_machine_gun",
+          "class_5": "tower_class_multi",
+          "class_6": "tower_class_frost",
+          "class_7": "tower_class_anti_air"
+        }
+      }
+    },
+    {
+      "id": "ultimate_fusion",
+      "section": "towers",
+      "claim": "终极塔合成以同玩家七路线终阶塔各一座为材料，设防重入及终极数量限制。",
+      "verification": "source_verified",
+      "source_ids": [
+        "tower_fusion",
+        "tower_fusion_config",
+        "tower_limit"
+      ],
+      "configured_values_at_2026_10_24": {
+        "ultimate_per_player": 1,
+        "route_count": 7,
+        "configured_name": "万象归一"
+      }
+    },
+    {
+      "id": "target_and_cadence",
+      "section": "combat",
+      "claim": "索敌排除资源树、友军、死亡和防空不合法目标；真实范围内优先BOSS/进攻BOSS/波次首领，再最近，平距稳定索引，训练假人仅回退。",
+      "verification": "source_verified",
+      "source_ids": [
+        "tower_targeting",
+        "tower_combat",
+        "anti_air",
+        "attack_cadence"
+      ],
+      "limits_or_notes": "攻击间隔单位为秒，先后应用固定减间隔和攻速倍率；动画、原生自主索敌和表现弹道不是发伤害授权。"
+    },
+    {
+      "id": "damage_transaction",
+      "section": "combat",
+      "claim": "伤害服务与filter维护原始攻击者/目标及事务，区分普攻、持续、溅射、反射和纯表现，项目护甲与大数值缩放只能处理一次。",
+      "verification": "source_verified",
+      "source_ids": [
+        "damage_service",
+        "damage_filter",
+        "armor"
+      ],
+      "limits_or_notes": "不得给visual_only来源真实伤害，不得由表现命中重复提交原攻击；实际引擎伤害和逻辑大数值需按适配层还原。"
+    },
+    {
+      "id": "hero_summon",
+      "section": "heroes",
+      "claim": "召唤检查本人、存活/败退、祭坛/主城、权益、已有英雄与落点，异步预载后重查；付费英雄对应道具只解锁该英雄。",
+      "verification": "source_verified",
+      "source_ids": [
+        "hero_summon",
+        "hero_summon_rules",
+        "hero_definitions",
+        "hero_access"
+      ],
+      "configured_values_at_2026_10_24": {
+        "max_summoned_heroes_per_player": 1,
+        "required_city_level": 4,
+        "enabled_hero_count": 6,
+        "historical_id_exception": {
+          "id": "hero_shadow_fiend",
+          "display_name": "光之守卫",
+          "native_unit": "npc_dota_hero_keeper_of_the_light"
+        }
+      },
+      "limits_or_notes": "不要只按内部ID推断英雄名，也不要把商城英雄解锁当全局VIP授权。"
+    },
+    {
+      "id": "inventory_and_equipment",
+      "section": "inventory",
+      "claim": "逻辑背包与装备实例是业务数据，原生物品只是载体；合成按玩家锁和request_id幂等，全量验料后同一同步变更扣料/产出，属性统一聚合。",
+      "verification": "source_verified",
+      "source_ids": [
+        "inventory",
+        "inventory_transaction",
+        "weapon_synthesis",
+        "weapon_equipment",
+        "equipment_instance",
+        "equipment_aggregate",
+        "profile_service"
+      ],
+      "limits_or_notes": "HTTP权威房间不能用本地save变更冒充永久成功；离线局内状态与持久库存必须区分。"
+    },
+    {
+      "id": "rebirth_and_skill_choice",
+      "section": "heroes",
+      "claim": "转生依序由挑战有效奖励推进；技能选择排除不合法候选并受技能容量，属性/成长/技能点由奖励服务应用。",
+      "verification": "source_verified",
+      "source_ids": [
+        "rebirth_csv",
+        "hero_progression",
+        "skill_choices"
+      ],
+      "configured_values_at_2026_10_24": {
+        "rebirth_range": [
+          1,
+          10
+        ],
+        "new_skill_choice_rebirths": [
+          2,
+          3,
+          4
+        ],
+        "offer_count": 3,
+        "skill_capacity": 10
+      }
+    },
+    {
+      "id": "rogue",
+      "section": "rogue",
+      "claim": "建造者开局池与BOSS肉鸽池按玩家独立维护队列、候选和领取；未选/重抽不等于永远从池移除，效果有生命周期。",
+      "verification": "source_verified",
+      "source_ids": [
+        "rogue_rewards",
+        "rogue_effects"
+      ]
+    },
+    {
+      "id": "training_rooms",
+      "section": "heroes",
+      "claim": "训练房仅接受本人有效英雄并校验费用和落点；个人marker优先但保留旧共享marker回退。暗影界当前只开放传送。",
+      "verification": "source_verified",
+      "source_ids": [
+        "training_rooms",
+        "altar_actions",
+        "room_locations"
+      ],
+      "configured_values_at_2026_10_24": {
+        "endless_training_required_rebirth": 10,
+        "endless_training_entry_gold": 50000,
+        "endless_training_gold_per_second": 50000,
+        "specified_growth_multiplier": 15,
+        "shadow_realm_monsters_and_drops_enabled": false
+      },
+      "limits_or_notes": "十五倍是指定练功成长收益，不是通用塔DPS倍率；本次未逐地图验证个人房间marker齐备。"
+    },
+    {
+      "id": "personal_wave_population",
+      "section": "waves",
+      "claim": "运行时波次通道、目标墙、存活数和持续超限败退按玩家管理；总存活数仅参与最终完成检查。",
+      "verification": "source_verified",
+      "source_ids": [
+        "wave_system",
+        "global_rules",
+        "multiplayer"
+      ],
+      "configured_values_at_2026_10_24": {
+        "alive_limit_per_player": 90,
+        "overflow_grace_seconds": 10
+      },
+      "limits_or_notes": "generated/global_rules的description仍写全场共享/全员失败，与运行代码冲突；此处以wave_system实际个人实现为准。"
+    },
+    {
+      "id": "wall_ownership_defeat",
+      "section": "waves",
+      "claim": "已完成城墙死亡按登记player_id淘汰对应参局玩家；施工死亡不按成墙触发，归属缺失不得猜成0号。败者观战，其余继续。",
+      "verification": "source_verified",
+      "source_ids": [
+        "wall_defeat",
+        "building_system",
+        "multiplayer",
+        "player_context"
+      ],
+      "limits_or_notes": "所有参局者失败才触发整体失败。离线/线上联网能力不改变这个归属规则。"
+    },
+    {
+      "id": "wall_navigation",
+      "section": "navigation",
+      "claim": "墙使用登记障碍和真实碰撞，近战接触位负责正面攻击/候位/补位，障碍释放应恢复底层地形并处理重叠引用。",
+      "verification": "source_verified",
+      "source_ids": [
+        "wall_navigation",
+        "wall_contact",
+        "wall_ai"
+      ],
+      "limits_or_notes": "不能靠瞬移、隐形第二层实体或随意关碰撞掩盖路径故障；需要原生地图验证，Lua夹具不能证明引擎实际不卡。"
+    },
+    {
+      "id": "final_clear",
+      "section": "endgame",
+      "claim": "最后一波生成完成、无失败生成、无待生成且无存活才结算一次；先冻结普通战斗和获胜名单，再发个人通关并进入存档挑战或终局。",
+      "verification": "source_verified",
+      "source_ids": [
+        "wave_system",
+        "archive_challenges",
+        "archive_service"
+      ],
+      "limits_or_notes": "漏生怪不能当作胜利；失败/掉线名单和奖励资格不能在逐人提交过程中改变。"
+    },
+    {
+      "id": "cooperative_reward",
+      "section": "endgame",
+      "claim": "当前代码具备共享合作事件和逐玩家结算，命令ID及待保存队列阻止重试重复奖励，后端日限额继续约束持久收益。",
+      "verification": "source_verified",
+      "source_ids": [
+        "archive_cooperative",
+        "archive_cooperative_rules",
+        "archive_service",
+        "archive_challenges"
+      ],
+      "configured_values_at_2026_10_24": {
+        "cooperative_rules_enabled": true,
+        "shared_challenge_roll": true
+      },
+      "limits_or_notes": "源码存在和已开启不等于v05四人托管/合作发奖已原生验收；本轮实际线上验证仅单人。"
+    },
+    {
+      "id": "offline_online_cheat_boundary",
+      "section": "security",
+      "claim": "开发作弊只允许可信development+服务器Tools+明确关闭网页登录；启用网页登录、配置缺失/错误均拒绝。离线逻辑档案只在本局内存。",
+      "verification": "source_verified",
+      "source_ids": [
+        "release_policy",
+        "offline_logic"
+      ],
+      "limits_or_notes": "sv_cheats、房主身份或客户端字段不能替代构建身份；离线provider不得接HTTP、凭据或fixture文件。"
+    },
+    {
+      "id": "balance_source_of_truth",
+      "section": "maintenance",
+      "claim": "普通CSV经build_configs生成Lua；v3战斗规格双输入交叉校验生成normalized和human_monster_spec，修正表已计入。",
+      "verification": "source_verified",
+      "source_ids": [
+        "csv_builder",
+        "human_spec_json",
+        "human_spec_workbook",
+        "human_spec_importer",
+        "human_spec_normalized",
+        "human_spec_generated",
+        "human_rules"
+      ],
+      "limits_or_notes": "不要手改generated，也不要重复应用corrections；mode_release_config是独立发布/验收开关，不由import_human_monster_spec输出。"
+    },
+    {
+      "id": "historical_docs",
+      "section": "maintenance",
+      "claim": "旧开局文档与旧合作文档可解释历史，不可覆盖当前模式、难度交集和线上验证范围。",
+      "verification": "source_verified",
+      "source_ids": [
+        "old_mode_doc",
+        "old_cooperative_doc",
+        "mode_progression",
+        "team_difficulty",
+        "release_receipt"
+      ],
+      "limits_or_notes": "旧两模式/N1-N5/仅房主权限及早期联网结论需结合当前实现和v05回执重审。"
+    }
+  ],
+  "known_incomplete_or_unverified": [
+    {
+      "id": "unreleased_modes",
+      "state": "configured_but_not_released",
+      "modes": [
+        "scourge",
+        "ruins",
+        "celestial",
+        "fishing"
+      ],
+      "source_ids": [
+        "release_modes"
+      ]
+    },
+    {
+      "id": "shadow_realm_content",
+      "state": "teleport_only_no_monsters_or_drops",
+      "source_ids": [
+        "altar_actions"
+      ]
+    },
+    {
+      "id": "normal_workshop_multiplayer",
+      "state": "not_verified",
+      "note": "v05仅验证单人云存档入口；四人声明不是托管交付或延迟验收。",
+      "source_ids": [
+        "release_receipt"
+      ]
+    },
+    {
+      "id": "independent_steam_connectivity",
+      "state": "author_pc_relay_still_required",
+      "source_ids": [
+        "release_receipt"
+      ]
+    },
+    {
+      "id": "private_room_markers_all_maps",
+      "state": "not_verified",
+      "source_ids": [
+        "room_locations"
+      ]
+    },
+    {
+      "id": "v05_exact_mode_configuration",
+      "state": "not_reextracted_this_audit",
+      "note": "当前开发分支配置不能证明冻结线上包的同名配置内容。",
+      "source_ids": [
+        "release_receipt",
+        "release_modes"
+      ]
+    }
+  ],
+  "available_regressions_not_run": [
+    "scripts/vscripts/tests/test_startup_loading_service.lua",
+    "scripts/vscripts/tests/test_difficulty_unlocks.lua",
+    "scripts/vscripts/tests/test_player_profile_modes.lua",
+    "scripts/vscripts/tests/test_worker_training_queue.lua",
+    "scripts/vscripts/tests/test_resource_opening_wood.lua",
+    "scripts/vscripts/tests/test_tower_target_selection.lua",
+    "scripts/vscripts/tests/test_damage_transaction_lifecycle.lua",
+    "scripts/vscripts/tests/test_hero_summon_player_isolation.lua",
+    "scripts/vscripts/tests/test_hero_skill_point_upgrade.lua",
+    "scripts/vscripts/tests/test_rogue_reward_history.lua",
+    "scripts/vscripts/tests/test_wave_population_endgame.lua",
+    "scripts/vscripts/tests/test_wave_spawn_routing.lua",
+    "scripts/vscripts/tests/test_wall_navigation.lua",
+    "scripts/vscripts/tests/test_wall_melee_contact.lua",
+    "scripts/vscripts/tests/test_archive_service.lua",
+    "scripts/vscripts/tests/test_release_debug_policy.lua",
+    "scripts/vscripts/tests/test_release_debug_entrypoints.lua"
+  ],
+  "excluded_context": [
+    "CSS",
+    "icons",
+    "panel_coordinates",
+    "temporary_screenshots",
+    "credentials",
+    "player_tokens",
+    "third_party_business_code"
+  ]
+}

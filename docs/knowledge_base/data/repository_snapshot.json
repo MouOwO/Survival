@@ -1,0 +1,18 @@
+{
+  "game": {
+    "head": "ba81736bf45d0dc74373858c39d99c0f7ca1f69b",
+    "branch": "dev",
+    "upstream": "origin/dev",
+    "ahead_behind": "0\t0",
+    "working_changes": 149,
+    "captured_before_knowledge_commit": true
+  },
+  "content": {
+    "head": "4711503a8312d106cfa05ceb67c72e74f7d2329e",
+    "branch": "master",
+    "upstream": "origin/master",
+    "ahead_behind": "0\t0",
+    "working_changes": 1,
+    "captured_before_knowledge_commit": true
+  }
+}

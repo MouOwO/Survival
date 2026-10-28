@@ -1,0 +1,1145 @@
+{
+  "schema": 1,
+  "captured_utc": "2026-10-24T13:50:40.449992+00:00",
+  "path_bases": {
+    "game": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival",
+    "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival"
+  },
+  "sources": [
+    {
+      "repository": "game",
+      "path": "AGENTS.md",
+      "bytes": 2570,
+      "sha256": "ad1d9c203762c451dc6ea010b2ce838b7ad5b3933462ce9765e63a6935991344",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "data/balance/human_spec_v3/human_spec.json",
+      "bytes": 101937,
+      "sha256": "425c732f61670d21013ad5da83c419ffaa8ff7576c3f1abf894e7d9c9ea6d1c0",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "data/balance/human_spec_v3/normalized.json",
+      "bytes": 91162,
+      "sha256": "f4aef83457254d23727ae42048fe1a66776fff5296d8069bdc05043a83734083",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "data/balance/human_spec_v3/接入规格_人话版_v3.xlsx",
+      "bytes": 37649,
+      "sha256": "39241c3c99c0477ff42b91114a197f449c4f9b9f93d232c1d680e74782156582",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "data/csv/建筑与工人系统/training_definitions.csv",
+      "bytes": 4912,
+      "sha256": "f3ea514c767e94b91ec4274c01159f37281781cea4713c3f88f76da9ff6f1c67",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "data/csv/挑战与奖励系统/rebirth_challenges.csv",
+      "bytes": 3815,
+      "sha256": "416276a746e4c261e4599ad6dbbbab57971b2846b81e2dc02692842b424d34d9",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "docs/COOPERATIVE_REWARD_RULES_20261011.md",
+      "bytes": 6617,
+      "sha256": "85aee7848bd59d6bfb29a1f5e10ba82d4ffe4bf562d5cb96ae62500fb57f750e",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "docs/MATCH_SETUP_AND_MODES.md",
+      "bytes": 10889,
+      "sha256": "0a718805e7cc2da17d5c3b79065278ddb0b0d3ca337278a3409e22254efddf83",
+      "scope": "historical_context_requires_current_code_check"
+    },
+    {
+      "repository": "game",
+      "path": "docs/RUNTIME_REFACTOR.md",
+      "bytes": 11941,
+      "sha256": "e5c99323ff1614184804c5a3e1a80ccc501b0bd32d2da79c72ea9beca5026a78",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "docs/STARTUP_LOADING.md",
+      "bytes": 14799,
+      "sha256": "516123adcb54858f736f4f81cd8f5baf6a1fe4aedeaf0630539058ceecad442a",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "docs/ai/DECISIONS.md",
+      "bytes": 36589,
+      "sha256": "43bc857ad5afa6824538dbed13a549df5051c2858addf36c58aa2361ed9bb5f2",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "docs/ai/FISHING_REWARD_INTEGRATION.md",
+      "bytes": 7237,
+      "sha256": "629c098348880af23fe0d17887429db2cb419bb1ab826dea0b6efad947c49f82",
+      "scope": "historical_context_requires_current_code_check"
+    },
+    {
+      "repository": "game",
+      "path": "docs/ai/KNOWN_ISSUES.md",
+      "bytes": 12449,
+      "sha256": "8a42789f62d1ed8499e1db3357ee59de3553d4202377a8d11a4d38a43923a37e",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "docs/ai/PROJECT_CONTEXT.md",
+      "bytes": 15555,
+      "sha256": "95758add27cada0602c2ba40972aa868e8d31ef2a7ca71045f10577ff74fb730",
+      "scope": "historical_context_requires_current_code_check"
+    },
+    {
+      "repository": "game",
+      "path": "docs/ai/ROGUE_REWARD_INTEGRATION.md",
+      "bytes": 8565,
+      "sha256": "91011d45853ca7a58a44ee6cb6de81cf3e5bb665016fc7cfd938146c66ebcc70",
+      "scope": "historical_context_requires_current_code_check"
+    },
+    {
+      "repository": "game",
+      "path": "docs/ai/START_HERE.md",
+      "bytes": 5005,
+      "sha256": "56e176e717ddd2730a688e045c5597809cf8d4afcdf6ce1928fa7f64036d4204",
+      "scope": "historical_context_requires_current_code_check"
+    },
+    {
+      "repository": "game",
+      "path": "docs/ai/architecture/MULTIPLAYER_TOPOLOGY_REPORT.md",
+      "bytes": 19422,
+      "sha256": "3f0b62d3897459e5af3b800aa1635ba0c8f0d1c5c0726e500bd633c589e6814a",
+      "scope": "historical_context_requires_current_code_check"
+    },
+    {
+      "repository": "game",
+      "path": "docs/ai/registry/README.md",
+      "bytes": 805,
+      "sha256": "c054a92f760dce3e6e5a48d8b3c927d3d2b554d186528af562aee76ece0a56da",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "docs/payments/alipay_native_qr_20260930.md",
+      "bytes": 5111,
+      "sha256": "37189040007adb6346830b76311016c2afbdc38b0c972cdf31438c2a311d8017",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "docs/payments/payment_acceptance_20260928.json",
+      "bytes": 1243,
+      "sha256": "ad3799de1c9105d6ccc0fa50fcb4f32f0c018611e38f0f6b87e79947c3bd124e",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "docs/player_web_auth.md",
+      "bytes": 11529,
+      "sha256": "e18b81330b71c60610f39efaccf060dc276635d5ecca2cb54decc89b15b8ceff",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "docs/stream_workshop_vpk.md",
+      "bytes": 5308,
+      "sha256": "58eb320a8e23c6c09a9f0e2cb8dc8b3b06eea25b761f8d80f499993b450747a3",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "docs/test_entries.md",
+      "bytes": 6196,
+      "sha256": "934b36f48d803305ad52f9cacb26affbfaac9c8c5fbf6e34dc81d62ff40534dd",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "docs/workshop_isolated_test.md",
+      "bytes": 14413,
+      "sha256": "add23610da5a054fcd44baa6cffbe07d19dfcb0025b1e1e0c3480ee1bb1b6946",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "maps/ws4_entry.vpk",
+      "bytes": 144203,
+      "sha256": "abce9c7f6a1159303c799ec9a8b40afa7f724e7bf4c52509038e490afa67fecb",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/dream_island_entry_review_20261024.json",
+      "bytes": 4791,
+      "sha256": "c2577664443aa2a6835c22b649766889de9c6ca7156f1d8e2ac2595236a3a282",
+      "scope": "recorded_evidence_not_rerun"
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/online_cheat_policy_20261024.json",
+      "bytes": 5856,
+      "sha256": "265b8fab37f464a3796acb48aeb9b4bcfa80ddc4e3874b763612c4ee0908b189",
+      "scope": "recorded_evidence_not_rerun"
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/startup_read16_repair_20261023.md",
+      "bytes": 4553,
+      "sha256": "588d98fa7c0ac2da2dd9eb6dbd89ffd94ac355eb69f7f7a64ffbbad106083a48",
+      "scope": "recorded_evidence_not_rerun"
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/test_listing.json",
+      "bytes": 6044,
+      "sha256": "b6731403470cab09935bf56831024d2f2510ce1452566014f7022d558570d4f4",
+      "scope": "recorded_evidence_not_rerun"
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/tower_feast_login_review_20261024.json",
+      "bytes": 2905,
+      "sha256": "708bba98f51affe631945546234c897c3f9d5887f858ccc6d665d11445d78753",
+      "scope": "recorded_evidence_not_rerun"
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/workshop_entry_release_20261024.json",
+      "bytes": 7044,
+      "sha256": "6008c9050e740a90a51aa1878eacb099436e0ea7c2d23e3e7ae4f4bed7608816",
+      "scope": "recorded_evidence_not_rerun"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/addon_game_mode.lua",
+      "bytes": 49606,
+      "sha256": "ed267043700d47d2c7f72ff81989255c28b0fdf0c9401f9d0daaa8268df64cc9",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/addon_game_mode_client.lua",
+      "bytes": 1688,
+      "sha256": "db095896002b6f63b47484908285448c9ca2bdae70f2dce718ab2d53b02e3fd8",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/combat/attack_cadence.lua",
+      "bytes": 1320,
+      "sha256": "f3402b8388baf5df90a439c20de8d2788d8b89bfb0ddf168530d6a123c401c45",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/combat/damage_filter_service.lua",
+      "bytes": 20736,
+      "sha256": "344f7d9b2ea0c9f32f704288d425d2ecddfd4870e106bb4ac8bb13d86d6607b9",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/combat/damage_service.lua",
+      "bytes": 3972,
+      "sha256": "92342e520b57acbc474a995545b6cdefb550138dfb07d92ad733b9910e4ace05",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/config/armor_balance.lua",
+      "bytes": 6295,
+      "sha256": "94ca2bc73cf4a3fc0eaea65f6d2b532fd4db129b0512a91911521bd833b32f17",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/config/difficulty_config.lua",
+      "bytes": 3584,
+      "sha256": "90ff551c8fcd167aaaad4d575d0f887889317fe0801c653fb84273ca9a440ef4",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/config/generated/altar_actions.lua",
+      "bytes": 2038,
+      "sha256": "be8127fb207d66811425614887d75069eb12c15acfc9d83138100d963148387e",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/config/generated/archive_cooperative_reward_rules.lua",
+      "bytes": 364,
+      "sha256": "bb7203fe2072d18450868c823879fedcee7d1ffb5ac703b649c1c5614341e4c1",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/config/generated/building_definitions.lua",
+      "bytes": 3668,
+      "sha256": "e54d4f79c10cc0312f83bd5a41f5a29c50363d767a1131e0cf2de00cf022f889",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/config/generated/global_rules.lua",
+      "bytes": 6065,
+      "sha256": "2a1ce9506d1f77b28025b3c38e915910669f45772cc6aabdb42cd63b43d67fb4",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/config/generated/hero_definitions.lua",
+      "bytes": 5814,
+      "sha256": "00b9dcc07136bc3180bd4b6e3695a63b16db433d9a9297e45e825db6c02cab35",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/config/generated/hero_skill_choice_rules.lua",
+      "bytes": 699,
+      "sha256": "8b177805503ba60ebe81410d4435f22ee93d83a8e1d1144c69712e8804279226",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/config/generated/hero_summon_rules.lua",
+      "bytes": 654,
+      "sha256": "267885b98b56e40f3a55cc9f75f1b6c11734c8982f8b2cf0dc0d3b28a75a9ced",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/config/generated/human_monster_spec.lua",
+      "bytes": 82661,
+      "sha256": "66ae4b89c83539fd30ab1274871c4444026eab2aa44699e20fc1d0df739c741e",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/config/generated/lumberjack_fusion_definitions.lua",
+      "bytes": 7306,
+      "sha256": "5ebff49c9a0a9f0cf49ce48660933245e9844041fcabae10545e60adfac4fa8a",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/config/generated/tower_fusion_runtime.lua",
+      "bytes": 880,
+      "sha256": "319871f9b6fca6c9854594dd15f16c4c31404aec07546454d6da457e0d814b8f",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/config/human_monster_rules.lua",
+      "bytes": 1702,
+      "sha256": "b2a4b952078aaeac36866c38eb1ee8efd58c3e8399264bcb09eff1ade7656392",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/config/mode_progression.lua",
+      "bytes": 3317,
+      "sha256": "1584a1556aa3ced801c40e3cca441ef695c5da8717e7b37569ff1d6762253bfe",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/config/mode_release_config.lua",
+      "bytes": 824,
+      "sha256": "488711159e258bb52ed8f270732a7ff05be555e193be3a2c92420bc5593959b6",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/config/player_web_auth.lua",
+      "bytes": 243,
+      "sha256": "f21d23d40188a7e49f8e43675ee05fe8af2e533929a8e769d28cd556ab89a630",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/config/release_profile.lua",
+      "bytes": 336,
+      "sha256": "573c8a6731e67c9b51a3839cd6a60b66695dfe11f3a7bf08d7f5cf729895881e",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/config/tower_combat_rules.lua",
+      "bytes": 3209,
+      "sha256": "1c3cef1bc73180adb051b53d93252661a56d5160dbd949af9bb7e5413a038be7",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/config/tower_route_config.lua",
+      "bytes": 5744,
+      "sha256": "41f6711a6444dad3130f532a765286620dcae3e7b0c82c5eb399272be24bd581",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/config/waves_config.lua",
+      "bytes": 574,
+      "sha256": "25a874a2ae661d1f8f6e5cddf3af04b87646413699707e5bf04012f0fe4e485d",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/core/deadline_queue.lua",
+      "bytes": 2111,
+      "sha256": "3916d15827aafa99efda6f04317884ba82dab8316ce9414d46a7177ce8a91868",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/core/event_bus.lua",
+      "bytes": 5844,
+      "sha256": "316d424fc50cd86e639eb29c83cda3bcc4cc688fb10ac4954a86cbfd916d8cf9",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/core/hero_health_guard.lua",
+      "bytes": 6333,
+      "sha256": "582129b5c12ca4f879db91f21d00f057803b407d9a6ac45f2af43fa1ec34cad1",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/core/modifier_registry.lua",
+      "bytes": 11962,
+      "sha256": "691fc4e80dfe4b954b9c156907815410cf9c1797ad74523ca155d277b442e245",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/core/release_policy.lua",
+      "bytes": 1135,
+      "sha256": "eb617e2954b1beb0dc63690bfb081ee4f8346eabd8c94255c4ba2dc1012e169f",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/core/scheduler.lua",
+      "bytes": 4467,
+      "sha256": "022efde7b9969ea3aad6ceb002031f3ceaeae8ee5abe837c66c6e095392ede6c",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/core/target_history.lua",
+      "bytes": 6623,
+      "sha256": "98c26d81df1a3d3a906a8ac8d1397e3664e230f74ff1bfcf8a4660746352ffba",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/debug/mode_unlock_test.lua",
+      "bytes": 1561,
+      "sha256": "6d696377571601f120f96d093da4a4892a3270f1df6a7b3ad8fcafd182c092fb",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/debug/offline_logic_test.lua",
+      "bytes": 7049,
+      "sha256": "bc3042ce151f74d1bccaf04ef5c611be2f6a5e9f8955bedc9fe578894a67f34f",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/modifiers/modifier_enemy_wall_ai.lua",
+      "bytes": 30106,
+      "sha256": "dd0af3891fbc6765e9d2d1f5d2640c2dd9b0370e301a9d600b98f2ae34b780d3",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/research/research_technology_service.lua",
+      "bytes": 12496,
+      "sha256": "79832d3f5ccf8b7f7adb39ba8b6b445289fbdfff5f4971f0017d84c869eee3a4",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/anti_air_rules.lua",
+      "bytes": 997,
+      "sha256": "d382c242005697bac20f3e41ae42cc40e692be7fbb09fc4a257a6b14a6cbe148",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/archive_calendar.lua",
+      "bytes": 1256,
+      "sha256": "fcc826c5c2c8fc766a20af464b3f14e4aaf957ea06b0586b5bf3fe1f3b3557cd",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/archive_challenge_service.lua",
+      "bytes": 28098,
+      "sha256": "02382381c96f5a500ad605279e8e7a939e0d4403a40e4e6b93b215b2f33e71c3",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/archive_cooperative_reward_service.lua",
+      "bytes": 7710,
+      "sha256": "717c7748d2def56f5abc5bb59776b8d2838594480e1371572769fb019f17ae5e",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/archive_monthly_effects.lua",
+      "bytes": 1044,
+      "sha256": "1675c968a74b601b73ec35da764780e58ba97ce32ce0468dc53a720a572bfe67",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/archive_service.lua",
+      "bytes": 54070,
+      "sha256": "d85e2c6b692c17962908d4302d42412ab1101c0d6f6a4977d57e97f919bff504",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/asset_preload_service.lua",
+      "bytes": 34775,
+      "sha256": "04fe849b86b8ae21a2c1f3ed9ee3fb2e6038e0eaf64ca261ed7c660ac6cb8610",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/building_defeat_rules.lua",
+      "bytes": 932,
+      "sha256": "079e7f70e1d11f14fb3534d22df1d7960b8a32afe6f94cefb4efc1a6c05201c8",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/building_population_service.lua",
+      "bytes": 643,
+      "sha256": "2f487f874d1292cd4775a7d945e8dcee17226ed435df9a52354f42df53923392",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/building_system.lua",
+      "bytes": 70419,
+      "sha256": "90b2f95b123f55f20401e1d9716a751a2148c5725c5cd67380ef14cf6f85fb06",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/content_inventory_service.lua",
+      "bytes": 18818,
+      "sha256": "8d492500b3f6b716efa869e2737f79cf2a839a6cd9d4a9f06633a1847d7388b3",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/equipment_instance_service.lua",
+      "bytes": 1450,
+      "sha256": "0f348d5f97e06fb0f153d75aee269af8e76f19311b67ec24ed4eee760278175c",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/equipment_stat_aggregation_service.lua",
+      "bytes": 5506,
+      "sha256": "92165c7f164a2b44e1438705c186f65ec6cb85a0bce089292f29317367984a00",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/gold_mine_system.lua",
+      "bytes": 22885,
+      "sha256": "a8d0c3355a9de37e595be36b7cadc418f83ed3bb1a512d11e7251204a2d6b12b",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/hero_progression_system.lua",
+      "bytes": 8882,
+      "sha256": "de1d972b3e4bf122730c181bde55fee8e06c1800c6a965574fe18aa4a5714ca5",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/hero_summon_access.lua",
+      "bytes": 1560,
+      "sha256": "6d1e160b4decae2a3df2899821c0476998c900f1a55aea74b7dd11336c6336cb",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/hero_summon_system.lua",
+      "bytes": 28465,
+      "sha256": "e6cabacd4572a4306e026de13011cc8882701eb45d5c7d3f74462886f1c77a4b",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/inventory_transaction_service.lua",
+      "bytes": 2791,
+      "sha256": "9704e3579acf31c8e0ed22d79471907948561804af0a53d8c22823fab10933ba",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/lumberjack_fusion_service.lua",
+      "bytes": 13505,
+      "sha256": "fe2df3f6708518bf8e0e02e9bb56fd9a3776ec6ab0998e379c9ace8e5a692f9d",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/match_setup_service.lua",
+      "bytes": 10475,
+      "sha256": "9492f4c0e51fc38e52fe9d63ef143aa6be61d0e24eb46ac64c92e367511cfbf2",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/multiplayer_player_service.lua",
+      "bytes": 9587,
+      "sha256": "55aef4d45f1a2ad12fce95437547230f398455424c5244c9ae67f386deec0f29",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/online_time_service.lua",
+      "bytes": 18986,
+      "sha256": "52a3a85b1cdca2bf2a61bbe98659c2b9a96d62952364fc280d8ebff2a10697b7",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/permanent_reward_effect_service.lua",
+      "bytes": 32082,
+      "sha256": "9a837e6456f97306b2d2aa4499bafa0303dd29c005311f08c629b6c3c8d2d8b8",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/player_context_service.lua",
+      "bytes": 10042,
+      "sha256": "f6d5fa4254f8c8d34b5fbae5ec39e1412935382347b2d298c4a842d4a0f64278",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/player_profile_providers/http_fishing_provider.lua",
+      "bytes": 9948,
+      "sha256": "b9715c9039781a0a7fc4e621c1d94b559c6261dcfb359e1dd959026e4f27d423",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/player_profile_service.lua",
+      "bytes": 54623,
+      "sha256": "e38ba5a09903e0b83ab5b45b5cf4cccaee8ad83d43499126925fdb9baa4f54b3",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/player_room_locations.lua",
+      "bytes": 1601,
+      "sha256": "806c811555cdc949f630a07547552789717d1db3240a0f71ff9c5557e55b8bdd",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/player_tower_limit_service.lua",
+      "bytes": 3268,
+      "sha256": "47b09e0936cb5d278501ec3947821b763b91ecc4a04e82e664368cce944fc1e1",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/player_web_auth.lua",
+      "bytes": 14437,
+      "sha256": "5d11e3d0f46ff5f0004cd202c398d121a53c1bdc93dcb403db56fde5eb669d8d",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/resource_system.lua",
+      "bytes": 12971,
+      "sha256": "38a870104081407083fd9871d51220e25495b334b17f783e4e00f727b8ca8075",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/rogue_effect_runtime_service.lua",
+      "bytes": 14224,
+      "sha256": "c56626252c7dc885d781f4e003c541b0e4b64d90d7ec6cac703d4599bb829a92",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/rogue_reward_service.lua",
+      "bytes": 22339,
+      "sha256": "d5143446658cf7301af72add149fdb79458032360d00578eec9af7726142bd03",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/startup_loading_service.lua",
+      "bytes": 30735,
+      "sha256": "00959e70772c32e101b234c8ebb4fe79f1902635f70af3c06e33ac80446aa68d",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/team_difficulty_service.lua",
+      "bytes": 3692,
+      "sha256": "057850ad79f3b28a63151f12363e15be9a0c2ccdb45a901c7139b81be63832db",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/tower_fusion_service.lua",
+      "bytes": 32923,
+      "sha256": "cdeabaf14176fcdbafc5767cb9ed8b05305b07d4965a5daa59ece416d345a29f",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/tower_targeting.lua",
+      "bytes": 2913,
+      "sha256": "5efc3c3101f957469a60e77660b69c012846cad8033965600524ee2db30b5b06",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/training_room_service.lua",
+      "bytes": 10555,
+      "sha256": "b637b44415ffce8503d348a818b10e101f24f3b7a48ffbe4d67bafd068bd15d3",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/wall_melee_contact.lua",
+      "bytes": 41000,
+      "sha256": "f01df4311ee4f88933bb9a5ccaa3321a996198fe4b8fbc310851b3af8edbab5c",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/wall_navigation_service.lua",
+      "bytes": 8795,
+      "sha256": "e37c394b31dce0499c2ffbb238fad22696dc13d5bb4f6e267a40b6c8362566d9",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/wave_system.lua",
+      "bytes": 108867,
+      "sha256": "9d2af35f1c64c162d6771f2033f15156bb5a0b5ef7e724d393fc6d12d62e8b5f",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/weapon_equipment_service.lua",
+      "bytes": 22141,
+      "sha256": "b244e15e4b9f81c8c137caa0dfc13aa672ace20803abd92d8ad4ba67293d987e",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/weapon_synthesis_service.lua",
+      "bytes": 17997,
+      "sha256": "f6af1f020ec05ec444ed97e5ef5f6c13f8f00ebdfb67c6d015611e26a3633b7f",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/worker_system.lua",
+      "bytes": 83953,
+      "sha256": "7b72d6a06e30cdddd27d866a1bde927c83a66e9e3a6c5afe5115aa64852c8baa",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/worker_training_queue_service.lua",
+      "bytes": 7865,
+      "sha256": "84807513f8ecea969d765eda83b45fa5c209826077b8810edab88833a85ecf0d",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/systems/workshop_entry.lua",
+      "bytes": 2893,
+      "sha256": "1afaa3f740a2b3c5c53c8f802ec244f3b20e277f13f20157175088edaecc4fcc",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/tests/test_archive_service.lua",
+      "bytes": 32761,
+      "sha256": "5a55c2111ccb8e7ef59146b6c3afc93c86ab5dc118494c13d2c250f5b26bdcae",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/tests/test_damage_transaction_lifecycle.lua",
+      "bytes": 3651,
+      "sha256": "f9247a946c64e005133bc114dc308167818660898358902199ad517939f8a0e6",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/tests/test_difficulty_unlocks.lua",
+      "bytes": 17635,
+      "sha256": "3be368c1bf31f97202c2ead1f3099a687ca42d385d9a94e35f3f69f4270daf7a",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/tests/test_hero_skill_point_upgrade.lua",
+      "bytes": 14656,
+      "sha256": "ad6b7f468b2227ef218e62dc881eb432ce687eb84d804b2d85406ec50a03e4c9",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/tests/test_hero_summon_player_isolation.lua",
+      "bytes": 14595,
+      "sha256": "d9afdb458274363fffbbbe647745f2015c0e59acfb1e57ae2707148dbd6261a5",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/tests/test_player_profile_modes.lua",
+      "bytes": 6267,
+      "sha256": "96b2b5f91e31b5a3d98abee4854b7b56631c5895e9c0ea7d8c45005db85484e1",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/tests/test_release_debug_entrypoints.lua",
+      "bytes": 7783,
+      "sha256": "83aeaad4184d9b630ebc1c3e55ce08789da1741c2d6639cc5b99ffbaf2e0d342",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/tests/test_release_debug_policy.lua",
+      "bytes": 3725,
+      "sha256": "785ab89225143e439d015a1415bc5b8ed0dcf9820e55838dd0242d6dcb9bc649",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/tests/test_resource_opening_wood.lua",
+      "bytes": 2305,
+      "sha256": "a3cf6ebef79d076e51720d06e5bd168a5ff22e25d7aad799e34015da7e2fb94e",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/tests/test_rogue_reward_history.lua",
+      "bytes": 4370,
+      "sha256": "8fb4da5347f4f8a229418670277200d15d0d2a72de357417e37eadedbb41d79f",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/tests/test_startup_loading_service.lua",
+      "bytes": 46305,
+      "sha256": "dd7356094447aa76898f2dfc2eaeeb8cd52788b80a30913e07aa577c02bf59a8",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/tests/test_tower_target_selection.lua",
+      "bytes": 7125,
+      "sha256": "0afc6290524fca49cbcc95ccf047c235ee47f5a583dacca5a9c6d155d6dcf202",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/tests/test_wall_melee_contact.lua",
+      "bytes": 15396,
+      "sha256": "497888545c23f8d6b1859ec26e00dfcbf2f20567eb8ef5b912ecb7e013f670e6",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/tests/test_wall_navigation.lua",
+      "bytes": 4007,
+      "sha256": "2400ed783c01a6f91ba1186e7f9a7fab7eef1869a2c8a5f1a586950255a8df11",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/tests/test_wave_population_endgame.lua",
+      "bytes": 40704,
+      "sha256": "f0a8dfc730b0e57084eec3a1d824798b6b45840d7a0f0907dfe3687724611108",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/tests/test_wave_spawn_routing.lua",
+      "bytes": 9322,
+      "sha256": "d17bc4254fcbcec87799375b968bb1e97b087abd171264535ab12f006a2e5747",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "scripts/vscripts/tests/test_worker_training_queue.lua",
+      "bytes": 12929,
+      "sha256": "ca5a08d54f2961d85163f594b6a068ccfd9dbc675a766a4762354a3611d7c6d0",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "server/aliyun/database/target/202609230001_match_profile_sessions.sql",
+      "bytes": 3628,
+      "sha256": "495038ea19d181ac85b1543a2f93637ff1a119c00772dde13a8e3e0cf8272494",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "server/aliyun/database/target/202610220001_human_spec_mode_admission.sql",
+      "bytes": 3807,
+      "sha256": "2f51a8a6040d0380c19042eadab103d2aeacaa8832ce7087f74b5b3afd3801e5",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "server/archive_backend/service.py",
+      "bytes": 28081,
+      "sha256": "ce291aa6252f8defadd5b059012cb246881753e9fa9df350ab040f8282e6e4f6",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "server/fishing_api_overrides/match_profiles.py",
+      "bytes": 11951,
+      "sha256": "e9943770df181f482d42a06840f4a5609b6ddc39150d3b67ee135e19f8637ea6",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "server/migrations/202610090002_archive_vip_recharge_sync.sql",
+      "bytes": 4526,
+      "sha256": "e06a9faf663b774b5f4b6c0c10e30c4c2c452f113bd4e2d356b66a3e1c331ebd",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "server/payment_backend/alipay.py",
+      "bytes": 10066,
+      "sha256": "8bf70387ab9a6702be8e48dbb0e817bdcd03f3f27b46855596bb00c34ee1ede4",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "server/payment_backend/commerce_bundles.py",
+      "bytes": 16375,
+      "sha256": "90e5951c9d147b965efef45b0e29062830bf3e7b6fede7f99aa5dae352d3064d",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "server/payment_backend/csv_catalog.py",
+      "bytes": 12364,
+      "sha256": "bd025fd82ee5c4c22f567f6070952a65f12553139ca74d28eede977ff17c257d",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "server/payment_backend/service.py",
+      "bytes": 30612,
+      "sha256": "971224cae14f3159cc3e85a33e5cfbb409d56ab3d633114fda0c0a94abb10e0a",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "server/payment_backend/ucoin_catalog.py",
+      "bytes": 3907,
+      "sha256": "8884debb891b9f577ba0d79e5df0432d467a0ce35a069034bb05ade2e4d19662",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "server/payment_backend/ucoin_pricing.py",
+      "bytes": 1182,
+      "sha256": "26ed3722f2f2f3401ded97235cc4a2836f0ebbe7a9c38a06d7d29e5ed30e1340",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "server/payment_backend/upgrade_commerce_bundles.sql",
+      "bytes": 22632,
+      "sha256": "401cf5b97d209c21322c7990d989f7875bb98601b3ba0bfb0fa1b4b446c4382d",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "server/payment_backend/upgrade_ucoin_rate_100.sql",
+      "bytes": 13881,
+      "sha256": "86cdfa282472883c06dc3ce398d71a96be3b08c3133b4ab891a3f28eb13b32e2",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "server/payment_backend/wechat.py",
+      "bytes": 7750,
+      "sha256": "6f049c5be9c7070c7a9ae433147854bd25dbd332dc59abc2e38733ff7f5e1a17",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "server/player_web_auth/README.txt",
+      "bytes": 6741,
+      "sha256": "2cb498fdcbb18a0673e1024a59197266d31c14059e7407353cbca20809eaa47c",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "server/player_web_auth/http_api.py",
+      "bytes": 10716,
+      "sha256": "52448ef0b5cfbf564782886fcee817c3466ccbf710500bc1a901d97e2f9230c0",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "server/player_web_auth/service.py",
+      "bytes": 32394,
+      "sha256": "4befe7d77dd21f211f03f3f0eb016a6c1ec22bca273c914128ef2728a3aaadb8",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "server/workshop_test/run_api.py",
+      "bytes": 2005,
+      "sha256": "feb7569e2ae3c6b5ffe8dac4f44e70644e919cc00da9ec0853e9f47e843168c3",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "tools/build_configs.py",
+      "bytes": 41836,
+      "sha256": "9fbdf16dbbf01f47605e3cf17c9b78ac4359a84a10a5d0a49f85ce2a4e6c8f47",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "tools/build_runtime_release.py",
+      "bytes": 23963,
+      "sha256": "aa66f7bd57e50c48327b97f9242f3db97954ff443698477f2114448abdc194ea",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "tools/build_workshop_entry_map.py",
+      "bytes": 11373,
+      "sha256": "e8124a270ca942e9f0f2b7aae5642c33b118e7411c19d9a3586c6141087c2b27",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "tools/import_human_monster_spec.py",
+      "bytes": 8231,
+      "sha256": "18224951425407118920babf1152f2b117c60362f5bd869059d7029df0ac080c",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "tools/publish_test_release.py",
+      "bytes": 21921,
+      "sha256": "df8023986c4b31558b6da027b89a9df973f9376c8b5dfddf49cc6bab8b7b69c7",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "tools/run_runtime_regression.py",
+      "bytes": 4976,
+      "sha256": "0309409766b701c5142656aab888c76e717a2b6649a40f522729f6045e45da7b",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "tools/steam_workshop_upload.py",
+      "bytes": 23818,
+      "sha256": "09d4ae58b8a10210f5fac3d28cf81ca5f39bebf8586d36e97eaf71b3654e246d",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "tools/workshop_test/build_workshop_entry_candidate.py",
+      "bytes": 13916,
+      "sha256": "abad8d3d09043c11d61685360907c71f62f625064ac021e0a38dd2594d164ace",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "game",
+      "path": "tools/workshop_test/remote_web_auth.py",
+      "bytes": 30664,
+      "sha256": "dfaba8e26ec069839b1109e1e0f49f1d6cd530e304d40624bb0f52ef3cb5e9d1",
+      "scope": "source_or_configuration_at_snapshot"
+    },
+    {
+      "repository": "content",
+      "path": "maps/ws4_entry.vmap",
+      "bytes": 539864,
+      "sha256": "9b92938f8f582e1b69592a0b6699264bc7eb39836427a58e07abdf9f46920928",
+      "scope": "own_editable_entry_map"
+    }
+  ],
+  "missing_optional_source_paths": [],
+  "hashes_are_source_snapshot_not_source_backup": true,
+  "source_files_copied_wholesale": false,
+  "historical_source_may_contain_superseded_rules": true,
+  "original_transcripts_hashed_or_copied": false,
+  "private_configuration_read_or_exported": false,
+  "official_references": [
+    {
+      "url": "https://partner.steamgames.com/doc/api/ISteamHTTP#CreateHTTPRequest",
+      "scope": "native_Steam_HTTP_interface_not_Dota_stage_policy"
+    },
+    {
+      "url": "https://partner.steamgames.com/doc/sdk/api#initialization_and_shutdown",
+      "scope": "native_SDK_initialization_not_proof_of_Dota_phase_mapping"
+    },
+    {
+      "url": "https://github.com/ValveSoftware/Dota2-Gameplay/issues/35497",
+      "scope": "player_report_in_official_tracker_not_confirmed_Valve_whitelist_policy"
+    },
+    {
+      "url": "https://fetch.spec.whatwg.org/#append-a-request-origin-header",
+      "scope": "browser_form_Origin_behavior"
+    },
+    {
+      "url": "https://www.w3.org/TR/referrer-policy/#referrer-policy-same-origin",
+      "scope": "same_origin_referrer_policy"
+    },
+    {
+      "url": "https://partner.steamgames.com/doc/api/ISteamUGC#SetItemContent",
+      "scope": "Workshop_content_directory_API_not_native_Dota_playability_proof"
+    },
+    {
+      "url": "https://developers.openai.com/blog/mastering-codex-remote-for-engineering",
+      "scope": "optional_session_compact_fork_commands_depend_on_host; not executed by this export"
+    }
+  ]
+}

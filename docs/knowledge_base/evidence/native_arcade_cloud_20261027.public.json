@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "status": "VERIFIED_NATIVE_GUEST_SCAN",
+  "workshop_id": "3824360109",
+  "visibility": "unlisted",
+  "release_sequence": 2026102709,
+  "revision": "WS4-NATIVE-CLOUD-03",
+  "content_sha256": "1262cbe5905d760c6c15400e4051038613c6a78bffb99b64d9d2d5d609d3cf40",
+  "vpk_sha256": "b09f36be87db6dc3c8f055e06a9c18438236437d0167c7634effba6707b37278",
+  "package_bytes": 3767362385,
+  "package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 274380,
+      "sha256": "b09f36be87db6dc3c8f055e06a9c18438236437d0167c7634effba6707b37278"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1073605094,
+      "sha256": "5237ed97e661a93b40045f7297b7dee695bcd6eb3369622897f863202a015982"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1068730788,
+      "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379183,
+      "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 552372940,
+      "sha256": "7383f8f065b0adde28a9a0ad0560419add35d150fcf92f7d6776268b8d3cc1e4"
+    }
+  ],
+  "file_count": 6658,
+  "changed_runtime_paths": [
+    "panorama/scripts/custom_game/payment_test.vjs_c"
+  ],
+  "download_manifest": "3869894305253699960",
+  "download_verified": true,
+  "native_guest_qr_scan": "PASS_GUEST_PHONE_SCAN_PRODUCT_AMOUNT_CONFIRMED_PAYMENT_NOT_PERFORMED",
+  "ready_for_public_release": false,
+  "source_record": "publishing/workshop/native_arcade_cloud_20261027.json",
+  "source_record_sha256": "f6e33af8319d4db3d8a68f13a27ab62ea1b891c27e9493d6c4ae36e8f02684f9"
+}

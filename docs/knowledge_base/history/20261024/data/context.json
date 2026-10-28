@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-10-24",
+  "language": "zh-CN",
+  "generated_utc": "2026-10-24T13:50:40.449992+00:00",
+  "project": {
+    "internal_names": [
+      "Survival",
+      "SurvivalContent"
+    ],
+    "workshop_title": "孤城逐晓·封闭测试",
+    "workshop_id": "3824360109",
+    "game_repository": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival",
+    "content_repository": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival",
+    "genre": "Dota2 cooperative survival tower defense with account progression"
+  },
+  "usage": {
+    "read_first": "00_START_HERE.md",
+    "read_domains_on_demand": true,
+    "historical_instructions_are_live_authorization": false,
+    "secrets_included": false,
+    "raw_session_database_modified": false,
+    "source_code_backup_included": false
+  },
+  "modules": [
+    {
+      "file": "00_START_HERE.md",
+      "domain": "bootstrap"
+    },
+    {
+      "file": "01_architecture_and_workflow.md",
+      "domain": "architecture"
+    },
+    {
+      "file": "02_core_gameplay.md",
+      "domain": "gameplay"
+    },
+    {
+      "file": "03_progression_save_contract.md",
+      "domain": "save"
+    },
+    {
+      "file": "04_network_auth_official.md",
+      "domain": "identity_network"
+    },
+    {
+      "file": "05_payments_commerce_delivery.md",
+      "domain": "commerce"
+    },
+    {
+      "file": "06_build_release_ops.md",
+      "domain": "release"
+    },
+    {
+      "file": "07_decisions_incidents_pending.md",
+      "domain": "decisions_and_pending"
+    },
+    {
+      "file": "08_new_project_reuse.md",
+      "domain": "new_project_reuse"
+    },
+    {
+      "file": "09_session_digest.md",
+      "domain": "history_digest"
+    },
+    {
+      "file": "10_runtime_engine_contracts.md",
+      "domain": "engine_contracts"
+    }
+  ],
+  "machine_readable_facts": [
+    "data/gameplay_facts.json",
+    "data/commerce_facts.json",
+    "data/network_release_facts.json"
+  ],
+  "evidence_order": [
+    "current_source_for_current_development",
+    "signed_release_manifest_for_frozen_runtime",
+    "native_test_with_precise_entry_scope",
+    "historical_deployment_receipts",
+    "historical_requests_not_implementation",
+    "unknown_not_inferred"
+  ],
+  "status": {
+    "current_development": {
+      "acceptance_all_difficulties_unlocked": true,
+      "acceptance_persistent_writes": "isolated_for_entire_match",
+      "published_mode_ids": [
+        "standard",
+        "pure",
+        "rich",
+        "cold"
+      ],
+      "normal_unlock_policy": "N1-N4 open; N5 onward previous clear in same mode; complete-roster intersection"
+    },
+    "frozen_workshop": {
+      "revision": "WS4-ENTRY-05",
+      "sequence": 2026102405,
+      "manifest": "2955439000185399689",
+      "content_sha256": "b4750e433bdd1b1ea2fab0de98d13b3660ed5d3ef80a10c63c46512eab10bc60",
+      "entry_map": "ws4_entry",
+      "gameplay_map": "template_map",
+      "routing_command": "dota_launch_custom_game 3824360109 template_map",
+      "visibility": "unlisted",
+      "scope": "four_account_isolated_test_single_player_cloud_profile",
+      "owner_confirmed_original_workshop_entry": true,
+      "native_difficulty_observed": "N5",
+      "profile_revision_observed": 43,
+      "protected_modules_preserved": 180,
+      "runtime_files": 6630,
+      "v05_mode_flags_inferred_from_current_development": false
+    },
+    "network": {
+      "real_multiplayer_hosting_delivered": false,
+      "vpn_two_player_historical_success": true,
+      "vpn_lag_resolved": false,
+      "author_pc_steam_tls_relay_required": true,
+      "official_http_whitelist_rule_confirmed": false,
+      "internal_valve_http_creation_failure_reason_confirmed": false
+    },
+    "commerce": {
+      "ws4_real_money_enabled": false,
+      "ws4_trusted_rankings_enabled": false,
+      "wechat_historical_real_010_yuan_acceptance": true,
+      "alipay_real_payment_verified_in_this_snapshot": false
+    }
+  },
+  "test_entries": {
+    "offline": "离线逻辑测试.cmd",
+    "online": "联网登录测试.cmd",
+    "offline_storage": "per_match_memory",
+    "offline_cheats": true,
+    "online_debug_mutations_allowed": false,
+    "current_workshop_engine_sv_cheats": "NOT_QUERIED"
+  },
+  "invariants": [
+    "server_verified_identity_and_ownership",
+    "admission_before_mode_profile_and_gameplay",
+    "permanent_account_profile_separate_from_mode_battle_projection",
+    "immutable_match_baseline",
+    "revision_and_generation_reject_stale_callbacks",
+    "idempotent_immutable_receipts",
+    "server_time_for_periods",
+    "cash_signature_amount_merchant_checks_before_atomic_delivery",
+    "login_does_not_prove_host_results",
+    "native_entry_scope_distinct_from_unit_tests",
+    "game_and_content_independent_delivery"
+  ],
+  "new_project_must_replace": [
+    "workshop_and_app_ids",
+    "domain_and_callbacks",
+    "account_namespace_and_test_allowlist",
+    "databases_and_roles",
+    "private_keys_and_tokens",
+    "merchant_configuration",
+    "release_trust_policy",
+    "hosting_and_network_setup"
+  ],
+  "git_delivery_sequence": [
+    "inspect_both",
+    "stash_unique_record_id",
+    "pull_current_strategy",
+    "pop_only_this_stash",
+    "verify_preserved_changes",
+    "stage_task_only",
+    "validate",
+    "commit_if_needed",
+    "push",
+    "verify_remote"
+  ],
+  "remaining_important_work": [
+    "stable_steam_egress_without_author_pc",
+    "real_public_multiplayer_hosting",
+    "multi_account_reconnect_and_long_match_performance",
+    "production_reward_trust",
+    "payment_and_refund_production_acceptance",
+    "unpublished_modes_and_shadow_realm_gameplay"
+  ],
+  "source_manifest": "data/source_manifest.json",
+  "repository_snapshot": "data/repository_snapshot.json",
+  "session_coverage": "data/session_inventory.json"
+}

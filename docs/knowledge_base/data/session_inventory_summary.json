@@ -1,0 +1,279 @@
+{
+  "schema": 1,
+  "snapshot_only": true,
+  "raw_sessions_included": false,
+  "observed_utc": "2026-10-28T01:37:05.699371+00:00",
+  "C_disk": {
+    "total_bytes": 107376275456,
+    "used_bytes": 106141642752,
+    "free_bytes": 1234632704
+  },
+  "directories": {
+    "sessions": {
+      "path": "C:\\Users\\Administrator\\.codex\\sessions",
+      "files_without_reparse_targets": 1837,
+      "subdirectories": 51,
+      "logical_bytes_without_reparse_targets": 31094398966,
+      "reparse_entries_skipped": 0,
+      "links": []
+    },
+    "archived_sessions": {
+      "path": "C:\\Users\\Administrator\\.codex\\archived_sessions",
+      "files_without_reparse_targets": 1,
+      "subdirectories": 0,
+      "logical_bytes_without_reparse_targets": 409934,
+      "reparse_entries_skipped": 24,
+      "links": [
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-02T14-53-25-01a060e4-d992-7011-af40-f82506549133.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-02T14-53-25-01a060e4-d992-7011-af40-f82506549133.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-02T14-53-25-01a060e4-d992-7011-af40-f82506549133.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 51304
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-02T15-22-25-01a060ff-63f3-7872-88f3-5be3d8592282.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-02T15-22-25-01a060ff-63f3-7872-88f3-5be3d8592282.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-02T15-22-25-01a060ff-63f3-7872-88f3-5be3d8592282.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 26126482
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-03T01-55-39-01a06343-248d-7f23-82dd-18963e9d832e.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-03T01-55-39-01a06343-248d-7f23-82dd-18963e9d832e.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-03T01-55-39-01a06343-248d-7f23-82dd-18963e9d832e.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 49006004
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-05T08-25-19-01a06343-248d-7f23-82dd-18963e9d832e_01a06ef4-9a2a-7aa0-bbe1-d02c19bd32fa.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-05T08-25-19-01a06343-248d-7f23-82dd-18963e9d832e_01a06ef4-9a2a-7aa0-bbe1-d02c19bd32fa.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-05T08-25-19-01a06343-248d-7f23-82dd-18963e9d832e_01a06ef4-9a2a-7aa0-bbe1-d02c19bd32fa.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 25793
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-05T08-25-35-01a06343-248d-7f23-82dd-18963e9d832e_01a06ef4-d8a0-7850-8187-ac3d5da68fb6.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-05T08-25-35-01a06343-248d-7f23-82dd-18963e9d832e_01a06ef4-d8a0-7850-8187-ac3d5da68fb6.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-05T08-25-35-01a06343-248d-7f23-82dd-18963e9d832e_01a06ef4-d8a0-7850-8187-ac3d5da68fb6.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 39637
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-05T08-36-34-01a06343-248d-7f23-82dd-18963e9d832e_01a06efe-e6ff-7302-90da-7f1b153959b2.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-05T08-36-34-01a06343-248d-7f23-82dd-18963e9d832e_01a06efe-e6ff-7302-90da-7f1b153959b2.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-05T08-36-34-01a06343-248d-7f23-82dd-18963e9d832e_01a06efe-e6ff-7302-90da-7f1b153959b2.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 39852
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-05T08-42-37-01a06343-248d-7f23-82dd-18963e9d832e_01a06f04-736d-7440-8b46-a8b1d0bed748.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-05T08-42-37-01a06343-248d-7f23-82dd-18963e9d832e_01a06f04-736d-7440-8b46-a8b1d0bed748.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-05T08-42-37-01a06343-248d-7f23-82dd-18963e9d832e_01a06f04-736d-7440-8b46-a8b1d0bed748.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 39852
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-05T10-03-56-01a06343-248d-7f23-82dd-18963e9d832e_01a06f4e-e2ec-7fd3-93eb-ba926fbc1647.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-05T10-03-56-01a06343-248d-7f23-82dd-18963e9d832e_01a06f4e-e2ec-7fd3-93eb-ba926fbc1647.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-05T10-03-56-01a06343-248d-7f23-82dd-18963e9d832e_01a06f4e-e2ec-7fd3-93eb-ba926fbc1647.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 39897
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-05T10-06-06-01a06343-248d-7f23-82dd-18963e9d832e_01a06f50-deb6-7470-9d34-b98c0f84c919.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-05T10-06-06-01a06343-248d-7f23-82dd-18963e9d832e_01a06f50-deb6-7470-9d34-b98c0f84c919.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-05T10-06-06-01a06343-248d-7f23-82dd-18963e9d832e_01a06f50-deb6-7470-9d34-b98c0f84c919.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 66170120
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-05T17-01-50-01a070cd-7ef9-7e83-93fe-705377cbb6e1.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-05T17-01-50-01a070cd-7ef9-7e83-93fe-705377cbb6e1.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-05T17-01-50-01a070cd-7ef9-7e83-93fe-705377cbb6e1.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 16135326
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-06T18-47-43-01a07654-c95b-7e01-80fe-2a41cdb36f85.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-06T18-47-43-01a07654-c95b-7e01-80fe-2a41cdb36f85.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-06T18-47-43-01a07654-c95b-7e01-80fe-2a41cdb36f85.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 774405
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-06T21-21-21-01a076e1-7314-73e3-aa08-fd61f90b2817.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-06T21-21-21-01a076e1-7314-73e3-aa08-fd61f90b2817.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-06T21-21-21-01a076e1-7314-73e3-aa08-fd61f90b2817.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 3427039494
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-13T11-01-06-01a098b6-1c15-7a02-957d-33048a994ad7.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-13T11-01-06-01a098b6-1c15-7a02-957d-33048a994ad7.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-13T11-01-06-01a098b6-1c15-7a02-957d-33048a994ad7.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 178992861
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-14T14-20-31-01a09e93-0b43-79d2-8575-2a4ea43a3df6.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-14T14-20-31-01a09e93-0b43-79d2-8575-2a4ea43a3df6.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-14T14-20-31-01a09e93-0b43-79d2-8575-2a4ea43a3df6.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 1694388
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-14T16-34-39-01a09f0d-d780-7fd0-be10-c78a9eb82909.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-14T16-34-39-01a09f0d-d780-7fd0-be10-c78a9eb82909.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-14T16-34-39-01a09f0d-d780-7fd0-be10-c78a9eb82909.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 1420501382
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-17T20-59-13-01a0af73-23a4-7133-9660-94bd54bc767c.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-17T20-59-13-01a0af73-23a4-7133-9660-94bd54bc767c.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-17T20-59-13-01a0af73-23a4-7133-9660-94bd54bc767c.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 30204809
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-17T21-08-02-01a0af7b-35ea-7440-a7c3-b7e923704eff.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-17T21-08-02-01a0af7b-35ea-7440-a7c3-b7e923704eff.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-17T21-08-02-01a0af7b-35ea-7440-a7c3-b7e923704eff.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 29347460
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-25T13-10-16-01a0d6f8-ad34-75f0-8717-2f24c98b0d0d.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-25T13-10-16-01a0d6f8-ad34-75f0-8717-2f24c98b0d0d.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-25T13-10-16-01a0d6f8-ad34-75f0-8717-2f24c98b0d0d.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 1289993
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-29T17-27-16-01a0ec7d-6646-77e1-8dc3-0997f46de492.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-29T17-27-16-01a0ec7d-6646-77e1-8dc3-0997f46de492.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-29T17-27-16-01a0ec7d-6646-77e1-8dc3-0997f46de492.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 291851331
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-30T11-39-57-01a0f065-c9e9-7c50-83a1-f97f3ebb983d.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-30T11-39-57-01a0f065-c9e9-7c50-83a1-f97f3ebb983d.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-30T11-39-57-01a0f065-c9e9-7c50-83a1-f97f3ebb983d.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 508018453
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-30T23-24-51-01a0f2eb-2320-7b01-9724-216a58028953.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-30T23-24-51-01a0f2eb-2320-7b01-9724-216a58028953.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-30T23-24-51-01a0f2eb-2320-7b01-9724-216a58028953.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 17587603
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-30T23-25-08-01a0f2eb-66e1-7452-b36c-7927232d6bac.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-30T23-25-08-01a0f2eb-66e1-7452-b36c-7927232d6bac.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-30T23-25-08-01a0f2eb-66e1-7452-b36c-7927232d6bac.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 23087740
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-09-30T23-25-28-01a0f2eb-b366-7300-80e4-e9ca6b97bf91.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-09-30T23-25-28-01a0f2eb-b366-7300-80e4-e9ca6b97bf91.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-09-30T23-25-28-01a0f2eb-b366-7300-80e4-e9ca6b97bf91.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 17084120
+        },
+        {
+          "path": "C:\\Users\\Administrator\\.codex\\archived_sessions\\rollout-2026-10-02T13-51-42-01a0fb2b-1d9e-7ab2-9243-92886ced5545.jsonl",
+          "target": "\\\\?\\D:\\CodexData\\archived_sessions\\rollout-2026-10-02T13-51-42-01a0fb2b-1d9e-7ab2-9243-92886ced5545.jsonl",
+          "resolved_target": "D:\\CodexData\\archived_sessions\\rollout-2026-10-02T13-51-42-01a0fb2b-1d9e-7ab2-9243-92886ced5545.jsonl",
+          "target_exists": true,
+          "target_open_readable": true,
+          "target_bytes": 309528
+        }
+      ]
+    },
+    "attachments": {
+      "path": "C:\\Users\\Administrator\\.codex\\attachments",
+      "files_without_reparse_targets": 11,
+      "subdirectories": 9,
+      "logical_bytes_without_reparse_targets": 2737574,
+      "reparse_entries_skipped": 0,
+      "links": []
+    },
+    "generated_images": {
+      "path": "C:\\Users\\Administrator\\.codex\\generated_images",
+      "files_without_reparse_targets": 2,
+      "subdirectories": 1,
+      "logical_bytes_without_reparse_targets": 6510154,
+      "reparse_entries_skipped": 0,
+      "links": []
+    }
+  },
+  "project_summary": {
+    "state_total_threads": 1848,
+    "project_threads": 1848,
+    "project_archived_threads": 19,
+    "project_existing_rollouts": 1848,
+    "project_missing_rollouts": 0,
+    "project_logical_bytes_all_target_volumes": 37140503475,
+    "project_logical_bytes_on_C_nonlinks": 31084236676,
+    "project_logical_bytes_on_D_link_targets": 6056266799,
+    "project_history_modes": {
+      "paginated": 1824,
+      "legacy": 24
+    },
+    "project_source_kinds": {
+      "vscode": 23,
+      "subagent.other": 1278,
+      "subagent.thread_spawn": 547
+    },
+    "current_root_tree_threads_protected": 30,
+    "project_thread_history_counts": {
+      "thread_history_projection_state": 1822,
+      "thread_turns": 14253,
+      "thread_items": 207864,
+      "thread_realtime_items": 0
+    },
+    "project_rollout_bytes_by_resolved_drive": {
+      "C:": 31084236676,
+      "D:": 6056266799
+    }
+  },
+  "archived_link_summary": {
+    "count": 24,
+    "targets_exist": 24,
+    "targets_open_readable": 24,
+    "linked_target_logical_bytes_not_C_occupancy": 6105457834
+  },
+  "sqlite_read_mode": "mode=ro; PRAGMA query_only=ON; read transaction includes committed WAL snapshot, not immutable; no database SQL writes",
+  "sqlite_total_changes": {
+    "state": 0,
+    "history": 0
+  }
+}

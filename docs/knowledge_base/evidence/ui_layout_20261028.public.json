@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "status": "LAYOUT2801_UPLOADED_OFFICIAL_DOWNLOAD_VERIFIED_PENDING_NATIVE_LAYOUT_TEST",
+  "workshop_id": "3824360109",
+  "visibility": "unlisted",
+  "release_sequence": 2026102801,
+  "revision": "WS4-NATIVE-CLOUD-04",
+  "content_sha256": "f20c64b00da4e9d9f1a93bd7fca23163aa3f8b203e9ae354de5f60d9a8c75503",
+  "vpk_sha256": "8e7f22eb14bbb757702fcca0267f0dc8ce9d6c1a82a802de0265dcd1f503fa6f",
+  "package_bytes": 3767362491,
+  "package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 274380,
+      "sha256": "8e7f22eb14bbb757702fcca0267f0dc8ce9d6c1a82a802de0265dcd1f503fa6f"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1073605200,
+      "sha256": "f08e7ece61016dc26c27762d956126d6c133fb0e514b2b3eee17d25d5000857b"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1068730788,
+      "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379183,
+      "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 552372940,
+      "sha256": "7383f8f065b0adde28a9a0ad0560419add35d150fcf92f7d6776268b8d3cc1e4"
+    }
+  ],
+  "file_count": 6658,
+  "source_sha256": "136ce07fcebc36c7c27ffc428ab05c0d7f63837902f5c7dfdb885b553810cc27",
+  "changed_runtime_paths": [
+    "panorama/scripts/custom_game/production_progress.vjs_c"
+  ],
+  "download_manifest": "6288215904920783611",
+  "download_receipt_sha256": "09ff2163ea73e75fec9437addfe3f0cefaf668d97723a1d7d50a533b737b6d6c",
+  "uploaded": true,
+  "download_verified": true,
+  "native_guest_layout_acceptance": "NOT_RUN",
+  "ready_for_public_release": false,
+  "source_record": "publishing/workshop/ui_layout_20261028.json",
+  "source_record_sha256": "1b4e2b9069b7455f59ec2668ed2759dd7b1ea0a237f8b9d679d874c9b03fb06b"
+}

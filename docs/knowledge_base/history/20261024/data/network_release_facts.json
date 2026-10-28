@@ -1,0 +1,351 @@
+{
+  "schema": "survival.project_knowledge.network_release.v1",
+  "as_of": "2026-10-24",
+  "timezone": "Asia/Shanghai",
+  "classification": "sanitized_project_facts_no_credentials",
+  "source_of_truth": "publishing/workshop/workshop_entry_release_20261024.json",
+  "release": {
+    "revision": "WS4-ENTRY-05",
+    "status": "PUBLISHED_DOWNLOADED_ORIGINAL_WORKSHOP_LOGIN_PROFILE_GAMEPLAY_VERIFIED",
+    "candidate": "20261024_ws4_workshop_entry_v05",
+    "sequence": 2026102405,
+    "content_sha256": "b4750e433bdd1b1ea2fab0de98d13b3660ed5d3ef80a10c63c46512eab10bc60",
+    "base_candidate": "20261024_ws4_web_auth_v04",
+    "base_sequence": 2026102404,
+    "base_content_sha256": "f5be8205cd107797f75c5b930224933de8c15f10e9a9e17932b3d6d747f91eb7",
+    "base_runtime_files": 6627,
+    "runtime_files": 6630,
+    "runtime_bytes": 3766734732,
+    "signature_valid": true,
+    "protected_modules_preserved_byte_identical": 180,
+    "frozen_main_body_preserved": true,
+    "gameplay_map_changed": false,
+    "backend_changed": false,
+    "modified_paths": [
+      "addoninfo.txt",
+      "scripts/vscripts/addon_game_mode.lua"
+    ],
+    "added_paths": [
+      "maps/ws4_entry.vpk",
+      "scripts/vscripts/addon_game_mode_client.lua",
+      "scripts/vscripts/systems/workshop_entry.lua"
+    ],
+    "runtime_policy_sha256": "9527373a7a27e7396e4e4418b38ce20045a60e1efb5eb320f9463259d2639061",
+    "production_profile_sha256": "f217f9a3a893433aa38d1b76afdb6b3dd319056cffec2ff9a9d37beaee7aa746"
+  },
+  "workshop": {
+    "app_id": 570,
+    "item_id": "3824360109",
+    "visibility": "unlisted",
+    "steam_manifest": "2955439000185399689",
+    "official_download_full_verification": true,
+    "mode": "single_player_cloud_save",
+    "default_map": "ws4_entry",
+    "entry_capacity": 1,
+    "target_map": "template_map",
+    "target_declared_capacity": 4,
+    "fixed_client_command": "dota_launch_custom_game 3824360109 template_map",
+    "accepted_client_map_names": [
+      "ws4_entry",
+      "maps/ws4_entry.vpk"
+    ],
+    "server_callbacks_defined_at_root_entry_scope": true,
+    "client_launch_once_per_vm": true,
+    "multiplayer_hosting_provided": false,
+    "multiplayer_latency_solution_provided": false,
+    "ready_for_public_release": false,
+    "entry_map": {
+      "source": "content/dota_addons/Survival/maps/ws4_entry.vmap",
+      "runtime": "maps/ws4_entry.vpk",
+      "bytes": 144203,
+      "sha256": "abce9c7f6a1159303c799ec9a8b40afa7f724e7bf4c52509038e490afa67fecb",
+      "vpk_entries_crc_verified": 16,
+      "compiler_failed_resources": 0,
+      "third_party_map_copied": false
+    }
+  },
+  "auth": {
+    "public_base": "https://pay.xiaofengnet.com/ws4-web",
+    "official_identity_provider": "https://steamcommunity.com/openid/login",
+    "start_path": "/v1/player-auth/start",
+    "poll_path": "/v1/player-auth/poll",
+    "binding": [
+      "engine_verified_player_account",
+      "match_session_id"
+    ],
+    "pending_ttl_seconds": 600,
+    "player_grant_ttl_seconds": 14400,
+    "browser_default_ttl_seconds": 14400,
+    "browser_remember_opt_in_ttl_seconds": 2592000,
+    "per_match_explicit_approval_required": true,
+    "new_approval_revokes_older_account_grants": true,
+    "raw_tokens_in_urls_logs_or_panorama": false,
+    "panorama_allowed_data": [
+      "own_public_user_code",
+      "fixed_https_verification_uri",
+      "sanitized_state_and_diagnostic_enums"
+    ],
+    "internal_bearer_location": "cloud_private_environment_only",
+    "passwords_collected_by_game": false,
+    "fixed_steam_endpoint_certificate_and_hostname_validation": true,
+    "openid_redirects_allowed": false,
+    "callback_state_browser_nonce_single_use_enforced": true,
+    "failed_callback_first_fixed_error_persisted": true,
+    "failed_callback_refresh_reverifies_or_grants_identity": false,
+    "csrf_and_exact_origin_required": true,
+    "origin_null_accepted": false,
+    "authorize_success_html_referrer_policy": "same-origin",
+    "other_response_referrer_policy": "no-referrer",
+    "identity_is_gameplay_result_attestation": false
+  },
+  "services": [
+    {
+      "role": "player_web_auth",
+      "unit": "goufayu-ws4-web.service",
+      "listen": "127.0.0.1:18767",
+      "storage": "private_sqlite_authorization_state"
+    },
+    {
+      "role": "isolated_business_api",
+      "unit": "goufayu-ws4.service",
+      "listen": "127.0.0.1:18765",
+      "legacy_public_base": "https://pay.xiaofengnet.com/ws4"
+    },
+    {
+      "role": "isolated_database",
+      "unit": "goufayu-ws4-db.service",
+      "listen": "127.0.0.1:15432",
+      "database": "goufayu_ws4"
+    }
+  ],
+  "temporary_steam_transport": {
+    "flag": "PLAYER_WEB_AUTH_STEAM_TLS_RELAY",
+    "allowed_values": [
+      "0",
+      "1"
+    ],
+    "default_enabled": false,
+    "current_test_enabled": true,
+    "ecs_loopback_listener": "127.0.0.1:18768",
+    "fixed_destination": "steamcommunity.com:443",
+    "official_tls_terminates_at_steam": true,
+    "certificate_hostname_and_sni_verified_by_ecs_client": true,
+    "author_pc_and_usable_network_required": true,
+    "arbitrary_proxy_supported": false,
+    "production_uptime_solution": false,
+    "root_cause_of_ecs_tls_reset_confirmed": false
+  },
+  "business_limits": {
+    "allowed_account_count": 4,
+    "test_database_isolated_from_existing_saves": true,
+    "original_player_order_and_balance_data_copied": false,
+    "real_money_payments": false,
+    "trusted_rankings": false,
+    "generic_rewards_grant_allowed": false,
+    "local_progress_flag": "ISOLATED_LOCAL_PROGRESS",
+    "local_progress_default_enabled": false,
+    "local_progress_mutation_allowlist": [
+      "archive/command",
+      "archive/endless-batch",
+      "online-time/checkpoint"
+    ],
+    "local_progress_trust": "editable_by_local_host_isolated_test_only"
+  },
+  "test_entries": {
+    "offline": {
+      "entry": "离线逻辑测试.cmd",
+      "tools_required": true,
+      "development_required": true,
+      "explicit_flag": "survival_offline_logic_test=1",
+      "profile": "per_match_memory_only",
+      "cloud_requests": false,
+      "cheats_allowed": true,
+      "engine_sv_cheats_launch_value": 1,
+      "map": "template_map"
+    },
+    "online": {
+      "entry": "联网登录测试.cmd",
+      "frozen_addon": "svt_w24",
+      "cheats_allowed": false,
+      "engine_sv_cheats_launch_value": 0,
+      "checks": [
+        "content_sha256",
+        "runtime_policy_sha256",
+        "production_profile_sha256"
+      ]
+    },
+    "current_workshop_match_engine_sv_cheats": "NOT_QUERIED",
+    "localhost_is_tamperproof": false
+  },
+  "verification": {
+    "independent_non_tools_addon_real_login_verified": true,
+    "direct_original_workshop_id_v04_real_login_verified": true,
+    "direct_original_v04_profile_revisions": [
+      27,
+      28,
+      29,
+      30
+    ],
+    "entry_probe_automatic_route_and_valid_challenge_verified": true,
+    "final_scope": "ordinary_Steam_launch_original_Workshop_button",
+    "owner_confirmed_original_entry": true,
+    "owner_started_match": true,
+    "tools_mode": false,
+    "insecure_launch_flag": false,
+    "difficulty": "N5",
+    "cloud_profile_loaded": true,
+    "cloud_checkpoint_written": true,
+    "profile_revision_max": 43,
+    "last_profile_updated_utc": "2026-10-24T13:07:19.392338+00:00",
+    "observation_preserved_active_match": true,
+    "cloud_evidence_scope": "read_only_aggregate_no_player_records_exported",
+    "multiplayer_verified_for_current_release": false,
+    "all_four_archive_volumes_and_tail_native_reads_passed": true
+  },
+  "diagnosis": {
+    "Invalid_NotOnDedicatedServer": "No valid Valve dedicated-server credential in the current game context; not proof that any purchased cloud VM fixes it.",
+    "WS4-WEB-04/start/create/0": "Request object construction failed before HTTP send; zero is not a backend HTTP response.",
+    "observed_entry_resolution": "fixed_same_item_standard_launch_context_restores_HTTP_creation",
+    "only_GAME_IN_PROGRESS_http_requirement_confirmed": false,
+    "Valve_http_whitelist_rule_confirmed": false,
+    "Valve_internal_context_failure_cause_confirmed": false,
+    "Failed_to_read_16_bytes": "Matching large inline VPK failed native reads; byte-preserving split volumes passed. Specific Valve source defect not established."
+  },
+  "packaging": {
+    "format": "VPK_v2_directory_plus_external_archives",
+    "directory_name": "3824360109.vpk",
+    "archive_names": [
+      "3824360109_000.vpk",
+      "3824360109_001.vpk",
+      "3824360109_002.vpk",
+      "3824360109_003.vpk"
+    ],
+    "maximum_archive_bytes": 1073741824,
+    "inline_container_threshold_bytes": 2147483647,
+    "integrity": [
+      "fixed_policy_Ed25519_manifest",
+      "file_size",
+      "SHA256",
+      "MD5",
+      "CRC32",
+      "VPK_section_digests",
+      "native_resource_reads"
+    ],
+    "candidate_manifests_or_private_keys_packaged_in_vpk": false,
+    "mixed_version_volumes_allowed": false,
+    "new_output_overwrites_existing": false,
+    "git_push_updates_workshop": false,
+    "steam_manifest_is_git_commit": false
+  },
+  "operations": {
+    "transport_change_sequence": [
+      "rollback",
+      "prepare",
+      "configure-transport",
+      "activate",
+      "verify"
+    ],
+    "git_repositories": [
+      "game/dota_addons/survival",
+      "content/dota_addons/Survival"
+    ],
+    "git_delivery_sequence": [
+      "inspect_both",
+      "stash_include_untracked_record_object",
+      "pull",
+      "pop_only_created_stash",
+      "verify_original_changes",
+      "stage_task_scope",
+      "test",
+      "commit",
+      "push",
+      "compare_remote_head"
+    ],
+    "lfs_and_gitattributes_preserved": true,
+    "preexisting_game_changes_to_preserve": 102,
+    "force_push_or_discard_user_changes_allowed": false,
+    "rollback_may_disable_signature_policy": false,
+    "web_first_install_sequence": [
+      "audit",
+      "prepare",
+      "activate",
+      "verify"
+    ],
+    "web_existing_source_update_sequence": [
+      "audit",
+      "rollback",
+      "prepare",
+      "activate",
+      "verify"
+    ],
+    "existing_source_update_requires_successful_rollback": true
+  },
+  "reference_boundary": {
+    "tower_feast_workshop_id": "2234335140",
+    "dream_island_workshop_id": "3616205610",
+    "readable_entry_and_ui_selected_resources_only": true,
+    "selected_resources_crc_verified": true,
+    "protected_core_decrypted_or_executed": false,
+    "third_party_business_implementation_copied": false,
+    "third_party_backend_protocol_verified": false
+  },
+  "source_files": [
+    "publishing/workshop/workshop_entry_release_20261024.json",
+    "publishing/workshop/online_cheat_policy_20261024.json",
+    "publishing/workshop/dream_island_entry_review_20261024.json",
+    "publishing/workshop/tower_feast_login_review_20261024.json",
+    "publishing/workshop/startup_read16_repair_20261023.md",
+    "docs/player_web_auth.md",
+    "docs/test_entries.md",
+    "docs/workshop_isolated_test.md",
+    "docs/stream_workshop_vpk.md",
+    "server/player_web_auth/README.txt",
+    "tools/workshop_test/build_workshop_entry_candidate.py",
+    "tools/build_workshop_entry_map.py",
+    "tools/build_runtime_release.py",
+    "tools/publish_test_release.py",
+    "tools/steam_workshop_upload.py",
+    "tools/workshop_test/remote_web_auth.py",
+    "server/workshop_test/run_api.py",
+    "server/player_web_auth/service.py",
+    "server/player_web_auth/http_api.py",
+    "scripts/vscripts/systems/player_web_auth.lua",
+    "tools/workshop_test/remote_web_auth.py",
+    "server/workshop_test/run_api.py",
+    "server/player_web_auth/service.py",
+    "server/player_web_auth/http_api.py",
+    "scripts/vscripts/systems/player_web_auth.lua"
+  ],
+  "primary_sources": [
+    {
+      "url": "https://partner.steamgames.com/doc/api/ISteamHTTP#CreateHTTPRequest",
+      "scope": "native_Steam_HTTP_interface_not_Dota_stage_policy"
+    },
+    {
+      "url": "https://partner.steamgames.com/doc/sdk/api#initialization_and_shutdown",
+      "scope": "native_SDK_initialization_not_proof_of_Dota_phase_mapping"
+    },
+    {
+      "url": "https://github.com/ValveSoftware/Dota2-Gameplay/issues/35497",
+      "scope": "player_report_in_official_tracker_not_confirmed_Valve_whitelist_policy"
+    },
+    {
+      "url": "https://fetch.spec.whatwg.org/#append-a-request-origin-header",
+      "scope": "browser_form_Origin_behavior"
+    },
+    {
+      "url": "https://www.w3.org/TR/referrer-policy/#referrer-policy-same-origin",
+      "scope": "same_origin_referrer_policy"
+    },
+    {
+      "url": "https://partner.steamgames.com/doc/api/ISteamUGC#SetItemContent",
+      "scope": "Workshop_content_directory_API_not_native_Dota_playability_proof"
+    }
+  ],
+  "sanitization": {
+    "tester_steam_ids_omitted": true,
+    "passwords_keys_bearers_device_codes_cookies_callback_urls_omitted": true,
+    "private_configuration_files_read_for_this_module": false,
+    "production_or_system_changes_for_this_module": false
+  }
+}

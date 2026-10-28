@@ -1,0 +1,937 @@
+{
+  "schema": 1,
+  "scope": "Authoritative instructions, top-level project docs and publication records; code paths additionally indexed in repository_files",
+  "files": [
+    {
+      "repository": "game",
+      "path": "AGENTS.md",
+      "bytes": 3086,
+      "sha256": "6f232c10eefb14a4a8df5b465ab08f2736d084b75bdd0542eb03304df7dd43a0",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "content",
+      "path": "AGENTS.md",
+      "bytes": 3121,
+      "sha256": "28163c818969c2ba9af60e50882f603166d6a27cb50029718b1cdcfc023a1e11",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/aghanim_platform_review_20261023.json",
+      "bytes": 1279,
+      "sha256": "14e33e3f3805e4ea44ee580b21733c66f7345d179dffca56fbd1cf68aa819310",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/arcade_cleanup_20261027.json",
+      "bytes": 12226,
+      "sha256": "1e07e500cc1d74ce1b07ff375ef931682ce14e5f16f4704243d47c4955dc52f9",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/arcade_shop_20261026.json",
+      "bytes": 24389,
+      "sha256": "9fc3543386124e67a695555240b69b96c987b62d9a2076d0c8fcf04165f33fed",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/arcade_two_player_20261025.json",
+      "bytes": 32105,
+      "sha256": "ccd7ec73ca68ea2d1de5707065d4b28458f2cede0d38342dd2538a63cd1655f1",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/auth_diagnostics_20261023.json",
+      "bytes": 1743,
+      "sha256": "220783424814929c572d6ef428f027c8f6ad979dd498c88926569be98567f841",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/dream_island_entry_review_20261024.json",
+      "bytes": 4791,
+      "sha256": "c2577664443aa2a6835c22b649766889de9c6ca7156f1d8e2ac2595236a3a282",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/hosting_visibility_proposal_20261023.json",
+      "bytes": 2603,
+      "sha256": "6cb1c46961b0c085421043867cadc38bf310be2b642e4163d4c3c1dc374b0335",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/isolated_auth_20261023.json",
+      "bytes": 1894,
+      "sha256": "01c8d1b3f759a3c003168fc4e555afa209e0653c333c748d04cbbe1166bc8169",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/key_authority_20261023.json",
+      "bytes": 2508,
+      "sha256": "05570ea696b8d2520308d94e263aba7b5d61a1cf16438bcdf7ca96efcd37af04",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/local_launcher_20261023.json",
+      "bytes": 2059,
+      "sha256": "d835760e8b58d4dee656f9b6ce2fe18ebb1e3fd8749027633cfee42dd6a97b65",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/map_resources_20261028.json",
+      "bytes": 4616,
+      "sha256": "5fa9f92dfc11c7a6208a19cd82566c859c022641bb96734f52207dfa8dff1501",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/multiplayer_entry_20261025.json",
+      "bytes": 24198,
+      "sha256": "f77e651d7a83f27831582dc763266dba2ea8451d05220451ae53bd3fbb69cc6a",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/native_arcade_cloud_20261027.json",
+      "bytes": 15524,
+      "sha256": "f6e33af8319d4db3d8a68f13a27ab62ea1b891c27e9493d6c4ae36e8f02684f9",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/native_shop_qr_20261026.json",
+      "bytes": 4616,
+      "sha256": "66169a38c9ad923ef5360d7e11d6e86f01a2fb31b5d50a642cd3a60d80e29994",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/online_cheat_policy_20261024.json",
+      "bytes": 5856,
+      "sha256": "265b8fab37f464a3796acb48aeb9b4bcfa80ddc4e3874b763612c4ee0908b189",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/online_cheat_policy_20261025.json",
+      "bytes": 6630,
+      "sha256": "63acc7c7d905ab995ae0b3fea572b41626f4280759724b31373d7f572d36bb90",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/payment_helper_20261027.json",
+      "bytes": 11645,
+      "sha256": "bcb88d63ba11187bd9809823584f09ae2dafbb6a86d6f7429cbd496a700cbd43",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/player_web_auth_20261024.json",
+      "bytes": 4879,
+      "sha256": "a27e71791d5e992bbd6158c093d33a36c89ddb66571ad56345c19cb6b135eeda",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/remote_join_20261023.json",
+      "bytes": 10939,
+      "sha256": "a9ec8ec323f2e1000b5c808a4a83c0ae678d45017d8ea12e98f9317e76404dae",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/split_update_20261023.json",
+      "bytes": 2497,
+      "sha256": "89d82947b4490d60ff327bcf33673bc0a962c85fed3d176b685b50c1040f1ad9",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/test_entries_20261024.json",
+      "bytes": 3770,
+      "sha256": "56b83fae0990a183723bf3e176c6695f8c3fa78498f5cfc2df6a1bae7069d5a9",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/test_listing.json",
+      "bytes": 4944,
+      "sha256": "6eb03eb425969997c2997187eb6edf057185202708f4aea500fba1b682cfe28c",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/tower_feast_login_review_20261024.json",
+      "bytes": 2905,
+      "sha256": "708bba98f51affe631945546234c897c3f9d5887f858ccc6d665d11445d78753",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/ui_data_qa_release_20261025.json",
+      "bytes": 10017,
+      "sha256": "0ff5a53f0f33584d1ae19e5e48801453b28f59f64aff9c96db8100e617d44c0b",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/ui_layout_20261028.json",
+      "bytes": 6159,
+      "sha256": "1b4e2b9069b7455f59ec2668ed2759dd7b1ea0a237f8b9d679d874c9b03fb06b",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/web_auth_diagnostic_20261024.json",
+      "bytes": 4264,
+      "sha256": "3daf85160e384135985a7f3b91fa099fd98a860eb1affc20cc5887f06e63ff63",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/web_auth_release_20261024.json",
+      "bytes": 3400,
+      "sha256": "8b92e6d65eb6e09b79316e18e6e6c12ead773b9423b09d17cddbecb0328d4fe9",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "publishing/workshop/workshop_entry_release_20261024.json",
+      "bytes": 7044,
+      "sha256": "6008c9050e740a90a51aa1878eacb099436e0ea7c2d23e3e7ae4f4bed7608816",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/ABILITY_TOOLTIP_HOT_RELOAD_FIX_20260927.md",
+      "bytes": 2662,
+      "sha256": "02179b9e28486cb41d33029f471adc15acbd418015e533301111a00aeb83a30e",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/ALIYUN_BACKEND_AUDIT.md",
+      "bytes": 5174,
+      "sha256": "44d776ec483c040008cb38e7dd1219124f932bbbda706a25f9bc30cc12984264",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/ALIYUN_TEST_MIGRATION.md",
+      "bytes": 69129,
+      "sha256": "7463d230c11b58125630e41f78d6b1e7d6cdac5a06c5ab370d9dacf2e305c6d4",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/ALIYUN_UPSTREAM_COMPATIBILITY.md",
+      "bytes": 5836,
+      "sha256": "4e67816ed38a7c254ef8e76051cc73751270f46198fe8b633a37b3a78833b3f3",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/arcade_cleanup_20261027.md",
+      "bytes": 4862,
+      "sha256": "6354cd21f9664501f0fe659221de548e864914b4f295a48a78957e557082e93d",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/arcade_multiplayer_20261025.md",
+      "bytes": 7926,
+      "sha256": "61a5ccd495bce58a8c90892db82800a6d5427a60d5df60fdde996647bcfa25ce",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/arcade_two_player_20261025.md",
+      "bytes": 14234,
+      "sha256": "c041c1e4ee55400bdc9d071dff6cd6180649e7811b92739e00e100cae462e7d7",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/archive_buildings.md",
+      "bytes": 2933,
+      "sha256": "c5e8377025daf9e1d60f46643d549761502ead5ac9d764cfbd842aa433572fc9",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/ARCHIVE_CHALLENGE_BUILDINGS_20260928.md",
+      "bytes": 1894,
+      "sha256": "f6d8f85cf1bf7794675b39e7ef58dcad4d162da401d4ab48e14ce5e792297908",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/ARCHIVE_CHALLENGE_TIMER_20260928.md",
+      "bytes": 1268,
+      "sha256": "bd06534a13117c3afc544d88f3b379002a40cf630527a96bb79901d6cb4829f1",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/archive_data_contract.md",
+      "bytes": 34674,
+      "sha256": "d3463f838f308a3ea546e0137101432a60eefb0c1ecaed406209a5562b1b4e5c",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/ARCHIVE_FUSION_READABILITY_20260928.md",
+      "bytes": 4515,
+      "sha256": "3df7f21e97480cd3b50b1c08f0025885a5ce609b500eb10635b55854ea44a2d3",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/archive_server_integration.md",
+      "bytes": 19908,
+      "sha256": "3cfb6ae9a6c076efcb268503cd0ff6ed87f72df4a5f4e5e0b81a8279ff5b3648",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/ARCHIVE_TEXTURE_BUILD.md",
+      "bytes": 3593,
+      "sha256": "f275d54a56434ba343a59b87b3947d895e428c60840e9557541a4620975bbfec",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/ARCHIVE_UI_REFRESH_20260928.md",
+      "bytes": 3268,
+      "sha256": "da0f2cbd754d336dfb3fcf4e3b72749ddea622c77ac22a6560701b5d568d2efb",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/AUTO_UPGRADE_IDLE_OPTIMIZATION_20260928.md",
+      "bytes": 2252,
+      "sha256": "df144a04ecb0a1f27d5014ae28d9ee5310090f6443156eeaa86b8ce0a74bdecc",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/BOX_SELECTION_FILTER_20260928.md",
+      "bytes": 4047,
+      "sha256": "2eedd463142e40afa7ad4d2bc1a6e0534b305985822db2fd808d3bcfab6f97b3",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/BUILDING_COMPACT_HUD_20260927.md",
+      "bytes": 1653,
+      "sha256": "162ba9be17e5e004ecaedf435f3b28b667f3f6ebb9da25b8f32a0e7fe6ca3a53",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/BUILDING_CONCEPT_MODELS_20260927.md",
+      "bytes": 3062,
+      "sha256": "f086c72e2e50746912acb9639d6b60b3c2a04717acab4c4c13145cd485681f7f",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/BUILDING_PRODUCTION.md",
+      "bytes": 7892,
+      "sha256": "7f6a4df16ee9f79f5f1a38e4246abb11580bcd391fc225e74899aee0109f9056",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/BUILDING_UI_NAMED_WALLS_20260927.md",
+      "bytes": 3152,
+      "sha256": "1b116701085ca8988229e8c72837605b163cc1d4acb0c159ae94a1f2748abfbd",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/building_upgrade_effect.md",
+      "bytes": 1752,
+      "sha256": "7968a69db169b63e2d924660a8d483298dd526a9410f8bb574ec0afb6ee54b40",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/COMBAT_PERFORMANCE.md",
+      "bytes": 11599,
+      "sha256": "a6f52547d5092cc73f13e5e306cbda68c4c9fe8d02e4f7a89e6350c60d791a7f",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/COMBAT_PERFORMANCE_REVIEW_20260928.md",
+      "bytes": 4689,
+      "sha256": "0536cba3563ebe1f758d0e6885b688a79029f75fdc6505e10db1bb69b5da48c6",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/COMBAT_RULES_AND_UI_20260928.md",
+      "bytes": 4086,
+      "sha256": "6d6fd8a9dc9b0dd55f69fbe080811e8dbb70c87ad6878330c8be1484062145b2",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/COOPERATIVE_REWARD_RULES_20261011.md",
+      "bytes": 6617,
+      "sha256": "85aee7848bd59d6bfb29a1f5e10ba82d4ffe4bf562d5cb96ae62500fb57f750e",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/CRASH_20260926.md",
+      "bytes": 1826,
+      "sha256": "86bb5e5ee7c9ef3d36b13c2b5bb1f7d6606ed6b8ab06928a2dc1e7eeda32e5e2",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/DIVINE_WISH_HISTORY_FIX_20260927.md",
+      "bytes": 1833,
+      "sha256": "7e52ed77463a9745ef07919ca7644cef4643a4a2f2a449978b85b2adbab08998",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/ENDLESS_FLOOR_REWARDS_20260928.md",
+      "bytes": 4920,
+      "sha256": "04642f8495c51fa6863947c2c9cd78adcea610866724e75cc9f08239fed5ee15",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/endless_monster_visual_design_20261009.md",
+      "bytes": 11893,
+      "sha256": "2d2d7c757353e12e242f48a01b903d5c64982ee52cfc2cefd4c53f7ab460991b",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/ENDLESS_MONSTER_VISUAL_RUNTIME_20261011.md",
+      "bytes": 2686,
+      "sha256": "e296f5305fc4e708a74ca86e6db1985961c37e2f9aaf568e74481d923fd4a561",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/FINAL_HUD_REVISION_20260928.md",
+      "bytes": 1339,
+      "sha256": "e26a197928eaeb88ca669f3d939d36510361941fd122fefe0d470b8fbb7ec508",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/GOLD_MINE_GOLD_PALETTE_20260928.md",
+      "bytes": 886,
+      "sha256": "78b371d21a1ef6d5566acc1f0cd56de3c9c7af43e89a178793e3b13adbe9ebbd",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/grid_placement_rendering.md",
+      "bytes": 23628,
+      "sha256": "cc21d0b08c9da97da1d6e55e56736fd1bf2aa524dd3c3c0d21f4fe77e0198f42",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/guest_payment_qr_20261027.md",
+      "bytes": 3627,
+      "sha256": "cc83b0a3828ea9e9a65dd5421e4979d7f816b20cc868f60b22e450ba6d60f373",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/HAMMER_BACKEND_RECONNECT.md",
+      "bytes": 11363,
+      "sha256": "1845e75bde77d124ce78ee7f59b2804a7f6f657e971da5082069919465294e42",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/HERO_CORNER_ALTAR_FOLLOW_20260928.md",
+      "bytes": 2293,
+      "sha256": "f12f3648ce3754c8f5cc2f7ad6c08582968dceb8baefe07b1eea4ff07fd9fda9",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/HERO_SUMMON_DESTINATION.md",
+      "bytes": 3386,
+      "sha256": "ae1d39d1d89ff03f336778b8024a8952ace623cd31640e0881de840e0802a753",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/hosted_lobby_20261025.md",
+      "bytes": 9825,
+      "sha256": "bba465e264ef281963bb7628286b1244f7f23e8c2c026379de6e622edbf1c4be",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/HUD_BONUS_MINIMAP_20260928.md",
+      "bytes": 3120,
+      "sha256": "f6d9e815ef2488dfa26b25b267c6098c47f6beebaf970b57d1daa20f93ad1c7e",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/HUD_READABILITY_FOLLOWUP_20260928.md",
+      "bytes": 5384,
+      "sha256": "cc134c2fe5bd7230e3d6175c10a2935d41dbcec1a7e1a8de3625af7e88980755",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/HUD_STAT_BONUS_REVISION_20260927.md",
+      "bytes": 2517,
+      "sha256": "f6cfb2eaf8a17ab9e169e8b9ab1edb99558d2989731a82b9b361181ab6545d0b",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/LOTTERY_CINEMATIC_V1_20260929.md",
+      "bytes": 3423,
+      "sha256": "62df6070fb083e490ca3fbfc6cc8b671438e511fbcf39e5a6a693d2658038472",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/lottery_data_contract.md",
+      "bytes": 8069,
+      "sha256": "a78c6aafc34b6fc58dd163397b92adf4ee7a85eb6221bc6fbcdac9c34999170b",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/lottery_loading_fix.md",
+      "bytes": 2988,
+      "sha256": "6bd15a7f01b1b89ca4bc3a03a4176040ecddddc1e2a7ad88685dcc86928545c2",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/lottery_pool_updates.md",
+      "bytes": 2323,
+      "sha256": "828fd44ecd5765fec8378c6ae7c5f7a9a313509fa0a8cdae1e06ce3f9ad77c0f",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/lua_release_protection.md",
+      "bytes": 6233,
+      "sha256": "cf906533303e87665cb0bf1fa6c5aae0562b8644eece1a5a9644325b9886a14c",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/LUMBERJACK_FUSION_QUEUE_20260928.md",
+      "bytes": 2061,
+      "sha256": "bd1cae52b1915141badbb5513dc7c084b9b594c6d05d00e3f58aa0e0a79011d7",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/LUMBERJACK_PERSONAL_GROWTH_20260928.md",
+      "bytes": 2623,
+      "sha256": "0be94b426bdbc4adb431c6788d437f280091c34472de52a2d4fc980ab3440887",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/LUMBERJACK_STUTTER_20260926.md",
+      "bytes": 2776,
+      "sha256": "d1cf7213947087fe5785b307556fc526b0aab4855abcff7359fbd9553fb1d7e8",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/map_resources_20261028.md",
+      "bytes": 4540,
+      "sha256": "f23875e98f584de1cabae677a2385a1fa8c4ebc8119a52577c658d7a496e913d",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/MATCH_SETUP_AND_MODES.md",
+      "bytes": 10889,
+      "sha256": "0a718805e7cc2da17d5c3b79065278ddb0b0d3ca337278a3409e22254efddf83",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/MINIMAP_OCEAN_20260928.md",
+      "bytes": 3005,
+      "sha256": "26dcd146886f23105f858ababcc21dca20ba89e01ba35fdcd2a6775784e4200c",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/MINIMAP_SHORTCUTS.md",
+      "bytes": 3723,
+      "sha256": "d8fca686ede26eb7ce556e28c53267c31ae52ed31156f3072eb846a3edc36657",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/MODEL_PORTRAITS_20260926.md",
+      "bytes": 3320,
+      "sha256": "d278ba5adf37e3a9287e08180353e9d52c03fc0a2a865fbfb6b75f51d8d467ed",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/MONSTER_NAVIGATION.md",
+      "bytes": 6211,
+      "sha256": "86d67ddcb1ee5888f88a06ceb6f26690845b66569e96b02a53762f0677f9bde8",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/MULTIPLAYER_TREE_CAMERA_FIX.md",
+      "bytes": 2444,
+      "sha256": "45576cb7fa15186aa69c03cbfa23aacc310475b70a28eaabbca5d2884c6cbdf2",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/MULTISELECT_PORTRAITS.md",
+      "bytes": 2341,
+      "sha256": "25b823effd3c0627537449bff092db967d8ce9c9fbf54fe947e219618081bd65",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/native_arcade_cloud_20261027.md",
+      "bytes": 15490,
+      "sha256": "f9acca7c41cd49fae3197f0745fb539170f82d17b1734e2fbec3a2bc060ffaa0",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/NATIVE_HUD_ICONS.md",
+      "bytes": 12614,
+      "sha256": "a7dd5fe619dfc57d8ea82510215d8b7be9757adbb0189f93970f1a538921c59b",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/native_shop_qr_20261026.md",
+      "bytes": 7389,
+      "sha256": "c86562e4e528a6f9d0dd80e7eb75ea7dbae3f5f7cfe410a3d0cf1c9a7138d3a2",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/NEW_PC_LAN_TEST_GUIDE.md",
+      "bytes": 40531,
+      "sha256": "61762e284740045960b8812b16cff5cc73215488e8c5336541171b1fbad32e88",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/payment_shop_20261026.md",
+      "bytes": 8559,
+      "sha256": "bdf7a8e831144f8263e67bd540c50b3decab4eba4c5c1460860b355b280da70c",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/payment_shop_csv_guide.md",
+      "bytes": 18344,
+      "sha256": "fc0c41a5e4aa4dc18dd0783b2bea700c83d0ff379c675c7c63723b2accf015b0",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/player_web_auth.md",
+      "bytes": 11529,
+      "sha256": "e18b81330b71c60610f39efaccf060dc276635d5ecca2cb54decc89b15b8ceff",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/PORTRAIT_ALL_UNITS_20260927.md",
+      "bytes": 3429,
+      "sha256": "22ebbcea7d532147df30a3884fbdf98288a23b72f0503c9fa9a1b5a46af71b19",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/PORTRAIT_ANIMATION_RESPAWN_20260927.md",
+      "bytes": 2574,
+      "sha256": "7631eb8fdb1213056b29619546bb36e0b08061eb4469bcf6cf56216ae7624b6e",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/PORTRAIT_FRAME_CLEANUP_20260927.md",
+      "bytes": 1750,
+      "sha256": "ab7d0dd4737b921de66f7e15024419abbfb28540e033c83d2731a281873ffebd",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/PORTRAIT_HERO_COLORS_20260927.md",
+      "bytes": 1854,
+      "sha256": "9fc7f31e6c11f12b20b124d98ac607d7ac491fb5532e70aaffa834e9427d0d0a",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/PORTRAIT_LIVE_FIX_20260927.md",
+      "bytes": 2727,
+      "sha256": "85ae55b94b5978c3a8a0fcaeb2ca3973a8117d746c867be5efa65c607ee90637",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/PRIVATE_HUD_COUNTDOWNS_20260928.md",
+      "bytes": 1885,
+      "sha256": "4c6abb05b28f90e6b22c989b2b9b9bf4594d3207798751834e78c2b48011abc8",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/release_security_20261021.md",
+      "bytes": 12681,
+      "sha256": "5201edfa50ba7f482083503d80e6138abba82c7450d2489875bdb586953b7816",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/release_slim_20261021.md",
+      "bytes": 4292,
+      "sha256": "47ceb6fd4b0bf120204fb04ed6b83bf9b2ee98ab0ec30ba95db795bf52cc7118",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/release_test_20261021.md",
+      "bytes": 5529,
+      "sha256": "a7b3c5bdea4691fd1b527a33a621905b200bd417a3d05e748ec8666c84267819",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/release_test_20261022.md",
+      "bytes": 4507,
+      "sha256": "66ab4005a4b095ad49999e40f7e4ccafe2319163bc2ef001bcfce10a58d130eb",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/RESOURCE_TREE_HUD_20260928.md",
+      "bytes": 1678,
+      "sha256": "452d609663426269cb656c06420ef8db666137ea425072a4d89fbaa8bccbab08",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/RUNTIME_REFACTOR.md",
+      "bytes": 11941,
+      "sha256": "e5c99323ff1614184804c5a3e1a80ccc501b0bd32d2da79c72ea9beca5026a78",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/STARTUP_LOADING.md",
+      "bytes": 14799,
+      "sha256": "516123adcb54858f736f4f81cd8f5baf6a1fe4aedeaf0630539058ceecad442a",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/STATS_HUD_LAYOUT_20260927.md",
+      "bytes": 1117,
+      "sha256": "d377d349e9eda2f2b1413734ffac9a588b3b58552c01658c8257575bcc0adb22",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/steam_workshop_upload.md",
+      "bytes": 3286,
+      "sha256": "f375b3e03d97ed1011e99a034720a149959390efd854d4c60d7b500bc03ff8a4",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/stream_workshop_vpk.md",
+      "bytes": 5308,
+      "sha256": "58eb320a8e23c6c09a9f0e2cb8dc8b3b06eea25b761f8d80f499993b450747a3",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/test_entries.md",
+      "bytes": 7595,
+      "sha256": "909931c00b434e85bc2fae5fd1f604877943f95f30c67cef9d8898000835141d",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/TOOLTIP_PERFORMANCE.md",
+      "bytes": 3379,
+      "sha256": "e440baf8b9f043027569c04aaa4846f283488967fdce6238fa267f1e1f0d5b72",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/TOWER_AUTO_UPGRADE_20260928.md",
+      "bytes": 1352,
+      "sha256": "ae516e8512d1b130a6a7ebf0481c4a2de9fee14b404d641fd889fe4678d211c6",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/TOWER_DESTRUCTION.md",
+      "bytes": 3493,
+      "sha256": "7de675eeefbf08967aab6f4e300e92821c037878fbd2ec5bdaf026b4af5b6822",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/tower_effect_design_20261001.md",
+      "bytes": 16975,
+      "sha256": "c60b7decd467d30c367b09a763d2f25998bbc4115010cee43188ebdc8cff69df",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/tower_effect_design_20261002.md",
+      "bytes": 18139,
+      "sha256": "dc05779c63861767a364e756803f469ef4fde70fc244b6619906c0af96f608f1",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/tower_effect_trial_1_20261001.md",
+      "bytes": 4873,
+      "sha256": "dae2c7942555367380f41ff808de2a70fefa0cd29cc4ad58337d0c875d686c1d",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/TOWER_MODEL_VISIBILITY_FIX_20260929.md",
+      "bytes": 4123,
+      "sha256": "ef96ed5cf8292995abe55d61a3d1fec187264d1f58a4e2474f60c75522c15468",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/TOWER_PRESENTATION_20261001.md",
+      "bytes": 9856,
+      "sha256": "70633b386663d279277041878d774a7950f8f952f8ec95979af3850cddbd1497",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/TOWER_TREE_TARGETING.md",
+      "bytes": 12160,
+      "sha256": "3c1e82b6cffe1c0dbfd7b20c80a345b0459594b91171e5f90d03fd86f06ee0d9",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/ui_fixes_20261014.md",
+      "bytes": 2854,
+      "sha256": "34c6faf7a7fed84c13efca8dbf93e9c4f4135f80927f1a84a7e4354a42484198",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/UI_GUIDE.md",
+      "bytes": 34123,
+      "sha256": "67a9b60cd58db635f0f22b179a446ad125933546d2ff06f70ea9aae093006945",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/ui_layout_20261028.md",
+      "bytes": 8068,
+      "sha256": "da2744055e196fddfb973a3f87de2c054858486c663c6815024e0925c5ded0de",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/UI_QUEUE_FIXES_20260928.md",
+      "bytes": 6793,
+      "sha256": "c6e233c6a8be360884f79feffab43650486b13c8328218a7b5818a62bd753629",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/wall_contact_and_placement.md",
+      "bytes": 32994,
+      "sha256": "0c45051160fa9f09cba5646bc2a7ee56c60a66a12642c8fca93b763ba687faf1",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/wall_quick_upgrade.md",
+      "bytes": 884,
+      "sha256": "3c985c8d9e15d3296964d78320be92373fd18d9fdfbdcbdcf369ec03c476b85f",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/wave_unit_names.md",
+      "bytes": 1113,
+      "sha256": "d98e391bd6959282dc933da2200664e5c03e5c489df162241141a94a70e507ca",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/WORKER_PRESENTATION_20260928.md",
+      "bytes": 2626,
+      "sha256": "6152b380d6ba7d41b5a140e00cf94a848679101a6a9239864552c8c3b2166f06",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/workshop_isolated_test.md",
+      "bytes": 14413,
+      "sha256": "add23610da5a054fcd44baa6cffbe07d19dfcb0025b1e1e0c3480ee1bb1b6946",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/workshop_test_handoff.md",
+      "bytes": 6149,
+      "sha256": "8d674c1d43d77d2af88117e78f7c0f189006d4b60c8824914658d533b46c3afa",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/ws4_local_launcher.md",
+      "bytes": 34431,
+      "sha256": "378e82e9a68b491e5862bdd61145018dde6db1c577e509a75d244c7e569b06c5",
+      "copied_into_knowledge": false
+    },
+    {
+      "repository": "game",
+      "path": "docs/僵尸岛苟发育_新手入门与系统说明.md",
+      "bytes": 20268,
+      "sha256": "4da06962952be1f292691816fa9bb02511c39efe100e6c64afbf083fbe4ee1ab",
+      "copied_into_knowledge": false
+    }
+  ]
+}

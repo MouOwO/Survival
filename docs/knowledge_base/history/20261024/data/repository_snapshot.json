@@ -1,0 +1,456 @@
+{
+  "schema": 1,
+  "captured_utc": "2026-10-24T13:50:40.449992+00:00",
+  "scope": "read_only; cached refs and separate authorized ls-remote; no stash/pull/pop/commit/push performed for Desktop-only export",
+  "repositories": {
+    "game": {
+      "root": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival",
+      "branch": "dev",
+      "head": "a1871d23247787e9f4e88231e224c1238c45323f",
+      "upstream": "origin/dev",
+      "upstream_tracking_head": "a1871d23247787e9f4e88231e224c1238c45323f",
+      "ahead_behind_tracking": [
+        "0",
+        "0"
+      ],
+      "remote_head_read_only_ls_remote": "a1871d23247787e9f4e88231e224c1238c45323f",
+      "remote_verified_at_export": true,
+      "prior_auth_delivery_commit": "b5a1ecde0e6fa8a8b07c51d3fd3d99601b57cde2",
+      "auth_delivery_is_ancestor_of_snapshot": true,
+      "uncommitted_count": 102,
+      "preserved_uncommitted_changes": [
+        {
+          "status": " M",
+          "path": "materials/models/creeps/lane_creeps/creep_crystal_bad_melee/bad_melee_crystal.vmat_c"
+        },
+        {
+          "status": " M",
+          "path": "materials/models/items/bristleback/bristlebot/dark_carnival_bristlebot_goo_proj_ball.vmat_c"
+        },
+        {
+          "status": " M",
+          "path": "materials/models/items/troll_warlord/mohawk_weapon_all/mohawk_weapon_crystal_blade.vmat_c"
+        },
+        {
+          "status": " M",
+          "path": "materials/models/items/weaver/spring2021_dimension_ripper_arms/spring2021_dimension_ripper_arms_crystal.vmat_c"
+        },
+        {
+          "status": " M",
+          "path": "materials/models/items/winter_wyvern/spring2021_frost_thorn_back/spring2021_frost_thorn_back_crystal.vmat_c"
+        },
+        {
+          "status": " M",
+          "path": "materials/models/items/winter_wyvern/spring2021_frost_thorn_head/spring2021_frost_thorn_head_crystal.vmat_c"
+        },
+        {
+          "status": " M",
+          "path": "materials/overviews/template_map.vmat_c"
+        },
+        {
+          "status": " M",
+          "path": "materials/overviews/template_map_tga_d9088edf.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "materials/survival_valley/flowers_ivory.vmat_c"
+        },
+        {
+          "status": " M",
+          "path": "materials/survival_valley/flowers_mauve.vmat_c"
+        },
+        {
+          "status": " M",
+          "path": "materials/survival_valley/flowers_red.vmat_c"
+        },
+        {
+          "status": " M",
+          "path": "materials/survival_valley/stone_aegis.vmat_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/portrait_boss_map_head.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/portrait_work_head_boss.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/portrait_work_head_happy.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/portrait_work_head_tired.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/shadow_01.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/shadow_02.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/shadow_03.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/shadow_04.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_001.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_002.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_003.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_004.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_005.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_006.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_007.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_008.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_009.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_010.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_011.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_012.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_013.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_014.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_015.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_016.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_017.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_018.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_019.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_020.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_021.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_022.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_023.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_024.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_025.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/archive_gpu_regular/star_blessing_026.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/hud_resources_v2/wood.vsvg_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/images/custom_game/loading/dawnward_citadel_background_png.vtex_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/layout/custom_game/commerce_resources.vxml_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/layout/custom_game/custom_loading_screen.vxml_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/layout/custom_game/survival_grid_placement.vxml_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/layout/custom_game/survival_hud.vxml_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/scripts/custom_game/ability_tooltip.vjs_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/scripts/custom_game/boss_warning_remaining_5d5c1152eb.vjs_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/scripts/custom_game/common/ui_typography.vjs_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/scripts/custom_game/handoff_assets.vjs_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/scripts/custom_game/handoff_boot.vjs_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/scripts/custom_game/survival_grid_placement.vjs_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/scripts/custom_game/survival_grid_state.vjs_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/styles/custom_game/ability_tooltip.vcss_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/styles/custom_game/handoff_assets.vcss_c"
+        },
+        {
+          "status": " M",
+          "path": "panorama/styles/custom_game/inventory_tooltip.vcss_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/amber_portal/native_full/dark_center.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/amber_portal/native_full/ground.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/amber_portal/native_full/interior.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/amber_portal/native_full/native/wisp_relocate_marker_ti7_embers.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/amber_portal/native_full/native/wisp_relocate_marker_ti7_end.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/amber_portal/native_full/native/wisp_relocate_marker_ti7_rays.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/amber_portal/native_full/native/wisp_relocate_marker_ti7_ring.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/amber_portal/native_full/native/wisp_relocate_marker_ti7_ring_core.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/amber_portal/native_full/native/wisp_relocate_marker_ti7_ring_glow.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/amber_portal/native_full/native/wisp_relocate_marker_ti7_ring_swirl.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/amber_portal/native_full/native/wisp_relocate_marker_ti7_streaks.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/amber_portal/native_full/native/wisp_relocate_marker_ti7_warp.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/amber_portal/native_full/sparkles.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/bases/detail_motes.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/bases/detail_ultimate.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/bases/ultimate.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/death_willow/shadow_ground.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/death_willow/shadow_ground_soft.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/ice_portal/native_full/dark_center.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/ice_portal/native_full/ground.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/ice_portal/native_full/interior.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/ice_portal/native_full/native/wisp_relocate_marker_ti7_end_sparkle.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/ice_portal/native_full/native/wisp_relocate_marker_ti7_endpoint_core_flare.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/ice_portal/native_full/native/wisp_relocate_marker_ti7_endpoint_embers.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/ice_portal/native_full/native/wisp_relocate_marker_ti7_endpoint_end.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/ice_portal/native_full/native/wisp_relocate_marker_ti7_endpoint_flash.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/ice_portal/native_full/native/wisp_relocate_marker_ti7_endpoint_rays.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/ice_portal/native_full/native/wisp_relocate_marker_ti7_endpoint_ring.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/ice_portal/native_full/native/wisp_relocate_marker_ti7_endpoint_ring_core.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/ice_portal/native_full/native/wisp_relocate_marker_ti7_endpoint_ring_glow.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/ice_portal/native_full/native/wisp_relocate_marker_ti7_endpoint_ring_swirl.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/ice_portal/native_full/native/wisp_relocate_marker_ti7_endpoint_streaks.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/towers/ice_portal/native_full/sparkles.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/weapons/weapon_glow.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/weapons/weapon_shards.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival/weapons/weapon_trail.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "particles/survival_environment/valley_spawn.vpcf_c"
+        },
+        {
+          "status": " M",
+          "path": "server/archive_backend/__pycache__/match_modes.cpython-314.pyc"
+        },
+        {
+          "status": " M",
+          "path": "server/bundles/current.json"
+        }
+      ],
+      "existing_stash_count": 21,
+      "knowledge_export_new_commit_created": false,
+      "source_files_changed_by_this_task": false
+    },
+    "content": {
+      "root": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival",
+      "branch": "master",
+      "head": "1f9c83c2c4d0d8ca005007bf610e6c42b5560e70",
+      "upstream": "origin/master",
+      "upstream_tracking_head": "1f9c83c2c4d0d8ca005007bf610e6c42b5560e70",
+      "ahead_behind_tracking": [
+        "0",
+        "0"
+      ],
+      "remote_head_read_only_ls_remote": "1f9c83c2c4d0d8ca005007bf610e6c42b5560e70",
+      "remote_verified_at_export": true,
+      "prior_auth_delivery_commit": "3b3c567112763ddade02799c262cee9044d51f9f",
+      "auth_delivery_is_ancestor_of_snapshot": true,
+      "uncommitted_count": 0,
+      "preserved_uncommitted_changes": [],
+      "existing_stash_count": 4,
+      "knowledge_export_new_commit_created": false,
+      "source_files_changed_by_this_task": false
+    }
+  }
+}

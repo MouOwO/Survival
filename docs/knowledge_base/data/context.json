@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "snapshot_date": "2026-10-28",
+  "timezone": "Asia/Shanghai",
+  "project": "孤城逐晓 / Survival",
+  "read_first": "00_START_HERE.md",
+  "latest_release": {
+    "schema": 1,
+    "status": "MAP2802_UPLOADED_OFFICIAL_DOWNLOAD_VERIFIED_HOST_MAP_LOADED",
+    "workshop_id": "3824360109",
+    "visibility": "unlisted",
+    "release_sequence": 2026102802,
+    "revision": "WS4-MAP-RESOURCES-01",
+    "content_sha256": "310aad0a33116f29304d9ea7251524b4c1721bd5fb2b7952610d63cca2ac09d5",
+    "vpk_sha256": "b3dbe2351798561cd8d585449a7e304822d62f0706689527285c7f41658359f8",
+    "package_bytes": 3767361725,
+    "package_files": [
+      {
+        "name": "3824360109.vpk",
+        "bytes": 274380,
+        "sha256": "b3dbe2351798561cd8d585449a7e304822d62f0706689527285c7f41658359f8"
+      },
+      {
+        "name": "3824360109_000.vpk",
+        "bytes": 1073604434,
+        "sha256": "419160879971c9c6a0e775d44caa48c52e7d98e66649084ad55cb9b6e4df15eb"
+      },
+      {
+        "name": "3824360109_001.vpk",
+        "bytes": 1068730788,
+        "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+      },
+      {
+        "name": "3824360109_002.vpk",
+        "bytes": 1072379183,
+        "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+      },
+      {
+        "name": "3824360109_003.vpk",
+        "bytes": 552372940,
+        "sha256": "7383f8f065b0adde28a9a0ad0560419add35d150fcf92f7d6776268b8d3cc1e4"
+      }
+    ],
+    "file_count": 6658,
+    "source_sha256": "4e62350c1bf08e663f5217885f26652918c2e09296a829f29a987ba8a14dccdc",
+    "compiled_map_sha256": "f868f295a01b78f63dbeb9fe9edfc6a7591b3889ace84f0892f595ac46f22186",
+    "source_crc32": 3557144492,
+    "map_crc_entries_verified": 307,
+    "changed_runtime_paths": [
+      "maps/template_map.vpk"
+    ],
+    "download_manifest": "2226754158672105621",
+    "download_receipt_sha256": "5babf60a6c7c06bd3867dfb45f9defae57d477ac3728bedea66394ab03f3b948",
+    "uploaded": true,
+    "download_verified": true,
+    "native_map_acceptance": "PASS_HOST_ORDINARY_ARCADE_MAP_LOADED",
+    "ready_for_public_release": false,
+    "source_record": "publishing/workshop/map_resources_20261028.json",
+    "source_record_sha256": "5fa9f92dfc11c7a6208a19cd82566c859c022641bb96734f52207dfa8dff1501"
+  },
+  "evidence_boundaries": {
+    "native_two_player_auth_profile": "PASS_IN_2708",
+    "guest_qr_phone_scan": "PASS_PRODUCT_AND_AMOUNT_IN_2709_NO_PAYMENT",
+    "helper_cash_delivery": "USER_CONFIRMED_0.5_YUAN_LUMBER_AXE",
+    "native_guest_cash_payment": "NOT_VERIFIED",
+    "map2802_host_load": "PASS",
+    "map2802_two_player": "NOT_RUN",
+    "layout2801_guest_2560": "NOT_RUN",
+    "guest_refresh_tool": "27_MOCK_TESTS_PASS_NOT_RUN_ON_GUEST"
+  },
+  "user_decisions": {
+    "offline_cheats": true,
+    "online_cheats": false,
+    "monthly_card_keep_current_cap_bonus": true,
+    "rich_N10_wave8_flying_position2": {
+      "health": 1420000,
+      "attack": 160000,
+      "source": "Human v3 post-multiplier overrides; see02"
+    }
+  },
+  "pending": [
+    "guest remains old09 after restart: get current-account uncached query/one-item refresh report",
+    "guest 2560x1440 updated UI validation",
+    "native guest cash delivery/refund and reconnect/long-match validation",
+    "stable Steam verification egress without author PC",
+    "temporary or staged feature notes in02/03 require confirmation"
+  ],
+  "source_version_heads": {
+    "game": {
+      "head": "ba81736bf45d0dc74373858c39d99c0f7ca1f69b",
+      "branch": "dev",
+      "upstream": "origin/dev",
+      "ahead_behind": "0\t0",
+      "working_changes": 149,
+      "captured_before_knowledge_commit": true
+    },
+    "content": {
+      "head": "4711503a8312d106cfa05ceb67c72e74f7d2329e",
+      "branch": "master",
+      "upstream": "origin/master",
+      "ahead_behind": "0\t0",
+      "working_changes": 1,
+      "captured_before_knowledge_commit": true
+    }
+  },
+  "old_snapshot": "history/20261024/",
+  "no_secrets_included": true,
+  "raw_chat_backup_is_separate": true
+}

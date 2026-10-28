@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "date": "2026-10-24",
+  "revision": "WS4-ENTRY-05",
+  "status": "PUBLISHED_DOWNLOADED_ORIGINAL_WORKSHOP_LOGIN_PROFILE_GAMEPLAY_VERIFIED",
+  "workshop_id": "3824360109",
+  "visibility": "unlisted",
+  "candidate": "20261024_ws4_workshop_entry_v05",
+  "release_sequence": 2026102405,
+  "content_sha256": "b4750e433bdd1b1ea2fab0de98d13b3660ed5d3ef80a10c63c46512eab10bc60",
+  "steam_manifest": "2955439000185399689",
+  "base_content_sha256": "f5be8205cd107797f75c5b930224933de8c15f10e9a9e17932b3d6d747f91eb7",
+  "runtime_files": 6630,
+  "runtime_bytes": 3766734732,
+  "package_bytes": 3767007982,
+  "signature_valid": true,
+  "allowed_changes": [
+    "addoninfo.txt",
+    "maps/ws4_entry.vpk",
+    "scripts/vscripts/addon_game_mode.lua",
+    "scripts/vscripts/addon_game_mode_client.lua",
+    "scripts/vscripts/systems/workshop_entry.lua"
+  ],
+  "protected_modules_preserved": 180,
+  "frozen_main_body_preserved": true,
+  "online_authentication_changed": false,
+  "backend_code_changed": false,
+  "original_gameplay_map_changed": false,
+  "package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 273250,
+      "sha256": "2d363a7d5ee2b96560d11536fa4be508e7b56c440dbbc88f35fcb88a5e99a039"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1073502508,
+      "sha256": "221565f108953f4384b44936c6044c95b784d98fb557ef65d0b337cdbc38e150"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1068730788,
+      "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379183,
+      "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 552122253,
+      "sha256": "b029127130dc54a0c98a9bb62beae30312c9b30f065ae19fa30e63949a53c3d5"
+    }
+  ],
+  "steam_official_download_full_verification": true,
+  "native_package_reads": [
+    {
+      "archive": 0,
+      "path": "materials/ascension_arenas/bronze_color_png_7afed1ed.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 1,
+      "path": "materials/survival_buildings/kingdom_arcane_r1_color_png_44a7b4ad.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 2,
+      "path": "materials/survival_buildings/kingdom_wall_stage4_r2_normal_png_f2749443.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 3,
+      "path": "panorama/images/custom_game/archive_items_v2/beast_03_png.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 3,
+      "path": "panorama/images/ui/shared/texture/teal_png.vtex_c",
+      "exit_code": 0
+    }
+  ],
+  "native_download_reads": [
+    {
+      "archive": 0,
+      "path": "materials/ascension_arenas/bronze_color_png_7afed1ed.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 1,
+      "path": "materials/survival_buildings/kingdom_arcane_r1_color_png_44a7b4ad.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 2,
+      "path": "materials/survival_buildings/kingdom_wall_stage4_r2_normal_png_f2749443.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 3,
+      "path": "panorama/images/custom_game/archive_items_v2/beast_03_png.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 3,
+      "path": "panorama/images/ui/shared/texture/teal_png.vtex_c",
+      "exit_code": 0
+    }
+  ],
+  "export_scope": "Selected artifact metadata only; no player, order, credential, callback or process records",
+  "source_file": "publishing/workshop/workshop_entry_release_20261024.json",
+  "source_sha256": "6008c9050e740a90a51aa1878eacb099436e0ea7c2d23e3e7ae4f4bed7608816"
+}

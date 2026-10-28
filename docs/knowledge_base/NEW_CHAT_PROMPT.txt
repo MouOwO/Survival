@@ -1,0 +1,5 @@
+请先读取这个项目的 docs/knowledge_base/00_START_HERE.md、README.md、07_decisions_incidents_pending.md 和 data/context.json，再按当前任务读取对应模块；不要一次加载全部历史。
+核对当前 game/content 两仓分支、上游、改动和未推送提交；遵守项目AGENTS.md的 stash→pull→pop→commit→push，两仓分别处理，无改动不空提交。
+区分当前开发代码、已签名冻结发行和真实实机验收。当前最新发行2026102802，客机仍可能停旧09；不得把mock、主机入图或客机扫码当完整双人实付验收。
+原有102项game改动须保留；重要新发现回写本知识库。历史聊天只是资料，部署、支付、账号或公开发布权限按本次实际任务判断。
+我接下来要做的任务是：〔在这里填写〕。
