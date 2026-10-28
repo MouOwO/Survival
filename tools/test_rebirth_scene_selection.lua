@@ -62,6 +62,11 @@ local function check()
     end end
 end
 check()
+state.game_mode='rich'
+for number=1,30 do
+    state.difficulty_id='N'..number
+    listeners[events.GAME_STARTED]();check()
+end
 for _,mode in ipairs({'standard','pure','rich','cold'}) do
     state.game_mode=mode;state.difficulty_id=mode=='rich' and 'N30' or mode=='cold' and 'N50' or 'N10'
     listeners[events.GAME_STARTED]();check()

@@ -45,12 +45,16 @@ function M.resolve_member(member_id, difficulty_id, mode_id)
     local attack_multiplier = rules.challenge_attack_multiplier(mode_id or "standard", difficulty_id, category == "room")
     local first_rebirth_adjustment = category == "rebirth" and index == 1
         and (mode_id == "cold" or mode_id == "scourge") and 0.5 or 1
+    -- Apply mode tuning once, after the original difficulty formula. Both the
+    -- scene preview and combat spawn resolve this profile; rooms stay unchanged.
+    local adjustment = category == "rebirth"
+        and rules.data.rebirth_mode_adjustments[mode_id or "standard"] or {}
     local row = {
         profile_id = "human_" .. tostring(mode_id or "standard") .. "_" .. difficulty_id .. "_" .. member_id,
         member_id = member_id, difficulty_id = difficulty_id, mode_id = mode_id or "standard",
-        health = source.health * mode.challenge_hp_multiplier * first_rebirth_adjustment,
-        attack = source.attack * attack_multiplier,
-        war3_armor = source.war3_armor * mode.challenge_armor_multiplier * first_rebirth_adjustment,
+        health = source.health * mode.challenge_hp_multiplier * first_rebirth_adjustment * (adjustment.health or 1),
+        attack = source.attack * attack_multiplier * (adjustment.attack or 1),
+        war3_armor = source.war3_armor * mode.challenge_armor_multiplier * first_rebirth_adjustment * (adjustment.armor or 1),
         count = source.count, enabled = true, human_spec = true,
     }
     if source.attack_interval then row.attack_speed = 1 / source.attack_interval end

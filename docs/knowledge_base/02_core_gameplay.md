@@ -77,6 +77,8 @@
 
 2026-10-28 转生展示修复：场上10个待挑战模型沿用只读展示实体，取消 `modifier_rebirth_scene_display` 的UNSELECTABLE；仍无敌、静止、禁攻击/命令、无碰撞/经验/金币/挑战奖励。`rebirth_scene_display_service` 用同一 `challenge_combat_profile_config.resolve` 和大数投影设置生命/攻击/护甲/攻速，按当前模式难度取值，并在GAME_STARTED后刷新，不另造预览倍率。正式挑战仍由原spawn/service负责，开打隐藏展示，结束后按尸体时限恢复。2803仅发布这两份Lua，未夹带之前尚未发布的商城、悬停UI和波次改动；10个原生实体属性核对通过，完整候选游廊点选及双人挑战未验。见[转生修复记录](evidence/rebirth_selection_20261028.md)。
 
+2026-10-28 丰饶转生首轮平衡：用户确认“数值太低，需要加强”。当前开发双源新增转生专用模式调优，丰饶全N1–N30、全部10阶在原难度结果上生命×5、攻击×3、护甲×2，仅应用一次；这组幅度是本轮实现选择，待实战确认。预览和实际挑战共用解析，不改变其他模式、练功房和十戒。2350组配置、300组实际生产spawn闭包与全30难度预览离线测试通过；尚未原生实战或上传此平衡版本，已上传2803不含此改动。见[平衡记录](evidence/rich_rebirth_balance_20261028.md)。
+
 入口：`systems/hero_summon_system.lua`、`systems/content_inventory_service.lua`、`systems/inventory_transaction_service.lua`、`systems/weapon_synthesis_service.lua`、`systems/equipment_instance_service.lua`、`systems/equipment_stat_aggregation_service.lua`、`systems/training_room_service.lua`、`systems/player_room_locations.lua`，以及英雄/物品/挑战类 CSV。
 
 ## 7. 波次、红翼修正、败退与终局

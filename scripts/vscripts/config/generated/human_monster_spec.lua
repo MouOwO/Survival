@@ -2,7 +2,7 @@
 -- Values already include the source correction table; never apply it again.
 return {
     ["version"] = 3,
-    ["sources"] = { ["json"] = "human_spec.json", ["workbook"] = "接入规格_人话版_v3.xlsx", ["json_sha256"] = "61d238f735a567957cbaa5711fef31fff813ac4d0530090959c81e8380164a58", ["workbook_sha256"] = "23e866199395c52782a5c7f4e87abe1c0472dd4f6bb3aa9c83992f48508f0997", ["cross_checked_cells"] = 2818, ["workbook_only_wave_bases"] = 30 },
+    ["sources"] = { ["json"] = "human_spec.json", ["workbook"] = "接入规格_人话版_v3.xlsx", ["json_sha256"] = "b2cd86878757e8d74ee9d7f4add793b6c154d5fbb793e11b07a3c592371d30ae", ["workbook_sha256"] = "ed24f49a3635cbbd4e5e3c2957b4eaa031252d1ac42f3870a7dc7d6af120ba18", ["cross_checked_cells"] = 2823, ["workbook_only_wave_bases"] = 30 },
     ["modes"] = {
         ["standard"] = {
             [1] = { ["hp_multiplier"] = 2.0, ["armor_multiplier"] = 1.2, ["challenge_hp_multiplier"] = 2.0, ["challenge_armor_multiplier"] = 1.0, ["total_waves"] = 25, ["max_difficulty"] = 10 },
@@ -338,6 +338,9 @@ return {
         [8] = { ["name"] = "转生BOSS8", ["health"] = 160195520.0, ["war3_armor"] = 280.0, ["attack"] = 7520200.0, ["attack_interval"] = 0.4 },
         [9] = { ["name"] = "转生BOSS9", ["health"] = 220195520.0, ["war3_armor"] = 310.0, ["attack"] = 12520200.0, ["attack_interval"] = 0.4 },
         [10] = { ["name"] = "转生BOSS10", ["health"] = 420195520.0, ["war3_armor"] = 340.0, ["attack"] = 18520200.0, ["attack_interval"] = 0.4 },
+    },
+    ["rebirth_mode_adjustments"] = {
+        ["rich"] = { ["health"] = 5, ["attack"] = 3, ["armor"] = 2, ["note"] = "2026-10-28用户要求加强丰饶转生怪；首轮调优在原难度公式后仅对转生BOSS乘一次，幅度为本轮实现选择，待实战确认。" },
     },
     ["special_bosses"] = {
         [1] = { ["name"] = "火焰巨魔", ["health"] = 5104960.0, ["war3_armor"] = 300.0, ["attack"] = 100000.0, ["attack_interval"] = 0.5, ["count"] = 1 },

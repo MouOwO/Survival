@@ -15,8 +15,8 @@
     },
     {
       "path": "02_core_gameplay.md",
-      "bytes": 16498,
-      "sha256": "9542bd62029b6954d23bec3775923e5ec95c3e88caf27560132077aad078cec8"
+      "bytes": 17103,
+      "sha256": "dd3c6d6c2e36bd842fa6c979f70fe0ad1dbdabd93a1594850b57424d438bae44"
     },
     {
       "path": "03_progression_save_contract.md",
@@ -267,6 +267,11 @@
       "path": "evidence/rebirth_selection_20261028.md",
       "bytes": 2895,
       "sha256": "287f5bf1a704d78dc8e30f1f4dc5bda4eb43e60100063d99bbe21789340c42ab"
+    },
+    {
+      "path": "evidence/rich_rebirth_balance_20261028.md",
+      "bytes": 2247,
+      "sha256": "18c81d16eb60e76b5a887e72107bc2f15d9c882cec50d3f94212fc2580b87953"
     }
   ]
 }
