@@ -159,7 +159,7 @@ const ticketPurchases=[];config.SurvivalCommerceView={OpenTicketPurchase:pool=>{
 for(const id of ['map','cultivation','dragon_knight','summer']){
  current.SelectPool(id);const ticketData=data(id),special=id==='dragon_knight'||id==='summer';ticketData.selected_pool.ticket_content_id=special?'special_lottery_ticket':'lottery_ticket';events.ui_lottery_snapshot(ticketData);
  ticketAlignment();poolNavigation(id);
- ticketPurchasePolicy(special);
+ ticketPurchasePolicy(true);
  if(special){nativeTicketPurchase.events.onactivate();const purchase=ticketPurchases.at(-1);assert.equal(purchase.id,id,'the plus button routes the selected pool');assert.equal(purchase.ticket_content_id,ticketData.selected_pool.ticket_content_id,'the correct ticket type reaches the existing purchase flow');}
 }
 assert.equal(ticketPurchases.length,2,'only the two special-ticket pools expose native purchase actions');

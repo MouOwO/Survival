@@ -55,7 +55,7 @@ function openAll(h, snapshot = h.snapshot, owner = h.owner) {
 
 test('The public catalog uses the existing black lion window, skin, five sections and incremental rows', () => {
     const h = setup();
-    assert.equal(h.snapshot.products.length, 173, 'Use the actual compiler output');
+    assert.equal(h.snapshot.products.length, 175, 'Use the actual compiler output');
     assert.equal(h.view.OpenReadonly(h.snapshot, h.owner), true);
     assert.equal(h.view.IsReadonlyOpen(h.owner), true);
     assert.equal(h.store().panel.id, 'BlackLionMarketWindow');
@@ -73,7 +73,7 @@ test('The public catalog uses the existing black lion window, skin, five section
     assert.equal(h.cardList().length, 40);
     first.forEach((row, index) => assert.equal(h.cardList()[index], row, 'Scrolling appends without replacing existing hovered rows'));
     const all = h.loadAllBatches();
-    assert.equal(all.length, 173);
+    assert.equal(all.length, 175);
     assert(all.every(row => row.BHasClass('BLMarketRow')));
     assert.equal(h.view.Inspect().hasMoreProducts, false);
     noFinancialWork(h);
@@ -84,7 +84,7 @@ test('Every formal offer survives including separate cash and wallet prices for 
     deepFreeze(h.snapshot);
     const rows = openAll(h), records = rows.map(row => rowRecord(h, row));
     assert.deepEqual(records.map(record => record.item.offer_id).sort(), h.snapshot.products.map(item => item.offer_id).sort());
-    assert.equal(new Set(records.map(record => record.item.offer_id)).size, 173);
+    assert.equal(new Set(records.map(record => record.item.offer_id)).size, 175);
     const cash = h.snapshot.products.find(item => item.currency === 'CNY' && h.snapshot.products.some(other => other.sku === item.sku && other.currency !== 'CNY'));
     assert(cash, 'Formal data includes both payment methods for one SKU');
     const wallet = h.snapshot.products.find(item => item.sku === cash.sku && item.currency !== 'CNY');
@@ -168,7 +168,7 @@ test('The existing currency and section controls filter public offers without is
         assert.equal(h.view.SelectCategory(group), true, 'Original section is still selectable: ' + group);
         h.loadAllBatches();
     }
-    assert.equal(h.cardList().length, 173);
+    assert.equal(h.cardList().length, 175);
     noFinancialWork(h);
 });
 

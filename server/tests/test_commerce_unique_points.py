@@ -33,10 +33,10 @@ class PointOfferTests(unittest.TestCase):
         products = self.compile()
         bulk, single = products['video_p089'], products['video_p103']
         self.assertFalse(bulk['enabled'])
-        self.assertEqual((bulk['price'], bulk['ownership_quantity']), (8000, 100))
+        self.assertEqual((bulk['price'], bulk['ownership_quantity']), (5000, 100))
         self.assertEqual(bulk['effects'], {'hero_basic_attack_growth': 10})
         self.assertTrue(single['enabled'])
-        self.assertEqual((single['price'], single['ownership_quantity'], single['purchase_limit']), (8000, 1, 0))
+        self.assertEqual((single['price'], single['ownership_quantity'], single['purchase_limit']), (60, 1, 0))
         self.assertEqual(single['item_id'], bulk['item_id'])
         self.assertEqual(single['effects'], {})
 
@@ -83,7 +83,7 @@ class PointPurchaseTests(unittest.TestCase):
         self.assertTrue(self.purchase()['ok'])
         save = self.profile['save']
         self.assertEqual(save['content_inventory']['lottery_ember_of_legacy'], 1)
-        self.assertEqual(save['archive']['commerce']['balances']['shop_points'], 92000)
+        self.assertEqual(save['archive']['commerce']['balances']['shop_points'], 99940)
         self.assertAlmostEqual(save['gameplay_stats']['hero_basic_attack_growth'], before['hero_basic_attack_growth'])
         lua = self.LuaRuntime(unpack_returned_tuples=True)
         lua.globals().INPUT = json.dumps(dict(configs=self.bundle.configs, save=save))
@@ -103,7 +103,7 @@ class PointPurchaseTests(unittest.TestCase):
         self.assertEqual(self.profile, after)
         self.assertTrue(self.purchase(token='unique_second_0002')['ok'])
         self.assertEqual(self.profile['save']['content_inventory']['lottery_ember_of_legacy'], 2)
-        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'], 84000)
+        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'], 99880)
 
     def test_paused_bulk_offer_never_debits_or_grants_and_is_absent_from_catalog(self):
         before = copy.deepcopy(self.profile)
@@ -176,7 +176,7 @@ class PointPurchaseTests(unittest.TestCase):
             results = [future.result(timeout=20) for future in futures]
         self.assertEqual(sum(r['ok'] is True for r in results), 2)
         self.assertEqual(self.profile['save']['content_inventory']['lottery_ember_of_legacy'], 2)
-        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'], 84000)
+        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'], 99880)
 
     def historical_bundle(self):
         data = json.loads((self.bundle.directory / 'bundle.json').read_bytes())

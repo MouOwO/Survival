@@ -37,6 +37,8 @@ const products = formal.map(item => ({sku: item.sku, source_id: item.source_id, 
     required_vip_level: item.required_vip_level === undefined ? item.grants && item.grants.required_vip_level : item.required_vip_level,
     enabled: true, owned: 0, purchase_limit: 1, purchase_method: 'wallet', currency: 'shop_points',
     currency_name: '商城积分', price: typeof item.price === 'number' ? item.price : 10}));
+const priceOrder = ids => ids.slice().sort((a,b) => products.find(p=>p.sku===a).price-products.find(p=>p.sku===b).price);
+expectedIds.splice(0,expectedIds.length,...priceOrder(expectedIds));
 const originalProducts = JSON.stringify(products);
 const scriptRoot = path.join(dataRoot, 'panorama/src/scripts/custom_game');
 const candidateNames = new Set(['black_lion_market_model.js', 'black_lion_market.js', 'commerce_remaining_5d5c1152eb.js']);
@@ -105,6 +107,7 @@ const expectedGroups = {
     vip: vipBundles,
     promotions: presentation.groups.promotions.filter(sku => singleSkus.has(sku))
 };
+Object.keys(expectedGroups).forEach(group => {expectedGroups[group]=priceOrder(expectedGroups[group]);});
 assert.equal(expectedGroups.all.length, 114); assert.equal(expectedGroups.promotions.length, 25);
 function expectedGroup(id, excluded = []) { return expectedGroups[id].filter(sku => !excluded.includes(sku)); }
 function assertExclusiveGroups(h, message) {
@@ -182,7 +185,7 @@ const changed = makeHarness(); changed.walletSnapshot(changedProducts); select(c
 assert.deepEqual(displayIds(changed), expectedIds.filter(id => id !== changedSku));
 assert.equal(changed.cfg.SurvivalCommerceView.Inspect().groups.find(group => group.id === 'home').count, 14);
 select(changed, 'all'); assert.deepEqual(allRows(changed).ids, expectedGroup('all', [changedSku]));
-select(changed, 'bundles'); assert.deepEqual(allRows(changed).ids, [...ordinaryBundles, changedSku]);
+select(changed, 'bundles'); assert.deepEqual(allRows(changed).ids, priceOrder([...ordinaryBundles, changedSku]));
 
 // A missing independent configuration must stay empty, never fall back to All.
 const missing = makeHarness({missingHome: true}); missing.walletSnapshot(products); select(missing, 'home');

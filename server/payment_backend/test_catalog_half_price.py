@@ -8,7 +8,7 @@ import sys
 import tempfile
 import unittest
 from unittest.mock import patch
-from .csv_catalog import build,compile_catalog,rows,SOURCES,HALF_PRICE_POLICY,MONTHLY_FIXED_PRICE_POLICY,FIXED_QUALITY_SHOP_POINTS_POLICY,QUALITY_SHOP_POINTS_PRICES
+from .csv_catalog import build,compile_catalog,rows,SOURCES,HALF_PRICE_POLICY,MONTHLY_FIXED_PRICE_POLICY,FIXED_QUALITY_SHOP_POINTS_POLICY,fixed_points_price,FIXED_TICKET_PRICE_POLICY,TICKET_PRICES
 from .commerce_bundles import compile_commerce,csv_text
 from . import ucoin_recharge
 
@@ -21,7 +21,7 @@ class HalfPriceTests(unittest.TestCase):
 
     def test_fixed_point_prices_and_unchanged_cash_half_prices(self):
         records=rows(self.package['commerce_tables']['commerce_products'])
-        self.assertEqual(len(records),129)
+        self.assertEqual(len(records),130)
         catalog=compile_commerce(self.package['commerce_tables'],self.reference,self.package['tables']['payment_categories'])
         compiled={p['sku']:p for p in catalog['products']}
         memberships=rows(self.package['commerce_tables']['commerce_bundle_members'])
@@ -31,7 +31,7 @@ class HalfPriceTests(unittest.TestCase):
             with self.subTest(sku=p['sku']):
                 if p['currency']=='shop_points':
                     self.assertEqual(p['price_policy'],FIXED_QUALITY_SHOP_POINTS_POLICY)
-                    self.assertEqual(int(p['price']),QUALITY_SHOP_POINTS_PRICES[p['point_quality']])
+                    self.assertEqual(int(p['price']),fixed_points_price(p))
                 else:
                     self.assertEqual(p['price_policy'],HALF_PRICE_POLICY)
                     self.assertEqual(Decimal(p['price'])*2,Decimal(p['price_baseline']))
@@ -43,13 +43,17 @@ class HalfPriceTests(unittest.TestCase):
         self.assertEqual(catalog,again,'Compiling final authority prices must never discount again')
 
     def test_seven_cash_discounts_fixed_monthly_price_and_recharge_are_independent(self):
-        records=rows(self.package['tables']['payment_products']);self.assertEqual(len(records),8)
+        records=rows(self.package['tables']['payment_products']);self.assertEqual(len(records),9)
         products={p['sku']:p for p in compile_catalog(self.package['tables'],self.reference)['products']}
         for p in records:
             if p['sku']=='archive_pass_monthly':
                 self.assertEqual(p['price_policy'],MONTHLY_FIXED_PRICE_POLICY)
                 self.assertEqual(Decimal(p['price_yuan']),58)
                 self.assertEqual(Decimal(p['price_baseline_yuan']),20)
+            elif p['sku'] in TICKET_PRICES:
+                self.assertEqual(p['price_policy'],FIXED_TICKET_PRICE_POLICY)
+                self.assertEqual(Decimal(p['price_yuan'])*100,TICKET_PRICES[p['sku']])
+                self.assertEqual(p['price_yuan'],p['price_baseline_yuan'])
             else:
                 self.assertEqual(p['price_policy'],HALF_PRICE_POLICY)
                 self.assertEqual(Decimal(p['price_yuan'])*2,Decimal(p['price_baseline_yuan']))
@@ -99,16 +103,11 @@ class HalfPriceTests(unittest.TestCase):
             for relative in (tool.COMMERCE,tool.PAYMENT):
                 path=temporary/relative;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes((ROOT/relative).read_bytes())
             with patch.object(tool,'ROOT',temporary),patch.object(tool,'OUT',temporary/'audit'):
-                for relative,field,basis,count in ((tool.COMMERCE,'price','price_baseline',129),(tool.PAYMENT,'price_yuan','price_baseline_yuan',8)):
+                for relative,field,basis,count in ((tool.COMMERCE,'price','price_baseline',130),(tool.PAYMENT,'price_yuan','price_baseline_yuan',9)):
                     path=temporary/relative;before=path.read_bytes()
-                    if relative==tool.COMMERCE:
-                        with self.assertRaisesRegex(AssertionError,'invalid_existing_policy'):
-                            tool.update_prices(relative,field,basis,count)
-                        self.assertEqual(path.read_bytes(),before,'The archived half-price migration cannot overwrite newer fixed point prices')
-                        continue
-                    tool.update_prices(relative,field,basis,count);once=path.read_bytes()
-                    tool.update_prices(relative,field,basis,count)
-                    self.assertEqual(before,once);self.assertEqual(once,path.read_bytes())
+                    with self.assertRaisesRegex(AssertionError,'invalid_existing_policy'):
+                        tool.update_prices(relative,field,basis,count)
+                    self.assertEqual(path.read_bytes(),before,'The archived migration cannot overwrite newer fixed prices')
 
     def test_half_price_tool_reapply_promotes_only_monthly_to_fixed_price_once(self):
         spec=importlib.util.spec_from_file_location('half_price_tool',ROOT/'tools/shop_pricing_half_20261017/catalog_prices.py')
@@ -117,6 +116,13 @@ class HalfPriceTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             temporary=Path(directory);path=temporary/tool.PAYMENT;path.parent.mkdir(parents=True,exist_ok=True)
             current=(ROOT/tool.PAYMENT).read_bytes()
+            # This archived migration accepts only its original eight offers.
+            # Keep a historical fixture rather than reapplying it to new tickets.
+            fixture=rows(current.decode('utf-8-sig'))
+            fixture=[p for p in fixture if p['sku']!='lottery_ticket_single']
+            ticket=next(p for p in fixture if p['sku']=='special_lottery_ticket_single')
+            ticket.update(price_yuan='25.00',price_policy=HALF_PRICE_POLICY,price_baseline_yuan='50.00')
+            current=csv_text(fixture,list(fixture[0])).encode('utf-8')
             old=current.replace(b'single,58.00,0,1,80,',b'single,10.00,0,1,80,')
             old=old.replace('58元开通'.encode(),'10元开通'.encode()).replace(MONTHLY_FIXED_PRICE_POLICY.encode(),HALF_PRICE_POLICY.encode())
             self.assertNotEqual(old,current);path.write_bytes(old)

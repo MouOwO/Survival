@@ -79,7 +79,7 @@ class UcoinCatalogTests(unittest.TestCase):
         cash_count=sum(p['currency']=='u_coin' for p in rows(self.commerce_tables['commerce_products']))
         self.assertEqual(len(merged), len(old['products']) + cash_count + 1)
         self.assertEqual(merged[ucoin_recharge.SKU],ucoin_recharge.product())
-        self.assertEqual(merged['special_lottery_ticket_single']['amount'], 2500)
+        self.assertEqual(merged['special_lottery_ticket_single']['amount'], 600)
         self.assertFalse(merged['starter_bundle_v4']['enabled'])
 
     def test_other_wallet_currencies_are_not_cash_products(self):

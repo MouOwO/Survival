@@ -10,9 +10,9 @@ class CatalogTests(unittest.TestCase):
         self.package=build(ROOT);self.tables=copy.deepcopy(self.package['tables'])
         self.reference={k:(ROOT/'data/csv'/k).read_text(encoding='utf-8-sig') for k in SOURCES}
     def compile(self):return compile_catalog(self.tables,self.reference)
-    def test_single_special_ticket_costs_25_yuan_and_is_repeatable(self):
+    def test_single_special_ticket_costs_6_yuan_and_is_repeatable(self):
         p=next(p for p in self.compile()['products'] if p['sku']=='special_lottery_ticket_single')
-        self.assertTrue(p['enabled']);self.assertEqual(p['amount'],2500)
+        self.assertTrue(p['enabled']);self.assertEqual(p['amount'],600)
         self.assertEqual(p['purchase_limit'],0);self.assertEqual(p['product_type'],'single')
         self.assertEqual(p['effects'],{});self.assertEqual(p['grants']['entitlements'],[])
         self.assertEqual(p['grants']['items'],{'special_lottery_ticket':1})
@@ -69,7 +69,7 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(int(rule['duration_days']),product['grants']['entitlement_days'][rule['pass_entitlement_id']])
     def test_unknown_or_unimplemented_rewards_fail_whole_catalog(self):
         for old,new in [('stat,initial_wood','stat,imaginary_buff'),('entitlement,vip','entitlement,admin'),
-                        ('item,special_lottery_ticket','item,lottery_ticket'),('item,special_lottery_ticket,10','item,lottery_monkey_king,1')]:
+                        ('item,special_lottery_ticket','item,unknown_ticket'),('item,special_lottery_ticket,10','item,lottery_monkey_king,1')]:
             with self.subTest(new=new):
                 self.tables=copy.deepcopy(self.package['tables'])
                 self.tables['payment_rewards']=self.tables['payment_rewards'].replace(old,new)

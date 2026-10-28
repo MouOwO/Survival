@@ -137,6 +137,24 @@ function rechargeItem(extra = {}) {
         amount_fen:100,unit_amount_fen:100,max_quantity:999999,recharge_u_coin_per_unit:100,enabled:1,
         reward_lines:[{kind:'wallet',id:'u_coin',label:'U币',quantity:100}],...extra};
 }
+test('Lottery purchase selects the matching ordinary or gold single ticket and preserves the requested kind during refresh', () => {
+    const h=harness({market:true});
+    const ordinary=paidItem({sku:'lottery_ticket_single',title:'普通抽奖券 ×1',product_type:'single',category_id:'item',
+        amount_fen:300,u_coin_price:300,reward_lines:[{kind:'item',id:'lottery_ticket',quantity:1,label:'普通抽奖券'}]});
+    const gold=paidItem({sku:'special_lottery_ticket_single',title:'金色抽奖券 ×1',product_type:'single',category_id:'item',
+        amount_fen:600,u_coin_price:600,reward_lines:[{kind:'item',id:'special_lottery_ticket',quantity:1,label:'金色抽奖券'}]});
+    h.paidSnapshot([gold,ordinary]);
+    assert(h.cfg.SurvivalCommerceView.OpenTicketPurchase({id:'map',ticket_content_id:'lottery_ticket'}));
+    assert.equal(h.$('#PaymentTitle').text,ordinary.title);
+    assert.equal(h.cfg.SurvivalCommerceView.OpenTicketPurchase({id:'future',ticket_content_id:'unknown_ticket'}),false);
+    assert(h.cfg.SurvivalCommerceView.OpenTicketPurchase({id:'summer',ticket_content_id:'special_lottery_ticket'}));
+    assert.equal(h.$('#PaymentTitle').text,gold.title);
+    const cold=harness({market:true});
+    assert(cold.cfg.SurvivalCommerceView.OpenTicketPurchase({id:'map',ticket_content_id:'lottery_ticket'}));
+    cold.paidSnapshot([gold,ordinary]);
+    assert.equal(cold.$('#PaymentTitle').text,ordinary.title);
+    assert.equal(cold.requests.filter(r=>r.payload.action==='create').length,0,'Opening a ticket quote does not create a payment');
+});
 function simpleDetail(h, card, title = '测试道具') {
     const nodes = h.descendants(card.__purpleDetail), labels = nodes.filter(p => p.paneltype === 'Label');
     assert.equal(labels.length, 3, 'The tooltip contains only name, quality, and effect');

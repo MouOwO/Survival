@@ -1,6 +1,6 @@
 ﻿reward_id,sku,reward_type,target_id,amount,display_name,enabled
 #types:string,string,string,string,number,string,boolean
-video_p001_r1,video_p001,item,special_lottery_ticket,1,特殊抽奖券,1
+video_p001_r1,video_p001,item,special_lottery_ticket,1,金色抽奖券,1
 video_p004_r1,video_p004,stat,initial_wood,200,开局木材,1
 video_p004_r2,video_p004,stat,lumberjack_efficiency,1,伐木效率,1
 video_p004_r3,video_p004,stat,gold_mine_efficiency_pct,6,金矿效率,1
@@ -534,3 +534,4 @@ video_p147_r5,video_p147,stat,hero_attribute_bonus_pct,25,英雄全属性加成,
 video_p147_r6,video_p147,stat,hero_final_damage_bonus_pct,25,英雄最终伤害,1
 video_p147_r7,video_p147,stat,hero_attack_armor_reduction_pct,8,英雄攻击减甲百分比,1
 video_p147_r8,video_p147,stat,hero_attack_attribute_efficiency_pct,8,英雄攻击属性效率,1
+points_welfare_zongzi_r1,points_welfare_zongzi,stat,hero_basic_attack_growth,0.05,英雄基础攻击成长,1

@@ -10,7 +10,7 @@ sys.path.insert(0,str(ROOT/'server'))
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 import test_archive_backend as base
 from archive_backend.commerce_catalog import build_catalog
-from payment_backend.csv_catalog import (rows,validate_price_policy,
+from payment_backend.csv_catalog import (rows,validate_price_policy,fixed_points_price,
     FIXED_QUALITY_SHOP_POINTS_POLICY as POLICY,QUALITY_SHOP_POINTS_PRICES as PRICES)
 
 
@@ -31,26 +31,30 @@ class PointPriceTests(unittest.TestCase):
         registry=json.loads((ROOT/'data/ui/item_resources.json').read_text(encoding='utf-8-sig'))['items']
         resources={key:item for item in registry for key in [item['id'],*item.get('aliases',[])]}
         point_goods=[p for p in products if p['currency']=='shop_points']
-        self.assertEqual(len(point_goods),86)
+        self.assertEqual(len(point_goods),87)
         for p in products:
             with self.subTest(sku=p['sku']):
                 if p['currency']=='shop_points':
                     self.assertEqual(p['product_type'],'single')
                     self.assertEqual(p['price_policy'],POLICY)
-                    self.assertEqual(int(p['price']),PRICES[p['point_quality']])
-                    self.assertEqual(compiled[p['sku']]['price'],PRICES[p['point_quality']])
+                    self.assertEqual(int(p['price']),fixed_points_price(p))
+                    self.assertEqual(compiled[p['sku']]['price'],fixed_points_price(p))
                     self.assertEqual(compiled[p['sku']]['price_policy'],POLICY)
                     self.assertNotIn('original_price',compiled[p['sku']])
                     resource=next((resources[key] for key in (p['ownership_id'],p['sku'],p['source_id']) if key in resources),{})
                     quality=lottery.get(p['ownership_id'],{}).get('quality') or resource.get('quality')
                     if p['sku'] in ('video_p147','video_p151'):quality='ur'
+                    if p['sku']=='points_welfare_zongzi':quality='r'
                     self.assertEqual(p['point_quality'],quality.lower(),'Pricing quality must match the authoritative item or its shared alias resource')
                 if p['sku'] in before:
                     allowed={'price','price_policy'} if p['currency']=='shop_points' else set()
+                    if p['sku']=='video_p001':allowed.add('description')
                     for field,value in before[p['sku']].items():
                         if field not in allowed:self.assertEqual(p[field],value,field)
-        for sku in ('video_p147','video_p151','video_p103','video_p089'):
-            self.assertEqual(compiled[sku]['price'],8000)
+        for sku in ('video_p147','video_p151','video_p089'):
+            self.assertEqual(compiled[sku]['price'],5000)
+        for sku in ('video_p103','points_welfare_zongzi'):
+            self.assertEqual(compiled[sku]['price'],60)
         self.assertFalse(compiled['video_p089']['enabled'])
         self.assertEqual(compiled['video_p089']['ownership_quantity'],100)
 
@@ -59,7 +63,7 @@ class PointPriceTests(unittest.TestCase):
             with self.subTest(quality=quality):
                 self.setUp()
                 product=next(p for p in self.bundle.tables['commerce_catalog'].values()
-                    if p.get('point_quality')==quality and p['enabled'] and not p['effects'].get('starjoy_points'))
+                    if p.get('point_quality')==quality and p['price']==price and p['enabled'] and not p['effects'].get('starjoy_points'))
                 self.profile['save']['archive']['commerce']={'balances':{'shop_points':price,'u_coin':123}}
                 self.profile['save']['gameplay_stats'].update(starjoy_points=9000,starjoy_points_earned=12000)
                 result=self.send('commerce_purchase',sku=product['sku'],request_id='fixedprice_'+quality)
@@ -100,11 +104,11 @@ class PointPriceTests(unittest.TestCase):
     def test_fixed_policy_rejects_other_currencies_bundles_wrong_quality_and_half_prices(self):
         record={'sku':'test_fixed','product_type':'single','currency':'shop_points',
                 'point_quality':'n','price_policy':POLICY,'price_baseline':'188'}
-        self.assertTrue(validate_price_policy(record,200,'price_baseline'))
+        self.assertTrue(validate_price_policy(record,100,'price_baseline'))
         for changes,value,field,scale in (({'currency':'u_coin'},200,'price_baseline',1),
                 ({'currency':'shop_gold'},200,'price_baseline',1),
                 ({'product_type':'bundle'},200,'price_baseline',1),
-                ({'point_quality':'unknown'},200,'price_baseline',1),({},100,'price_baseline',1),
+                ({'point_quality':'unknown'},200,'price_baseline',1),({},50,'price_baseline',1),
                 ({},200,'price_baseline_yuan',100)):
             with self.subTest(changes=changes,value=value):
                 with self.assertRaisesRegex(ValueError,'catalog_fixed_quality_points_price_invalid'):

@@ -39,9 +39,9 @@ class PublicShopCatalogTests(unittest.TestCase):
                 if product["enabled"] is True:
                     expected[channel + ":" + product["sku"]] = (channel, product)
         actual = {offer["offer_id"]: offer for offer in self.data["products"]}
-        self.assertEqual(len(actual), 173)
+        self.assertEqual(len(actual), 175)
         self.assertEqual(set(actual), set(expected))
-        self.assertEqual(sum(p["currency"] == "CNY" for p in actual.values()), 48)
+        self.assertEqual(sum(p["currency"] == "CNY" for p in actual.values()), 49)
         shared = set(p["sku"] for p in self.compiled["catalog"]["products"] if p["enabled"]) & set(
             p["sku"] for p in self.commerce["products"] if p["enabled"])
         self.assertTrue(shared, "real catalog must exercise dual-channel SKUs")
@@ -64,7 +64,7 @@ class PublicShopCatalogTests(unittest.TestCase):
     def test_known_cash_price_units_and_three_wallet_units(self):
         offers = {p["offer_id"]: p for p in self.data["products"]}
         for sku, fen in (("archive_pass_monthly", 5800),
-                         ("special_lottery_ticket_single", 2500), ("u_coin_recharge", 100)):
+                         ("special_lottery_ticket_single", 600), ("lottery_ticket_single", 300), ("u_coin_recharge", 100)):
             self.assertEqual(offers["cash:" + sku]["price"], fen)
             self.assertEqual(offers["cash:" + sku]["currency"], "CNY")
         payment = copy.deepcopy(self.compiled["catalog"])
@@ -147,7 +147,7 @@ class PublicShopCatalogTests(unittest.TestCase):
                        "--web-output", str(destination)]
             built = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, encoding="utf-8", check=True)
             summary = json.loads(built.stdout)
-            self.assertEqual((summary["offers"], summary["cash_offers"]), (173, 48))
+            self.assertEqual((summary["offers"], summary["cash_offers"]), (175, 49))
             manifest = json.loads((destination / "manifest.json").read_text(encoding="utf-8"))
             self.assertIs(manifest["checkout_enabled"], False)
             self.assertEqual(set(manifest["files"]), {"index.html", "shop.css", "shop.js", "catalog.js", "catalog.json"})

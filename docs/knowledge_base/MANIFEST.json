@@ -30,8 +30,8 @@
     },
     {
       "path": "05_payments_commerce_delivery.md",
-      "bytes": 13359,
-      "sha256": "4d76db9cd19f6ca81861150410183de2f8acce83b639e6e56afc1ecfde73be75"
+      "bytes": 14657,
+      "sha256": "8fec4c00765ea4cfc0609f3e0258f17bc80611ae6da57dc3fbd178ccf5e211e9"
     },
     {
       "path": "06_build_release_ops.md",
@@ -252,6 +252,11 @@
       "path": "tools/verify_knowledge.py",
       "bytes": 1993,
       "sha256": "76331e711948f58761439119c684badcc654fa7ce8c9a107c1e440f693c0be7c"
+    },
+    {
+      "path": "evidence/commerce_prices_20261028.md",
+      "bytes": 2499,
+      "sha256": "8bca6c86e27bfd5b6a3d626db48f73de8dee309f78309ae3061cdaa65e4b5bb5"
     }
   ]
 }

@@ -15,9 +15,22 @@ TABLES=('payment_categories','payment_products','payment_rewards')
 SUPPORTED_ENTITLEMENTS={'vip','archive_pass'}
 HALF_PRICE_POLICY='half_current_20261017'
 FIXED_QUALITY_SHOP_POINTS_POLICY='fixed_quality_shop_points_20261021'
-QUALITY_SHOP_POINTS_PRICES={'n':200,'r':600,'sr':1500,'ssr':3000,'ur':8000}
+QUALITY_SHOP_POINTS_PRICES={'n':100,'r':500,'sr':1000,'ssr':2500,'ur':5000}
+STACKABLE_POINTS_OFFERS={'video_p103':('lottery_ember_of_legacy','ur'),
+                         'points_welfare_zongzi':('welfare_zongzi','r')}
+FIXED_TICKET_PRICE_POLICY='fixed_ticket_price_20261028'
+TICKET_PRICES={'lottery_ticket_single':300,'special_lottery_ticket_single':600}
 MONTHLY_FIXED_PRICE_POLICY='monthly_fixed_58_20261017'
 MONTHLY_FIXED_AMOUNT_FEN=5800
+
+def fixed_points_price(product):
+    override=STACKABLE_POINTS_OFFERS.get(product['sku'])
+    if override:
+        if (product.get('ownership_id')!=override[0] or product.get('point_quality')!=override[1]
+                or str(product.get('ownership_quantity') or 1)!='1'):
+            raise ValueError('catalog_stackable_points_offer_invalid:'+product['sku'])
+        return 60
+    return QUALITY_SHOP_POINTS_PRICES.get(product.get('point_quality'))
 
 def rows(text):
     result=[]
@@ -53,11 +66,18 @@ def validate_price_policy(product,value,baseline_field,*,scale=1,expected_baseli
         if (product.get('currency')!='shop_points' or product.get('product_type')!='single'
                 or baseline_field!='price_baseline' or scale!=1
                 or quality not in QUALITY_SHOP_POINTS_PRICES
-                or value!=QUALITY_SHOP_POINTS_PRICES.get(quality) or not baseline):
+                or value!=fixed_points_price(product) or not baseline):
             raise ValueError('catalog_fixed_quality_points_price_invalid:'+product['sku'])
         # Historical source/baseline values remain evidence, never operands for
         # applying the earlier one-time half-price migration to this fixed price.
         number(baseline,True,1,100000000)
+        return True
+    if policy==FIXED_TICKET_PRICE_POLICY:
+        if (product['sku'] not in TICKET_PRICES or product.get('product_type')!='single'
+                or baseline_field!='price_baseline_yuan' or scale!=100
+                or value!=TICKET_PRICES.get(product['sku']) or not baseline
+                or number(Decimal(str(baseline))*100,True)!=value):
+            raise ValueError('catalog_fixed_ticket_price_invalid:'+product['sku'])
         return True
     if product['sku']=='archive_pass_monthly' or policy==MONTHLY_FIXED_PRICE_POLICY:
         # The monthly pass is an explicitly approved fixed-price exception.
@@ -142,7 +162,7 @@ def compile_catalog(tables,reference, *, max_products=100):
                     ids=item['effect_ids'].split('|');values=item['effect_values'].split('|')
                     if len(ids)!=len(values):raise ValueError('道具属性配置不匹配: '+target)
                     for field,value in zip(ids,values):add(field,Decimal(value)*amount)
-                elif target in currencies and flag(currencies[target]['enabled']) and currencies[target]['acquisition_policy']=='external_purchase_only':
+                elif target in currencies and flag(currencies[target]['enabled']) and currencies[target]['acquisition_policy'] in ('external_purchase_only','gameplay_and_purchase'):
                     limits[target]=2147483647
                 else:raise ValueError(sku+': 不支持此付费道具或抽奖券 '+target)
                 inventory[target]=inventory.get(target,0)+amount

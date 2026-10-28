@@ -44,9 +44,8 @@ def project(payment, commerce, payment_hash):
     ids = [item["offer_id"] for item in offers]
     if len(ids) != len(set(ids)):
         raise ValueError("public_shop_duplicate_offer")
-    preferred = {"cash:archive_pass_monthly": 0, "cash:special_lottery_ticket_single": 1,
-                 "cash:u_coin_recharge": 2}
-    offers.sort(key=lambda item: preferred.get(item["offer_id"], 3))
+    offers.sort(key=lambda item: (item["price"] / 100 if item["currency"] == "CNY"
+                                 else item["price"], item["offer_id"]))
     data = dict(schema_version=1, checkout_enabled=False, availability="preview_only",
                 source="payment_backend.csv_catalog.build+commerce_bundles.compile_commerce",
                 payment_catalog_sha256=payment_hash,

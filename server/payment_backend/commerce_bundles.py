@@ -92,9 +92,13 @@ def compile_commerce(tables,reference,category_text,*,max_products=200):
     for sku,product in compiled.items():
         # New ember quantities use the inventory-derived combat projection.
         # Keep disabled historical bulk offers intact for immutable receipts.
-        if products[sku]['ownership_id']=='lottery_ember_of_legacy' and flag(products[sku]['enabled']):
+        marker=products[sku]['ownership_id']
+        if marker in ('lottery_ember_of_legacy','welfare_zongzi') and flag(products[sku]['enabled']):
             product['effects'].pop('hero_basic_attack_growth',None)
             product['grants']['effect_labels'].pop('hero_basic_attack_growth',None)
+            product['grants']['lines']=[dict(kind='item',id=marker,
+                quantity=number(products[sku].get('ownership_quantity') or 1,True,1,100),
+                label='薪火余烬' if marker=='lottery_ember_of_legacy' else '粽子')]
     # Validate all roots, including disabled ones; their marker and icon are never
     # exempted from the formal catalog contract.
     markers={}
