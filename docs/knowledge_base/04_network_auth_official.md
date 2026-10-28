@@ -89,6 +89,6 @@ VG／散夜尚无已验收的作者接入、租服或部署接口。啊哈利姆
 
 ## 维护入口与下一轮验收
 
-主要源码：`scripts/vscripts/systems/player_web_auth.lua`、`systems/workshop_entry.lua`、`systems/native_setup_auto_start.lua`、`server/player_web_auth/{service.py,http_api.py}`、`server/lobby_backend/`。领域记录：[原生云链路](../native_arcade_cloud_20261027.md)、[授权说明](../player_web_auth.md)、[独立大厅](../hosted_lobby_20261025.md)。旧说明可能仍保留当时单人／现金关闭的历史段落，当前状态优先看本文与最新 publishing JSON。
+主要源码：`scripts/vscripts/systems/player_web_auth.lua`、`systems/workshop_entry.lua`、`systems/native_setup_auto_start.lua`、`server/player_web_auth/{service.py,http_api.py}`、`server/lobby_backend/`。领域记录：原生云链路（项目来源：`docs/native_arcade_cloud_20261027.md`）、授权说明（项目来源：`docs/player_web_auth.md`）、独立大厅（项目来源：`docs/hosted_lobby_20261025.md`）。旧说明可能仍保留当时单人／现金关闭的历史段落，当前状态优先看本文与最新 publishing JSON。
 
 后续必须单独验证：第二台获取2802→两人同行和布局→错账号／过期／撤销／旧回包→断线重连及后加入→四人跨网长局→稳定云端 Steam 出站。登录、云档、支付分别验收，不以一个总 PASS 掩盖剩余工作。

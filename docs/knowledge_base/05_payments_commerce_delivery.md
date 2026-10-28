@@ -77,4 +77,4 @@ VIP充值进度由delivered触发器写入去重充值credit及累计分，再�
 
 下一轮先让第二台获得正确2802，再验证双方独立账号交易隔离、实际积分成功、扫码小额付款、权威到账、限购与余额刷新、退出重开读回。支付验收需避免重复建单／重复收费；先核对现有待处理单。支付宝precreate历史被拒，当前以page_pay为已配置路线，尚无WS4真实支付宝付款证据。正式开放还需要稳定Steam出站、可信奖励来源、异常单／退款处理、告警、备份恢复和四人长局测试；本地主机禁作弊不构成商业反作弊证明。
 
-依据：[商城接入历史](../payment_shop_20261026.md)、[自有UI历史](../native_shop_qr_20261026.md)、[加入方QR修复](../guest_payment_qr_20261027.md)、[payment helper记录](../../publishing/workshop/payment_helper_20261027.json)、[native2709记录](../../publishing/workshop/native_arcade_cloud_20261027.json)。迁移新项目可复用订单状态机、签名验收、幂等与刷新屏障；不能沿用本项目域名、商户凭据、真实账本、测试身份或付款码。
+依据：商城接入历史（项目来源：`docs/payment_shop_20261026.md`）、自有UI历史（项目来源：`docs/native_shop_qr_20261026.md`）、加入方QR修复（项目来源：`docs/guest_payment_qr_20261027.md`）、payment helper记录（项目来源：`publishing/workshop/payment_helper_20261027.json`）、native2709记录（项目来源：`publishing/workshop/native_arcade_cloud_20261027.json`）。迁移新项目可复用订单状态机、签名验收、幂等与刷新屏障；不能沿用本项目域名、商户凭据、真实账本、测试身份或付款码。

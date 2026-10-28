@@ -25,13 +25,13 @@
     },
     {
       "path": "04_network_auth_official.md",
-      "bytes": 12556,
-      "sha256": "ee13b85cd83547f0ee830986b0a1978025480a7d872019d27e677e94c554f2a0"
+      "bytes": 12619,
+      "sha256": "096e018804cadb93a59171ba7656d985b1d7ad9eb868135611704e4c0184bc0f"
     },
     {
       "path": "05_payments_commerce_delivery.md",
-      "bytes": 13270,
-      "sha256": "7eae113f71c93a28b1ac1c51952a18d7b5a058ce03315665ea0205162f1de2e7"
+      "bytes": 13359,
+      "sha256": "4d76db9cd19f6ca81861150410183de2f8acce83b639e6e56afc1ecfde73be75"
     },
     {
       "path": "06_build_release_ops.md",
@@ -240,8 +240,8 @@
     },
     {
       "path": "tools/verify_knowledge.py",
-      "bytes": 1927,
-      "sha256": "2ab40076b27dccc6538c7d30255ff623e1af7f9d51140b6825f2d0313549e06b"
+      "bytes": 1993,
+      "sha256": "76331e711948f58761439119c684badcc654fa7ce8c9a107c1e440f693c0be7c"
     }
   ]
 }

@@ -25,7 +25,7 @@ for row in manifest['files']:
         for target in re.findall(r'\]\(([^)]+)\)',raw.decode('utf8')):
             target=target.strip('<>').split('#',1)[0]
             if not target or '://' in target or target.startswith('#'):continue
-            if not (p.parent/target).is_file():errors.append('link '+row['path']+' -> '+target)
+            if not (p.parent/target).resolve().is_relative_to(root.resolve()) or not (p.parent/target).is_file():errors.append('link '+row['path']+' -> '+target)
 for file,algo in [('SHA256SUMS.txt','sha256'),('MD5SUMS.md5','md5')]:
     for line in (root/file).read_text(encoding='utf8').splitlines():
         digest,name=line.split('  ',1);p=root/name
