@@ -1,0 +1,148 @@
+{
+  "schema": 1,
+  "kind": "NATIVE_UI_LAYOUT_REPAIR",
+  "status": "LAYOUT2801_UPLOADED_OFFICIAL_DOWNLOAD_VERIFIED_PENDING_NATIVE_LAYOUT_TEST",
+  "workshop_id": "3824360109",
+  "visibility": "unlisted",
+  "release_sequence": 2026102801,
+  "revision": "WS4-NATIVE-CLOUD-04",
+  "content_sha256": "f20c64b00da4e9d9f1a93bd7fca23163aa3f8b203e9ae354de5f60d9a8c75503",
+  "vpk_sha256": "8e7f22eb14bbb757702fcca0267f0dc8ce9d6c1a82a802de0265dcd1f503fa6f",
+  "package_bytes": 3767362491,
+  "package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 274380,
+      "sha256": "8e7f22eb14bbb757702fcca0267f0dc8ce9d6c1a82a802de0265dcd1f503fa6f"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1073605200,
+      "sha256": "f08e7ece61016dc26c27762d956126d6c133fb0e514b2b3eee17d25d5000857b"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1068730788,
+      "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379183,
+      "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 552372940,
+      "sha256": "7383f8f065b0adde28a9a0ad0560419add35d150fcf92f7d6776268b8d3cc1e4"
+    }
+  ],
+  "file_count": 6658,
+  "package_report": "output/ui_layout_20261028/package.json",
+  "package_report_sha256": "fdd18e31dea56098a4ffe949591b3aeb2e5a3905764e6b257f42a11e5a0443ee",
+  "changed_runtime_paths": [
+    "panorama/scripts/custom_game/production_progress.vjs_c"
+  ],
+  "protected_modules_preserved": 180,
+  "review_source_files": 16,
+  "source_sha256": "136ce07fcebc36c7c27ffc428ab05c0d7f63837902f5c7dfdb885b553810cc27",
+  "compiled_sha256": "36dd249135d8c650ea0055023c33e4df2cc7b068a77e7521b32ba82cbac5b4ce",
+  "single_valve_compile_passed": true,
+  "signed": true,
+  "full_runtime_validator_passed": true,
+  "full_view_canonical_guard": "PASS",
+  "qr_fix_preserved": true,
+  "authentication_payment_gameplay_code_preserved": true,
+  "previous_verified_release_sequence": 2026102709,
+  "previous_release_record": "publishing/workshop/native_arcade_cloud_20261027.json",
+  "original_game_102_files_preserved": true,
+  "content_map_preserved_uncommitted": true,
+  "reported_guest_resolution": [
+    2560,
+    1440
+  ],
+  "reported_guest_display_mode": "UNKNOWN",
+  "actual_guest_ui_scale": "UNKNOWN",
+  "layout_regression": {
+    "viewports": 12,
+    "physical_viewport_scale_cases": 72,
+    "selection_switch_cases": 10,
+    "frozen09_negative_control_detects_regression": true,
+    "existing_tooltip_assertion_fails_on_unmodified09": true
+  },
+  "native_guest_layout_acceptance": "NOT_RUN",
+  "workshop_upload_performed": true,
+  "uploaded": true,
+  "download_verified": true,
+  "orders_created_by_agent": 0,
+  "ready_for_public_release": false,
+  "upload_log": "output/ui_layout_20261028/upload.log",
+  "upload_log_sha256": "28a240eac00c9fcfc47aa9562d513f0f0f35bfc71e4b3d0f5f5b8530da4d09dc",
+  "upload": {
+    "status": "SUBMITTED_UNLISTED_PENDING_DOWNLOAD_AND_NATIVE_TEST",
+    "uploaded": true,
+    "workshop_id": "3824360109",
+    "release_sequence": 2026102801,
+    "content_sha256": "f20c64b00da4e9d9f1a93bd7fca23163aa3f8b203e9ae354de5f60d9a8c75503",
+    "updated_at_utc": "2026-10-28T00:13:33.935569+00:00",
+    "legal_agreement_required": false,
+    "log": "output/ui_layout_20261028/upload.log",
+    "log_sha256": "28a240eac00c9fcfc47aa9562d513f0f0f35bfc71e4b3d0f5f5b8530da4d09dc"
+  },
+  "download_manifest": "6288215904920783611",
+  "download_receipt": "output/ui_layout_20261028/download_evidence/20261028T001512Z_2dd45dc3a84a4fae8b225ae313ddf333/verification.json",
+  "download_receipt_sha256": "09ff2163ea73e75fec9437addfe3f0cefaf668d97723a1d7d50a533b737b6d6c",
+  "official_download": {
+    "status": "OFFICIAL_REFRESH_NATIVE_DOWNLOAD_FULLY_VERIFIED",
+    "verified": true,
+    "observed_utc": "2026-10-28T00:15:12.351670+00:00",
+    "workshop_id": "3824360109",
+    "release_sequence": 2026102801,
+    "content_sha256": "f20c64b00da4e9d9f1a93bd7fca23163aa3f8b203e9ae354de5f60d9a8c75503",
+    "vpk_sha256": "8e7f22eb14bbb757702fcca0267f0dc8ce9d6c1a82a802de0265dcd1f503fa6f",
+    "steam_manifest": "6288215904920783611",
+    "manifest_is_string": true,
+    "manifest_source": "fresh_callback_install_acf_bound_to_queries_and_signed_bytes",
+    "signed_resources_verified": 6658,
+    "protected_modules_verified": 180,
+    "package_files_verified": 5,
+    "package_bytes": 3767362491,
+    "subscription_callback": {
+      "callback_id": 1313,
+      "result": 1,
+      "workshop_id": "3824360109",
+      "requested_utc": "2026-10-28T00:14:56.077951+00:00",
+      "received_utc": "2026-10-28T00:14:56.431257+00:00"
+    },
+    "download_callback": {
+      "callback_id": 3406,
+      "app_id": 570,
+      "workshop_id": "3824360109",
+      "result": 1,
+      "requested_utc": "2026-10-28T00:14:56.431342+00:00",
+      "received_utc": "2026-10-28T00:15:00.750655+00:00"
+    },
+    "signature_valid": true,
+    "canonical_journal_unchanged": true,
+    "evidence": "output/ui_layout_20261028/download_evidence/20261028T001512Z_2dd45dc3a84a4fae8b225ae313ddf333/verification.json",
+    "evidence_sha256": "09ff2163ea73e75fec9437addfe3f0cefaf668d97723a1d7d50a533b737b6d6c",
+    "log": "output/ui_layout_20261028/official_download.log",
+    "log_sha256": "37d828a1cb15dcc2eb87bab310e721e4db9fca04a33c4e68c774878f766a88c8",
+    "native_test": "NOT_RUN",
+    "multiplayer_acceptance": "NOT_RUN",
+    "ready_for_public_release": false
+  },
+  "layout_retest_progress": {
+    "status": "WAITING_GUEST_STEAM_UPDATE_COMPLETION",
+    "host_ordinary_arcade_room_created": true,
+    "host_workshop_page_sequence": 2026102801,
+    "party_members_observed": 2,
+    "actual_room_players_last_observed": 1,
+    "guest_report": "Steam shows download progress but repeatedly redownloads",
+    "guest_installation_verified": false,
+    "guest_cause": "UNKNOWN_PENDING_READONLY_DIAGNOSTICS",
+    "native_layout_acceptance": "NOT_RUN",
+    "diagnostic_prompt": "output/ui_layout_20261028/第二台更新排查提示词.txt",
+    "cache_deleted": false,
+    "orders_created": 0
+  }
+}
