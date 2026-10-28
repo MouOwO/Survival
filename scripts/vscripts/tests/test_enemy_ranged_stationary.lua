@@ -80,8 +80,10 @@ local function unit(index,team,x)
     return u
 end
 local wall=unit(1,2,0)
+wall.survival_building_id="wall"
 wall.hull=128
 local wall2=unit(2,2,1000)
+wall2.survival_building_id="wall"
 local function fixture()
     sequence=sequence+1
     -- The native shooter can fire past the center-distance range because of

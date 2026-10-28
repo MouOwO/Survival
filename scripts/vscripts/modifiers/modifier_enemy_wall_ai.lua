@@ -10,6 +10,7 @@ local navigation = require("systems/wall_navigation_service")
 local attack_observer = require("systems/enemy_attack_observer")
 local wall_targets = require("systems/wall_target_service")
 local ranged_stationary = require("systems/enemy_ranged_stationary")
+local wave_attack_rules = require("systems/wave_attack_rules")
 local function shared_death_ready()
     return type(attack_observer.can_route_death)=='function' and type(attack_observer.register_death)=='function'
         and type(attack_observer.bind_death_wall)=='function' and type(attack_observer.unregister_death)=='function'
@@ -100,6 +101,16 @@ function M:ReleaseRangedStationary(reason)
 end
 function M:HandleAttackStart(params,observed_event)
     if not IsServer() or not params or params.attacker~=self:GetParent() then return end
+    local parent = self:GetParent()
+    if params.target and not wave_attack_rules.can_attack(parent, params.target) then
+        -- Native retaliation can replace an explicit wall goal. Cancel only
+        -- this illegal attack; the normal AI resumes its wall/movement order.
+        self:ReleaseRangedStationary("target_changed")
+        parent:SetForceAttackTarget(nil)
+        if parent.Stop then parent:Stop() end
+        self.order_pending = true
+        return
+    end
     if params.target and params.target:entindex()==self.wall_entindex then
         self.last_attack_activity=now()
         self.recovery_delay=3
@@ -161,6 +172,12 @@ function M:OnCreated(params)
     -- callers that still send the former no_unit_collision spawn parameter.
     self.no_unit_collision = false
     if not IsServer() then return end
+    local parent = self:GetParent()
+    if parent.survival_is_wave_monster == true then
+        -- Explicit wall orders still work with native idle acquisition off.
+        if parent.SetIdleAcquire then parent:SetIdleAcquire(false) end
+        if parent.SetAcquisitionRange then parent:SetAcquisitionRange(0) end
+    end
     self:GetParent().survival_wall_contact_owner=self
     self.shared_attack_observer = attack_observer.is_ready() and true or false
     if self.shared_attack_observer then self:GetParent().survival_enemy_attack_owner = self end

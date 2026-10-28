@@ -1,6 +1,6 @@
 c8ff9f20a20b13e963f9d8f923289050  00_START_HERE.md
 fb110b300f7b417755b2f1240e1fd2d0  01_architecture_and_workflow.md
-96d79ced52cf917c633f8a4c249d438e  02_core_gameplay.md
+64e6dff7951fd1e289daa9592653eaf3  02_core_gameplay.md
 dd4586992ef7b73999d66364d616fcd7  03_progression_save_contract.md
 9d576c647659970add48911bde027755  04_network_auth_official.md
 0a5f052b45d7e5ea74170517ce545d36  05_payments_commerce_delivery.md
@@ -44,7 +44,7 @@ bde0039c868a127225d2ef2272f0d1f4  history/20261024/data/source_manifest.json
 7ac3e3ae5d21b4a78ef4b7a4df32dea2  history/20261024/evidence/workshop_entry_release_20261024.public.json
 be822c568a18ae480591c0f99b96b064  history/20261024/README.md
 ef98af27d691c5160519ae2ab7b23e7c  history/README.md
-a282b46cdcc5bee7f046fa95dccc0e5f  MANIFEST.json
+0e7bd9f1091e93c6c815b05c03539ae2  MANIFEST.json
 7f371090900ed781564a860494ae934d  NEW_CHAT_PROMPT.txt
 ea3caf643e5973fd3c27c4a14e1c8f6f  README.md
 af0ee735f9714eca05a9fbc294dbb5b5  tools/verify_knowledge.py

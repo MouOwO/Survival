@@ -1,6 +1,7 @@
 local M = {}
 local tree_damage_rules = require("systems/tree_damage_rules")
 local anti_air_rules = require("systems/anti_air_rules")
+local wave_attack_rules = require("systems/wave_attack_rules")
 local global_rules = require("config/generated/global_rules")
 local armor_balance = require("config/armor_balance")
 local titan_aura_armor = require("systems/commerce_titan_aura_values")
@@ -132,6 +133,15 @@ local function filter(_, keys)
     local transaction_id = record and record.transaction_id or nil
     if record and record.blocked then
         event_bus.emit(events.DAMAGE_BLOCKED, { transaction_id = transaction_id, reason = record.blocked })
+        return false
+    end
+    -- Also reject native retaliation, in-flight projectiles and splash that
+    -- bypass explicit orders. Consume the pending transaction above first.
+    if not wave_attack_rules.can_attack(attacker, victim) then
+        event_bus.emit(events.DAMAGE_BLOCKED, {
+            transaction_id = transaction_id,
+            reason = "wave_requires_wall_target",
+        })
         return false
     end
     local attack_evidence = false

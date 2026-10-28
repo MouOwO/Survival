@@ -3,6 +3,7 @@ local repair_order_service = require("systems/repair_order_service")
 local lumberjack_order_service = require("systems/lumberjack_order_service")
 local destination_validation = require("systems/destination_validation_service")
 local anti_air_rules = require("systems/anti_air_rules")
+local wave_attack_rules = require("systems/wave_attack_rules")
 local player_context = require("systems/player_context_service")
 
 local M = {}
@@ -65,6 +66,7 @@ local function filter(_, keys)
     local target_is_tree = tree_damage_rules.is_tree(target)
     for _, unit in ipairs(units) do
         -- Ownership was already checked for every ordered unit above.
+        if not wave_attack_rules.can_attack(unit, target) then return false end
         local is_tower = tree_damage_rules.is_arrow_tower(unit)
         if target_is_tree
             and not tree_damage_rules.is_allowed_tree_attacker(unit) then
