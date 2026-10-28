@@ -30,7 +30,7 @@ def with_movement_activities(body, model):
         return body
     fields = '\n'.join(f'            "{tag}" "{speed}"' for tag, speed in activities)
     declaration = '\n        "MovementSpeedActivityModifiers"\n        {\n' + fields + '\n        }\n'
-    return body.rstrip()[:-1] + declaration + '    }'
+    return body.rstrip()[:-1].rstrip() + declaration + '    }'
 
 
 def read_table(name):
@@ -190,9 +190,11 @@ def main():
             named = dict(source, archetype_id=identity, display_name=f'波次{wave_number}BOSS')
             if identity in by_id:
                 # Per-wave outfits may intentionally differ from the generic boss.
-                # Preserve those visual columns while refreshing shared combat data.
+                # Preserve visuals and the per-wave audited attack-speed policy
+                # while refreshing shared combat data.
                 for field in ('model_path', 'normal_flying_model_path',
-                              'model_asset_id', 'default_wearable_asset_id'):
+                              'model_asset_id', 'default_wearable_asset_id',
+                              'native_attack_speed_policy'):
                     named[field] = by_id[identity].get(field, named.get(field, ''))
                 by_id[identity].update(named)
             else:
@@ -200,6 +202,11 @@ def main():
                 archetypes[3].append(named)
             row = by_id[identity]
             wave['archetype_id'] = identity
+        # Formal waves share the established 128-unit melee base reach. Apply
+        # this after boss copies so a rebuild cannot restore ranged/long reach
+        # from a shared practice/challenge archetype.
+        row['attack_type'] = 'melee'
+        row['attack_range'] = '128'
         row['unit_name'] = 'npc_survival_wave_named_' + row['archetype_id']
         units[row['unit_name']] = row['display_name']
         models[row['unit_name']] = row['model_path']
@@ -218,12 +225,12 @@ def main():
         body = re.sub(r'("Model"\s*)"[^"]+"', lambda m: m[1] + '"' + models[key] + '"', template)
         body = with_movement_activities(body, models[key])
         row = combat[key]
+        body = re.sub(r'("AttackRange"\s*)"[^"]+"', lambda m: m[1] + '"' + row['attack_range'] + '"', body)
         if row.get('projectile_model') == 'particles/units/heroes/hero_winter_wyvern/winter_wyvern_base_attack.vpcf':
-            body = re.sub(r'("AttackCapabilities"\s*)"[^"]+"', lambda m: m[1] + '"DOTA_UNIT_CAP_RANGED_ATTACK"', body)
-            body = re.sub(r'("AttackRange"\s*)"[^"]+"', lambda m: m[1] + '"' + row['attack_range'] + '"', body)
-            fields = '\n'.join('        "' + name + '" "' + value + '"' for name, value in (
-                ('ProjectileModel', row['projectile_model']), ('ProjectileSpeed', row['projectile_speed']),
-                ('AttackAnimationPoint', '0.25')))
+            # Keep the existing windup timing even when a ranged-looking
+            # model now fights in melee; it no longer needs a projectile.
+            native_fields = [('AttackAnimationPoint', '0.25')]
+            fields = '\n'.join('        "' + name + '" "' + value + '"' for name, value in native_fields)
             body = body.rstrip()[:-1] + fields + '\n    }'
         definitions.append(f'    "{key}"\n    {body}')
     block = '\n'.join([BEGIN] + definitions + [END])

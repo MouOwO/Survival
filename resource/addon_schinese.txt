@@ -4,25 +4,6 @@
     "Tokens"
     {
 // BEGIN GENERATED FORMAL WAVE RANGE ALIASES
-        "npc_survival_range_armored_horned_large" "大型灰黑重甲角兽人"
-        "npc_survival_range_beast_green_large" "大型绿色恶魔/兽类近战怪"
-        "npc_survival_range_boss_blade_demon_wave_name_20" "波次20BOSS"
-        "npc_survival_range_boss_dreadlord_wave_name_10" "波次10BOSS"
-        "npc_survival_range_boss_dreadlord_wave_name_5" "波次5BOSS"
-        "npc_survival_range_boss_twinblade_demon_wave_name_15" "波次15BOSS"
-        "npc_survival_range_boss_twinblade_demon_wave_name_25" "波次25BOSS"
-        "npc_survival_range_boss_twinblade_demon_wave_name_30" "波次30BOSS"
-        "npc_survival_range_demon_purple_melee" "紫红色恶魔近战怪"
-        "npc_survival_range_dwarf_white_rifle" "白发矮人枪兵"
-        "npc_survival_range_golem_gray_large" "大型灰白岩石傀儡"
-        "npc_survival_range_orc_brown_large" "大型棕色獠牙兽人近战怪"
-        "npc_survival_range_orc_large_melee" "大型兽人/巨型近战怪"
-        "npc_survival_range_orc_longnose_large" "大型长鼻兽人近战怪"
-        "npc_survival_range_sea_beast_large" "大型绿色海兽持三叉戟怪"
-        "npc_survival_range_stitcher_large" "大型缝合屠夫怪"
-        "npc_survival_range_stitcher_small" "小型缝合屠夫怪"
-        "npc_survival_range_undead_red_mage_large" "大型红袍持盾亡灵法师"
-        "npc_survival_range_undead_red_mage_small" "小型红袍持盾亡灵法师"
 // END GENERATED FORMAL WAVE RANGE ALIASES
 
         "npc_dota_unit_building_research_lab" "研究所"

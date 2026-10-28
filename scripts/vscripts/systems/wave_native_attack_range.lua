@@ -82,11 +82,13 @@ local function contract(definition)
             or next(definition.passive_skill_ids)~=nil)) then return nil,"unknown_ability_contract" end
     local reach=definition.attack_range==nil and 128 or number(definition.attack_range)
     if not reach or reach<=0 then return nil,"invalid_config_range" end
+    if definition.attack_type~="melee" or reach~=128 then return nil,"not_formal_melee" end
     reach=math.max(0,math.floor(reach))
     local source=c.kv[definition.unit_name]
     if type(source)~="table" or not c.cap.is_bare_creature(definition.unit_name) then return nil,"source_kv_unknown" end
+    if source.AttackCapabilities~="DOTA_UNIT_CAP_MELEE_ATTACK" then return nil,"source_kv_unknown" end
     local alias=c.manifest.schema=="formal_native_range_v1" and c.manifest.roster_count==44
-        and c.manifest.alias_count==19 and c.manifest.by_id[definition.archetype_id]
+        and c.manifest.alias_count==0 and c.manifest.by_id[definition.archetype_id]
     if not alias or alias.source_unit_name~=definition.unit_name or alias.attack_range~=reach then
         return nil,"manifest_unknown"
     end
@@ -114,7 +116,7 @@ function M.prepare_aliases()
             if not accepted then name=nil end
             if name and alias and not ctx.ready[name] and not ctx.pending[name] then
                 alias_count=alias_count+1
-                if alias_count>19 then reject("alias_limit");return false,"alias bound exceeded" end
+                if alias_count>0 then reject("alias_limit");return false,"alias bound exceeded" end
                 if type(PrecacheUnitByNameAsync)~="function" then
                     ctx.failed[name]=true;ctx.counts.precache_failed=ctx.counts.precache_failed+1
                 else
@@ -216,7 +218,7 @@ function M.alias_creation_failed(ticket)
 end
 function M.snapshot()
     local result={enabled=M.enabled(),generation=serial,ready_aliases=0,pending_aliases=0,
-        failed_aliases=0,alias_limit=19,formal_roster_limit=44,actual_native_behavior_verified=false,
+        failed_aliases=0,alias_limit=0,formal_roster_limit=44,actual_native_behavior_verified=false,
         removes_existing_modifiers=false,orders_issued=0,rejections={}}
     if not context then return result end
     for _ in pairs(context.ready) do result.ready_aliases=result.ready_aliases+1 end

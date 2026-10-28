@@ -778,6 +778,8 @@ local function rebuild_waves()
 end
 
 local function apply_stats(unit, row, definition, defer_attack_cap, formal_wave, native_range_ticket)
+    local attack_range = formal_wave and 128 or (definition.attack_range or 128)
+    local ranged = not formal_wave and definition.attack_type == "ranged"
     unit.survival_movement_type = definition.movement_type or "ground"
     unit.survival_movement_type_override = row.movement_type_override
     unit:SetBaseMaxHealth(row.health)
@@ -816,12 +818,12 @@ local function apply_stats(unit, row, definition, defer_attack_cap, formal_wave,
     if formal_wave then
         if not native_range_ticket then
             unit:AddNewModifier(unit, nil, "modifier_survival_hero_attack_range", {
-                attack_range = definition.attack_range or 128,
+                attack_range = attack_range,
             })
         end
-    elseif unit.Script_SetAttackRange then unit:Script_SetAttackRange(definition.attack_range or 128)
-    elseif unit.SetAttackRange then unit:SetAttackRange(definition.attack_range or 128) end
-    if definition.attack_type == "ranged" then
+    elseif unit.Script_SetAttackRange then unit:Script_SetAttackRange(attack_range)
+    elseif unit.SetAttackRange then unit:SetAttackRange(attack_range) end
+    if ranged then
         unit:SetAttackCapability(DOTA_UNIT_CAP_RANGED_ATTACK)
     else
         unit:SetAttackCapability(DOTA_UNIT_CAP_MELEE_ATTACK)
@@ -832,7 +834,7 @@ local function apply_stats(unit, row, definition, defer_attack_cap, formal_wave,
     if unit.SetModel and model_path then unit:SetModel(model_path) end
     if unit.SetOriginalModel and model_path then unit:SetOriginalModel(model_path) end
     if unit.SetAttackCapability then
-        unit:SetAttackCapability(definition.attack_type == "ranged"
+        unit:SetAttackCapability(ranged
             and DOTA_UNIT_CAP_RANGED_ATTACK or DOTA_UNIT_CAP_MELEE_ATTACK)
     end
     -- Default path above is unchanged. Only an explicitly opted-in fresh
@@ -842,7 +844,7 @@ local function apply_stats(unit, row, definition, defer_attack_cap, formal_wave,
         unit.survival_wave_native_base_range = omitted
         if not omitted then
             unit:AddNewModifier(unit, nil, "modifier_survival_hero_attack_range", {
-                attack_range = definition.attack_range or 128,
+                attack_range = attack_range,
             })
         end
     end
@@ -979,6 +981,10 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         wave_number = wave_number,
         model_path = model_path_for(row, definition),
     })
+    -- Visual/native unit setup must not restore a model's ranged attack type.
+    -- All formal waves enter the same melee contact allocator, including
+    -- ranged-looking and flying models; challenge births use their own path.
+    unit:SetAttackCapability(DOTA_UNIT_CAP_MELEE_ATTACK)
     -- Decide after all native/passive/appearance skills are present. Default
     -- callers of apply_stats (including challenges) still install the old cap.
     local omit_attack_cap = not class_ticket and defer_attack_cap and wave_native_attack_cap.can_omit(unit, definition, true)
@@ -1003,21 +1009,18 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
     if native_range_ticket and native_range_ticket.birth_proven then
         local finalized = wave_native_range.finalize(unit, definition, native_range_ticket)
         unit.survival_wave_native_base_range = finalized
-        if not finalized then
-            unit:AddNewModifier(unit, nil, "modifier_survival_hero_attack_range", {
-                attack_range = definition.attack_range or 128,
-            })
-        end
+    end
+    if not unit.survival_wave_native_base_range then
+        -- Reassert the base after appearance setup without changing attack
+        -- speed or the existing additive melee-contact compensation.
+        unit:AddNewModifier(unit, nil, "modifier_survival_hero_attack_range", { attack_range = 128 })
     end
     if native_range_ticket then
         unit.survival_wave_range_source_unit_name = source_definition.unit_name
     end
-    -- Native ranged attackers always chase and need no Lua contact bonus.
-    -- Flying-labelled melee attackers still use ground-navigation contacts.
+    -- Every formal wave is melee and must retain contact-range compensation.
     -- Set this only after final stats/visuals and before modifier declaration.
-    local attack_capability = unit.GetAttackCapability and unit:GetAttackCapability()
-    unit.survival_wave_skip_contact_range_bonus = DOTA_UNIT_CAP_RANGED_ATTACK ~= nil
-        and attack_capability == DOTA_UNIT_CAP_RANGED_ATTACK
+    unit.survival_wave_skip_contact_range_bonus = false
     unit:AddNewModifier(unit, nil, "modifier_enemy_wall_ai", {
         wall_entindex = wall_for_channel(channel),
         wall_target_player_id = channel and channel.player_id or nil,

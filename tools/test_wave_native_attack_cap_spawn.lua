@@ -57,6 +57,7 @@ LoadKeyValues=function(path)
 end
 local events=require("core/events")
 local deps={
+    ["visual/model_scale"]=require("visual/model_scale"),
     ["core/events"]=events,
     ["systems/wave_native_attack_cap"]=dofile(arg[1].."/wave_native_attack_cap.lua"),
     ["core/scheduler"]={cancel=no_op},

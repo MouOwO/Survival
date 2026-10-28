@@ -44,9 +44,9 @@ local function enable(prepare)
     callbacks={}
     if prepare~=false then
         assert(range.prepare_aliases())
-        assert(#callbacks==19,"native_alias_prewarm_not_queued_expected19_arityfailures="..precache_arity_failures)
+        assert(#callbacks==0,"all formal sources already have melee range; no aliases should be precached")
         for _,fn in ipairs(callbacks) do fn() end
-        assert(range.snapshot().ready_aliases==19 and range.snapshot().pending_aliases==0)
+        assert(range.snapshot().ready_aliases==0 and range.snapshot().pending_aliases==0)
     end
 end
 package.loaded["core/team_alignment"]={enforce=no_op}
@@ -118,6 +118,7 @@ local function create(name)
     return u
 end
 local dependencies={
+    ["visual/model_scale"]=require("visual/model_scale"),
     ["core/event_bus"]={emit=no_op},["core/events"]={MONSTER_SPAWNED="spawned"},
     ["core/team_alignment"]={enforce=no_op},["config/generated/monster_archetypes"]=definitions,
     ["config/generated/wave_definitions"]={rows=rows},["config/generated/archive_challenge_rules"]={by_id={default={}}},
@@ -160,7 +161,7 @@ local by_id={};for _,row in ipairs(rows) do if not by_id[row.archetype_id] then 
 local function birth(id)
     local row=assert(by_id[id]);spawn(row,0,row.wave_number,1);return units[#units]
 end
--- Off retains every old modifier/name, including the native-128 ranged source.
+-- Off keeps the normal range modifier on all 44 now-melee source names.
 local old_calls=load_calls
 for identity in pairs(manifest.by_id) do
     local u=birth(identity);assert(u.name==definitions.by_id[identity].unit_name)
@@ -169,16 +170,19 @@ for identity in pairs(manifest.by_id) do
 end
 assert(load_calls==old_calls or load_calls==old_calls+1,"default off read range contract")
 assert(precache_calls==0 and range.snapshot().enabled==false)
--- Pending aliases fall back before spawning, while 25 known originals work.
+-- Every source has the native 128 melee reach; there is no async alias wait.
 enable(false)
 local u=birth("dwarf_white_rifle")
-assert(u.name==definitions.by_id.dwarf_white_rifle.unit_name and u.modifiers.modifier_survival_hero_attack_range)
-assert(range.snapshot().rejections.alias_not_ready==1)
+assert(u.name==definitions.by_id.dwarf_white_rifle.unit_name and not u.modifiers.modifier_survival_hero_attack_range)
+assert(range.snapshot().rejections.alias_not_ready==nil)
 enable()
 local original_count,alias_count=0,0
 for identity,metadata in pairs(manifest.by_id) do
     local source=definitions.by_id[identity];u=birth(identity)
-    assert(u.name==metadata.unit_name and u.survival_wave_native_base_range==true)
+    local reasons={}
+    for reason,count in pairs(range.snapshot().rejections) do reasons[#reasons+1]=reason.."="..count end
+    assert(u.name==metadata.unit_name and u.survival_wave_native_base_range==true,
+        identity.." native proof rejected: "..table.concat(reasons,","))
     assert(not u.modifiers.modifier_survival_hero_attack_range and not u.modifiers.modifier_debug_attack_cap,
         "range alias regressed attack-cap omission")
     assert(u:Script_GetAttackRange()==source.attack_range and source.unit_name==metadata.source_unit_name)
@@ -190,7 +194,7 @@ for identity,metadata in pairs(manifest.by_id) do
     assert(u:Script_GetAttackRange()==source.attack_range+50+(source.attack_type=="melee" and 80 or 0))
     if metadata.alias then alias_count=alias_count+1 else original_count=original_count+1 end
 end
-assert(original_count==25 and alias_count==19 and range.snapshot().omitted==44)
+assert(original_count==44 and alias_count==0 and range.snapshot().omitted==44)
 -- The exact engine-injected inert warp stays accepted; arbitrary hidden
 -- native abilities do not gain a range exemption from their appearance.
 local warp_kv={ID=8873,MaxLevel=1,AbilityType="ABILITY_TYPE_BASIC",
@@ -227,32 +231,31 @@ for _,edit in ipairs({
     assert(range.snapshot().omitted==0)
 end
 enable();edit_visual=function(v) v.range_bonus=100 end;u=birth("dwarf_white_rifle");edit_visual=nil
-assert(u.modifiers.modifier_survival_hero_attack_range and u:Script_GetAttackRange()==700)
+assert(u.modifiers.modifier_survival_hero_attack_range and u:Script_GetAttackRange()==228)
 assert(range.snapshot().birth_proven==1 and range.snapshot().late_fallback==1 and range.snapshot().omitted==0)
 enable();edit_visual=function(v) v.modifiers.unknown_native={} end;u=birth("dwarf_white_rifle");edit_visual=nil
 assert(u.modifiers.modifier_survival_hero_attack_range and range.snapshot().late_fallback==1)
--- Alias creation failure uses one original fallback transaction, no double count.
+-- Retired alias failures cannot affect the now-original-only birth path.
 enable();creation_failure=function(name) return name:match("^npc_survival_range_") end
 local spawned,pending,failed=state.spawned,state.pending,state.failed_spawn
 u=birth("dwarf_white_rifle");creation_failure=nil
 assert(state.spawned==spawned+1 and state.pending==pending-1 and state.failed_spawn==failed)
-assert(attempts[#attempts-1]==manifest.by_id.dwarf_white_rifle.unit_name
-    and attempts[#attempts]==definitions.by_id.dwarf_white_rifle.unit_name)
-assert(u.modifiers.modifier_survival_hero_attack_range and range.snapshot().creation_fallback==1)
+assert(attempts[#attempts]==definitions.by_id.dwarf_white_rifle.unit_name)
+assert(not u.modifiers.modifier_survival_hero_attack_range and range.snapshot().creation_fallback==0)
 enable();creation_failure=function(name) if name:match("^npc_survival_range_") then error("native alias registration missing") end end
 spawned,pending,failed=state.spawned,state.pending,state.failed_spawn
 u=birth("dwarf_white_rifle");creation_failure=nil
 assert(state.spawned==spawned+1 and state.pending==pending-1 and state.failed_spawn==failed)
 assert(u.name==definitions.by_id.dwarf_white_rifle.unit_name)
-assert(u.modifiers.modifier_survival_hero_attack_range and range.snapshot().creation_fallback==1)
--- Corrupt/missing native alias metadata cannot change the selected name.
+assert(not u.modifiers.modifier_survival_hero_attack_range and range.snapshot().creation_fallback==0)
+-- Corrupt/missing native source metadata cannot authorize an exemption.
 local rifle=definitions.by_id.dwarf_white_rifle
 local alias_name=manifest.by_id.dwarf_white_rifle.unit_name
-local original_model=kv[alias_name].Model
-enable();kv[alias_name].Model="foreign.vmdl"
+local original_capability=kv[alias_name].AttackCapabilities
+enable();kv[alias_name].AttackCapabilities="DOTA_UNIT_CAP_RANGED_ATTACK"
 local e,t=range.select_for_formal_spawn(rifle)
-assert(e==rifle and t==nil and range.snapshot().rejections.alias_kv_unknown==1)
-kv[alias_name].Model=original_model
+assert(e==rifle and t==nil and range.snapshot().rejections.source_kv_unknown==1)
+kv[alias_name].AttackCapabilities=original_capability
 local saved_alias=kv[alias_name]
 enable();kv[alias_name]=nil;e,t=range.select_for_formal_spawn(rifle)
 assert(e==rifle and t==nil);kv[alias_name]=saved_alias
@@ -262,8 +265,8 @@ assert(e==rifle and t==nil and range.snapshot().rejections.manifest_unknown==1);
 -- Engine unit precache failure is bounded and never blocks normal spawning.
 local precache=PrecacheUnitByNameAsync
 enable(false);PrecacheUnitByNameAsync=function() error("native unit precache failed") end
-assert(range.prepare_aliases());assert(range.snapshot().failed_aliases==19 and range.snapshot().pending_aliases==0)
-u=birth("dwarf_white_rifle");assert(u.modifiers.modifier_survival_hero_attack_range)
+assert(range.prepare_aliases());assert(range.snapshot().failed_aliases==0 and range.snapshot().pending_aliases==0)
+u=birth("dwarf_white_rifle");assert(not u.modifiers.modifier_survival_hero_attack_range)
 PrecacheUnitByNameAsync=precache
 -- Closed config manifest, reused ticket/unit, shared name and unexpected policy.
 enable();local d=definitions.by_id.humanoid_white_melee
@@ -305,4 +308,4 @@ assert(not challenge.modifiers.modifier_survival_hero_attack_range and challenge
 assert(challenge.survival_wave_native_base_range==nil and range.snapshot().omitted==old_omits)
 range.set_probe_enabled(false)
 assert(precache_arity_failures==0,"native arity failed during actual alias preparation")
-print("WAVE_NATIVE_RANGE_REAL_BIRTH_PASS: 44 actual contracts/25 original+19 aliases; strict native getters, name/cap/ability/mod scope; range/cap/contact/buff/stat parity; alias creation transaction fallback; closed manifest/shared/new sources fallback; stale tickets/world/callbacks; challenge unchanged; native registration/frames UNVERIFIED")
+print("WAVE_NATIVE_RANGE_REAL_BIRTH_PASS: 44 melee originals, zero aliases/precache; strict native getters, name/cap/ability/mod scope; range/cap/contact/buff/stat parity; closed manifest/shared/new sources fallback; stale tickets/world; challenge unchanged; native registration/frames UNVERIFIED")

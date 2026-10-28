@@ -86,14 +86,21 @@ local dependencies = {
     ["systems/monster_navigation_policy"] = require("systems/monster_navigation_policy"),
     ["systems/wave_monster_collision"] = require("systems/wave_monster_collision"),
     ["systems/wave_spawn_sequence"] = require("systems/wave_spawn_sequence"),
+    ["combat/endless_stat_projection"] = require("combat/endless_stat_projection"),
     ["config/monster_visual_config"] = { resolve = function() return { model_path = "cosmetic.vmdl" } end },
     ["systems/monster_visual_service"] = { apply = function(u)
         assert(u.survival_wave_skip_contact_range_bonus == nil)
         u.cosmetic_complete = true
     end },
-    ["systems/monster_hero_visual_service"] = { apply = function(u)
+    ["systems/monster_hero_visual_service"] = { apply = function(u, definition, options)
         assert(u.survival_wave_skip_contact_range_bonus == nil)
         u.hero_visual_complete = true
+        if options and options.formal_wave then
+            -- Some native/model setup can restore its original ranged combat.
+            -- The formal birth must reassert melee reach before AI declaration.
+            u:SetAttackCapability(DOTA_UNIT_CAP_RANGED_ATTACK)
+            u:AddNewModifier(u, nil, "modifier_survival_hero_attack_range", {attack_range=600})
+        end
     end },
     ["systems/monster_hull_scale"] = { apply = function() return true end },
     ["systems/monster_corpse_lifecycle_service"] = { track = noop },
@@ -139,12 +146,18 @@ set_upvalue(spawn, "monster_spawn_marker", marker)
 set_upvalue(spawn, "state", { pending = 9999, spawned = 0, alive = 0 })
 set_upvalue(spawn, "publish", noop)
 local batches, wave15, retained, wave15_melee = 0, 0, 0, 0
-for _, row in ipairs(rows) do
+for _, dataset in ipairs({ rows,
+    require("config/generated/rich_wave_definitions").rows,
+    require("config/generated/recorded_mode_wave_definitions").rows }) do
+local count_wave15 = dataset == rows
+for _, row in ipairs(dataset) do
     if row.enabled ~= false then
         local definition = assert(definitions.by_id[row.archetype_id])
         spawn(row, 0, row.wave_number, 1)
         local u = units[#units]
-        local expected = definition.attack_type == "ranged"
+        local expected = false
+        assert(definition.attack_type == "melee" and definition.attack_range == 128, row.wave_id .. " config")
+        assert(u:GetAttackCapability() == DOTA_UNIT_CAP_MELEE_ATTACK, row.wave_id .. " native capability")
         local m = u.modifiers.modifier_enemy_wall_ai
         assert(u.Script_SetAttackRange == nil and u.SetAttackRange == nil,
             "fixture must match the real missing-setter API")
@@ -154,12 +167,13 @@ for _, row in ipairs(rows) do
         assert(#m.declarations == (expected and 1 or 2), row.wave_id)
         assert(u.cosmetic_complete and u.hero_visual_complete, row.wave_id)
         if not expected then retained = retained + 1 end
-        if row.difficulty_id == "N1" and row.wave_number == 15 then
+        if count_wave15 and row.difficulty_id == "N1" and row.wave_number == 15 then
             if not expected then wave15_melee = wave15_melee + row.monster_count end
             wave15 = wave15 + row.monster_count
         end
         batches = batches + 1
     end
+end
 end
 -- The native base property is readable in the client VM without server fields.
 local configured = units[1].modifiers.modifier_survival_hero_attack_range
@@ -187,23 +201,24 @@ retained_modifier:OnRefresh({attack_range=600})
 assert(contact_unit:Script_GetAttackRange()==625)
 retained_modifier:OnRefresh({attack_range=base})
 contact_unit.range_bonus=0
-assert(batches > 100 and retained > 0 and wave15 == 61 and wave15_melee > 0,
-    "wave15 flying melee must keep contact reach compensation")
+assert(batches == 2246 and retained == batches and wave15 == 61 and wave15_melee == wave15,
+    "every roster and every wave15 unit must use melee contact reach")
 
--- Unknown/missing native capability must not be optimized merely because the
--- configuration says ranged. Movement labels never decide native reach.
+-- New/stale ranged definitions and missing/stale getters cannot opt a formal
+-- birth out of melee contacts. Native/model setup must finish before the guard.
 for _, case in ipairs({
-    { "unknown", false, nil, true },
+    { "unknown", false, nil, false },
     { "ground", true, nil, false },
     { "ground", false, 0, false },
     { "flying", false, DOTA_UNIT_CAP_MELEE_ATTACK, false },
-    { "flying", false, DOTA_UNIT_CAP_RANGED_ATTACK, true },
+    { "flying", false, DOTA_UNIT_CAP_RANGED_ATTACK, false },
 }) do
     definitions.by_id.range_policy_fixture = { unit_name = "fixture", model_path = "fixture.vmdl",
-        movement_type = case[1], attack_type = "ranged" }
+        movement_type = case[1], attack_type = "ranged", attack_range = 900 }
     suppress_capability_getter, capability_override = case[2], case[3]
     spawn({ archetype_id = "range_policy_fixture", health = 100, attack = 1 }, 0, 1, 1)
     local u = units[#units]
+    assert(u.attack_capability == DOTA_UNIT_CAP_MELEE_ATTACK and u:Script_GetAttackRange() == 128)
     assert(u.survival_wave_skip_contact_range_bonus == case[4])
     assert(u.modifiers.modifier_enemy_wall_ai.contact_range_property_enabled == not case[4])
 end
@@ -225,6 +240,25 @@ for _, movement in ipairs({ "ground", "flying" }) do
             "challenge path must not opt into the formal-wave range change")
     end
 end
+-- Audit the actual human-spec composition too: rotations and mode/difficulty
+-- overrides can select a different archetype from the authored wave template.
+local builder = require("systems/wave_difficulty_builder")
+local mode_difficulties = require("config/difficulty_config").rows_by_mode
+local profiles, composed = 0, 0
+for mode_id, options in pairs(mode_difficulties) do
+    for _, option in ipairs(options) do
+        local built, reason = builder.build(rows, option.difficulty_id, mode_id)
+        assert(built, tostring(reason))
+        for _, row in ipairs(built.rows) do
+            local definition = assert(definitions.by_id[row.archetype_id], row.archetype_id)
+            assert(definition.attack_type == "melee" and definition.attack_range == 128,
+                mode_id .. "/" .. option.difficulty_id .. "/" .. row.wave_number)
+            composed = composed + 1
+        end
+        profiles = profiles + 1
+    end
+end
 print("ENEMY_RANGE_SPAWN_POLICY_PASS batches=" .. batches .. " retained=" .. retained
     .. " wave15_units=" .. wave15 .. " wave15_melee=" .. wave15_melee
+    .. " mode_profiles=" .. profiles .. " composed_units=" .. composed
     .. " missing setters: formal native base override, client property, additive buffs/contact; final stats/visuals precede declaration; challenge fallback")

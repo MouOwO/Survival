@@ -38,6 +38,8 @@ for _, row in ipairs(require("config/generated/wave_definitions").rows) do
     if row.enabled ~= false then
         local definition = assert(archetypes.by_id[row.archetype_id], row.wave_id)
         assert(definition.enabled ~= false, row.wave_id .. " has disabled archetype")
+        assert(definition.attack_type == "melee" and definition.attack_range == 128,
+            row.wave_id .. " must use the common melee combat policy")
         local profile = check(row, definition, true, row.wave_id,
             (definition.model_scale or 1) * (row.model_scale_multiplier or 1))
         used_archetypes[row.archetype_id] = true
@@ -95,7 +97,8 @@ for _, member in ipairs(require("config/generated/encounter_members").rows) do
     end
 end
 local function size(values) local n = 0; for _ in pairs(values) do n = n + 1 end; return n end
-assert(counts.wave > 800 and size(used_archetypes) >= 44 and size(behavior) == 4,
+assert(counts.wave > 800 and size(used_archetypes) >= 44 and size(behavior) == 2
+    and behavior["ground/melee"] and behavior["flying/melee"],
     "the shipped formal-wave matrix was not exercised")
 assert(counts.building == 5 and counts.archive >= 20 and counts.endless == 200
     and counts.encounter > 0, "the shipped challenge matrix was not exercised")
