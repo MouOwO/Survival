@@ -4,7 +4,7 @@ fb110b300f7b417755b2f1240e1fd2d0  01_architecture_and_workflow.md
 dd4586992ef7b73999d66364d616fcd7  03_progression_save_contract.md
 9d576c647659970add48911bde027755  04_network_auth_official.md
 0a5f052b45d7e5ea74170517ce545d36  05_payments_commerce_delivery.md
-acb1f5124867617ea7f2cf857da514b1  06_build_release_ops.md
+919f95f7c8208d0351ef799e40630d11  06_build_release_ops.md
 1d30614ce16428f692a00516f06f8bbc  07_decisions_incidents_pending.md
 09cc7762f1f48697dd72117174ab1baf  08_new_project_reuse.md
 e86cb49a9028b56768551c0ce2d2e156  09_session_digest.md
@@ -12,6 +12,9 @@ bb3780deff6573b79c1336d9d4846e4f  10_runtime_engine_contracts.md
 02e917d898f284488194760afea37626  11_completed_work_catalog.md
 c5d539495e5a99a38be32acd29d3b90b  12_sessions_archive_and_recovery.md
 98b3396fbcd73bc51729998c7668c19a  13_art_ui_qa.md
+947a8870ab657036fda67c28334f6f34  MANIFEST.json
+7f371090900ed781564a860494ae934d  NEW_CHAT_PROMPT.txt
+ea3caf643e5973fd3c27c4a14e1c8f6f  README.md
 33fbd1cc38438efb46442edfabdebbc6  data/completed_work_index.json
 91a98c95efe0e3df020a0d7146a59dac  data/context.json
 a2cf6623b3dfa52436def9121e2a2df8  data/repository_files.json
@@ -19,6 +22,7 @@ e00af3d2ab373f106f2e8376fc916516  data/repository_snapshot.json
 c0b201c4a593456542540fe302151ada  data/session_backup_summary.json
 c270354f0ab93987b37d246f8cfc7a87  data/session_inventory_summary.json
 fac77a65ca3f1a9794eb3da23531980f  data/source_manifest.json
+0303586f2dbfaca6593c5ba60b94c52b  evidence/directory_cleanup_20261028.public.json
 fe7d9c44a2ef175aab61bbb32df54b2f  evidence/login_relay_recovery_20261028.public.json
 6343b517e8b058a545957d35b14bd602  evidence/map_resources_20261028.public.json
 5906bc38f6a603b2ec5cfc751b70e0a1  evidence/native_arcade_cloud_20261027.public.json
@@ -34,6 +38,7 @@ f86dcafc4ef630ffc26b5fa65ae8b4ce  history/20261024/06_build_release_ops.md
 2200d5e5ad964d6a32303b4aff2ac34e  history/20261024/08_new_project_reuse.md
 b3e4843d18eb2718a6466bbf0c4503a4  history/20261024/09_session_digest.md
 f471a24e21cd0eba40602c3b67347dec  history/20261024/10_runtime_engine_contracts.md
+be822c568a18ae480591c0f99b96b064  history/20261024/README.md
 e3ccfcd021db06cac28493cec9bbc4db  history/20261024/data/commerce_facts.json
 14218e5fff3dfe84f96589039f3be510  history/20261024/data/context.json
 0c62f4e46c4112b56baee68489cac50c  history/20261024/data/gameplay_facts.json
@@ -42,9 +47,5 @@ e3ccfcd021db06cac28493cec9bbc4db  history/20261024/data/commerce_facts.json
 7ff7363ccf9795cd12bd4bfa286a2b66  history/20261024/data/session_inventory.json
 bde0039c868a127225d2ef2272f0d1f4  history/20261024/data/source_manifest.json
 7ac3e3ae5d21b4a78ef4b7a4df32dea2  history/20261024/evidence/workshop_entry_release_20261024.public.json
-be822c568a18ae480591c0f99b96b064  history/20261024/README.md
 ef98af27d691c5160519ae2ab7b23e7c  history/README.md
-0e7bd9f1091e93c6c815b05c03539ae2  MANIFEST.json
-7f371090900ed781564a860494ae934d  NEW_CHAT_PROMPT.txt
-ea3caf643e5973fd3c27c4a14e1c8f6f  README.md
 af0ee735f9714eca05a9fbc294dbb5b5  tools/verify_knowledge.py

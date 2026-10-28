@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "kind": "PROJECT_DIRECTORY_CLEANUP_ROUND1",
+  "status": "PASS",
+  "before_worktree_bytes": 42852956451,
+  "after_worktree_bytes": 29972285262,
+  "excluded_git_histories_and_links": true,
+  "deleted_files": 13076,
+  "deleted_bytes": 12931497874,
+  "tracked_deleted_files": 13,
+  "categories": {
+    "generated_design_work_cache_author_sources_and_final_packages_preserved": {
+      "files": 1636,
+      "bytes": 990513764
+    },
+    "historical_video_ocr_frames_canonical_balance_data_and_evidence_preserved": {
+      "files": 9642,
+      "bytes": 2857778126
+    },
+    "historical_intermediate_map_exports_current_editable_map_preserved": {
+      "files": 37,
+      "bytes": 6214429659
+    },
+    "generated_browser_preview_copy_original_sources_and_reports_preserved": {
+      "files": 91,
+      "bytes": 84414247
+    },
+    "historical_browser_screenshots_reports_and_native_icon_inputs_preserved": {
+      "files": 1657,
+      "bytes": 2784110231
+    },
+    "retired_st2_gpu_no_live_source_references": {
+      "files": 13,
+      "bytes": 251847
+    }
+  },
+  "archive": "D:\\Survival_清理归档\\20261028_round1\\historical_files.zip",
+  "archive_bytes": 6779550108,
+  "archive_sha256": "b3428441fa10586ba70c6a6efa3fecceafd91ecd0c53f5fe54744f90f8687540",
+  "archive_fully_verified": true,
+  "plan_sha256": "77307b773552dd91288f17872b0e7179d088e3475d57172f9afde5071ee1dc0a",
+  "runtime_before_files": 6680,
+  "runtime_after_files": 6668,
+  "runtime_removed_paths": [
+    "panorama/images/custom_game/st2_localmount/bars/st2_top_resource_360x42_png.vtex_c",
+    "panorama/images/custom_game/st2_localmount/bars/st2_top_wave_520x40_png.vtex_c",
+    "panorama/images/custom_game/st2_localmount/common/st2_shop_button_128x42_png.vtex_c",
+    "panorama/images/custom_game/st2_localmount/hero/st2_level_badge_34x32_png.vtex_c",
+    "panorama/images/custom_game/st2_localmount/hero/st2_portrait_overlay_124x120_png.vtex_c",
+    "panorama/images/custom_game/st2_localmount/hero/st2_stats_frame_238x96_png.vtex_c",
+    "panorama/images/custom_game/st2_localmount/inventory/st2_inventory_panel_180x120_png.vtex_c",
+    "panorama/images/custom_game/st2_localmount/inventory/st2_inventory_slot_54x54_png.vtex_c",
+    "panorama/images/custom_game/st2_localmount/skills/st2_hp_frame_238x18_png.vtex_c",
+    "panorama/images/custom_game/st2_localmount/skills/st2_mp_frame_238x18_png.vtex_c",
+    "panorama/images/custom_game/st2_localmount/skills/st2_skill_panel_320x138_png.vtex_c",
+    "panorama/images/custom_game/st2_localmount/skills/st2_skill_slot_54x54_png.vtex_c",
+    "panorama/styles/custom_game/survival_hud_st2_local.vcss_c"
+  ],
+  "remaining_runtime_dual_hashes_match_except_concurrent_work": true,
+  "concurrent_runtime_changes_preserved": [
+    "scripts/vscripts/combat/damage_filter_service.lua",
+    "scripts/vscripts/modifiers/modifier_enemy_wall_ai.lua",
+    "scripts/vscripts/systems/tree_attack_order_filter.lua",
+    "scripts/vscripts/systems/wave_attack_rules.lua"
+  ],
+  "unchanged_runtime_files_verified": 6664,
+  "original_changes_preserved": 102,
+  "cleanup_tests_passed": 8,
+  "runtime_tests_passed": 21,
+  "runtime_tests_skipped": 1,
+  "native_visual_test": "NOT_RUN",
+  "workshop_upload_performed": false
+}
