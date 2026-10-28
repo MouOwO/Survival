@@ -2,6 +2,7 @@
 package.path = "scripts/vscripts/?.lua;" .. package.path
 local function noop() end
 local created, removed, jobs, listeners = {}, {}, {}, {}
+local stat_writes = 0
 local state = {ok=true,difficulty_id="N1",game_mode="standard"}
 DOTA_TEAM_NEUTRALS=4
 function Vector(x,y,z) return {x=x,y=y,z=z} end
@@ -23,7 +24,10 @@ function CreateUnitByName(name,_,_,_,_,team)
         {"SetMaximumGoldBounty","gold_max"},{"SetDeathXP","xp"},
         {"SetDayTimeVisionRange","day_vision"},{"SetNightTimeVisionRange","night_vision"},
         {"SetAcquisitionRange","acquisition"}}) do
-        local method,key=entry[1],entry[2];body[method]=function(self,value) self[key]=value end
+        local method,key=entry[1],entry[2];body[method]=function(self,value)
+            if method=='SetHealth' then stat_writes=stat_writes+1 end
+            self[key]=value
+        end
     end
     for _,name in ipairs({"SetIdleAcquire","SetModel","SetOriginalModel","SetAbsOrigin","SetForwardVector","Stop"}) do body[name]=noop end
     created[#created+1]=body;return body
@@ -35,14 +39,21 @@ package.loaded['visual/model_scale']={apply=noop}
 package.loaded['core/logger']={warn=function(_,message) error(message) end,info=noop}
 package.loaded['core/scheduler']={cancel=function(key) jobs[key]=nil end,after=function(_,fn,key) jobs[key]=fn end}
 package.loaded['systems/match_setup_service']={public_snapshot=function() return {selected_game_mode=state.game_mode} end}
-package.loaded['core/event_bus']={request=function() return state end,
-    subscribe=function(name,fn) listeners[name]=fn;return name end,
-    unsubscribe=function(name) listeners[name]=nil end,after_dispatch=function(_,fn) fn() end,
-    emit=function() error('Preview must not publish combat/reward events') end}
+package.loaded['core/test_access_policy']={enabled=function() return false end}
+local bus=require('core/event_bus')
+local subscribe,unsubscribe=bus.subscribe,bus.unsubscribe
+bus.subscribe=function(name,fn)
+    local token=subscribe(name,fn);listeners[token]=true;return token
+end
+bus.unsubscribe=function(token) listeners[token]=nil;return unsubscribe(token) end
 local events=require('core/events')
+bus.handle_request(events.WAVE_STATE_GET_REQUEST,function() return state end)
 local profiles=require('config/challenge_combat_profile_config')
 local projection=require('combat/endless_stat_projection')
 local encounters=require('config/generated/monster_encounters')
+if arg and arg[1] then
+    package.loaded['systems/rebirth_scene_display_service']=assert(loadfile(arg[1]))()
+end
 local service=require('systems/rebirth_scene_display_service')
 local started=service.start();assert(started.ok and started.displayed==10)
 local function check()
@@ -50,7 +61,8 @@ local function check()
         local encounter=encounters.by_id[body.survival_encounter_id]
         local expected,reason=profiles.resolve(encounter.encounter_id,state.difficulty_id,state.game_mode)
         assert(expected and not reason)
-        local function same(a,b) assert(math.abs(tonumber(a)-tonumber(b))<=math.max(1,math.abs(b))*1e-12) end
+        local function same(a,b) assert(math.abs(tonumber(a)-tonumber(b))<=math.max(1,math.abs(b))*1e-12,
+            'preview stat does not match '..state.game_mode..state.difficulty_id) end
         same(projection.for_ui(body,body.health,'health'),expected.health)
         same(projection.for_ui(body,body.attack_max,'attack'),expected.attack)
         same(body.survival_war3_armor,expected.war3_armor or expected.armor)
@@ -62,14 +74,32 @@ local function check()
     end end
 end
 check()
+-- Reproduce the menu order: GAME_STARTED happens while N1 is the default.
+-- N15 is selected later, with no second GAME_STARTED event.
 state.game_mode='rich'
+bus.emit(events.GAME_STARTED,{})
+bus.emit(events.WAVE_CHANGED,{game_mode='rich',difficulty_id='N1',reason='mode_selected'})
+check()
+state.difficulty_id='N15'
+bus.emit(events.WAVE_CHANGED,{game_mode='rich',difficulty_id='N15',reason='difficulty_changed'})
+check()
+local first=created[1]
+assert(tonumber(projection.for_ui(first,first.health,'health'))==156937500)
+assert(tonumber(projection.for_ui(first,first.attack_max,'attack'))==14400)
+assert(math.floor(first.survival_war3_armor)==1691)
+assert(first.survival_rebirth_preview_difficulty=='N15' and first.survival_rebirth_preview_mode=='rich')
+local written=stat_writes
+for number=1,100 do
+    bus.emit(events.WAVE_CHANGED,{game_mode='rich',difficulty_id='N15',reason='countdown_tick'})
+end
+assert(stat_writes==written,'Clock/population updates must not rewrite preview stats')
 for number=1,30 do
     state.difficulty_id='N'..number
-    listeners[events.GAME_STARTED]();check()
+    bus.emit(events.WAVE_CHANGED,{game_mode='rich',difficulty_id=state.difficulty_id,reason='difficulty_changed'});check()
 end
 for _,mode in ipairs({'standard','pure','rich','cold'}) do
     state.game_mode=mode;state.difficulty_id=mode=='rich' and 'N30' or mode=='cold' and 'N50' or 'N10'
-    listeners[events.GAME_STARTED]();check()
+    bus.emit(events.WAVE_CHANGED,{game_mode=mode,difficulty_id=state.difficulty_id,reason='difficulty_changed'});check()
 end
 assert(#created==10,'Stat refresh must retain the ten existing models')
 service.hide('encounter_rebirth_01');assert(removed[created[1]])
@@ -85,4 +115,4 @@ local modifier=assert(loadfile('scripts/vscripts/modifiers/modifier_rebirth_scen
 local flags=modifier:CheckState()
 assert(flags[MODIFIER_STATE_UNSELECTABLE]~=true,'Idle rebirth bosses must be selectable')
 for _,name in ipairs({'INVULNERABLE','NO_HEALTH_BAR','NO_UNIT_COLLISION','COMMAND_RESTRICTED','DISARMED','ROOTED'}) do assert(flags[_G['MODIFIER_STATE_'..name]]) end
-print('REBIRTH_SCENE_SELECTION_PASS: ten selectable stat previews; standard/pure/rich/cold; exact large health/attack; armor/speed; no rewards; restore/reset isolation')
+print('REBIRTH_SCENE_SELECTION_PASS: real event bus; N15 selection after GAME_STARTED; user-supplied N15 reference; 100 clock events without rewrites; all rich tiers; standard/pure/cold; restore/reset isolation')

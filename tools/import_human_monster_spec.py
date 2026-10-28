@@ -19,8 +19,7 @@ SHEETS = {'modes': '模式与难度', 'counts': '数量与间隔', 'spawns': '�
           'rebirth_bosses': '转生BOSS', 'special_bosses': '特殊BOSS', 'save_challenges': '存档挑战',
           'void_shadows': '虚空之影', 'overrides': '修正表', 'unlock': '解锁条件',
           'examples': '示例', 'tianzai_combo': '天灾首怪与精英', 'special_rotation': '特殊轮换怪',
-          'special_rotation_stat_overrides': '轮换怪属性修正',
-          'rebirth_mode_adjustments': '转生模式调优'}
+          'special_rotation_stat_overrides': '轮换怪属性修正'}
 
 
 def equal(left, right):
@@ -109,26 +108,6 @@ def rotation_stat_overrides(rows, modes, rotation_modes):
     return result
 
 
-def rebirth_mode_adjustments(rows, modes):
-    """Keep post-baseline tuning scoped to rebirth bosses in one mode."""
-    result = {}
-    for row in rows:
-        assert set(row) == {'模式', '生命倍率', '攻击倍率', '护甲倍率', '说明'}, \
-            'Invalid rebirth adjustment columns'
-        mode = MODE_IDS.get(row['模式'])
-        assert mode in modes, 'Invalid rebirth adjustment mode'
-        assert mode not in result, 'Duplicate rebirth adjustment mode'
-        adjustment = {}
-        for column, field in [('生命倍率', 'health'), ('攻击倍率', 'attack'), ('护甲倍率', 'armor')]:
-            value = row[column]
-            assert type(value) in (int, float) and math.isfinite(value) and value > 0, \
-                f'Invalid rebirth adjustment {field}'
-            adjustment[field] = value
-        assert isinstance(row['说明'], str) and row['说明'].strip(), 'Missing rebirth adjustment note'
-        result[mode] = dict(adjustment, note=row['说明'])
-    return result
-
-
 def load(json_path, workbook_path):
     raw = json.loads(json_path.read_text(encoding='utf-8-sig'))
     workbook = openpyxl.load_workbook(workbook_path, read_only=True, data_only=True)
@@ -178,7 +157,6 @@ def load(json_path, workbook_path):
         'special_rotation_stat_overrides': stat_overrides,
         'rooms': [base(row, '房间') for row in raw['rooms']],
         'rebirth_bosses': [base(row, '转生BOSS') for row in raw['rebirth_bosses']],
-        'rebirth_mode_adjustments': rebirth_mode_adjustments(raw['rebirth_mode_adjustments'], modes),
         'special_bosses': [base(row, 'BOSS') for row in raw['special_bosses']],
         'save_challenges': archive,
         'building_challenges': [{'name': row['技能'], 'fixed_health': row['固定HP'],

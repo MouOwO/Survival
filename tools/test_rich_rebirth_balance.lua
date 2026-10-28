@@ -10,9 +10,9 @@ for mode, difficulties in pairs(rules.data.modes) do
             local id=string.format('encounter_rebirth_%02d',level)
             local first=(level==1 and (mode=='cold' or mode=='scourge')) and 0.5 or 1
             local attack=(mode=='scourge' or mode=='ruins' or mode=='celestial') and (3+number) or (1.8+0.2*number)
-            local hp=source.health*difficulty.challenge_hp_multiplier*first*(mode=='rich' and 5 or 1)
-            local damage=source.attack*attack*(mode=='rich' and 3 or 1)
-            local armor=source.war3_armor*difficulty.challenge_armor_multiplier*first*(mode=='rich' and 2 or 1)
+            local hp=source.health*difficulty.challenge_hp_multiplier*first
+            local damage=source.attack*attack
+            local armor=source.war3_armor*difficulty.challenge_armor_multiplier*first
             local row=assert(profiles.resolve(id,'N'..number,mode))
             close(row.health,hp);close(row.attack,damage);close(row.war3_armor,armor)
             close(row.attack_speed,1/source.attack_interval)
@@ -25,9 +25,12 @@ end
 assert(total==2350)
 -- Literal anchors are independent of both the importer and runtime formula.
 local first=assert(profiles.resolve('encounter_rebirth_01','N1','rich'))
-assert(first.health==2250000 and first.attack==18000 and first.war3_armor==280)
+assert(first.health==450000 and first.attack==6000 and first.war3_armor==140)
+local n15=assert(profiles.resolve('encounter_rebirth_01','N15','rich'))
+assert(n15.health==156937500 and n15.attack==14400 and math.floor(n15.war3_armor)==1691)
+close(n15.war3_armor,1691.69)
 local tenth=assert(profiles.resolve('encounter_rebirth_10','N10','rich'))
-assert(tenth.health==310944684800 and tenth.attack==211130280 and tenth.war3_armor==6120)
+assert(tenth.health==62188936960 and tenth.attack==70376760 and tenth.war3_armor==3060)
 local file=assert(io.open('tools/test_monster_appearance_spawn_paths.lua','rb'))
 local fixture=file:read('*a');file:close()
 local boundary=assert(fixture:find('deps["systems/wave_spawn_routing"]=load_service',1,true))

@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-28",
+  "scope": "development code and current offline Tools match; no Workshop upload",
+  "status": "PASS_NATIVE_N15_PREVIEW_AND_OFFLINE_REGRESSION",
+  "native": {
+    "after": {
+      "armor": 1691.69,
+      "attack": 14400,
+      "health": 156937500
+    },
+    "before": {
+      "armor": 280,
+      "attack": 18000,
+      "health": 2250000
+    },
+    "combat_modules_keep_original_table_references": true,
+    "difficulty": "N15",
+    "mode": "rich",
+    "preview_count": 10
+  },
+  "video_observations": [
+    {
+      "record_id": "N2-REBIRTH-01",
+      "difficulty_id": "N2",
+      "video_time": "04:39.00",
+      "stats": {
+        "health": 750000,
+        "attack": 6600,
+        "war3_armor": 175
+      },
+      "frame": "docs/evidence/rich_n2_n3_20261018/N2-REBIRTH-01.png",
+      "frame_sha256": "ec223b68ff9396e123f2f1275523923e1877be225783a90a8e6a1e84a8236278"
+    },
+    {
+      "record_id": "rich-N4-015",
+      "difficulty_id": "N4",
+      "video_time": "15:10.00",
+      "stats": {
+        "health": 2100000,
+        "attack": 7800,
+        "war3_armor": 315
+      },
+      "frame": "docs/evidence/mode_monsters_20261020/rich-N4-015.png",
+      "frame_sha256": "1aab6493b3e5a4ac25c247ac8671fa9b4010b911f9572a50579f818d7767d772"
+    }
+  ],
+  "n15_reference_source": "user supplied 1.569亿 / 14400 / 1691, not a newly decoded N15 video",
+  "baseline_mode_wave_room_archive_semantics_unchanged": true,
+  "removed_previous_extra_multipliers": {
+    "health": 5,
+    "attack": 3,
+    "armor": 2
+  },
+  "checks": {
+    "formula_profiles": 2350,
+    "production_spawn_cases": 300,
+    "preview_rich_difficulties": 30,
+    "clock_events_without_stat_rewrite": 100,
+    "import_tests": 9,
+    "build_pipeline_tests": 4,
+    "original_production_service_fails_specific_rich_n15_regression": true,
+    "retry_lifecycle_fixture": "test_access_policy disabled only in offline test invocation; no production authentication changes"
+  }
+}

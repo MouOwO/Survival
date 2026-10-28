@@ -17,7 +17,7 @@ local stat_projection = require("combat/endless_stat_projection")
 local M = {}
 local bodies, unavailable, revisions = {}, {}, {}
 local started, generation = false, 0
-local refresh_subscription
+local refresh_subscription, wave_subscription, last_stats_key
 local MODIFIER = "modifier_rebirth_scene_display"
 local PREFIX = "rebirth_scene_restore:"
 
@@ -35,13 +35,18 @@ local function call(unit, method, ...)
     if type(unit[method]) == "function" then unit[method](unit, ...) end
 end
 
-local function apply_preview_stats(body, encounter, archetype)
+local function preview_context()
     local state = event_bus.request(events.WAVE_STATE_GET_REQUEST, {})
     local difficulty = state and state.ok and state.difficulty_id or "N1"
     local mode = state and state.game_mode
         or require("systems/match_setup_service").public_snapshot().selected_game_mode or "standard"
     if not difficulty or difficulty == "" then difficulty = "N1" end
     if mode == "" then mode = "standard" end
+    return difficulty, mode
+end
+
+local function apply_preview_stats(body, encounter, archetype, difficulty, mode)
+    if not difficulty then difficulty, mode = preview_context() end
     local profile, reason = combat_profiles.resolve(encounter.encounter_id, difficulty, mode)
     assert(not reason, reason)
     profile = profile or archetype
@@ -51,6 +56,8 @@ local function apply_preview_stats(body, encounter, archetype)
     body.survival_encounter_id = encounter.encounter_id
     body.survival_display_name = encounter.display_name
     body.survival_level = tonumber(encounter.rebirth_level) or 1
+    body.survival_rebirth_preview_difficulty = difficulty
+    body.survival_rebirth_preview_mode = mode
     body:SetBaseMaxHealth(profile.health)
     body:SetMaxHealth(profile.health)
     body:SetHealth(profile.health)
@@ -152,15 +159,29 @@ local function corpse_delay()
         + 2 * math.max(0.01, value("monster_corpse_update_interval", 0.05))
 end
 
+local function queue_stats_refresh(payload)
+    -- WAVE_CHANGED also publishes the countdown/population clock. Only a
+    -- changed mode/difficulty should rewrite ten idle entities' attributes.
+    if payload and payload.game_mode and payload.difficulty_id
+        and last_stats_key == payload.game_mode .. ":" .. payload.difficulty_id then return end
+    local current_generation = generation
+    event_bus.after_dispatch("rebirth_scene_stats", function()
+        if not started or generation ~= current_generation then return end
+        local difficulty, mode = preview_context()
+        if last_stats_key ~= mode .. ":" .. difficulty then M.refresh_stats() end
+    end)
+end
+
 function M.start()
     if not require("systems/startup_asset_preload_service").snapshot().complete then
         return { ok = false, error = "startup_assets_not_ready" }
     end
     started = true
     if not refresh_subscription then
-        refresh_subscription = event_bus.subscribe(events.GAME_STARTED, function()
-            event_bus.after_dispatch("rebirth_scene_stats", function() if started then M.refresh_stats() end end)
-        end)
+        refresh_subscription = event_bus.subscribe(events.GAME_STARTED, queue_stats_refresh)
+        -- Difficulty is selected after GAME_STARTED in the normal menu flow.
+        -- Read authoritative state once the selection event has committed.
+        wave_subscription = event_bus.subscribe(events.WAVE_CHANGED, queue_stats_refresh)
     end
     local count, failed, failures = 0, 0, {}
     for _, encounter in ipairs(encounters.rows) do
@@ -173,19 +194,26 @@ function M.start()
             end
         end
     end
+    M.refresh_stats()
     logger.info("RebirthScene", string.format("startup displayed=%d failures=%d", count, failed))
     return { ok = next(failures) == nil, displayed = count, failures = failures }
 end
 
 function M.refresh_stats()
+    local difficulty, mode = preview_context()
+    local complete = true
     for id, body in pairs(bodies) do
         local encounter = encounter_for(id)
         local archetype = encounter and archetypes.by_id[encounter.archetype_id]
         if valid(body) and archetype then
-            local ok, reason = pcall(apply_preview_stats, body, encounter, archetype)
-            if not ok then logger.warn("RebirthScene", tostring(id) .. ":" .. tostring(reason)) end
+            local ok, reason = pcall(apply_preview_stats, body, encounter, archetype, difficulty, mode)
+            if not ok then
+                complete = false
+                logger.warn("RebirthScene", tostring(id) .. ":" .. tostring(reason))
+            end
         end
     end
+    if complete then last_stats_key = mode .. ":" .. difficulty end
 end
 
 function M.hide(id)
@@ -215,6 +243,8 @@ end
 function M.reset()
     started = false
     if refresh_subscription then event_bus.unsubscribe(refresh_subscription); refresh_subscription = nil end
+    if wave_subscription then event_bus.unsubscribe(wave_subscription); wave_subscription = nil end
+    last_stats_key = nil
     generation = generation + 1
     for id in pairs(revisions) do scheduler.cancel(PREFIX .. id) end
     local ids = {}

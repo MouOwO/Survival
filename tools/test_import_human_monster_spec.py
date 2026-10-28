@@ -36,29 +36,6 @@ class HumanMonsterImportTests(unittest.TestCase):
         self.assertEqual(result['waves'][8]['health'], 4123.5)
         self.assertEqual(result['special_rotation'][8][0]['health'], 1105)
 
-    def test_rebirth_tuning_requires_matching_sources(self):
-        self.assertEqual({key: self.data['rebirth_mode_adjustments']['rich'][key]
-                          for key in ('health', 'attack', 'armor')},
-                         dict(health=5, attack=3, armor=2))
-        raw = json.loads(self.json_path.read_text(encoding='utf-8-sig'))
-        raw['rebirth_mode_adjustments'][0]['生命倍率'] = 6
-        with tempfile.TemporaryDirectory() as folder:
-            destination = Path(folder) / 'human.json'
-            destination.write_text(json.dumps(raw, ensure_ascii=False), encoding='utf-8')
-            with self.assertRaisesRegex(AssertionError, 'Conflicting sources: 转生模式调优'):
-                importer.load(destination, self.xlsx_path)
-
-    def test_rebirth_tuning_rejects_ambiguous_or_invalid_rules(self):
-        raw = json.loads(self.json_path.read_text(encoding='utf-8-sig'))
-        row = raw['rebirth_mode_adjustments'][0]
-        for field, value in [('模式', '未知'), ('生命倍率', 0), ('攻击倍率', -1),
-                             ('护甲倍率', True), ('生命倍率', float('inf')),
-                             ('攻击倍率', '3'), ('说明', '')]:
-            with self.subTest(field=field, value=value), self.assertRaises(AssertionError):
-                importer.rebirth_mode_adjustments([{**row, field: value}], self.data['modes'])
-        with self.assertRaisesRegex(AssertionError, 'Duplicate rebirth adjustment'):
-            importer.rebirth_mode_adjustments([row, row], self.data['modes'])
-
     def test_different_json_version_is_rejected(self):
         raw = json.loads(self.json_path.read_text(encoding='utf-8-sig'))
         raw['modes'][0]['HP倍率'] = 999

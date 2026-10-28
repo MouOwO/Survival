@@ -1,6 +1,6 @@
-cbfa465b7a21957cc27ee2d9f67ae9b7  00_START_HERE.md
+5a6a09acb6e73975d5a32f932788c083  00_START_HERE.md
 fb110b300f7b417755b2f1240e1fd2d0  01_architecture_and_workflow.md
-ffbc70fcf91ba3672b6b371d57059d70  02_core_gameplay.md
+31da2190e3f495a853e9f12effd23c93  02_core_gameplay.md
 dd4586992ef7b73999d66364d616fcd7  03_progression_save_contract.md
 9d576c647659970add48911bde027755  04_network_auth_official.md
 4177c2c25d4f67763a71f50d9a967147  05_payments_commerce_delivery.md
@@ -12,7 +12,7 @@ bb3780deff6573b79c1336d9d4846e4f  10_runtime_engine_contracts.md
 02e917d898f284488194760afea37626  11_completed_work_catalog.md
 c5d539495e5a99a38be32acd29d3b90b  12_sessions_archive_and_recovery.md
 a8d0efad32f84d2ed65fb22821d8fd46  13_art_ui_qa.md
-4cfdfcced0c3da96ce1ef830eb2db105  MANIFEST.json
+13252091eebc72d8c43678075040e4fa  MANIFEST.json
 7f371090900ed781564a860494ae934d  NEW_CHAT_PROMPT.txt
 ea3caf643e5973fd3c27c4a14e1c8f6f  README.md
 33fbd1cc38438efb46442edfabdebbc6  data/completed_work_index.json
@@ -52,4 +52,5 @@ af0ee735f9714eca05a9fbc294dbb5b5  tools/verify_knowledge.py
 da968ec106f304daefb80924924a2f24  evidence/commerce_prices_20261028.md
 fe736a70e5066f94b0f4630e83e2ed7d  evidence/tooltip_follow_20261028.md
 cb8fc4604e1551df608b4aa4d4895e3b  evidence/rebirth_selection_20261028.md
-4ae7afff35ea905ad7214dd48e1d7036  evidence/rich_rebirth_balance_20261028.md
+3d8a69fef0f476d9e593a17bb121cc6d  evidence/rich_rebirth_balance_20261028.md
+86034733dd60d08c7744b934da3dcbdc  evidence/rebirth_n15_preview_20261028.md
