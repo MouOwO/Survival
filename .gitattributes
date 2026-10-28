@@ -166,3 +166,6 @@ scripts/vscripts/systems/native_setup_auto_start.lua text eol=lf
 tools/native_arcade_cloud_20261027/*.py text eol=lf
 tools/native_arcade_cloud_20261027/*.lua text eol=lf
 panorama/src/scripts/custom_game/native_transport_probe.js text eol=crlf
+
+# Knowledge manifests hash UTF-8 LF bytes across Windows checkouts.
+docs/knowledge_base/** text eol=lf

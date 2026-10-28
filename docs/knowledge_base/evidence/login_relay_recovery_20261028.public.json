@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "observed_at": "2026-10-28T15:49:09+08:00",
+  "kind": "STEAM_LOGIN_RELAY_RECOVERY",
+  "status": "OFFICIAL_VERIFICATION_TRANSPORT_RESTORED_PLAYER_RETRY_REQUIRED",
+  "reported_error": "steam_verification_unavailable",
+  "before": {
+    "web_business_database_nginx_running": true,
+    "public_health_http": 200,
+    "loopback_health_http": 200,
+    "cloud_relay_enabled": true,
+    "cloud_loopback_listener_present": false,
+    "recorded_local_relay_process_exists": false,
+    "production_steam_check_error": "steam_verification_unavailable",
+    "probe_seconds": 0.01
+  },
+  "action": {
+    "tool": "tools/workshop_test/steam_tls_relay.py",
+    "steps": ["--stop", "--start"],
+    "stale_receipt_safely_retired": true,
+    "existing_fixed_destination_restored": true,
+    "cloud_configuration_changed": false,
+    "cloud_services_restarted": false,
+    "authentication_rules_changed": false,
+    "user_credentials_or_assertions_used": false,
+    "account_or_save_data_changed": false
+  },
+  "after": {
+    "cloud_loopback_listener_present": true,
+    "production_steam_check_transport_ok": true,
+    "official_invalid_dummy_assertion_rejected": true,
+    "probe_seconds": 0.74,
+    "public_health_http": 200,
+    "loopback_health_http": 200,
+    "cloud_service_pids_unchanged": true,
+    "official_tls_certificate_validation_preserved": true,
+    "real_player_login_confirmed": false
+  },
+  "remaining": [
+    "Player must start a fresh Steam login from the game's authorization page; the old callback preserves its first failure.",
+    "The relay still depends on this PC and its network remaining online.",
+    "The original relay process exit cause is unknown; no automatic recovery was installed.",
+    "Package cleanup was paused before any resource deletion or new publication."
+  ]
+}

@@ -25,8 +25,8 @@
     },
     {
       "path": "04_network_auth_official.md",
-      "bytes": 12619,
-      "sha256": "096e018804cadb93a59171ba7656d985b1d7ad9eb868135611704e4c0184bc0f"
+      "bytes": 13797,
+      "sha256": "7f458102db46b02770249e5928b1ec9f20b02580668c8f22f1710455ffd2950a"
     },
     {
       "path": "05_payments_commerce_delivery.md",
@@ -107,6 +107,11 @@
       "path": "data/source_manifest.json",
       "bytes": 31769,
       "sha256": "dd22616e57ab56e16490fd3fe910bc57f394da64ef3b2545965850c53ea1b02e"
+    },
+    {
+      "path": "evidence/login_relay_recovery_20261028.public.json",
+      "bytes": 1810,
+      "sha256": "30cfd2a0304da53e3a2fd95f72b1c269e97520a5ded629caea796b82c02e6d04"
     },
     {
       "path": "evidence/map_resources_20261028.public.json",
