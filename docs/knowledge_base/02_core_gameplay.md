@@ -75,6 +75,8 @@
 
 转生按挑战有效奖励依序推进；二至四转三选一，排除已有/满级，单次候选去重，公共技能容量10。开局建造者与 BOSS 肉鸽池分开按玩家维护，未选或重抽不等于永久移出池；效果需完整生命周期。十转年轮圣殿当前入场5万金币、持续每秒5万，15倍只作用于指定攻击/属性成长收益；暗影界仍只有传送，怪物和掉落未启用。个人房间 marker 优先，但仍有旧共享点回退，不能宣称所有地图都物理隔离。
 
+2026-10-28 转生展示修复：场上10个待挑战模型沿用只读展示实体，取消 `modifier_rebirth_scene_display` 的UNSELECTABLE；仍无敌、静止、禁攻击/命令、无碰撞/经验/金币/挑战奖励。`rebirth_scene_display_service` 用同一 `challenge_combat_profile_config.resolve` 和大数投影设置生命/攻击/护甲/攻速，按当前模式难度取值，并在GAME_STARTED后刷新，不另造预览倍率。正式挑战仍由原spawn/service负责，开打隐藏展示，结束后按尸体时限恢复。2803仅发布这两份Lua，未夹带之前尚未发布的商城、悬停UI和波次改动；10个原生实体属性核对通过，完整候选游廊点选及双人挑战未验。见[转生修复记录](evidence/rebirth_selection_20261028.md)。
+
 入口：`systems/hero_summon_system.lua`、`systems/content_inventory_service.lua`、`systems/inventory_transaction_service.lua`、`systems/weapon_synthesis_service.lua`、`systems/equipment_instance_service.lua`、`systems/equipment_stat_aggregation_service.lua`、`systems/training_room_service.lua`、`systems/player_room_locations.lua`，以及英雄/物品/挑战类 CSV。
 
 ## 7. 波次、红翼修正、败退与终局

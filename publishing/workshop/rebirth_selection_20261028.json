@@ -1,0 +1,224 @@
+{
+  "schema": 1,
+  "revision": "WS4-REBIRTH-INSPECT-01",
+  "release_sequence": 2026102803,
+  "workshop_id": "3824360109",
+  "status": "REBIRTH2803_UPLOADED_DOWNLOAD_PENDING_DOTA_EXIT",
+  "package": {
+    "schema": 1,
+    "status": "BUILT_SIGNED_REBIRTH_SELECTION_REQUIRES_NATIVE_SMOKE",
+    "revision": "WS4-REBIRTH-INSPECT-01",
+    "dry_run": false,
+    "release_sequence": 2026102803,
+    "content_sha256": "7d39ab251f4c8f20d8338a49a8335b0447c0e4e8f6a196978312b40f8981ab96",
+    "files": 6658,
+    "base_release_sequence": 2026102802,
+    "base_content_sha256": "310aad0a33116f29304d9ea7251524b4c1721bd5fb2b7952610d63cca2ac09d5",
+    "base_package_report_sha256": "4b701bce2b41d30ffe4bc5d3628dd44180778e52d70085b58ea7bde801c6a368",
+    "base_official_download_sha256": "5babf60a6c7c06bd3867dfb45f9defae57d477ac3728bedea66394ab03f3b948",
+    "candidate": "D:\\Survival_发布候选\\20261028_ws4_rebirth_selection_v01_view",
+    "overlay": "D:\\Survival_发布候选\\20261028_ws4_rebirth_selection_v01_overlay",
+    "trusted_source": "D:\\Survival_发布候选\\20261028_ws4_rebirth_selection_v01_overlay_trusted_source",
+    "output": "D:\\Survival_工坊输出\\20261028_ws4_rebirth_selection_v01\\3824360109.vpk",
+    "changed_runtime_paths": [
+      "scripts/vscripts/modifiers/modifier_rebirth_scene_display.lua",
+      "scripts/vscripts/systems/rebirth_scene_display_service.lua"
+    ],
+    "added_runtime_paths": [],
+    "deleted_runtime_paths": [],
+    "protected_modules_preserved": 180,
+    "protected_modules_rebuilt": 0,
+    "trusted_review_files": 16,
+    "authentication_payment_code_preserved": true,
+    "maps_and_panorama_preserved": true,
+    "payload_changed": false,
+    "full_input_hash_verification": true,
+    "payload_bytes": 3767090402,
+    "rebuilt_archives": [
+      0
+    ],
+    "reused_archives": [
+      1,
+      2,
+      3
+    ],
+    "archive_migrations": [],
+    "container_bytes": 3767364782,
+    "disk_preflight": [
+      {
+        "root": "D:\\",
+        "required_bytes": 1360231127,
+        "free_bytes": 62106214400,
+        "reserve_bytes": 268435456
+      }
+    ],
+    "workshop_upload_performed": false,
+    "native_test": "NOT_RUN",
+    "ready_for_upload": false,
+    "signature_valid": true,
+    "trusted_key_id": "77075eac0032a300aca694059dc47e93",
+    "package_files": [
+      {
+        "name": "3824360109.vpk",
+        "bytes": 274380,
+        "sha256": "c293d9335610df50417f3f06b86e14e9f576cee4993892c166054b7b9ef78a2e"
+      },
+      {
+        "name": "3824360109_000.vpk",
+        "bytes": 1073607491,
+        "sha256": "70344a5334d9e3f396dfe90646018bdf14e11a48625f8f4ff0dd127fa645c5b6"
+      },
+      {
+        "name": "3824360109_001.vpk",
+        "bytes": 1068730788,
+        "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+      },
+      {
+        "name": "3824360109_002.vpk",
+        "bytes": 1072379183,
+        "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+      },
+      {
+        "name": "3824360109_003.vpk",
+        "bytes": 552372940,
+        "sha256": "7383f8f065b0adde28a9a0ad0560419add35d150fcf92f7d6776268b8d3cc1e4"
+      }
+    ],
+    "vpk_sha256": "c293d9335610df50417f3f06b86e14e9f576cee4993892c166054b7b9ef78a2e",
+    "verification": {
+      "vpk_version": 2,
+      "files": 6658,
+      "payload_bytes": 3767090402,
+      "archive_count": 4,
+      "crc32_verified": true,
+      "manifest_dual_hashes_verified": true,
+      "section_md5s_verified": true,
+      "whole_vpk_md5_verified": true
+    },
+    "full_runtime_validator_passed": true,
+    "full_view_canonical_guard": "PASS",
+    "immutable_base_unchanged": true
+  },
+  "native_smoke": {
+    "status": "PASS_NATIVE_PREVIEW_ENTITIES",
+    "map": "template_map",
+    "tools": true,
+    "units_verified": 10,
+    "runtime_process_id": 18404,
+    "vconsole_port": 29008,
+    "reviewed_lua_matches_signed_candidate": true,
+    "full_signed_candidate_native_acceptance": "NOT_COMPLETED",
+    "native_scope": "existing offline Tools world; read-only entity states and stats",
+    "profile_or_payment_writes_performed": false,
+    "previews": [
+      {
+        "armor": 340,
+        "attack": "37040400",
+        "attack_speed": 2.5,
+        "health": "840391039.99999988",
+        "id": "encounter_rebirth_10",
+        "invulnerable": true,
+        "name": "挑战10转",
+        "selectable": true
+      },
+      {
+        "armor": 310,
+        "attack": "25040400",
+        "attack_speed": 2.5,
+        "health": "440391040",
+        "id": "encounter_rebirth_09",
+        "invulnerable": true,
+        "name": "挑战9转",
+        "selectable": true
+      },
+      {
+        "armor": 280,
+        "attack": "15040400",
+        "attack_speed": 2.5,
+        "health": "320391040",
+        "id": "encounter_rebirth_08",
+        "invulnerable": true,
+        "name": "挑战8转",
+        "selectable": true
+      },
+      {
+        "armor": 250,
+        "attack": "5040400",
+        "attack_speed": 2.5,
+        "health": "160391040",
+        "id": "encounter_rebirth_07",
+        "invulnerable": true,
+        "name": "挑战7转",
+        "selectable": true
+      },
+      {
+        "armor": 220,
+        "attack": "2000000",
+        "attack_speed": 2.5,
+        "health": "80391040",
+        "id": "encounter_rebirth_06",
+        "invulnerable": true,
+        "name": "挑战6转",
+        "selectable": true
+      },
+      {
+        "armor": 190,
+        "attack": "770400",
+        "attack_speed": 2.5,
+        "health": "40391040",
+        "id": "encounter_rebirth_05",
+        "invulnerable": true,
+        "name": "挑战5转",
+        "selectable": true
+      },
+      {
+        "armor": 160,
+        "attack": "319200",
+        "attack_speed": 2.5,
+        "health": "20209920",
+        "id": "encounter_rebirth_04",
+        "invulnerable": true,
+        "name": "挑战4转",
+        "selectable": true
+      },
+      {
+        "armor": 130,
+        "attack": "98000",
+        "attack_speed": 2.5,
+        "health": "6566400",
+        "id": "encounter_rebirth_03",
+        "invulnerable": true,
+        "name": "挑战3转",
+        "selectable": true
+      },
+      {
+        "armor": 100,
+        "attack": "30000",
+        "attack_speed": 1,
+        "health": "1004800",
+        "id": "encounter_rebirth_02",
+        "invulnerable": true,
+        "name": "挑战2转",
+        "selectable": true
+      },
+      {
+        "armor": 70,
+        "attack": "6000",
+        "attack_speed": 1.6666666269302,
+        "health": "300000",
+        "id": "encounter_rebirth_01",
+        "invulnerable": true,
+        "name": "挑战1转",
+        "selectable": true
+      }
+    ]
+  },
+  "native_smoke_sha256": "5122b256d98e7e59f8f6eaa77589604a7d08bf55188c19cb702ddc11e498cb9d",
+  "uploaded": true,
+  "download_verified": false,
+  "ready_for_public_release": false,
+  "scope": "Only rebirth preview modifier and service; previous unreleased commerce/UI/wave changes excluded",
+  "workshop_upload_performed": true,
+  "upload_log": "output/rebirth_selection_20261028/upload.log",
+  "upload_log_sha256": "1a1ef219fb15e73709cbdea2c2f00b20294f379747c795f75d8b6351223a5070"
+}

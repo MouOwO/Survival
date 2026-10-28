@@ -1,6 +1,6 @@
 # 06｜构建、签名、工坊分发与恢复
 
-事实截点：2026-10-28。当前原不公开列出条目 `3824360109` 最新发行是 `2026102802 / WS4-MAP-RESOURCES-01`，已上传、作者账号官方完整下载校验通过，主机从普通原游廊载入地图通过；两人布局、客机更新和完整玩法仍未验收。旧10/24的 `WS4-ENTRY-05` 是历史，不再是当前发行。
+事实截点：2026-10-28。当前原不公开列出条目 `3824360109` 最新上传是 `2026102803 / WS4-REBIRTH-INSPECT-01`，仅替换两份转生展示Lua；现有离线Tools中10个展示怪状态/属性核对通过。2803官方完整下载要求先关闭Dota，当前离线测试对局仍在运行，等待用户确认后继续；没有2803安装manifest或游廊点选验收。2802的官方完整下载和主机载图通过仍属于2802历史，不能推广为2803验收。
 
 ## 五种身份分开记录
 
@@ -20,6 +20,7 @@ Git push 不发布游廊；上传成功不证明下载成功；下载成功不�
 | 2709 `WS4-NATIVE-CLOUD-03` | 只替换 `payment_test.vjs_c` | 6658／3767362385 | `3869894305253699960` | 官方全量PASS，原房间2人，加入方手机识码及商品金额PASS；未付款 |
 | 2801 `WS4-NATIVE-CLOUD-04` | 只替换 `production_progress.vjs_c` | 6658／3767362491 | `6288215904920783611` | 官方全量PASS；客机训练队列布局回归未完成 |
 | 2802 `WS4-MAP-RESOURCES-01` | 只替换 `maps/template_map.vpk` | 6658／3767361725 | `2226754158672105621` | 官方全量PASS，主机普通原游廊载图PASS；两机／完整玩法未测 |
+| 2803 `WS4-REBIRTH-INSPECT-01` | 只替换转生展示modifier与service | 6658／3767364782 | 待关闭Dota后官方校验 | 原生10个展示实体状态/属性PASS，两份Lua与候选相同；完整候选游廊点选/两人挑战未测 |
 
 三份最新领域记录为 `publishing/workshop/native_arcade_cloud_20261027.json`、`ui_layout_20261028.json`、`map_resources_20261028.json`；当前入口总状态为 `test_listing.json`。2802继承QR和布局字节，不自动继承新版双人／支付验收。`ready_for_public_release=false`。
 
@@ -28,6 +29,7 @@ Git push 不发布游廊；上传成功不证明下载成功；下载成功不�
 | 2709 | `1262cbe5905d760c6c15400e4051038613c6a78bffb99b64d9d2d5d609d3cf40` | `b09f36be87db6dc3c8f055e06a9c18438236437d0167c7634effba6707b37278` | `041b7b4fd90500ef15e48e7fa475731455cafbe8da132499d38d6e520004fff8` |
 | 2801 | `f20c64b00da4e9d9f1a93bd7fca23163aa3f8b203e9ae354de5f60d9a8c75503` | `8e7f22eb14bbb757702fcca0267f0dc8ce9d6c1a82a802de0265dcd1f503fa6f` | `fdd18e31dea56098a4ffe949591b3aeb2e5a3905764e6b257f42a11e5a0443ee` |
 | 2802 | `310aad0a33116f29304d9ea7251524b4c1721bd5fb2b7952610d63cca2ac09d5` | `b3dbe2351798561cd8d585449a7e304822d62f0706689527285c7f41658359f8` | `4b701bce2b41d30ffe4bc5d3628dd44180778e52d70085b58ea7bde801c6a368` |
+| 2803 | `7d39ab251f4c8f20d8338a49a8335b0447c0e4e8f6a196978312b40f8981ab96` | `c293d9335610df50417f3f06b86e14e9f576cee4993892c166054b7b9ef78a2e` | `a9492685a24d871dc003a02bf08b2145952f7171409e3bc7088b44c5b21c2320` |
 
 2802官方完整下载回执原始SHA256：`5babf60a6c7c06bd3867dfb45f9defae57d477ac3728bedea66394ab03f3b948`。原路径为 `output/map_resources_20261028/download_evidence/20261028T010453Z_f4ad7619af99475c859dad247cb377d3/verification.json`。路径仅作证据索引，不能因文件名存在就认定证据内容有效；恢复后的文件仍须核对记录摘要。
 

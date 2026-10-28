@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 3251,
-      "sha256": "8503d8a5d5ae086a09cbc7539c8a93ae09865925926e13a1fd62ae232dd27c30"
+      "bytes": 3501,
+      "sha256": "2cb1e992e5aa800cfdbe183a87e874c975d2185c9cdeb8986e4b8c28ca51171f"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -15,8 +15,8 @@
     },
     {
       "path": "02_core_gameplay.md",
-      "bytes": 15713,
-      "sha256": "5f0a94542163d1ccaaedf80d29cca2ec9e36d6aa022417f041961d573ab594de"
+      "bytes": 16498,
+      "sha256": "9542bd62029b6954d23bec3775923e5ec95c3e88caf27560132077aad078cec8"
     },
     {
       "path": "03_progression_save_contract.md",
@@ -35,8 +35,8 @@
     },
     {
       "path": "06_build_release_ops.md",
-      "bytes": 14687,
-      "sha256": "aa62cadb07a401de84220c4bdfd50a30a3b1cf664fd4b54ae9c3cf54e83f1789"
+      "bytes": 15278,
+      "sha256": "6bebb30f51f0acbb2118ad94ca14521db9fa2443cb386e238ea5db3a529080f4"
     },
     {
       "path": "07_decisions_incidents_pending.md",
@@ -70,8 +70,8 @@
     },
     {
       "path": "13_art_ui_qa.md",
-      "bytes": 3337,
-      "sha256": "2a3049c5be3f34ab328340151c2326b1af5d2d495776bb0437afcc579cec4807"
+      "bytes": 3765,
+      "sha256": "586ae9e7bccdafc3f244eaab3801ba6665ca7028095bfa3f006b1ae605891966"
     },
     {
       "path": "NEW_CHAT_PROMPT.txt",
@@ -262,6 +262,11 @@
       "path": "evidence/tooltip_follow_20261028.md",
       "bytes": 3321,
       "sha256": "ccdbf9e15416596d9a7cefd22d380cdc89628cff9f342983ee373d4ce77b6d51"
+    },
+    {
+      "path": "evidence/rebirth_selection_20261028.md",
+      "bytes": 2895,
+      "sha256": "287f5bf1a704d78dc8e30f1f4dc5bda4eb43e60100063d99bbe21789340c42ab"
     }
   ]
 }

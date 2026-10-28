@@ -8,10 +8,16 @@ local visuals = require("systems/monster_hero_visual_service")
 local scheduler = require("core/scheduler")
 local logger = require("core/logger")
 local model_scale = require("visual/model_scale")
+local event_bus = require("core/event_bus")
+local events = require("core/events")
+local combat_profiles = require("config/challenge_combat_profile_config")
+local armor_balance = require("config/armor_balance")
+local stat_projection = require("combat/endless_stat_projection")
 
 local M = {}
 local bodies, unavailable, revisions = {}, {}, {}
 local started, generation = false, 0
+local refresh_subscription
 local MODIFIER = "modifier_rebirth_scene_display"
 local PREFIX = "rebirth_scene_restore:"
 
@@ -27,6 +33,36 @@ end
 
 local function call(unit, method, ...)
     if type(unit[method]) == "function" then unit[method](unit, ...) end
+end
+
+local function apply_preview_stats(body, encounter, archetype)
+    local state = event_bus.request(events.WAVE_STATE_GET_REQUEST, {})
+    local difficulty = state and state.ok and state.difficulty_id or "N1"
+    local mode = state and state.game_mode
+        or require("systems/match_setup_service").public_snapshot().selected_game_mode or "standard"
+    if not difficulty or difficulty == "" then difficulty = "N1" end
+    if mode == "" then mode = "standard" end
+    local profile, reason = combat_profiles.resolve(encounter.encounter_id, difficulty, mode)
+    assert(not reason, reason)
+    profile = profile or archetype
+    -- Use the same native/logical boundary as the actual challenge boss.
+    if profile.human_spec then profile = stat_projection.prepare_exact(body, profile)
+    else profile = stat_projection.prepare(body, profile) end
+    body.survival_encounter_id = encounter.encounter_id
+    body.survival_display_name = encounter.display_name
+    body.survival_level = tonumber(encounter.rebirth_level) or 1
+    body:SetBaseMaxHealth(profile.health)
+    body:SetMaxHealth(profile.health)
+    body:SetHealth(profile.health)
+    body:SetBaseDamageMin(profile.attack)
+    body:SetBaseDamageMax(profile.attack)
+    local armor = tonumber(profile.war3_armor or profile.armor or archetype.war3_armor or archetype.armor) or 0
+    body:SetPhysicalArmorBaseValue(0)
+    body.survival_war3_armor, body.survival_base_war3_armor = armor, armor
+    body.survival_effective_war3_armor, body.survival_armor = armor, 0
+    body.survival_armor_mapping_version = armor_balance.CUSTOM_WAR3_MAPPING_VERSION
+    body.survival_attack_speed = math.max(.01, tonumber(profile.attack_speed or archetype.attack_speed or archetype.base_attack_speed) or .5)
+    body:SetBaseAttackTime(1 / body.survival_attack_speed)
 end
 
 local function remove_body(id)
@@ -59,6 +95,7 @@ local function create_body(id)
         assert(valid(body), "display_unit_create_failed")
         body.survival_rebirth_scene_display = true
         body.survival_hide_custom_health_bar = true
+        apply_preview_stats(body, encounter, archetype)
         body:AddNewModifier(body, nil, MODIFIER, {})
         assert(body:HasModifier(MODIFIER), "display_isolation_modifier_failed")
         -- npc_spawned may have attached the shared health-bar thinker before
@@ -120,6 +157,11 @@ function M.start()
         return { ok = false, error = "startup_assets_not_ready" }
     end
     started = true
+    if not refresh_subscription then
+        refresh_subscription = event_bus.subscribe(events.GAME_STARTED, function()
+            event_bus.after_dispatch("rebirth_scene_stats", function() if started then M.refresh_stats() end end)
+        end)
+    end
     local count, failed, failures = 0, 0, {}
     for _, encounter in ipairs(encounters.rows) do
         if encounter_for(encounter.encounter_id) and not unavailable[encounter.encounter_id] then
@@ -133,6 +175,17 @@ function M.start()
     end
     logger.info("RebirthScene", string.format("startup displayed=%d failures=%d", count, failed))
     return { ok = next(failures) == nil, displayed = count, failures = failures }
+end
+
+function M.refresh_stats()
+    for id, body in pairs(bodies) do
+        local encounter = encounter_for(id)
+        local archetype = encounter and archetypes.by_id[encounter.archetype_id]
+        if valid(body) and archetype then
+            local ok, reason = pcall(apply_preview_stats, body, encounter, archetype)
+            if not ok then logger.warn("RebirthScene", tostring(id) .. ":" .. tostring(reason)) end
+        end
+    end
 end
 
 function M.hide(id)
@@ -161,6 +214,7 @@ end
 
 function M.reset()
     started = false
+    if refresh_subscription then event_bus.unsubscribe(refresh_subscription); refresh_subscription = nil end
     generation = generation + 1
     for id in pairs(revisions) do scheduler.cancel(PREFIX .. id) end
     local ids = {}
