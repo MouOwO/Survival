@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "title": "孤城逐晓 · 封闭测试",
+  "description": "四人协作塔防与生存。建造城防、培养英雄，应对不断增强的怪物波次，并挑战无尽模式。本条目仅供四个获准账号验证开局前 Steam 网页登录、独立测试存档和游戏内扫码购买。",
+  "visibility_requested": "unlisted",
+  "tester_steamids64": [
+    "76561198424163156",
+    "76561198845461206",
+    "76561198104787442",
+    "76561198974301984"
+  ],
+  "cover": "gucheng_zhuxiao_workshop_1024x768.jpg",
+  "cover_master": "gucheng_zhuxiao_cover_4x3_master.png",
+  "cover_sha256": "571cc75655cfa3db9cb6c05aca61d9522d65ee98ed827768f257b8d897d188fa",
+  "cover_master_sha256": "afa13381fddf56fc68804cf0791287bdcbff45016f654b5cef6eaa276ba2167e",
+  "cover_bytes": 412015,
+  "cover_width": 1024,
+  "cover_height": 768,
+  "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3824360109",
+  "owner_approved_unlisted_on": "2026-10-23",
+  "map": "ws4_entry",
+  "gameplay_map": "template_map",
+  "gameplay_map_capacity": 4,
+  "session_only": false,
+  "cloud_archive_enabled": true,
+  "real_money_payments": true,
+  "online_cheats_allowed": false,
+  "max_players": 4,
+  "release_revision": "WS4-TEN-SIN-STARTUP-01",
+  "release_sequence": 2026102804,
+  "workshop_id": "3824360109",
+  "runtime_content_sha256": "71a5d2cb2413a427c5c919724ff8384281692700b1fbf48520245525814c4d9e",
+  "vpk_sha256": "7de376afb1380df8003dc7a5b61728cc7483433d5421e3f235090331c273c4df",
+  "package_bytes": 3767365890,
+  "runtime_files": 6658,
+  "package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 274380,
+      "sha256": "7de376afb1380df8003dc7a5b61728cc7483433d5421e3f235090331c273c4df"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1073608599,
+      "sha256": "340ca1ddc08e2938dac1cc40054bbf2cc7c3f430104a355ce19860ed8f8a4538"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1068730788,
+      "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379183,
+      "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 552372940,
+      "sha256": "7383f8f065b0adde28a9a0ad0560419add35d150fcf92f7d6776268b8d3cc1e4"
+    }
+  ],
+  "uploaded": true,
+  "download_verified": true,
+  "ready_for_public_release": false,
+  "status": "UPLOADED_DOWNLOAD_VERIFIED_SUPERSEDED_BY_2805_HERO_REBIND",
+  "release_record": "publishing/workshop/ten_sin_startup_20261028.json",
+  "previous_release_record": "publishing/workshop/rebirth_selection_20261028.json",
+  "native_test": "NOT_RUN_SUPERSEDED_BEFORE_ENTRY_VISUAL_ACCEPTANCE",
+  "native_guest_layout_acceptance": "NOT_RETESTED_THIS_MAP_REVISION",
+  "payment_acceptance": "PAYMENT_CODE_PRESERVED_NO_NEW_PAYMENT_TEST",
+  "orders_created_by_agent": 0,
+  "workshop_upload_performed": true,
+  "native_map_acceptance": "PASS_HOST_ORDINARY_ARCADE_MAP_LOADED",
+  "guest_update_issue": "GUEST_STILL_OLD09_METADATA_RESTART_DID_NOT_RESOLVE_PENDING_ACCOUNT_QUERY",
+  "download_manifest": "8833388868921862808",
+  "download_receipt": "output/ten_sin_startup_20261028/download_evidence/20261028T134156Z_83444d67eeb3493d98e175b9011c6829/verification.json",
+  "download_receipt_sha256": "6ca4c8c5236991055d098eb6e89cb1fdacf4a26977e5cbccc08f963de1d9f04d",
+  "superseded_by_release_sequence": 2026102805
+}

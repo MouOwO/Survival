@@ -6,24 +6,24 @@
   "read_first": "00_START_HERE.md",
   "latest_release": {
     "schema": 1,
-    "status": "MAP2802_UPLOADED_OFFICIAL_DOWNLOAD_VERIFIED_HOST_MAP_LOADED",
+    "status": "UPLOADED_OFFICIAL_DOWNLOAD_VERIFIED_NATIVE_ENTRY_VISUAL_PENDING",
     "workshop_id": "3824360109",
     "visibility": "unlisted",
-    "release_sequence": 2026102802,
-    "revision": "WS4-MAP-RESOURCES-01",
-    "content_sha256": "310aad0a33116f29304d9ea7251524b4c1721bd5fb2b7952610d63cca2ac09d5",
-    "vpk_sha256": "b3dbe2351798561cd8d585449a7e304822d62f0706689527285c7f41658359f8",
-    "package_bytes": 3767361725,
+    "release_sequence": 2026102805,
+    "revision": "WS4-TEN-SIN-STARTUP-02",
+    "content_sha256": "549afe0f4125a5f880884f1f5a42d1a6ae307b7b7ea97ddacc400e34dcfd0776",
+    "vpk_sha256": "d6d2f75f530539abe58f69457c41b31f01a362546b573034c860440c9afe8fcc",
+    "package_bytes": 3767366244,
     "package_files": [
       {
         "name": "3824360109.vpk",
         "bytes": 274380,
-        "sha256": "b3dbe2351798561cd8d585449a7e304822d62f0706689527285c7f41658359f8"
+        "sha256": "d6d2f75f530539abe58f69457c41b31f01a362546b573034c860440c9afe8fcc"
       },
       {
         "name": "3824360109_000.vpk",
-        "bytes": 1073604434,
-        "sha256": "419160879971c9c6a0e775d44caa48c52e7d98e66649084ad55cb9b6e4df15eb"
+        "bytes": 1073608953,
+        "sha256": "77deb683b91a45250aa6f9a6dac61c97049cd33eeb1226b0b2307f5d98ab2fa8"
       },
       {
         "name": "3824360109_001.vpk",
@@ -42,21 +42,25 @@
       }
     ],
     "file_count": 6658,
-    "source_sha256": "4e62350c1bf08e663f5217885f26652918c2e09296a829f29a987ba8a14dccdc",
-    "compiled_map_sha256": "f868f295a01b78f63dbeb9fe9edfc6a7591b3889ace84f0892f595ac46f22186",
-    "source_crc32": 3557144492,
-    "map_crc_entries_verified": 307,
     "changed_runtime_paths": [
-      "maps/template_map.vpk"
+      "scripts/vscripts/systems/challenge_session_service.lua"
     ],
-    "download_manifest": "2226754158672105621",
-    "download_receipt_sha256": "5babf60a6c7c06bd3867dfb45f9defae57d477ac3728bedea66394ab03f3b948",
     "uploaded": true,
     "download_verified": true,
-    "native_map_acceptance": "PASS_HOST_ORDINARY_ARCADE_MAP_LOADED",
+    "download_manifest": "3734424561061643436",
+    "download_receipt_sha256": "b0f41a3c7f6f81fcf2c20f7d13d4811e8e298623780334b45b167b7c1e0926bb",
+    "native_test": "NOT_RUN_ENTRY_VISUAL_PENDING",
     "ready_for_public_release": false,
-    "source_record": "publishing/workshop/map_resources_20261028.json",
-    "source_record_sha256": "5fa9f92dfc11c7a6208a19cd82566c859c022641bb96734f52207dfa8dff1501"
+    "source_record": "publishing/workshop/ten_sin_startup_20261028_v02.json",
+    "source_record_sha256": "54de37a59524147d5b918c1ff66127da6a4f5dff2811805ee7a59dcfcc4fd97f",
+    "inherited_map_provenance": {
+      "release_sequence": 2026102802,
+      "source_sha256": "4e62350c1bf08e663f5217885f26652918c2e09296a829f29a987ba8a14dccdc",
+      "compiled_map_sha256": "f868f295a01b78f63dbeb9fe9edfc6a7591b3889ace84f0892f595ac46f22186",
+      "source_crc32": 3557144492,
+      "map_crc_entries_verified": 307,
+      "native_map_acceptance": "PASS_HOST_ORDINARY_ARCADE_MAP_LOADED"
+    }
   },
   "evidence_boundaries": {
     "native_two_player_auth_profile": "PASS_IN_2708",
@@ -66,7 +70,9 @@
     "map2802_host_load": "PASS",
     "map2802_two_player": "NOT_RUN",
     "layout2801_guest_2560": "NOT_RUN",
-    "guest_refresh_tool": "27_MOCK_TESTS_PASS_NOT_RUN_ON_GUEST"
+    "guest_refresh_tool": "27_MOCK_TESTS_PASS_NOT_RUN_ON_GUEST",
+    "ten_sin_2805_entry_visual": "NOT_RUN",
+    "ten_sin_2805_official_full_download": "PASS"
   },
   "user_decisions": {
     "offline_cheats": true,
@@ -79,7 +85,8 @@
     }
   },
   "pending": [
-    "guest remains old09 after restart: get current-account uncached query/one-item refresh report",
+    "2805 native entry ten-sin visibility and multiplayer stage checkout",
+    "guest remains old09 after restart: latest target 2805: get current-account uncached query/one-item refresh report",
     "guest 2560x1440 updated UI validation",
     "native guest cash delivery/refund and reconnect/long-match validation",
     "stable Steam verification egress without author PC",
@@ -87,19 +94,19 @@
   ],
   "source_version_heads": {
     "game": {
-      "head": "ba81736bf45d0dc74373858c39d99c0f7ca1f69b",
+      "head": "6abc772548791b91bbd7650bbfb05d43d653fa87",
       "branch": "dev",
       "upstream": "origin/dev",
       "ahead_behind": "0\t0",
-      "working_changes": 149,
+      "working_changes": 21,
       "captured_before_knowledge_commit": true
     },
     "content": {
-      "head": "4711503a8312d106cfa05ceb67c72e74f7d2329e",
+      "head": "2d55f9726a764e562044baab6b139fc2b221d464",
       "branch": "master",
       "upstream": "origin/master",
       "ahead_behind": "0\t0",
-      "working_changes": 1,
+      "working_changes": 0,
       "captured_before_knowledge_commit": true
     }
   },

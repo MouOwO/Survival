@@ -1,0 +1,89 @@
+--- a/scripts/vscripts/systems/challenge_session_service.lua
++++ b/scripts/vscripts/systems/challenge_session_service.lua
+@@ -481,12 +481,48 @@
+     unit:RemoveModifierByName(challenge_11_staging)
+     local ai = unit.FindModifierByName and unit:FindModifierByName("modifier_practice_monster_ai")
+     if ai and not ai:IsNull() and type(ai.Resume) == "function" then
++        -- Entry staging may precede combat-hero creation/replacement. Bind at
++        -- checkout so every stage fights the current hero, not the builder.
++        local owner = tonumber(unit.survival_challenge_11_staged_owner)
++        local hero = owner ~= nil and hero_for(owner) or nil
++        ai.hero_entindex = alive(hero) and hero:entindex() or -1
+         ai:Resume()
+     elseif unit.SetForceAttackTarget then unit:SetForceAttackTarget(nil) end
+ end
+ 
++local function refresh_prepared_challenge_11(session, difficulty_id, mode_id)
++    if session.difficulty_id == difficulty_id and session.game_mode == mode_id then return true end
++    local updates = {}
++    for entindex, unit in pairs(session.prepared_monsters or {}) do
++        local meta = monster_meta[entindex]
++        if valid(unit) and meta and unit.survival_challenge_11_staged == true then
++            local member = meta.member
++            local profile, reason = combat_profiles.resolve(member.member_id, difficulty_id, mode_id)
++            if reason then return false, reason end
++            local archetype = archetypes.by_id[tostring(member.combat_archetype_id or "")]
++                or archetypes.by_id[member.archetype_id]
++            updates[#updates + 1] = {unit=unit, archetype=archetype, profile=profile}
++        end
++    end
++    for _, update in ipairs(updates) do
++        local unit, profile = update.unit, update.profile
++        if profile and profile.human_spec
++            and type(require("combat/endless_stat_projection").prepare_exact) == "function" then
++            profile = require("combat/endless_stat_projection").prepare_exact(unit, profile)
++        elseif profile and ((tonumber(profile.health) or 0) > 100000000
++            or (tonumber(profile.attack) or 0) > 100000000) then
++            profile = require("combat/endless_stat_projection").prepare(unit, profile)
++        end
++        apply_combat_stats(unit, update.archetype, profile)
++    end
++    session.difficulty_id, session.game_mode = difficulty_id, mode_id
++    return true
++end
++
+ local function prepare_challenge_11(player_id, team, difficulty_id, mode_id)
+-    if challenge_11_prepared_by_player[player_id] then return true end
++    if challenge_11_prepared_by_player[player_id] then
++        return refresh_prepared_challenge_11(challenge_11_prepared_by_player[player_id], difficulty_id, mode_id)
++    end
+     local encounter = encounters.by_id.encounter_challenge_11
+     local challenge = challenge_for_encounter("encounter_challenge_11")
+     local list = members_for("encounter_challenge_11")
+@@ -527,6 +563,10 @@
+         and next(session.prepared_monsters) and session
+         or challenge_11_prepared_by_player[session.player_id]
+     if not staged then return false end
++    -- Entry previews can predate difficulty selection. Reuse their bodies,
++    -- refreshing the selected combat profile before any stage is released.
++    local refreshed = refresh_prepared_challenge_11(staged, session.difficulty_id, session.game_mode)
++    if not refreshed then return false end
+     local target_member = session.members[1]
+     local selected_entindex = nil
+     for entindex, unit in pairs(staged.prepared_monsters or {}) do
+@@ -1442,6 +1482,7 @@
+     local wave_state = event_bus.request(events.WAVE_STATE_GET_REQUEST, {})
+     local difficulty_id = wave_state and wave_state.ok
+         and tostring(wave_state.difficulty_id or "") or difficulty_config.default_id
++    if difficulty_id == "" then difficulty_id = difficulty_config.default_id end
+     prepare_challenge_11(
+         player_id,
+         tonumber(payload.team) or PlayerResource:GetTeam(player_id),
+@@ -1497,7 +1538,17 @@
+         if player_id then foreground_encounter_by_player[player_id] = nil end
+     end)
+     event_bus.subscribe(events.HERO_READY, start_auto_tests)
++    -- HERO_READY follows the authentication/asset barrier and creates the
++    -- builder at entry; do not wait for a combat hero to be purchased.
++    event_bus.subscribe(events.HERO_READY, prepare_after_hero_summoned)
+     event_bus.subscribe(events.HERO_SUMMONED, prepare_after_hero_summoned)
++    event_bus.subscribe(events.WAVE_CHANGED, function()
++        event_bus.after_dispatch("challenge_11_preview_stats", function()
++            for player_id, prepared in pairs(challenge_11_prepared_by_player) do
++                prepare_after_hero_summoned({player_id=player_id, team=prepared.team})
++            end
++        end)
++    end)
+ end
+ 
+ return M

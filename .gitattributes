@@ -169,3 +169,14 @@ panorama/src/scripts/custom_game/native_transport_probe.js text eol=crlf
 
 # Knowledge manifests hash UTF-8 LF bytes across Windows checkouts.
 docs/knowledge_base/** text eol=lf
+
+# Preserve the reviewed ten-sin startup patch and its pinned source bytes.
+scripts/vscripts/systems/challenge_session_service.lua text eol=crlf
+tools/ten_sin_startup_20261028/*.py text eol=lf
+tools/ten_sin_startup_20261028/*.json text eol=lf
+tools/ten_sin_startup_20261028/*.patch text eol=lf whitespace=-blank-at-eol
+tools/ten_sin_startup_20261028_v02/*.py text eol=lf
+tools/ten_sin_startup_20261028_v02/*.json text eol=lf
+tools/ten_sin_startup_20261028_v02/*.patch text eol=lf whitespace=-blank-at-eol
+publishing/workshop/ten_sin_startup_20261028*.json text eol=lf
+tools/test_ten_sin_startup.lua text eol=lf

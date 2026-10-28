@@ -16,6 +16,8 @@
 
 源码入口：`scripts/vscripts/addon_game_mode.lua`、`systems/startup_loading_service.lua`、`systems/match_setup_service.lua`、`systems/team_difficulty_service.lua`、`systems/player_profile_service.lua`（后文省略路径均位于 `scripts/vscripts/`）。
 
+十戒预览在身份/资源屏障后的 `HERO_READY` 即创建于各玩家十个对应标记，不再等购买战斗英雄。预备实体仍保持无敌、禁攻击及奖励隔离；重复就绪复用实体，模式/难度变化刷新属性，每一段出战时重新绑定当前英雄。真实service的模拟引擎回归与四玩家checkout通过；原生新版开局画面/多人完整挑战尚未验收。冻结发布只含对应四段补丁，不能据此认定同期开发数值也已发布，见[十戒开局展示证据](evidence/ten_sin_startup_20261028.md)。
+
 ## 2. 模式、难度与验收局隔离
 
 当前 `config/mode_release_config.lua` 开放 `standard` 常规、`pure` 纯净、`rich` 丰饶、`cold` 极寒；`scourge/ruins/celestial/fishing` 有部分配置不代表战斗模式已经发布。当前 v3 难度行范围为常规/纯净 N1–N10、丰饶 N1–N30、极寒 N1–N50；具体总波数取该模式、难度的 `human_monster_spec` 行，不能沿用旧 `waves_config.lua` 的通用30波回退。

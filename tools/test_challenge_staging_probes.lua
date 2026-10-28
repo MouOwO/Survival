@@ -12,6 +12,7 @@ IsServer = function() return server end
 IsInToolsMode = function() return tools_mode end
 GetMapName = function() return map_name end
 GameRules = {GetGameModeEntity = function() return world end, GetGameTime = function() return 10 end}
+PlayerResource = {GetSelectedHeroEntity=function() end}
 Vector = function(x, y, z) return {x=x, y=y, z=z} end
 local guard = {mode=world}
 _G.SURVIVAL_REAL_GAME_STRESS_ISOLATION = guard

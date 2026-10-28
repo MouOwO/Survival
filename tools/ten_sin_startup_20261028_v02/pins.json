@@ -1,0 +1,24 @@
+{
+  "runtime_path": "scripts/vscripts/systems/challenge_session_service.lua",
+  "local_source": {
+    "bytes": 65430,
+    "md5": "c4724c9eafeee6c5ef3f458a13acbdc8",
+    "sha256": "c6a42c8f34069b994158f92edd9b3a4686c9a27561b7c4b548397481670c0341"
+  },
+  "frozen_source": {
+    "bytes": 62086,
+    "md5": "6d531b8324baa227dfab7cee47644286",
+    "sha256": "a54ee8038769ace0e3ea6d516b2ec3f57917f372e09f4a78acf00c600cc9f779"
+  },
+  "patch": {
+    "bytes": 4854,
+    "md5": "6c9164b240344e7507de2d45d6387389",
+    "sha256": "cd5885ad14fecb53ad708af4a62beb52ac8c2e00d47a2596ce0411e4c39e8e2f"
+  },
+  "target": {
+    "bytes": 63548,
+    "md5": "ae39451d9440319d301ee257f87d9bd4",
+    "sha256": "9a6e273a771ff4845f659dbd92fddae865df24bf59d19f33cb7fef50268dd709"
+  },
+  "changed_hunks": 4
+}

@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 3916,
-      "sha256": "6f64354970015f70498dd0b0e85d78f20ab3dc268cf9af63f2dde21f6b584a00"
+      "bytes": 3926,
+      "sha256": "ed8b045c046406db97a81b15de05fd45f359c9f783d276c185ac184777d87e9d"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -15,8 +15,8 @@
     },
     {
       "path": "02_core_gameplay.md",
-      "bytes": 17291,
-      "sha256": "10ef574298113f53fbca0d5763ca3e57d2b127186303caf6ce1deab451c050aa"
+      "bytes": 17863,
+      "sha256": "69a5ade1cacec980cdc541e783de6df90f71f0586d0bbb7e8b91bfa00f4c38d4"
     },
     {
       "path": "03_progression_save_contract.md",
@@ -35,13 +35,13 @@
     },
     {
       "path": "06_build_release_ops.md",
-      "bytes": 15278,
-      "sha256": "6bebb30f51f0acbb2118ad94ca14521db9fa2443cb386e238ea5db3a529080f4"
+      "bytes": 16185,
+      "sha256": "b74e5b4ce4058d98c152f6fe8600762bde74562dd29e20845058f8a826beaa20"
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 12356,
-      "sha256": "eef6cb632e620a8f68e10c0422efcf41ca4f04b1aef21e6cac85a38727042a66"
+      "bytes": 12556,
+      "sha256": "a771816126e8b8e4f9b7a0a7d7c0227c3fbe7f1bcd82406f36a659472b266316"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -90,8 +90,8 @@
     },
     {
       "path": "data/context.json",
-      "bytes": 4056,
-      "sha256": "95d53d60f22c387f91cbfedd00edaf9cbde4f66c7feccd95216b2d6b64624b2a"
+      "bytes": 4429,
+      "sha256": "2292c9f6cba6e63181e97ead18933903d69edf42dab6b9797343fbb62920f008"
     },
     {
       "path": "data/repository_files.json",
@@ -119,6 +119,11 @@
       "sha256": "dd22616e57ab56e16490fd3fe910bc57f394da64ef3b2545965850c53ea1b02e"
     },
     {
+      "path": "evidence/commerce_prices_20261028.md",
+      "bytes": 2499,
+      "sha256": "8bca6c86e27bfd5b6a3d626db48f73de8dee309f78309ae3061cdaa65e4b5bb5"
+    },
+    {
       "path": "evidence/directory_cleanup_20261028.public.json",
       "bytes": 3245,
       "sha256": "0513bc1daeca98655081b92520b1c2f882ad875076fa4b0b2138925acb9db720"
@@ -137,6 +142,31 @@
       "path": "evidence/native_arcade_cloud_20261027.public.json",
       "bytes": 1694,
       "sha256": "3d57d439d339f2655e98d9b690735cf65de3945a15e7b52b77ac29e1bc7d657b"
+    },
+    {
+      "path": "evidence/rebirth_n15_preview_20261028.md",
+      "bytes": 3466,
+      "sha256": "b143e8524db8ba3b6f40a406ac3e6e703b92d3866a8e750da86bbee40c8809d4"
+    },
+    {
+      "path": "evidence/rebirth_selection_20261028.md",
+      "bytes": 2895,
+      "sha256": "287f5bf1a704d78dc8e30f1f4dc5bda4eb43e60100063d99bbe21789340c42ab"
+    },
+    {
+      "path": "evidence/rich_rebirth_balance_20261028.md",
+      "bytes": 2479,
+      "sha256": "8761a37a0ff0439a4f41cc620851170e3227aa678d7186aef1e0ce523b81eb28"
+    },
+    {
+      "path": "evidence/ten_sin_startup_20261028.md",
+      "bytes": 3892,
+      "sha256": "6b886a61b5f50cf4941f68023fa54603251443785cd5ff103dc759d03faf0884"
+    },
+    {
+      "path": "evidence/tooltip_follow_20261028.md",
+      "bytes": 3321,
+      "sha256": "ccdbf9e15416596d9a7cefd22d380cdc89628cff9f342983ee373d4ce77b6d51"
     },
     {
       "path": "evidence/ui_layout_20261028.public.json",
@@ -252,31 +282,6 @@
       "path": "tools/verify_knowledge.py",
       "bytes": 1993,
       "sha256": "76331e711948f58761439119c684badcc654fa7ce8c9a107c1e440f693c0be7c"
-    },
-    {
-      "path": "evidence/commerce_prices_20261028.md",
-      "bytes": 2499,
-      "sha256": "8bca6c86e27bfd5b6a3d626db48f73de8dee309f78309ae3061cdaa65e4b5bb5"
-    },
-    {
-      "path": "evidence/tooltip_follow_20261028.md",
-      "bytes": 3321,
-      "sha256": "ccdbf9e15416596d9a7cefd22d380cdc89628cff9f342983ee373d4ce77b6d51"
-    },
-    {
-      "path": "evidence/rebirth_selection_20261028.md",
-      "bytes": 2895,
-      "sha256": "287f5bf1a704d78dc8e30f1f4dc5bda4eb43e60100063d99bbe21789340c42ab"
-    },
-    {
-      "path": "evidence/rich_rebirth_balance_20261028.md",
-      "bytes": 2479,
-      "sha256": "8761a37a0ff0439a4f41cc620851170e3227aa678d7186aef1e0ce523b81eb28"
-    },
-    {
-      "path": "evidence/rebirth_n15_preview_20261028.md",
-      "bytes": 3466,
-      "sha256": "b143e8524db8ba3b6f40a406ac3e6e703b92d3866a8e750da86bbee40c8809d4"
     }
   ]
 }

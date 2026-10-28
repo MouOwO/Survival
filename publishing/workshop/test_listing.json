@@ -26,23 +26,23 @@
   "real_money_payments": true,
   "online_cheats_allowed": false,
   "max_players": 4,
-  "release_revision": "WS4-REBIRTH-INSPECT-01",
-  "release_sequence": 2026102803,
+  "release_revision": "WS4-TEN-SIN-STARTUP-02",
+  "release_sequence": 2026102805,
   "workshop_id": "3824360109",
-  "runtime_content_sha256": "7d39ab251f4c8f20d8338a49a8335b0447c0e4e8f6a196978312b40f8981ab96",
-  "vpk_sha256": "c293d9335610df50417f3f06b86e14e9f576cee4993892c166054b7b9ef78a2e",
-  "package_bytes": 3767364782,
+  "runtime_content_sha256": "549afe0f4125a5f880884f1f5a42d1a6ae307b7b7ea97ddacc400e34dcfd0776",
+  "vpk_sha256": "d6d2f75f530539abe58f69457c41b31f01a362546b573034c860440c9afe8fcc",
+  "package_bytes": 3767366244,
   "runtime_files": 6658,
   "package_files": [
     {
       "name": "3824360109.vpk",
       "bytes": 274380,
-      "sha256": "c293d9335610df50417f3f06b86e14e9f576cee4993892c166054b7b9ef78a2e"
+      "sha256": "d6d2f75f530539abe58f69457c41b31f01a362546b573034c860440c9afe8fcc"
     },
     {
       "name": "3824360109_000.vpk",
-      "bytes": 1073607491,
-      "sha256": "70344a5334d9e3f396dfe90646018bdf14e11a48625f8f4ff0dd127fa645c5b6"
+      "bytes": 1073608953,
+      "sha256": "77deb683b91a45250aa6f9a6dac61c97049cd33eeb1226b0b2307f5d98ab2fa8"
     },
     {
       "name": "3824360109_001.vpk",
@@ -61,20 +61,27 @@
     }
   ],
   "uploaded": true,
-  "download_verified": false,
+  "download_verified": true,
   "ready_for_public_release": false,
-  "status": "REBIRTH2803_UPLOADED_DOWNLOAD_PENDING_DOTA_EXIT",
-  "release_record": "publishing/workshop/rebirth_selection_20261028.json",
-  "previous_release_record": "publishing/workshop/map_resources_20261028.json",
-  "native_test": "PASS_NATIVE_PREVIEW_ENTITIES_FULL_CANDIDATE_AND_MULTIPLAYER_NOT_TESTED",
+  "status": "UPLOADED_OFFICIAL_DOWNLOAD_VERIFIED_NATIVE_ENTRY_VISUAL_PENDING",
+  "release_record": "publishing/workshop/ten_sin_startup_20261028_v02.json",
+  "previous_release_record": "publishing/workshop/ten_sin_startup_20261028.json",
+  "native_test": "NOT_RUN_ENTRY_MODELS_NATIVE_VISUAL_ACCEPTANCE_PENDING",
   "native_guest_layout_acceptance": "NOT_RETESTED_THIS_MAP_REVISION",
   "payment_acceptance": "PAYMENT_CODE_PRESERVED_NO_NEW_PAYMENT_TEST",
   "orders_created_by_agent": 0,
   "workshop_upload_performed": true,
-  "native_map_acceptance": "PASS_HOST_ORDINARY_ARCADE_MAP_LOADED",
-  "native_map_smoke_evidence": "output/map_resources_20261028/native_map_smoke.json",
-  "native_map_smoke_evidence_sha256": "e5000a606c37094dc3a5feea1acaec7ef46ff084ecdd7ee0acb402eb2496547b",
   "guest_update_issue": "GUEST_STILL_OLD09_METADATA_RESTART_DID_NOT_RESOLVE_PENDING_ACCOUNT_QUERY",
-  "upload_log": "output/rebirth_selection_20261028/upload.log",
-  "upload_log_sha256": "1a1ef219fb15e73709cbdea2c2f00b20294f379747c795f75d8b6351223a5070"
+  "upload_log_sha256": "c41ef9f3f388389aec63ba4284366e3baee94a5c395e7575182cfe7fe1c1a1ce",
+  "download_manifest": "3734424561061643436",
+  "download_receipt": "output/ten_sin_startup_20261028_v02/download_evidence/20261028T134521Z_bcd096375caa43868149efac30366ab2/verification.json",
+  "download_receipt_sha256": "b0f41a3c7f6f81fcf2c20f7d13d4811e8e298623780334b45b167b7c1e0926bb",
+  "signed_resources_verified": 6658,
+  "protected_modules_verified": 180,
+  "package_report_sha256": "102bbeec95e21acc777ac2418473cc652e01246981adc162c3f0bb36f7a64155",
+  "inherited_map_acceptance": {
+    "release_sequence": 2026102802,
+    "status": "PASS_HOST_ORDINARY_ARCADE_MAP_LOADED"
+  },
+  "native_map_acceptance": "NOT_RETESTED_IN_2805"
 }

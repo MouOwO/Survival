@@ -1,0 +1,118 @@
+{
+  "schema": 1,
+  "revision": "WS4-TEN-SIN-STARTUP-01",
+  "release_sequence": 2026102804,
+  "workshop_id": "3824360109",
+  "status": "UPLOADED_DOWNLOAD_VERIFIED_SUPERSEDED_BY_2805_HERO_REBIND",
+  "package": {
+    "schema": 1,
+    "status": "BUILT_SIGNED_TEN_SIN_STARTUP_REQUIRES_NATIVE_SMOKE",
+    "revision": "WS4-TEN-SIN-STARTUP-01",
+    "dry_run": false,
+    "release_sequence": 2026102804,
+    "content_sha256": "71a5d2cb2413a427c5c919724ff8384281692700b1fbf48520245525814c4d9e",
+    "files": 6658,
+    "base_release_sequence": 2026102803,
+    "base_content_sha256": "7d39ab251f4c8f20d8338a49a8335b0447c0e4e8f6a196978312b40f8981ab96",
+    "base_package_report_sha256": "a9492685a24d871dc003a02bf08b2145952f7171409e3bc7088b44c5b21c2320",
+    "ancestor_2802_download_sha256": "5babf60a6c7c06bd3867dfb45f9defae57d477ac3728bedea66394ab03f3b948",
+    "base_download_verified": false,
+    "candidate": "D:\\Survival_发布候选\\20261028_ws4_ten_sin_startup_v01_view",
+    "overlay": "D:\\Survival_发布候选\\20261028_ws4_ten_sin_startup_v01_overlay",
+    "trusted_source": "D:\\Survival_发布候选\\20261028_ws4_ten_sin_startup_v01_overlay_trusted_source",
+    "output": "D:\\Survival_工坊输出\\20261028_ws4_ten_sin_startup_v01\\3824360109.vpk",
+    "changed_runtime_paths": [
+      "scripts/vscripts/systems/challenge_session_service.lua"
+    ],
+    "added_runtime_paths": [],
+    "deleted_runtime_paths": [],
+    "protected_modules_preserved": 180,
+    "protected_modules_rebuilt": 0,
+    "trusted_review_files": 16,
+    "authentication_payment_code_preserved": true,
+    "maps_and_panorama_preserved": true,
+    "payload_changed": false,
+    "full_input_hash_verification": true,
+    "payload_bytes": 3767091510,
+    "rebuilt_archives": [
+      0
+    ],
+    "reused_archives": [
+      1,
+      2,
+      3
+    ],
+    "archive_migrations": [],
+    "container_bytes": 3767365890,
+    "disk_preflight": [
+      {
+        "root": "D:\\",
+        "required_bytes": 1360336151,
+        "free_bytes": 61002522624,
+        "reserve_bytes": 268435456
+      }
+    ],
+    "workshop_upload_performed": false,
+    "native_test": "NOT_RUN",
+    "ready_for_upload": false,
+    "signature_valid": true,
+    "trusted_key_id": "77075eac0032a300aca694059dc47e93",
+    "package_files": [
+      {
+        "name": "3824360109.vpk",
+        "bytes": 274380,
+        "sha256": "7de376afb1380df8003dc7a5b61728cc7483433d5421e3f235090331c273c4df"
+      },
+      {
+        "name": "3824360109_000.vpk",
+        "bytes": 1073608599,
+        "sha256": "340ca1ddc08e2938dac1cc40054bbf2cc7c3f430104a355ce19860ed8f8a4538"
+      },
+      {
+        "name": "3824360109_001.vpk",
+        "bytes": 1068730788,
+        "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+      },
+      {
+        "name": "3824360109_002.vpk",
+        "bytes": 1072379183,
+        "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+      },
+      {
+        "name": "3824360109_003.vpk",
+        "bytes": 552372940,
+        "sha256": "7383f8f065b0adde28a9a0ad0560419add35d150fcf92f7d6776268b8d3cc1e4"
+      }
+    ],
+    "vpk_sha256": "7de376afb1380df8003dc7a5b61728cc7483433d5421e3f235090331c273c4df",
+    "verification": {
+      "vpk_version": 2,
+      "files": 6658,
+      "payload_bytes": 3767091510,
+      "archive_count": 4,
+      "crc32_verified": true,
+      "manifest_dual_hashes_verified": true,
+      "section_md5s_verified": true,
+      "whole_vpk_md5_verified": true
+    },
+    "full_runtime_validator_passed": true,
+    "full_view_canonical_guard": "PASS",
+    "immutable_base_unchanged": true
+  },
+  "uploaded": true,
+  "download_verified": true,
+  "ready_for_public_release": false,
+  "native_test": "NOT_RUN_SUPERSEDED_BEFORE_ENTRY_VISUAL_ACCEPTANCE",
+  "scope": "Only the four reviewed ten-sin startup/preview-refresh hunks over frozen REBIRTH2803; unrelated development changes excluded",
+  "offline_tests": [
+    "entry before combat hero, ten markers/models/outfits, ready dedup, difficulty refresh, stage checkout, defeat cleanup, no rewards",
+    "52 outfit parts and startup asset barrier",
+    "5 frozen patch/protected-module scope tests"
+  ],
+  "workshop_upload_performed": true,
+  "upload_log_sha256": "4c76a2de81c409afb28197359245d2a5d39b430a1f3a51ab7cfc349ef15e2b23",
+  "download_manifest": "8833388868921862808",
+  "download_receipt": "output/ten_sin_startup_20261028/download_evidence/20261028T134156Z_83444d67eeb3493d98e175b9011c6829/verification.json",
+  "download_receipt_sha256": "6ca4c8c5236991055d098eb6e89cb1fdacf4a26977e5cbccc08f963de1d9f04d",
+  "superseded_by_release_sequence": 2026102805
+}

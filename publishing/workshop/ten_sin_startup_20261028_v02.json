@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "revision": "WS4-TEN-SIN-STARTUP-02",
+  "release_sequence": 2026102805,
+  "workshop_id": "3824360109",
+  "status": "UPLOADED_OFFICIAL_DOWNLOAD_VERIFIED_NATIVE_ENTRY_VISUAL_PENDING",
+  "package": {
+    "schema": 1,
+    "status": "BUILT_SIGNED_TEN_SIN_STARTUP_REQUIRES_NATIVE_SMOKE",
+    "revision": "WS4-TEN-SIN-STARTUP-02",
+    "dry_run": false,
+    "release_sequence": 2026102805,
+    "content_sha256": "549afe0f4125a5f880884f1f5a42d1a6ae307b7b7ea97ddacc400e34dcfd0776",
+    "files": 6658,
+    "base_release_sequence": 2026102803,
+    "base_content_sha256": "7d39ab251f4c8f20d8338a49a8335b0447c0e4e8f6a196978312b40f8981ab96",
+    "base_package_report_sha256": "a9492685a24d871dc003a02bf08b2145952f7171409e3bc7088b44c5b21c2320",
+    "ancestor_2802_download_sha256": "5babf60a6c7c06bd3867dfb45f9defae57d477ac3728bedea66394ab03f3b948",
+    "base_download_verified": false,
+    "candidate": "D:\\Survival_发布候选\\20261028_ws4_ten_sin_startup_v02_view",
+    "overlay": "D:\\Survival_发布候选\\20261028_ws4_ten_sin_startup_v02_overlay",
+    "trusted_source": "D:\\Survival_发布候选\\20261028_ws4_ten_sin_startup_v02_overlay_trusted_source",
+    "output": "D:\\Survival_工坊输出\\20261028_ws4_ten_sin_startup_v02\\3824360109.vpk",
+    "changed_runtime_paths": [
+      "scripts/vscripts/systems/challenge_session_service.lua"
+    ],
+    "added_runtime_paths": [],
+    "deleted_runtime_paths": [],
+    "protected_modules_preserved": 180,
+    "protected_modules_rebuilt": 0,
+    "trusted_review_files": 16,
+    "authentication_payment_code_preserved": true,
+    "maps_and_panorama_preserved": true,
+    "payload_changed": false,
+    "full_input_hash_verification": true,
+    "payload_bytes": 3767091864,
+    "rebuilt_archives": [
+      0
+    ],
+    "reused_archives": [
+      1,
+      2,
+      3
+    ],
+    "archive_migrations": [],
+    "container_bytes": 3767366244,
+    "disk_preflight": [
+      {
+        "root": "D:\\",
+        "required_bytes": 1360337213,
+        "free_bytes": 59921625088,
+        "reserve_bytes": 268435456
+      }
+    ],
+    "workshop_upload_performed": false,
+    "native_test": "NOT_RUN",
+    "ready_for_upload": false,
+    "signature_valid": true,
+    "trusted_key_id": "77075eac0032a300aca694059dc47e93",
+    "package_files": [
+      {
+        "name": "3824360109.vpk",
+        "bytes": 274380,
+        "sha256": "d6d2f75f530539abe58f69457c41b31f01a362546b573034c860440c9afe8fcc"
+      },
+      {
+        "name": "3824360109_000.vpk",
+        "bytes": 1073608953,
+        "sha256": "77deb683b91a45250aa6f9a6dac61c97049cd33eeb1226b0b2307f5d98ab2fa8"
+      },
+      {
+        "name": "3824360109_001.vpk",
+        "bytes": 1068730788,
+        "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+      },
+      {
+        "name": "3824360109_002.vpk",
+        "bytes": 1072379183,
+        "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+      },
+      {
+        "name": "3824360109_003.vpk",
+        "bytes": 552372940,
+        "sha256": "7383f8f065b0adde28a9a0ad0560419add35d150fcf92f7d6776268b8d3cc1e4"
+      }
+    ],
+    "vpk_sha256": "d6d2f75f530539abe58f69457c41b31f01a362546b573034c860440c9afe8fcc",
+    "verification": {
+      "vpk_version": 2,
+      "files": 6658,
+      "payload_bytes": 3767091864,
+      "archive_count": 4,
+      "crc32_verified": true,
+      "manifest_dual_hashes_verified": true,
+      "section_md5s_verified": true,
+      "whole_vpk_md5_verified": true
+    },
+    "full_runtime_validator_passed": true,
+    "full_view_canonical_guard": "PASS",
+    "immutable_base_unchanged": true
+  },
+  "uploaded": true,
+  "download_verified": true,
+  "ready_for_public_release": false,
+  "native_test": "NOT_RUN_ENTRY_VISUAL_ACCEPTANCE_PENDING",
+  "supersedes_release_sequence": 2026102804,
+  "scope": "Four reviewed hunks over frozen REBIRTH2803: entry staging, selected-mode stats, current-hero binding on every stage; unrelated development changes excluded",
+  "offline_tests": [
+    "ten entry markers/models/outfits, repeat-ready dedup, profile refresh, first and later-stage replacement-hero rebinding, 4-owner checkout, failure rollback, defeat cleanup, no rewards",
+    "52 outfit components and startup preload barrier",
+    "5 patch drift/protected-module scope checks",
+    "original delayed-spawn and intermediate stale-hero negative controls rejected"
+  ],
+  "workshop_upload_performed": true,
+  "upload_log_sha256": "c41ef9f3f388389aec63ba4284366e3baee94a5c395e7575182cfe7fe1c1a1ce",
+  "download_manifest": "3734424561061643436",
+  "download_receipt": "output/ten_sin_startup_20261028_v02/download_evidence/20261028T134521Z_bcd096375caa43868149efac30366ab2/verification.json",
+  "download_receipt_sha256": "b0f41a3c7f6f81fcf2c20f7d13d4811e8e298623780334b45b167b7c1e0926bb",
+  "signed_resources_verified": 6658,
+  "protected_modules_verified": 180,
+  "package_report_sha256": "102bbeec95e21acc777ac2418473cc652e01246981adc162c3f0bb36f7a64155",
+  "failed_first_attempt": {
+    "error": "Steam API callback 3404 returned EResult=2",
+    "failure_log_sha256": "2ee06835d74c0a2669c8e036e24a7adca1cbca42d33bfcf00cb5315d1f6d20eb",
+    "pending_journal_sha256": "e05dca1890bfd5179f03dfb6abede3d750796568314351dabf3f9e23e13dbd35",
+    "preserved": true,
+    "reconciliation_sha256": "aedee7a1f5e155eec2ffbe645bdb62aff03af380e01d223b97fb9e49cd1b3dcd",
+    "remote_previous_release_verified": 2026102804,
+    "explicit_retries": 1
+  }
+}
