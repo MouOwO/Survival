@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "kind": "NATIVE_MAP_RESOURCE_UPDATE",
+  "status": "MAP2802_UPLOADED_OFFICIAL_DOWNLOAD_VERIFIED_HOST_MAP_LOADED",
+  "workshop_id": "3824360109",
+  "visibility": "unlisted",
+  "release_sequence": 2026102802,
+  "revision": "WS4-MAP-RESOURCES-01",
+  "content_sha256": "310aad0a33116f29304d9ea7251524b4c1721bd5fb2b7952610d63cca2ac09d5",
+  "vpk_sha256": "b3dbe2351798561cd8d585449a7e304822d62f0706689527285c7f41658359f8",
+  "package_bytes": 3767361725,
+  "package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 274380,
+      "sha256": "b3dbe2351798561cd8d585449a7e304822d62f0706689527285c7f41658359f8"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1073604434,
+      "sha256": "419160879971c9c6a0e775d44caa48c52e7d98e66649084ad55cb9b6e4df15eb"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1068730788,
+      "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379183,
+      "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 552372940,
+      "sha256": "7383f8f065b0adde28a9a0ad0560419add35d150fcf92f7d6776268b8d3cc1e4"
+    }
+  ],
+  "file_count": 6658,
+  "package_report": "output/map_resources_20261028/package.json",
+  "package_report_sha256": "4b701bce2b41d30ffe4bc5d3628dd44180778e52d70085b58ea7bde801c6a368",
+  "changed_runtime_paths": [
+    "maps/template_map.vpk"
+  ],
+  "protected_modules_preserved": 180,
+  "review_source_files": 16,
+  "source_sha256": "4e62350c1bf08e663f5217885f26652918c2e09296a829f29a987ba8a14dccdc",
+  "source_crc32": 3557144492,
+  "compiled_map_sha256": "f868f295a01b78f63dbeb9fe9edfc6a7591b3889ace84f0892f595ac46f22186",
+  "compile_log_sha256": "be9a1899a5f39ada3bef977e5d53a77f0da794efa8464f7f083b6947878450c4",
+  "map_verification_sha256": "ddcd2dd519777e56e7fca1d5ee8849f58d8939bbe0c795aaa36e5f5636ba777f",
+  "map_crc_entries_verified": 307,
+  "source_crc_matches": true,
+  "signed": true,
+  "full_runtime_validator_passed": true,
+  "full_view_canonical_guard": "PASS",
+  "qr_fix_preserved": true,
+  "layout_fix_preserved": true,
+  "authentication_payment_gameplay_code_preserved": true,
+  "previous_verified_release_sequence": 2026102801,
+  "previous_release_record": "publishing/workshop/ui_layout_20261028.json",
+  "uploaded": true,
+  "workshop_upload_performed": true,
+  "download_verified": true,
+  "native_map_acceptance": "PASS_HOST_ORDINARY_ARCADE_MAP_LOADED",
+  "orders_created_by_agent": 0,
+  "ready_for_public_release": false,
+  "download_manifest": "2226754158672105621",
+  "download_receipt": "output/map_resources_20261028/download_evidence/20261028T010453Z_f4ad7619af99475c859dad247cb377d3/verification.json",
+  "download_receipt_sha256": "5babf60a6c7c06bd3867dfb45f9defae57d477ac3728bedea66394ab03f3b948",
+  "official_download": {
+    "status": "OFFICIAL_REFRESH_NATIVE_DOWNLOAD_FULLY_VERIFIED",
+    "observed_utc": "2026-10-28T01:04:53.611375+00:00",
+    "workshop_id": "3824360109",
+    "release_sequence": 2026102802,
+    "content_sha256": "310aad0a33116f29304d9ea7251524b4c1721bd5fb2b7952610d63cca2ac09d5",
+    "vpk_sha256": "b3dbe2351798561cd8d585449a7e304822d62f0706689527285c7f41658359f8",
+    "steam_manifest": "2226754158672105621",
+    "manifest_is_string": true,
+    "manifest_source": "fresh_callback_install_acf_bound_to_queries_and_signed_bytes",
+    "signed_resources_verified": 6658,
+    "protected_modules_verified": 180,
+    "canonical_journal_unchanged": true,
+    "verified": true,
+    "evidence": "output/map_resources_20261028/download_evidence/20261028T010453Z_f4ad7619af99475c859dad247cb377d3/verification.json",
+    "evidence_sha256": "5babf60a6c7c06bd3867dfb45f9defae57d477ac3728bedea66394ab03f3b948",
+    "log": "output/map_resources_20261028/official_download.log",
+    "log_sha256": "4c8bfda2c928e63db3d90daefce4fdb0c5457200c6c0a760420e6e42d2892fd3",
+    "native_test": "NOT_RUN",
+    "multiplayer_acceptance": "NOT_RUN",
+    "ready_for_public_release": false
+  },
+  "upload_log": "output/map_resources_20261028/upload.log",
+  "upload_log_sha256": "1503e1c6d7c8f030be15f421b22b8cfc9c053ce53d8243ac3aefd5c08ca89e1d",
+  "native_map_smoke_evidence": "output/map_resources_20261028/native_map_smoke.json",
+  "native_map_smoke_evidence_sha256": "e5000a606c37094dc3a5feea1acaec7ef46ff084ecdd7ee0acb402eb2496547b",
+  "native_test": "PASS_HOST_MAP_LOADED_FULL_GAMEPLAY_AND_TWO_PLAYER_NOT_TESTED",
+  "guest_update_issue": "GUEST_STILL_OLD09_METADATA_RESTART_DID_NOT_RESOLVE_PENDING_ACCOUNT_QUERY"
+}
