@@ -70,8 +70,8 @@
     },
     {
       "path": "13_art_ui_qa.md",
-      "bytes": 2826,
-      "sha256": "7515623d9cf388c2c2ecbd33576a2ba99c752245d76d587d79e9595dc5b010fc"
+      "bytes": 3337,
+      "sha256": "2a3049c5be3f34ab328340151c2326b1af5d2d495776bb0437afcc579cec4807"
     },
     {
       "path": "NEW_CHAT_PROMPT.txt",
@@ -257,6 +257,11 @@
       "path": "evidence/commerce_prices_20261028.md",
       "bytes": 2499,
       "sha256": "8bca6c86e27bfd5b6a3d626db48f73de8dee309f78309ae3061cdaa65e4b5bb5"
+    },
+    {
+      "path": "evidence/tooltip_follow_20261028.md",
+      "bytes": 3321,
+      "sha256": "ccdbf9e15416596d9a7cefd22d380cdc89628cff9f342983ee373d4ce77b6d51"
     }
   ]
 }

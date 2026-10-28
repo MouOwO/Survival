@@ -396,6 +396,37 @@ assert.equal(cfg.SurvivalArchiveV10.Inspect().layout, 'commerce_goods_grid');
 assert.equal(cards()[0].style.height, '112px'); assert.equal(cards()[1].style.position, '106px 0px 0px');
 assert.equal(cards()[0].__v10.countHost.visible, false, 'Purchased unique goods keep their existing uncluttered cell');
 assert.equal(JSON.stringify(pointsRows), pointsBefore, 'Rendering and filtering never clamp historical counts or alter authoritative rows');
+// Reproduce the dense-grid failure with the actual production controller:
+// late mouseout, a dropped mouseover, and repeated short stops on each item.
+let hoverCursor=[0,0];context.GameUI.GetCursorPosition=()=>hoverCursor;
+function cursorOver(card){const at=card.GetPositionWithinWindow();hoverCursor=[at.x+8,at.y+8];}
+function currentTooltip(card){assert(nodes.get('ArchiveV10Tooltip').visible,'The stopped cursor keeps a visible description');assert.equal(nodes.get('ArchiveV10TooltipTitle').text,card.__archiveItem.name);}
+pointsApi.SelectCategory('points');snapshot('points',49,pointsCatalog);
+const [hoverFirst,hoverSecond]=cards();
+cursorOver(hoverFirst);hoverFirst.events.onmouseover();advance(.04);currentTooltip(hoverFirst);
+cursorOver(hoverSecond);hoverSecond.events.onmouseover();hoverFirst.events.onmouseout();advance(.21);currentTooltip(hoverSecond);
+cursorOver(hoverFirst); // Deliberately omit mouseover: no extra movement is needed.
+advance(.04);currentTooltip(hoverFirst);
+const hoverPanelCount=allPanels.length;
+for(let index=0;index<100;index++){
+    const target=index%2?hoverFirst:hoverSecond,previous=index%2?hoverSecond:hoverFirst;
+    cursorOver(target);
+    if(index%3)target.events.onmouseover();
+    previous.events.onmouseout();advance(.04);currentTooltip(target);
+    advance(.18);currentTooltip(target);
+}
+assert.equal(allPanels.length,hoverPanelCount,'Rapid hover reuses tooltip panels and materials');
+const scrolledCards=cards(),positions=scrolledCards.map(card=>card.style.position);
+scrolledCards.forEach(card=>{const [x,y]=card.style.position.split(' ').map(parseFloat);card.style.position=`${x}px ${y-116}px 0px`;});
+const gridAt=nodes.get('ArchiveGrid').GetPositionWithinWindow();hoverCursor=[gridAt.x+8,gridAt.y+8];
+advance(.04);currentTooltip(scrolledCards[7]);
+scrolledCards.forEach((card,index)=>{card.style.position=positions[index];});
+advance(.04);currentTooltip(hoverFirst);
+hoverCursor=[0,0];hoverFirst.events.onmouseout();hoverSecond.events.onmouseout();advance(.3);
+assert.equal(nodes.get('ArchiveV10Tooltip').visible,false,'Leaving the grid dismisses without another enter');
+cfg.SurvivalArchive.Close();advance(.1);
+assert.equal(cfg.SurvivalTooltipDismiss.Inspect().watching,false,'Closing the archive stops shared cursor polling');
+cfg.SurvivalArchive.Open();delete context.GameUI.GetCursorPosition;
 // Monthly copy is applied after authoritative business rendering, on every refresh.
 for (const [category, note] of Object.entries({shadow:'月卡玩家掉落+1',map_level:'月卡玩家双倍在线时长',work:'月卡玩家双倍效果',fragment:'每日上限20个，月卡玩家40个',pet:'每日上限30个，月卡玩家90个'})) {
     cfg.SurvivalArchive.SelectCategory(category);

@@ -11,8 +11,8 @@ e86cb49a9028b56768551c0ce2d2e156  09_session_digest.md
 bb3780deff6573b79c1336d9d4846e4f  10_runtime_engine_contracts.md
 02e917d898f284488194760afea37626  11_completed_work_catalog.md
 c5d539495e5a99a38be32acd29d3b90b  12_sessions_archive_and_recovery.md
-98b3396fbcd73bc51729998c7668c19a  13_art_ui_qa.md
-ccff4f1c490d0630ed65044f309da51f  MANIFEST.json
+5c286580d852a63a40d8c605bcf2cd5b  13_art_ui_qa.md
+6189f0c0d1f5962bc2e27c4edf70f78e  MANIFEST.json
 7f371090900ed781564a860494ae934d  NEW_CHAT_PROMPT.txt
 ea3caf643e5973fd3c27c4a14e1c8f6f  README.md
 33fbd1cc38438efb46442edfabdebbc6  data/completed_work_index.json
@@ -50,3 +50,4 @@ bde0039c868a127225d2ef2272f0d1f4  history/20261024/data/source_manifest.json
 ef98af27d691c5160519ae2ab7b23e7c  history/README.md
 af0ee735f9714eca05a9fbc294dbb5b5  tools/verify_knowledge.py
 da968ec106f304daefb80924924a2f24  evidence/commerce_prices_20261028.md
+fe736a70e5066f94b0f4630e83e2ed7d  evidence/tooltip_follow_20261028.md

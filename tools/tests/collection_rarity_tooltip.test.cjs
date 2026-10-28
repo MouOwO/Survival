@@ -41,7 +41,15 @@ const unknown=hover('wife',{quality:'UNCONFIGURED',draw_probability:0.25});asser
 const defaultTitleColor=nodes.CollectionGW2TooltipTitle.style.color;
 assert(!Object.values(qualityColors).includes(defaultTitleColor),'Unknown names reset to the default title color after a graded hover');
 assert.equal(hover('wife',{quality:'',draw_probability:undefined}).visible,false,'No row is shown without recognized grade or probability');
+api.Open('wife');h.emit('survival_archive_snapshot',{ok:1,category_id:'wife',sequence:++sequence,chunk:1,chunks:1,pending:0,
+ rows:[{id:'hover_one',name:'收藏一',count:1,description:'攻击+1'},{id:'hover_two',name:'收藏二',count:1,description:'生命+2'}],social:{tickets:2,draw_cost:1,remaining:19,total:2}});
+const firstHover=nodes.CollectionGW2Item_hover_one,secondHover=nodes.CollectionGW2Item_hover_two;
+function cursorOver(card){const at=card.GetPositionWithinWindow();h.setCursor(at.x+5,at.y+5);}
+cursorOver(firstHover);firstHover.events.onmouseover();h.flushFinite();
+cursorOver(secondHover);h.flushFinite();firstHover.events.onmouseout();h.flushFinite();
+assert(nodes.CollectionGW2Tooltip.visible);assert.equal(nodes.CollectionGW2TooltipTitle.text,'收藏二','Collection hover recovers a missed enter and ignores the previous icon leave');
 api.Close();
+assert.equal(cfg.SurvivalTooltipDismiss.Inspect().watching,false,'Closing the collection stops hover polling');
 const anchor=new h.root.constructor('Panel',h.root,'NormalArchiveAnchor');anchor.style.width='100px';anchor.style.height='78px';
 const normal=cfg.SurvivalArchiveTooltip.Create({parent:h.root,root:h.root,idPrefix:'OrdinaryArchiveProbe'});
 assert.equal(nodes.OrdinaryArchiveProbeRarity,undefined,'Normal archive tooltips do not gain any extra layout node');

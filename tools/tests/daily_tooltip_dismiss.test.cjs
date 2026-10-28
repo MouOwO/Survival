@@ -12,8 +12,9 @@ for(let index=0;index<7;index++){
 }
 const first=nodes.DailyGW2Day_1,second=nodes.DailyGW2Day_2,tip=nodes.DailyGW2Tooltip,surface=nodes.DailyGW2TooltipSurface;
 first.events.onmouseover();h.flushFinite();assert(tip.visible,'An open daily page keeps its real reward tooltip');
+const firstTitle=nodes.DailyGW2TooltipTitle.text;
 const at=surface.GetPositionWithinWindow();h.setCursor(at.x+10,at.y+10);surface.events.onmouseover();assert(!tip.visible,'Entering the tooltip hides immediately');
-first.events.onmouseout();first.events.onmouseover();h.flushFinite();assert(!tip.visible,'Delayed measurement and the same dismissed source cannot reopen beneath the cursor');
+first.events.onmouseout();first.events.onmouseover();h.flushFinite();assert(!tip.visible||nodes.DailyGW2TooltipTitle.text!==firstTitle,'The dismissed source stays suppressed; a different reward under the current cursor may open');
 const secondAt=second.GetPositionWithinWindow();h.setCursor(secondAt.x+10,secondAt.y+40);second.events.onmouseover();h.flushFinite();assert(tip.visible,'Entering a different daily reward underneath the dismissed area opens that reward');assert(nodes.DailyGW2TooltipTitle.text.includes('第2天'));
 h.setCursor(0,0);h.flushFinite();first.events.onmouseover();assert(tip.visible,'Leaving the old source and tooltip area permits a new hover');
 let measuredBodyHeight=1000;

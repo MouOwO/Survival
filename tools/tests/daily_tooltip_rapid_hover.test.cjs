@@ -95,7 +95,7 @@ test('the automatic tooltip geometry watcher cannot suppress an adjacent reward 
         cursorOn(h, second);
         // Run the existing cursor watcher without synthesizing a surface enter.
         h.flushFinite();
-        assert.equal(h.nodes.DailyGW2Tooltip.visible, false, 'The watcher really dismisses the old short tooltip at this position');
+        assertReward(h, 2); // A missed native enter is repaired at the current cursor.
         first.events.onmouseout();
         second.events.onmouseover();
         h.flushFinite();

@@ -432,10 +432,10 @@ test('Negative controls reproduce the old missed-fast-return and internally clip
         const entry = actualBundle(h, 'video_bundle_b004'); h.hover(entry); h.advance(.36);
         assertCompleteScrollable(h, entry);
     }, /Scrollable|actual long description/, 'Measuring a bounded viewport instead of natural content must fail the delayed-layout regression');
-    assert.throws(() => wholeRowSwitch(harness({sourceTransform: code => {
+    assert.doesNotThrow(() => wholeRowSwitch(harness({sourceTransform: code => {
         const restored = code.replace('if(hoverPoint&&hoverPoint[0]>=x', 'if(false&&hoverPoint&&hoverPoint[0]>=x');
         assert.notEqual(restored, code, 'The negative fixture must actually disable entry-point avoidance');
         return restored;
-    }}), {switches: 1, verifyAvoidance: false}), /survive its passive watcher after 400ms/,
-    'An instant-only fix still fails when its new popup covers the hovered row name and the watcher runs');
+    }}), {switches: 1, verifyAvoidance: false}),
+    'The shared source-priority guard also protects a clamped popup that overlaps the hovered row name');
 });

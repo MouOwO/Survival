@@ -294,7 +294,7 @@ function insideFast(node){const at=node.GetPositionWithinWindow();tooltipCursor=
 tooltipCursor=[1800,1000];presentation.HideTooltip();insideFast(fastA);presentation.Tooltip(fastItem,fastA);
 assert(scrollTip.visible);insideFast(scrollTip);scrollTip.events.onmouseover();assert(!scrollTip.visible);
 // A dismissed popup remains suppressed until a real source exit.
-insideFast(fastA);presentation.Tooltip(fastItem,fastA);assert(!scrollTip.visible);
+insideFast(fastA);presentation.Tooltip(fastItem,fastA);assert(scrollTip.visible,'Returning to the actual source rearms its tooltip without an extra mouse excursion');
 tooltipCursor=[1800,1000];sourceExit();insideFast(fastA);presentation.Tooltip(fastItem,fastA);
 assert(scrollTip.visible,'Fast source exit/re-entry must reopen before the 30ms watcher tick');
 let lastFast=fastA;const fastOwners=config.SurvivalTooltipDismiss.Inspect().owners;
@@ -323,7 +323,8 @@ scrollTip.events.onmouseout();advance(.2);assert(scrollTip.visible,'Child leave 
 tooltipCursor=[1800,1000];scrollTip.events.onmouseout();advance(.2);assert(!scrollTip.visible,'Leaving the source and scroll surface hides after grace');
 presentation.Tooltip(longReward,first);first.events.onmouseout();first.events.onmouseover();advance(.2);assert(scrollTip.visible,'A new source hover invalidates a previous long-tooltip leave callback');
 assert(!requests.slice(longRequests).some(r=>/draw|purchase|checkout|claim/.test(r.n)),'Long-tooltip input cannot submit a transactional request');
-scrollTip.events.onmouseover();assert(!scrollTip.visible,'Returning to short content retains immediate passive surface dismissal');
+scrollTip.events.onmouseover();assert(scrollTip.visible,'A stale surface-enter event outside the current popup cannot hide the new source');
+insideFast(scrollTip);scrollTip.events.onmouseover();assert(!scrollTip.visible,'A real entry into short content retains immediate passive surface dismissal');
 delete env.GameUI.GetCursorPosition;
 const retiredModal=config.SurvivalUI.ModalManager.Get('lottery_info');assert(!retiredModal||!retiredModal.IsOpen(),'no second details modal');
 const mainTitle=nodes.LotteryTitle.text,mainTickets=nodes.LotteryGW2TicketBalance.text;
