@@ -15,6 +15,7 @@
 | 选择与多玩家 | 每个客户端只渲染自身选中实体/账户状态；共享NetTable不意味着可以显示房主私有余额、订单或面板。旧实体回包须丢弃 |
 | 道具连续悬停 | 2026-10-28修复积分道具快速移入后弹窗消失/不切换：源道具优先于弹窗重叠区域，离开事件携带来源；存档/收藏/签到在当前悬停期间每30ms补查可见道具，恢复漏掉的移入事件，离开或关闭即停止。长说明保留滚动输入，禁止旧surface事件隐藏新说明。48项相关回归通过；本地资源已编译，尚未游戏内实机验收或上传游廊。见[悬停修复记录](evidence/tooltip_follow_20261028.md) |
 | 转生怪查看 | 2803已上传：待挑战展示模型取消不可选中状态，按当前模式/难度填入真实挑战属性及大数还原。保留展示隔离和无奖励；原生10个实体属性核对通过，尚未完成完整候选的游廊实际鼠标点选/双人挑战验收。官方重新下载等待关闭Dota，不能沿用2802安装manifest。见[转生修复记录](evidence/rebirth_selection_20261028.md) |
+| 转生怪原生头像试用 | 2026-10-29按用户要求仅让一至十转十只Boss（含待挑战展示与正式挑战）恢复Valve原生选中头像；通过精确单位名在快照到达前恢复，资产身份兼容旧通用单位。隐藏独立替换Scene及切换遮罩，清除PortraitContainer自制背景，关闭自制光点；沿用现有HUD尺寸/边框/属性与状态模糊处理。另将portraits_custom.txt中十个模型的完整配置恢复为本机pak01中官方portraits.txt原件，生成器保留此例外，--restore-rebirth-only可单独恢复。引擎按模型共用配置，因此同模型引用也继承原版背景/镜头；其他单位和我方剑圣的头像替换方式保留，世界模型/饰品不变。十个配置与Valve逐项一致、其余模型配置保持，头像/背景及选择/多选专项回归通过，两份JS已同步content并官方编译（各1 compiled/0 failed）。需重新进入本地开发地图逐个点选观察饰品与背景，不能称原生饰品显示问题已全部修复，未上传游廊。源码：combat_stats.js、portrait_presentation.js、tools/build_unit_portraits.py；回归：test_seven_sins_portrait.cjs、test_portrait_presentation.cjs。 |
 | 地图与小地图 | 当前Hammer源是权威，编译sourceCRC+内部CRC双校验；overview与实际地形要配套检查，避免从旧截图反推新包正确 |
 
 QA资料：docs/validation/UI_DATA_QA_20261025.md/.json、docs/ui_layout_20261028.md、docs/guest_payment_qr_20261027.md、docs/map_resources_20261028.md、docs/ai/CURRENT_TASK.md。测试通过范围与未跑项分别记录，不能把工具mock测试写成双人或实付结果。

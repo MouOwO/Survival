@@ -6,7 +6,7 @@ const cases=[
  ['hero_permanent_hero_doom','npc_dota_hero_doom_bringer',''],
  ['hero_permanent_hero_blademaster','npc_dota_hero_juggernaut',''],
  ['tower_keeper_of_the_light','npc_dota_hero_tinker',''],
- ['monster_boss_rebirth_01_phalanx','npc_dota_hero_undying',''],
+ ['monster_boss_ten_sin_01_murid_divine','npc_dota_hero_necrolyte',''],
  ['monster_wave_humanoid_red_axe','npc_dota_hero_axe',''],
  ['monster_archive_shadow_1','npc_dota_hero_shadow_demon',''],
  ['challenge_monster_terrorblade_fractal_horns','npc_dota_hero_terrorblade',''],
@@ -61,4 +61,31 @@ for(const patch of [
  assert.equal(t.api.portraitState().snapshot,prior);assert.equal(t.metrics.setUnit.length,1);
  assert.equal(t.overlay.values.visibility,'visible');t.api.shutdown('late_done');
 }
-console.log('SEVEN_SINS_PORTRAIT_PASS: real shared update/hide/mount/position/sentinel; 12 assets including Doom/Juggernaut/tower/boss/wave/archive/6 challenges, 64 stable frames each, exact allowlist and multi-selection cleanup');
+// Read the actual ten rebirth identities so staged previews and live bosses
+// exercise the same production path, before and after snapshot delivery.
+const fs=require('fs');
+const archetypes=fs.readFileSync('scripts/vscripts/config/generated/monster_archetypes.lua','utf8');
+const rebirths=[...archetypes.matchAll(/archetype_id = "rebirth_boss_(\d+)"[^\r\n]+unit_name = "([^"]+)"[^\r\n]+default_wearable_asset_id = "([^"]+)"/g)];
+assert.equal(rebirths.length,10);
+for(const [,rank,unit,asset] of rebirths){
+ const t=setup({portrait:true});
+ const jugg={entindex:7,refresh_version:1,model_asset_id:'hero_permanent_hero_blademaster',portrait_unit_name:'npc_dota_hero_juggernaut'};
+ t.api.updateSnapshot(jugg);assert.equal(t.overlay.values.visibility,'visible');
+ t.select(8,unit);t.api.portraitTransition('selection_changed');
+ assert.equal(t.overlay.values.visibility,'collapse',rank+' must restore native immediately, before a snapshot');
+ assert.equal(t.native().values.opacity,'0.35');
+ const snapshot={entindex:8,refresh_version:2,model_asset_id:asset,portrait_unit_name:'npc_dota_hero_undying'};
+ for(let frame=0;frame<64;frame++)t.api.updateSnapshot({...snapshot,refresh_version:frame+2});
+ assert.equal(t.metrics.setUnit.length,1,'rebirth must never load our replacement scene');
+ assert.equal(t.overlay.values.visibility,'collapse');assert.equal(t.overlay.GetParent(),t.context);
+ assert.equal(t.api.portraitState().key,'');
+ t.api.portraitTransition('same_selection');assert.equal(t.overlay.values.visibility,'collapse','no black transition mask');
+ t.setMulti(true);t.api.cosmeticPortraitSentinel();assert.equal(t.overlay.values.visibility,'collapse');
+ t.setMulti(false);t.api.cosmeticPortraitSentinel();assert.equal(t.overlay.values.visibility,'collapse');
+ t.select(7,'npc_dota_hero_juggernaut');t.api.updateSnapshot({...jugg,refresh_version:100});
+ assert.equal(t.overlay.values.visibility,'visible','player Juggernaut keeps the existing isolated portrait');
+ t.api.updateSnapshot({...snapshot,refresh_version:999});
+ assert.equal(t.overlay.values.visibility,'visible','late boss response must not clear the selected Juggernaut');
+ t.api.shutdown('rebirth_done');assert.equal(t.jobs.size,0);
+}
+console.log('SEVEN_SINS_PORTRAIT_PASS: 12 existing split portraits and all 10 configured native rebirth portraits; pending/late snapshots, 64 stable updates, selection, multiselect and Juggernaut restoration');

@@ -2,7 +2,7 @@ const fs=require('fs'),vm=require('vm'),assert=require('assert');
 let now=0,selected=7,unitName="unknown_unit";
 const cfg={};
 vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/portrait_palette.js','utf8'),{GameUI:{CustomUIConfig:()=>cfg}});
-vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/portrait_presentation.js','utf8'),{GameUI:{CustomUIConfig:()=>cfg},Players:{GetLocalPlayerPortraitUnit:()=>selected},Entities:{GetUnitName:()=>unitName},Date:{now:()=>now}});
+vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/portrait_presentation.js','utf8'),{GameUI:{CustomUIConfig:()=>cfg},Players:{GetLocalPlayerPortraitUnit:()=>selected},Entities:{GetUnitName:()=>unitName},Date:{now:()=>now},$:{CreatePanel:(type,parent,id)=>new Panel(id,parent)}});
 class Panel {
  constructor(id,parent){this.id=id;this.parent=parent;this.children=[];this.style={};this.hittest=true;this.hittestchildren=true;if(parent)parent.children.push(this);}
  IsValid(){return !this.removed;}
@@ -134,6 +134,29 @@ const ioBackgroundPng=fs.readFileSync('panorama/src/images/custom_game/portrait_
 assert.equal(ioBackgroundPng.subarray(1,4).toString(),'PNG');
 assert.equal(ioBackgroundPng.readUInt32BE(16),128);assert.equal(ioBackgroundPng.readUInt32BE(20),128);
 console.log('BUILDER_PORTRAIT_BACKDROP_PASS: native coolinterior image only for the selected builder, both hosts covered, palette restoration on selection/identity/clear, no model brightness or tint');
+
+// Returning from a custom portrait must remove both the builder's image and
+// generated color/motes, including before the boss snapshot arrives.
+selected=790;unitName='npc_survival_builder_proxy';
+const nativeRebirth=fixture();
+cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:selected,model_asset_id:'builder_io_benevolent_companion'});
+cfg.SurvivalPortraitPresentation.Refresh(nativeRebirth.group);
+// The visible native host already has motes from the builder refresh above.
+new Panel('SurvivalPortraitMotes',nativeRebirth.custom);
+for(let rank=1;rank<=10;rank++){
+ selected=790+rank;unitName='npc_survival_named_rebirth_boss_'+String(rank).padStart(2,'0');
+ cfg.SurvivalPortraitPresentation.Refresh(nativeRebirth.group);
+ assert.equal(cfg.SurvivalPortraitPresentation.InspectBackdrop().nativeRebirth,true);
+ for(const key of ['backgroundColor','backgroundImage','backgroundSize','backgroundPosition','backgroundRepeat'])
+  assert.equal(nativeRebirth.container.style[key],'','native rebirth clears custom '+key);
+ for(const parent of [nativeRebirth.container,nativeRebirth.custom])
+  assert.equal(parent.FindChildTraverse('SurvivalPortraitMotes').style.visibility,'collapse');
+}
+selected=810;unitName='npc_dota_hero_juggernaut';
+cfg.SurvivalPortraitPresentation.Refresh(nativeRebirth.group);
+assert.equal(cfg.SurvivalPortraitPresentation.InspectBackdrop().nativeRebirth,false);
+assert(nativeRebirth.container.style.backgroundColor.includes('gradient('),'other heroes retain their background');
+console.log('NATIVE_REBIRTH_BACKDROP_PASS: ten named units restore native backdrop before snapshots; stale Io image and both mote layers cleared, other heroes preserved');
 
 // Use the production scene controller with separate state so the native HUD
 // assertions above remain independent of the corner shortcut's live identity.
