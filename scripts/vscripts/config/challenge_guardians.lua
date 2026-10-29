@@ -32,4 +32,12 @@ return {
         offset = { 2.43063, 81.42163, 34.43931 },
         parts = {},
     },
+    ["npc_archive_challenge_4"] = {
+        hero_unit = "npc_dota_hero_kunkka",
+        body = "models/survival_buildings/guardian_kunkka_akimbo_v3.vmdl",
+        sequence = "idle", cycle = 0.12,
+        scale = 0.85, yaw = 270,
+        offset = { 2.43063, 81.42163, 34.43931 },
+        parts = {},
+    },
 }

@@ -64,6 +64,8 @@ local DEV_PRELOAD_POLL_INTERVAL = 0.05
 local DEV_PRELOAD_TASK_ID = "dev_wave_preload"
 local DEV_WAVE_COMPLETE_TASK_ID = "dev_wave_complete"
 local ARCHIVE_CHALLENGE_RETRY_TASK_ID = "archive_challenge_begin_retry"
+local ARCHIVE_CHALLENGE_SAVE_TASK_ID = "archive_challenge_admission_save"
+local ARCHIVE_CHALLENGE_ADMISSION_SECONDS = 30
 local OVERFLOW_TASK_ID = "wave_monster_overflow"
 local wave_resource_sessions = {}
 local wave_model_leases = {}
@@ -607,7 +609,7 @@ local function update_population_limit()
 end
 
 local function stop_defeated_match()
-    if state.defeat_settled then return end
+    if state.defeat_settled or state.victory_settled then return end
     state.defeat_settled = true
     state.status, state.timer, state.pending = "defeat", 0, 0
     state.post_clear_frozen = true
@@ -619,6 +621,7 @@ local function stop_defeated_match()
     scheduler.cancel(DEV_PRELOAD_TASK_ID)
     scheduler.cancel(DEV_WAVE_COMPLETE_TASK_ID)
     scheduler.cancel(ARCHIVE_CHALLENGE_RETRY_TASK_ID)
+    scheduler.cancel("archive_challenge_admission_save")
     cancel_pending_wave_resource_sessions("all_players_defeated", false)
 end
 
@@ -690,34 +693,113 @@ local function settle_victory_once()
         end
     end
     local function begin_archive_phase()
-        local phase = event_bus.request("archive.challenge_begin", {
+        local phase, request_error = event_bus.request("archive.challenge_begin", {
             player_ids = archive_players, difficulty_id = difficulty_id,
         })
-        if not (phase and phase.ok and phase.keep_running) then return false end
-        state.status = "archive_challenges"
-        publish("archive_challenges_started")
+        if phase and phase.ok then
+            if not phase.keep_running then return "complete" end
+            state.status = "archive_challenges"
+            publish("archive_challenges_started")
+            return "running"
+        end
+        local reason = phase and phase.error or request_error or "archive_admission_invalid"
+        local human = false
+        for _, id in ipairs(archive_players) do
+            if not PlayerResource or not PlayerResource.IsFakeClient or not PlayerResource:IsFakeClient(id) then
+                human = true
+                break
+            end
+        end
+        if not human then return "permanent", "cooperative_roster_empty" end
+        local setup = package.loaded["systems/match_setup_service"]
+        local mode = setup and type(setup.get_mode) == "function" and setup.get_mode() or "standard"
+        if not difficulty_config.get(difficulty_id, mode) then
+            return "permanent", "archive_mode_difficulty_unavailable"
+        end
+        -- An unregistered/loading authority may recover. Admission invariants
+        -- (illegal tier, empty human roster, duplicate frozen session) cannot.
+        local temporary = tostring(reason):match("^no_request_handler:")
+            or reason == "archive_profile_unavailable" or reason == "profile_not_loaded"
+            or reason == "archive_loading" or reason == "mode_not_selected"
+        return temporary and "retry" or "permanent", reason
+    end
+    local save_players = {}
+    for _, id in ipairs(archive_players) do save_players[id] = true end
+    local function finish_after_saves(reason)
+        state.status = "archive_challenges_pending"
+        state.challenge_saving, state.challenge_ended = 1, 1
+        state.archive_admission_error = reason
+        phase_guard.freeze_for_settlement()
+        print("[WaveSystem] archive admission ended: " .. tostring(reason or "not_required"))
+        local multiplayer = package.loaded["systems/multiplayer_player_service"]
+        if multiplayer and type(multiplayer.participating_player_ids) == "function" then
+            for _, id in ipairs(multiplayer.participating_player_ids()) do save_players[id] = true end
+        end
+        if reason then
+            for id in pairs(save_players) do
+                event_bus.emit(events.UI_NOTIFICATION, {player_id=id, level="error",
+                    message="存档挑战未能开启（" .. tostring(reason) .. "），已获得奖励保存后结束本局。"})
+            end
+        end
+        publish("archive_admission_saving")
+        local finalizing = false
+        local function saved()
+            if game_has_ended() then return false end
+            local cooperative = package.loaded["systems/archive_cooperative_reward_service"]
+            if cooperative and cooperative.has_pending and cooperative.has_pending() then return true end
+            local archive_service = require("systems/archive_service")
+            if not finalizing then
+                if archive_service.begin_finalization then archive_service.begin_finalization() end
+                finalizing = true
+            end
+            -- Include participants who disconnected before the final kill;
+            -- their earlier earned rewards still own the same save barrier.
+            for id in pairs(save_players) do
+                if archive_service.has_pending(id) then return true end
+            end
+            if GameRules and GameRules.SetGameWinner then GameRules:SetGameWinner(DOTA_TEAM_GOODGUYS) end
+            return false
+        end
+        local function save_tick()
+            local ok, waiting = pcall(saved)
+            if ok then return waiting end
+            print("[WaveSystem] archive admission save pending: " .. tostring(waiting))
+            return true
+        end
+        if save_tick() then scheduler.every(0.25, save_tick, ARCHIVE_CHALLENGE_SAVE_TASK_ID) end
+    end
+    local admission, reason = begin_archive_phase()
+    if admission == "running" then return true end
+    if admission == "complete" or admission == "permanent" then
+        finish_after_saves(reason)
         return true
     end
-    if begin_archive_phase() then return true end
     local difficulty_number = tonumber(tostring(difficulty_id):match("[Nn](%d+)")) or 0
     if difficulty_number >= (tonumber(archive_challenge_rules.building_unlock_difficulty) or 3) then
         state.status = "archive_challenges_pending"
+        state.archive_admission_deadline = current_game_time() + ARCHIVE_CHALLENGE_ADMISSION_SECONDS
         publish("archive_challenges_pending")
         scheduler.every(1, function()
             if not state.post_clear_frozen or game_has_ended() then return false end
+            if current_game_time() >= state.archive_admission_deadline then
+                finish_after_saves("archive_admission_timeout")
+                return false
+            end
             archive_players = {}
             for _, player_id in ipairs(player_context.active_player_ids()) do
                 if disconnected_players[player_id] ~= true then
                     archive_players[#archive_players + 1] = player_id
                 end
             end
-            return not begin_archive_phase()
+            local next_admission, next_reason = begin_archive_phase()
+            if next_admission == "running" then return false end
+            if next_admission == "retry" then return true end
+            finish_after_saves(next_reason)
+            return false
         end, ARCHIVE_CHALLENGE_RETRY_TASK_ID)
         return true
     end
-    if GameRules and GameRules.SetGameWinner then
-        GameRules:SetGameWinner(DOTA_TEAM_GOODGUYS)
-    end
+    finish_after_saves()
     return true
 end
 
@@ -2146,6 +2228,7 @@ function M.init()
     scheduler.cancel(DEV_PRELOAD_TASK_ID)
     scheduler.cancel(DEV_WAVE_COMPLETE_TASK_ID)
     scheduler.cancel(ARCHIVE_CHALLENGE_RETRY_TASK_ID)
+    scheduler.cancel("archive_challenge_admission_save")
     clear_overflow()
     player_populations = {}
     reset(); enemies = {}; wall_entindex = -1; wall_by_player = {}

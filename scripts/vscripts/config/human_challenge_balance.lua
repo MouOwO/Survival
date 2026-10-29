@@ -65,33 +65,21 @@ end
 function M.has_member(member_id) return source_for(member_id) ~= nil end
 
 function M.archive(challenge_id, difficulty_id)
-    local name
-    local shadow = tonumber(tostring(challenge_id):match("^shadow_(%d+)$"))
-    if shadow then name = "虚空之影" .. shadow end
-    local category, ordinal = tostring(challenge_id):match("^(hunt)_(%d+)$")
-    if not category then category, ordinal = tostring(challenge_id):match("^(cage)_(%d+)$") end
-    local source
-    if name then source = named(rules.data.save_challenges, name)
-    elseif category then
-        local prefix = category == "hunt" and "神兽狩猎" or "秘法牢笼"
-        local counter = 0
-        for _, row in ipairs(rules.data.save_challenges or {}) do
-            if row.name:sub(1, #prefix) == prefix then
-                counter = counter + 1
-                if counter == tonumber(ordinal) then source = row; break end
-            end
-        end
-    end
-    if not source then return nil end
+    -- Archive profiles are final authored values, independent of both the
+    -- wave formulas and current mode/difficulty. Resolve by stable challenge
+    -- id so the video layout can reorder bosses without changing their stats.
+    local source = require("config/generated/archive_challenge_stats").by_id[
+        tostring(challenge_id) .. "_N1"]
+    if not source or not source.enabled then return nil end
     return {
         stats_id = challenge_id .. "_" .. tostring(difficulty_id),
         challenge_id = challenge_id, difficulty_id = difficulty_id,
         health = source.health, attack = source.attack, war3_armor = source.war3_armor,
-        -- The workbook's 250 is the Warcraft attack-speed percentage. Runtime
-        -- rows use attacks/second against the one-second archive base interval.
-        attack_speed = source.attack_speed / 100, authored_attack_speed = source.attack_speed,
-        count = source.count, enabled = true, human_spec = true,
-        source_name = source.name, evidence = source.evidence,
+        attack_speed = source.attack_speed, authored_attack_speed = source.attack_speed * 100,
+        move_speed = source.move_speed, attack_range = source.attack_range,
+        magic_resistance = source.magic_resistance,
+        count = tonumber(source.count) or 1, enabled = true, human_spec = true, fixed_archive_stats = true,
+        source_name = source.challenge_id, evidence = source.notes,
     }
 end
 

@@ -96,10 +96,11 @@ local function player_wave_snapshot(player_id)
     if personal.overflow_grace_seconds ~= nil then
         snapshot.overflow_grace_seconds = personal.overflow_grace_seconds
     end
-    local challenge = event_bus.request("archive.challenge_state", {})
+    local challenge = event_bus.request("archive.challenge_state", {player_id = player_id})
     if challenge and (challenge.active == 1 or challenge.ended == 1) then
         snapshot.challenge_remaining_seconds = challenge.remaining_seconds
         snapshot.challenge_saving = challenge.saving or 0
+        snapshot.challenge_player_finished = challenge.player_finished or 0
         snapshot.challenge_deadline = challenge.deadline
         snapshot.challenge_ended = challenge.ended
     end

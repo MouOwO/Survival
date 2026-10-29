@@ -9,5 +9,8 @@ end
 for _, row in ipairs(definitions.rows) do
     _G["ability_archive_" .. row.challenge_id] = create(row.challenge_id)
 end
+for _, row in ipairs(require("config/generated/archive_challenge_actions").rows) do
+    if row.enabled then _G[row.ability_name] = create(row.action_id) end
+end
 ability_archive_finish = create("finish")
 ability_archive_endless = create("endless")

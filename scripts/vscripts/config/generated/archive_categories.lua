@@ -22,6 +22,7 @@ M.rows = {
     { category_id = "titles", display_name = "称号", renderer = "titles", sort_order = 33, enabled = true },
     { category_id = "wife", display_name = "我的老婆", renderer = "collection", sort_order = 66, enabled = true },
     { category_id = "commerce_goods", display_name = "商城道具", renderer = "commerce_goods", sort_order = 99, enabled = true },
+    { category_id = "concubine", display_name = "我的侍妾", renderer = "collection", sort_order = 67, enabled = true },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do

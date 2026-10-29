@@ -19,7 +19,8 @@ local settlement=require(input.command.kind:match("^commerce_") and "systems/com
 -- No remote code, filesystem IO, shell execution or clock access from the settlement.
 local write=io.write
 io=nil;os=nil;dofile=nil;loadfile=nil;loadstring=nil;debug=nil
-local context = input.command.kind == "challenge" and {challenge_random_seed=input.seed} or nil
+local context = (input.command.kind == "challenge" or input.command.kind == "endless")
+    and {challenge_random_seed=input.seed} or nil
 local ok,result=pcall(settlement.settle,input.profile,input.command,input.has_pass==true,context)
 if not ok then result={ok=false,error="settlement_failed"} end
 write(encoder.encode(result))

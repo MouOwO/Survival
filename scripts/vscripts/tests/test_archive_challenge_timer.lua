@@ -1,4 +1,6 @@
 package.path = "scripts/vscripts/?.lua;" .. package.path
+package.loaded["core/test_access_policy"]={enabled=function() return false end,
+    enforce=function() return true end,allowed=function() return true end}
 local bus, events = require("core/event_bus"), require("core/events")
 local scheduler = require("core/scheduler")
 local clock, winners, rewards, removed, cancels, units, serial, pending
@@ -12,9 +14,14 @@ Vector = function(x,y,z) return {x=x,y=y,z=z} end
 package.loaded["config/generated/archive_challenge_definitions"] = {rows = {
     {challenge_id="test",building_id=1,enabled=true,min_difficulty=1,description="test",cooldown_seconds=0,reward_kind="shadow"}
 }, by_id = {test={challenge_id="test",building_id=1,enabled=true,min_difficulty=1,description="test",cooldown_seconds=0,reward_kind="shadow"}}}
-package.loaded["config/generated/archive_challenge_stats"] = {by_id={test_N1={enabled=true}}}
+package.loaded["config/generated/archive_challenge_stats"] = {by_id={test_N1={enabled=true,
+    health=100,attack=1,war3_armor=0,attack_speed=1,move_speed=280,attack_range=160,magic_resistance=0,count=1}}}
+local endless_action={action_id="endless",building_id=2,slot_order=1,min_difficulty=1,
+    enabled=true,ability_name="ability_archive_endless",display_name="无尽挑战",description="计时测试无尽入口"}
+package.loaded["config/generated/archive_challenge_actions"]={rows={endless_action},by_id={endless=endless_action}}
 package.loaded["config/generated/archive_challenge_rules"] = {by_id={default={
     building_unlock_difficulty=1, building_spacing=240, building_offset_y=360,
+    building_count=4,
     building_model="test.vmdl",building_model_scale=1,phase_duration_seconds=1800}}}
 package.loaded["systems/player_context_service"] = {
     register_unit=function(id,u) u.owner=id end, unregister_unit=noop,
@@ -24,6 +31,8 @@ package.loaded["systems/archive_service"] = {has_pending=function() return pendi
 package.loaded["debug/mode_unlock_test"] = {is_enabled=function() return acceptance_active end}
 package.loaded["systems/player_profile_service"] = {
     get_daily_limit=function(_,key) return daily_quotas and daily_quotas[key] end}
+package.loaded["systems/match_setup_service"]={get_mode=function() return "standard" end}
+package.loaded["systems/archive_challenge_reward_eligibility"]={check=function() return true end}
 package.loaded["systems/archive_endless_service"] = {init=noop,is_running=function() return false end,
     cancel=function(id) cancels[id]=(cancels[id] or 0)+1 end,
     start=function() endless_starts=endless_starts+1;return true end}
@@ -49,6 +58,7 @@ local function unit(name,position)
     return u
 end
 package.loaded["systems/wave_system"] = {
+    get_difficulty=function() return "N1" end,
     get_player_spawn_marker=function() return {IsNull=function() return false end,GetAbsOrigin=function() return Vector(0,0,0) end} end,
     spawn_challenge_monster=function() return unit("boss",Vector(0,0,0)) end}
 local function setup()
@@ -79,7 +89,8 @@ pending=true
 tick(1899.9);assert(winners==0 and service.phase_snapshot().remaining_seconds==1)
 assert(clock_publications==0,"no periodic challenge timer broadcast before expiry")
 tick(1900);assert(winners==0 and service.phase_snapshot().expired==1 and service.phase_snapshot().saving==1)
-assert(rewards==0 and removed==7 and cancels[0]==1 and cancels[1]==1)
+assert(rewards==0 and removed==9 and cancels[0]==1 and cancels[1]==1,
+    "timeout removes four hubs per owner and the unrewarded live boss")
 assert(service._test.players()[0].finished and service._test.players()[1].finished)
 bus.emit(events.ENGINE_ENTITY_KILLED,{victim=boss,victim_entindex=boss.id})
 assert(rewards==0,"timeout cleanup must not grant boss rewards")
@@ -151,6 +162,7 @@ print("ARCHIVE_ACCEPTANCE_QUOTA_PASS: exhausted real quotas block normal UI/cast
 -- Real endless service must reject a queued next wave and boundary kills.
 package.loaded["systems/player_context_service"].is_defeated=function() return false end
 package.loaded["systems/archive_endless_config"]={rules={monsters_per_wave=1,time_limit_seconds=60},
+    allowed_variant=function(tier,mode,variant) return tier==1 and mode=="standard" and variant=="endless" end,
     wave=function() return {health=100,attack=1,war3_armor=0} end,score=function() return 1 end}
 package.loaded["systems/archive_service"].record_endless_wave=function() rewards=rewards+1;return {ok=true} end
 package.loaded["systems/archive_endless_service"]=nil

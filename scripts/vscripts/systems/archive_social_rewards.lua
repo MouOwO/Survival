@@ -1,6 +1,7 @@
 local items = require("config/generated/archive_social_items")
 local rules = require("config/generated/archive_social_rules")
 local daily_limits = require("systems/archive_daily_limits")
+local eligibility = require("systems/archive_challenge_reward_eligibility")
 local M = {}
 local quality_order = {"N", "R", "SR", "SSR", "UR"}
 local function normalize(save)
@@ -85,17 +86,21 @@ function M.info(save, pool)
     return { tickets=save.social_tickets[rule.currency_id] or 0, currency_name=rule.currency_name,
         draw_cost=rule.draw_cost, remaining=remaining, total=total,
         rarity_probabilities=current.quality_probabilities, rarity_base_probabilities=initial.quality_probabilities,
-        unlocked=save.social_unlocks.friend_100 and 1 or 0 }
+        draw_total=eligibility.total_draws(save, pool),
+        unlocked=eligibility.check(save, {reward_kind="social_ticket", reward_key=pool}) and 1 or 0 }
 end
 function M.grant_ticket(command, save, pool, pass)
     normalize(save)
     local rule = rules.by_id[pool]
     if not rule or not rule.enabled then return false, "奖池无效" end
-    local key = "social_" .. pool
+    local ok, reason = eligibility.check(save, {reward_kind="social_ticket", reward_key=pool})
+    if not ok then return true, {awarded=0, skipped_reason=reason} end
+    local key = pool == "concubine" and "salary" or "social_" .. pool
     local amount = 1 + (pass == true and (tonumber(rule.pass_extra_count) or 0) or 0)
     local accepted = daily_limits.grant(save, key, amount, assert(command.day_key), pass)
     save.social_tickets[rule.currency_id] = (save.social_tickets[rule.currency_id] or 0) + accepted
-    return true
+    return true, {awarded=accepted, skipped_reason=accepted == 0 and "今日获取次数已达上限" or nil,
+        currency_id=rule.currency_id, currency_name=rule.currency_name}
 end
 function M.apply(command, save, stats, apply_effects)
     normalize(save)
@@ -136,15 +141,17 @@ function M.apply(command, save, stats, apply_effects)
         end
     end
     assert(chosen, "social_draw_invalid")
+    local previous_draws = eligibility.migrate(save, command.pool_id)
     save.social_tickets[currency] = save.social_tickets[currency] - rule.draw_cost
     save.social_counts[chosen.item_id] = (save.social_counts[chosen.item_id] or 0) + 1
+    save.social_draw_counts[command.pool_id] = previous_draws + 1
     local before, effects = {}, {}
     for _, field in ipairs(chosen.effect_ids) do before[field] = tonumber(stats[field]) or 0 end
     apply_effects(stats, chosen)
     for field, value in pairs(before) do effects[field] = (tonumber(stats[field]) or 0) - value end
     save.social_last_draw = {pool_id=command.pool_id, name=chosen.display_name, id=command.id, effects=effects}
-    if M.info(save, "friend").total >= rules.by_id.friend.unlock_count then save.social_unlocks.friend_100=true end
-    if M.info(save, "beast").total >= rules.by_id.beast.unlock_count then save.social_unlocks.ex_100=true end
+    if eligibility.total_draws(save, "friend") > rules.by_id.friend.unlock_count then save.social_unlocks.friend_100=true end
+    if eligibility.total_draws(save, "beast") > rules.by_id.beast.unlock_count then save.social_unlocks.ex_100=true end
     return true
 end
 return M

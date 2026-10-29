@@ -1,0 +1,394 @@
+{
+  "date": "2026-10-29",
+  "scope": "local development; no Workshop upload or remote database changes",
+  "status": "PASS_LOCAL_CONTRACTS_NATIVE_CONFIG_READ_ONLY",
+  "candidate_bundle": "5c380a98f337c1af59d0e00be039268adb03b5dbd5fc847df6b7aa5001f15560",
+  "runtime_bundle_unchanged": "47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e",
+  "candidate_counts": {
+    "archive_challenge_definitions": 36,
+    "archive_challenge_actions": 7,
+    "archive_challenge_stats": 360,
+    "archive_fragment_definitions": 16,
+    "archive_cage_items": 81,
+    "archive_challenge_gear_items": 10,
+    "archive_challenge_modes": 7
+  },
+  "concubine_items": 5,
+  "pal_enabled": false,
+  "fixed_stats": {
+    "configured_modes": 7,
+    "valid_mode_tier_challenge_combinations": 8460,
+    "exact_field_comparisons": 67680
+  },
+  "native_config": {
+    "actions": 7,
+    "configured_buildings": 4,
+    "definitions": 36,
+    "hubs": [],
+    "mode": "rich",
+    "mutated_match": false,
+    "offline": true
+  },
+  "full_native_spawn_and_multiplayer_verified": false,
+  "local_checks": [
+    {
+      "name": "test_archive_four_hub_placement",
+      "exit_code": 0,
+      "seconds": 0.02,
+      "command": [
+        "C:\\Program Files\\lua\\bin\\lua5.1.exe",
+        "scripts/vscripts/tests/test_archive_four_hub_placement.lua"
+      ],
+      "last_line": "PASS archive four-hub placement: 2235 checks; real cold shared routing, 16 hubs, all modes, bounded 24 candidates, terrain/bounds/unit rejection, safe recovery"
+    },
+    {
+      "name": "test_archive_high_difficulty_variants",
+      "exit_code": 0,
+      "seconds": 0.03,
+      "command": [
+        "C:\\Program Files\\lua\\bin\\lua5.1.exe",
+        "scripts/vscripts/tests/test_archive_high_difficulty_variants.lua"
+      ],
+      "last_line": "PASS archive high difficulty/variants: 233 checks; mode bounds, frozen identities, exact score admission, skipped waves, solo tower and callbacks"
+    },
+    {
+      "name": "test_archive_phase_admission",
+      "exit_code": 0,
+      "seconds": 0.11,
+      "command": [
+        "C:\\Program Files\\lua\\bin\\lua5.1.exe",
+        "scripts/vscripts/tests/test_archive_phase_admission.lua"
+      ],
+      "last_line": "ARCHIVE_PHASE_ADMISSION_PASS: strict human/config failures, late handler, fixed 30s retry, disconnected/cooperative/clear save barriers"
+    },
+    {
+      "name": "test_archive_post_win_defeat",
+      "exit_code": 0,
+      "seconds": 0.0,
+      "command": [
+        "C:\\Program Files\\lua\\bin\\lua5.1.exe",
+        "scripts/vscripts/tests/test_archive_post_win_defeat.lua"
+      ],
+      "last_line": "ARCHIVE_POST_WIN_DEFEAT_PASS: real bootstrap listener preserves saved victory; ordinary defeat remains effective"
+    },
+    {
+      "name": "test_archive_fixed_all_modes",
+      "exit_code": 0,
+      "seconds": 0.03,
+      "command": [
+        "C:\\Program Files\\lua\\bin\\lua5.1.exe",
+        "scripts/vscripts/tests/test_archive_fixed_all_modes.lua"
+      ],
+      "last_line": "ARCHIVE_FIXED_ALL_MODES_PASS: 8460 valid combinations / 7 configured modes / 67680 exact field comparisons; Pal excluded"
+    },
+    {
+      "name": "test_archive_challenge_gear",
+      "exit_code": 0,
+      "seconds": 0.0,
+      "command": [
+        "C:\\Program Files\\lua\\bin\\lua5.1.exe",
+        "scripts/vscripts/tests/test_archive_challenge_gear.lua"
+      ],
+      "last_line": "ARCHIVE_CHALLENGE_GEAR_PASS: 68 checks; real effects, cadence, skip crossings, independent cursors, quality boundaries, full inventory, inspectable rows"
+    },
+    {
+      "name": "test_archive_challenge_timer",
+      "exit_code": 0,
+      "seconds": 0.02,
+      "command": [
+        "C:\\Program Files\\lua\\bin\\lua5.1.exe",
+        "scripts/vscripts/tests/test_archive_challenge_timer.lua"
+      ],
+      "last_line": "ARCHIVE_ENDLESS_DEADLINE_PASS: no late wave, no boundary reward, no expired start"
+    },
+    {
+      "name": "test_archive_challenge_hub_positions",
+      "exit_code": 0,
+      "seconds": 0.02,
+      "command": [
+        "C:\\Program Files\\lua\\bin\\lua5.1.exe",
+        "scripts/vscripts/tests/test_archive_challenge_hub_positions.lua"
+      ],
+      "last_line": "PASS archive hub recovery: shared wall area, grounded bounded placement, blocked/water/occupied rejection, fog, retry and partial setup reuse"
+    },
+    {
+      "name": "test_archive_endless_rewards",
+      "exit_code": 0,
+      "seconds": 0.02,
+      "command": [
+        "C:\\Program Files\\lua\\bin\\lua5.1.exe",
+        "scripts/vscripts/tests/test_archive_endless_rewards.lua"
+      ],
+      "last_line": "ARCHIVE_ENDLESS_RUNTIME_PASS: all effect fields projected, real damage grants wood/attributes, owner-only"
+    },
+    {
+      "name": "test_wave_population_endgame",
+      "exit_code": 0,
+      "seconds": 0.73,
+      "command": [
+        "C:\\Program Files\\lua\\bin\\lua5.1.exe",
+        "scripts/vscripts/tests/test_wave_population_endgame.lua"
+      ],
+      "last_line": "PASS fishing wave isolation: no difficulty/countdown/preload/spawn/challenge/clear; direct, event and debug requests denied; two-hour lifecycle stays playable; standard/pure still start real waves"
+    },
+    {
+      "name": "test_archive_challenge_runtime",
+      "exit_code": 0,
+      "seconds": 0.1,
+      "command": [
+        "C:\\Program Files\\lua\\bin\\lua5.1.exe",
+        "tools/test_archive_challenge_runtime.lua"
+      ],
+      "last_line": "ARCHIVE_RUNTIME_FLICKER_REGRESSION_PASS 73 UI checks plus team early-finish and reward handoff barrier: identity, N gates, used, active boss, endless busy/end, shared refresh, activation and cleanup"
+    },
+    {
+      "name": "test_archive_cooperative_rewards",
+      "exit_code": 0,
+      "seconds": 2.39,
+      "command": [
+        "C:\\Program Files\\lua\\bin\\lua5.1.exe",
+        "tools/test_archive_cooperative_rewards.lua"
+      ],
+      "last_line": "ARCHIVE_COOPERATIVE_REWARDS_PASS 249 checks: roster, source authority, account isolation, monthly perks, delayed profile, disconnect, failure retries, highest team floor, bounded transport, terminal flush and independent wife daily rewards"
+    },
+    {
+      "name": "test_archive_portal_hubs",
+      "exit_code": 0,
+      "seconds": 0.02,
+      "command": [
+        "C:\\Program Files\\lua\\bin\\lua5.1.exe",
+        "tools/test_archive_portal_hubs.lua"
+      ],
+      "last_line": "ARCHIVE_PORTAL_HUBS_PASS: production rules, four owners/16 hubs, cardinal/diagonal offsets, old-anchor rejection, lower ground, occupancy/trees/navigation, bounded retries, idempotency, shared portal, native clear-space disabled"
+    },
+    {
+      "name": "test_archive_hub_placement",
+      "exit_code": 0,
+      "seconds": 0.0,
+      "command": [
+        "C:\\Program Files\\lua\\bin\\lua5.1.exe",
+        "tools/test_archive_hub_placement.lua"
+      ],
+      "last_line": "PASS archive hub placement: four-player wall/builder ownership, missing/blocked/occupied base refuses portals, bounded search, legacy compatibility"
+    },
+    {
+      "name": "test_archive_clear_flow",
+      "exit_code": 0,
+      "seconds": 1.32,
+      "command": [
+        "C:\\Program Files\\lua\\bin\\lua5.1.exe",
+        "tools/test_archive_clear_flow.lua"
+      ],
+      "last_line": "ARCHIVE_CLEAR_FLOW_PASS 6 cases plus failure/dev guards: normal/early, final-wave guards, co-op flag, HTTP failure/timeout retries, duplicate death, stale receipt isolation, authoritative revision and HUD refresh"
+    },
+    {
+      "name": "test_archive_video_rewards",
+      "exit_code": 0,
+      "seconds": 0.01,
+      "command": [
+        "C:\\Program Files\\lua\\bin\\lua5.1.exe",
+        "tools/test_archive_video_rewards.lua"
+      ],
+      "last_line": "ARCHIVE_VIDEO_REWARDS_PASS 162 checks"
+    },
+    {
+      "name": "test_endless_spawn_cost",
+      "exit_code": 0,
+      "seconds": 0.13,
+      "command": [
+        "C:\\Program Files\\lua\\bin\\lua5.1.exe",
+        "tools/test_endless_spawn_cost.lua"
+      ],
+      "last_line": "ENDLESS_STARTUP_MODEL_PRECACHE_PASS model=models/heroes/nevermore/nevermore.vmdl calls=1 static_ready=345 failed=0"
+    },
+    {
+      "name": "test_endless_death_cost",
+      "exit_code": 0,
+      "seconds": 0.44,
+      "command": [
+        "C:\\Program Files\\lua\\bin\\lua5.1.exe",
+        "tools/test_endless_death_cost.lua"
+      ],
+      "last_line": "ENDLESS_DEATH_COST_PASS players=4 waves=200 births=4000 deaths=4000 duplicate_deaths=4000 removed=4000 max_corpses=16 max_retained=20 max_tasks=14 pending=0 world_scans=0 outfit_props=0 particles=0 corpse_moves=54952"
+    },
+    {
+      "name": "test_endless_gameplay_continuity",
+      "exit_code": 0,
+      "seconds": 0.02,
+      "command": [
+        "C:\\Program Files\\lua\\bin\\lua5.1.exe",
+        "tools/test_endless_gameplay_continuity.lua"
+      ],
+      "last_line": "ENDLESS_GAMEPLAY_CONTINUITY_PASS: endless harvesting, upgrade spending, passive income, wave rollover, multiplayer finish, save barriers, spawn/setup failures, terminal lock/reset, queued reset, duplicate lifecycle events"
+    },
+    {
+      "name": "python_contracts",
+      "exit_code": 0,
+      "seconds": 10.97,
+      "command": [
+        "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "-m",
+        "unittest",
+        "tools.test_archive_challenge_mode_sessions",
+        "tools.test_archive_command_contract",
+        "tools.test_archive_challenge_receipt_flow",
+        "tools.test_archive_video_contract_20261029",
+        "tools.test_archive_challenge_assets_20261029",
+        "tools.test_archive_video_reward_backend",
+        "tools.test_archive_csv_records"
+      ],
+      "last_line": "OK"
+    },
+    {
+      "name": "catalog_check",
+      "exit_code": 0,
+      "seconds": 0.06,
+      "command": [
+        "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "tools/configure_archive_video_challenges.py",
+        "--check"
+      ],
+      "last_line": "ARCHIVE_VIDEO_CONFIG_CHECK_PASS: 36 challenges, 7 actions, fixed N1-N10 compatibility rows, 4 buildings; Pal excluded"
+    }
+  ],
+  "release_requirements": [
+    "deploy Python backend plus exact immutable bundle coherently",
+    "bind reviewed game bundle hash only with corresponding backend release",
+    "fresh native game: four buildings, tooltips, personal finish and multiplayer rewards"
+  ],
+  "video_stat_limits": "HP/armor/attack speed not visible; retained v3/project baseline; abbreviated attack displays retain explicit precision provenance",
+  "python_unittest_count": 38,
+  "content_localization_sync": {
+    "status": "PASS",
+    "archive_tokens": 92,
+    "unrelated_tokens_preserved": 601,
+    "content_sha256": "16640e78c3886d4a021d898cdaa2151f54fcb5c3774a722059602631f4b3282a",
+    "original_sha256": "3420cecbe74c06ba024f7adf93ff52e6b8c6ab07af875505847816cab75a4ba5",
+    "existing_format_preserved": "flat dota root; only managed challenge block inserted"
+  },
+  "ui_regressions": [
+    {
+      "program": "tools/test_archive_challenge_ui_20261029.cjs",
+      "exit_code": 0
+    },
+    {
+      "program": "tools/test_archive_concubine_ui_20261029.cjs",
+      "exit_code": 0
+    },
+    {
+      "program": "tools/test_archive_ability_runtime_flicker.cjs",
+      "exit_code": 0
+    },
+    {
+      "program": "tools/test_ability_tooltip_recovery.cjs",
+      "exit_code": 0
+    }
+  ],
+  "panorama_compilation": {
+    "compiler": "Valve resourcecompiler.exe",
+    "files": [
+      {
+        "source": "panorama/src/scripts/custom_game/ui_bootstrap.js",
+        "source_and_content_sha256": "0f4322616fe69b24bfe84350da29c4ab18ea72a4343bb0a9057682dc2f221a47",
+        "compiled": "panorama/scripts/custom_game/ui_bootstrap.vjs_c",
+        "compiled_sha256": "8eb2b145e4945a6161d35ecbf55722f0c78fa5c6275db749fcb3b93b7231da50",
+        "compiled_bytes": 33966,
+        "exit_code": 0
+      },
+      {
+        "source": "panorama/src/scripts/custom_game/topnav_remaining_5d5c1152eb.js",
+        "source_and_content_sha256": "b47055301fbae8819bf3da312a35f302fc745806e9dcacb8cf8e24370154786c",
+        "compiled": "panorama/scripts/custom_game/topnav_remaining_5d5c1152eb.vjs_c",
+        "compiled_sha256": "573bb146fe1fb32931325ef9065f8ddc08ec64045e64c18f31a24749e1f7ab72",
+        "compiled_bytes": 141504,
+        "exit_code": 0
+      },
+      {
+        "source": "panorama/src/scripts/custom_game/archive.js",
+        "source_and_content_sha256": "77ccf7697bcc4e6babe73fc5a4b219349c3279139f7c82e942e221191613f453",
+        "compiled": "panorama/scripts/custom_game/archive.vjs_c",
+        "compiled_sha256": "01b1119e2d256ec0a15385c9f7510c74e4db104be889cad1b971ea6ee3594b7e",
+        "compiled_bytes": 22650,
+        "exit_code": 0
+      },
+      {
+        "source": "panorama/src/scripts/custom_game/archive_180de7e38b.js",
+        "source_and_content_sha256": "f35ea333379a1ce3022792a5ac870159c25c7e8ba7fc35d05d2c5b2366b42d2c",
+        "compiled": "panorama/scripts/custom_game/archive_180de7e38b.vjs_c",
+        "compiled_sha256": "71c038de5a11c0b32fcccb412ae3b5f892c2e8b42133f4351a49dfb64a03d6eb",
+        "compiled_bytes": 31452,
+        "exit_code": 0
+      },
+      {
+        "source": "panorama/src/scripts/custom_game/archive_180de7e38b_titles_compact_v6.js",
+        "source_and_content_sha256": "3c9b0adbf7f874da3ece8887218ce239f6eaa1d5a4e735067653d2a602a3b628",
+        "compiled": "panorama/scripts/custom_game/archive_180de7e38b_titles_compact_v6.vjs_c",
+        "compiled_sha256": "7aa999fdd6329dfc1d9ddf3bb8ca2f0b110ba2a4816851554fc507a44f0babda",
+        "compiled_bytes": 42732,
+        "exit_code": 0
+      },
+      {
+        "source": "panorama/src/scripts/custom_game/archive_v10.js",
+        "source_and_content_sha256": "d796ffa14c88d8ab2de7fe09c5c237587b27c6d87c2613663efa8284a777a24a",
+        "compiled": "panorama/scripts/custom_game/archive_v10.vjs_c",
+        "compiled_sha256": "d8a4582cc0e09d9b87d764d260fa2f242e46cc3844ecaaf285582d75cbefbe0b",
+        "compiled_bytes": 38106,
+        "exit_code": 0
+      },
+      {
+        "source": "panorama/src/scripts/custom_game/archive_void_v1.js",
+        "source_and_content_sha256": "fa647fde8624da5b1b33406938a681f7505c30d43a05bf30b035ee26f963e2ef",
+        "compiled": "panorama/scripts/custom_game/archive_void_v1.vjs_c",
+        "compiled_sha256": "f612016891f9e9ed3dd8a8c139580523a4b05d4a80893426fba82ae3306ef85f",
+        "compiled_bytes": 21916,
+        "exit_code": 0
+      },
+      {
+        "source": "panorama/src/scripts/custom_game/icons_remaining_5d5c1152eb.js",
+        "source_and_content_sha256": "b5bb057ff45ad3dd904fa59ef3481607eadeacc33b6261c266f6ba117df4c8ba",
+        "compiled": "panorama/scripts/custom_game/icons_remaining_5d5c1152eb.vjs_c",
+        "compiled_sha256": "6ac1ff7af9e5f96662a4e07181795f4f06396407709b76ff793954f6f0f1f834",
+        "compiled_bytes": 10466,
+        "exit_code": 0
+      },
+      {
+        "source": "panorama/src/scripts/custom_game/common/archive_tooltip.js",
+        "source_and_content_sha256": "2c472c7c9681f3c220f29f32253b3ff1cb67798706b6bfa43d89d5ea83bcb05b",
+        "compiled": "panorama/scripts/custom_game/common/archive_tooltip.vjs_c",
+        "compiled_sha256": "c573b9f08d4511f311da7d1e43a93eb08135a4cf761415d557067aac70dd21dd",
+        "compiled_bytes": 26915,
+        "exit_code": 0
+      },
+      {
+        "source": "panorama/src/scripts/custom_game/archive_handoff_180de7e38b.js",
+        "source_and_content_sha256": "c865677c1f908b6fa6df5d431feb3c89cb31dbc4f620a1ad629b53ab45b35ccd",
+        "compiled": "panorama/scripts/custom_game/archive_handoff_180de7e38b.vjs_c",
+        "compiled_sha256": "f61895a3de5a02498387c28c7506db34d3264c15227016ef7ea2126bba7ed93c",
+        "compiled_bytes": 31516,
+        "exit_code": 0
+      },
+      {
+        "source": "panorama/src/scripts/custom_game/collection_gw2.js",
+        "source_and_content_sha256": "2e81797562d2b9cc4878f2b95bf635fb3e8a72db6efcd9b301b4d91a26741eed",
+        "compiled": "panorama/scripts/custom_game/collection_gw2.vjs_c",
+        "compiled_sha256": "670aa762f26851d2c7e0ed496465182b5ec5e1e1ea900ac8bdf862df2dd357fb",
+        "compiled_bytes": 31829,
+        "exit_code": 0
+      },
+      {
+        "source": "panorama/src/scripts/custom_game/common/item_resources.js",
+        "source_and_content_sha256": "435e813df330b6c23456fd9637e5c03da56c2b8c1665a5ca4758f08390d004e4",
+        "compiled": "panorama/scripts/custom_game/common/item_resources.vjs_c",
+        "compiled_sha256": "500d428af6f9462b1fd1385f9dec99c6f4819e9ce64f57a36dee740b4ed93bec",
+        "compiled_bytes": 341500,
+        "exit_code": 0
+      }
+    ]
+  }
+}

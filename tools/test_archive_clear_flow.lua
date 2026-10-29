@@ -33,7 +33,7 @@ package.loaded["systems/player_context_service"] = {
     is_defeated=function() return false end,
 }
 package.loaded["systems/title_presentation_service"] = {
-    init=function() end, rows=function() return {} end, preview_mode=function() return false end,
+    init=function() end, rows=function() return {} end, preview_active=function() return false end,
 }
 GameRules = {GetGameTime=function() return clock end}
 RandomInt = function(minimum) return minimum end
@@ -75,11 +75,12 @@ function provider.archive_submit(body, success, rejected)
     success(copy(receipt))
 end
 package.loaded["systems/player_profile_service"] = {
+    supports_rich_mode=function() return true end,
     get_account_profile=function(id) return copy(profiles[id]) end,
     get_profile=function() error("archive must use the account profile") end,
     get_provider=function() return provider end,
     apply_snapshot=function(id, snapshot, reason)
-        assert(reason == "archive_clear", "unexpected profile application reason")
+        assert(reason == "archive_standard_clear", "unexpected profile application reason")
         assert(snapshot.account_id == "fixture-account-" .. id)
         if snapshot.revision < profiles[id].revision then
             return {ok=false, error="snapshot_revision_stale"}
@@ -93,6 +94,9 @@ package.loaded["systems/player_profile_service"] = {
     end,
 }
 package.loaded["systems/archive_http_adapter"] = nil
+-- Production HTTP sessions provide explicit gameplay mode and progression
+-- capability. Legacy mode-less mixed counts are a different saved contract.
+package.loaded["systems/match_setup_service"] = {get_mode=function() return "standard" end}
 local archive = require("systems/archive_service")
 local no_op = function() end
 local wave_deps = {
@@ -170,6 +174,10 @@ local function fresh(ids)
         state=state, first=first, second=second, enemy_state=enemy_state}
 end
 local cases = 0
+local function achievement_row(rows, achievement_id)
+    for _, row in ipairs(rows) do if row.id == achievement_id then return row end end
+    error("missing authoritative achievement row: " .. achievement_id)
+end
 local function delivered_clear(id)
     local decoded, sequence
     for _, packet in ipairs(packets) do
@@ -218,7 +226,7 @@ local function run(mode, ids, retry_kind)
     assert(f.state.victory_settled and f.state.post_clear_frozen)
     assert(#requests == #ids)
     for _, body in ipairs(requests) do
-        assert(body.command.kind == "clear" and body.command.count == 1)
+        assert(body.command.kind == "standard_clear" and body.command.count == 1)
         assert(body.command.difficulty_id == "n1")
         assert(body.command.cooperative_win == (#ids >= 2 and body.account_id ~= "fixture-account-2" and 1 or 0))
     end
@@ -234,13 +242,17 @@ local function run(mode, ids, retry_kind)
     for _, id in ipairs(ids) do
         assert(not archive.has_pending(id))
         assert(profiles[id].save.archive.clear_counts.n1 == 1)
-        assert(profiles[id].save.archive.completed.clear_n1_1 == true)
-        local row = archive.snapshot(id, "clear").rows[1]
-        assert(row.count == 1 and row.completed == 1, "authoritative clear was not reflected in the page")
+        assert(profiles[id].save.archive.standard_clear_counts.n1 == 1)
+        assert(profiles[id].save.archive.completed["standard:clear_n1_1"] == true)
+        local row = achievement_row(archive.snapshot(id, "clear").rows, "clear_n1_1")
+        assert(row.mode_id == "standard" and row.difficulty_id == "n1"
+            and row.count == 1 and row.completed == 1, "authoritative clear was not reflected in the page")
         local delivered = delivered_clear(id)
         assert(delivered.pending == 0 and delivered.revision == profiles[id].revision,
             "confirmed revision/pending state not sent to the clear HUD")
-        assert(delivered.rows[1].count == 1 and delivered.rows[1].completed == 1,
+        local delivered_row = achievement_row(delivered.rows, "clear_n1_1")
+        assert(delivered_row.mode_id == "standard" and delivered_row.difficulty_id == "n1"
+            and delivered_row.count == 1 and delivered_row.completed == 1,
             "clear HUD did not receive confirmed row data")
     end
     assert(apply_count == #ids)

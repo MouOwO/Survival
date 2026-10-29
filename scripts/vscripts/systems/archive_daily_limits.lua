@@ -53,7 +53,10 @@ function M.challenge_key(definition)
     if definition.reward_kind == "fragment" then return definition.reward_key end
     if definition.reward_kind == "shadow" then return "shadow" end
     if definition.reward_kind == "cage" then return "cage" end
-    if definition.reward_kind == "social_ticket" then return "social_" .. tostring(definition.reward_key) end
+    if definition.reward_kind == "social_ticket" then
+        return definition.reward_key == "concubine" and "salary" or "social_" .. tostring(definition.reward_key)
+    end
+    if definition.reward_kind == "challenge_points" then return definition.reward_key end
     return nil
 end
 function M.snapshot(profile, day_key)

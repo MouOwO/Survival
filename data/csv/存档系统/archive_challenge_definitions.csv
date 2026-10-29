@@ -1,29 +1,134 @@
-challenge_id,building_id,slot_order,display_name,min_difficulty,reward_kind,reward_key,model_path,model_scale,ability_icon,cooldown_seconds,enabled,description,default_wearable_asset_id
-#中文表头:挑战ID,建筑序号,技能顺序,技能名称,解锁难度,奖励种类,奖励ID或品质,模型,模型缩放,技能图标,冷却秒,启用,说明,饰品资源ID
-#types:string,number,number,string,number,string,string,string,number,string,number,boolean,string,string
-shadow_1,1,1,虚空之影1,1,shadow,n1,models/heroes/shadow_demon/shadow_demon.vmdl,1.1,nevermore_shadowraze1,3,1,从工作簿虚空之影N1对应物品池独立随机2次，允许重复，最终固定2件。,monster_archive_shadow_1
-shadow_2,1,2,虚空之影2,2,shadow,n2,models/heroes/shadow_demon/shadow_demon.vmdl,1.1,nevermore_shadowraze1,3,1,从工作簿虚空之影N2对应物品池独立随机2次，允许重复，最终固定2件。,monster_archive_shadow_2
-shadow_3,1,3,虚空之影3,3,shadow,n3,models/heroes/shadow_demon/shadow_demon.vmdl,1.1,nevermore_shadowraze1,3,1,从工作簿虚空之影N3对应物品池独立随机2次，允许重复，最终固定2件。,monster_archive_shadow_3
-shadow_4,1,4,虚空之影4,4,shadow,n4,models/heroes/shadow_demon/shadow_demon.vmdl,1.1,nevermore_shadowraze1,3,1,击败BOSS随机获得2件绿色虚空道具；通行证额外1件，同品质内等概率。,monster_archive_shadow_4
-hunt_01,1,5,神兽狩猎-1,5,fragment,fragment_01,models/heroes/sven/sven.vmdl,1.2,sven_gods_strength,3,1,击败对应神兽获得神兵-破碎大剑 碎片；每20片晋升1级。,monster_archive_hunt_01
-hunt_02,1,6,神兽狩猎-2,6,fragment,fragment_02,models/heroes/mars/mars.vmdl,1.2,mars_arena_of_blood,3,1,击败对应神兽获得神兵-始祖之祸 碎片；每20片晋升1级。,monster_archive_hunt_02
-hunt_03,1,7,神兽狩猎-3,7,fragment,fragment_03,models/heroes/doom/doom.vmdl,1.2,doom_bringer_doom,3,1,击败对应神兽获得神兵-焚焰 碎片；每20片晋升1级。,monster_archive_hunt_03
-hunt_04,1,8,神兽狩猎-4,8,fragment,fragment_04,models/items/spectre/spectre_arcana/spectre_arcana_base.vmdl,1.2,spectre_haunt,3,1,击败对应神兽获得神兵-净魂之刃 碎片；每20片晋升1级。,monster_archive_hunt_04
-cage_1,1,9,秘法牢笼-1,7,cage,cage_1,models/items/dragon_knight/silver_dragon_king_dragon/silver_dragon_king_dragon.vmdl,1.5,visage_summon_familiars,3,1,击败BOSS随机掉落本池9种材料之一；通行证额外1件。,monster_archive_cage_1
-cage_2,1,10,秘法牢笼-2,8,cage,cage_2,models/items/dragon_knight/silver_dragon_king_dragon/silver_dragon_king_dragon.vmdl,1.5,visage_summon_familiars,3,1,击败BOSS随机掉落本池9种材料之一；通行证额外1件。,monster_archive_cage_2
-cage_3,1,11,秘法牢笼-3,9,cage,cage_3,models/items/dragon_knight/silver_dragon_king_dragon/silver_dragon_king_dragon.vmdl,1.5,visage_summon_familiars,3,1,击败BOSS随机掉落本池9种材料之一；通行证额外1件。,monster_archive_cage_3
-hunt_05,2,1,神兽狩猎-5,8,fragment,fragment_05,models/items/faceless_void/faceless_void_arcana/faceless_void_arcana_base.vmdl,1.2,faceless_void_chronosphere,3,1,击败对应神兽获得神兵-狂战斧 碎片；每20片晋升1级。,monster_archive_hunt_05
-hunt_06,2,2,神兽狩猎-6,9,fragment,fragment_06,models/heroes/antimage/antimage.vmdl,1.2,antimage_mana_void,3,1,击败对应神兽获得神兵-碎颅锤 碎片；每20片晋升1级。,monster_archive_hunt_06
-hunt_07,2,3,神兽狩猎-7,10,fragment,fragment_07,models/heroes/kunkka/kunkka.vmdl,1.2,kunkka_ghostship,3,1,击败对应神兽获得神兵-影刃 碎片；每20片晋升1级。,monster_archive_hunt_07
-hunt_08,2,4,神兽狩猎-8,10,fragment,fragment_08,models/items/pudge/arcana/pudge_arcana_base.vmdl,1.2,pudge_dismember,3,1,击败对应神兽获得神兵-龙爪弯钩 碎片；每20片晋升1级。,monster_archive_hunt_08
-hunt_09,3,1,神兽狩猎-9,10,fragment,fragment_09,models/heroes/weaver/weaver.vmdl,1.2,weaver_time_lapse,3,1,击败对应神兽获得神兵-纯金之触 碎片；每20片晋升1级。,monster_archive_hunt_09
-hunt_10,3,2,神兽狩猎-10,10,fragment,fragment_10,models/heroes/legion_commander/legion_commander.vmdl,1.2,legion_commander_duel,3,1,击败对应神兽获得神兵-战鬼双刃 碎片；每20片晋升1级。,monster_archive_hunt_10
-hunt_11,3,3,神兽狩猎-11,10,fragment,fragment_11,models/heroes/clinkz/clinkz.vmdl,1.2,clinkz_death_pact,3,1,击败对应神兽获得神兵-魔头之命 碎片；每20片晋升1级。,monster_archive_hunt_11
-hunt_12,3,4,神兽狩猎-12,10,fragment,fragment_12,models/items/rubick/rubick_arcana/rubick_arcana_base.vmdl,1.2,rubick_spell_steal,3,1,击败对应神兽获得神兵-魔导师密钥 碎片；每20片晋升1级。,monster_archive_hunt_12
-cage_4,3,5,秘法牢笼-4,10,cage,cage_4,models/heroes/jakiro/jakiro.vmdl,1.5,visage_summon_familiars,3,1,击败BOSS随机掉落本池9种材料之一；通行证额外1件。每局仅可挑战一次。,monster_archive_cage_4
-cage_5,3,6,秘法牢笼-5,10,cage,cage_5,models/heroes/jakiro/jakiro.vmdl,1.5,visage_summon_familiars,3,1,击败BOSS随机掉落本池9种材料之一；通行证额外1件。每局仅可挑战一次。,monster_archive_cage_5
-cage_6,3,7,秘法牢笼-6,10,cage,cage_6,models/heroes/jakiro/jakiro.vmdl,1.5,visage_summon_familiars,3,1,击败BOSS随机掉落本池9种材料之一；通行证额外1件。每局仅可挑战一次。,monster_archive_cage_6
-social_friend,3,8,好基友挑战,1,social_ticket,friend,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3,1,召唤1只怪物，击杀获得1张义帖；本挑战每日最多获得10张，每局仅限一次。,monster_archive_social_friend
-social_ex,3,9,前女友挑战,1,social_ticket,ex,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3,1,召唤1只怪物，击杀获得1张邀请函；本挑战每日最多获得10张，每局仅限一次。,monster_archive_social_ex
-social_beast,3,10,瑞兽赐福挑战,1,social_ticket,beast,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3,1,召唤1只怪物，击杀获得1张福签；本挑战每日最多获得10张，每局仅限一次。,monster_archive_social_beast
-social_wife,3,11,老婆挑战,1,social_ticket,wife,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3,1,召唤1只怪物，击杀获得1朵玫瑰；本挑战每日最多获得10朵，每局仅限一次。,monster_archive_social_wife
+challenge_id,building_id,slot_order,display_name,min_difficulty,reward_kind,reward_key,model_path,model_scale,ability_icon,cooldown_seconds,enabled,description,default_wearable_asset_id,unlock_text,reward_requirement_pool,reward_requirement_count
+#中文表头:挑战ID,建筑序号,绝对技能格位1至12,技能名称,最低难度,奖励种类,奖励ID或品质,模型,模型缩放,技能图标,冷却秒,启用,完整说明,饰品资源ID,解锁条件显示,奖励前置累计池,奖励前置次数严格大于
+#types:string,number,number,string,number,string,string,string,number,string,number,boolean,string,string,string,string,number
+shadow_1,1,1,虚空之影,1,shadow,n1,models/heroes/shadow_demon/shadow_demon.vmdl,1.1,nevermore_shadowraze1,3.0,1,挑战成功后可获得虚空之影道具,monster_archive_shadow_1,,,0
+shadow_2,1,2,虚空之影,2,shadow,n2,models/heroes/shadow_demon/shadow_demon.vmdl,1.1,nevermore_shadowraze1,3.0,1,挑战成功后可获得虚空之影道具,monster_archive_shadow_2,N2解锁,,0
+shadow_3,1,3,虚空之影,3,shadow,n3,models/heroes/shadow_demon/shadow_demon.vmdl,1.1,nevermore_shadowraze1,3.0,1,"需要：
+ - N3解锁
+挑战成功后可获得虚空之影道具",monster_archive_shadow_3,N3解锁,,0
+shadow_4,1,4,虚空之影,4,shadow,n4,models/heroes/shadow_demon/shadow_demon.vmdl,1.1,nevermore_shadowraze1,3.0,1,"需要：
+ - N4解锁
+挑战成功后可获得虚空之影道具",monster_archive_shadow_4,N4解锁,,0
+hunt_01,1,5,神兽狩猎-巫妖王,5,fragment,fragment_01,models/heroes/sven/sven.vmdl,1.2,sven_gods_strength,3.0,1,"需要：
+ - N5解锁
+挑战成功后可获得神器碎片-霜之哀伤",monster_archive_hunt_01,N5解锁,,0
+hunt_02,1,6,神兽狩猎-阿尔萨斯,6,fragment,fragment_02,models/heroes/mars/mars.vmdl,1.2,mars_arena_of_blood,3.0,1,"需要：
+ - N6解锁
+挑战成功后可获得神器碎片-米奈希尔之力",monster_archive_hunt_02,N6解锁,,0
+hunt_03,1,7,神兽狩猎-伊利丹,7,fragment,fragment_03,models/heroes/doom/doom.vmdl,1.2,doom_bringer_doom,3.0,1,"需要：
+ - N7解锁
+挑战成功后可获得神器碎片-埃辛诺斯战刃",monster_archive_hunt_03,N7解锁,,0
+hunt_04,1,8,神兽狩猎-洛萨,8,fragment,fragment_04,models/items/spectre/spectre_arcana/spectre_arcana_base.vmdl,1.2,spectre_haunt,3.0,1,"需要：
+ - N8解锁
+挑战成功后可获得神器碎片-灰烬使者",monster_archive_hunt_04,N8解锁,,0
+cage_1,1,9,秘法牢笼-死亡之翼,7,cage,cage_1,models/items/dragon_knight/silver_dragon_king_dragon/silver_dragon_king_dragon.vmdl,1.5,visage_summon_familiars,3.0,1,"需要：
+ - N7解锁
+挑战成功后可获得专属奖励",monster_archive_cage_1,N7解锁,,0
+cage_2,1,10,秘法牢笼-红龙女王,8,cage,cage_2,models/items/dragon_knight/silver_dragon_king_dragon/silver_dragon_king_dragon.vmdl,1.5,visage_summon_familiars,3.0,1,"需要：
+ - N8解锁
+挑战成功后可获得专属奖励",monster_archive_cage_2,N8解锁,,0
+cage_3,1,11,秘法牢笼-冰霜巨龙,9,cage,cage_3,models/items/dragon_knight/silver_dragon_king_dragon/silver_dragon_king_dragon.vmdl,1.5,visage_summon_familiars,3.0,1,"需要：
+ - N9解锁
+挑战成功后可获得专属奖励",monster_archive_cage_3,N9解锁,,0
+hunt_05,2,1,神兽狩猎-格罗姆,8,fragment,fragment_05,models/items/faceless_void/faceless_void_arcana/faceless_void_arcana_base.vmdl,1.2,faceless_void_chronosphere,3.0,1,"需要：
+ - N8解锁
+挑战成功后可获得神器碎片-血吼",monster_archive_hunt_05,N8解锁,,0
+hunt_06,2,2,神兽狩猎-泰兰德,9,fragment,fragment_06,models/heroes/antimage/antimage.vmdl,1.2,antimage_mana_void,3.0,1,"需要：
+ - N9解锁
+挑战成功后可获得神器碎片-索利达尔群星之怒",monster_archive_hunt_06,N9解锁,,0
+hunt_07,2,3,神兽狩猎-风王子,10,fragment,fragment_07,models/heroes/kunkka/kunkka.vmdl,1.2,kunkka_ghostship,3.0,1,"需要：
+ - N10解锁
+挑战成功后可获得神器碎片-雷霆之怒逐风者的祝福之剑",monster_archive_hunt_07,N10解锁,,0
+hunt_08,2,4,神兽狩猎-黑龙王子,10,fragment,fragment_08,models/items/pudge/arcana/pudge_arcana_base.vmdl,1.2,pudge_dismember,3.0,1,"需要：
+ - N10解锁
+挑战成功后可获得神器碎片-阿什坎迪兄弟会之剑",monster_archive_hunt_08,N10解锁,,0
+social_beast,2,5,瑞兽挑战,1,social_ticket,beast,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3.0,1,"召唤瑞兽
+击败后可获得1个赐福，可以用于抽奖
+
+每天最多获得10个赐福
+
+会攻击塔",monster_archive_social_beast,,,0
+social_ex,2,6,前女友挑战,1,social_ticket,ex,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3.0,1,"召唤前女友
+击败后可获得1个邀请函，可以用于抽奖
+
+每天最多获得10个邀请函
+瑞兽赐福总次数大于100方可获得
+
+会攻击塔",monster_archive_social_ex,,beast,100
+football,2,7,绿茵挑战,1,challenge_points,football,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3.0,1,"召唤一群足球怪
+击败后可获得10点绿茵积分
+
+每天最多获得100个绿茵积分
+
+会攻击塔",monster_archive_social_beast,,,0
+cage_4,3,1,秘法牢笼-绿龙伊瑟拉,10,cage,cage_4,models/heroes/jakiro/jakiro.vmdl,1.5,visage_summon_familiars,3.0,1,"需要：
+ - N10解锁
+挑战成功后可获得专属奖励",monster_archive_cage_4,N10解锁,,0
+cage_5,3,2,秘法牢笼-蓝龙玛里苟斯,10,cage,cage_5,models/heroes/jakiro/jakiro.vmdl,1.5,visage_summon_familiars,3.0,1,"需要：
+ - N10解锁
+挑战成功后可获得专属奖励",monster_archive_cage_5,N10解锁,,0
+cage_6,3,3,秘法牢笼-青铜龙诺兹多姆,10,cage,cage_6,models/heroes/jakiro/jakiro.vmdl,1.5,visage_summon_familiars,3.0,1,"需要：
+ - N10解锁
+挑战成功后可获得专属奖励",monster_archive_cage_6,N10解锁,,0
+social_friend,3,4,好基友挑战,1,social_ticket,friend,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3.0,1,"召唤好基友
+击败后可获得1个义帖，可以用于抽奖
+
+每天最多获得10个义帖
+邀请函总次数大于100方可获得
+
+会攻击塔",monster_archive_social_friend,,ex,100
+hunt_09,3,5,神兽狩猎-奥蕾莉亚,10,fragment,fragment_09,models/heroes/weaver/weaver.vmdl,1.2,weaver_time_lapse,3.0,1,"需要：
+ - N10解锁
+挑战成功后可获得神器碎片-星月湮灭战弓",monster_archive_hunt_09,N10解锁,,0
+hunt_10,3,6,神兽狩猎-乌瑟尔,10,fragment,fragment_10,models/heroes/legion_commander/legion_commander.vmdl,1.2,legion_commander_duel,3.0,1,"需要：
+ - N10解锁
+挑战成功后可获得神器碎片-圣光裁决之锤",monster_archive_hunt_10,N10解锁,,0
+hunt_11,3,7,神兽狩猎-泰蕾苟萨,10,fragment,fragment_11,models/heroes/clinkz/clinkz.vmdl,1.2,clinkz_death_pact,3.0,1,"需要：
+ - N10解锁
+挑战成功后可获得神器碎片-泰蕾苟萨法杖",monster_archive_hunt_11,N10解锁,,0
+hunt_12,3,8,神兽狩猎-古尔丹,10,fragment,fragment_12,models/items/rubick/rubick_arcana/rubick_arcana_base.vmdl,1.2,rubick_spell_steal,3.0,1,"需要：
+ - N10解锁
+挑战成功后可获得神器碎片-萨格拉斯之杖",monster_archive_hunt_12,N10解锁,,0
+watermelon,3,9,西瓜挑战,1,challenge_points,watermelon,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3.0,1,"召唤一个西瓜
+击败后可获得1点西瓜积分
+
+每天最多获得10个西瓜
+
+会攻击塔",monster_archive_social_beast,,,0
+cage_7,4,1,秘法牢笼-虚空龙,10,cage,cage_7,models/heroes/jakiro/jakiro.vmdl,1.5,visage_summon_familiars,3.0,1,"需要：
+ - N10解锁
+挑战成功后可获得专属奖励",monster_archive_cage_4,N10解锁,,0
+cage_8,4,2,秘法牢笼-暮光龙,10,cage,cage_8,models/heroes/jakiro/jakiro.vmdl,1.5,visage_summon_familiars,3.0,1,"需要：
+ - N10解锁
+挑战成功后可获得专属奖励",monster_archive_cage_4,N10解锁,,0
+cage_9,4,3,秘法牢笼-石英龙,10,cage,cage_9,models/heroes/jakiro/jakiro.vmdl,1.5,visage_summon_familiars,3.0,1,"需要：
+ - N10解锁
+挑战成功后可获得专属奖励",monster_archive_cage_4,N10解锁,,0
+hunt_16,4,4,神兽狩猎-守界圣辉,10,fragment,fragment_16,models/heroes/legion_commander/legion_commander.vmdl,1.2,legion_commander_duel,3.0,1,挑战成功后可获得神器碎片-守界圣辉,monster_archive_hunt_10,N10解锁,,0
+hunt_13,4,5,神兽狩猎-萨格拉斯,10,fragment,fragment_13,models/heroes/doom/doom.vmdl,1.2,doom_bringer_doom,3.0,1,"需要：
+ - N10解锁
+挑战成功后可获得神器碎片-黑暗撕裂者",monster_archive_hunt_03,N10解锁,,0
+hunt_14,4,6,神兽狩猎-佐瓦尔,10,fragment,fragment_14,models/heroes/mars/mars.vmdl,1.2,mars_arena_of_blood,3.0,1,"需要：
+ - N10解锁
+挑战成功后可获得神器碎片-创世权柄",monster_archive_hunt_02,N10解锁,,0
+hunt_15,4,7,神兽狩猎-阿克蒙德,10,fragment,fragment_15,models/items/spectre/spectre_arcana/spectre_arcana_base.vmdl,1.2,spectre_haunt,3.0,1,"需要：
+ - N10解锁
+挑战成功后可获得神器碎片-万军崩裂",monster_archive_hunt_04,N10解锁,,0
+social_wife,4,9,我的老婆挑战,10,social_ticket,wife,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3.0,1,"需要：
+ - N10解锁
+召唤我的老婆
+击败后可获得1个玫瑰，可以用于抽奖
+
+每天最多获得10个玫瑰
+义帖总次数大于100方可获得
+
+会攻击塔",monster_archive_social_wife,N10解锁,friend,100
+social_concubine,4,10,我的侍妾挑战,10,social_ticket,concubine,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3.0,1,"需要：
+ - N10解锁
+召唤我的侍妾
+击败后可获得1个工资，可以用于抽奖
+
+每天最多获得10个工资
+义帖总次数大于100方可获得
+
+会攻击塔",monster_archive_social_wife,N10解锁,friend,100

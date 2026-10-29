@@ -127,10 +127,13 @@ renderers.work = function(_, archive) return require("systems/archive_online_rew
 renderers.friend = function(_, archive) return require("systems/archive_social_rewards").rows(archive, "friend") end
 renderers.ex = function(_, archive) return require("systems/archive_social_rewards").rows(archive, "ex") end
 renderers.wife = function(_, archive) return require("systems/archive_social_rewards").rows(archive, "wife") end
+renderers.concubine = function(_, archive) return require("systems/archive_social_rewards").rows(archive, "concubine") end
 renderers.beast = function(_, archive) return require("systems/archive_social_rewards").rows(archive, "beast") end
 renderers.boss = function(profile) return (require("systems/archive_boss_rewards").project(profile)) end
 renderers.endless = function(_, archive)
-    return require("systems/archive_endless_rewards").rows(archive)
+    local rows = require("systems/archive_endless_rewards").rows(archive)
+    for _, row in ipairs(require("systems/archive_challenge_gear").rows(archive)) do rows[#rows+1] = row end
+    return rows
 end
 renderers.fragment = challenge_rewards.fragment_rows
 renderers.pet = challenge_rewards.cage_rows
@@ -180,6 +183,7 @@ renderers.points = function(profile)
             icon_type="custom",icon_style="seal",count=count,target=zongzi.max_owned,max_owned=zongzi.max_owned,
             item_type="积分道具",source_kind="benefit",unlocked=count>0 and 1 or 0,count_known=1}
     end
+    for _, row in ipairs(challenge_rewards.point_rows(profile.save.archive or {})) do rows[#rows+1] = row end
     return rows
 end
 
@@ -291,6 +295,9 @@ local function local_settle(player_id, command)
         if policy.shared_challenge_roll() then
             context = {challenge_random_seed = policy.local_seed(command.id)}
         end
+    elseif command.kind == "endless" then
+        context = {challenge_random_seed = require("systems/archive_cooperative_reward_policy").local_seed(
+            command.id .. ":" .. tostring(player_id))}
     end
     local result = require("systems/archive_settlement").settle(profile, command, has_pass(profile), context)
     if not result.ok or result.duplicate then return result end
@@ -303,7 +310,9 @@ local function local_settle(player_id, command)
     end
     local sections={archive=archive,gameplay_stats=stats}
     if result.content_inventory then sections.content_inventory=result.content_inventory end
-    return profiles.update_save_sections(player_id,sections,"archive_"..command.kind)
+    local committed = profiles.update_save_sections(player_id,sections,"archive_"..command.kind)
+    if committed and committed.ok and result.response then committed.response = copy(result.response) end
+    return committed
 end
 
 local flush
@@ -407,6 +416,11 @@ flush = function(player_id)
             elseif result and (result.ok or result.terminal) then queue[id] = nil end
             if terminal_error or result and result.terminal and not result.ok then
                 bus.emit(events.UI_NOTIFICATION,{player_id=player_id,level="error",message=terminal_error or result.error or "存档请求被拒绝"})
+            end
+            if command.kind == "challenge" and result and result.ok and not result.duplicate
+                and type(result.response) == "table" and result.response.skipped_reason then
+                bus.emit(events.UI_NOTIFICATION,{player_id=player_id,level="info",
+                    message="挑战已完成，本次未获得奖励：" .. tostring(result.response.skipped_reason)})
             end
             send(player_id)
             if command.kind == "social_draw" then
@@ -574,13 +588,17 @@ function M.record_clear(player_id, difficulty_id, cooperative_win)
         day_key = tostring(require("systems/archive_calendar").day()) })
 end
 
-function M.record_endless_wave(player_id, wave_number, difficulty)
+function M.record_endless_wave(player_id, wave_number, difficulty, variant)
+    variant = variant or "endless"
+    if variant ~= "endless" and variant ~= "tower" then return {ok=false,error="endless_variant_invalid"} end
     if not integer(wave_number) or wave_number < 1 or not tonumber(difficulty)
         or not require("systems/archive_endless_config").wave(tonumber(difficulty), wave_number) then
         return { ok = false, error = "endless_wave_invalid" }
     end
-    return enqueue(player_id, { id = session_id .. ":endless:" .. wave_number,
-        kind = "endless", wave = wave_number, difficulty = tonumber(difficulty) })
+    local command = { id = session_id .. ":" .. variant .. ":" .. wave_number,
+        kind = "endless", wave = wave_number, difficulty = tonumber(difficulty) }
+    if variant == "tower" then command.variant = variant end
+    return enqueue(player_id, command)
 end
 
 function M.flush_endless_rewards(player_id)
@@ -607,10 +625,11 @@ function M.has_pending(player_id)
 end
 
 -- A dispatcher retry must distinguish this reward from unrelated queued work.
-function M.has_reward_pending(player_id, kind, reward_id)
+function M.has_reward_pending(player_id, kind, reward_id, variant)
     for _, command in pairs(pending[player_id] or {}) do
         if command.kind == kind and (kind == "challenge" and command.challenge_id == reward_id
-            or kind == "endless" and command.wave == reward_id) then return true end
+            or kind == "endless" and command.wave == reward_id
+                and (command.variant or "endless") == (variant or "endless")) then return true end
     end
     return false
 end

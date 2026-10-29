@@ -1124,6 +1124,8 @@ function M.activate()
     end)
     event_bus.subscribe(events.PLAYER_DEFEATED, function()
         if multiplayer_player_service.all_participants_defeated() then
+            local wave_state = event_bus.request(events.WAVE_STATE_GET_REQUEST, {})
+            if wave_state and wave_state.victory_settled == true then return end
             require("systems/online_time_service").finish("all_players_defeated")
             GameRules:SetGameWinner(DOTA_TEAM_BADGUYS)
         end

@@ -1,0 +1,26 @@
+action_id,ability_name,building_id,slot_order,display_name,min_difficulty,unlock_text,ability_icon,cooldown_seconds,enabled,description
+#中文表头:入口ID,技能名称,建筑序号,绝对技能格位1至12,显示名称,最低难度,解锁条件显示,技能图标,冷却秒,启用,完整说明
+#types:string,string,number,number,string,number,string,string,number,boolean,string
+endless,ability_archive_endless,2,9,无尽模式开启,3,N3解锁,nevermore_requiem,0,1,"需要：
+ - N3解锁
+所有难度模式下难度一致，每波难度会逐层升高
+每通过10层获取无尽积分奖励增加100%
+
+无尽模式下每20波会掉落一件存档装备，波次越高品质概率越高"
+endless_skip,ability_archive_endless_skip,2,10,无尽跳关,3,N3解锁,faceless_void_time_walk,0,1,"需要：
+ - N3解锁
+每次点击无尽跳2/5/10/20层(每波)
+
+无法退回请谨慎"
+tower_solo,ability_archive_tower_solo,2,11,通天塔(单人)开启,10,极寒或天灾N10解锁,skywrath_mage_mystic_flare,0,1,"需要：
+ - 极寒或天灾N10解锁
+所有难度模式下难度一致，每波难度会逐层升高
+每通过10层获取无尽积分奖励增加100%（通天塔下积分获取更高）
+
+结束会立马计算存档，请在打之前把其他存档挑战都打完
+
+通天塔下每15波会掉落一件存档装备，波次越高品质概率越高"
+return_1,ability_archive_return_1,1,12,返回,1,,kunkka_return,0,1,返回选择自己的英雄；不结束存档挑战。
+return_2,ability_archive_return_2,2,12,返回,1,,kunkka_return,0,1,返回选择自己的英雄；不结束存档挑战。
+return_3,ability_archive_return_3,3,12,返回,1,,kunkka_return,0,1,返回选择自己的英雄；不结束存档挑战。
+return_4,ability_archive_return_4,4,12,返回,1,,kunkka_return,0,1,返回选择自己的英雄；不结束存档挑战。

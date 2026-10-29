@@ -26,6 +26,8 @@ CreateUnitByName=function(name,position,clear,owner,unit_owner,team)
     function unit:IsAlive() return self.alive and not self.removed end
     function unit:entindex() assert(not self.removed); return self.index end
     function unit:GetAbsOrigin() assert(not self.removed); return self.position end
+    function unit:GetModelName() return self.values.SetModel end
+    function unit:GetModelScale() return self.values.SetModelScale or 1 end
     function unit:SetAbsOrigin(position) assert(not self.removed); count("corpse_move"); self.position=position end
     function unit:AddNoDraw() assert(not self.removed); count("corpse_hide"); self.hidden=true end
     function unit:GetHullRadius() return self.hull end
@@ -54,6 +56,18 @@ CustomGameEventManager={Send_ServerToPlayer=function() count("state_event") end}
 package.loaded["core/logger"]={info=noop,warn=noop,error=noop}
 package.loaded["systems/player_context_service"]={is_defeated=function() return false end}
 package.loaded["systems/archive_service"]={record_endless_wave=function() count("earned_wave") end,flush_endless_rewards=noop}
+-- Count lifecycle work with a trusted fixture session, while business
+-- admission and actual account settlement run in the separate variant test.
+package.loaded["systems/archive_cooperative_reward_service"]={
+    matches_session=function(mode,difficulty) return mode=="standard" and difficulty==1 end,
+    record_endless_wave=function() count("earned_wave");return {ok=true} end,flush_endless_rewards=noop}
+-- Stress the default no-outfit lifecycle; configured ornaments have separate
+-- assembly tests and must not turn this fixture into an invalid native prop.
+local default_visual_rules=require("config/generated/archive_endless_rules").by_id.default
+package.loaded["systems/archive_endless_visual_config"]={resolve=function(number)
+    return {visual_id="death_cost_default",model_path=default_visual_rules.model_path,
+        model_scale=default_visual_rules.model_scale,display_name="生命周期测试主体",components={},ornaments={},effects={}}
+end,resources=function() return {} end}
 local bus,events=require("core/event_bus"),require("core/events")
 local scheduler=require("core/scheduler")
 local lifecycle=require("systems/monster_corpse_lifecycle_service")
@@ -62,6 +76,7 @@ local challenge_visual=require("systems/challenge_monster_visual_service")
 local generic_visual=require("systems/monster_visual_service")
 local deps={
     ["core/event_bus"]=bus,["core/events"]=events,["core/scheduler"]=scheduler,
+    ["visual/model_scale"]=require("visual/model_scale"),
     ["core/team_alignment"]={enforce=noop},
     ["config/armor_balance"]=require("config/armor_balance"),
     ["config/global_rules"]=require("config/global_rules"),
@@ -143,7 +158,7 @@ assert(removed_count==4000 and retained_count==0 and alive_count==0)
 assert(size(corpse_states)==0 and scheduler.task_count()==0,"corpse/task cache leaked")
 assert(generic_visual.active_state_count()==0)
 assert(max_corpses<=16 and max_retained<=20,"dead monster count grew with cleared waves")
-assert(max_tasks<=9,"more than four spawn tasks, four next-wave tasks, and two shared timers")
+assert(max_tasks<=14,"more than bounded per-owner spawn/next/appearance verification work and shared lifecycle timers")
 assert((counts.world_scan or 0)==0 and (counts.prop_spawn or 0)==0
     and (counts.particle_spawn or 0)==0 and (counts.runtime_precache or 0)==0)
 print(string.format("ENDLESS_DEATH_COST_PASS players=4 waves=%d births=%d deaths=%d duplicate_deaths=%d removed=%d max_corpses=%d max_retained=%d max_tasks=%d pending=%d world_scans=%d outfit_props=%d particles=%d corpse_moves=%d",

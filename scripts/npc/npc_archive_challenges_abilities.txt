@@ -9,7 +9,7 @@
         "MaxLevel" "1"
         "AbilityCastPoint" "0"
         "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
+        "AbilityCooldown" "3.0"
     }
     "ability_archive_shadow_2"
     {
@@ -20,7 +20,7 @@
         "MaxLevel" "1"
         "AbilityCastPoint" "0"
         "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
+        "AbilityCooldown" "3.0"
     }
     "ability_archive_shadow_3"
     {
@@ -31,7 +31,7 @@
         "MaxLevel" "1"
         "AbilityCastPoint" "0"
         "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
+        "AbilityCooldown" "3.0"
     }
     "ability_archive_shadow_4"
     {
@@ -42,7 +42,7 @@
         "MaxLevel" "1"
         "AbilityCastPoint" "0"
         "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
+        "AbilityCooldown" "3.0"
     }
     "ability_archive_hunt_01"
     {
@@ -53,7 +53,7 @@
         "MaxLevel" "1"
         "AbilityCastPoint" "0"
         "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
+        "AbilityCooldown" "3.0"
     }
     "ability_archive_hunt_02"
     {
@@ -64,7 +64,7 @@
         "MaxLevel" "1"
         "AbilityCastPoint" "0"
         "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
+        "AbilityCooldown" "3.0"
     }
     "ability_archive_hunt_03"
     {
@@ -75,7 +75,7 @@
         "MaxLevel" "1"
         "AbilityCastPoint" "0"
         "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
+        "AbilityCooldown" "3.0"
     }
     "ability_archive_hunt_04"
     {
@@ -86,7 +86,7 @@
         "MaxLevel" "1"
         "AbilityCastPoint" "0"
         "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
+        "AbilityCooldown" "3.0"
     }
     "ability_archive_cage_1"
     {
@@ -97,7 +97,7 @@
         "MaxLevel" "1"
         "AbilityCastPoint" "0"
         "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
+        "AbilityCooldown" "3.0"
     }
     "ability_archive_cage_2"
     {
@@ -108,7 +108,7 @@
         "MaxLevel" "1"
         "AbilityCastPoint" "0"
         "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
+        "AbilityCooldown" "3.0"
     }
     "ability_archive_cage_3"
     {
@@ -119,7 +119,7 @@
         "MaxLevel" "1"
         "AbilityCastPoint" "0"
         "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
+        "AbilityCooldown" "3.0"
     }
     "ability_archive_hunt_05"
     {
@@ -130,7 +130,7 @@
         "MaxLevel" "1"
         "AbilityCastPoint" "0"
         "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
+        "AbilityCooldown" "3.0"
     }
     "ability_archive_hunt_06"
     {
@@ -141,7 +141,7 @@
         "MaxLevel" "1"
         "AbilityCastPoint" "0"
         "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
+        "AbilityCooldown" "3.0"
     }
     "ability_archive_hunt_07"
     {
@@ -152,7 +152,7 @@
         "MaxLevel" "1"
         "AbilityCastPoint" "0"
         "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
+        "AbilityCooldown" "3.0"
     }
     "ability_archive_hunt_08"
     {
@@ -163,106 +163,7 @@
         "MaxLevel" "1"
         "AbilityCastPoint" "0"
         "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
-    }
-    "ability_archive_hunt_09"
-    {
-        "BaseClass" "ability_lua"
-        "ScriptFile" "abilities/archive_challenge_abilities"
-        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-        "AbilityTextureName" "weaver_time_lapse"
-        "MaxLevel" "1"
-        "AbilityCastPoint" "0"
-        "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
-    }
-    "ability_archive_hunt_10"
-    {
-        "BaseClass" "ability_lua"
-        "ScriptFile" "abilities/archive_challenge_abilities"
-        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-        "AbilityTextureName" "legion_commander_duel"
-        "MaxLevel" "1"
-        "AbilityCastPoint" "0"
-        "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
-    }
-    "ability_archive_hunt_11"
-    {
-        "BaseClass" "ability_lua"
-        "ScriptFile" "abilities/archive_challenge_abilities"
-        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-        "AbilityTextureName" "clinkz_death_pact"
-        "MaxLevel" "1"
-        "AbilityCastPoint" "0"
-        "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
-    }
-    "ability_archive_hunt_12"
-    {
-        "BaseClass" "ability_lua"
-        "ScriptFile" "abilities/archive_challenge_abilities"
-        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-        "AbilityTextureName" "rubick_spell_steal"
-        "MaxLevel" "1"
-        "AbilityCastPoint" "0"
-        "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
-    }
-    "ability_archive_cage_4"
-    {
-        "BaseClass" "ability_lua"
-        "ScriptFile" "abilities/archive_challenge_abilities"
-        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-        "AbilityTextureName" "visage_summon_familiars"
-        "MaxLevel" "1"
-        "AbilityCastPoint" "0"
-        "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
-    }
-    "ability_archive_cage_5"
-    {
-        "BaseClass" "ability_lua"
-        "ScriptFile" "abilities/archive_challenge_abilities"
-        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-        "AbilityTextureName" "visage_summon_familiars"
-        "MaxLevel" "1"
-        "AbilityCastPoint" "0"
-        "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
-    }
-    "ability_archive_cage_6"
-    {
-        "BaseClass" "ability_lua"
-        "ScriptFile" "abilities/archive_challenge_abilities"
-        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-        "AbilityTextureName" "visage_summon_familiars"
-        "MaxLevel" "1"
-        "AbilityCastPoint" "0"
-        "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
-    }
-    "ability_archive_social_friend"
-    {
-        "BaseClass" "ability_lua"
-        "ScriptFile" "abilities/archive_challenge_abilities"
-        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-        "AbilityTextureName" "ogre_magi_multicast"
-        "MaxLevel" "1"
-        "AbilityCastPoint" "0"
-        "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
-    }
-    "ability_archive_social_ex"
-    {
-        "BaseClass" "ability_lua"
-        "ScriptFile" "abilities/archive_challenge_abilities"
-        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-        "AbilityTextureName" "ogre_magi_multicast"
-        "MaxLevel" "1"
-        "AbilityCastPoint" "0"
-        "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
+        "AbilityCooldown" "3.0"
     }
     "ability_archive_social_beast"
     {
@@ -273,7 +174,205 @@
         "MaxLevel" "1"
         "AbilityCastPoint" "0"
         "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
+        "AbilityCooldown" "3.0"
+    }
+    "ability_archive_social_ex"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "ogre_magi_multicast"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "3.0"
+    }
+    "ability_archive_football"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "ogre_magi_multicast"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "3.0"
+    }
+    "ability_archive_cage_4"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "visage_summon_familiars"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "3.0"
+    }
+    "ability_archive_cage_5"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "visage_summon_familiars"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "3.0"
+    }
+    "ability_archive_cage_6"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "visage_summon_familiars"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "3.0"
+    }
+    "ability_archive_social_friend"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "ogre_magi_multicast"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "3.0"
+    }
+    "ability_archive_hunt_09"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "weaver_time_lapse"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "3.0"
+    }
+    "ability_archive_hunt_10"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "legion_commander_duel"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "3.0"
+    }
+    "ability_archive_hunt_11"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "clinkz_death_pact"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "3.0"
+    }
+    "ability_archive_hunt_12"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "rubick_spell_steal"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "3.0"
+    }
+    "ability_archive_watermelon"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "ogre_magi_multicast"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "3.0"
+    }
+    "ability_archive_cage_7"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "visage_summon_familiars"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "3.0"
+    }
+    "ability_archive_cage_8"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "visage_summon_familiars"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "3.0"
+    }
+    "ability_archive_cage_9"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "visage_summon_familiars"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "3.0"
+    }
+    "ability_archive_hunt_16"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "legion_commander_duel"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "3.0"
+    }
+    "ability_archive_hunt_13"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "doom_bringer_doom"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "3.0"
+    }
+    "ability_archive_hunt_14"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "mars_arena_of_blood"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "3.0"
+    }
+    "ability_archive_hunt_15"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "spectre_haunt"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "3.0"
     }
     "ability_archive_social_wife"
     {
@@ -284,8 +383,105 @@
         "MaxLevel" "1"
         "AbilityCastPoint" "0"
         "AbilityManaCost" "0"
-        "AbilityCooldown" "3"
+        "AbilityCooldown" "3.0"
     }
-    "ability_archive_finish" { "BaseClass" "ability_lua" "ScriptFile" "abilities/archive_challenge_abilities" "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET" "AbilityTextureName" "chen_hand_of_god" "MaxLevel" "1" "AbilityCastPoint" "0" "AbilityCooldown" "0" "AbilityManaCost" "0" }
-    "ability_archive_endless" { "BaseClass" "ability_lua" "ScriptFile" "abilities/archive_challenge_abilities" "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET" "AbilityTextureName" "nevermore_requiem" "MaxLevel" "1" "AbilityCastPoint" "0" "AbilityCooldown" "0" "AbilityManaCost" "0" }
+    "ability_archive_social_concubine"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "ogre_magi_multicast"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "3.0"
+    }
+    "ability_archive_endless"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "nevermore_requiem"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "0"
+    }
+    "ability_archive_endless_skip"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "faceless_void_time_walk"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "0"
+    }
+    "ability_archive_tower_solo"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "skywrath_mage_mystic_flare"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "0"
+    }
+    "ability_archive_return_1"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "kunkka_return"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "0"
+    }
+    "ability_archive_return_2"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "kunkka_return"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "0"
+    }
+    "ability_archive_return_3"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "kunkka_return"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "0"
+    }
+    "ability_archive_return_4"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "kunkka_return"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "0"
+    }
+    "ability_archive_finish"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "chen_hand_of_god"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "0"
+    }
 }

@@ -8,12 +8,26 @@ local visual_config = require("systems/archive_endless_visual_config")
 local visual_service = require("visual/endless_monster_visual_service")
 local rules = config.rules
 local M = {}
-local runs, enemies, changed = {}, {}, nil
+local runs, enemies, changed, finished = {}, {}, nil, nil
+local skip_indices, skip_choices = {}, {2, 5, 10, 20}
+local started_variants = {}
 local subscriptions, timer_active = {}, false
 local try_spawn_wave, try_spawn_next, killed
 local function valid(unit) return unit and not unit:IsNull() end
 local function now() return GameRules:GetGameTime() end
 function M.is_running(id) return runs[id] and runs[id].status == "running" or false end
+function M.skip_step(id) return skip_choices[skip_indices[id] or 0] or 1 end
+function M.cycle_skip(id)
+    if type(id) ~= "number" or id < 0 or id ~= math.floor(id) then return false, "player_invalid" end
+    local next_index = (skip_indices[id] or 0) + 1
+    if next_index > #skip_choices then return false, "已达到20层间隔，无法退回" end
+    skip_indices[id] = next_index
+    if runs[id] then
+        -- The new interval is consumed only when the next wave is created.
+        if changed then changed(id) end
+    end
+    return true, M.skip_step(id)
+end
 function M.can_rebuild_wall(id)
     if require("systems/player_context_service").is_defeated(id) then return false end
     return runs[id] and runs[id].started == true or false
@@ -26,7 +40,8 @@ end
 function M.snapshot(id)
     local run = runs[id]
     if not run then return { status = "idle", wave = 0, score = 0, remaining = 0, pending = 0, seconds = 0 } end
-    return { status = run.status, wave = run.wave, cleared = run.cleared, score = run.score,
+    return { status = run.status, variant = run.variant, skip_step = M.skip_step(id),
+        wave = run.wave, cleared = run.cleared, score = run.score,
         remaining = run.remaining + (run.pending or 0), pending = run.pending or 0,
         seconds = math.max(0, math.ceil((run.deadline or now()) - now())),
         reason = run.reason or "", health = tostring(run.row and run.row.health or 0),
@@ -34,7 +49,7 @@ function M.snapshot(id)
 end
 local function publish(run, availability_changed)
     -- Counts and countdown ticks do not change challenge-button availability.
-    -- Rebuilding all three hubs here rewrote every ability once a second.
+    -- Rebuilding all archive hubs here rewrote every ability once a second.
     if availability_changed and changed then changed(run.player_id) end
     if PlayerResource and CustomGameEventManager then
         local player = PlayerResource:GetPlayer(run.player_id)
@@ -76,6 +91,11 @@ local function stop(run, reason)
     -- Ending a challenge must not leave its last completed waves waiting for
     -- the next periodic online batch.
     cooperative_rewards.flush_endless_rewards()
+    if run.started and not run.finish_notified and finished then
+        run.finish_notified = true
+        local ok, error = pcall(finished, run.player_id, run.variant, reason)
+        if not ok then print("[ArchiveEndless] finish callback failed: " .. tostring(error)) end
+    end
 end
 function M.cancel(id, reason)
     if M.is_running(id) then stop(runs[id], reason or "主动结束") end
@@ -90,8 +110,10 @@ local function complete_wave(run)
     if run.status ~= "running" or run.creating or run.pending > 0 or run.remaining > 0
         or run.wave_cleared then return end
     local ok, score = pcall(function()
-        local next_score = run.score + config.score(run.wave)
-        cooperative_rewards.record_endless_wave(run.player_id, run.wave, run.difficulty)
+        local next_score = run.score + config.score(run.wave, run.variant)
+        local result = cooperative_rewards.record_endless_wave(run.player_id, run.wave, run.difficulty, run.variant)
+        assert(type(result) == "table" and result.ok == true,
+            result and result.error or "endless_reward_not_accepted")
         return next_score
     end)
     if not ok then
@@ -107,7 +129,7 @@ local function complete_wave(run)
     -- Never create the next wave recursively inside a death event.
     scheduler.after(0, function()
         if runs[run.player_id] == run and run.status == "running" and run.generation == generation then
-            try_spawn_wave(run, run.wave + 1)
+            try_spawn_wave(run, run.wave + M.skip_step(run.player_id))
         end
     end, "archive_endless_next:" .. run.player_id)
 end
@@ -137,7 +159,7 @@ local function spawn_next(run)
     run.remaining = run.remaining + 1
     run.pending = run.pending - 1
     run.spawning = run.pending > 0
-    unit.survival_display_name = "无尽第" .. run.wave .. "波 · " .. run.visual.display_name
+    unit.survival_display_name = (run.variant == "tower" and "通天塔第" or "无尽第") .. run.wave .. "波 · " .. run.visual.display_name
     -- Own the unit before dressing it: failed or reentrant assembly must be
     -- cleaned with the run. A factory listener can already have killed it.
     if not unit.IsAlive or unit:IsAlive() then
@@ -188,7 +210,7 @@ end
 local function spawn_wave(run, number)
     local phase = bus.request("archive.challenge_state", {})
     if phase and phase.expired == 1 then stop(run, "挑战阶段时间已到"); return false, "挑战阶段时间已到" end
-    local row = config.wave(run.difficulty, number)
+    local row = config.wave(run.difficulty, number, run.mode)
     if not row then stop(run, "已完成全部配置波次"); return true end
     run.wave, run.row, run.remaining, run.units = number, row, 0, {}
     -- Resolve once for the whole wave, keeping all five births identical and
@@ -227,18 +249,32 @@ local function ensure_timer()
         if not timer_active then return false end
     end, "archive_endless_timer")
 end
-function M.start(id, difficulty)
+function M.start(id, difficulty, variant)
+    variant = variant or "endless"
     if require("systems/player_context_service").is_defeated(id) then return false, "player_defeated" end
     if M.is_running(id) then return false, "无尽挑战正在进行" end
-    if runs[id] and runs[id].started then return false, "本局已开启无尽挑战" end
-    if not config.wave(difficulty, 1) then return false, "该难度无尽属性尚未配置" end
+    if started_variants[id] and started_variants[id][variant] then return false, "本局已开启该挑战" end
+    local setup = package.loaded["systems/match_setup_service"]
+    local mode = setup and type(setup.get_mode) == "function" and setup.get_mode() or "standard"
+    if not cooperative_rewards.matches_session(mode, difficulty) then return false, "cooperative_session_invalid" end
+    if not config.allowed_variant(difficulty, mode, variant) then return false, "endless_variant_unavailable" end
+    if not config.wave(difficulty, 1, mode) then return false, "该难度无尽属性尚未配置" end
     if not phase_guard.set_endless_active(id, true) then return false, "本局已结束" end
-    local run = { player_id = id, difficulty = difficulty, status = "running", wave = 0,
+    local previous = runs[id]
+    local previous_skip = skip_indices[id]
+    if previous and previous.variant ~= variant then skip_indices[id] = nil end
+    local run = { player_id = id, difficulty = difficulty, mode = mode, variant = variant, status = "running", wave = 0,
         cleared = 0, score = 0, units = {}, remaining = 0, pending = 0 }
     runs[id] = run
     -- Keep ordinary gameplay alive, including the queued frame between waves.
     local ok, reason = try_spawn_wave(run, 1)
     run.started = ok == true
+    if ok then
+        started_variants[id] = started_variants[id] or {}
+        started_variants[id][variant] = true
+    else
+        skip_indices[id] = previous_skip
+    end
     if ok and run.status == "running" then ensure_timer(); publish(run, true) end
     return ok, reason
 end
@@ -256,7 +292,7 @@ killed = function(payload)
     complete_wave(run)
     publish(run)
 end
-function M.init(on_changed)
+function M.init(on_changed, on_finished)
     scheduler.cancel("archive_endless_timer")
     timer_active = false
     for _, subscription in ipairs(subscriptions) do bus.unsubscribe(subscription) end
@@ -266,7 +302,8 @@ function M.init(on_changed)
         phase_guard.set_endless_active(id, false)
         cleanup(run)
     end
-    runs, enemies, changed = {}, {}, on_changed
+    runs, enemies, skip_indices, changed, finished = {}, {}, {}, on_changed, on_finished
+    started_variants = {}
     subscriptions[#subscriptions + 1] = bus.subscribe(events.ENGINE_ENTITY_KILLED, killed)
     subscriptions[#subscriptions + 1] = bus.subscribe(events.PLAYER_DEFEATED, function(payload)
         M.cancel(tonumber(payload.player_id), "本局失败")

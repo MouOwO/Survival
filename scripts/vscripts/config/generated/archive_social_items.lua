@@ -162,6 +162,11 @@ M.rows = {
     { item_id = "wife_40", pool_id = "wife", display_name = "亚丝娜", max_owned = 1, quality = "UR", description = "英雄最终伤害+30%", effect_ids = {"hero_final_damage_bonus_pct"}, effect_values = {"30"}, enabled = true },
     { item_id = "wife_31", pool_id = "wife", display_name = "凯尔希", max_owned = 6, quality = "SSR", description = "初始魔法卡+1", enabled = true, draw_enabled = false, availability_note = "待适配，暂不参与抽取，不消耗玫瑰" },
     { item_id = "wife_39", pool_id = "wife", display_name = "夜刀神十香", max_owned = 1, quality = "UR", description = "墙皮肤-夜刀神十香", enabled = true, draw_enabled = false, availability_note = "待适配，暂不参与抽取，不消耗玫瑰" },
+    { item_id = "concubine_01", pool_id = "concubine", display_name = "灯火守望者", max_owned = 60, quality = "N", description = "初始金币+50", effect_ids = {"initial_gold"}, effect_values = {"50"}, enabled = true, draw_enabled = true },
+    { item_id = "concubine_02", pool_id = "concubine", display_name = "林间药师", max_owned = 10, quality = "R", description = "英雄初始属性+2500", effect_ids = {"hero_initial_attributes"}, effect_values = {"2500"}, enabled = true, draw_enabled = true },
+    { item_id = "concubine_03", pool_id = "concubine", display_name = "雾海旅人", max_owned = 6, quality = "SR", description = "英雄每秒属性+50", effect_ids = {"hero_attributes_per_second"}, effect_values = {"50"}, enabled = true, draw_enabled = true },
+    { item_id = "concubine_04", pool_id = "concubine", display_name = "星辰咏者", max_owned = 5, quality = "SSR", description = "箭塔攻击加成+2%", effect_ids = {"tower_attack_bonus_pct"}, effect_values = {"2"}, enabled = true, draw_enabled = true },
+    { item_id = "concubine_05", pool_id = "concubine", display_name = "长夜之誓", max_owned = 1, quality = "UR", description = "英雄最终伤害+10%", effect_ids = {"hero_final_damage_bonus_pct"}, effect_values = {"10"}, enabled = true, draw_enabled = true },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do

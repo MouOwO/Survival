@@ -1,0 +1,3959 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-29",
+  "timezone": "Asia/Shanghai",
+  "sources": {
+    "conditions": {
+      "source": "d:\\录像文件\\存档挑战条件.mp4",
+      "sha256": "dcb2079b74dccdd90f919b76efce9fa45198b45f0f89ccbffe4e704ac9af87b1",
+      "fps": 60.0,
+      "frames": 3619,
+      "duration_seconds": 60.31666666666667,
+      "width": 1920,
+      "height": 1080
+    },
+    "related": {
+      "source": "D:\\录像文件\\存档挑战相关.mp4",
+      "sha256": "27d3c04410504913e116f333e937f0441a43be7db25272672a5199459a16cf04",
+      "fps": 60.0,
+      "frames": 20116,
+      "duration_seconds": 335.26666666666665,
+      "width": 1920,
+      "height": 1080
+    },
+    "v3": {
+      "path": "data/balance/human_spec_v3/normalized.json",
+      "sha256": "48b4e87cf359efd893eb3f435f423554e05071a7da6c67422dad16be9d9e2e66",
+      "archive_rows": 29
+    }
+  },
+  "decisions": [
+    "All archive combat profiles are fixed final values in every mode and difficulty; no wave/challenge multiplier.",
+    "User selected condition-video building 3 order: Alleria, Uther, Tarecgosa, Guldan.",
+    "Guarding Radiance uses unused building4 slot4; Pal feature explicitly removed by user and building4 slot8 stays empty.",
+    "Tooltip omitted generic N requirement: preserve project N1 for beast/ex/friend/football/watermelon; guard uses peer hunt N10 project baseline.",
+    "Reward prerequisite means cumulative draw count strictly greater than 100, not >=100 and not owning 100 tokens.",
+    "Football spawns five units as an explicit project decision; video only says a group, not its exact count.",
+    "No attached video shows health/armor/attack speed. Preserve v3 or existing social baseline, with evidence provenance.",
+    "Rounded 6.49亿 and 3.60亿 are represented by 649000000 and 360000000; exact underlying integers are unknown.",
+    "Black dragon 1.68亿 retains compatible v3 exact value 168000002; last digits are not proven by video."
+  ],
+  "rules": {
+    "rule_id": "default",
+    "building_unlock_difficulty": 1,
+    "building_spacing": 240,
+    "building_offset_y": 360,
+    "building_model": "models/survival_buildings/archive_challenge_01.vmdl",
+    "building_model_scale": "1",
+    "base_fragment_daily_limit": 20,
+    "pass_fragment_daily_limit": 40,
+    "cage_daily_limit": 30,
+    "pass_cage_daily_limit": 90,
+    "cage_drop_count": 1,
+    "pass_cage_extra_count": 1,
+    "day_timezone_offset": 10800,
+    "final_boss_shadow_drops_enabled": 0,
+    "building_model_1": "models/survival_buildings/archive_challenge_01.vmdl",
+    "building_model_2": "models/survival_buildings/archive_challenge_02.vmdl",
+    "building_model_3": "models/survival_buildings/archive_challenge_03.vmdl",
+    "phase_duration_seconds": 1800,
+    "building_anchor": "wave_portal",
+    "building_count": 4,
+    "building_model_4": "models/survival_buildings/archive_challenge_03.vmdl"
+  },
+  "challenges": [
+    {
+      "challenge_id": "shadow_1",
+      "building_id": 1,
+      "slot_order": 1,
+      "display_name": "虚空之影",
+      "min_difficulty": 1,
+      "reward_kind": "shadow",
+      "reward_key": "n1",
+      "model_path": "models/heroes/shadow_demon/shadow_demon.vmdl",
+      "model_scale": 1.1,
+      "ability_icon": "nevermore_shadowraze1",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "挑战成功后可获得虚空之影道具",
+      "default_wearable_asset_id": "monster_archive_shadow_1",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 1.8,
+        "frame": "frames/t001800.jpg",
+        "complete_tooltip": "虚空之影\n挑战成功后可获得虚空之影道具",
+        "unlock_source": "project_preserved_baseline_requirement_not_printed_in_video",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:shadow_1"
+      },
+      "stats": {
+        "health": 9000010,
+        "attack": 189002,
+        "war3_armor": 998.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "虚空之影1",
+          "historical_evidence_label": "实机验证"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "虚空之影",
+          "seconds": 130.5,
+          "attack_display": "189002",
+          "attack_integer": 189002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t130500.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "虚空之影1",
+          "historical_evidence_label": "实机验证"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "虚空之影1",
+          "historical_evidence_label": "实机验证"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（实机验证），本次视频不可见；攻击189002，视频整数显示"
+    },
+    {
+      "challenge_id": "shadow_2",
+      "building_id": 1,
+      "slot_order": 2,
+      "display_name": "虚空之影",
+      "min_difficulty": 2,
+      "reward_kind": "shadow",
+      "reward_key": "n2",
+      "model_path": "models/heroes/shadow_demon/shadow_demon.vmdl",
+      "model_scale": 1.1,
+      "ability_icon": "nevermore_shadowraze1",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "挑战成功后可获得虚空之影道具",
+      "default_wearable_asset_id": "monster_archive_shadow_2",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N2解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 2.4,
+        "frame": "frames/t002400.jpg",
+        "complete_tooltip": "虚空之影\n挑战成功后可获得虚空之影道具",
+        "unlock_source": "project_preserved_baseline_requirement_not_printed_in_video",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:shadow_2"
+      },
+      "stats": {
+        "health": 54000000,
+        "attack": 750002.0,
+        "war3_armor": 1498.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "虚空之影2",
+          "historical_evidence_label": "实机验证"
+        },
+        "attack": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "虚空之影2",
+          "historical_evidence_label": "实机验证",
+          "precision": "v3_authored_value_not_readable_from_attached_video"
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "虚空之影2",
+          "historical_evidence_label": "实机验证"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "虚空之影2",
+          "historical_evidence_label": "实机验证"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（实机验证），本次视频不可见；攻击沿用v3未见视频整数"
+    },
+    {
+      "challenge_id": "shadow_3",
+      "building_id": 1,
+      "slot_order": 3,
+      "display_name": "虚空之影",
+      "min_difficulty": 3,
+      "reward_kind": "shadow",
+      "reward_key": "n3",
+      "model_path": "models/heroes/shadow_demon/shadow_demon.vmdl",
+      "model_scale": 1.1,
+      "ability_icon": "nevermore_shadowraze1",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N3解锁\n挑战成功后可获得虚空之影道具",
+      "default_wearable_asset_id": "monster_archive_shadow_3",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N3解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 3,
+        "frame": "frames/t003000.jpg",
+        "complete_tooltip": "虚空之影\n需要：\n - N3解锁\n挑战成功后可获得虚空之影道具",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:shadow_3"
+      },
+      "stats": {
+        "health": 90000020,
+        "attack": 1250002.0,
+        "war3_armor": 1998.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "虚空之影3",
+          "historical_evidence_label": "实机验证"
+        },
+        "attack": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "虚空之影3",
+          "historical_evidence_label": "实机验证",
+          "precision": "v3_authored_value_not_readable_from_attached_video"
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "虚空之影3",
+          "historical_evidence_label": "实机验证"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "虚空之影3",
+          "historical_evidence_label": "实机验证"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（实机验证），本次视频不可见；攻击沿用v3未见视频整数"
+    },
+    {
+      "challenge_id": "shadow_4",
+      "building_id": 1,
+      "slot_order": 4,
+      "display_name": "虚空之影",
+      "min_difficulty": 4,
+      "reward_kind": "shadow",
+      "reward_key": "n4",
+      "model_path": "models/heroes/shadow_demon/shadow_demon.vmdl",
+      "model_scale": 1.1,
+      "ability_icon": "nevermore_shadowraze1",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N4解锁\n挑战成功后可获得虚空之影道具",
+      "default_wearable_asset_id": "monster_archive_shadow_4",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N4解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 4,
+        "frame": "frames/t004000.jpg",
+        "complete_tooltip": "虚空之影\n需要：\n - N4解锁\n挑战成功后可获得虚空之影道具",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:shadow_4"
+      },
+      "stats": {
+        "health": 126000000,
+        "attack": 1750002.0,
+        "war3_armor": 2498.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "虚空之影4",
+          "historical_evidence_label": "实机验证"
+        },
+        "attack": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "虚空之影4",
+          "historical_evidence_label": "实机验证",
+          "precision": "v3_authored_value_not_readable_from_attached_video"
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "虚空之影4",
+          "historical_evidence_label": "实机验证"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "虚空之影4",
+          "historical_evidence_label": "实机验证"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（实机验证），本次视频不可见；攻击沿用v3未见视频整数"
+    },
+    {
+      "challenge_id": "hunt_01",
+      "building_id": 1,
+      "slot_order": 5,
+      "display_name": "神兽狩猎-巫妖王",
+      "min_difficulty": 5,
+      "reward_kind": "fragment",
+      "reward_key": "fragment_01",
+      "model_path": "models/heroes/sven/sven.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "sven_gods_strength",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N5解锁\n挑战成功后可获得神器碎片-霜之哀伤",
+      "default_wearable_asset_id": "monster_archive_hunt_01",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N5解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 5,
+        "frame": "frames/t005000.jpg",
+        "complete_tooltip": "神兽狩猎-巫妖王\n需要：\n - N5解锁\n挑战成功后可获得神器碎片-霜之哀伤",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:hunt_01"
+      },
+      "stats": {
+        "health": 270000000.0,
+        "attack": 4500002,
+        "war3_armor": 2998.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-巫妖王",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "巫妖王",
+          "seconds": 152.0,
+          "attack_display": "4500002",
+          "attack_integer": 4500002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t152000.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-巫妖王",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-巫妖王",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击4500002，视频整数显示"
+    },
+    {
+      "challenge_id": "hunt_02",
+      "building_id": 1,
+      "slot_order": 6,
+      "display_name": "神兽狩猎-阿尔萨斯",
+      "min_difficulty": 6,
+      "reward_kind": "fragment",
+      "reward_key": "fragment_02",
+      "model_path": "models/heroes/mars/mars.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "mars_arena_of_blood",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N6解锁\n挑战成功后可获得神器碎片-米奈希尔之力",
+      "default_wearable_asset_id": "monster_archive_hunt_02",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N6解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 6,
+        "frame": "frames/t006000.jpg",
+        "complete_tooltip": "神兽狩猎-阿尔萨斯\n需要：\n - N6解锁\n挑战成功后可获得神器碎片-米奈希尔之力",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:hunt_02"
+      },
+      "stats": {
+        "health": 330000000.0,
+        "attack": 5500002,
+        "war3_armor": 3498.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-阿尔萨斯",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "阿尔萨斯",
+          "seconds": 157.0,
+          "attack_display": "5500002",
+          "attack_integer": 5500002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t157000.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-阿尔萨斯",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-阿尔萨斯",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示"
+    },
+    {
+      "challenge_id": "hunt_03",
+      "building_id": 1,
+      "slot_order": 7,
+      "display_name": "神兽狩猎-伊利丹",
+      "min_difficulty": 7,
+      "reward_kind": "fragment",
+      "reward_key": "fragment_03",
+      "model_path": "models/heroes/doom/doom.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "doom_bringer_doom",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N7解锁\n挑战成功后可获得神器碎片-埃辛诺斯战刃",
+      "default_wearable_asset_id": "monster_archive_hunt_03",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N7解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 7,
+        "frame": "frames/t007000.jpg",
+        "complete_tooltip": "神兽狩猎-伊利丹\n需要：\n - N7解锁\n挑战成功后可获得神器碎片-埃辛诺斯战刃",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:hunt_03"
+      },
+      "stats": {
+        "health": 450000000.0,
+        "attack": 7500002,
+        "war3_armor": 1998.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-伊利丹",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "伊利丹",
+          "seconds": 161.0,
+          "attack_display": "7500002",
+          "attack_integer": 7500002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t161000.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-伊利丹",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-伊利丹",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击7500002，视频整数显示"
+    },
+    {
+      "challenge_id": "hunt_04",
+      "building_id": 1,
+      "slot_order": 8,
+      "display_name": "神兽狩猎-洛萨",
+      "min_difficulty": 8,
+      "reward_kind": "fragment",
+      "reward_key": "fragment_04",
+      "model_path": "models/items/spectre/spectre_arcana/spectre_arcana_base.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "spectre_haunt",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N8解锁\n挑战成功后可获得神器碎片-灰烬使者",
+      "default_wearable_asset_id": "monster_archive_hunt_04",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N8解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 8,
+        "frame": "frames/t008000.jpg",
+        "complete_tooltip": "神兽狩猎-洛萨\n需要：\n - N8解锁\n挑战成功后可获得神器碎片-灰烬使者",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:hunt_04"
+      },
+      "stats": {
+        "health": 630000000.0,
+        "attack": 10500002,
+        "war3_armor": 2498.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-洛萨",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "洛萨",
+          "seconds": 169.5,
+          "attack_display": "10500002",
+          "attack_integer": 10500002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t169500.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-洛萨",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-洛萨",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击10500002，视频整数显示"
+    },
+    {
+      "challenge_id": "cage_1",
+      "building_id": 1,
+      "slot_order": 9,
+      "display_name": "秘法牢笼-死亡之翼",
+      "min_difficulty": 7,
+      "reward_kind": "cage",
+      "reward_key": "cage_1",
+      "model_path": "models/items/dragon_knight/silver_dragon_king_dragon/silver_dragon_king_dragon.vmdl",
+      "model_scale": 1.5,
+      "ability_icon": "visage_summon_familiars",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N7解锁\n挑战成功后可获得专属奖励",
+      "default_wearable_asset_id": "monster_archive_cage_1",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N7解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 9,
+        "frame": "frames/t009000.jpg",
+        "complete_tooltip": "秘法牢笼-死亡之翼\n需要：\n - N7解锁\n挑战成功后可获得专属奖励",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:cage_1"
+      },
+      "stats": {
+        "health": 450000000.0,
+        "attack": 15000002,
+        "war3_armor": 2998.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-死亡之翼",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "死亡之翼",
+          "seconds": 176.0,
+          "attack_display": "15000002",
+          "attack_integer": 15000002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t176000.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-死亡之翼",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-死亡之翼",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击15000002，视频整数显示"
+    },
+    {
+      "challenge_id": "cage_2",
+      "building_id": 1,
+      "slot_order": 10,
+      "display_name": "秘法牢笼-红龙女王",
+      "min_difficulty": 8,
+      "reward_kind": "cage",
+      "reward_key": "cage_2",
+      "model_path": "models/items/dragon_knight/silver_dragon_king_dragon/silver_dragon_king_dragon.vmdl",
+      "model_scale": 1.5,
+      "ability_icon": "visage_summon_familiars",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N8解锁\n挑战成功后可获得专属奖励",
+      "default_wearable_asset_id": "monster_archive_cage_2",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N8解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 10,
+        "frame": "frames/t010000.jpg",
+        "complete_tooltip": "秘法牢笼-红龙女王\n需要：\n - N8解锁\n挑战成功后可获得专属奖励",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:cage_2"
+      },
+      "stats": {
+        "health": 630000000.0,
+        "attack": 21000002,
+        "war3_armor": 3498.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-红龙女王",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "红龙女王",
+          "seconds": 181.0,
+          "attack_display": "21000002",
+          "attack_integer": 21000002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t181000.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-红龙女王",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-红龙女王",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击21000002，视频整数显示"
+    },
+    {
+      "challenge_id": "cage_3",
+      "building_id": 1,
+      "slot_order": 11,
+      "display_name": "秘法牢笼-冰霜巨龙",
+      "min_difficulty": 9,
+      "reward_kind": "cage",
+      "reward_key": "cage_3",
+      "model_path": "models/items/dragon_knight/silver_dragon_king_dragon/silver_dragon_king_dragon.vmdl",
+      "model_scale": 1.5,
+      "ability_icon": "visage_summon_familiars",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N9解锁\n挑战成功后可获得专属奖励",
+      "default_wearable_asset_id": "monster_archive_cage_3",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N9解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 11,
+        "frame": "frames/t011000.jpg",
+        "complete_tooltip": "秘法牢笼-冰霜巨龙\n需要：\n - N9解锁\n挑战成功后可获得专属奖励",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:cage_3"
+      },
+      "stats": {
+        "health": 840000000.0,
+        "attack": 28000002,
+        "war3_armor": 3998.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-冰霜巨龙",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "冰霜巨龙",
+          "seconds": 186.5,
+          "attack_display": "28000002",
+          "attack_integer": 28000002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t186500.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-冰霜巨龙",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-冰霜巨龙",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击28000002，视频整数显示"
+    },
+    {
+      "challenge_id": "hunt_05",
+      "building_id": 2,
+      "slot_order": 1,
+      "display_name": "神兽狩猎-格罗姆",
+      "min_difficulty": 8,
+      "reward_kind": "fragment",
+      "reward_key": "fragment_05",
+      "model_path": "models/items/faceless_void/faceless_void_arcana/faceless_void_arcana_base.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "faceless_void_chronosphere",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N8解锁\n挑战成功后可获得神器碎片-血吼",
+      "default_wearable_asset_id": "monster_archive_hunt_05",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N8解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 14,
+        "frame": "frames/t014000.jpg",
+        "complete_tooltip": "神兽狩猎-格罗姆\n需要：\n - N8解锁\n挑战成功后可获得神器碎片-血吼",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:hunt_05"
+      },
+      "stats": {
+        "health": 1260000000.0,
+        "attack": 21000002,
+        "war3_armor": 2498.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-格罗姆",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "格罗姆",
+          "seconds": 272.0,
+          "attack_display": "21000002",
+          "attack_integer": 21000002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t272000.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-格罗姆",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-格罗姆",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击21000002，视频整数显示"
+    },
+    {
+      "challenge_id": "hunt_06",
+      "building_id": 2,
+      "slot_order": 2,
+      "display_name": "神兽狩猎-泰兰德",
+      "min_difficulty": 9,
+      "reward_kind": "fragment",
+      "reward_key": "fragment_06",
+      "model_path": "models/heroes/antimage/antimage.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "antimage_mana_void",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N9解锁\n挑战成功后可获得神器碎片-索利达尔群星之怒",
+      "default_wearable_asset_id": "monster_archive_hunt_06",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N9解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 15,
+        "frame": "frames/t015000.jpg",
+        "complete_tooltip": "神兽狩猎-泰兰德\n需要：\n - N9解锁\n挑战成功后可获得神器碎片-索利达尔群星之怒",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:hunt_06"
+      },
+      "stats": {
+        "health": 2520000000.0,
+        "attack": 42000000,
+        "war3_armor": 2498.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-泰兰德",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "泰兰德",
+          "seconds": 275.5,
+          "attack_display": "42000000",
+          "attack_integer": 42000000,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t275500.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-泰兰德",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-泰兰德",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击42000000，视频整数显示"
+    },
+    {
+      "challenge_id": "hunt_07",
+      "building_id": 2,
+      "slot_order": 3,
+      "display_name": "神兽狩猎-风王子",
+      "min_difficulty": 10,
+      "reward_kind": "fragment",
+      "reward_key": "fragment_07",
+      "model_path": "models/heroes/kunkka/kunkka.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "kunkka_ghostship",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N10解锁\n挑战成功后可获得神器碎片-雷霆之怒逐风者的祝福之剑",
+      "default_wearable_asset_id": "monster_archive_hunt_07",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N10解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 16,
+        "frame": "frames/t016000.jpg",
+        "complete_tooltip": "神兽狩猎-风王子\n需要：\n - N10解锁\n挑战成功后可获得神器碎片-雷霆之怒逐风者的祝福之剑",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:hunt_07"
+      },
+      "stats": {
+        "health": 5040000000.0,
+        "attack": 84000000,
+        "war3_armor": 2498.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-风王子",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "风王子",
+          "seconds": 281.0,
+          "attack_display": "84000000",
+          "attack_integer": 84000000,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t281000.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-风王子",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-风王子",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击84000000，视频整数显示"
+    },
+    {
+      "challenge_id": "hunt_08",
+      "building_id": 2,
+      "slot_order": 4,
+      "display_name": "神兽狩猎-黑龙王子",
+      "min_difficulty": 10,
+      "reward_kind": "fragment",
+      "reward_key": "fragment_08",
+      "model_path": "models/items/pudge/arcana/pudge_arcana_base.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "pudge_dismember",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N10解锁\n挑战成功后可获得神器碎片-阿什坎迪兄弟会之剑",
+      "default_wearable_asset_id": "monster_archive_hunt_08",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N10解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 17,
+        "frame": "frames/t017000.jpg",
+        "complete_tooltip": "神兽狩猎-黑龙王子\n需要：\n - N10解锁\n挑战成功后可获得神器碎片-阿什坎迪兄弟会之剑",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:hunt_08"
+      },
+      "stats": {
+        "health": 10080000000.0,
+        "attack": 168000002.0,
+        "war3_armor": 2498.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-黑龙王子",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "黑龙王子",
+          "seconds": 318.5,
+          "attack_display": "1.68亿",
+          "attack_integer": null,
+          "precision": "rounded_display_only_unknown_exact_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t318500.jpg",
+          "visual_reviewed": true,
+          "selection_policy": "preserve_v3_exact_168000002_consistent_with_rounded_1.68亿"
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-黑龙王子",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-黑龙王子",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击1.68亿，仅视频缩写，配置代表值/末位未证"
+    },
+    {
+      "challenge_id": "social_beast",
+      "building_id": 2,
+      "slot_order": 5,
+      "display_name": "瑞兽挑战",
+      "min_difficulty": 1,
+      "reward_kind": "social_ticket",
+      "reward_key": "beast",
+      "model_path": "models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "ogre_magi_multicast",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "召唤瑞兽\n击败后可获得1个赐福，可以用于抽奖\n\n每天最多获得10个赐福\n\n会攻击塔",
+      "default_wearable_asset_id": "monster_archive_social_beast",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 19,
+        "frame": "frames/t019000.jpg",
+        "complete_tooltip": "瑞兽挑战\n召唤瑞兽\n击败后可获得1个赐福，可以用于抽奖\n\n每天最多获得10个赐福\n\n会攻击塔",
+        "unlock_source": "project_preserved_baseline_requirement_not_printed_in_video",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:social_beast"
+      },
+      "stats": {
+        "health": 32000000,
+        "attack": 649000000,
+        "war3_armor": 7992,
+        "attack_speed": 1,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "preserved_existing_project_social_baseline",
+          "observed_in_attached_video": false
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "瑞兽",
+          "seconds": 286.5,
+          "attack_display": "6.49亿",
+          "attack_integer": null,
+          "precision": "rounded_display_only_unknown_exact_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t286500.jpg",
+          "visual_reviewed": true,
+          "selection_policy": "project_representative_of_rounded_display_not_proven_exact"
+        },
+        "war3_armor": {
+          "source": "preserved_existing_project_social_baseline",
+          "observed_in_attached_video": false
+        },
+        "attack_speed": {
+          "source": "preserved_existing_project_social_baseline",
+          "observed_in_attached_video": false
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用项目社交基线32M/7992/1次每秒，本次视频不可见；攻击6.49亿，仅视频缩写，配置代表值/末位未证"
+    },
+    {
+      "challenge_id": "social_ex",
+      "building_id": 2,
+      "slot_order": 6,
+      "display_name": "前女友挑战",
+      "min_difficulty": 1,
+      "reward_kind": "social_ticket",
+      "reward_key": "ex",
+      "model_path": "models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "ogre_magi_multicast",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "召唤前女友\n击败后可获得1个邀请函，可以用于抽奖\n\n每天最多获得10个邀请函\n瑞兽赐福总次数大于100方可获得\n\n会攻击塔",
+      "default_wearable_asset_id": "monster_archive_social_ex",
+      "reward_requirement_pool": "beast",
+      "reward_requirement_count": 100,
+      "unlock_text": "",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 18,
+        "frame": "frames/t018000.jpg",
+        "complete_tooltip": "前女友挑战\n召唤前女友\n击败后可获得1个邀请函，可以用于抽奖\n\n每天最多获得10个邀请函\n瑞兽赐福总次数大于100方可获得\n\n会攻击塔",
+        "unlock_source": "project_preserved_baseline_requirement_not_printed_in_video",
+        "reward_requirement_comparison": "strictly_greater_than",
+        "art_source": "existing_project_reuse:social_ex"
+      },
+      "stats": {
+        "health": 32000000,
+        "attack": 649000000,
+        "war3_armor": 7992,
+        "attack_speed": 1,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "preserved_existing_project_social_baseline",
+          "observed_in_attached_video": false
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "前女友",
+          "seconds": 295.5,
+          "attack_display": "6.49亿",
+          "attack_integer": null,
+          "precision": "rounded_display_only_unknown_exact_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t295500.jpg",
+          "visual_reviewed": true,
+          "selection_policy": "project_representative_of_rounded_display_not_proven_exact"
+        },
+        "war3_armor": {
+          "source": "preserved_existing_project_social_baseline",
+          "observed_in_attached_video": false
+        },
+        "attack_speed": {
+          "source": "preserved_existing_project_social_baseline",
+          "observed_in_attached_video": false
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用项目社交基线32M/7992/1次每秒，本次视频不可见；攻击6.49亿，仅视频缩写，配置代表值/末位未证"
+    },
+    {
+      "challenge_id": "football",
+      "building_id": 2,
+      "slot_order": 7,
+      "display_name": "绿茵挑战",
+      "min_difficulty": 1,
+      "reward_kind": "challenge_points",
+      "reward_key": "football",
+      "model_path": "models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "ogre_magi_multicast",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "召唤一群足球怪\n击败后可获得10点绿茵积分\n\n每天最多获得100个绿茵积分\n\n会攻击塔",
+      "default_wearable_asset_id": "monster_archive_social_beast",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "",
+      "evidence": {
+        "tooltip_source": "related",
+        "seconds": 22.5,
+        "frame": "output/archive_challenges_20261029/related/frames/t022500.jpg",
+        "complete_tooltip": "绿茵挑战\n召唤一群足球怪\n击败后可获得10点绿茵积分\n\n每天最多获得100个绿茵积分\n\n会攻击塔",
+        "unlock_source": "project_preserved_baseline_requirement_not_printed_in_video",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:social_beast"
+      },
+      "stats": {
+        "health": 32000000,
+        "attack": 64901248,
+        "war3_armor": 7992,
+        "attack_speed": 1,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 5
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "preserved_existing_project_social_baseline",
+          "observed_in_attached_video": false
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "足球怪",
+          "seconds": 306.5,
+          "attack_display": "64901248",
+          "attack_integer": 64901248,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t306500.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "preserved_existing_project_social_baseline",
+          "observed_in_attached_video": false
+        },
+        "attack_speed": {
+          "source": "preserved_existing_project_social_baseline",
+          "observed_in_attached_video": false
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用项目社交基线32M/7992/1次每秒，本次视频不可见；攻击64901248，视频整数显示；足球群数5为项目配置，视频未列群数"
+    },
+    {
+      "challenge_id": "cage_4",
+      "building_id": 3,
+      "slot_order": 1,
+      "display_name": "秘法牢笼-绿龙伊瑟拉",
+      "min_difficulty": 10,
+      "reward_kind": "cage",
+      "reward_key": "cage_4",
+      "model_path": "models/heroes/jakiro/jakiro.vmdl",
+      "model_scale": 1.5,
+      "ability_icon": "visage_summon_familiars",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N10解锁\n挑战成功后可获得专属奖励",
+      "default_wearable_asset_id": "monster_archive_cage_4",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N10解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 25,
+        "frame": "frames/t025000.jpg",
+        "complete_tooltip": "秘法牢笼-绿龙伊瑟拉\n需要：\n - N10解锁\n挑战成功后可获得专属奖励",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:cage_4"
+      },
+      "stats": {
+        "health": 450000000.0,
+        "attack": 15000002,
+        "war3_armor": 2998.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-绿龙伊瑟拉",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "绿龙伊瑟拉",
+          "seconds": 66.0,
+          "attack_display": "15000002",
+          "attack_integer": 15000002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t066000.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-绿龙伊瑟拉",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-绿龙伊瑟拉",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击15000002，视频整数显示"
+    },
+    {
+      "challenge_id": "cage_5",
+      "building_id": 3,
+      "slot_order": 2,
+      "display_name": "秘法牢笼-蓝龙玛里苟斯",
+      "min_difficulty": 10,
+      "reward_kind": "cage",
+      "reward_key": "cage_5",
+      "model_path": "models/heroes/jakiro/jakiro.vmdl",
+      "model_scale": 1.5,
+      "ability_icon": "visage_summon_familiars",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N10解锁\n挑战成功后可获得专属奖励",
+      "default_wearable_asset_id": "monster_archive_cage_5",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N10解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 26,
+        "frame": "frames/t026000.jpg",
+        "complete_tooltip": "秘法牢笼-蓝龙玛里苟斯\n需要：\n - N10解锁\n挑战成功后可获得专属奖励",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:cage_5"
+      },
+      "stats": {
+        "health": 450000000.0,
+        "attack": 15000002,
+        "war3_armor": 2998.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-蓝龙玛里苟斯",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "蓝龙玛里苟斯",
+          "seconds": 73.5,
+          "attack_display": "15000002",
+          "attack_integer": 15000002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t073500.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-蓝龙玛里苟斯",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-蓝龙玛里苟斯",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击15000002，视频整数显示"
+    },
+    {
+      "challenge_id": "cage_6",
+      "building_id": 3,
+      "slot_order": 3,
+      "display_name": "秘法牢笼-青铜龙诺兹多姆",
+      "min_difficulty": 10,
+      "reward_kind": "cage",
+      "reward_key": "cage_6",
+      "model_path": "models/heroes/jakiro/jakiro.vmdl",
+      "model_scale": 1.5,
+      "ability_icon": "visage_summon_familiars",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N10解锁\n挑战成功后可获得专属奖励",
+      "default_wearable_asset_id": "monster_archive_cage_6",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N10解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 27,
+        "frame": "frames/t027000.jpg",
+        "complete_tooltip": "秘法牢笼-青铜龙诺兹多姆\n需要：\n - N10解锁\n挑战成功后可获得专属奖励",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:cage_6"
+      },
+      "stats": {
+        "health": 450000000.0,
+        "attack": 15000002,
+        "war3_armor": 2998.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-青铜龙诺兹多姆",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "青铜龙诺兹多姆",
+          "seconds": 80.5,
+          "attack_display": "15000002",
+          "attack_integer": 15000002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t080500.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-青铜龙诺兹多姆",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-青铜龙诺兹多姆",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击15000002，视频整数显示"
+    },
+    {
+      "challenge_id": "social_friend",
+      "building_id": 3,
+      "slot_order": 4,
+      "display_name": "好基友挑战",
+      "min_difficulty": 1,
+      "reward_kind": "social_ticket",
+      "reward_key": "friend",
+      "model_path": "models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "ogre_magi_multicast",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "召唤好基友\n击败后可获得1个义帖，可以用于抽奖\n\n每天最多获得10个义帖\n邀请函总次数大于100方可获得\n\n会攻击塔",
+      "default_wearable_asset_id": "monster_archive_social_friend",
+      "reward_requirement_pool": "ex",
+      "reward_requirement_count": 100,
+      "unlock_text": "",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 28,
+        "frame": "frames/t028000.jpg",
+        "complete_tooltip": "好基友挑战\n召唤好基友\n击败后可获得1个义帖，可以用于抽奖\n\n每天最多获得10个义帖\n邀请函总次数大于100方可获得\n\n会攻击塔",
+        "unlock_source": "project_preserved_baseline_requirement_not_printed_in_video",
+        "reward_requirement_comparison": "strictly_greater_than",
+        "art_source": "existing_project_reuse:social_friend"
+      },
+      "stats": {
+        "health": 32000000,
+        "attack": 649000000,
+        "war3_armor": 7992,
+        "attack_speed": 1,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "preserved_existing_project_social_baseline",
+          "observed_in_attached_video": false
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "好基友",
+          "seconds": 87.5,
+          "attack_display": "6.49亿",
+          "attack_integer": null,
+          "precision": "rounded_display_only_unknown_exact_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t087500.jpg",
+          "visual_reviewed": true,
+          "selection_policy": "project_representative_of_rounded_display_not_proven_exact"
+        },
+        "war3_armor": {
+          "source": "preserved_existing_project_social_baseline",
+          "observed_in_attached_video": false
+        },
+        "attack_speed": {
+          "source": "preserved_existing_project_social_baseline",
+          "observed_in_attached_video": false
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用项目社交基线32M/7992/1次每秒，本次视频不可见；攻击6.49亿，仅视频缩写，配置代表值/末位未证"
+    },
+    {
+      "challenge_id": "hunt_09",
+      "building_id": 3,
+      "slot_order": 5,
+      "display_name": "神兽狩猎-奥蕾莉亚",
+      "min_difficulty": 10,
+      "reward_kind": "fragment",
+      "reward_key": "fragment_09",
+      "model_path": "models/heroes/weaver/weaver.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "weaver_time_lapse",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N10解锁\n挑战成功后可获得神器碎片-星月湮灭战弓",
+      "default_wearable_asset_id": "monster_archive_hunt_09",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N10解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 30,
+        "frame": "frames/t030000.jpg",
+        "complete_tooltip": "神兽狩猎-奥蕾莉亚\n需要：\n - N10解锁\n挑战成功后可获得神器碎片-星月湮灭战弓",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:hunt_09"
+      },
+      "stats": {
+        "health": 330000000.0,
+        "attack": 5500002,
+        "war3_armor": 2998.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-奥蕾莉亚",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "奥蕾莉亚",
+          "seconds": 117.5,
+          "attack_display": "5500002",
+          "attack_integer": 5500002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t117500.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-奥蕾莉亚",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-奥蕾莉亚",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示"
+    },
+    {
+      "challenge_id": "hunt_10",
+      "building_id": 3,
+      "slot_order": 6,
+      "display_name": "神兽狩猎-乌瑟尔",
+      "min_difficulty": 10,
+      "reward_kind": "fragment",
+      "reward_key": "fragment_10",
+      "model_path": "models/heroes/legion_commander/legion_commander.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "legion_commander_duel",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N10解锁\n挑战成功后可获得神器碎片-圣光裁决之锤",
+      "default_wearable_asset_id": "monster_archive_hunt_10",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N10解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 31,
+        "frame": "frames/t031000.jpg",
+        "complete_tooltip": "神兽狩猎-乌瑟尔\n需要：\n - N10解锁\n挑战成功后可获得神器碎片-圣光裁决之锤",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:hunt_10"
+      },
+      "stats": {
+        "health": 330000000.0,
+        "attack": 5500002,
+        "war3_armor": 2998.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-乌瑟尔",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "乌瑟尔",
+          "seconds": 113.0,
+          "attack_display": "5500002",
+          "attack_integer": 5500002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t113000.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-乌瑟尔",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-乌瑟尔",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示"
+    },
+    {
+      "challenge_id": "hunt_11",
+      "building_id": 3,
+      "slot_order": 7,
+      "display_name": "神兽狩猎-泰蕾苟萨",
+      "min_difficulty": 10,
+      "reward_kind": "fragment",
+      "reward_key": "fragment_11",
+      "model_path": "models/heroes/clinkz/clinkz.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "clinkz_death_pact",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N10解锁\n挑战成功后可获得神器碎片-泰蕾苟萨法杖",
+      "default_wearable_asset_id": "monster_archive_hunt_11",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N10解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 33,
+        "frame": "frames/t033000.jpg",
+        "complete_tooltip": "神兽狩猎-泰蕾苟萨\n需要：\n - N10解锁\n挑战成功后可获得神器碎片-泰蕾苟萨法杖",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:hunt_11"
+      },
+      "stats": {
+        "health": 330000000.0,
+        "attack": 5500002,
+        "war3_armor": 2998.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-泰蕾苟萨",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "泰蕾苟萨",
+          "seconds": 107.5,
+          "attack_display": "5500002",
+          "attack_integer": 5500002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t107500.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-泰蕾苟萨",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-泰蕾苟萨",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示"
+    },
+    {
+      "challenge_id": "hunt_12",
+      "building_id": 3,
+      "slot_order": 8,
+      "display_name": "神兽狩猎-古尔丹",
+      "min_difficulty": 10,
+      "reward_kind": "fragment",
+      "reward_key": "fragment_12",
+      "model_path": "models/items/rubick/rubick_arcana/rubick_arcana_base.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "rubick_spell_steal",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N10解锁\n挑战成功后可获得神器碎片-萨格拉斯之杖",
+      "default_wearable_asset_id": "monster_archive_hunt_12",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N10解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 34,
+        "frame": "frames/t034000.jpg",
+        "complete_tooltip": "神兽狩猎-古尔丹\n需要：\n - N10解锁\n挑战成功后可获得神器碎片-萨格拉斯之杖",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:hunt_12"
+      },
+      "stats": {
+        "health": 330000000.0,
+        "attack": 5500002,
+        "war3_armor": 2998.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-古尔丹",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "古尔丹",
+          "seconds": 102.0,
+          "attack_display": "5500002",
+          "attack_integer": 5500002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t102000.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-古尔丹",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-古尔丹",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示"
+    },
+    {
+      "challenge_id": "watermelon",
+      "building_id": 3,
+      "slot_order": 9,
+      "display_name": "西瓜挑战",
+      "min_difficulty": 1,
+      "reward_kind": "challenge_points",
+      "reward_key": "watermelon",
+      "model_path": "models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "ogre_magi_multicast",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "召唤一个西瓜\n击败后可获得1点西瓜积分\n\n每天最多获得10个西瓜\n\n会攻击塔",
+      "default_wearable_asset_id": "monster_archive_social_beast",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 35,
+        "frame": "frames/t035000.jpg",
+        "complete_tooltip": "西瓜挑战\n召唤一个西瓜\n击败后可获得1点西瓜积分\n\n每天最多获得10个西瓜\n\n会攻击塔",
+        "unlock_source": "project_preserved_baseline_requirement_not_printed_in_video",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:social_beast"
+      },
+      "stats": {
+        "health": 32000000,
+        "attack": 360000000,
+        "war3_armor": 7992,
+        "attack_speed": 1,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "preserved_existing_project_social_baseline",
+          "observed_in_attached_video": false
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "西瓜",
+          "seconds": 122.5,
+          "attack_display": "3.60亿",
+          "attack_integer": null,
+          "precision": "rounded_display_only_unknown_exact_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t122500.jpg",
+          "visual_reviewed": true,
+          "selection_policy": "project_representative_of_rounded_display_not_proven_exact"
+        },
+        "war3_armor": {
+          "source": "preserved_existing_project_social_baseline",
+          "observed_in_attached_video": false
+        },
+        "attack_speed": {
+          "source": "preserved_existing_project_social_baseline",
+          "observed_in_attached_video": false
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用项目社交基线32M/7992/1次每秒，本次视频不可见；攻击3.60亿，仅视频缩写，配置代表值/末位未证"
+    },
+    {
+      "challenge_id": "cage_7",
+      "building_id": 4,
+      "slot_order": 1,
+      "display_name": "秘法牢笼-虚空龙",
+      "min_difficulty": 10,
+      "reward_kind": "cage",
+      "reward_key": "cage_7",
+      "model_path": "models/heroes/jakiro/jakiro.vmdl",
+      "model_scale": 1.5,
+      "ability_icon": "visage_summon_familiars",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N10解锁\n挑战成功后可获得专属奖励",
+      "default_wearable_asset_id": "monster_archive_cage_4",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N10解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 38,
+        "frame": "frames/t038000.jpg",
+        "complete_tooltip": "秘法牢笼-虚空龙\n需要：\n - N10解锁\n挑战成功后可获得专属奖励",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:cage_4"
+      },
+      "stats": {
+        "health": 450000000.0,
+        "attack": 15000002,
+        "war3_armor": 2998.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-虚空龙",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "虚空龙",
+          "seconds": 193.5,
+          "attack_display": "15000002",
+          "attack_integer": 15000002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t193500.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-虚空龙",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-虚空龙",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击15000002，视频整数显示"
+    },
+    {
+      "challenge_id": "cage_8",
+      "building_id": 4,
+      "slot_order": 2,
+      "display_name": "秘法牢笼-暮光龙",
+      "min_difficulty": 10,
+      "reward_kind": "cage",
+      "reward_key": "cage_8",
+      "model_path": "models/heroes/jakiro/jakiro.vmdl",
+      "model_scale": 1.5,
+      "ability_icon": "visage_summon_familiars",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N10解锁\n挑战成功后可获得专属奖励",
+      "default_wearable_asset_id": "monster_archive_cage_4",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N10解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 39,
+        "frame": "frames/t039000.jpg",
+        "complete_tooltip": "秘法牢笼-暮光龙\n需要：\n - N10解锁\n挑战成功后可获得专属奖励",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:cage_4"
+      },
+      "stats": {
+        "health": 450000000.0,
+        "attack": 15000002,
+        "war3_armor": 2998.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-暮光龙",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "暮光龙",
+          "seconds": 200.0,
+          "attack_display": "15000002",
+          "attack_integer": 15000002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t200000.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-暮光龙",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-暮光龙",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击15000002，视频整数显示"
+    },
+    {
+      "challenge_id": "cage_9",
+      "building_id": 4,
+      "slot_order": 3,
+      "display_name": "秘法牢笼-石英龙",
+      "min_difficulty": 10,
+      "reward_kind": "cage",
+      "reward_key": "cage_9",
+      "model_path": "models/heroes/jakiro/jakiro.vmdl",
+      "model_scale": 1.5,
+      "ability_icon": "visage_summon_familiars",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N10解锁\n挑战成功后可获得专属奖励",
+      "default_wearable_asset_id": "monster_archive_cage_4",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N10解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 40,
+        "frame": "frames/t040000.jpg",
+        "complete_tooltip": "秘法牢笼-石英龙\n需要：\n - N10解锁\n挑战成功后可获得专属奖励",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:cage_4"
+      },
+      "stats": {
+        "health": 450000000.0,
+        "attack": 15000002,
+        "war3_armor": 2998.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-石英龙",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "石英龙",
+          "seconds": 204.5,
+          "attack_display": "15000002",
+          "attack_integer": 15000002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t204500.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-石英龙",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "秘法牢笼-石英龙",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击15000002，视频整数显示"
+    },
+    {
+      "challenge_id": "hunt_16",
+      "building_id": 4,
+      "slot_order": 4,
+      "display_name": "神兽狩猎-守界圣辉",
+      "min_difficulty": 10,
+      "reward_kind": "fragment",
+      "reward_key": "fragment_16",
+      "model_path": "models/heroes/legion_commander/legion_commander.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "legion_commander_duel",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "挑战成功后可获得神器碎片-守界圣辉",
+      "default_wearable_asset_id": "monster_archive_hunt_10",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N10解锁",
+      "evidence": {
+        "tooltip_source": "related",
+        "seconds": 43,
+        "frame": "output/archive_challenges_20261029/related/frames/t043000.jpg",
+        "complete_tooltip": "神兽狩猎-守界圣辉\n挑战成功后可获得神器碎片-守界圣辉",
+        "unlock_source": "project_preserved_baseline_requirement_not_printed_in_video",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:hunt_10"
+      },
+      "stats": {
+        "health": 330000000.0,
+        "attack": 5500002,
+        "war3_armor": 2998.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-守界圣辉",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "提尔",
+          "seconds": 226.5,
+          "attack_display": "5500002",
+          "attack_integer": 5500002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t226500.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-守界圣辉",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-守界圣辉",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示"
+    },
+    {
+      "challenge_id": "hunt_13",
+      "building_id": 4,
+      "slot_order": 5,
+      "display_name": "神兽狩猎-萨格拉斯",
+      "min_difficulty": 10,
+      "reward_kind": "fragment",
+      "reward_key": "fragment_13",
+      "model_path": "models/heroes/doom/doom.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "doom_bringer_doom",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N10解锁\n挑战成功后可获得神器碎片-黑暗撕裂者",
+      "default_wearable_asset_id": "monster_archive_hunt_03",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N10解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 42,
+        "frame": "frames/t042000.jpg",
+        "complete_tooltip": "神兽狩猎-萨格拉斯\n需要：\n - N10解锁\n挑战成功后可获得神器碎片-黑暗撕裂者",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:hunt_03"
+      },
+      "stats": {
+        "health": 330000000.0,
+        "attack": 5500002,
+        "war3_armor": 2998.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-萨格拉斯",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "萨格拉斯",
+          "seconds": 210.0,
+          "attack_display": "5500002",
+          "attack_integer": 5500002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t210000.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-萨格拉斯",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-萨格拉斯",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示"
+    },
+    {
+      "challenge_id": "hunt_14",
+      "building_id": 4,
+      "slot_order": 6,
+      "display_name": "神兽狩猎-佐瓦尔",
+      "min_difficulty": 10,
+      "reward_kind": "fragment",
+      "reward_key": "fragment_14",
+      "model_path": "models/heroes/mars/mars.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "mars_arena_of_blood",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N10解锁\n挑战成功后可获得神器碎片-创世权柄",
+      "default_wearable_asset_id": "monster_archive_hunt_02",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N10解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 43,
+        "frame": "frames/t043000.jpg",
+        "complete_tooltip": "神兽狩猎-佐瓦尔\n需要：\n - N10解锁\n挑战成功后可获得神器碎片-创世权柄",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:hunt_02"
+      },
+      "stats": {
+        "health": 330000000.0,
+        "attack": 5500002,
+        "war3_armor": 2998.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-佐瓦尔",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "佐瓦尔",
+          "seconds": 215.5,
+          "attack_display": "5500002",
+          "attack_integer": 5500002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t215500.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-佐瓦尔",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-佐瓦尔",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示"
+    },
+    {
+      "challenge_id": "hunt_15",
+      "building_id": 4,
+      "slot_order": 7,
+      "display_name": "神兽狩猎-阿克蒙德",
+      "min_difficulty": 10,
+      "reward_kind": "fragment",
+      "reward_key": "fragment_15",
+      "model_path": "models/items/spectre/spectre_arcana/spectre_arcana_base.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "spectre_haunt",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N10解锁\n挑战成功后可获得神器碎片-万军崩裂",
+      "default_wearable_asset_id": "monster_archive_hunt_04",
+      "reward_requirement_pool": "",
+      "reward_requirement_count": 0,
+      "unlock_text": "N10解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 44,
+        "frame": "frames/t044000.jpg",
+        "complete_tooltip": "神兽狩猎-阿克蒙德\n需要：\n - N10解锁\n挑战成功后可获得神器碎片-万军崩裂",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": null,
+        "art_source": "existing_project_reuse:hunt_04"
+      },
+      "stats": {
+        "health": 330000000.0,
+        "attack": 5500002,
+        "war3_armor": 2998.0,
+        "attack_speed": 2.5,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-阿克蒙德",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "阿克蒙德",
+          "seconds": 220.5,
+          "attack_display": "5500002",
+          "attack_integer": 5500002,
+          "precision": "exact_display_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t220500.jpg",
+          "visual_reviewed": true
+        },
+        "war3_armor": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-阿克蒙德",
+          "historical_evidence_label": "按规律推导（未实机）"
+        },
+        "attack_speed": {
+          "source": "human_spec_v3_final_authored_value",
+          "observed_in_attached_video": false,
+          "v3_name": "神兽狩猎-阿克蒙德",
+          "historical_evidence_label": "按规律推导（未实机）"
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示"
+    },
+    {
+      "challenge_id": "social_wife",
+      "building_id": 4,
+      "slot_order": 9,
+      "display_name": "我的老婆挑战",
+      "min_difficulty": 10,
+      "reward_kind": "social_ticket",
+      "reward_key": "wife",
+      "model_path": "models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "ogre_magi_multicast",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N10解锁\n召唤我的老婆\n击败后可获得1个玫瑰，可以用于抽奖\n\n每天最多获得10个玫瑰\n义帖总次数大于100方可获得\n\n会攻击塔",
+      "default_wearable_asset_id": "monster_archive_social_wife",
+      "reward_requirement_pool": "friend",
+      "reward_requirement_count": 100,
+      "unlock_text": "N10解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 47,
+        "frame": "frames/t047000.jpg",
+        "complete_tooltip": "我的老婆挑战\n需要：\n - N10解锁\n召唤我的老婆\n击败后可获得1个玫瑰，可以用于抽奖\n\n每天最多获得10个玫瑰\n义帖总次数大于100方可获得\n\n会攻击塔",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": "strictly_greater_than",
+        "art_source": "existing_project_reuse:social_wife"
+      },
+      "stats": {
+        "health": 32000000,
+        "attack": 649000000,
+        "war3_armor": 7992,
+        "attack_speed": 1,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "preserved_existing_project_social_baseline",
+          "observed_in_attached_video": false
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "老婆",
+          "seconds": 235.5,
+          "attack_display": "6.49亿",
+          "attack_integer": null,
+          "precision": "rounded_display_only_unknown_exact_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t235500.jpg",
+          "visual_reviewed": true,
+          "selection_policy": "project_representative_of_rounded_display_not_proven_exact"
+        },
+        "war3_armor": {
+          "source": "preserved_existing_project_social_baseline",
+          "observed_in_attached_video": false
+        },
+        "attack_speed": {
+          "source": "preserved_existing_project_social_baseline",
+          "observed_in_attached_video": false
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用项目社交基线32M/7992/1次每秒，本次视频不可见；攻击6.49亿，仅视频缩写，配置代表值/末位未证"
+    },
+    {
+      "challenge_id": "social_concubine",
+      "building_id": 4,
+      "slot_order": 10,
+      "display_name": "我的侍妾挑战",
+      "min_difficulty": 10,
+      "reward_kind": "social_ticket",
+      "reward_key": "concubine",
+      "model_path": "models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl",
+      "model_scale": 1.2,
+      "ability_icon": "ogre_magi_multicast",
+      "cooldown_seconds": 3.0,
+      "enabled": 1,
+      "description": "需要：\n - N10解锁\n召唤我的侍妾\n击败后可获得1个工资，可以用于抽奖\n\n每天最多获得10个工资\n义帖总次数大于100方可获得\n\n会攻击塔",
+      "default_wearable_asset_id": "monster_archive_social_wife",
+      "reward_requirement_pool": "friend",
+      "reward_requirement_count": 100,
+      "unlock_text": "N10解锁",
+      "evidence": {
+        "tooltip_source": "conditions",
+        "seconds": 52,
+        "frame": "frames/t052000.jpg",
+        "complete_tooltip": "我的侍妾挑战\n需要：\n - N10解锁\n召唤我的侍妾\n击败后可获得1个工资，可以用于抽奖\n\n每天最多获得10个工资\n义帖总次数大于100方可获得\n\n会攻击塔",
+        "unlock_source": "video_explicit_N_requirement",
+        "reward_requirement_comparison": "strictly_greater_than",
+        "art_source": "existing_project_reuse:social_wife"
+      },
+      "stats": {
+        "health": 32000000,
+        "attack": 649000000,
+        "war3_armor": 7992,
+        "attack_speed": 1,
+        "move_speed": 280,
+        "attack_range": 160,
+        "magic_resistance": 0,
+        "count": 1
+      },
+      "stat_evidence": {
+        "health": {
+          "source": "preserved_existing_project_social_baseline",
+          "observed_in_attached_video": false
+        },
+        "attack": {
+          "source": "related_video_selected_monster_attack_display",
+          "observed_in_attached_video": true,
+          "monster": "侍妾",
+          "seconds": 260.0,
+          "attack_display": "6.49亿",
+          "attack_integer": null,
+          "precision": "rounded_display_only_unknown_exact_integer",
+          "frame": "output/archive_challenges_20261029/related/frames/t260000.jpg",
+          "visual_reviewed": true,
+          "selection_policy": "project_representative_of_rounded_display_not_proven_exact"
+        },
+        "war3_armor": {
+          "source": "preserved_existing_project_social_baseline",
+          "observed_in_attached_video": false
+        },
+        "attack_speed": {
+          "source": "preserved_existing_project_social_baseline",
+          "observed_in_attached_video": false
+        }
+      },
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用项目社交基线32M/7992/1次每秒，本次视频不可见；攻击6.49亿，仅视频缩写，配置代表值/末位未证"
+    }
+  ],
+  "actions": [
+    {
+      "action_id": "endless",
+      "ability_name": "ability_archive_endless",
+      "building_id": 2,
+      "slot_order": 9,
+      "display_name": "无尽模式开启",
+      "min_difficulty": 3,
+      "unlock_text": "N3解锁",
+      "ability_icon": "nevermore_requiem",
+      "cooldown_seconds": 0,
+      "enabled": 1,
+      "description": "需要：\n - N3解锁\n所有难度模式下难度一致，每波难度会逐层升高\n每通过10层获取无尽积分奖励增加100%\n\n无尽模式下每20波会掉落一件存档装备，波次越高品质概率越高",
+      "evidence": {
+        "source": "conditions",
+        "seconds": 20,
+        "frame": "frames/t020000.jpg"
+      }
+    },
+    {
+      "action_id": "endless_skip",
+      "ability_name": "ability_archive_endless_skip",
+      "building_id": 2,
+      "slot_order": 10,
+      "display_name": "无尽跳关",
+      "min_difficulty": 3,
+      "unlock_text": "N3解锁",
+      "ability_icon": "faceless_void_time_walk",
+      "cooldown_seconds": 0,
+      "enabled": 1,
+      "description": "需要：\n - N3解锁\n每次点击无尽跳2/5/10/20层(每波)\n\n无法退回请谨慎",
+      "evidence": {
+        "source": "conditions",
+        "seconds": 21,
+        "frame": "frames/t021000.jpg"
+      }
+    },
+    {
+      "action_id": "tower_solo",
+      "ability_name": "ability_archive_tower_solo",
+      "building_id": 2,
+      "slot_order": 11,
+      "display_name": "通天塔(单人)开启",
+      "min_difficulty": 10,
+      "unlock_text": "极寒或天灾N10解锁",
+      "ability_icon": "skywrath_mage_mystic_flare",
+      "cooldown_seconds": 0,
+      "enabled": 1,
+      "description": "需要：\n - 极寒或天灾N10解锁\n所有难度模式下难度一致，每波难度会逐层升高\n每通过10层获取无尽积分奖励增加100%（通天塔下积分获取更高）\n\n结束会立马计算存档，请在打之前把其他存档挑战都打完\n\n通天塔下每15波会掉落一件存档装备，波次越高品质概率越高",
+      "evidence": {
+        "source": "conditions",
+        "seconds": 23,
+        "frame": "frames/t023000.jpg"
+      }
+    },
+    {
+      "action_id": "return_1",
+      "ability_name": "ability_archive_return_1",
+      "building_id": 1,
+      "slot_order": 12,
+      "display_name": "返回",
+      "min_difficulty": 1,
+      "unlock_text": "",
+      "ability_icon": "kunkka_return",
+      "cooldown_seconds": 0,
+      "enabled": 1,
+      "description": "返回选择自己的英雄；不结束存档挑战。",
+      "evidence": {
+        "source": "project_behavior_decision",
+        "video_return_icon_visible": true,
+        "video_return_tooltip_not_hovered": true
+      }
+    },
+    {
+      "action_id": "return_2",
+      "ability_name": "ability_archive_return_2",
+      "building_id": 2,
+      "slot_order": 12,
+      "display_name": "返回",
+      "min_difficulty": 1,
+      "unlock_text": "",
+      "ability_icon": "kunkka_return",
+      "cooldown_seconds": 0,
+      "enabled": 1,
+      "description": "返回选择自己的英雄；不结束存档挑战。",
+      "evidence": {
+        "source": "project_behavior_decision",
+        "video_return_icon_visible": true,
+        "video_return_tooltip_not_hovered": true
+      }
+    },
+    {
+      "action_id": "return_3",
+      "ability_name": "ability_archive_return_3",
+      "building_id": 3,
+      "slot_order": 12,
+      "display_name": "返回",
+      "min_difficulty": 1,
+      "unlock_text": "",
+      "ability_icon": "kunkka_return",
+      "cooldown_seconds": 0,
+      "enabled": 1,
+      "description": "返回选择自己的英雄；不结束存档挑战。",
+      "evidence": {
+        "source": "project_behavior_decision",
+        "video_return_icon_visible": true,
+        "video_return_tooltip_not_hovered": true
+      }
+    },
+    {
+      "action_id": "return_4",
+      "ability_name": "ability_archive_return_4",
+      "building_id": 4,
+      "slot_order": 12,
+      "display_name": "返回",
+      "min_difficulty": 1,
+      "unlock_text": "",
+      "ability_icon": "kunkka_return",
+      "cooldown_seconds": 0,
+      "enabled": 1,
+      "description": "返回选择自己的英雄；不结束存档挑战。",
+      "evidence": {
+        "source": "project_behavior_decision",
+        "video_return_icon_visible": true,
+        "video_return_tooltip_not_hovered": true
+      }
+    }
+  ],
+  "raw_tooltips": [
+    {
+      "key": "shadow_1",
+      "title": "虚空之影",
+      "seconds": 1.8,
+      "building": 1,
+      "slot_row": 1,
+      "slot_column": 1,
+      "frame": "frames/t001800.jpg",
+      "complete_tooltip": "虚空之影\n挑战成功后可获得虚空之影道具",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": null,
+      "uncertainty": "N1/N2 first two slots are enabled; tooltip omits requirement. N1/N2 association inferred from ordered four slots, not explicitly printed."
+    },
+    {
+      "key": "shadow_2",
+      "title": "虚空之影",
+      "seconds": 2.4,
+      "building": 1,
+      "slot_row": 1,
+      "slot_column": 2,
+      "frame": "frames/t002400.jpg",
+      "complete_tooltip": "虚空之影\n挑战成功后可获得虚空之影道具",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": null,
+      "uncertainty": "N1/N2 first two slots are enabled; tooltip omits requirement. N1/N2 association inferred from ordered four slots, not explicitly printed."
+    },
+    {
+      "key": "shadow_3",
+      "title": "虚空之影",
+      "seconds": 3,
+      "building": 1,
+      "slot_row": 1,
+      "slot_column": 3,
+      "frame": "frames/t003000.jpg",
+      "complete_tooltip": "虚空之影\n需要：\n - N3解锁\n挑战成功后可获得虚空之影道具",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N3解锁",
+      "uncertainty": null
+    },
+    {
+      "key": "shadow_4",
+      "title": "虚空之影",
+      "seconds": 4,
+      "building": 1,
+      "slot_row": 1,
+      "slot_column": 4,
+      "frame": "frames/t004000.jpg",
+      "complete_tooltip": "虚空之影\n需要：\n - N4解锁\n挑战成功后可获得虚空之影道具",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N4解锁",
+      "uncertainty": null
+    },
+    {
+      "key": "hunt_01",
+      "title": "神兽狩猎-巫妖王",
+      "seconds": 5,
+      "building": 1,
+      "slot_row": 2,
+      "slot_column": 1,
+      "frame": "frames/t005000.jpg",
+      "complete_tooltip": "神兽狩猎-巫妖王\n需要：\n - N5解锁\n挑战成功后可获得神器碎片-霜之哀伤",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N5解锁",
+      "reward_text": "神器碎片-霜之哀伤"
+    },
+    {
+      "key": "hunt_02",
+      "title": "神兽狩猎-阿尔萨斯",
+      "seconds": 6,
+      "building": 1,
+      "slot_row": 2,
+      "slot_column": 2,
+      "frame": "frames/t006000.jpg",
+      "complete_tooltip": "神兽狩猎-阿尔萨斯\n需要：\n - N6解锁\n挑战成功后可获得神器碎片-米奈希尔之力",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N6解锁",
+      "reward_text": "神器碎片-米奈希尔之力"
+    },
+    {
+      "key": "hunt_03",
+      "title": "神兽狩猎-伊利丹",
+      "seconds": 7,
+      "building": 1,
+      "slot_row": 2,
+      "slot_column": 3,
+      "frame": "frames/t007000.jpg",
+      "complete_tooltip": "神兽狩猎-伊利丹\n需要：\n - N7解锁\n挑战成功后可获得神器碎片-埃辛诺斯战刃",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N7解锁",
+      "reward_text": "神器碎片-埃辛诺斯战刃"
+    },
+    {
+      "key": "hunt_04",
+      "title": "神兽狩猎-洛萨",
+      "seconds": 8,
+      "building": 1,
+      "slot_row": 2,
+      "slot_column": 4,
+      "frame": "frames/t008000.jpg",
+      "complete_tooltip": "神兽狩猎-洛萨\n需要：\n - N8解锁\n挑战成功后可获得神器碎片-灰烬使者",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N8解锁",
+      "reward_text": "神器碎片-灰烬使者"
+    },
+    {
+      "key": "hunt_05",
+      "title": "神兽狩猎-格罗姆",
+      "seconds": 14,
+      "building": 2,
+      "slot_row": 1,
+      "slot_column": 1,
+      "frame": "frames/t014000.jpg",
+      "complete_tooltip": "神兽狩猎-格罗姆\n需要：\n - N8解锁\n挑战成功后可获得神器碎片-血吼",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N8解锁",
+      "reward_text": "神器碎片-血吼"
+    },
+    {
+      "key": "hunt_06",
+      "title": "神兽狩猎-泰兰德",
+      "seconds": 15,
+      "building": 2,
+      "slot_row": 1,
+      "slot_column": 2,
+      "frame": "frames/t015000.jpg",
+      "complete_tooltip": "神兽狩猎-泰兰德\n需要：\n - N9解锁\n挑战成功后可获得神器碎片-索利达尔群星之怒",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N9解锁",
+      "reward_text": "神器碎片-索利达尔群星之怒"
+    },
+    {
+      "key": "hunt_07",
+      "title": "神兽狩猎-风王子",
+      "seconds": 16,
+      "building": 2,
+      "slot_row": 1,
+      "slot_column": 3,
+      "frame": "frames/t016000.jpg",
+      "complete_tooltip": "神兽狩猎-风王子\n需要：\n - N10解锁\n挑战成功后可获得神器碎片-雷霆之怒逐风者的祝福之剑",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N10解锁",
+      "reward_text": "神器碎片-雷霆之怒逐风者的祝福之剑"
+    },
+    {
+      "key": "hunt_08",
+      "title": "神兽狩猎-黑龙王子",
+      "seconds": 17,
+      "building": 2,
+      "slot_row": 1,
+      "slot_column": 4,
+      "frame": "frames/t017000.jpg",
+      "complete_tooltip": "神兽狩猎-黑龙王子\n需要：\n - N10解锁\n挑战成功后可获得神器碎片-阿什坎迪兄弟会之剑",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N10解锁",
+      "reward_text": "神器碎片-阿什坎迪兄弟会之剑"
+    },
+    {
+      "key": "hunt_09",
+      "title": "神兽狩猎-奥蕾莉亚",
+      "seconds": 30,
+      "building": 3,
+      "slot_row": 2,
+      "slot_column": 1,
+      "frame": "frames/t030000.jpg",
+      "complete_tooltip": "神兽狩猎-奥蕾莉亚\n需要：\n - N10解锁\n挑战成功后可获得神器碎片-星月湮灭战弓",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N10解锁",
+      "reward_text": "神器碎片-星月湮灭战弓"
+    },
+    {
+      "key": "hunt_10",
+      "title": "神兽狩猎-乌瑟尔",
+      "seconds": 31,
+      "building": 3,
+      "slot_row": 2,
+      "slot_column": 2,
+      "frame": "frames/t031000.jpg",
+      "complete_tooltip": "神兽狩猎-乌瑟尔\n需要：\n - N10解锁\n挑战成功后可获得神器碎片-圣光裁决之锤",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N10解锁",
+      "reward_text": "神器碎片-圣光裁决之锤"
+    },
+    {
+      "key": "hunt_11",
+      "title": "神兽狩猎-泰蕾苟萨",
+      "seconds": 33,
+      "building": 3,
+      "slot_row": 2,
+      "slot_column": 3,
+      "frame": "frames/t033000.jpg",
+      "complete_tooltip": "神兽狩猎-泰蕾苟萨\n需要：\n - N10解锁\n挑战成功后可获得神器碎片-泰蕾苟萨法杖",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N10解锁",
+      "reward_text": "神器碎片-泰蕾苟萨法杖"
+    },
+    {
+      "key": "hunt_12",
+      "title": "神兽狩猎-古尔丹",
+      "seconds": 34,
+      "building": 3,
+      "slot_row": 2,
+      "slot_column": 4,
+      "frame": "frames/t034000.jpg",
+      "complete_tooltip": "神兽狩猎-古尔丹\n需要：\n - N10解锁\n挑战成功后可获得神器碎片-萨格拉斯之杖",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N10解锁",
+      "reward_text": "神器碎片-萨格拉斯之杖"
+    },
+    {
+      "key": "hunt_13",
+      "title": "神兽狩猎-萨格拉斯",
+      "seconds": 42,
+      "building": 4,
+      "slot_row": 2,
+      "slot_column": 1,
+      "frame": "frames/t042000.jpg",
+      "complete_tooltip": "神兽狩猎-萨格拉斯\n需要：\n - N10解锁\n挑战成功后可获得神器碎片-黑暗撕裂者",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N10解锁",
+      "reward_text": "神器碎片-黑暗撕裂者"
+    },
+    {
+      "key": "hunt_14",
+      "title": "神兽狩猎-佐瓦尔",
+      "seconds": 43,
+      "building": 4,
+      "slot_row": 2,
+      "slot_column": 2,
+      "frame": "frames/t043000.jpg",
+      "complete_tooltip": "神兽狩猎-佐瓦尔\n需要：\n - N10解锁\n挑战成功后可获得神器碎片-创世权柄",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N10解锁",
+      "reward_text": "神器碎片-创世权柄"
+    },
+    {
+      "key": "hunt_15",
+      "title": "神兽狩猎-阿克蒙德",
+      "seconds": 44,
+      "building": 4,
+      "slot_row": 2,
+      "slot_column": 3,
+      "frame": "frames/t044000.jpg",
+      "complete_tooltip": "神兽狩猎-阿克蒙德\n需要：\n - N10解锁\n挑战成功后可获得神器碎片-万军崩裂",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N10解锁",
+      "reward_text": "神器碎片-万军崩裂"
+    },
+    {
+      "key": "cage_1",
+      "title": "秘法牢笼-死亡之翼",
+      "seconds": 9,
+      "building": 1,
+      "slot_row": 3,
+      "slot_column": 1,
+      "frame": "frames/t009000.jpg",
+      "complete_tooltip": "秘法牢笼-死亡之翼\n需要：\n - N7解锁\n挑战成功后可获得专属奖励",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N7解锁",
+      "reward_text": "专属奖励（此tooltip没有明细）"
+    },
+    {
+      "key": "cage_2",
+      "title": "秘法牢笼-红龙女王",
+      "seconds": 10,
+      "building": 1,
+      "slot_row": 3,
+      "slot_column": 2,
+      "frame": "frames/t010000.jpg",
+      "complete_tooltip": "秘法牢笼-红龙女王\n需要：\n - N8解锁\n挑战成功后可获得专属奖励",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N8解锁",
+      "reward_text": "专属奖励（此tooltip没有明细）"
+    },
+    {
+      "key": "cage_3",
+      "title": "秘法牢笼-冰霜巨龙",
+      "seconds": 11,
+      "building": 1,
+      "slot_row": 3,
+      "slot_column": 3,
+      "frame": "frames/t011000.jpg",
+      "complete_tooltip": "秘法牢笼-冰霜巨龙\n需要：\n - N9解锁\n挑战成功后可获得专属奖励",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N9解锁",
+      "reward_text": "专属奖励（此tooltip没有明细）"
+    },
+    {
+      "key": "cage_4",
+      "title": "秘法牢笼-绿龙伊瑟拉",
+      "seconds": 25,
+      "building": 3,
+      "slot_row": 1,
+      "slot_column": 1,
+      "frame": "frames/t025000.jpg",
+      "complete_tooltip": "秘法牢笼-绿龙伊瑟拉\n需要：\n - N10解锁\n挑战成功后可获得专属奖励",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N10解锁",
+      "reward_text": "专属奖励（此tooltip没有明细）"
+    },
+    {
+      "key": "cage_5",
+      "title": "秘法牢笼-蓝龙玛里苟斯",
+      "seconds": 26,
+      "building": 3,
+      "slot_row": 1,
+      "slot_column": 2,
+      "frame": "frames/t026000.jpg",
+      "complete_tooltip": "秘法牢笼-蓝龙玛里苟斯\n需要：\n - N10解锁\n挑战成功后可获得专属奖励",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N10解锁",
+      "reward_text": "专属奖励（此tooltip没有明细）"
+    },
+    {
+      "key": "cage_6",
+      "title": "秘法牢笼-青铜龙诺兹多姆",
+      "seconds": 27,
+      "building": 3,
+      "slot_row": 1,
+      "slot_column": 3,
+      "frame": "frames/t027000.jpg",
+      "complete_tooltip": "秘法牢笼-青铜龙诺兹多姆\n需要：\n - N10解锁\n挑战成功后可获得专属奖励",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N10解锁",
+      "reward_text": "专属奖励（此tooltip没有明细）"
+    },
+    {
+      "key": "cage_7",
+      "title": "秘法牢笼-虚空龙",
+      "seconds": 38,
+      "building": 4,
+      "slot_row": 1,
+      "slot_column": 1,
+      "frame": "frames/t038000.jpg",
+      "complete_tooltip": "秘法牢笼-虚空龙\n需要：\n - N10解锁\n挑战成功后可获得专属奖励",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N10解锁",
+      "reward_text": "专属奖励（此tooltip没有明细）"
+    },
+    {
+      "key": "cage_8",
+      "title": "秘法牢笼-暮光龙",
+      "seconds": 39,
+      "building": 4,
+      "slot_row": 1,
+      "slot_column": 2,
+      "frame": "frames/t039000.jpg",
+      "complete_tooltip": "秘法牢笼-暮光龙\n需要：\n - N10解锁\n挑战成功后可获得专属奖励",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N10解锁",
+      "reward_text": "专属奖励（此tooltip没有明细）"
+    },
+    {
+      "key": "cage_9",
+      "title": "秘法牢笼-石英龙",
+      "seconds": 40,
+      "building": 4,
+      "slot_row": 1,
+      "slot_column": 3,
+      "frame": "frames/t040000.jpg",
+      "complete_tooltip": "秘法牢笼-石英龙\n需要：\n - N10解锁\n挑战成功后可获得专属奖励",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N10解锁",
+      "reward_text": "专属奖励（此tooltip没有明细）"
+    },
+    {
+      "key": "rui",
+      "title": "瑞兽挑战",
+      "seconds": 19,
+      "building": 2,
+      "slot_row": 2,
+      "slot_column": 1,
+      "frame": "frames/t019000.jpg",
+      "complete_tooltip": "瑞兽挑战\n召唤瑞兽\n击败后可获得1个赐福，可以用于抽奖\n\n每天最多获得10个赐福\n\n会攻击塔",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "reward_text": "赐福",
+      "reward_quantity": 1,
+      "daily_limit_text": "每天最多获得10个赐福",
+      "attacks_towers": true
+    },
+    {
+      "key": "ex_girlfriend",
+      "title": "前女友挑战",
+      "seconds": 18,
+      "building": 2,
+      "slot_row": 2,
+      "slot_column": 2,
+      "frame": "frames/t018000.jpg",
+      "complete_tooltip": "前女友挑战\n召唤前女友\n击败后可获得1个邀请函，可以用于抽奖\n\n每天最多获得10个邀请函\n瑞兽赐福总次数大于100方可获得\n\n会攻击塔",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "reward_text": "邀请函",
+      "reward_quantity": 1,
+      "daily_limit_text": "每天最多获得10个邀请函",
+      "reward_gate_text": "瑞兽赐福总次数大于100方可获得",
+      "attacks_towers": true
+    },
+    {
+      "key": "good_friend",
+      "title": "好基友挑战",
+      "seconds": 28,
+      "building": 3,
+      "slot_row": 1,
+      "slot_column": 4,
+      "frame": "frames/t028000.jpg",
+      "complete_tooltip": "好基友挑战\n召唤好基友\n击败后可获得1个义帖，可以用于抽奖\n\n每天最多获得10个义帖\n邀请函总次数大于100方可获得\n\n会攻击塔",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "reward_text": "义帖",
+      "reward_quantity": 1,
+      "daily_limit_text": "每天最多获得10个义帖",
+      "reward_gate_text": "邀请函总次数大于100方可获得",
+      "attacks_towers": true
+    },
+    {
+      "key": "watermelon",
+      "title": "西瓜挑战",
+      "seconds": 35,
+      "building": 3,
+      "slot_row": 3,
+      "slot_column": 1,
+      "frame": "frames/t035000.jpg",
+      "complete_tooltip": "西瓜挑战\n召唤一个西瓜\n击败后可获得1点西瓜积分\n\n每天最多获得10个西瓜\n\n会攻击塔",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "reward_text": "西瓜积分",
+      "reward_quantity": 1,
+      "daily_limit_text": "每天最多获得10个西瓜",
+      "attacks_towers": true
+    },
+    {
+      "key": "pal",
+      "title": "帕鲁挑战",
+      "seconds": 46,
+      "building": 4,
+      "slot_row": 2,
+      "slot_column": 4,
+      "frame": "frames/t046000.jpg",
+      "complete_tooltip": "帕鲁挑战\n需要：\n - N20以上解锁\n召唤神兽帕鲁\n击败后可获得1个随机帕鲁\n\n每天最多获得20个宠物蛋",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N20以上解锁",
+      "reward_text": "随机帕鲁",
+      "reward_quantity": 1,
+      "daily_limit_text": "每天最多获得20个宠物蛋",
+      "uncertainty": "Tooltip reward says random Pal but daily cap says pet eggs. Preserve distinction; no Pal species/weights/monster stats shown."
+    },
+    {
+      "key": "wife",
+      "title": "我的老婆挑战",
+      "seconds": 47,
+      "building": 4,
+      "slot_row": 3,
+      "slot_column": 1,
+      "frame": "frames/t047000.jpg",
+      "complete_tooltip": "我的老婆挑战\n需要：\n - N10解锁\n召唤我的老婆\n击败后可获得1个玫瑰，可以用于抽奖\n\n每天最多获得10个玫瑰\n义帖总次数大于100方可获得\n\n会攻击塔",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N10解锁",
+      "reward_text": "玫瑰",
+      "reward_quantity": 1,
+      "daily_limit_text": "每天最多获得10个玫瑰",
+      "reward_gate_text": "义帖总次数大于100方可获得",
+      "attacks_towers": true
+    },
+    {
+      "key": "concubine",
+      "title": "我的侍妾挑战",
+      "seconds": 52,
+      "building": 4,
+      "slot_row": 3,
+      "slot_column": 2,
+      "frame": "frames/t052000.jpg",
+      "complete_tooltip": "我的侍妾挑战\n需要：\n - N10解锁\n召唤我的侍妾\n击败后可获得1个工资，可以用于抽奖\n\n每天最多获得10个工资\n义帖总次数大于100方可获得\n\n会攻击塔",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N10解锁",
+      "reward_text": "工资",
+      "reward_quantity": 1,
+      "daily_limit_text": "每天最多获得10个工资",
+      "reward_gate_text": "义帖总次数大于100方可获得",
+      "attacks_towers": true
+    },
+    {
+      "key": "endless_start",
+      "title": "无尽模式开启",
+      "seconds": 20,
+      "building": 2,
+      "slot_row": 3,
+      "slot_column": 1,
+      "frame": "frames/t020000.jpg",
+      "complete_tooltip": "无尽模式开启\n需要：\n - N3解锁\n所有难度模式下难度一致，每波难度会逐层升高\n每通过10层获取无尽积分奖励增加100%\n\n无尽模式下每20波会掉落一件存档装备，波次越高品质概率越高",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N3解锁"
+    },
+    {
+      "key": "endless_skip",
+      "title": "无尽跳关",
+      "seconds": 21,
+      "building": 2,
+      "slot_row": 3,
+      "slot_column": 2,
+      "frame": "frames/t021000.jpg",
+      "complete_tooltip": "无尽跳关\n需要：\n - N3解锁\n每次点击无尽跳2/5/10/20层(每波)\n\n无法退回请谨慎",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "N3解锁"
+    },
+    {
+      "key": "sky_tower_start",
+      "title": "通天塔(单人)开启",
+      "seconds": 23,
+      "building": 2,
+      "slot_row": 3,
+      "slot_column": 3,
+      "frame": "frames/t023000.jpg",
+      "complete_tooltip": "通天塔(单人)开启\n需要：\n - 极寒或天灾N10解锁\n所有难度模式下难度一致，每波难度会逐层升高\n每通过10层获取无尽积分奖励增加100%（通天塔下积分获取更高）\n\n结束会立马计算存档，请在打之前把其他存档挑战都打完\n\n通天塔下每15波会掉落一件存档装备，波次越高品质概率越高",
+      "review_method": "local frame visual confirmation; OCR only used for finding frames",
+      "required_difficulty_text": "极寒或天灾N10解锁"
+    }
+  ],
+  "related_tooltips": [
+    {
+      "building": 3,
+      "row": 1,
+      "column": 1,
+      "name": "秘法牢笼-绿龙伊瑟拉",
+      "seconds": 2,
+      "frame": "output/archive_challenges_20261029/related/frames/t002000.jpg",
+      "reward": "专属奖励",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": null
+    },
+    {
+      "building": 3,
+      "row": 1,
+      "column": 2,
+      "name": "秘法牢笼-蓝龙玛里苟斯",
+      "seconds": 3,
+      "frame": "output/archive_challenges_20261029/related/frames/t003000.jpg",
+      "reward": "专属奖励",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": null
+    },
+    {
+      "building": 3,
+      "row": 1,
+      "column": 3,
+      "name": "秘法牢笼-青铜龙诺兹多姆",
+      "seconds": 4,
+      "frame": "output/archive_challenges_20261029/related/frames/t004000.jpg",
+      "reward": "专属奖励",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": null
+    },
+    {
+      "building": 3,
+      "row": 1,
+      "column": 4,
+      "name": "好基友挑战",
+      "seconds": 5.5,
+      "frame": "output/archive_challenges_20261029/related/frames/t005500.jpg",
+      "reward": "1个义贴，可以用于抽奖",
+      "unlock_condition_visible": "邀请函总次数大于100方可获得",
+      "daily_cap_visible": 10,
+      "notes": "会攻击塔；召唤好基友"
+    },
+    {
+      "building": 3,
+      "row": 2,
+      "column": 1,
+      "name": "神兽狩猎-古尔丹",
+      "seconds": 7,
+      "frame": "output/archive_challenges_20261029/related/frames/t007000.jpg",
+      "reward": "神器碎片-萨格拉斯之杖",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": "位置按相关视频该帧光标；条件视频同排方向相反，需主agent决策"
+    },
+    {
+      "building": 3,
+      "row": 2,
+      "column": 2,
+      "name": "神兽狩猎-泰蕾苟萨",
+      "seconds": 8.5,
+      "frame": "output/archive_challenges_20261029/related/frames/t008500.jpg",
+      "reward": "神器碎片-泰蕾苟萨法杖",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": "相关视频排列与条件视频相反"
+    },
+    {
+      "building": 3,
+      "row": 2,
+      "column": 3,
+      "name": "神兽狩猎-乌瑟尔",
+      "seconds": 10,
+      "frame": "output/archive_challenges_20261029/related/frames/t010000.jpg",
+      "reward": "神器碎片-圣光裁决之锤",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": "相关视频排列与条件视频相反"
+    },
+    {
+      "building": 3,
+      "row": 2,
+      "column": 4,
+      "name": "神兽狩猎-奥蕾莉亚",
+      "seconds": 12,
+      "frame": "output/archive_challenges_20261029/related/frames/t012000.jpg",
+      "reward": "神器碎片-星月湮灭战弓",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": "弓名由条件视频agent视觉复核；相关视频row2c4，与条件视频排列反序"
+    },
+    {
+      "building": 3,
+      "row": 3,
+      "column": 1,
+      "name": "西瓜挑战",
+      "seconds": 14,
+      "frame": "output/archive_challenges_20261029/related/frames/t014000.jpg",
+      "reward": "1点西瓜积分",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": 10,
+      "notes": "会攻击塔；召唤一个西瓜；视频每日上限原文为10个西瓜"
+    },
+    {
+      "building": 2,
+      "row": 1,
+      "column": 1,
+      "name": "神兽狩猎-格罗姆",
+      "seconds": 17,
+      "frame": "output/archive_challenges_20261029/related/frames/t017000.jpg",
+      "reward": "神器碎片-血吼",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": null
+    },
+    {
+      "building": 2,
+      "row": 1,
+      "column": 2,
+      "name": "神兽狩猎-泰兰德",
+      "seconds": 18.5,
+      "frame": "output/archive_challenges_20261029/related/frames/t018500.jpg",
+      "reward": "神器碎片-索利达尔群星之怒",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": null
+    },
+    {
+      "building": 2,
+      "row": 1,
+      "column": 3,
+      "name": "神兽狩猎-风王子",
+      "seconds": 19.5,
+      "frame": "output/archive_challenges_20261029/related/frames/t019500.jpg",
+      "reward": "神器碎片-雷霆之怒逐风者的祝福之剑",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": null
+    },
+    {
+      "building": 2,
+      "row": 1,
+      "column": 4,
+      "name": "神兽狩猎-黑龙王子",
+      "seconds": 20.5,
+      "frame": "output/archive_challenges_20261029/related/frames/t020500.jpg",
+      "reward": "神器碎片-阿什坎迪兄弟会之剑",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": null
+    },
+    {
+      "building": 2,
+      "row": 2,
+      "column": 3,
+      "name": "绿茵挑战",
+      "seconds": 22.5,
+      "frame": "output/archive_challenges_20261029/related/frames/t022500.jpg",
+      "reward": "10点绿茵积分",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": 100,
+      "notes": "会攻击塔；召唤一群足球怪；具体数量未在tooltip列出；原帧白马图标r2c3，经视觉复核"
+    },
+    {
+      "building": 2,
+      "row": 2,
+      "column": 2,
+      "name": "前女友挑战",
+      "seconds": 23.5,
+      "frame": "output/archive_challenges_20261029/related/frames/t023500.jpg",
+      "reward": "1个邀请函，可以用于抽奖",
+      "unlock_condition_visible": "瑞兽赐福总次数大于100方可获得",
+      "daily_cap_visible": 10,
+      "notes": "会攻击塔；召唤前女友"
+    },
+    {
+      "building": 2,
+      "row": 2,
+      "column": 1,
+      "name": "瑞兽挑战",
+      "seconds": 25,
+      "frame": "output/archive_challenges_20261029/related/frames/t025000.jpg",
+      "reward": "1个赐福，可以用于抽奖",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": 10,
+      "notes": "会攻击塔；25秒光标绿袍头像r2c1"
+    },
+    {
+      "building": 2,
+      "row": 3,
+      "column": 1,
+      "name": "无尽模式开启",
+      "seconds": 26,
+      "frame": "output/archive_challenges_20261029/related/frames/t026000.jpg",
+      "reward": "每通过10层无尽积分奖励增加100%；每20波掉1件存档装备；波次越高品质概率越高",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": "所有难度模式下难度一致，每波逐层升高"
+    },
+    {
+      "building": 2,
+      "row": 3,
+      "column": 2,
+      "name": "无尽跳关",
+      "seconds": 27,
+      "frame": "output/archive_challenges_20261029/related/frames/t027000.jpg",
+      "reward": null,
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": "金币100000；每次点击无尽跳2/5/10/20层（每波）；无法退回请谨慎"
+    },
+    {
+      "building": 2,
+      "row": 3,
+      "column": 3,
+      "name": "通天塔（单人）开启",
+      "seconds": 28.5,
+      "frame": "output/archive_challenges_20261029/related/frames/t028500.jpg",
+      "reward": "每通过10层无尽积分奖励增加100%且积分更高；每15波掉1件存档装备，越高品质概率越高",
+      "unlock_condition_visible": "极寒或天灾N10解锁",
+      "daily_cap_visible": null,
+      "notes": "所有难度模式下难度一致，每波逐层升高；结束立马计算存档，打之前先把其他存档挑战打完"
+    },
+    {
+      "building": 4,
+      "row": 1,
+      "column": 1,
+      "name": "秘法牢笼-虚空龙",
+      "seconds": 35.5,
+      "frame": "output/archive_challenges_20261029/related/frames/t035500.jpg",
+      "reward": "专属奖励",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": null
+    },
+    {
+      "building": 4,
+      "row": 2,
+      "column": 1,
+      "name": "神兽狩猎-萨格拉斯",
+      "seconds": 39,
+      "frame": "output/archive_challenges_20261029/related/frames/t039000.jpg",
+      "reward": "神器碎片-黑暗撕裂者",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": null
+    },
+    {
+      "building": 4,
+      "row": 2,
+      "column": 2,
+      "name": "神兽狩猎-佐瓦尔",
+      "seconds": 40.5,
+      "frame": "output/archive_challenges_20261029/related/frames/t040500.jpg",
+      "reward": "神器碎片-创世权柄",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": null
+    },
+    {
+      "building": 4,
+      "row": 2,
+      "column": 3,
+      "name": "神兽狩猎-阿克蒙德",
+      "seconds": 42,
+      "frame": "output/archive_challenges_20261029/related/frames/t042000.jpg",
+      "reward": "神器碎片-万军崩裂",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": null
+    },
+    {
+      "building": 4,
+      "row": null,
+      "column": null,
+      "name": "神兽狩猎-守界圣辉",
+      "seconds": 43,
+      "frame": "output/archive_challenges_20261029/related/frames/t043000.jpg",
+      "reward": "神器碎片-守界圣辉",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": "明确存在，但当帧光标r2c4；45.5同格图标显示帕鲁挑战，存在滞后/动态矛盾，不能覆盖条件视频布局"
+    },
+    {
+      "building": 4,
+      "row": 3,
+      "column": 1,
+      "name": "我的老婆挑战",
+      "seconds": 44.5,
+      "frame": "output/archive_challenges_20261029/related/frames/t044500.jpg",
+      "reward": "1个玫瑰，可以用于抽奖",
+      "unlock_condition_visible": "义贴总次数大于100方可获得",
+      "daily_cap_visible": 10,
+      "notes": "会攻击塔；召唤我的老婆"
+    },
+    {
+      "building": 4,
+      "row": 2,
+      "column": 4,
+      "name": "帕鲁挑战",
+      "seconds": 45.5,
+      "frame": "output/archive_challenges_20261029/related/frames/t045500.jpg",
+      "reward": "1个随机帕鲁",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": 20,
+      "notes": "召唤神兽帕鲁；上限原文为每天最多获得20个宠物蛋；格位与43秒守界tooltip冲突"
+    },
+    {
+      "building": 1,
+      "row": 1,
+      "column": null,
+      "name": "虚空之影",
+      "seconds": 49.5,
+      "frame": "output/archive_challenges_20261029/related/frames/t049500.jpg",
+      "reward": "虚空之影道具",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": "四个第一排图标相同，尚未逐一hover确认是否都同名"
+    },
+    {
+      "building": 1,
+      "row": 2,
+      "column": 1,
+      "name": "神兽狩猎-巫妖王",
+      "seconds": 53,
+      "frame": "output/archive_challenges_20261029/related/frames/t053000.jpg",
+      "reward": "神器碎片-霜之哀伤",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": null
+    },
+    {
+      "building": 1,
+      "row": 2,
+      "column": 2,
+      "name": "神兽狩猎-阿尔萨斯",
+      "seconds": 54,
+      "frame": "output/archive_challenges_20261029/related/frames/t054000.jpg",
+      "reward": "神器碎片-米奈希尔之力",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": null
+    },
+    {
+      "building": 1,
+      "row": 2,
+      "column": 3,
+      "name": "神兽狩猎-伊利丹",
+      "seconds": 55,
+      "frame": "output/archive_challenges_20261029/related/frames/t055000.jpg",
+      "reward": "神器碎片-埃辛诺斯战刃",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": null
+    },
+    {
+      "building": 1,
+      "row": 2,
+      "column": 4,
+      "name": "神兽狩猎-洛萨",
+      "seconds": 56.5,
+      "frame": "output/archive_challenges_20261029/related/frames/t056500.jpg",
+      "reward": "神器碎片-灰烬使者",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": null
+    },
+    {
+      "building": 1,
+      "row": 3,
+      "column": 1,
+      "name": "秘法牢笼-死亡之翼",
+      "seconds": 57.5,
+      "frame": "output/archive_challenges_20261029/related/frames/t057500.jpg",
+      "reward": "专属奖励",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": null
+    },
+    {
+      "building": 1,
+      "row": 3,
+      "column": 2,
+      "name": "秘法牢笼-红龙女王",
+      "seconds": 58.5,
+      "frame": "output/archive_challenges_20261029/related/frames/t058500.jpg",
+      "reward": "专属奖励",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": null
+    },
+    {
+      "building": 1,
+      "row": 3,
+      "column": 3,
+      "name": "秘法牢笼-冰霜巨龙",
+      "seconds": 60,
+      "frame": "output/archive_challenges_20261029/related/frames/t060000.jpg",
+      "reward": "专属奖励",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": null
+    },
+    {
+      "building": 4,
+      "row": 1,
+      "column": 3,
+      "name": "秘法牢笼-石英龙",
+      "seconds": 38,
+      "frame": "output/archive_challenges_20261029/related/frames/t038000.jpg",
+      "reward": "专属奖励",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": "38秒r1c3紫色宝石，视觉复核"
+    },
+    {
+      "building": 4,
+      "row": 1,
+      "column": 2,
+      "name": "秘法牢笼-暮光龙",
+      "seconds": 37,
+      "frame": "output/archive_challenges_20261029/related/frames/t037000.jpg",
+      "reward": "专属奖励",
+      "unlock_condition_visible": null,
+      "daily_cap_visible": null,
+      "notes": "37秒r1c2黄金龙头，视觉复核"
+    },
+    {
+      "building": 4,
+      "row": 3,
+      "column": 2,
+      "name": "我的侍妾挑战",
+      "seconds": 47,
+      "frame": "output/archive_challenges_20261029/related/frames/t047000.jpg",
+      "reward": "1个工资，可以用于抽奖",
+      "unlock_condition_visible": "义贴总次数大于100方可获得",
+      "daily_cap_visible": 10,
+      "notes": "47秒完整tooltip，无库存提示的257.5秒为第二次证据；会攻击塔"
+    }
+  ],
+  "attack_observations": [
+    {
+      "monster": "绿龙伊瑟拉",
+      "seconds": 66.0,
+      "attack_display": "15000002",
+      "attack_integer": 15000002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t066000.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "蓝龙玛里苟斯",
+      "seconds": 73.5,
+      "attack_display": "15000002",
+      "attack_integer": 15000002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t073500.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "青铜龙诺兹多姆",
+      "seconds": 80.5,
+      "attack_display": "15000002",
+      "attack_integer": 15000002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t080500.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "好基友",
+      "seconds": 87.5,
+      "attack_display": "6.49亿",
+      "attack_integer": null,
+      "precision": "rounded_display_only_unknown_exact_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t087500.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "古尔丹",
+      "seconds": 102.0,
+      "attack_display": "5500002",
+      "attack_integer": 5500002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t102000.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "泰蕾苟萨",
+      "seconds": 107.5,
+      "attack_display": "5500002",
+      "attack_integer": 5500002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t107500.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "乌瑟尔",
+      "seconds": 113.0,
+      "attack_display": "5500002",
+      "attack_integer": 5500002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t113000.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "奥蕾莉亚",
+      "seconds": 117.5,
+      "attack_display": "5500002",
+      "attack_integer": 5500002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t117500.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "西瓜",
+      "seconds": 122.5,
+      "attack_display": "3.60亿",
+      "attack_integer": null,
+      "precision": "rounded_display_only_unknown_exact_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t122500.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "虚空之影",
+      "seconds": 130.5,
+      "attack_display": "189002",
+      "attack_integer": 189002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t130500.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "巫妖王",
+      "seconds": 152.0,
+      "attack_display": "4500002",
+      "attack_integer": 4500002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t152000.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "阿尔萨斯",
+      "seconds": 157.0,
+      "attack_display": "5500002",
+      "attack_integer": 5500002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t157000.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "伊利丹",
+      "seconds": 161.0,
+      "attack_display": "7500002",
+      "attack_integer": 7500002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t161000.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "洛萨",
+      "seconds": 169.5,
+      "attack_display": "10500002",
+      "attack_integer": 10500002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t169500.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "死亡之翼",
+      "seconds": 176.0,
+      "attack_display": "15000002",
+      "attack_integer": 15000002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t176000.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "红龙女王",
+      "seconds": 181.0,
+      "attack_display": "21000002",
+      "attack_integer": 21000002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t181000.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "冰霜巨龙",
+      "seconds": 186.5,
+      "attack_display": "28000002",
+      "attack_integer": 28000002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t186500.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "虚空龙",
+      "seconds": 193.5,
+      "attack_display": "15000002",
+      "attack_integer": 15000002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t193500.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "暮光龙",
+      "seconds": 200.0,
+      "attack_display": "15000002",
+      "attack_integer": 15000002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t200000.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "石英龙",
+      "seconds": 204.5,
+      "attack_display": "15000002",
+      "attack_integer": 15000002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t204500.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "萨格拉斯",
+      "seconds": 210.0,
+      "attack_display": "5500002",
+      "attack_integer": 5500002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t210000.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "佐瓦尔",
+      "seconds": 215.5,
+      "attack_display": "5500002",
+      "attack_integer": 5500002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t215500.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "阿克蒙德",
+      "seconds": 220.5,
+      "attack_display": "5500002",
+      "attack_integer": 5500002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t220500.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "提尔",
+      "seconds": 226.5,
+      "attack_display": "5500002",
+      "attack_integer": 5500002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t226500.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "老婆",
+      "seconds": 235.5,
+      "attack_display": "6.49亿",
+      "attack_integer": null,
+      "precision": "rounded_display_only_unknown_exact_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t235500.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "神兽帕鲁",
+      "seconds": 244.0,
+      "attack_display": "6.49亿",
+      "attack_integer": null,
+      "precision": "rounded_display_only_unknown_exact_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t244000.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "侍妾",
+      "seconds": 260.0,
+      "attack_display": "6.49亿",
+      "attack_integer": null,
+      "precision": "rounded_display_only_unknown_exact_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t260000.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "格罗姆",
+      "seconds": 272.0,
+      "attack_display": "21000002",
+      "attack_integer": 21000002,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t272000.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "泰兰德",
+      "seconds": 275.5,
+      "attack_display": "42000000",
+      "attack_integer": 42000000,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t275500.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "风王子",
+      "seconds": 281.0,
+      "attack_display": "84000000",
+      "attack_integer": 84000000,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t281000.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "瑞兽",
+      "seconds": 286.5,
+      "attack_display": "6.49亿",
+      "attack_integer": null,
+      "precision": "rounded_display_only_unknown_exact_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t286500.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "前女友",
+      "seconds": 295.5,
+      "attack_display": "6.49亿",
+      "attack_integer": null,
+      "precision": "rounded_display_only_unknown_exact_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t295500.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "足球怪",
+      "seconds": 306.5,
+      "attack_display": "64901248",
+      "attack_integer": 64901248,
+      "precision": "exact_display_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t306500.jpg",
+      "visual_reviewed": true
+    },
+    {
+      "monster": "黑龙王子",
+      "seconds": 318.5,
+      "attack_display": "1.68亿",
+      "attack_integer": null,
+      "precision": "rounded_display_only_unknown_exact_integer",
+      "frame": "output/archive_challenges_20261029/related/frames/t318500.jpg",
+      "visual_reviewed": true
+    }
+  ],
+  "excluded_features": [
+    {
+      "challenge_id": "pet",
+      "name": "帕鲁挑战",
+      "excluded_by_user_20261029": true,
+      "reason": "用户要求灵兽帕鲁功能先不做，对应功能先删除",
+      "video_fact": {
+        "key": "pal",
+        "title": "帕鲁挑战",
+        "seconds": 46,
+        "building": 4,
+        "slot_row": 2,
+        "slot_column": 4,
+        "frame": "frames/t046000.jpg",
+        "complete_tooltip": "帕鲁挑战\n需要：\n - N20以上解锁\n召唤神兽帕鲁\n击败后可获得1个随机帕鲁\n\n每天最多获得20个宠物蛋",
+        "review_method": "local frame visual confirmation; OCR only used for finding frames",
+        "required_difficulty_text": "N20以上解锁",
+        "reward_text": "随机帕鲁",
+        "reward_quantity": 1,
+        "daily_limit_text": "每天最多获得20个宠物蛋",
+        "uncertainty": "Tooltip reward says random Pal but daily cap says pet eggs. Preserve distinction; no Pal species/weights/monster stats shown."
+      }
+    }
+  ]
+}

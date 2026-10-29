@@ -2,6 +2,16 @@
 package.path = "scripts/vscripts/?.lua;" .. package.path
 
 local rules = require("config/generated/archive_challenge_rules").by_id.default
+local hub_count = tonumber(rules.building_count) or 4
+assert(hub_count==4,"production archive phase must expose four buildings")
+package.loaded["config/generated/archive_challenge_actions"]={rows={},by_id={}}
+package.loaded["systems/archive_challenge_reward_eligibility"]={check=function() return true end}
+package.loaded["systems/player_profile_service"]={get_daily_limit=function() end}
+package.loaded["systems/archive_cooperative_reward_service"]={
+    begin=function() return true end,has_pending=function() return false end,
+    matches_session=function() return true end,
+    record_challenge=function() error("placement test cannot dispatch rewards") end,
+}
 assert(rules.building_anchor == "wave_portal", "production archive rules must select wave_portal")
 assert(rules.building_offset_y == 360, "production portal offset must remain 360")
 local bus = require("core/event_bus")
@@ -41,7 +51,7 @@ local function ability()
     return result
 end
 local function create_unit(name, position, find_clear_space, owner, unit_owner, team)
-    assert(name:match("^npc_archive_challenge_[123]$"), "fixture may only create archive hubs")
+    assert(name:match("^npc_archive_challenge_[1-4]$"), "fixture may only create archive hubs")
     assert(find_clear_space == false, "immobile hubs must disable native clear-space search")
     assert(team == DOTA_TEAM_GOODGUYS and owner == nil and unit_owner == nil)
     local unit = entity(position.x, position.y, position.z)
@@ -95,6 +105,9 @@ package.loaded["core/scheduler"] = {
         fixture.timers[key] = {callback = callback, delay = delay}
     end,
     every = function(delay, callback, key)
+        if key=="archive_challenge_daily_rollover" then
+            assert(delay==5);fixture.timers[key]={callback=callback,delay=delay};return
+        end
         assert(key:match("^archive_hubs_retry:[0-3]$") and delay == 1)
         fixture.timers[key] = {callback = callback, delay = delay}
     end,
@@ -113,7 +126,7 @@ local function reset()
         -- Every old anchor exists at a raised, unrelated site; none may win.
         fixture.old_markers["wall_" .. id] = entity(9000 + id * 1000, 9000, 384)
         fixture.old_markers["player_" .. id .. "_builder_spawn"] = entity(9000 + id * 1000, 9500, 384)
-        for index = 1, 3 do
+        for index = 1, hub_count do
             fixture.old_markers["player_" .. id .. "_archive_hub_" .. index] =
                 entity(9000 + id * 1000, 10000 + index * 240, 408)
         end
@@ -192,19 +205,21 @@ end
 local function assert_cardinal(unit, portal, distances)
     local p, anchor = unit:GetAbsOrigin(), portal:GetAbsOrigin()
     local dx, dy = p.x - anchor.x, p.y - anchor.y
-    assert((dx == 0) ~= (dy == 0), "each hub must lie on one cardinal side of its actual portal")
-    assert(distances[math.abs(dx) + math.abs(dy)], "hub must remain in the bounded portal neighborhood")
+    assert((dx == 0) ~= (dy == 0) or math.abs(math.abs(dx)-math.abs(dy))<0.001,
+        "each hub uses a cardinal/diagonal direction from its actual portal")
+    assert(distances[math.floor(math.sqrt(dx*dx+dy*dy)+0.5)], "hub must remain in the bounded portal neighborhood")
     assert(p.z == 24, "hub must be grounded on the actual lower approach")
 end
 local function assert_complete(service, ids, distances)
-    assert(#fixture.created == #ids * 3 and #fixture.registered == #ids * 3)
-    assert(fixture.fog_calls == #ids * 3 and retry_count() == 0)
+    assert(#fixture.created == #ids * hub_count and #fixture.registered == #ids * hub_count)
+    assert(fixture.fog_calls == #ids * hub_count and retry_count() == 0)
     for _, id in ipairs(ids) do
         local state = assert(service._test.players()[id])
-        for index = 1, 3 do
-            local unit = assert(state.hubs[index], "all three original hub types must exist")
+        for index = 1, hub_count do
+            local unit = assert(state.hubs[index], "all four hub types must exist")
             assert(unit.owner == id and unit.survival_archive_hub == index and unit.visual_applied)
-            assert(unit.model == rules["building_model_" .. index] and unit.original_model == unit.model)
+            local expected=rules["building_model_"..index] or index==4 and rules.building_model_3 or rules.building_model
+            assert(unit.model == expected and unit.original_model == unit.model)
             assert(unit.scale == rules.building_model_scale and unit.modifier_invulnerable)
             assert(unit.modifier_building_no_health_bar)
             assert_cardinal(unit, fixture.portals[id], distances)
@@ -223,7 +238,7 @@ local function assert_complete(service, ids, distances)
     assert(fixture.clear_space_calls == 0)
 end
 
--- Real rules and real creation service produce exactly three hubs per player.
+-- Real rules and real creation service produce exactly four hubs per player.
 local service = reset()
 for id, xy in pairs({[0] = {3600, 0}, [1] = {0, -3600}, [2] = {-3600, 0}, [3] = {0, 3600}}) do
     fixture.portals[id] = entity(xy[1], xy[2], 48, 0)
@@ -232,7 +247,7 @@ begin(service, {0, 1, 2, 3})
 assert_complete(service, {0, 1, 2, 3}, {[360] = true})
 local wave_lookups, nav_queries, fog_calls = fixture.wave_lookups, fixture.nav_queries, fixture.fog_calls
 begin(service, {0, 1, 2, 3})
-assert(#fixture.created == 12 and fixture.wave_lookups == wave_lookups)
+assert(#fixture.created == 16 and fixture.wave_lookups == wave_lookups)
 assert(fixture.nav_queries == nav_queries and fixture.fog_calls == fog_calls,
     "duplicate begin must reuse all ready hubs without repeating placement")
 
@@ -258,28 +273,28 @@ for _, failure in ipairs({"occupied", "tree", "blocked", "unwalkable"}) do
     end
 end
 
--- No safe terrain: keep the original retry and stop after 12 candidates/player.
+-- No safe terrain: keep the original retry and stop after 24 candidates/player.
 service = reset()
 for id = 0, 3 do fixture.portals[id] = entity(id * 3000, 2000, 48, 0) end
 fixture.traversable = function() return false end
 begin(service, {0, 1, 2, 3})
 assert(#fixture.created == 0 and retry_count() == 4)
-assert(fixture.nav_queries == 48, "placement must stop after 12 failed candidates per player")
+assert(fixture.nav_queries == 96, "placement must stop after 24 failed candidates per player")
 local before_retry = fixture.nav_queries
 assert(retry(0) == true and #fixture.created == 0)
-assert(fixture.nav_queries - before_retry == 12 and retry_count() == 4)
+assert(fixture.nav_queries - before_retry == 24 and retry_count() == 4)
 fixture.traversable = function() return true end
 for id = 0, 3 do assert(retry(id) == false, "unblocked retry must complete") end
 assert_complete(service, {0, 1, 2, 3}, {[360] = true})
 
--- Several owners may share the same runtime portal. All 12 hubs stay separate.
+-- Several owners may share the same runtime portal. All 16 hubs stay separate.
 service = reset()
 local shared = entity(-1024, 4096, 48, 0)
 for id = 0, 3 do fixture.portals[id] = shared end
 begin(service, {0, 1, 2, 3})
 assert_complete(service, {0, 1, 2, 3}, {[360] = true, [600] = true, [840] = true})
 begin(service, {0, 1, 2, 3})
-assert(#fixture.created == 12 and retry_count() == 0)
+assert(#fixture.created == 16 and retry_count() == 0)
 
 -- A missing runtime portal waits even when all old anchor types are available.
 service = reset()
@@ -291,4 +306,4 @@ assert(retry(2) == false)
 assert_complete(service, {2}, {[360] = true})
 
 print = report
-print("ARCHIVE_PORTAL_HUBS_PASS: production rules, four owners/12 hubs, cardinal offsets, old-anchor rejection, lower ground, occupancy/trees/navigation, bounded retries, idempotency, shared portal, native clear-space disabled")
+print("ARCHIVE_PORTAL_HUBS_PASS: production rules, four owners/16 hubs, cardinal/diagonal offsets, old-anchor rejection, lower ground, occupancy/trees/navigation, bounded retries, idempotency, shared portal, native clear-space disabled")

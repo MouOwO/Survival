@@ -23,7 +23,7 @@ FIELDS = {
     "cold_clear": {"difficulty_id","count","day_key","cooperative_win"},
     "scourge_clear": {"difficulty_id","count","day_key","cooperative_win"},
     "mode_clear": {"difficulty_id","count","day_key","cooperative_win"},
-    "endless": {"wave","difficulty"}, "endless_reconcile": set(), "starjoy_reconcile": set(), "welfare_reconcile": set(),
+    "endless": {"wave","difficulty","variant"}, "endless_reconcile": set(), "starjoy_reconcile": set(), "welfare_reconcile": set(),
     "challenge": {"challenge_id","kill_sequence","difficulty_id","day_key"},
     "social_draw": {"pool_id"}, "promotion": {"fragment_id","day_key"},
     "daily_init": {"today"}, "daily_claim": {"today","target_day"},
@@ -101,7 +101,11 @@ class ArchiveService:
             if type(c.get("count")) is not int or c["count"]!=1 or not re.fullmatch(r"n(?:[1-9]|[1-4][0-9]|50)",str(c.get("difficulty_id"))): raise ArchiveError("archive_clear_invalid")
             if "cooperative_win" in c: integer("cooperative_win",0,1)
         if kind=="endless":
-            integer("wave",1,1000);integer("difficulty",1,20)
+            # Full mode/tier admission follows durable session lookup below;
+            # this numeric envelope alone never admits standard N21..N50.
+            integer("wave",1,1000);integer("difficulty",1,50)
+            if c.get("variant", "endless") not in ("endless", "tower"):
+                raise ArchiveError("endless_variant_invalid")
         if kind=="challenge":
             definition=self.bundle.tables["archive_challenge_definitions"].get(c.get("challenge_id"))
             if not definition or not definition.get("enabled"): raise ArchiveError("archive_challenge_invalid")
@@ -150,7 +154,7 @@ class ArchiveService:
         c.pop("today",None);c.pop("day_key",None)
         match=c["id"].split(":",1)[0]
         if kind=="clear": c["id"]=match+":clear"
-        if kind=="endless": c["id"]=match+":endless:"+str(c["wave"])
+        if kind=="endless": c["id"]=match+":"+c.get("variant", "endless")+":"+str(c["wave"])
         if kind in {"endless_reconcile", "starjoy_reconcile", "welfare_reconcile"}: c["id"]=match+":"+kind
         if kind=="challenge": c["id"]=match+":challenge_kind:"+c["challenge_id"]
         return c
@@ -198,7 +202,9 @@ class ArchiveService:
             except ValueError as error:
                 raise ArchiveError(str(error)) from error
         if not accepts(self.bundle, requested_hash, kind): return {"ok":False,"terminal":True,"error":"archive_config_mismatch","config_hash":self.bundle.hash}
-        command=self.validate(payload.get("command"))
+        original_command=self.validate(payload.get("command"))
+        from .challenge_sessions import legacy_receipt, scope as scope_challenge
+        command=scope_challenge(self, payload, original_command)
         from .match_modes import scope_clear
         command=scope_clear(self,payload,command)
         if command['kind'] == 'commerce_catalog':
@@ -206,6 +212,10 @@ class ArchiveService:
             return self.settle(profile, command, False)
         database_id=self.app._database_account_id(account)
         self.app._ensure_gameplay_stats(database_id)
+        accepted_challenge=legacy_receipt(self, database_id, original_command, command)
+        if accepted_challenge is not None:
+            result=self.finish_prepared(database_id,original_command["id"],accepted_challenge)
+            return self.app._public_response(result,database_id,account)
         from .clear_receipts import lookup
         receipt = lookup(self, payload, command)
         if receipt is not None:
@@ -245,6 +255,8 @@ class ArchiveService:
             raise ArchiveError("archive_batch_duplicate_id")
         if len({command["id"].split(":", 1)[0] for command in validated}) != 1:
             raise ArchiveError("archive_batch_session_invalid")
+        from .challenge_sessions import validate_batch as validate_challenge_batch
+        validate_challenge_batch(self, payload, validated)
         results, profile = [], None
         for original, command in zip(commands, validated):
             request = dict(payload)
@@ -263,6 +275,17 @@ class ArchiveService:
         for _ in range(4):
             if not prepared.get("ok") or prepared.get("done"): return prepared
             profile,command=prepared["profile"],dict(prepared["command"])
+            from .challenge_sessions import bound_receipt, validate as validate_challenge_session
+            version=prepared.get("config_hash",self.bundle.hash)
+            recorded_bundle = None
+            if bound_receipt(command) and version != self.bundle.hash:
+                if not re.fullmatch(r"[0-9a-f]{64}",version): raise ArchiveError("archive_config_invalid")
+                recorded_bundle = Bundle(self.bundle.directory.parent/version)
+            # A pre-session-contract receipt is already accepted durable work.
+            # Do not derive a new session from its independent archive runtime
+            # prefix or rewrite its database identity/fingerprint on recovery.
+            if recorded_bundle is None or "archive_challenge_modes" in recorded_bundle.tables:
+                validate_challenge_session(self, {}, command, database_account=account, pending=True)
             # This timestamp belongs to the durable database receipt, not the
             # HTTP caller or the worker's retry time. It keeps late checkpoints
             # and claims in the period where their operation was first accepted.
@@ -277,7 +300,6 @@ class ArchiveService:
                 from .clear_receipts import bound_command
                 command = bound_command(command, clear_mode)
             reducer=self
-            version=prepared.get("config_hash",self.bundle.hash)
             from .unique_points import legacy_lottery_error
             # Starjoy is cumulative progression. Reject new and unfinished old
             # exchanges through the existing terminal receipt commit; completed
@@ -350,7 +372,14 @@ class ArchiveService:
                 rpc="archive_commit_lottery"
                 commit_payload.update(p_inventory=result.get("content_inventory",{}),p_response=result.get("response",{}))
             committed=self.app.rpc_client.rpc(rpc,commit_payload)
-            if committed.get("error")!="archive_revision_conflict": return committed
+            if committed.get("error")!="archive_revision_conflict":
+                # A successful first commit can report that this recipient's
+                # own reward prerequisite/quota excluded the drop. Completed
+                # historical receipts above remain immutable and are not
+                # supplemented with a different operation's latest status.
+                if committed.get("ok") and command["kind"] == "challenge" and isinstance(result.get("response"), dict):
+                    committed = dict(committed, response=result["response"])
+                return committed
             prepared=self.app.rpc_client.rpc("archive_resume",{"p_account":account,"p_id":operation_id})
         return {"ok":False,"error":"archive_busy_retry"}
 

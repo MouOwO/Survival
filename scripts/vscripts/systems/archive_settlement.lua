@@ -135,9 +135,23 @@ function M.settle(profile, command, pass, context)
     elseif command.kind == "endless" then
         local config = require("systems/archive_endless_config")
         if not config.wave(command.difficulty, command.wave) then return { ok = false, terminal = true, error = "endless_wave_invalid" } end
+        if command.variant ~= nil and command.variant ~= "endless" and command.variant ~= "tower" then
+            return {ok = false, terminal = true, error = "endless_variant_invalid"}
+        end
         archive.endless_score = (tonumber(archive.endless_score) or 0)
-            + daily_limits.grant(archive,"endless",config.score(command.wave),command.day_key,pass)
+            + daily_limits.grant(archive,"endless",config.score(command.wave, command.variant),command.day_key,pass)
         archive.endless_best_wave = math.max(tonumber(archive.endless_best_wave) or 0, command.wave)
+        if command.variant == "tower" then
+            archive.tower_best_wave = math.max(tonumber(archive.tower_best_wave) or 0, command.wave)
+        end
+        local random_int
+        if context and context.challenge_random_seed then
+            random_int = require("systems/archive_cooperative_reward_policy").random_int(context.challenge_random_seed)
+        end
+        local accepted, result = require("systems/archive_challenge_gear").grant_endless(
+            command, archive, stats, apply_effects, random_int)
+        if not accepted then return {ok = false, terminal = true, error = result} end
+        response = result
         require("systems/archive_endless_rewards").reconcile(archive, stats, apply_effects)
     elseif command.kind == "endless_reconcile" then
         -- Only persisted server progress is considered; this command has no progress input.
@@ -149,6 +163,7 @@ function M.settle(profile, command, pass, context)
         end
         local ok, reason = challenge_rewards.apply(command, archive, stats, pass, apply_effects, random_int)
         if not ok then return { ok = false, error = reason } end
+        response = type(reason) == "table" and reason or nil
     elseif command.kind == "social_draw" or command.kind == "social_ticket_cheat" then
         local ok, reason = require("systems/archive_social_rewards").apply(command, archive, stats, apply_effects)
         if not ok then return { ok=false, error=reason, terminal=true } end

@@ -1,6 +1,6 @@
 # 07｜关键决策、事故与未完成事项
 
-事实截点：2026-10-28。本页保留可复用原因、用户长期约定和剩余依赖，不保留逐次像素微调或原始聊天。核心玩法、存档契约分别见[02](02_core_gameplay.md)／[03](03_progression_save_contract.md)；联网、支付和发行分别见[04](04_network_auth_official.md)、[05](05_payments_commerce_delivery.md)、[06](06_build_release_ops.md)。
+事实截点：2026-10-29。本页保留可复用原因、用户长期约定和剩余依赖，不保留逐次像素微调或原始聊天。核心玩法、存档契约分别见[02](02_core_gameplay.md)／[03](03_progression_save_contract.md)；联网、支付和发行分别见[04](04_network_auth_official.md)、[05](05_payments_commerce_delivery.md)、[06](06_build_release_ops.md)。
 
 ## 当前基线与已确认决策
 
@@ -13,6 +13,8 @@
 - 每次任务game/content两仓均需交付核对，顺序为stash→pull→pop→commit→push；保留原改动和已有stash，不强推。冻结发行不等于发布全部开发工作区。
 
 ## 故障经验：精简过程，保留因果边界
+
+2026-10-29存档视频任务：用户取消灵兽帕鲁，保留36项其他挑战与四座建筑。四列三行、第三楼第二排顺序、所有模式实际出生点附近、固定终值以及严格累计抽奖>100已接入；未见数值使用明示项目规则。高难度存档阶段runtime ID与可信match session不同，已修正后台新操作的会话绑定并保留旧回执恢复；阶段准入失败现在有30秒上限和保存出口。真实Lua worker／RPC事务、8460组固定属性、四人16建筑候选放置回归通过，原生只读确认36定义／7操作／4建筑配置加载。完整新局生成、多人UI和云端部署仍待验，当前游廊版本及活动结算hash未改。细节见[存档视频证据](evidence/archive_video_challenges_20261029.md)。
 
 2026-10-29离线测试停在“正在准备队伍”：最新日志offline_20261029_014958_507275.log在09:50:35的Precache阶段找不到新增config/generated/archive_challenge_actions.lua，09:50:49 Activate又遇到archive_challenge_service的“loop or previous error loading module”，因此initialize_services中断，startup_loading_service/native_setup_auto_start尚未初始化。该配置实际于09:50:43生成，晚于首次require约8秒；这是并行开发时先启动游戏、后生成依赖造成的当前VM加载失败残留，不是队伍人数或地图导航导致。补齐后的633个静态require路径均存在，30份当时变更Lua语法检查通过。离线入口的实际控制台端口为29006（联网29005，新手引导29008），不能只探测29000/29001。确认Tools、离线内存档、原生custom setup状态后，用完整上下文命令dota_launch_custom_game survival template_map重载尚未开局的卡住地图，避免在半初始化世界重复注册服务。09:56:09 Addon initialized、09:56:13 admission_finished authentication_and_assets_ready=true；各UI容器均记录visible=false、admission_complete=true、phase=ready。没有改玩法源码、生成表或准入规则；未提交的存档挑战开发保持原样。只读探针、重载前置检查和依赖扫描位于output/offline_team_setup_20261029；原始日志留在output/test_entry_runtime。后续先完成配置生成再启动新局；不要用热重载整个addon_game_mode反复执行已有事件初始化来清除require失败状态。
 
@@ -66,6 +68,7 @@
 | P0 | 原生两人新布局／地图回归 | 两台都在同一实际地图；客机2560×1440队列、选择切换、建造／波次及界面无错位；记录实际UI缩放 |
 | P0 | 完成知识归档 | 误删的六目录和103份原字节备份已真实恢复核对；继续完成正式知识库、快照、校验清单与双仓交付 |
 | P1 | 2805十戒原生开局与挑战回归 | 新开原游廊局，未购英雄时十个模型已在对应位置；选难度后属性更新，每段攻击当前英雄；多玩家独立清理 |
+| P1 | 四座存档挑战开发验收与配套发行 | 新局每玩家实际出生点附近4楼、绝对4×3格位和tooltip、组怪单次奖励、个人结束／队友继续、塔结束保存通过；新后台Python+不可变bundle与游戏hash同批审阅部署后再验真实云档，帕鲁继续不做 |
 | P1 | 原游廊现金完整链路 | 独立账号小额实付→验签→单次交付→本局权益／余额／限购刷新→重启读回；避免重复订单 |
 | P1 | 钱包成功和双账号隔离 | 足额积分／G币真实成功及失败回滚，重复点击／旧回包不重复扣款，不串另一个账号 |
 | P1 | 认证异常与重连 | 每局确认、记住浏览器、错账号、过期／撤销、断线重连、后加入、旧请求回包全部明确结果 |

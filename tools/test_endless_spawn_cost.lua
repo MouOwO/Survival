@@ -30,6 +30,8 @@ local function create(name, position, clear, owner, unit_owner, team)
     function unit:IsAlive() return self.alive and not self.removed end
     function unit:entindex() return self.index end
     function unit:GetAbsOrigin() return self.position end
+    function unit:GetModelName() return self.values.SetModel end
+    function unit:GetModelScale() return self.values.SetModelScale or 1 end
     function unit:GetHullRadius() return self.hull end
     function unit:SetHullRadius(radius) count("SetHullRadius"); self.hull=radius end
     function unit:HasModifier(modifier) return self.modifiers[modifier]~=nil end
@@ -55,10 +57,21 @@ CustomGameEventManager={Send_ServerToPlayer=function() count("state_event") end}
 package.loaded["core/logger"]={info=noop,warn=noop,error=noop}
 package.loaded["systems/player_context_service"]={is_defeated=function() return false end}
 package.loaded["systems/archive_service"]={record_endless_wave=noop}
+-- This operation-count test isolates spawn costs from account admission. The
+-- real dispatcher/session/reducer contract has its own high-tier integration.
+package.loaded["systems/archive_cooperative_reward_service"]={
+    matches_session=function(mode,difficulty) return mode=="standard" and difficulty==1 end,
+    record_endless_wave=function() return {ok=true} end,flush_endless_rewards=noop}
+local default_visual_rules=require("config/generated/archive_endless_rules").by_id.default
+package.loaded["systems/archive_endless_visual_config"]={resolve=function(number)
+    return {visual_id="spawn_cost_default",model_path=default_visual_rules.model_path,
+        model_scale=default_visual_rules.model_scale,display_name="成本测试主体",components={},ornaments={},effects={}}
+end,resources=function() return {} end}
 local bus, events=require("core/event_bus"),require("core/events")
 local scheduler=require("core/scheduler")
 local deps={
     ["core/event_bus"]=bus,["core/events"]=events,["core/scheduler"]=scheduler,
+    ["visual/model_scale"]=require("visual/model_scale"),
     ["core/team_alignment"]={enforce=noop},
     ["config/armor_balance"]=require("config/armor_balance"),
     ["config/global_rules"]=require("config/global_rules"),
@@ -102,6 +115,9 @@ for birth=2,config.rules.monsters_per_wave do
     scheduler.think()
     assert(#units-before==4,"each scheduled frame creates one unit per active player")
 end
+-- Finish the real appearance module's short post-commit verification jobs
+-- before measuring the steady wave countdown; they are not spawn backlogs.
+clock=3;scheduler.think()
 assert(#units==20 and scheduler.task_count()==1,"four waves share only the countdown after births")
 for _,unit in ipairs(units) do
     assert(unit.values.SetModel==config.rules.model_path and unit.values.SetOriginalModel==config.rules.model_path)

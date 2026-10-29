@@ -1,5 +1,9 @@
 package.path = "scripts/vscripts/?.lua;" .. package.path
 require("tests/development_release_profile")
+-- Fake native players below have no Steam identity. Authentication admission
+-- has its own tests; this isolated fixture exercises real combat ownership.
+package.loaded["core/test_access_policy"]={enabled=function() return false end,
+    enforce=function() return true end,allowed=function() return true end}
 -- Lua 5.1 simulation: production wave/archival services and real CSV-generated rules.
 package.path = "scripts/vscripts/?.lua;" .. package.path
 local bus = require("core/event_bus")
@@ -7,6 +11,8 @@ local events = require("core/events")
 local clock, engine_state = 0, 7
 DOTA_TEAM_GOODGUYS, DOTA_TEAM_BADGUYS = 2, 3
 DOTA_GAMERULES_STATE_POST_GAME = 8
+DOTA_UNIT_TARGET_TEAM_BOTH, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_BASIC = 3, 1, 2
+DOTA_UNIT_TARGET_BUILDING, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER = 4, 64, 0
 Vector = function(x, y, z) return { x = x, y = y, z = z } end
 local scheduled, winners, finalized, created, granted, archive_clears
 local active_players, markers_ready, reward_pending, last_projection, defeated, personal_finalized
@@ -30,12 +36,15 @@ local function marker(id)
     return { IsNull = function() return false end,
         GetAbsOrigin = function() return Vector(id * 1000, 20, 30) end }
 end
-local function unit(name)
+local function unit(name, position)
     serial = serial + 1
-    local result = { id = serial, name = name, abilities = {}, alive = true }
+    local result = { id = serial, name = name, abilities = {}, alive = true,
+        position = position or Vector(0,0,30) }
     function result:IsNull() return self.removed == true end
     function result:IsAlive() return self.alive end
     function result:entindex() return self.id end
+    function result:GetAbsOrigin() return self.position end
+    function result:GetHullRadius() return self.name:match("^npc_archive_challenge_") and 64 or 32 end
     function result:SetControllableByPlayer(id) self.owner = id end
     function result:FindAbilityByName(key) return self.abilities[key] end
     function result:AddAbility(key)
@@ -69,8 +78,22 @@ Entities = { FindByName = function(_, _, name)
     if markers_ready then return marker(tonumber(name:match("player_(%d+)")) or 0) end
 end }
 GetGroundPosition = function(position) return position end
-CreateUnitByName = function(name)
-    local value = unit(name); created[#created + 1] = value; return value
+CreateUnitByName = function(name, position)
+    local value = unit(name, position); created[#created + 1] = value; return value
+end
+GridNav = {IsTraversable=function() return true end, IsBlocked=function() return false end,
+    IsNearbyTree=function() return false end}
+FindUnitsInRadius = function(_, position, _, radius)
+    local result = {}
+    for _, value in ipairs(created) do
+        if not value:IsNull() and value:IsAlive() then
+            local point=value:GetAbsOrigin()
+            if (point.x-position.x)^2+(point.y-position.y)^2 <= radius^2 then
+                result[#result+1]=value
+            end
+        end
+    end
+    return result
 end
 UTIL_Remove = function(value) value.removed = true end
 GetGroundHeight = function() return 0 end
@@ -156,7 +179,7 @@ package.loaded["systems/online_time_service"] = { disconnect = function(id) pers
     finalized[#finalized + 1] = reason
 end }
 package.loaded["systems/archive_endless_service"] = { init = noop, cancel = noop,
-    is_running = function() return false end }
+    is_running = function() return false end, skip_step=function() return 1 end }
 package.loaded["systems/archive_endless_config"] = { group = function() return {} end }
 package.loaded["systems/archive_service"] = {
     has_pending = function(id) return reward_pending[id] == true end,
@@ -291,7 +314,15 @@ end
 -- The real rules admit N1/N2 but retain individual challenge difficulty gates.
 local fixture_hook = rawget(_G, "SURVIVAL_WAVE_POPULATION_FIXTURE")
 if fixture_hook then
-    fixture_hook({bus=bus,events=events,restart=restart,prepare_lanes=prepare_lanes,upvalue=upvalue})
+    fixture_hook({bus=bus,events=events,restart=restart,prepare_lanes=prepare_lanes,upvalue=upvalue,
+        final_ready=final_ready, final_check=final_check,
+        set_clock=function(value) clock=value end,
+        set_pending=function(id,value) reward_pending[id]=value end,
+        set_fake=function(id,value) fake_players[id]=value end,
+        set_active_players=function(ids) active_players=ids end,
+        scheduled=function() return scheduled end,
+        winners=function() return winners end,
+        clears=function() return archive_clears end})
     return
 end
 for _, difficulty in ipairs({"N1", "N2", "N3"}) do
@@ -311,12 +342,14 @@ for _, difficulty in ipairs({"N1", "N2", "N3"}) do
     kill(tail)
     assert(state.victory_settled and state.status == "archive_challenges")
     kill(tail)
-    assert(#winners == 0 and #created == 8 and #archive_clears == 2)
+    assert(#winners == 0 and #created == 10 and #archive_clears == 2)
     assert(cooperative_payloads[0] == 1 and cooperative_payloads[1] == 1, "both winning human teammates count")
     final_check()
-    assert(#created == 8 and #archive_clears == 2, "handoff/rewards must be idempotent")
+    assert(#created == 10 and #archive_clears == 2, "handoff/rewards must be idempotent")
     local players = archive._test.players()
-    local hero_hub = players[1].hubs[3]
+    for id=0,1 do assert(#players[id].hubs==4,"every winning player receives four archive hubs") end
+    local beast_definition=require("config/generated/archive_challenge_definitions").by_id.social_beast
+    local hero_hub = players[1].hubs[beast_definition.building_id]
     local beast = hero_hub:FindAbilityByName("ability_archive_social_beast")
     assert(beast.activated == true)
     assert(players[0].hubs[1]:FindAbilityByName("ability_archive_shadow_1").activated == true)
@@ -406,7 +439,7 @@ final_check()
 assert(state.status == "archive_challenges_pending" and #winners == 0)
 archive.init()
 assert(scheduled.archive_challenge_begin_retry() == false)
-assert(state.status == "archive_challenges" and #created == 6 and #archive_clears == 2,
+assert(state.status == "archive_challenges" and #created == 8 and #archive_clears == 2,
     "late archive handler must complete the pending handoff: " .. tostring(state.status)
         .. " created=" .. #created .. " clears=" .. #archive_clears)
 state = restart("N1")
@@ -417,7 +450,7 @@ assert(state.status == "archive_challenges" and #created == 0 and #winners == 0)
 markers_ready = true
 prepare_lanes()
 for id = 0, 1 do assert(scheduled["archive_hubs_retry:" .. id]() == false) end
-assert(#created == 6)
+assert(#created == 8)
 
 -- All four players have independent capacity: combined population is not a cap.
 local enemies

@@ -1,28 +1,37 @@
 from __future__ import annotations
 import csv
 import hashlib
+import io
 import json
 import math
+import os
 from pathlib import Path
+import shutil
+import subprocess
 
-MODULES = ("archive_settlement", "archive_challenge_rewards", "archive_social_rewards",
+MODULES = ("archive_settlement", "archive_challenge_rewards", "archive_social_rewards", "archive_challenge_reward_eligibility", "archive_challenge_gear",
            "archive_daily_rewards", "archive_benefit_rewards", "archive_stackable_items", "archive_daily_limits", "archive_clear_progress", "archive_online_rewards", "archive_endless_config", "archive_endless_rewards", "archive_building_rewards", "lottery_http_settlement", "archive_starjoy_rewards", "archive_vip_rewards", "archive_calendar", "archive_welfare_rewards", "archive_titles", "commerce_settlement", "commerce_effects", "archive_cooperative_reward_policy")
 # Presentation tables have a different schema and never participate in settlement.
 PRESENTATION_CSV = {"archive_icon_presentation.csv", "archive_item_icons.csv", "archive_navigation_icons.csv"}
 
 def read_csv(path):
-    lines = path.read_text(encoding="utf-8-sig").splitlines()
-    header = next(csv.reader([lines[0]]))
-    type_line = next((x for x in lines if x.startswith("#types:")), None)
-    if type_line is None: raise ValueError(f"csv_types_missing:{path.name}")
-    types = type_line[7:].split(",")
+    # Parse complete logical records before inspecting metadata. Physical-line
+    # filtering flattens quoted tooltip paragraphs and can delete a legitimate
+    # body line beginning with '#'. Both are part of a description, not rows.
+    records = list(csv.reader(io.StringIO(path.read_text(encoding="utf-8-sig"), newline="")))
+    header = records[0]
+    type_record = next((row for row in records[1:] if row and row[0].startswith("#types:")), None)
+    if type_record is None: raise ValueError(f"csv_types_missing:{path.name}")
+    types = [type_record[0][7:], *type_record[1:]]
     if len(header) != len(types):
         raise ValueError(f"csv_types_mismatch:{path.name}")
     rows, seen = [], set()
-    for raw in csv.DictReader(x for x in lines if not x.startswith("#")):
+    for values in records[1:]:
+        if not values or values[0].startswith("#"): continue
+        raw = dict(zip(header, values))
         row = {}
         for key, kind in zip(header, types):
-            value = (raw[key] or "").strip()
+            value = (raw.get(key) or "").strip()
             if not value:
                 continue
             if kind == "number":
@@ -38,6 +47,34 @@ def read_csv(path):
         if identity in seen: raise ValueError(f"csv_duplicate:{path.name}:{identity}")
         seen.add(identity); rows.append(row)
     return {"key": header[0], "rows": rows}
+
+def challenge_modes(source: str):
+    """Export exact mode tiers from the same Lua bytes packaged for settlement."""
+    lua = os.environ.get("LUA_EXECUTABLE") or shutil.which("lua5.1") or shutil.which("lua")
+    if not lua:
+        candidate = Path("C:/Program Files/lua/bin/lua5.1.exe")
+        lua = str(candidate) if candidate.is_file() else None
+    if not lua:
+        raise RuntimeError("set LUA_EXECUTABLE to export immutable challenge mode tiers")
+    script = ('local data=assert(loadstring(io.read("*a")))(); '
+              'for mode,rows in pairs(data.modes) do '
+              'io.write(mode,"\\t"); for number,row in ipairs(rows) do '
+              'if number>1 then io.write(",") end; io.write(number) end; '
+              'io.write("\\n") end')
+    result = subprocess.run([lua, "-e", script], input=source.encode("utf-8"),
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                            timeout=10, check=True,
+                            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+    rows = []
+    for line in result.stdout.decode("utf-8").splitlines():
+        mode, numbers = line.split("\t")
+        tiers = [int(value) for value in numbers.split(",")]
+        if not tiers or tiers != list(range(1, max(tiers) + 1)):
+            raise ValueError("archive_challenge_mode_tiers_invalid")
+        rows.append({"mode_id": mode, "difficulties": tiers})
+    if not rows:
+        raise ValueError("archive_challenge_modes_missing")
+    return {"key": "mode_id", "rows": sorted(rows, key=lambda row: row["mode_id"])}
 
 def build(root: Path, destination: Path | None = None, update_game_config: bool = True):
     from .commerce_catalog import build_catalog
@@ -60,6 +97,7 @@ def build(root: Path, destination: Path | None = None, update_game_config: bool 
         sources["core/"+name+".lua"] = (root/"scripts/vscripts/core"/(name+".lua")).read_text(encoding="utf-8-sig")
     sources["worker.lua"] = (root/"server/archive_backend/worker.lua").read_text(encoding="utf-8-sig")
     configs = {p.stem: read_csv(p) for p in files}
+    configs["archive_challenge_modes"] = challenge_modes(sources["config/generated/human_monster_spec.lua"])
     configs['commerce_catalog'] = {'key': 'sku', 'rows': commerce['products']}
     csv_hashes = {p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes().replace(b"\r\n",b"\n")).hexdigest() for p in files}
     data = {"protocol":1,"configs":configs,"sources":sources,"csv_hashes":csv_hashes}

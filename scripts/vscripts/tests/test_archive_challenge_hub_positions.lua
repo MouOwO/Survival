@@ -35,8 +35,10 @@ package.loaded["core/event_bus"] = { emit = function() end, request=function() e
 package.loaded["core/events"] = { UI_NOTIFICATION = "notification" }
 package.loaded["config/generated/archive_challenge_definitions"] = { rows = {}, by_id = {} }
 package.loaded["config/generated/archive_challenge_stats"] = { by_id = {} }
+package.loaded["config/generated/archive_challenge_actions"] = { rows = {}, by_id = {} }
 package.loaded["config/generated/archive_challenge_rules"] = { by_id = { default = {
     building_unlock_difficulty = 5, building_spacing = 240, building_offset_y = 360,
+    building_count = 3,
     building_model = "hub.vmdl", building_model_scale = 1,
     building_model_1 = "hub1.vmdl", building_model_2 = "hub2.vmdl", building_model_3 = "hub3.vmdl",
 } } }
@@ -52,9 +54,19 @@ package.loaded["systems/wave_system"] = {
     end,
 }
 package.loaded["systems/archive_service"] = {}
+-- Placement uses the real service and resolver, with reward admission isolated.
+package.loaded["systems/archive_cooperative_reward_service"] = {
+    begin=function() return true end,has_pending=function() return false end,
+    matches_session=function() return true end,
+    record_challenge=function() error("placement test cannot award rewards") end,
+}
 package.loaded["core/scheduler"] = {
     after = function(_, callback, key) if key ~= "archive_challenge_phase_timer" then scheduled[#scheduled + 1] = {callback=callback,key=key} end end,
-    every = function(_, callback, key) if key ~= "archive_challenge_phase_timer" then scheduled[#scheduled + 1] = { callback = callback, key = key } end end,
+    every = function(_, callback, key)
+        if key ~= "archive_challenge_phase_timer" and key ~= "archive_challenge_daily_rollover" then
+            scheduled[#scheduled + 1] = { callback = callback, key = key }
+        end
+    end,
     cancel = function() end,
 }
 package.loaded["systems/archive_endless_service"] = { is_running = function() return false end }
@@ -101,7 +113,8 @@ for player = 0, 3 do
         same(unit.position, player * 1000, index * 100, 384)
         assert(unit.owner == player and unit.survival_archive_hub == index)
         assert(unit.model == "hub" .. index .. ".vmdl" and unit.original_model == unit.model)
-        assert(unit.scale == 2/3 and unit.modifier_building_no_health_bar)
+        assert(unit.scale == 1 and unit.modifier_building_no_health_bar,
+            "archive hubs retain their authored building scale")
         assert(unit.modifier_invulnerable)
         assert(registered[player * 3 + index].id == player)
         assert(registered[player * 3 + index].role == "archive_challenge")

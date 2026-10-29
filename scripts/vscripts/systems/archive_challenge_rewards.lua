@@ -7,7 +7,12 @@ local shadow_drop_rules = require("config/generated/archive_shadow_challenge_dro
 local cage = require("config/generated/archive_cage_items")
 local rules = require("config/generated/archive_challenge_rules").by_id.default
 local daily_limits = require("systems/archive_daily_limits")
+local eligibility = require("systems/archive_challenge_reward_eligibility")
 local M = {}
+local point_rules = {
+    football={name="绿茵积分", count=10, description="绿茵挑战获得的永久积分；每次10点，每日最多100点。"},
+    watermelon={name="西瓜积分", count=1, description="西瓜挑战获得的永久积分；每次1点，每日最多10点。"},
+}
 local function normalize(save)
     save.fragment_counts = save.fragment_counts or {}
     save.fragment_totals = save.fragment_totals or {}
@@ -45,14 +50,18 @@ local function roll(items, count, filter, random_int)
     return result
 end
 function M.apply(command, save, stats, pass, apply, random_int)
-    normalize(save)
     local definition = challenges.by_id[command.challenge_id]
     if not definition or not definition.enabled then return false, "archive_challenge_unknown" end
+    local eligible, reason = eligibility.check(save, definition)
+    if not eligible then return true, {awarded=0, skipped_reason=reason, challenge_id=command.challenge_id} end
+    normalize(save)
+    local response = {awarded=0, challenge_id=command.challenge_id}
     if definition.reward_kind == "fragment" then
         local fragment = fragments.by_id[definition.reward_key]
         local remaining = daily_limits.remaining(save, fragment.fragment_id, assert(command.day_key), pass)
         local count = grant_fragment(save, stats, fragment, math.min(fragment.drop_count, remaining), apply)
         daily_limits.grant(save, fragment.fragment_id, count, command.day_key, pass)
+        response.awarded = count
     elseif definition.reward_kind == "shadow" then
         local drop_rule = shadow_drop_rules.by_id[definition.challenge_id]
         if not drop_rule or not drop_rule.enabled then
@@ -73,10 +82,18 @@ function M.apply(command, save, stats, pass, apply, random_int)
                 save.shadow_counts[id] = count + 1
                 remaining = remaining - daily_limits.grant(save, "shadow", 1, command.day_key, pass)
                 apply(stats, item)
+                response.awarded = response.awarded + 1
             end
         end
     elseif definition.reward_kind == "social_ticket" then
         return require("systems/archive_social_rewards").grant_ticket(command, save, definition.reward_key, pass)
+    elseif definition.reward_kind == "challenge_points" then
+        local point = point_rules[definition.reward_key]
+        if not point then return false, "archive_challenge_points_unknown" end
+        save.challenge_points = save.challenge_points or {}
+        local accepted = daily_limits.grant(save, definition.reward_key, point.count, assert(command.day_key), pass)
+        save.challenge_points[definition.reward_key] = (save.challenge_points[definition.reward_key] or 0) + accepted
+        response.awarded, response.currency_id, response.currency_name = accepted, definition.reward_key, point.name
     elseif definition.reward_kind == "cage" then
         local remaining = daily_limits.remaining(save, "cage", assert(command.day_key), pass)
         local count = rules.cage_drop_count + (pass and rules.pass_cage_extra_count or 0)
@@ -89,10 +106,12 @@ function M.apply(command, save, stats, pass, apply, random_int)
                 save.cage_counts[id] = owned + 1
                 remaining = remaining - daily_limits.grant(save, "cage", 1, command.day_key, pass)
                 apply(stats, item)
+                response.awarded = response.awarded + 1
             end
         end
     else return false, "archive_challenge_reward_unknown" end
-    return true
+    if response.awarded == 0 then response.skipped_reason = "今日获取次数已达上限或物品已集满" end
+    return true, response
 end
 function M.promote(command, save, stats, apply)
     normalize(save)
@@ -144,6 +163,15 @@ function M.cage_rows(profile, save)
             rows[#rows + 1] = { id = item.item_id, name = item.display_name, description = item.description,
                 icon_style = "shard", quality = "purple", count = count, target = item.max_owned }
         end
+    end
+    return rows
+end
+function M.point_rows(save)
+    local rows = {}
+    for _, key in ipairs({"football", "watermelon"}) do
+        local rule = point_rules[key]
+        rows[#rows+1] = {id="challenge_points_" .. key, name=rule.name, description=rule.description,
+            count=tonumber((save.challenge_points or {})[key]) or 0, quality="gold", icon_style="seal", count_known=1}
     end
     return rows
 end

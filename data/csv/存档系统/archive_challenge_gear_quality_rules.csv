@@ -1,0 +1,6 @@
+rule_id,min_wave,max_wave,weight_n,weight_r,weight_sr,weight_ssr,weight_ur,enabled
+#types:string,number,number,number,number,number,number,number,boolean
+archive_gear_early,1,49,6000,3000,900,90,10,1
+archive_gear_middle,50,99,4500,3500,1600,350,50,1
+archive_gear_high,100,199,2500,4000,2500,900,100,1
+archive_gear_peak,200,100000,1000,4000,3500,1300,200,1

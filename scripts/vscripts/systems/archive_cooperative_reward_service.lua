@@ -4,7 +4,7 @@ local multiplayer = require("systems/multiplayer_player_service")
 local scheduler = require("core/scheduler")
 local M = {}
 local roster, roster_ids, challenge_events, endless_events = {}, {}, {}, {}
-local difficulty_id, begun, retry_active = nil, false, false
+local difficulty_id, mode_id, begun, retry_active = nil, nil, false, false
 local retry_events, endless_recipients = {}, {}
 local RETRY_TIMER = "archive_cooperative_reward_retry"
 
@@ -14,6 +14,21 @@ local function normalized_id(value)
 end
 local function normalized_difficulty(value)
     return tonumber(tostring(value or ""):lower():match("^n?(%d+)$"))
+end
+local function current_mode()
+    local setup = package.loaded["systems/match_setup_service"]
+    return setup and type(setup.get_mode) == "function" and setup.get_mode()
+        or not setup and "standard" or nil
+end
+local function current_difficulty_matches(number)
+    local wave = package.loaded["systems/wave_system"]
+    return not wave or type(wave.get_difficulty) ~= "function"
+        or normalized_difficulty(wave.get_difficulty()) == number
+end
+function M.matches_session(mode, difficulty)
+    return begun and mode == mode_id and current_mode() == mode_id
+        and normalized_difficulty(difficulty) == difficulty_id
+        and current_difficulty_matches(difficulty_id)
 end
 local function enabled()
     return require("config/generated/archive_cooperative_reward_rules").by_id.default.enabled == true
@@ -34,12 +49,15 @@ end
 local function source_allowed(id, difficulty)
     id = normalized_id(id)
     return enabled() and begun and id ~= nil and roster[id] == true
-        and normalized_difficulty(difficulty) == difficulty_id and eligible(id)
+        and M.matches_session(mode_id, difficulty) and eligible(id)
 end
 function M.begin(player_ids, difficulty)
     if begun then return false, "cooperative_roster_already_started" end
     local number = normalized_difficulty(difficulty)
-    if not enabled() or not number or number < 1 or number > 20 then
+    local mode = current_mode()
+    if not enabled() or not number or not mode
+        or not require("config/difficulty_config").get("N" .. number, mode)
+        or not current_difficulty_matches(number) then
         return false, "cooperative_rewards_unavailable"
     end
     local active
@@ -54,8 +72,9 @@ function M.begin(player_ids, difficulty)
         end
     end
     table.sort(roster_ids)
-    difficulty_id, begun = number, true
-    return #roster_ids > 0
+    if #roster_ids == 0 then return false, "cooperative_roster_empty" end
+    difficulty_id, mode_id, begun = number, mode, true
+    return true
 end
 local function deliver(event)
     local archive = require("systems/archive_service")
@@ -66,14 +85,14 @@ local function deliver(event)
                 if event.kind == "challenge" then
                     return archive.record_challenge(id, event.challenge_id, event.kill_sequence, event.difficulty)
                 end
-                return archive.record_endless_wave(id, event.wave, event.difficulty)
+                    return archive.record_endless_wave(id, event.wave, event.difficulty, event.variant)
             end)
             -- A false local-settlement result can still mean the durable intent
             -- is queued (e.g. the account has not loaded yet). Hand it off once;
             -- archive_service alone owns save retries and its five-second batch.
             local reward_id = event.kind == "challenge" and event.challenge_id or event.wave
             if ok and (type(result) == "table" and result.ok == true
-                or archive.has_reward_pending and archive.has_reward_pending(id, event.kind, reward_id)) then
+                or archive.has_reward_pending and archive.has_reward_pending(id, event.kind, reward_id, event.variant)) then
                 event.delivered[id] = true
             else
                 waiting = true
@@ -98,7 +117,7 @@ end
 local function freeze_event(event, key)
     event.player_ids, event.delivered = {}, {}
     for _, id in ipairs(roster_ids) do
-        if eligible(id) then
+        if eligible(id) and (event.variant ~= "tower" or id == event.source_player_id) then
             event.player_ids[#event.player_ids + 1] = id
             if event.kind == "endless" then endless_recipients[id] = true end
         end
@@ -127,18 +146,25 @@ function M.record_challenge(source_player_id, challenge_id, kill_sequence, diffi
     challenge_events[challenge_id] = event
     return freeze_event(event, "challenge:" .. tostring(challenge_id))
 end
-function M.record_endless_wave(source_player_id, wave, difficulty)
+function M.record_endless_wave(source_player_id, wave, difficulty, variant)
+    variant = variant or "endless"
     if not source_allowed(source_player_id, difficulty) then
         return {ok = false, error = "cooperative_source_invalid"}
     end
-    if type(wave) ~= "number" or not normalized_id(wave) or wave < 1
-        or not require("systems/archive_endless_config").wave(difficulty_id, wave) then
+    local config = require("systems/archive_endless_config")
+    if not config.allowed_variant(difficulty_id, mode_id, variant)
+        or type(wave) ~= "number" or not normalized_id(wave) or wave < 1
+        or not require("systems/archive_endless_config").wave(difficulty_id, wave, mode_id) then
         return {ok = false, error = "endless_wave_invalid"}
     end
-    if endless_events[wave] then return {ok = true, duplicate = true} end
-    local event = {kind = "endless", wave = wave, difficulty = difficulty}
-    endless_events[wave] = event
-    return freeze_event(event, "endless:" .. tostring(wave))
+    -- A solo tower belongs to its source, while endless is one shared team
+    -- event. Both identities stay separate even at the same wave number.
+    local key = variant .. ":" .. (variant == "tower" and tostring(source_player_id) .. ":" or "") .. tostring(wave)
+    if endless_events[key] then return {ok = true, duplicate = true} end
+    local event = {kind = "endless", wave = wave, difficulty = difficulty,
+        variant = variant, source_player_id = tonumber(source_player_id)}
+    endless_events[key] = event
+    return freeze_event(event, key)
 end
 function M.flush_endless_rewards()
     local archive = require("systems/archive_service")
@@ -153,6 +179,6 @@ function M.init()
     scheduler.cancel(RETRY_TIMER)
     roster, roster_ids, challenge_events, endless_events = {}, {}, {}, {}
     retry_events, endless_recipients = {}, {}
-    difficulty_id, begun, retry_active = nil, false, false
+    difficulty_id, mode_id, begun, retry_active = nil, nil, false, false
 end
 return M

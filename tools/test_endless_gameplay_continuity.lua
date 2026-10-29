@@ -2,6 +2,8 @@
 -- Keep the real challenge, endless, resource, phase guard and scheduler services;
 -- substitute only the engine, map/config fixtures and archive HTTP boundary.
 package.path = "scripts/vscripts/?.lua;" .. package.path
+package.loaded["core/test_access_policy"]={enabled=function() return false end,
+    enforce=function() return true end,allowed=function() return true end}
 
 local bus, events = require("core/event_bus"), require("core/events")
 local scheduler = require("core/scheduler")
@@ -22,8 +24,12 @@ package.loaded["config/resources_config"] = {
 }
 package.loaded["config/generated/archive_challenge_definitions"] = {rows = {}, by_id = {}}
 package.loaded["config/generated/archive_challenge_stats"] = {by_id = {}}
+local endless_action={action_id="endless",building_id=2,slot_order=1,min_difficulty=1,
+    enabled=true,ability_name="ability_archive_endless",display_name="无尽挑战",description="玩法连续性测试入口"}
+package.loaded["config/generated/archive_challenge_actions"]={rows={endless_action},by_id={endless=endless_action}}
 package.loaded["config/generated/archive_challenge_rules"] = {by_id = {default = {
     building_unlock_difficulty = 1, building_spacing = 240, building_offset_y = 360,
+    building_count = 4,
     building_model = "test.vmdl", building_model_scale = 1, phase_duration_seconds = 10,
 }}}
 package.loaded["systems/archive_endless_config"] = {
@@ -31,7 +37,9 @@ package.loaded["systems/archive_endless_config"] = {
     group = function() return {} end,
     wave = function() return {health = 100, attack = 1, war3_armor = 0} end,
     score = function() return 1 end,
+    allowed_variant = function(tier,mode,variant) return tier==1 and mode=="standard" and variant=="endless" end,
 }
+package.loaded["systems/match_setup_service"]={get_mode=function() return "standard" end}
 package.loaded["systems/player_context_service"] = {
     is_defeated = function() return false end,
     register_unit = function(id, unit) unit.owner = id end,
@@ -95,6 +103,7 @@ local function unit(name, position)
     return body
 end
 package.loaded["systems/wave_system"] = {
+    get_difficulty = function() return "N1" end,
     get_player_spawn_marker = function(id)
         return {IsNull = function() return false end,
             GetAbsOrigin = function() return Vector(id * 2000, 0, 0) end}

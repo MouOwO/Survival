@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "snapshot_date": "2026-10-28",
+  "snapshot_date": "2026-10-29",
   "scope": "Curated project knowledge and historical snapshot; raw chat excluded",
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 3926,
-      "sha256": "ed8b045c046406db97a81b15de05fd45f359c9f783d276c185ac184777d87e9d"
+      "bytes": 4656,
+      "sha256": "f4290c79dd90bf7414acb64209efaa5e6800a72e0c25c5386b80cc1c48f91593"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -20,8 +20,8 @@
     },
     {
       "path": "03_progression_save_contract.md",
-      "bytes": 13444,
-      "sha256": "87c8a68170d5bd982b28556a852610f4061469485d4218b9f3b647719b1d8e01"
+      "bytes": 15566,
+      "sha256": "595f70c9847003a21e23679498c48fe4224bbe53c96b4d4ba58af56a9498c737"
     },
     {
       "path": "04_network_auth_official.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 14119,
-      "sha256": "94ffafec8d952aaeb5be9a51c54ff9c99b9dabbee353c5a9b71d388cc3c43dc9"
+      "bytes": 15218,
+      "sha256": "d701a3e9babe0c0fb8e93936f5d2dd4f7754aba26925d1a20e3ea31ffc06499f"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -132,6 +132,11 @@
       "path": "evidence/archive_round_icons_20261029.md",
       "bytes": 2763,
       "sha256": "3e6f036646f56e14d1049caa8a09c09f22c43eb835f3589b9a7aa98f6c4f1950"
+    },
+    {
+      "path": "evidence/archive_video_challenges_20261029.md",
+      "bytes": 9010,
+      "sha256": "4c6af9a5414795cad1e85c22c866ce2998cf008031513eb880867cb11361dd9d"
     },
     {
       "path": "evidence/challenge_projectiles_20261029.md",

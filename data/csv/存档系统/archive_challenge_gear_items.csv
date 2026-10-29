@@ -1,0 +1,12 @@
+item_id,display_name,quality,max_owned,description,effect_ids,effect_values,enabled
+#types:string,string,string,number,string,list,list,boolean
+archive_gear_n_blade,守望短刃,N,30,英雄初始属性+100（每件），无尽与通天塔装备,hero_initial_attributes,100,1
+archive_gear_n_guard,守望护符,N,30,城墙初始生命+1000（每件），无尽与通天塔装备,wall_initial_health,1000,1
+archive_gear_r_blade,远征长刃,R,30,英雄初始属性+300（每件），无尽与通天塔装备,hero_initial_attributes,300,1
+archive_gear_r_guard,远征护符,R,30,城墙初始生命+3000（每件），无尽与通天塔装备,wall_initial_health,3000,1
+archive_gear_sr_blade,星辉长刃,SR,30,英雄初始属性+1000（每件），无尽与通天塔装备,hero_initial_attributes,1000,1
+archive_gear_sr_guard,星辉护符,SR,30,城墙初始生命+10000（每件），无尽与通天塔装备,wall_initial_health,10000,1
+archive_gear_ssr_blade,黎明圣刃,SSR,30,英雄初始属性+3000（每件），无尽与通天塔装备,hero_initial_attributes,3000,1
+archive_gear_ssr_guard,黎明圣徽,SSR,30,城墙初始生命+30000（每件），无尽与通天塔装备,wall_initial_health,30000,1
+archive_gear_ur_blade,永昼圣刃,UR,30,英雄初始属性+8000（每件），无尽与通天塔装备,hero_initial_attributes,8000,1
+archive_gear_ur_guard,永昼圣徽,UR,30,城墙初始生命+80000（每件），无尽与通天塔装备,wall_initial_health,80000,1

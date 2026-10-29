@@ -14,12 +14,33 @@ local function ground(position)
     local ok, value = pcall(GetGroundPosition, position, nil)
     return ok and value or position
 end
+local function finite_position(position)
+    if not position then return false end
+    for _, axis in ipairs({"x", "y", "z"}) do
+        local value = tonumber(position[axis])
+        if not value or value ~= value or math.abs(value) > 32768 then return false end
+    end
+    return true
+end
+local function portal_ground(position)
+    -- A portal system spawn must wait for real terrain data. Legacy marker
+    -- placement below deliberately retains its original ground fallback.
+    if not finite_position(position) or not GetGroundPosition then return nil end
+    local ok, result = pcall(GetGroundPosition, position, nil)
+    return ok and finite_position(result) and result or nil
+end
+local function portal_origin(unit)
+    if not valid(unit) then return nil end
+    local ok, position = pcall(unit.GetAbsOrigin, unit)
+    return ok and portal_ground(position) or nil
+end
 local function portal_unit_overlap(position)
-    if not FindUnitsInRadius then return false end
-    local units = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, position, nil, 608,
+    if not FindUnitsInRadius then return true end
+    local ok, units = pcall(FindUnitsInRadius, DOTA_TEAM_GOODGUYS, position, nil, 608,
         DOTA_UNIT_TARGET_TEAM_BOTH,
         DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC + DOTA_UNIT_TARGET_BUILDING,
-        DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false) or {}
+        DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
+    if not ok or type(units) ~= "table" then return true end
     for _, unit in ipairs(units) do
         if valid(unit) and (not unit.IsAlive or unit:IsAlive())
             and not unit.survival_is_grid_preview and not unit.survival_rebirth_scene_display then
@@ -35,8 +56,10 @@ local function portal_unit_overlap(position)
     return false
 end
 local function available(player_id, position, anchor, reserved, spacing, portal_spawn)
-    local result = ground(position)
+    local result
+    if portal_spawn then result = portal_ground(position) else result = ground(position) end
     if not result then return nil end
+    if portal_spawn and (not GridNav or not GridNav.IsTraversable or not GridNav.IsBlocked) then return nil end
     if GridNav and GridNav.IsTraversable and GridNav.IsBlocked then
         -- Water can be traversable; also reject a lower floor than this anchor.
         if math.abs(result.z - anchor.z) > 96 then return nil end
@@ -54,12 +77,20 @@ local function available(player_id, position, anchor, reserved, spacing, portal_
         for _, dx in ipairs({-64, 0, 64}) do
             for _, dy in ipairs({-64, 0, 64}) do
                 local sample = Vector(result.x + dx, result.y + dy, result.z)
-                if not GridNav:IsTraversable(sample) or GridNav:IsBlocked(sample)
+                if portal_spawn then
+                    local walked, traversable = pcall(GridNav.IsTraversable, GridNav, sample)
+                    local checked, blocked = pcall(GridNav.IsBlocked, GridNav, sample)
+                    local landed = portal_ground(sample)
+                    if not walked or traversable ~= true or not checked or blocked ~= false
+                        or not landed or math.abs(landed.z - result.z) > 48 then return nil end
+                elseif not GridNav:IsTraversable(sample) or GridNav:IsBlocked(sample)
                     or math.abs(ground(sample).z - result.z) > 48 then return nil end
             end
         end
-        if portal_spawn and GridNav.IsNearbyTree
-            and GridNav:IsNearbyTree(result, 96, true) then return nil end
+        if portal_spawn and GridNav.IsNearbyTree then
+            local checked, tree = pcall(GridNav.IsNearbyTree, GridNav, result, 96, true)
+            if not checked or tree then return nil end
+        end
     end
     if portal_spawn and portal_unit_overlap(result) then return nil end
     if not GridNav and not portal_spawn then return result end
@@ -74,29 +105,41 @@ local function available(player_id, position, anchor, reserved, spacing, portal_
 end
 local function around_portal(player_id, index, rule, wave, reserved)
     local channel = wave.get_player_spawn_marker(player_id)
-    if not valid(channel) then return nil end
-    local anchor = ground(channel:GetAbsOrigin())
+    local anchor = portal_origin(channel)
     if not anchor then return nil end
     local spacing = math.max(192, tonumber(rule.building_spacing) or 240)
     local radius = math.max(360, tonumber(rule.building_offset_y) or 360)
-    local directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
+    local diagonal = 1 / math.sqrt(2)
+    -- Keep the four original cardinal preferences, then use diagonals to
+    -- support four owners sharing one entrance (four hubs each).
+    local directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0},
+        {diagonal, diagonal}, {diagonal, -diagonal},
+        {-diagonal, -diagonal}, {-diagonal, diagonal}}
+    local mode_spawns = require("systems/mode_spawn_service")
+    local mode_bounds
+    if mode_spawns.active() then
+        local config = mode_spawns.config()
+        if not config then return nil end
+        mode_bounds = config.bounds
+        if not mode_spawns.contains(mode_bounds, anchor) then return nil end
+    end
     local portals = {anchor}
     for id = 0, 3 do
         if id ~= player_id then
-            local other = wave.get_player_spawn_marker(id)
-            if valid(other) then portals[#portals + 1] = other:GetAbsOrigin() end
+            local other = portal_origin(wave.get_player_spawn_marker(id))
+            if other then portals[#portals + 1] = other end
         end
     end
-    -- Three existing hubs occupy separate cardinal sides; the fourth side is
-    -- available when a preferred side is blocked. Never search near the wall.
-    -- At most 12 candidates, and all remain within two spacings of the portal.
+    -- At most 24 candidates, all within radius + 2 * spacing of this actual
+    -- routed entrance (840 with production rules). Never borrow wall/old-map
+    -- markers or extend an unsuccessful search into a different region.
     for ring = 0, 2 do
-        for step = 0, 3 do
-            local direction = directions[(index - 1 + step) % 4 + 1]
+        for step = 0, 7 do
+            local direction = directions[(index - 1 + step) % 8 + 1]
             local distance = radius + ring * spacing
             local position = Vector(anchor.x + direction[1] * distance,
                 anchor.y + direction[2] * distance, anchor.z)
-            local clear = true
+            local clear = not mode_bounds or mode_spawns.contains(mode_bounds, position, 64, 64)
             for _, portal in ipairs(portals) do
                 local dx, dy = position.x - portal.x, position.y - portal.y
                 if dx * dx + dy * dy < 288 ^ 2 then clear = false; break end

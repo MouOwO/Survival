@@ -1,6 +1,8 @@
 -- Real roster, dispatcher, archive queue and reducer; in-memory account/HTTP
 -- fixtures only. No production requests, rewards or player saves are written.
 package.path = "scripts/vscripts/?.lua;" .. package.path
+package.loaded["core/test_access_policy"]={enabled=function() return false end,
+    enforce=function() return true end,allowed=function() return true end}
 local bus, events = require("core/event_bus"), require("core/events")
 local scheduler = require("core/scheduler")
 local context = require("systems/player_context_service")
@@ -35,15 +37,21 @@ package.loaded["systems/player_profile_service"] = {
     get_account_profile = function(id) return copy(profiles[id]) end,
     get_provider = function() return provider end,
 }
+package.loaded["systems/match_setup_service"] = {get_mode = function() return "standard" end}
+package.loaded["systems/wave_system"] = {get_difficulty = function() return "N10" end}
 package.loaded["systems/title_presentation_service"] = {
     init = function() end, rows = function() return {} end, preview_mode = function() return false end,
+    preview_active = function() return false end,
 }
 package.loaded["systems/online_time_service"] = {disconnect = function() end}
 local archive = require("systems/archive_service")
 local cooperative = require("systems/archive_cooperative_reward_service")
 local reducer = require("systems/archive_settlement")
 local function profile()
-    local value = {revision = 1, save = {gameplay_stats = {}, content_inventory = {}}, entitlements = {}}
+    -- This test isolates fanout/quota/monthly identity with eligible permanent
+    -- fixture accounts. The reward eligibility suite tests 100/101 boundaries.
+    local value = {revision = 1, save = {gameplay_stats = {}, content_inventory = {},
+        archive={social_draw_counts={beast=101,ex=101,friend=101}}}, entitlements = {}}
     for _, row in ipairs(schema.rows) do value.save.gameplay_stats[row.field_id] = row.default_value end
     return value
 end
@@ -161,7 +169,8 @@ check(cooperative.record_challenge(2, "social_beast", 12, "N10").duplicate,
     "save retry and second summoner do not create another reward")
 blocked[1] = nil; archive._test.flush(1)
 for id = 0, 3 do
-    check(profiles[id].save.archive.social_tickets.blessing_ticket == 1, "full independent base share " .. id)
+    check(profiles[id].save.archive.social_tickets.blessing_ticket == (id==0 and 2 or 1),
+        "base share plus only this account's active monthly extra " .. id)
 end
 
 fresh({0, 1, 2, 3})
@@ -174,10 +183,12 @@ for wave = 1, 100 do
 end
 check(#requests == 0, "endless team fanout retains the five-second batching delay")
 flush_all()
+local expected_endless_score=0
+for wave=1,100 do expected_endless_score=expected_endless_score+require("systems/archive_endless_config").score(wave) end
 for id = 0, 3 do
-    check(profiles[id].save.archive.endless_score == 3250
+    check(profiles[id].save.archive.endless_score == expected_endless_score
         and profiles[id].save.archive.endless_best_wave == 100,
-        "team highest 100 gives each account 3250, rather than summing the two runs")
+        "team highest 100 gives each account the configured cleared-wave score once")
     check(not archive.has_pending(id), "terminal flush includes every recipient")
 end
 check(delivered == 400, "each account owns exactly one receipt per successful layer")
@@ -217,13 +228,14 @@ for index,id in ipairs({"social_ex","social_friend","social_beast","social_wife"
 end
 for id=0,3 do
     local tickets=profiles[id].save.archive.social_tickets
-    check(tickets[wife_rule.currency_id]==1 and tickets.invitation==1 and tickets.yitie==1
-        and tickets.blessing_ticket==1,"wife reward preserves all other currencies for account "..id)
+    local expected=id==0 and 2 or 1
+    check(tickets[wife_rule.currency_id]==expected and tickets.invitation==expected and tickets.yitie==expected
+        and tickets.blessing_ticket==expected,"each account owns its own base/monthly entitlement for account "..id)
 end
 check(cooperative.record_challenge(2,"social_wife",99,"N10").duplicate and delivered==16,
     "a second summoner cannot multiply the shared wife reward; VIP/pass do not lend bonus identity")
 local saved=profile()
-saved.save.archive={social_tickets={invitation=7,yitie=8,blessing_ticket=9}}
+saved.save.archive={social_tickets={invitation=7,yitie=8,blessing_ticket=9},social_draw_counts={friend=101}}
 for index=1,wife_rule.daily_limit+2 do
     local command={id="wife_daily:"..index,kind="challenge",challenge_id="social_wife",
         difficulty_id="N10",kill_sequence=index,day_key="20410"}
