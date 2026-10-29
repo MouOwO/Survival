@@ -13,6 +13,7 @@ local M = {}
 local TREE_RESERVATION = "survival_tree_reserved"
 local trees_by_player = {}
 local trees_by_entity = {}
+local rich_level2_rewards = {}
 local region_slots = {}
 local ordinary_reservations = false
 local wall_attack_frame = nil
@@ -101,6 +102,11 @@ local function lumber_efficiency_buff(level)
     ) * math.max(0, (tonumber(level) or 1) - 1)
 end
 
+local function player_lumber_efficiency_buff(player_id, level)
+    return lumber_efficiency_buff(level)
+        + (rich_level2_rewards[player_id] and config.rich_level2_reward.lumber_efficiency or 0)
+end
+
 local function tree_snapshot(state)
     local tree_level = state.level
     local row = level_row(tree_level)
@@ -115,7 +121,9 @@ local function tree_snapshot(state)
         war3_armor = row.war3_armor,
         minimum_armor = row.minimum_armor,
         war3_minimum_armor = row.war3_minimum_armor,
-        lumber_efficiency_buff = lumber_efficiency_buff(tree_level),
+        lumber_efficiency_buff = player_lumber_efficiency_buff(state.player_id, tree_level),
+        rich_level2_wood_per_second = rich_level2_rewards[state.player_id]
+            and config.rich_level2_reward.wood_per_second or 0,
     }
 end
 
@@ -262,9 +270,21 @@ local function upgrade_tree(tree)
     local next_level = math.min(config.max_level, state.level + 1)
     apply_level(tree, next_level)
     state.level = next_level
+    local setup = package.loaded["systems/match_setup_service"]
+    local reward = previous_level == 1 and next_level == 2
+        and setup and setup.get_mode and setup.get_mode() == "rich"
+        and not rich_level2_rewards[state.player_id]
+    if reward then rich_level2_rewards[state.player_id] = true end
     local reason = next_level > previous_level
         and "tree_level_up" or "tree_max_level_reset"
     publish_changed(state, reason)
+    if reward then
+        event_bus.emit(events.UI_NOTIFICATION, {
+            player_id = state.player_id, level = "info",
+            message = string.format("丰饶之树升至 Lv2：本局永久额外获得伐木效率 +%d，每秒木材 +%d！",
+                config.rich_level2_reward.lumber_efficiency, config.rich_level2_reward.wood_per_second),
+        })
+    end
 end
 
 local function spawn_tree(payload)
@@ -360,8 +380,8 @@ local function on_tree_hit(payload)
         end
     end
     local efficiency = math.max(0, math.floor(
-        (tonumber(base_efficiency) or 0) + lumber_efficiency_buff(
-            (trees_by_player[payload.player_id] or {}).level)
+        (tonumber(base_efficiency) or 0) + player_lumber_efficiency_buff(
+            payload.player_id, (trees_by_player[payload.player_id] or {}).level)
             * math.max(1, tonumber(payload.fusion_count) or 1)
     ))
     if hero_wood_bonus_pct > 0 then
@@ -474,6 +494,7 @@ function M.init()
     harvest_feedback.reset()
     trees_by_player = {}
     trees_by_entity = {}
+    rich_level2_rewards = {}
     region_slots = {}
     ordinary_reservations = false
     wall_attack_frame = nil

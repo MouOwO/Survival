@@ -272,3 +272,18 @@ local primary_grid=trees._tree_grid_for_test(points[1])
 assert(occupied[primary_grid.grid_x..":"..primary_grid.grid_y]==903,
     "restoring a primary marker must not overwrite a newer foreign occupant")
 print("MULTIPLAYER_TREES_PASS: four primary patches, independent shared-region trees, per-player harvest, built-over backup rejection and precise cleanup")
+
+-- Rich Lv2 snapshots must reach the real worker/AI consumers, including fusion.
+package.loaded["systems/match_setup_service"]={get_mode=function() return "rich" end}
+reset()
+local rich_tree=unit("enemy_tree",500)
+trees._reset_for_test(1,rich_tree,0)
+local rich_worker,rich_ai=worker_state(0,rich_tree,3)
+local foreign_worker,foreign_ai=worker_state(1,rich_tree)
+trees._upgrade_tree_for_test(rich_tree)
+local expected=3*(bonus+config.rich_level2_reward.lumber_efficiency)
+assert(rich_worker.tree_lumber_efficiency_buff==expected
+    and rich_ai:GetLumberEfficiency()==10+expected,"owner worker panel and AI receive the extra rich reward")
+assert(foreign_ai:GetLumberEfficiency()==11,"teammate worker panel cannot inherit the reward")
+assert(hit(rich_ai,rich_tree).wood==rich_ai:GetLumberEfficiency(),"display and real yield must match")
+print("RICH_TREE_WORKER_REWARD_PASS: real worker state, fused AI efficiency and harvest agree; teammate unchanged")

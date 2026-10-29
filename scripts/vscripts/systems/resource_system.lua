@@ -33,6 +33,7 @@ local function new_account()
         population = config.initial_population,
         max_population = config.initial_max_population,
         wood_per_second = 0,
+        rich_tree_wood_per_second = 0,
         gold_per_second = 0,
         wood_fraction = 0,
         gold_fraction = 0,
@@ -83,7 +84,8 @@ local function start_income_task(player_id, account)
         if accounts[player_id] ~= account or not account.initialized then return false end
         if require("systems/player_context_service").is_defeated(player_id) then return false end
         if phase_guard.post_clear_frozen() then return true end
-        local wood_exact = account.wood_per_second + account.wood_fraction
+        local wood_exact = account.wood_per_second + account.rich_tree_wood_per_second
+            + account.wood_fraction
         local gold_exact = account.gold_per_second + account.gold_fraction
         local wood = math.floor(wood_exact)
         local gold = math.floor(gold_exact)
@@ -270,6 +272,17 @@ local function on_permanent_projection_changed(payload)
     end
 end
 
+local function on_tree_changed(payload)
+    local player_id = normalized_player_id(payload and payload.player_id)
+    local amount = tonumber(payload and payload.rich_level2_wood_per_second) or 0
+    if player_id == nil or amount <= 0 or amount ~= amount or amount == math.huge then return end
+    local account = get_account(player_id)
+    -- Set once, never accumulate repeated tree snapshots. This match reward
+    -- survives profile refresh and tree replacement independently of base income.
+    if account.rich_tree_wood_per_second >= amount then return end
+    account.rich_tree_wood_per_second = amount
+end
+
 function M.init()
     accounts = {}
     version = 0
@@ -280,6 +293,7 @@ function M.init()
     event_bus.handle_request(events.RESOURCE_RELEASE_POP_REQUEST, handle_release_pop)
     event_bus.handle_request(events.RESOURCE_DEBUG_SET_REQUEST, handle_debug_set)
     event_bus.subscribe(events.PLAYER_PROFILE_CHANGED, initialize_from_profile)
+    event_bus.subscribe(events.TREE_CHANGED, on_tree_changed)
     event_bus.subscribe(events.PERMANENT_REWARD_EFFECTS_CHANGED,
         on_permanent_projection_changed)
 end

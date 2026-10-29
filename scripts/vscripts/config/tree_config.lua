@@ -35,6 +35,9 @@ local M = {
     grid_cell_size = 64,
     max_level = #source_levels,
     levels = levels,
+    -- Additional one-time reward for the owner's first Lv1 -> Lv2 in rich mode.
+    -- Both bonuses last for this match and are separate from normal tree growth.
+    rich_level2_reward = { lumber_efficiency = 20, wood_per_second = 20 },
     lumber_efficiency_buff_per_level = global_rules.number(
         "tree_lumber_efficiency_buff_per_level",
         1
