@@ -1,0 +1,13 @@
+# 存档神器原画显示与四方向细线｜2026-10-29
+
+用户反馈玲珑心图标模糊，四个方向出现绿色细线；核对原图后明确选择“保留原画，优化缩放和边框，清晰度受原图限制”。
+
+中央资源表的九个building_01–building_09仍引用同名Valve物品，不改造型、库存、品质或属性。玲珑心本机pak01的octarine_core原生纹理为88×64、BGRA8888、单mip、NO_LOD；[Valve官方网页图片](https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/octarine_core.png)同为88×64，不存在本次已取得的更高清同款。原图细节有上限，不能靠放大声称高清。
+
+之前方形区域默认cover，会额外放大并裁切横向原图；共享FillIcon又在每次刷新时恢复1px品质边框，外层圆形裁切使方框边缘只剩四方向片段。修复将九个资源显式设为contain；仅对category_id=building且带ArchiveV10Icon的羊皮纸行去掉方形背景/边框，保留原金色圆环。每次刷新都应用例外，其他类别和神器弹窗继续沿用共用品质底图。共享API升级至5，使同数据hash的旧缓存也能重新加载。
+
+验证：6项底图/连续刷新/面板复用/缓存升级检查、3项fit契约、35项历史原生绑定与中央资源解析检查通过。九张真实VPK纹理解码后浏览器组装对照通过，contain及零边框均核对；对照位于output/archive_artifact_clarity_20261029/preview，属于资源组装，**不是游戏截图**。无重绘、锐化或扩充原图像素。
+
+Valve resourcecompiler对仅含本任务的common/item_resources.js完成1 compiled / 0 failed；content源码与game编译资源配套。编译输入LF字节SHA256为26a272ebb257b13758e8c5da6c6f32030adf00997515748390242dfcd9930cc7；运行产物SHA256为5cbeb907a8acc3207df12e24c1df4afd0ecceac19dbc10ea05122adc53ece74b。本地工作区另有存档挑战/侍妾等开发内容，任务提交的中央表和生成文件从HEAD仅叠加本次九项fit及边框逻辑，保留那些未提交改动，不把它们混入编译产物或本次提交。
+
+本次未做原生新版画面验收，也未上传游廊。原已发布2805身份不变；Git推送与本地编译不代表新工坊版本。

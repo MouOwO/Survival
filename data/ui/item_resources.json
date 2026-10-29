@@ -1959,7 +1959,8 @@
         88,
         64
       ],
-      "category_id": "building"
+      "category_id": "building",
+      "fit": "contain"
     },
     {
       "id": "building_02",
@@ -1971,7 +1972,8 @@
         88,
         64
       ],
-      "category_id": "building"
+      "category_id": "building",
+      "fit": "contain"
     },
     {
       "id": "building_03",
@@ -1983,7 +1985,8 @@
         86,
         64
       ],
-      "category_id": "building"
+      "category_id": "building",
+      "fit": "contain"
     },
     {
       "id": "building_04",
@@ -1995,7 +1998,8 @@
         88,
         64
       ],
-      "category_id": "building"
+      "category_id": "building",
+      "fit": "contain"
     },
     {
       "id": "building_05",
@@ -2007,7 +2011,8 @@
         88,
         64
       ],
-      "category_id": "building"
+      "category_id": "building",
+      "fit": "contain"
     },
     {
       "id": "building_06",
@@ -2019,7 +2024,8 @@
         88,
         64
       ],
-      "category_id": "building"
+      "category_id": "building",
+      "fit": "contain"
     },
     {
       "id": "building_07",
@@ -2031,7 +2037,8 @@
         88,
         64
       ],
-      "category_id": "building"
+      "category_id": "building",
+      "fit": "contain"
     },
     {
       "id": "building_08",
@@ -2043,7 +2050,8 @@
         88,
         64
       ],
-      "category_id": "building"
+      "category_id": "building",
+      "fit": "contain"
     },
     {
       "id": "building_09",
@@ -2055,7 +2063,8 @@
         88,
         64
       ],
-      "category_id": "building"
+      "category_id": "building",
+      "fit": "contain"
     },
     {
       "id": "building_advanced_research_lab",

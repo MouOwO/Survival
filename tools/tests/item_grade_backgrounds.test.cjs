@@ -47,8 +47,26 @@ test('Reused panels reset old grades and restore backgrounds cleared by consumer
  const invalid=icon();invalid.IsValid=()=>false;r.FillIcon(invalid,{quality:'UR'});assert.deepEqual(invalid.style,{});
 });
 test('The runtime upgrade replaces a cached old API even when resource data hash is unchanged',()=>{
- const {cfg,context,resources:r}=runtime();cfg.SurvivalItemResources={sourceHash:r.sourceHash,apiVersion:3};
+ const {cfg,context,resources:r}=runtime();cfg.SurvivalItemResources={sourceHash:r.sourceHash,apiVersion:4};
  vm.runInContext(source,context);const upgraded=cfg.SurvivalItemResources;
- assert.equal(upgraded.apiVersion,4);assert.equal(typeof upgraded.Grade,'function');
+ assert.equal(upgraded.apiVersion,5);assert.equal(typeof upgraded.Grade,'function');
  vm.runInContext(source,context);assert.equal(cfg.SurvivalItemResources,upgraded,'Repeated current includes share one registry');
+});
+
+test('All nine parchment artifacts retain native aspect and no square frame after repeated fills or panel reuse',()=>{
+ const {resources:r}=runtime(),p=icon();p.BHasClass=cls=>cls==='ArchiveV10Icon';
+ for(let i=1;i<=9;i++){
+  const id='building_'+String(i).padStart(2,'0'),row=r.Lookup(id);
+  assert.equal(row.fit,'contain');assert(row.uri.startsWith('file://{images}/items/'));
+  for(let paint=0;paint<3;paint++){
+   p.style.border='1px solid #83aa65';p.style.backgroundImage='old square bevel';
+   r.FillIcon(p,{id,quality:'N'});
+   assert.equal(p.style.border,'0px',id);assert.equal(p.style.backgroundImage,'none');
+   assert.equal(p.style.backgroundColor,'transparent');assert.equal(p.scaling,'stretch-to-fit-preserve-aspect');
+  }
+ }
+ r.FillIcon(p,{id:'lottery_gale_bow',quality:'N'});
+ assert.equal(p.style.border,'1px solid #83aa65','Other archive items retain their grade frame');
+ const popup=icon();r.FillIcon(popup,{id:'building_01',quality:'N'});
+ assert.equal(popup.style.border,'1px solid #83aa65','Artifact tooltip/other consumers retain the shared background');
 });
