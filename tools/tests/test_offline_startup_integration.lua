@@ -31,6 +31,7 @@ PlayerResource = {
 }
 EntIndexToHScript = function(index) return index == 200 and player or nil end
 GameRules = {
+    GetGameSessionConfigValue = function(_, _, default) return default end,
     GetGameModeEntity = function() return {SetContextThink = function(_, name, callback) tasks[name] = callback end} end,
     State_Get = function() return native_state end,
     GetGameTime = function() return clock end,
@@ -132,6 +133,55 @@ assert(second_profile.account_id == first_profile.account_id
     and next(second_profile.save.content_inventory) == nil,
     "same Steam account is isolated by a fresh memory session")
 assert(profiles.apply_snapshot(0, first_profile).error == "match_profile_mismatch")
+-- All previews must work with a blank offline account, independently of the
+-- separate released-tier acceptance switch, through the real startup gates.
+local release = require("config/mode_release_config")
+release.all_difficulties_unlocked = false
+local team = require("systems/team_difficulty_service")
+local mode_test = require("debug/mode_unlock_test")
+local maximum = {standard=10, pure=10, rich=30, cold=50, scourge=50, ruins=50, celestial=35}
+local modes = {"standard", "rich", "cold", "scourge", "ruins", "celestial", "fishing", "pure"}
+for _, mode in ipairs(modes) do
+    native_state = 2
+    launch()
+    local options = setup.snapshot().mode_options
+    assert(#options == 8, "offline exposes every configured mode")
+    for index, option in ipairs(options) do
+        assert(option.mode_id == modes[index] and option.unlocked == 1 and option.pending == 0)
+        assert(option.daily_capped == nil and option.daily_pending == nil)
+    end
+    assert(mode_test.is_enabled(), "offline previews keep settlement isolation even without tier acceptance")
+    acknowledge()
+    native_state = 3
+    tick(4)
+    assert(startup.is_ready())
+    select_mode(mode)
+    tick(3)
+    assert(startup.is_gameplay_ready() and startup.is_player_ready(0), mode .. " reaches gameplay")
+    local profile = assert(profiles.get_profile(0))
+    assert(profile.game_mode == mode and profile.mode == (mode == "pure" and "pure" or "standard"))
+    assert(next(profile.save.archive) == nil, "unlocking modes never manufactures permanent clears")
+    if mode == "fishing" then
+        assert(setup.is_fishing_mode() and #team.current(mode).options == 0)
+    else
+        local snapshot = team.current(mode)
+        assert(snapshot.ready and #snapshot.options == maximum[mode])
+        assert(snapshot.max_difficulty_id == "N" .. maximum[mode])
+        for _, option in ipairs(snapshot.options) do assert(option.unlocked == 1) end
+        assert(startup.is_difficulty_selection_ready(0))
+    end
+end
+-- Switching the launch choice does not convert an existing preview into a
+-- normal settling match; the isolation grant is latched until a fresh setup.
+values.survival_offline_logic_test = "0"
+assert(offline.configure() == false and not release.is_offline_preview())
+assert(mode_test.is_enabled())
+setup.init("normal_launch_after_offline_preview")
+assert(not mode_test.is_enabled() and #setup.snapshot().mode_options == 4)
+for _, mode in ipairs({"scourge", "ruins", "celestial", "fishing"}) do
+    assert(not release.is_available(mode) and not release.is_difficulty_open(mode))
+    assert(setup.select_mode(0, mode, setup.get_session_id()).error == "mode_not_released")
+end
 assert(http_calls == 0 and disk_calls == 0, "full admission and gameplay path uses no API or save files")
 io.open = original_open
-print("OFFLINE_STARTUP_INTEGRATION_PASS: real Steam identity, native host start, assets/UI gates, 100-percent admission, real mode/difficulty/profile gates, session isolation, no HTTP/files")
+print("OFFLINE_STARTUP_INTEGRATION_PASS: all eight blank-profile offline modes, full difficulty ranges, real admission/profile/team gates, isolated settlement, unchanged normal release gates, no HTTP/files")

@@ -1,19 +1,19 @@
 'use strict';
 const assert=require('node:assert/strict');
 const {harness,ready}=require('../test_startup_loading_ui.js');
-const names={pure:'纯净模式',standard:'常规模式',fishing:'摸鱼模式',rich:'丰饶模式',cold:'极寒模式',scourge:'天灾模式'};
+const names={pure:'纯净模式',standard:'常规模式',fishing:'摸鱼模式',rich:'丰饶模式',cold:'极寒模式',scourge:'天灾模式',ruins:'归墟模式',celestial:'天域模式'};
 const modes=Object.entries(names).map(([mode_id,display_name])=>({mode_id,display_name,unlocked:1}));
-const displayOrder=['standard','rich','cold','scourge','fishing','pure'];
+const displayOrder=['standard','rich','cold','scourge','ruins','celestial','fishing','pure'];
 const modeButton=(ui,mode)=>ui.nodes.MatchModeOptions.children.find(button=>button.children[0].text===names[mode]);
 const requests=ui=>ui.requests.filter(r=>r.name==='survival_loading_mode_select');
 const options=count=>Array.from({length:count},(_,i)=>({difficulty_id:'N'+(i+1),display_name:'N'+(i+1),unlocked:1}));
-for(const [mode,count] of [['cold',10],['scourge',10]]){
+for(const [mode,count] of [['cold',50],['scourge',50],['ruins',50],['celestial',35]]){
  const setup={mode_selected:false,mode_id:'',selector_player_id:0,mode_options:modes,
-  difficulty_options:options(10),difficulty_options_by_mode:{standard:options(10),cold:options(10),scourge:options(10)}};
+  difficulty_options:options(count),difficulty_options_by_mode:{standard:options(10),[mode]:options(count)}};
  const state=ready({admission_complete:true,profiles_ready:true,setup});
  const ui=harness({startupState:state,hud:true,loadSharedUI:true});ui.advance(.11);
- assert.equal(ui.nodes.MatchModeOptions.children.length,6,'The active HUD renders all six authoritative mode choices');
- assert.equal(ui.nodes.DifficultySelectionDialog.style.height,'414px','The popup grows to fit all six buttons');
+ assert.equal(ui.nodes.MatchModeOptions.children.length,8,'The active HUD renders all eight authoritative mode choices');
+ assert.equal(ui.nodes.DifficultySelectionDialog.style.height,'526px','The popup grows to fit all eight buttons');
  assert.deepEqual(ui.nodes.MatchModeOptions.children.map(button=>button.children[0].text),displayOrder.map(id=>names[id]),
   'Regular is first, progression modes follow their unlock chain and pure is last');
  const originalRows=ui.nodes.MatchModeOptions.children.slice();
@@ -37,7 +37,7 @@ for(const [mode,count] of [['cold',10],['scourge',10]]){
  const setup={mode_selected:false,selector_player_id:0,mode_options:modeOptions};
  const state=ready({admission_complete:true,profiles_ready:true,setup});
  const ui=harness({startupState:state,hud:true,loadSharedUI:true});ui.advance(.11);
- for(const mode of ['rich','cold','scourge']){
+ for(const mode of ['rich','cold','scourge','ruins','celestial']){
   const button=modeButton(ui,mode);
   assert.equal(button.enabled,false,'Missing progression permission cannot unlock '+mode);
   button.events.onactivate();assert.equal(requests(ui).length,0);

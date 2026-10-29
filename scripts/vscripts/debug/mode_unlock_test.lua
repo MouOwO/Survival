@@ -13,7 +13,8 @@ function M.reset(session)
     -- Explicit server configuration can open a read-only acceptance arena in
     -- any release channel. Latch isolation until the next match: disabling the
     -- flag halfway through a test must never turn its rewards into real saves.
-    enabled = session_id ~= "" and acceptance.all_difficulties_unlocked == true
+    enabled = session_id ~= "" and (acceptance.all_difficulties_unlocked == true
+        or acceptance.is_offline_preview())
 end
 
 function M.is_enabled()

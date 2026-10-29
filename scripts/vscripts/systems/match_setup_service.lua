@@ -56,6 +56,7 @@ function M.is_rich_mode() return mode_id == "rich" end
 function M.is_mode_selected() return mode_id ~= nil end
 
 local function mode_permission(id, requested)
+    if release_modes.is_offline_preview() then return true, false end
     -- Entry authentication precedes profile loading. Never accept a client
     -- unlock flag, a combat projection, or a previous account/session's save.
     local ok, profiles = pcall(require, "systems/player_profile_service")
@@ -77,6 +78,7 @@ local function daily_capped(quota)
         or tonumber(quota.remaining) == 0) or false
 end
 local function mode_daily_quota(id, requested)
+    if release_modes.is_offline_preview() then return nil end
     if mode_test.is_enabled() then return nil end
     local key = mode_daily_keys[requested]
     if not key then return nil end
@@ -142,8 +144,8 @@ function M.select_mode(id, requested, request_session)
     if not release_modes.is_known(requested) then
         return { ok = false, error = "mode_not_found" }
     end
-    -- Release gating applies before debug unlocks and before accepting retries.
-    if not release_modes.is_released(requested) then
+    -- Only the explicit offline arena may preview unreleased modes.
+    if not release_modes.is_available(requested) then
         return { ok = false, error = "mode_not_released" }
     end
     if mode_id ~= nil then
@@ -167,7 +169,7 @@ end
 function M.snapshot()
     local options = {}
     for _, row in ipairs(mode_options) do
-        if release_modes.is_released(row.mode_id) then
+        if release_modes.is_available(row.mode_id) then
             options[#options + 1] = { mode_id = row.mode_id, display_name = row.display_name,
                 description = row.description, unlocked = 1, pending = 0, unlock_hint = "" }
             if progression_rules.parent_mode(row.mode_id) then
