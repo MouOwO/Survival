@@ -57,6 +57,17 @@ def checks(raw):
     return dict(bytes=len(raw), md5=hashlib.md5(raw).hexdigest(), sha256=sha(raw))
 
 
+def same_plan(reviewed, current):
+    # Capacity is freshly admitted by capacity(); free space is an observation,
+    # not package identity. All bounds and every other plan field stay pinned.
+    def identity(plan):
+        result = copy.deepcopy(plan)
+        for row in result.get('disk_preflight', []):
+            row.pop('free_bytes', None)
+        return result
+    return identity(reviewed) == identity(current)
+
+
 def project(before, values, policy):
     allowed = {MAP, *('scripts/vscripts/' + n for n in LUA_NAMES)}
     old = {r['path']: r for r in before['files']}
@@ -138,7 +149,7 @@ def run(build=False, key=None, reviewed=None):
     need(pack.runtime.digest(JOURNAL) == journal_sha, 'Publication journal changed during plan')
     if not build:
         return plan
-    need(reviewed is not None and load(reviewed) == plan, 'Reviewed map plan changed')
+    need(reviewed is not None and same_plan(load(reviewed), plan), 'Reviewed map plan changed')
     need(key is not None, 'Existing external signing key required')
     key = pack.handoff.regular_path(pack.protect_data.external(key, source=BASE))
     for dest in (OVERLAY, TRUSTED, VIEW, OUTPUT):

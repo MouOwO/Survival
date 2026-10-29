@@ -1,0 +1,286 @@
+{
+  "schema": 1,
+  "workshop_id": "3824360109",
+  "release_sequence": 2026102902,
+  "revision": "WS4-MAP-UPDATE-02",
+  "uploaded": false,
+  "download_verified": false,
+  "ready_for_public_release": false,
+  "status": "UPLOAD_FAILED_3404_ERESULT_2_MANIFEST_TIMEOUT_PENDING_RECOVERY",
+  "scope": "Main map and explicit completed map/spawn/placement fixes; local portrait experiments excluded.",
+  "package": {
+    "schema": 1,
+    "revision": "WS4-MAP-UPDATE-02",
+    "release_sequence": 2026102902,
+    "workshop_id": "3824360109",
+    "source_git_head": "d9f8f1eeabc3da7dda9a4634765edb74e736051f",
+    "baseline_release_sequence": 2026102901,
+    "baseline_content_sha256": "7eee7d5b975573da3e26b2f8fcf079cbc346e33e4a06dc7f7c1c7280691e46ba",
+    "baseline_download_verified": false,
+    "canonical_journal_sha256": "723cadd56d7ef58fcd47b65a47c1b87e68746dc9314f05382d8bc463bae69ad0",
+    "content_sha256": "2580e62b2b65a73193cafc47be147471a6f907da273bbbe62c471f1b58d16243",
+    "files": 6695,
+    "changed_runtime_paths": [
+      "maps/template_map.vpk",
+      "scripts/vscripts/config/mode_release_config.lua",
+      "scripts/vscripts/config/mode_spawn_config.lua",
+      "scripts/vscripts/config/tree_config.lua",
+      "scripts/vscripts/systems/builder_service.lua",
+      "scripts/vscripts/systems/builder_work_position_service.lua",
+      "scripts/vscripts/systems/destination_validation_service.lua",
+      "scripts/vscripts/systems/grid_placement_system.lua",
+      "scripts/vscripts/systems/match_setup_service.lua",
+      "scripts/vscripts/systems/mode_spawn_service.lua",
+      "scripts/vscripts/systems/player_context_service.lua",
+      "scripts/vscripts/systems/rich_region_service.lua",
+      "scripts/vscripts/systems/tree_system.lua",
+      "scripts/vscripts/systems/valley_environment_service.lua",
+      "scripts/vscripts/systems/wall_target_service.lua",
+      "scripts/vscripts/systems/wave_spawn_routing.lua",
+      "scripts/vscripts/systems/wave_system.lua",
+      "scripts/vscripts/ui/grid_placement_router.lua"
+    ],
+    "target_pins": {
+      "maps/template_map.vpk": {
+        "bytes": 65168681,
+        "md5": "d383efa50d7ee2b96e9d4d9d1b7b4923",
+        "sha256": "31321fe7940c4406bbb6f47feb740fbb8fc5e2e0d7751d7166e588b7e113a6ae"
+      },
+      "scripts/vscripts/config/mode_release_config.lua": {
+        "bytes": 1365,
+        "md5": "5a6b98f3f5d7c880d82a5168f33a5ca9",
+        "sha256": "ae0540d07f48865ae1148f07555d995945b4b4a5265b34b93457c68e67d7ad6c"
+      },
+      "scripts/vscripts/config/mode_spawn_config.lua": {
+        "bytes": 6040,
+        "md5": "8d01f400e30a0a4a395bf22f25953930",
+        "sha256": "60227efd295152ab44274df5e97eea2c80ec9ca9b851837dbe5978122a368714"
+      },
+      "scripts/vscripts/config/tree_config.lua": {
+        "bytes": 4597,
+        "md5": "bd520c2308cee02a45facff3e006a7fe",
+        "sha256": "655c417078738dc2bf4a63e7f1198b75fc527b619c969e15e9a96428193bd6e2"
+      },
+      "scripts/vscripts/systems/builder_service.lua": {
+        "bytes": 11298,
+        "md5": "340397df62d33f018dd473f9534a0edc",
+        "sha256": "5083c158e899ef717b8bffea6317acdd577548b32cfac87ae75994f63b6f355d"
+      },
+      "scripts/vscripts/systems/builder_work_position_service.lua": {
+        "bytes": 7954,
+        "md5": "3711182965f75e2d2602212b269ea083",
+        "sha256": "cb61021f5b0f1fa81b467be91d487b8797d4a02b29cd76b542d4da785df846ac"
+      },
+      "scripts/vscripts/systems/destination_validation_service.lua": {
+        "bytes": 2521,
+        "md5": "c44ff22849ca3995d8989f676eab50ee",
+        "sha256": "12754b2fc082024384d6a4fe22507719622d78756823db874e5f05c8cb1003bb"
+      },
+      "scripts/vscripts/systems/grid_placement_system.lua": {
+        "bytes": 27470,
+        "md5": "93cedc9a75679567e56fd5f99c475a35",
+        "sha256": "db33f7ac29d824992ca179099551cbcccacc9e25ffe276b2b4515df273f06a0b"
+      },
+      "scripts/vscripts/systems/match_setup_service.lua": {
+        "bytes": 10400,
+        "md5": "d233bf3991dcba8a2c881c5718ee50a5",
+        "sha256": "7eca29d5dd08c673e9800ee7a8644a403476a27e0d7e4f573f6b2c5a4bb4e8f8"
+      },
+      "scripts/vscripts/systems/mode_spawn_service.lua": {
+        "bytes": 11258,
+        "md5": "8fa27e474880ee10617a69fd15d33d83",
+        "sha256": "f982f01803454dcf141eca6ba63f02efd4f7c77feaf7e452e5a53247bbc74a28"
+      },
+      "scripts/vscripts/systems/player_context_service.lua": {
+        "bytes": 9790,
+        "md5": "7a0fb1efd27c0ac5b3df75dfc38b3354",
+        "sha256": "473622740e8dbfd470a7652e4f267dc4a681ec1a367bc89cc5a70e701300b6cb"
+      },
+      "scripts/vscripts/systems/rich_region_service.lua": {
+        "bytes": 22215,
+        "md5": "0178a8bac57c07dd6308f6dc2480c32b",
+        "sha256": "4e4134902ee32fcfe71f4398bb698b22fd7ece43d5a574d2d62346a946ada8d6"
+      },
+      "scripts/vscripts/systems/tree_system.lua": {
+        "bytes": 21752,
+        "md5": "a81fb4273b576eaf41ddebb328b64d4d",
+        "sha256": "0d19fd03e960339ac9c4aca2397291aed893f5b6e7714532a63ed15aa4745230"
+      },
+      "scripts/vscripts/systems/valley_environment_service.lua": {
+        "bytes": 9484,
+        "md5": "6cd9d895fb4a0d648d926e8ece4b368d",
+        "sha256": "df531ca0ab6229db491fbe58d6b7b0e5f8952de13e48966108290a3f6b6e023b"
+      },
+      "scripts/vscripts/systems/wall_target_service.lua": {
+        "bytes": 10353,
+        "md5": "a2e3438b8c232aa3413c7a0d9105deba",
+        "sha256": "37846ecc6c0fdbdbbe121d572265168826a02b0387d9af6c08ec97ddcfb4b411"
+      },
+      "scripts/vscripts/systems/wave_spawn_routing.lua": {
+        "bytes": 7919,
+        "md5": "acef12fad16e1cc7289ad5550145657f",
+        "sha256": "4915972d542133fde076d29b7f656d5d30b13b022d3d04a80be21d9357fd6df8"
+      },
+      "scripts/vscripts/systems/wave_system.lua": {
+        "bytes": 111971,
+        "md5": "7101eec979650e435d2a71e462855e05",
+        "sha256": "b50b6eab3633b17dfeb29e05f7990354eba691fc8eebc9a37d3a75a40294189c"
+      },
+      "scripts/vscripts/ui/grid_placement_router.lua": {
+        "bytes": 31830,
+        "md5": "95e273c6ab8907ef6b780fe38e52e363",
+        "sha256": "ece92cf67d51f1b5d6935ed20a8c70b92ae5d83829915295b73092378b4f8f49"
+      }
+    },
+    "map_proof_sha256": "106d85a037ef2131443d840679db1f06eb369bb546af3847d8c5bd02f1ff0759",
+    "map_source_sha256": "882348479ee5da7c1f1eeac999b6bde56233e76de514c9650e4a6703864aa708",
+    "protected_modules_preserved": 184,
+    "protected_modules_rebuilt": 0,
+    "authentication_payment_ui_backend_preserved": true,
+    "trusted_review_files": 16,
+    "rebuilt_archives": [
+      0
+    ],
+    "archive_migrations": [],
+    "disk_preflight": [
+      {
+        "root": "D:\\",
+        "required_bytes": 1492378936,
+        "free_bytes": 159072821248,
+        "reserve_bytes": 268435456
+      }
+    ],
+    "candidate": "D:\\Survival_发布候选\\20261029_ws4_map_v02_view",
+    "trusted_source": "D:\\Survival_发布候选\\20261029_ws4_map_v02_trusted_source",
+    "output": "D:\\Survival_工坊输出\\20261029_ws4_map_v02\\3824360109.vpk",
+    "container_bytes": 3777976138,
+    "status": "BUILT_SIGNED_MAP_UPDATE",
+    "dry_run": false,
+    "signature_valid": true,
+    "full_runtime_validator_passed": true,
+    "payload_changed": false,
+    "workshop_upload_performed": false,
+    "package_files": [
+      {
+        "name": "3824360109.vpk",
+        "bytes": 275607,
+        "sha256": "0507b92f5be37b84daee60239b8d0c2165fc9c58582e183555fe698fdbd34fe7"
+      },
+      {
+        "name": "3824360109_000.vpk",
+        "bytes": 1071677021,
+        "sha256": "6d428d4080914b9d519fb78db9c47e903a07ecbfda495778b45a0e71a770ce32"
+      },
+      {
+        "name": "3824360109_001.vpk",
+        "bytes": 1071529200,
+        "sha256": "3046a3ae720dd0e80950e14562bf8c8c556f095a4ab068773d7f34dd78ca2b49"
+      },
+      {
+        "name": "3824360109_002.vpk",
+        "bytes": 1072379215,
+        "sha256": "e03f21542c7c283460e21c60c6350587a8b100b9ab5789d7cfa2ebe41fd1206a"
+      },
+      {
+        "name": "3824360109_003.vpk",
+        "bytes": 562115095,
+        "sha256": "a951c2374339e7007d350fe22ae5600f1d27169d03ee41f6b6ae0e2bedfc7f6d"
+      }
+    ],
+    "vpk_sha256": "0507b92f5be37b84daee60239b8d0c2165fc9c58582e183555fe698fdbd34fe7",
+    "verification": {
+      "vpk_version": 2,
+      "files": 6695,
+      "payload_bytes": 3777700531,
+      "archive_count": 4,
+      "crc32_verified": true,
+      "manifest_dual_hashes_verified": true,
+      "section_md5s_verified": true,
+      "whole_vpk_md5_verified": true
+    },
+    "native_test": "NOT_RUN",
+    "ready_for_upload": false
+  },
+  "package_report_sha256": "e474adda3a6f527d14bc3ef5e6a87942b5b31b16e1214fc1da1f6423007005c9",
+  "map_compilation": {
+    "status": "PASS",
+    "compiled": 303,
+    "failed": 0,
+    "skipped": 1,
+    "crc_entries": 308,
+    "proof": "output/map_publish_20261029/compile/verification.json",
+    "proof_sha256": "106d85a037ef2131443d840679db1f06eb369bb546af3847d8c5bd02f1ff0759",
+    "source_sha256": "882348479ee5da7c1f1eeac999b6bde56233e76de514c9650e4a6703864aa708",
+    "compiled_map_sha256": "31321fe7940c4406bbb6f47feb740fbb8fc5e2e0d7751d7166e588b7e113a6ae"
+  },
+  "native_smoke": {
+    "status": "PASS_NATIVE_SIGNED_PRODUCTION_STARTUP_ONLY",
+    "markers": {
+      "signed_addon_selected": true,
+      "server_activated": true,
+      "addon_initialized": true,
+      "modifier_registry_loaded": true,
+      "panorama_layout_loaded": true,
+      "no_script_runtime_error": true,
+      "no_vscript_error": true
+    },
+    "content_sha256": "2580e62b2b65a73193cafc47be147471a6f907da273bbbe62c471f1b58d16243",
+    "signed_resources_verified": 6695,
+    "protected_modules_verified": 184,
+    "cheats": false,
+    "native_process": {
+      "status": "ISOLATED_SIGNED_NATIVE_PROCESS_STARTED",
+      "pid": 16228,
+      "addon": "svt_m2902",
+      "cheats": false
+    },
+    "engine_log_sha256": "031745d8e360040589fe94b3da7748964e96c2e7ab376f32c2d52466c6e17d24",
+    "real_account_grants_verified": false,
+    "multiplayer_verified": false,
+    "scope": "Signed map candidate production startup only; pre-authentication."
+  },
+  "native_evidence_sha256": "0ced06ba06dc58a5731c6f8be47f2684792073d69943596869803b35905eb95e",
+  "canonical_upload_journal_sha256": "b2c171967a49fbf39f476676e99e5c16bfa76e1db41c1ca79b4110ed9a951343",
+  "official_download": {
+    "verified": false,
+    "installed_manifest": null,
+    "receipt": null,
+    "receipt_sha256": null
+  },
+  "authentication_payment_ui_backend_preserved": true,
+  "protected_modules_preserved": 184,
+  "protected_modules_rebuilt": 0,
+  "server_deployed": false,
+  "source_commits": {
+    "game": "d9f8f1eeabc3da7dda9a4634765edb74e736051f",
+    "content": "0f53fd186bd22ee535ac335745a4f8d5196785b5"
+  },
+  "evidence": {
+    "upload-preflight.log": {
+      "path": "output/map_publish_20261029/upload-preflight.log",
+      "sha256": "0bdbe4e9bbf9e81228efd002e3a2ae0e77a0d2777ed9da0915644f38d789c820"
+    },
+    "upload.log": {
+      "path": "output/map_publish_20261029/upload.log",
+      "sha256": "f257c74f883d0cd2546d0d5979bc5584576f8938bc4efc8c4b80bb07e26d45f3"
+    },
+    "after-failure-inspect.log": {
+      "path": "output/map_publish_20261029/after-failure-inspect.log",
+      "sha256": "de2d105d3b0756cf0625370d7ce34d2bd0dbe61c98fbfaef976740bdc87575de"
+    },
+    "recovery.log": {
+      "path": "output/map_publish_20261029/recovery.log",
+      "sha256": "9606dbe01d7b411ef0a511940d57d1f9c1c052f2474f60a2f377b72b4dda6171"
+    },
+    "depot-failure.redacted.log": {
+      "path": "output/map_publish_20261029/depot-failure.redacted.log",
+      "sha256": "e847d66a7a91a0ea140e2a8a76ddc60c4193d881c8471090ba4580b0d64fb036"
+    },
+    "workshop-failure.redacted.log": {
+      "path": "output/map_publish_20261029/workshop-failure.redacted.log",
+      "sha256": "ab494bf0d95e3948b2a9a90f0830c133036726d4e29b328dd294c3bfcbffe77d"
+    }
+  },
+  "failed_attempts_preserved": true,
+  "previous_release_record": "publishing/workshop/archive_all_20261029.json"
+}

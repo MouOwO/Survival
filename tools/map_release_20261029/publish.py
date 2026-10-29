@@ -21,6 +21,11 @@ def main():
                'Only the original restricted listing may be updated')
     listing['runtime_content_sha256'] = package['content_sha256']
     listing['release_sequence'] = build.SEQUENCE
+    listing['release_revision'] = build.REVISION
+    listing['vpk_sha256'] = package['vpk_sha256']
+    listing['package_bytes'] = sum(row['bytes'] for row in package['package_files'])
+    listing['runtime_files'] = package['files']
+    listing['package_files'] = package['package_files']
     listing['cover'] = str((original.parent / listing['cover']).resolve())
     target = build.REPORT_DIR / 'listing.json'
     raw = json.dumps(listing, ensure_ascii=False, indent=2) + '\n'

@@ -37,6 +37,17 @@ class ScopeTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             build.project(self.before, {'scripts/vscripts/config/mode_spawn_config.lua': b'changed'}, self.policy)
 
+    def test_plan_pins_identity_and_capacity_bounds_but_not_free_space_sample(self):
+        old = dict(content_sha256='pinned', disk_preflight=[dict(root='D:', required_bytes=100, free_bytes=900)])
+        current = copy.deepcopy(old)
+        current['disk_preflight'][0]['free_bytes'] = 899
+        self.assertTrue(build.same_plan(old, current))
+        current['disk_preflight'][0]['required_bytes'] = 101
+        self.assertFalse(build.same_plan(old, current))
+        current = copy.deepcopy(old)
+        current['content_sha256'] = 'changed'
+        self.assertFalse(build.same_plan(old, current))
+
 
 if __name__ == '__main__':
     unittest.main()

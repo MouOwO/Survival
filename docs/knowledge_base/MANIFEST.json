@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 4918,
-      "sha256": "85316be2b40956c9b8cbdb1b84ca8c7ac1a28dbdb541b32e784c2376dc6b3df8"
+      "bytes": 5512,
+      "sha256": "7c4bd306015673f9918c0940de09ef3e1271c09e49690975c82fb41f5295cccb"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -35,8 +35,8 @@
     },
     {
       "path": "06_build_release_ops.md",
-      "bytes": 17315,
-      "sha256": "aeb48da7ca5732e72289d08ab75da903660114a03d334cbdc5f9801677e3259f"
+      "bytes": 17909,
+      "sha256": "2d06fcc7bfb07eb47a81b3a3f01bb1aaac30da9b7d586be7385427a644a34556"
     },
     {
       "path": "07_decisions_incidents_pending.md",
@@ -177,6 +177,11 @@
       "path": "evidence/map_resources_20261028.public.json",
       "bytes": 2027,
       "sha256": "4961a25e6bddd4c85319aec305ffaa3370edd4d7eef444c72df253931072576f"
+    },
+    {
+      "path": "evidence/map_update_release_20261029.md",
+      "bytes": 3854,
+      "sha256": "4820b73d8484f4c1b5a02d1a63ffffaac3d4ccbce6a6a5b7c00de21ec9e0607d"
     },
     {
       "path": "evidence/native_arcade_cloud_20261027.public.json",
