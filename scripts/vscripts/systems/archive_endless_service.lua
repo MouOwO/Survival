@@ -243,7 +243,7 @@ try_spawn_wave = function(run, number)
     return spawn_failed(run, result)
 end
 local function announce_start(run, seconds)
-    bus.emit(events.UI_NOTIFICATION, {player_id = run.player_id, level = "info",
+    bus.emit(events.UI_NOTIFICATION, {player_id = run.player_id, level = "info", kind = "endless_tip",
         message = seconds > 0 and ("还有" .. seconds .. "秒开启无尽挑战") or "无尽挑战现在开始！"})
 end
 local function ensure_timer()

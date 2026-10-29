@@ -8,6 +8,7 @@ const source = fs.readFileSync(path.join(project,
     'panorama/src/scripts/custom_game/archive_180de7e38b_titles_compact_v6.js'), 'utf8');
 const metrics = {style: 0, classes: 0, tree: 0, created: 0, deleted: 0, palette: 0, warmed: 0, text: 0};
 const nodes = {}, subscriptions = {}, requests = [];
+const scheduled = new Map();
 class Panel {
     constructor(type, parent, id = '') {
         this.id = id; this.paneltype = type; this.parent = parent; this.children = [];
@@ -81,7 +82,8 @@ const cfg = {
 const $ = {
     GetContextPanel: () => root,
     CreatePanel: (type, parent, id) => new Panel(type, parent, id),
-    Schedule: () => ({}), CancelScheduled() {}, RegisterEventHandler() {}
+    Schedule(delay, callback) { const id = {}; scheduled.set(id, {delay, callback}); return id; },
+    CancelScheduled(id) { scheduled.delete(id); }, RegisterEventHandler() {}
 };
 vm.runInNewContext(source, {
     $, GameUI: {CustomUIConfig: () => cfg}, Game: {GetLocalPlayerID: () => 0},
@@ -158,4 +160,31 @@ subscriptions.survival_endless_state({status: 'finished', cleared: 1000, wave: 1
 assert.equal(nodes.EndlessStatus.text, '无尽结束 · 已通过1000波 · 1005分 · 时间结束');
 subscriptions.survival_endless_state({status: 'idle', score: 0});
 assert(nodes.EndlessStatus.BHasClass('ArchiveHidden'), 'idle still hides the gameplay banner');
-console.log('ARCHIVE_ENDLESS_REFRESH_PASS: 1000 closed/opened packets avoid tree/style work, live banner diffs, closed snapshot cache, immediate tab/reopen state, deduplicated clear request, structure/theme invalidation');
+const tipTimers = () => [...scheduled.values()].filter(timer => timer.delay === 3);
+subscriptions.ui_notification({kind:'endless_tip',player_id:1,message:'其他玩家的提示'});
+assert(nodes.EndlessStatus.BHasClass('ArchiveHidden'), 'another player cannot display a local tip');
+subscriptions.ui_notification({kind:'endless_tip',player_id:0,message:'还有20秒开启无尽挑战'});
+assert.equal(nodes.EndlessStatus.text,'还有20秒开启无尽挑战');
+assert.equal(tipTimers().length,1);
+const staleHide=tipTimers()[0].callback;
+subscriptions.ui_notification({kind:'endless_tip',player_id:0,message:'还有15秒开启无尽挑战'});
+assert.equal(tipTimers().length,1,'only one transient tip timer survives replacement');
+staleHide();assert(!nodes.EndlessStatus.BHasClass('ArchiveHidden'),'an old hide callback cannot hide the next reminder');
+tipTimers()[0].callback();assert(nodes.EndlessStatus.BHasClass('ArchiveHidden'),'tips automatically hide after three seconds');
+subscriptions.survival_endless_state({...latestState,wave:1001});
+const waveTip=tipTimers().at(-1).callback;waveTip();
+subscriptions.survival_endless_state({...latestState,wave:1001,seconds:59,remaining:3});
+assert(nodes.EndlessStatus.BHasClass('ArchiveHidden'),'ordinary per-second state changes do not reopen the tip');
+subscriptions.survival_endless_state({...latestState,wave:1002});
+assert(!nodes.EndlessStatus.BHasClass('ArchiveHidden'),'a new wave gets a fresh brief tip');
+api.Dispose();assert(nodes.EndlessStatus.BHasClass('ArchiveHidden'),'controller disposal hides its tip');
+const css=fs.readFileSync(path.join(project,'panorama/src/styles/custom_game/archive.css'),'utf8');
+const tipStyle=css.match(/#EndlessStatus\s*\{([^}]+)\}/)[1];
+assert.match(tipStyle,/horizontal-align:\s*center/);assert.match(tipStyle,/vertical-align:\s*center/);
+assert.match(tipStyle,/margin:\s*0px/);
+const ui=fs.readFileSync(path.join(project,'panorama/src/scripts/custom_game/survival_ui.js'),'utf8');
+const first=ui.indexOf('    function showNotification('),last=ui.indexOf('    function sendClientDiagnostic(',first);
+vm.runInNewContext(ui.slice(first,last)+'\nshowNotification({kind:"endless_tip",message:"倒计时"});',{
+    panel(){throw new Error('endless tips must not create an ordinary top notification');}
+});
+console.log('ARCHIVE_ENDLESS_REFRESH_PASS: cached snapshots, bounded center-tip timer, stale-hide guard, local countdown, wave/end dedup, no top duplicate, disposal and centered styling');

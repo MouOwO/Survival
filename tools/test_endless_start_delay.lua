@@ -31,7 +31,7 @@ package.loaded["systems/wave_system"]={spawn_challenge_monster=function(_,_,owne
 end}
 bus.handle_request("archive.challenge_state",function() return {expired=expired and 1 or 0} end)
 bus.subscribe(events.UI_NOTIFICATION,function(payload)
-    notices[#notices+1]={id=payload.player_id,text=payload.message,time=clock}
+    notices[#notices+1]={id=payload.player_id,text=payload.message,time=clock,kind=payload.kind}
 end)
 local endless=require("systems/archive_endless_service")
 local function reset()
@@ -55,6 +55,7 @@ assert(#notices==4)
 for i,seconds in ipairs({20,15,10,5}) do
     assert(notices[i].id==0 and notices[i].time==(i-1)*5)
     assert(notices[i].text=="还有"..seconds.."秒开启无尽挑战")
+    assert(notices[i].kind=="endless_tip", "countdown uses the screen-center tip channel")
 end
 advance(20)
 assert(#bodies==1 and bodies[1].born_at==20)

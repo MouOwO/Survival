@@ -9,3 +9,9 @@ archive_endless_service复用已有0.25秒服务计时器：接受请求后占�
 tools/test_endless_start_delay.lua以真实service、scheduler和event_bus验证20/15/10/5提示、20秒出怪、60秒单波限时等边界。另六组既有出生顺序、玩法连续性、尸体/出生开销、挑战阶段截止和高难度准入回归通过；这些夹具显式使用0秒准备，只测试原战斗过程，新测试使用真实生成配置20秒。出生顺序夹具补齐当前已有的allowed_variant准入接口。通过日志位于output/endless_start_delay_20261029/tests.json。
 
 旧test_endless_monster_visual_integration.lua在未修改service基线上也因旧会话/出生路线夹具无法启动，不在通过名单，本任务保留该脚本原逻辑；基线回执位于output/endless_start_delay_20261029/legacy_visual_baseline.log。模拟测试不等于原生提示画面或完整多人实机验收。本次仅修改本地并提交同步Git，未上传游廊，已发布2901身份不变。
+
+## 后续：统一为正中央tip
+
+用户提供“无尽第66波·剩余3只·59秒·本局245分”的左上状态条截图，要求使用正中间tip。现复用EndlessStatus节点，将其改为水平/垂直居中、透明背景、3秒后隐藏：倒计时20/15/10/5和实际开始经UI_NOTIFICATION的endless_tip类别传给本人，常规通知组件跳过该类别，避免顶端重复。战斗状态仍实时接收，但只在换波/结束时短暂显示摘要；同波每秒回包不重开或延长tip。
+
+替换提示时取消旧计时器并校验generation，存档控制器销毁时清理；常驻条不再显示，其他通知位置和玩法/奖励保持。前端archive_endless_refresh覆盖1000次回包、本人过滤、定时隐藏、旧回调隔离、波次去重、无顶端重复、居中样式和销毁；archive_v10_lifecycle及20秒真实scheduler时序回归同时通过。active archive控制器、survival_ui和archive.css三份源码同步content，Valve编译均为1 compiled/0 failed。原始编译记录位于output/endless_center_tip_20261029，仍未做原生画面验收或上传游廊。

@@ -15,8 +15,8 @@
     },
     {
       "path": "02_core_gameplay.md",
-      "bytes": 27222,
-      "sha256": "e34dd76ac269c223c5f954d413b450bb0e40c52951cab6c8b98bdb7ae4c81b95"
+      "bytes": 27640,
+      "sha256": "c8bad2b43ca88df42e154f559342b553fe6f11a96d9d201cebc302ef673db274"
     },
     {
       "path": "03_progression_save_contract.md",
@@ -165,8 +165,8 @@
     },
     {
       "path": "evidence/endless_start_delay_20261029.md",
-      "bytes": 1981,
-      "sha256": "478e1ecdedc962c2195f88b5814ca0fca9a2ba8aac20be15672917619d1ca034"
+      "bytes": 3103,
+      "sha256": "1dee0b152f3dd2dbc2af8527c81eb56946ff738af816a230f86a5b9f620ee6bb"
     },
     {
       "path": "evidence/login_relay_recovery_20261028.public.json",

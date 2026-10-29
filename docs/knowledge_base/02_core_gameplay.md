@@ -121,6 +121,8 @@
 
 2026-10-29本地无尽入口新增20秒准备期：点击即提示20秒，此后每5秒提示实际剩余时间，通常为15/10/5秒；到时才生成第一只怪并提示开始。单波60秒限时从真实出怪计算，准备期保留普通玩法窗口，但不生成怪物或发奖；重复点击不会重置，败退、挑战阶段过期或世界初始化会取消。通天塔原有入场时机保留。配置由archive_endless_rules.csv的start_delay_seconds=20生成；尚未上传游廊或原生新局画面验收，见[倒计时记录](evidence/endless_start_delay_20261029.md)。
 
+随后按用户截图要求，以上倒计时/开始信息及战斗换波/结束摘要统一改为屏幕正中央3秒tip，取消原左上常驻状态条；每秒的剩余数量/时间更新不重复弹tip。倒计时仍每5秒一次，只提示本人；旧隐藏回调不能覆盖新提示，控制器销毁时取消显示与计时器，关闭存档窗口不影响战斗提示。其他常规通知保留原位置。
+
 普通数值先改 `data/csv/`，再由 `tools/build_configs.py` 生成，禁止手改生成 Lua。v3 战斗双输入用 `tools/import_human_monster_spec.py` 交叉校验后生成 `normalized.json` 与 `human_monster_spec.lua`，修正只应用一次。CSV 有中文说明/类型行和 UTF-8、GB18030 历史编码，读取需沿现有导入器，不能把 `#types` 当业务行或批量重编码。
 
 相关回归入口包括 `scripts/vscripts/tests/test_startup_loading_service.lua`、`test_difficulty_unlocks.lua`、`test_worker_training_queue.lua`，以及波次人口/终局、塔索敌、伤害事务、英雄归属、墙导航专项。本文只定位现有入口，不表示这些测试本轮已跑。修改哪个模块就验证其事务、多人归属和原生行为；模拟通过不替代真实碰撞、完整守波或异地延迟验收。
