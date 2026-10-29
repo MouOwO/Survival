@@ -12,7 +12,7 @@ bb3780deff6573b79c1336d9d4846e4f  10_runtime_engine_contracts.md
 02e917d898f284488194760afea37626  11_completed_work_catalog.md
 c5d539495e5a99a38be32acd29d3b90b  12_sessions_archive_and_recovery.md
 64805f4af3ec5b11036177fe33ca15e2  13_art_ui_qa.md
-9455b007f8667ea43b4d86b97e819fce  MANIFEST.json
+fbf3e29b700dcd133c1172024e61939d  MANIFEST.json
 7f371090900ed781564a860494ae934d  NEW_CHAT_PROMPT.txt
 ea3caf643e5973fd3c27c4a14e1c8f6f  README.md
 33fbd1cc38438efb46442edfabdebbc6  data/completed_work_index.json
@@ -23,6 +23,7 @@ c0b201c4a593456542540fe302151ada  data/session_backup_summary.json
 c270354f0ab93987b37d246f8cfc7a87  data/session_inventory_summary.json
 fac77a65ca3f1a9794eb3da23531980f  data/source_manifest.json
 87587b3fe294751fccbb0fc7aa48cc69  evidence/archive_artifact_clarity_20261029.md
+943d5a6349790d7f56c3a78b941f36a0  evidence/archive_menu_performance_20261029.md
 160f3e51b50fc8ac7de23c69e559e301  evidence/challenge_projectiles_20261029.md
 da968ec106f304daefb80924924a2f24  evidence/commerce_prices_20261028.md
 0303586f2dbfaca6593c5ba60b94c52b  evidence/directory_cleanup_20261028.public.json
