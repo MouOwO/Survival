@@ -14,6 +14,8 @@
 
 ## 故障经验：精简过程，保留因果边界
 
+2026-10-29离线测试停在“正在准备队伍”：最新日志offline_20261029_014958_507275.log在09:50:35的Precache阶段找不到新增config/generated/archive_challenge_actions.lua，09:50:49 Activate又遇到archive_challenge_service的“loop or previous error loading module”，因此initialize_services中断，startup_loading_service/native_setup_auto_start尚未初始化。该配置实际于09:50:43生成，晚于首次require约8秒；这是并行开发时先启动游戏、后生成依赖造成的当前VM加载失败残留，不是队伍人数或地图导航导致。补齐后的633个静态require路径均存在，30份当时变更Lua语法检查通过。离线入口的实际控制台端口为29006（联网29005，新手引导29008），不能只探测29000/29001。确认Tools、离线内存档、原生custom setup状态后，用完整上下文命令dota_launch_custom_game survival template_map重载尚未开局的卡住地图，避免在半初始化世界重复注册服务。09:56:09 Addon initialized、09:56:13 admission_finished authentication_and_assets_ready=true；各UI容器均记录visible=false、admission_complete=true、phase=ready。没有改玩法源码、生成表或准入规则；未提交的存档挑战开发保持原样。只读探针、重载前置检查和依赖扫描位于output/offline_team_setup_20261029；原始日志留在output/test_entry_runtime。后续先完成配置生成再启动新局；不要用热重载整个addon_game_mode反复执行已有事件初始化来清除require失败状态。
+
 | 现象 | 已确认层次与处理 | 不应推导的结论 |
 | --- | --- | --- |
 | `Failed to read 16 bytes` | 大inline VPK可通过数学hash却原生大偏移读取失败；同资源分卷后通过，保留目录＋4卷 | 不是统一“代码没提交”，未定位Valve源码缺陷 |
