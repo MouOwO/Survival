@@ -26,62 +26,59 @@
   "real_money_payments": true,
   "online_cheats_allowed": false,
   "max_players": 4,
-  "release_revision": "WS4-TEN-SIN-STARTUP-02",
-  "release_sequence": 2026102805,
+  "release_revision": "WS4-ARCHIVE-ALL-01",
+  "release_sequence": 2026102901,
   "workshop_id": "3824360109",
-  "runtime_content_sha256": "549afe0f4125a5f880884f1f5a42d1a6ae307b7b7ea97ddacc400e34dcfd0776",
-  "vpk_sha256": "d6d2f75f530539abe58f69457c41b31f01a362546b573034c860440c9afe8fcc",
-  "package_bytes": 3767366244,
-  "runtime_files": 6658,
+  "runtime_content_sha256": "7eee7d5b975573da3e26b2f8fcf079cbc346e33e4a06dc7f7c1c7280691e46ba",
+  "vpk_sha256": "ccfcc45828f8ce758f43cb4749dd90edf33ed8659a1cdc259bfdc9f762786109",
+  "package_bytes": 3777996435,
+  "runtime_files": 6695,
   "package_files": [
     {
       "name": "3824360109.vpk",
-      "bytes": 274380,
-      "sha256": "d6d2f75f530539abe58f69457c41b31f01a362546b573034c860440c9afe8fcc"
+      "bytes": 275607,
+      "sha256": "ccfcc45828f8ce758f43cb4749dd90edf33ed8659a1cdc259bfdc9f762786109"
     },
     {
       "name": "3824360109_000.vpk",
-      "bytes": 1073608953,
-      "sha256": "77deb683b91a45250aa6f9a6dac61c97049cd33eeb1226b0b2307f5d98ab2fa8"
+      "bytes": 1071697318,
+      "sha256": "87b335f40a4fe133b7901a70e5b49a6d634a08b078259ba28ddb792208fcb4f2"
     },
     {
       "name": "3824360109_001.vpk",
-      "bytes": 1068730788,
-      "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+      "bytes": 1071529200,
+      "sha256": "3046a3ae720dd0e80950e14562bf8c8c556f095a4ab068773d7f34dd78ca2b49"
     },
     {
       "name": "3824360109_002.vpk",
-      "bytes": 1072379183,
-      "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+      "bytes": 1072379215,
+      "sha256": "e03f21542c7c283460e21c60c6350587a8b100b9ab5789d7cfa2ebe41fd1206a"
     },
     {
       "name": "3824360109_003.vpk",
-      "bytes": 552372940,
-      "sha256": "7383f8f065b0adde28a9a0ad0560419add35d150fcf92f7d6776268b8d3cc1e4"
+      "bytes": 562115095,
+      "sha256": "a951c2374339e7007d350fe22ae5600f1d27169d03ee41f6b6ae0e2bedfc7f6d"
     }
   ],
-  "uploaded": true,
-  "download_verified": true,
+  "uploaded": false,
+  "download_verified": false,
   "ready_for_public_release": false,
-  "status": "UPLOADED_OFFICIAL_DOWNLOAD_VERIFIED_NATIVE_ENTRY_VISUAL_PENDING",
-  "release_record": "publishing/workshop/ten_sin_startup_20261028_v02.json",
-  "previous_release_record": "publishing/workshop/ten_sin_startup_20261028.json",
-  "native_test": "NOT_RUN_ENTRY_MODELS_NATIVE_VISUAL_ACCEPTANCE_PENDING",
-  "native_guest_layout_acceptance": "NOT_RETESTED_THIS_MAP_REVISION",
-  "payment_acceptance": "PAYMENT_CODE_PRESERVED_NO_NEW_PAYMENT_TEST",
+  "status": "SIGNED_NATIVE_STARTUP_SERVER_VERIFIED_PENDING_UPLOAD",
+  "release_record": "publishing/workshop/archive_all_20261029.json",
+  "previous_release_record": "publishing/workshop/ten_sin_startup_20261028_v02.json",
+  "native_test": "PASS_ISOLATED_PRODUCTION_STARTUP_ONLY",
+  "native_guest_layout_acceptance": "NOT_RETESTED",
+  "payment_acceptance": "PAYMENT_SERVICE_UNCHANGED_NO_NEW_PAYMENT_TEST",
   "orders_created_by_agent": 0,
-  "workshop_upload_performed": true,
+  "workshop_upload_performed": false,
   "guest_update_issue": "GUEST_STILL_OLD09_METADATA_RESTART_DID_NOT_RESOLVE_PENDING_ACCOUNT_QUERY",
-  "upload_log_sha256": "c41ef9f3f388389aec63ba4284366e3baee94a5c395e7575182cfe7fe1c1a1ce",
-  "download_manifest": "3734424561061643436",
-  "download_receipt": "output/ten_sin_startup_20261028_v02/download_evidence/20261028T134521Z_bcd096375caa43868149efac30366ab2/verification.json",
-  "download_receipt_sha256": "b0f41a3c7f6f81fcf2c20f7d13d4811e8e298623780334b45b167b7c1e0926bb",
-  "signed_resources_verified": 6658,
-  "protected_modules_verified": 180,
-  "package_report_sha256": "102bbeec95e21acc777ac2418473cc652e01246981adc162c3f0bb36f7a64155",
+  "package_report_sha256": "39a6877ce20132efcf96cdfb3f435ab6f759d5ba6ab5bd2258fefe2fd0501cd7",
   "inherited_map_acceptance": {
     "release_sequence": 2026102802,
     "status": "PASS_HOST_ORDINARY_ARCADE_MAP_LOADED"
   },
-  "native_map_acceptance": "NOT_RETESTED_IN_2805"
+  "native_map_acceptance": "PASS_ISOLATED_SIGNED_STARTUP_PRE_AUTH_ONLY",
+  "archive_bundle_hash": "d573588b64d2ea6d1431c856d52e0515b5ed471cfdf6af4456ff618d0f568488",
+  "backend_release": "20261029-archive-d573588b64d2",
+  "database_ledger_entries": 37
 }

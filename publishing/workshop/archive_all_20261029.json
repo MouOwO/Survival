@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "workshop_id": "3824360109",
+  "release_sequence": 2026102901,
+  "revision": "WS4-ARCHIVE-ALL-01",
+  "uploaded": false,
+  "download_verified": false,
+  "ready_for_public_release": false,
+  "package": {
+    "schema": 1,
+    "status": "BUILT_AND_VERIFIED_FOR_NATIVE_TEST_ONLY",
+    "dry_run": false,
+    "output": "D:\\Survival_工坊输出\\20261029_ws4_archive_all_v01\\3824360109.vpk",
+    "content_sha256": "7eee7d5b975573da3e26b2f8fcf079cbc346e33e4a06dc7f7c1c7280691e46ba",
+    "release_sequence": 2026102901,
+    "files": 6695,
+    "trusted_key_id": "77075eac0032a300aca694059dc47e93",
+    "payload_bytes": 3777720828,
+    "container_bytes": 3777996435,
+    "layout": "external_archives",
+    "max_archive_bytes": 1073741824,
+    "signature_valid": true,
+    "full_input_hash_verification": true,
+    "payload_changed": false,
+    "workshop_upload_performed": false,
+    "native_dota_read_test": "NOT_RUN",
+    "native_over_2gib_read_test": "NOT_RUN",
+    "ready_for_upload": false,
+    "verification": {
+      "vpk_version": 2,
+      "files": 6695,
+      "payload_bytes": 3777720828,
+      "archive_count": 4,
+      "crc32_verified": true,
+      "manifest_dual_hashes_verified": true,
+      "section_md5s_verified": true,
+      "whole_vpk_md5_verified": true
+    },
+    "package_files": [
+      {
+        "name": "3824360109.vpk",
+        "bytes": 275607,
+        "sha256": "ccfcc45828f8ce758f43cb4749dd90edf33ed8659a1cdc259bfdc9f762786109"
+      },
+      {
+        "name": "3824360109_000.vpk",
+        "bytes": 1071697318,
+        "sha256": "87b335f40a4fe133b7901a70e5b49a6d634a08b078259ba28ddb792208fcb4f2"
+      },
+      {
+        "name": "3824360109_001.vpk",
+        "bytes": 1071529200,
+        "sha256": "3046a3ae720dd0e80950e14562bf8c8c556f095a4ab068773d7f34dd78ca2b49"
+      },
+      {
+        "name": "3824360109_002.vpk",
+        "bytes": 1072379215,
+        "sha256": "e03f21542c7c283460e21c60c6350587a8b100b9ab5789d7cfa2ebe41fd1206a"
+      },
+      {
+        "name": "3824360109_003.vpk",
+        "bytes": 562115095,
+        "sha256": "a951c2374339e7007d350fe22ae5600f1d27169d03ee41f6b6ae0e2bedfc7f6d"
+      }
+    ],
+    "vpk_sha256": "ccfcc45828f8ce758f43cb4749dd90edf33ed8659a1cdc259bfdc9f762786109",
+    "revision": "WS4-ARCHIVE-ALL-01",
+    "production_source": "D:\\Survival_发布候选\\20261029_ws4_archive_all_v01_source",
+    "candidate": "D:\\Survival_发布候选\\20261029_ws4_archive_all_v01_view",
+    "trusted_source": "D:\\Survival_发布候选\\20261029_ws4_archive_all_v01_trusted_source",
+    "protected_modules_rebuilt": 184,
+    "protected_modules_preserved": 0,
+    "full_runtime_validator_passed": true,
+    "full_source_plan_sha256": "92fd6092a11fd17cf1b22bf3362ace00b33797d192dd75ebcfe5d406d3d6d22a",
+    "native_test": "NOT_RUN"
+  },
+  "package_report_sha256": "39a6877ce20132efcf96cdfb3f435ab6f759d5ba6ab5bd2258fefe2fd0501cd7",
+  "native_smoke": {
+    "status": "PASS_NATIVE_SIGNED_PRODUCTION_STARTUP_ONLY",
+    "markers": {
+      "signed_addon_selected": true,
+      "server_activated": true,
+      "addon_initialized": true,
+      "modifier_registry_loaded": true,
+      "panorama_layout_loaded": true,
+      "no_script_runtime_error": true,
+      "no_vscript_error": true
+    },
+    "content_sha256": "7eee7d5b975573da3e26b2f8fcf079cbc346e33e4a06dc7f7c1c7280691e46ba",
+    "signed_resources_verified": 6695,
+    "protected_modules_verified": 184,
+    "debug_probe_rejected_with_cheats_disabled": true,
+    "native_process": {
+      "status": "ISOLATED_SIGNED_NATIVE_PROCESS_STARTED",
+      "pid": 41592,
+      "addon": "svt_a2901",
+      "cheats": false
+    },
+    "engine_log_sha256": "a4e2e706db6c3c06134d5f94f085d1e5c3ce1766dcf579a154b113011bb84136",
+    "engine_log_path": "output/release_archive_20261029/native_smoke_engine_frozen.log",
+    "real_account_grants_verified": false,
+    "multiplayer_verified": false,
+    "challenge_ui_visual_acceptance": false,
+    "scope": "Native signed candidate selected, server/client startup and protected dependencies load; pre-authentication only. Runtime arrays are checked offline; cheats remain disabled."
+  },
+  "backend": {
+    "bundle": "d573588b64d2ea6d1431c856d52e0515b5ed471cfdf6af4456ff618d0f568488",
+    "ledger_entries": 37,
+    "native_real_player_reward_verified": false,
+    "ok": true,
+    "payment_untouched": true,
+    "phase": "LIVE_VERIFIED",
+    "release": "20261029-archive-d573588b64d2"
+  },
+  "source_plan_sha256": "92fd6092a11fd17cf1b22bf3362ace00b33797d192dd75ebcfe5d406d3d6d22a",
+  "previous_release_record": "publishing/workshop/ten_sin_startup_20261028_v02.json"
+}

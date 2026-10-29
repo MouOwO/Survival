@@ -1,2 +1,2 @@
--- Verified 20261021 welfare publication; the compatible safe rollback retains stackable inventory.
-return { protocol = 1, hash = "47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e" }
+-- Archive challenge rows and durable receipts; deploy with the coordinated 20261029 backend.
+return { protocol = 1, hash = "d573588b64d2ea6d1431c856d52e0515b5ed471cfdf6af4456ff618d0f568488" }
