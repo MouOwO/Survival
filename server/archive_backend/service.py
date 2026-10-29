@@ -193,6 +193,12 @@ class ArchiveService:
         requested_hash = payload.get("config_hash")
         raw_command = payload.get("command")
         kind = raw_command.get("kind") if isinstance(raw_command, dict) else None
+        if kind == "redemption_redeem":
+            from .redemption_codes import command as redeem
+            try:
+                return redeem(self, payload)
+            except ValueError as error:
+                raise ArchiveError(str(error)) from error
         # Account tutorial metadata has its own protocol and SQL persistence.
         # It neither settles rewards nor depends on a reward configuration hash.
         from .onboarding import KINDS as onboarding_kinds, command as onboarding_command
@@ -272,6 +278,9 @@ class ArchiveService:
         return {"ok": True, "results": results, "profile": profile}
 
     def finish_prepared(self,account,operation_id,prepared,clear_mode=None):
+        if prepared.get("command", {}).get("kind") == "redemption_redeem":
+            from .redemption_codes import finish as finish_redemption
+            return finish_redemption(self, account, operation_id, prepared)
         for _ in range(4):
             if not prepared.get("ok") or prepared.get("done"): return prepared
             profile,command=prepared["profile"],dict(prepared["command"])

@@ -30,8 +30,8 @@
     },
     {
       "path": "05_payments_commerce_delivery.md",
-      "bytes": 14657,
-      "sha256": "8fec4c00765ea4cfc0609f3e0258f17bc80611ae6da57dc3fbd178ccf5e211e9"
+      "bytes": 15327,
+      "sha256": "52132fc1a71c034ce55ef2c14ba6c7df10eb0339496fba3ca381e3bd6b62d72b"
     },
     {
       "path": "06_build_release_ops.md",
@@ -204,6 +204,11 @@
       "sha256": "287f5bf1a704d78dc8e30f1f4dc5bda4eb43e60100063d99bbe21789340c42ab"
     },
     {
+      "path": "evidence/redemption_codes_20261029.md",
+      "bytes": 4332,
+      "sha256": "9b6f75a1a18649b17277d47f7f32296ad3b774fc19711de3034f12184b301138"
+    },
+    {
       "path": "evidence/rich_rebirth_balance_20261028.md",
       "bytes": 2479,
       "sha256": "8761a37a0ff0439a4f41cc620851170e3227aa678d7186aef1e0ce523b81eb28"
@@ -367,6 +372,11 @@
       "path": "validation/20261029/offline_early_clear_scene.json",
       "bytes": 1899,
       "sha256": "554d1c738da8b0be9b2df8d614ca81acf5de993813a84180253fb479bba5e801"
+    },
+    {
+      "path": "validation/20261029/redemption_codes.json",
+      "bytes": 1817,
+      "sha256": "fd3bda6a9729bc246d5b8bc4f7489318096ea58d8402db8943a9c14f20667b87"
     },
     {
       "path": "validation/20261029/ruins_stair_geometry.json.gz",

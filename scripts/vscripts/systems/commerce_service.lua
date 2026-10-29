@@ -14,7 +14,7 @@ function M.handle(payload)
     local id=tonumber(payload.PlayerID)
     if not id or not PlayerResource:IsValidPlayerID(id) or PlayerResource:IsFakeClient(id) then return end
     local action=payload.action;local token=payload.request_id
-    if action~='catalog' and action~='purchase' then return end
+    if action~='catalog' and action~='purchase' and action~='redeem' then return end
     if type(token)~='string' or #token<8 or #token>96 or token:find('[^%w_.-]') then return end
     local function reply(result)
         result.request_id=token;result.action=action;send(id,result)
@@ -31,6 +31,12 @@ function M.handle(payload)
         return account_ok and session_ok and current_account==account and current_session==session
     end
     local command={id='commerce:'..token,kind='commerce_'..action}
+    if action=='redeem' then
+        if type(payload.code)~='string' or #payload.code<6 or #payload.code>80 then
+            reply({ok=false,terminal=true,error='redeem_code_invalid'});return
+        end
+        command={id='redeem:'..token,kind='redemption_redeem',code=payload.code,request_id=token}
+    end
     if action=='purchase' then
         if type(payload.sku)~='string' or #payload.sku>64 or not payload.sku:match('^[a-z][a-z0-9_]+$') then
             reply({ok=false,terminal=true,error='product_unavailable'});return
@@ -54,7 +60,7 @@ function M.handle(payload)
             local response=result.response or {}
             reply({ok=result.ok==true,terminal=result.terminal==true or result.done==true,
                 sku=command.sku,error=result.error,title=response.title,price=response.price,
-                currency=response.currency,balance=response.balance})
+                currency=response.currency,balance=response.balance,granted=response.granted,skipped=response.skipped})
         end
     end
     local function attempt()
@@ -67,7 +73,7 @@ function M.handle(payload)
             completed=true;scheduler.cancel(timeout_key)
             if not same_player() then finish({ok=false,error='profile_not_ready'});return end
             if type(result)~='table' then result={ok=false,error='commerce_busy'} end
-            if action=='purchase' and not result.ok and not result.terminal and attempts<3 then
+            if action~='catalog' and not result.ok and not result.terminal and attempts<3 then
                 scheduler.after(1,attempt,retry_key)
             else finish(result) end
         end

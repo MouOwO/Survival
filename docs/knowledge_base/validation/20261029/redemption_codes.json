@@ -1,0 +1,61 @@
+{
+  "prepare": {
+    "ok": true,
+    "release": "20261029-redemption-2f918e4c0edd",
+    "backup_sha256": "b407bf274ce0c5ea461976b2df07eac1c7dd3e5ece19ba3c54f06ef3a29140cd",
+    "live_database_modified": false,
+    "payment_untouched": true
+  },
+  "validate": {
+    "ok": true,
+    "database": "goufayu_redeem_clone_62222ba4e968",
+    "checks": {
+      "ok": true,
+      "checks": [
+        "all_prizes_atomic_and_once_without_vip",
+        "concurrent_same_account_single_grant",
+        "concurrent_global_quota",
+        "expiry_bad_codes_and_database_rate_limit",
+        "lost_commit_reply_recovery",
+        "monthly_renewal_and_permanent_pass_preservation"
+      ],
+      "actual_app_transport_ready": true,
+      "real_lua_reducer": true,
+      "clone_only": true,
+      "real_player_redemption": false
+    },
+    "codes": 128,
+    "original_rows_unchanged": true,
+    "existing_sql_functions_unchanged": true,
+    "live_database_modified": false
+  },
+  "activate": {
+    "ok": true,
+    "release": "20261029-redemption-2f918e4c0edd",
+    "payment_untouched": true,
+    "codes": 128,
+    "original_rows_unchanged": true,
+    "existing_sql_functions_unchanged": true
+  },
+  "verify": {
+    "ok": true,
+    "release": "20261029-redemption-2f918e4c0edd",
+    "codes": 128,
+    "payment_untouched": true,
+    "old_archive_bundle_preserved": "d573588b64d2ea6d1431c856d52e0515b5ed471cfdf6af4456ff618d0f568488",
+    "real_player_redemption": false
+  },
+  "scope": {
+    "native_ui_pixel_acceptance": false,
+    "real_player_redemption": false,
+    "workshop_uploaded": false,
+    "plaintext_codes_in_git": false
+  },
+  "local_checks": {
+    "python_redemption_tests": 7,
+    "lua_transport_pass": true,
+    "panorama_interaction_tests": 3,
+    "existing_shop_layout_tests": 3,
+    "valve_compiled_resources": 3
+  }
+}

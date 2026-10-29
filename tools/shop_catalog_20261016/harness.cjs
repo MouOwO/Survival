@@ -28,10 +28,20 @@ function harness(options = {}) {
         GetChild(i) { return this.children[i]; }
         GetChildCount() { return this.children.length; }
         FindChildTraverse(id) { return this.id === id ? this : this.children.map(c => c.FindChildTraverse(id)).find(Boolean); }
+        BLoadLayout(uri) {
+            const file = path.resolve(__dirname, '../../panorama/src', uri.replace('file://{resources}/', ''));
+            const xml = fs.readFileSync(file, 'utf8');
+            for (const match of xml.matchAll(/<(TextEntry|Button)\b[^>]*\bid="([^"]+)"[^>]*>/g)) {
+                const child = new Panel(match[1], this, match[2]); child.text = '';
+                const event = match[0].match(/onactivate="([^"]+)"/);
+                if (event) child.SetPanelEvent('onactivate', () => vm.runInContext(event[1], context));
+            }
+            return true;
+        }
         SetPanelEvent(name, fn) { this.events[name] = fn; }
         SetImage(uri) { this.image = uri; }
         SetScaling(v) { this.scaling = v; }
-        SetFocus() {}
+        SetFocus() { this.focused = true; }
         SetAcceptsFocus() {}
         SetAttributeString(k, v) { this.attrs[k] = v; }
         GetAttributeString(k, fallback) { return this.attrs[k] === undefined ? fallback : this.attrs[k]; }
