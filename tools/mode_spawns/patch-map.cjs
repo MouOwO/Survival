@@ -55,13 +55,15 @@ for (const mode of ['rich', 'cold', 'scourge']) {
     config += '            player_bounds = {\n';
     row.player_bounds.forEach((b, id) => { config += `                [${id}] = ${bounds(b)},\n`; });
     config += '            },\n';
-    if (row.player_build_bounds) {
-        assert(mode === 'cold' && Number.isFinite(row.build_ground_height)
+    if (mode === 'scourge' || row.build_ground_height !== undefined || row.player_build_bounds) {
+        assert(['cold', 'scourge'].includes(mode) && Number.isFinite(row.build_ground_height)
             && Number.isFinite(row.build_ground_height_tolerance) && row.build_ground_height_tolerance >= 0
-            && row.build_ground_height_tolerance < 64, 'Invalid shared snow platform height');
+            && row.build_ground_height_tolerance < 64, 'Invalid platform height');
         config += `            build_ground_height = ${row.build_ground_height},\n`
-            + `            build_ground_height_tolerance = ${row.build_ground_height_tolerance},\n`
-            + '            player_build_bounds = {\n';
+            + `            build_ground_height_tolerance = ${row.build_ground_height_tolerance},\n`;
+    }
+    if (row.player_build_bounds) {
+        config += '            player_build_bounds = {\n';
         row.player_build_bounds.forEach((b, id) => {
             assert(inside(row.bounds, b.slice(0, 2)) && inside(row.bounds, b.slice(2)), 'Build court outside mode');
             assert(inside(b, row.player_bounds[id].slice(0, 2)) && inside(b, row.player_bounds[id].slice(2)),

@@ -25,7 +25,10 @@ for (const [name, mutate] of [
     ['build_height_includes_road', data => { data.modes.cold.build_ground_height_tolerance = 128; }],
     ['build_court_loses_landing', data => { data.modes.cold.player_build_bounds[0][0] = 14592; }],
     ['outside_mode', data => { data.modes.scourge.monster_bounds[0][2] = 16384; }],
-    ['player_court_overlap', data => { data.modes.scourge.monster_bounds[0][0] = -15360; }],
+    ['player_court_overlap', data => { data.modes.scourge.monster_bounds[0][2] = -9984; }],
+    ['scourge_height_invalid', data => { data.modes.scourge.build_ground_height = '768'; }],
+    ['scourge_height_missing', data => { delete data.modes.scourge.build_ground_height; }],
+    ['scourge_height_includes_terraces', data => { data.modes.scourge.build_ground_height_tolerance = 128; }],
     ['marker_outside_range', data => { data.modes.scourge.monster_bounds[0] = [-12288, 12672, -11520, 13440]; }],
     ['missing_owner_range', data => { data.modes.scourge.monster_bounds.pop(); }],
 ]) {

@@ -91,7 +91,8 @@ local function build_authored_regions()
     if not service.contains(config.bounds, center) then return nil, "mode_center_outside_bounds" end
     origin = center
     local result, compiled = {}, {}
-    local cold_floor = service.mode() == "cold" and config.player_build_bounds ~= nil
+    local terrain_floor = (service.mode() == "cold" and config.player_build_bounds ~= nil
+        or service.mode() == "scourge") and config.build_ground_height ~= nil
     for index, direction in ipairs(DIRECTIONS) do
         local player_id = index - 1
         local bounds = config.player_bounds and config.player_bounds[player_id]
@@ -116,7 +117,7 @@ local function build_authored_regions()
             local id = key(x, y)
             if compiled[id] then return nil, "mode_player_regions_overlap:" .. name end
             local allowed
-            if cold_floor then
+            if terrain_floor then
                 -- Court membership is terrain geometry, not a snapshot of live
                 -- obstructions. Exact placement separately checks fresh native
                 -- navigation, trees, slope, units and registered footprints.

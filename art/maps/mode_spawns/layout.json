@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "map_name": "template_map",
-  "note": "Player IDs are zero based. Rich: east, south, west, north. Cold: four shared snow courts ordered north to south (+Y); spawn arrows alternate +X,-X,+X,-X. Scourge: left clearing, north to south.",
+  "note": "Player IDs are zero based. Rich: east, south, west, north. Cold: four shared snow courts ordered north to south (+Y); spawn arrows alternate +X,-X,+X,-X. Scourge: builders/trees on four eastern high plateaus; monsters in the western clearing, north to south.",
   "modes": {
     "rich": {
       "center": [
@@ -191,27 +191,75 @@
       ],
       "players": [
         [
+          -10368,
+          13056,
+          768
+        ],
+        [
+          -10368,
+          9216,
+          768
+        ],
+        [
+          -10112,
+          5120,
+          768
+        ],
+        [
+          -10112,
+          1024,
+          768
+        ]
+      ],
+      "player_bounds": [
+        [
+          -10752,
+          11520,
+          -9216,
+          14336
+        ],
+        [
+          -10752,
+          7680,
+          -9216,
+          10752
+        ],
+        [
+          -10496,
+          3584,
+          -8960,
+          6656
+        ],
+        [
+          -10240,
+          -256,
+          -8960,
+          2560
+        ]
+      ],
+      "monsters": [
+        [
           -14080,
           13056,
-          128
+          256
         ],
         [
           -14080,
           9216,
-          128
+          256
         ],
         [
           -14080,
           5120,
-          128
+          256
         ],
         [
           -14080,
           1024,
-          128
+          256
         ]
       ],
-      "player_bounds": [
+      "monster_bounds": [
         [
           -15360,
           11520,
@@ -237,34 +285,8 @@
           2560
         ]
       ],
-      "monsters": [
-        [
-          -10368,
-          13056,
-          640
-        ],
-        [
-          -10368,
-          9216,
-          640
-        ],
-        [
-          -10112,
-          5120,
-          640
-        ],
-        [
-          -10112,
-          1024,
-          640
-        ]
-      ],
-      "monster_bounds": [
-        [-10752, 12672, -9984, 13440],
-        [-10752, 8832, -9984, 9600],
-        [-10496, 4736, -9728, 5504],
-        [-10496, 640, -9728, 1408]
-      ]
+      "build_ground_height": 768,
+      "build_ground_height_tolerance": 16
     }
   },
   "rich_navigation": {
