@@ -70,8 +70,8 @@
     },
     {
       "path": "13_art_ui_qa.md",
-      "bytes": 7718,
-      "sha256": "3c657cd463d62715021e0339da1262bfc306ae11906196a66e669fd0fc9450fe"
+      "bytes": 8418,
+      "sha256": "fe244d4ac107c1e9654b9e5c60d5e31a1bd79d092c968e46effdc2663e429a4a"
     },
     {
       "path": "NEW_CHAT_PROMPT.txt",
@@ -127,6 +127,11 @@
       "path": "evidence/archive_menu_performance_20261029.md",
       "bytes": 3311,
       "sha256": "620a49639ca7ea74f63836d7786fe447b9b91772c8bc1324df6b603d80c7de4b"
+    },
+    {
+      "path": "evidence/archive_round_icons_20261029.md",
+      "bytes": 2763,
+      "sha256": "3e6f036646f56e14d1049caa8a09c09f22c43eb835f3589b9a7aa98f6c4f1950"
     },
     {
       "path": "evidence/challenge_projectiles_20261029.md",

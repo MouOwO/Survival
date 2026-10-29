@@ -180,6 +180,7 @@ test('Archive points and goods remain borderless through the real shared icon re
     h.run(productionPart('archive_v10.js', '    function style(', '    function specText('));
     Object.assign(h.context, {cfg: h.cfg, current: 'points',
         S: {State: item => item.count_known === 0 ? null : Number(item.count) > 0,
+            IsUnlockItem: () => false,
             Quantity: item => String(item.count)}});
     h.run(productionPart('archive_v10.js', '    function findClass(', '    function render(data,'));
     const item = Object.freeze({id: noGradeID, name: '样例', quality: 'UR', count: 1, max_owned: 1});
