@@ -50,6 +50,7 @@ local function grounded_clear(caster, candidate, reference_height, units)
     if local_mode then
         local config = require("systems/mode_spawn_service").config()
         bounds = mode == "cold" and config and config.bounds
+            or config and config.player_build_bounds and config.player_build_bounds[owner]
             or config and config.player_bounds and config.player_bounds[owner]
         if not bounds then return nil end
     end

@@ -2,17 +2,24 @@
 -- the native terrain arrays/marker origins are supplied by the DMX reader.
 package.path="scripts/vscripts/?.lua;"..package.path
 local terrain=assert(loadfile(assert(arg[1])))()
+local native=arg[2] and assert(loadfile(arg[2]))()
 local mt={__add=function(a,b)return Vector(a.x+b.x,a.y+b.y,a.z+b.z)end}
 Vector=function(x,y,z)return setmetatable({x=x,y=y,z=z or 0},mt)end
 GetMapName=function()return "template_map"end
 local function vertex(i,j)return tonumber(terrain.height:sub(j*129+i+1,j*129+i+1))end
 local function height(p)
+ if native then
+  local sample=native[string.format("%.2f:%.2f",p.x,p.y)]
+  if sample then return sample[1] end
+ end
  local x,y=(p.x+16384)/256,(p.y+16384)/256;local i,j=math.floor(x),math.floor(y);local u,v=x-i,y-j
  return 128+128*((1-u)*(1-v)*vertex(i,j)+u*(1-v)*vertex(i+1,j)+(1-u)*v*vertex(i,j+1)+u*v*vertex(i+1,j+1))
 end
 GetGroundHeight=function(p)return height(p)end
 GetGroundPosition=function(p)return Vector(p.x,p.y,height(p))end
-GridNav={IsTraversable=function(_,p)local k=math.floor((p.y+16384)/64)*512+math.floor((p.x+16384)/64)+1;return terrain.nav:sub(k,k)=="0"end,
+GridNav={IsTraversable=function(_,p)
+ if native then local sample=native[string.format("%.2f:%.2f",p.x,p.y)];if sample then return sample[2] end end
+ local k=math.floor((p.y+16384)/64)*512+math.floor((p.x+16384)/64)+1;return terrain.nav:sub(k,k)=="0"end,
  IsBlocked=function()return false end,IsNearbyTree=function()return false end,CanFindPath=function()return true end}
 Entities={FindByName=function(_,_,name)local p=terrain.markers[name];return p and {IsNull=function()return false end,GetAbsOrigin=function()return Vector(unpack(p))end}end}
 package.loaded["systems/match_setup_service"]={get_mode=function()return "ruins"end}
@@ -58,7 +65,20 @@ local destinations=require("systems/destination_validation_service")
 local grid=require("systems/grid_placement_system")
 local trees=require("systems/tree_system")
 local config=assert(spawns.config())
+-- Flat land beside each stair was excluded by the old landing rectangles.
+-- Check a whole wall and a usable construction position, not only its center.
+local stair_walls={{-13376,-7872},{-10432,-7872},{-12608,-9792},{-11200,-9792}}
 bus.reset();grid.init();regions.init();trees.init()
+if native then
+ local expanded=config.player_build_bounds
+ config.player_build_bounds=nil;regions.init()
+ for id=0,3 do
+  local w=stair_walls[id+1]
+  assert(not grid._can_place_for_test({player_id=id,position=Vector(w[1],w[2],640),footprint={x=4,y=4}}).ok,
+      "old landing bounds must reproduce all four rejected stair walls")
+ end
+ config.player_build_bounds=expanded;regions.init()
+end
 local spawned={}
 bus.subscribe(events.TREE_SPAWNED,function(p)spawned[p.player_id]=units[p.entindex]end)
 for id=0,3 do
@@ -68,6 +88,21 @@ for id=0,3 do
  for _,cell in ipairs(region.cells)do assert(math.abs(height(Vector((cell[1]+.5)*64,(cell[2]+.5)*64))-640)<=config.build_ground_height_tolerance)end
  local builder=unit(spawn.position);builder.survival_builder_id="default_builder";builder.survival_player_id=id
  assert(regions.attach_builder(id,builder,slots[id+1]))
+ if native then
+  local wall=Vector(stair_walls[id+1][1],stair_walls[id+1][2],640)
+  for dx=-96,96,64 do for dy=-96,96,64 do
+   for _,o in ipairs({{0,0},{24.32,24.32},{24.32,-24.32},{-24.32,24.32},{-24.32,-24.32}})do
+    assert(native[string.format("%.2f:%.2f",wall.x+dx+o[1],wall.y+dy+o[2])],"missing native wall sample")
+   end
+  end end
+  local placed=grid._can_place_for_test({player_id=id,position=wall,footprint={x=4,y=4}})
+  assert(placed.ok,"stair wall "..id..": "..tostring(placed.error))
+  assert(not grid._can_place_for_test({player_id=(id+1)%4,position=wall,footprint={x=4,y=4}}).ok,
+      "stair repair must not permit construction on another player's plateau")
+  local work=assert(require("systems/builder_work_position_service").find(builder,{footprint={x=4,y=4}},wall),
+      "builder needs a valid work position beside the stair wall")
+  assert(native[string.format("%.2f:%.2f",work.x,work.y)],"missing native work-position sample")
+ end
  local channel=assert(spawns.wave_marker(id));local low=channel.position
  assert(low.z==128 and low.x>=-12800 and low.x<=-10752 and low.y>=-9472 and low.y<=-8192,"waves start in the central clearing")
  assert(not regions.validate_position(id,low) and destinations.validate_hero_position(low))
@@ -82,4 +117,10 @@ for id=0,3 do
  local wave={mode="ruins",player_id=id,route_id=id,spawn_position=low}
  for _=1,20 do local p=assert(spawns.wave_position(wave,32));assert(math.abs(p.x-low.x)<=192 and math.abs(p.y-low.y)<=192 and p.z==128)end
 end
+for id=0,3 do
+ local low=assert(spawns.wave_marker(id)).position
+ assert(not grid._can_place_for_test({player_id=id,position=low,footprint={x=4,y=4}}).ok,
+     "central lowland must remain unbuildable")
+end
+if native then print("RUINS_STAIR_WALLS_PASS: four complete 4x4 walls and construction work positions; foreign plateaus and central lowland rejected") end
 print("RUINS_SPAWNS_PASS: four highland builders/trees, full footprints, lowland builder rejection/guard, hero access, eighty safe central monster spawns")

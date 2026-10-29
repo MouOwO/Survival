@@ -108,6 +108,12 @@ return {
             },
             build_ground_height = 640,
             build_ground_height_tolerance = 16,
+            player_build_bounds = {
+                [0] = { min_x = -15872, min_y = -8832, max_x = -11904, max_y = -3328 },
+                [1] = { min_x = -11904, min_y = -8832, max_x = -8960, max_y = -3328 },
+                [2] = { min_x = -15872, min_y = -14848, max_x = -11904, max_y = -8832 },
+                [3] = { min_x = -11904, min_y = -14848, max_x = -8960, max_y = -8832 },
+            },
             portal_yaws = {
                 [0] = 135,
                 [1] = 45,
