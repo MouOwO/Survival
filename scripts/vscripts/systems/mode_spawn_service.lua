@@ -1,7 +1,7 @@
 -- Named Hammer markers are authoritative. Dedicated modes never borrow a
 -- normal-island marker or clamp their coordinates to its building bounds.
 local M = {}
-local dedicated = { rich = true, cold = true, scourge = true }
+local dedicated = { rich = true, cold = true, scourge = true, ruins = true }
 
 function M.mode()
     local setup = package.loaded["systems/match_setup_service"]

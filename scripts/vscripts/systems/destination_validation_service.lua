@@ -5,7 +5,7 @@ local M = {}
 local function rich_mode()
     local setup = package.loaded["systems/match_setup_service"]
     local mode = setup and setup.get_mode and setup.get_mode()
-    return mode == "rich" or mode == "cold" or mode == "scourge"
+    return mode == "rich" or mode == "cold" or mode == "scourge" or mode == "ruins"
 end
 
 local function constrained_hero(unit)

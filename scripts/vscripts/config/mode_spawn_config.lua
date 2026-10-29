@@ -85,5 +85,35 @@ return {
                 [3] = { min_x = -15232, min_y = -256, max_x = -12800, max_y = 2560 },
             },
         },
+        ruins = {
+            center_marker = "ruins_start",
+            bounds = { min_x = -15872, min_y = -14848, max_x = -8960, max_y = -3328 },
+            player_markers = {
+                [0] = "mode_ruins_player_0_spawn",
+                [1] = "mode_ruins_player_1_spawn",
+                [2] = "mode_ruins_player_2_spawn",
+                [3] = "mode_ruins_player_3_spawn",
+            },
+            monster_markers = {
+                [0] = "mode_ruins_monster_0_spawn",
+                [1] = "mode_ruins_monster_1_spawn",
+                [2] = "mode_ruins_monster_2_spawn",
+                [3] = "mode_ruins_monster_3_spawn",
+            },
+            player_bounds = {
+                [0] = { min_x = -15360, min_y = -7936, max_x = -12416, max_y = -5632 },
+                [1] = { min_x = -11392, min_y = -7936, max_x = -9216, max_y = -5632 },
+                [2] = { min_x = -15360, min_y = -11520, max_x = -12416, max_y = -9728 },
+                [3] = { min_x = -11392, min_y = -11520, max_x = -9216, max_y = -9728 },
+            },
+            build_ground_height = 640,
+            build_ground_height_tolerance = 16,
+            portal_yaws = {
+                [0] = 135,
+                [1] = 45,
+                [2] = 225,
+                [3] = 315,
+            },
+        },
     },
 }

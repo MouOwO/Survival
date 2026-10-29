@@ -56,9 +56,9 @@ package.loaded["systems/match_setup_service"] = { get_mode = function() return m
 local positions = {
     standard = { vector(88, 4096, 777), vector(-1024, 2984, 777),
         vector(-2136, 4096, 777), vector(-1024, 5208, 777) },
-    rich = {}, cold = {}, scourge = {},
+    rich = {}, cold = {}, scourge = {}, ruins = {},
 }
-for index, name in ipairs({"rich", "cold", "scourge"}) do
+for index, name in ipairs({"rich", "cold", "scourge", "ruins"}) do
     for lane = 1, 4 do positions[name][lane] = vector(index * 10000 + lane * 200, lane * -1000, 999) end
 end
 GetGroundHeight = function(position)
@@ -149,8 +149,16 @@ ParticleManager = {
 local bus, events = require("core/event_bus"), require("core/events")
 local service = require("systems/valley_environment_service")
 local function check_last_four(name)
-    local flat = name ~= "standard"
-    for lane, direction in ipairs(expected) do
+    local flat = name ~= "standard" and name ~= "ruins"
+    local directions = expected
+    if name == "ruins" then
+        directions = {}
+        for lane = 1, 4 do
+            local yaw = require("config/mode_spawn_config").modes.ruins.portal_yaws[lane - 1]
+            directions[lane] = {math.cos(math.rad(yaw)), math.sin(math.rad(yaw)), yaw}
+        end
+    end
+    for lane, direction in ipairs(directions) do
         local prop, particle = props[#props - 4 + lane], particles[#particles - 4 + lane]
         local marker, axes = positions[name][lane], particle.orientation[0]
         assert(particle.path == native_effect)
@@ -186,7 +194,7 @@ local function check_last_four(name)
             near(particle.cp[cp].x, prop.position.x); near(particle.cp[cp].z, prop.position.z)
         end
         assert(particle.cp[4].x == 0 and particle.cp[61].x == 0 and particle.cp[62].x == 0)
-        assert(marker.z == (flat and 999 or 777), "must not move the gameplay spawn marker")
+        assert(marker.z == (name == "standard" and 777 or 999), "must not move the gameplay spawn marker")
     end
 end
 local function check_rich()
@@ -272,6 +280,8 @@ mode = "cold"; bus.emit(events.BUILDER_READY, {})
 assert(#particles == before + 4); check_last_four("cold"); assert_live(4, 4)
 mode = "scourge"; bus.emit(events.WAVE_CHANGED, {})
 check_last_four("scourge"); assert_live(4, 4)
+mode = "ruins"; bus.emit(events.WAVE_CHANGED, {})
+check_last_four("ruins"); assert_live(4, 4)
 service.clear(); service.clear()
 assert_live(0, 0)
 local old_removed, old_destroyed = removed, destroyed

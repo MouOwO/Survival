@@ -14,7 +14,7 @@ local model = "models/heroes/abyssal_underlord/abyssal_underlord_portal_model.vm
 -- Player slots are east, south, west, north. Monsters leave the central
 -- sanctuary along these outward lanes; the native door's normal is local X.
 local lane_yaws = { 0, 270, 180, 90 }
-local dedicated_modes = { rich = true, cold = true, scourge = true }
+local dedicated_modes = { rich = true, cold = true, scourge = true, ruins = true }
 local attachment_height, ground_clearance = 97.362, 12
 
 local function selected_mode()
@@ -77,10 +77,10 @@ local function create_rich_portal(marker)
         Vector(0, 0, 1), Vector(1, 0, 0), Vector(0, -1, 0))
 end
 
-local function create_portal(marker, lane, flat)
+local function create_portal(marker, lane, flat, configured_yaw)
     local origin = marker:GetAbsOrigin()
     local center = Vector(origin.x, origin.y, GetGroundHeight(origin, nil) + ground_clearance)
-    local yaw = lane_yaws[lane]
+    local yaw = configured_yaw or lane_yaws[lane]
     local radians = math.rad(yaw)
     local forward = flat and Vector(0, 0, 1) or Vector(math.cos(radians), math.sin(radians), 0)
     local right = Vector(math.sin(radians), -math.cos(radians), 0)
@@ -114,7 +114,9 @@ function M.apply()
     M.clear()
     runtime.world = current_world()
     local mode = selected_mode()
-    local flat = dedicated_modes[mode] == true
+    local dedicated = dedicated_modes[mode] == true
+    local flat = dedicated and mode ~= "ruins"
+    local portal_yaws = mode == "ruins" and require("config/mode_spawn_config").modes.ruins.portal_yaws
     for i = 1, 4 do
         local old = Entities:FindByName(nil, "valley_decor_v1_fx_monsterborn_player" .. i)
         if old then DoEntFireByInstanceHandle(old, "Stop", "", 0, old, old) end
@@ -131,11 +133,11 @@ function M.apply()
         end
     else
         for i = 1, 4 do
-            local name = flat and ("mode_" .. mode .. "_monster_" .. (i - 1) .. "_spawn")
+            local name = dedicated and ("mode_" .. mode .. "_monster_" .. (i - 1) .. "_spawn")
                 or ("monsterborn_player" .. i)
             local marker = Entities:FindByName(nil, name)
             if marker then
-                local ok, err = pcall(create_portal, marker, i, flat)
+                local ok, err = pcall(create_portal, marker, i, flat, portal_yaws and portal_yaws[i - 1])
                 if not ok then
                     M.clear()
                     print("[ValleyEnvironment] portal setup failed: " .. tostring(err))

@@ -28,7 +28,7 @@ local function in_build_bounds(unit,p)
     local area=grid_config.build_bounds
     local setup=package.loaded["systems/match_setup_service"]
     local mode=setup and setup.get_mode and setup.get_mode()
-    if mode=="rich" or mode=="cold" or mode=="scourge" then
+    if mode=="rich" or mode=="cold" or mode=="scourge" or mode=="ruins" then
         local config=require("systems/mode_spawn_service").config()
         if not config then return false end
         area=config.bounds

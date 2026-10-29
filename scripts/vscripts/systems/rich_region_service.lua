@@ -19,7 +19,7 @@ local origin, initialization_error, guard_active = nil, nil, false
 local function rich()
     local setup = package.loaded["systems/match_setup_service"]
     local mode = setup and type(setup.get_mode) == "function" and setup.get_mode()
-    return mode == "rich" or mode == "cold" or mode == "scourge"
+    return mode == "rich" or mode == "cold" or mode == "scourge" or mode == "ruins"
 end
 
 local function shared_cold()
@@ -92,7 +92,7 @@ local function build_authored_regions()
     origin = center
     local result, compiled = {}, {}
     local terrain_floor = (service.mode() == "cold" and config.player_build_bounds ~= nil
-        or service.mode() == "scourge") and config.build_ground_height ~= nil
+        or service.mode() == "scourge" or service.mode() == "ruins") and config.build_ground_height ~= nil
     for index, direction in ipairs(DIRECTIONS) do
         local player_id = index - 1
         local bounds = config.player_bounds and config.player_bounds[player_id]

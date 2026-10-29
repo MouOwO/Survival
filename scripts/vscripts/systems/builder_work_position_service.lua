@@ -45,7 +45,7 @@ local function grounded_clear(caster, candidate, reference_height, units)
     local bounds = grid_config.build_bounds
     local setup = package.loaded["systems/match_setup_service"]
     local mode = setup and setup.get_mode and setup.get_mode()
-    local local_mode = mode == "rich" or mode == "cold" or mode == "scourge"
+    local local_mode = mode == "rich" or mode == "cold" or mode == "scourge" or mode == "ruins"
     local owner = tonumber(caster.survival_player_id)
     if local_mode then
         local config = require("systems/mode_spawn_service").config()

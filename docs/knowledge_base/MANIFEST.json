@@ -15,8 +15,8 @@
     },
     {
       "path": "02_core_gameplay.md",
-      "bytes": 30036,
-      "sha256": "ac5c15bd05c49f5cbaf9297c57e7a8ac4eae6080335e6ec808541b3452fe75e7"
+      "bytes": 30591,
+      "sha256": "d0eae321487dec4ebef0a3fb0c394cb1264a1c79d5eea3b58d943aa0b8f85b76"
     },
     {
       "path": "03_progression_save_contract.md",
@@ -207,6 +207,11 @@
       "path": "evidence/rich_tree_edge_positions_20261029.md",
       "bytes": 2300,
       "sha256": "ccbe1a3273d7481ebc11f062cd7fc630c569dd16899b5fb31e322af4cddd597c"
+    },
+    {
+      "path": "evidence/ruins_spawns_20261029.md",
+      "bytes": 3124,
+      "sha256": "0f3db09087fc0a658a6de119644d987f53520f79aed00a03d3122b788f0b7541"
     },
     {
       "path": "evidence/scourge_highland_20261029.md",

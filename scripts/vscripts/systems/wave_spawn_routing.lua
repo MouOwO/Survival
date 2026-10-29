@@ -90,7 +90,7 @@ end
 function M.refresh(channels, wall_by_player, hull_multiplier)
     local setup = package.loaded["systems/match_setup_service"]
     local mode = setup and setup.get_mode and setup.get_mode()
-    if mode == "rich" or mode == "cold" or mode == "scourge" then
+    if mode == "rich" or mode == "cold" or mode == "scourge" or mode == "ruins" then
         local mode_spawns = require("systems/mode_spawn_service")
         local config, groups = mode == "cold" and mode_spawns.config() or nil, {}
         for player_id, channel in pairs(channels) do

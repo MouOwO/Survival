@@ -11,7 +11,7 @@ local function marker(x,y,z)
 end
 -- Deliberately connected navigation: authored player ownership must not be
 -- inferred from disconnected flood-fill components or ordinary map quadrants.
-for index,name in ipairs({"rich","cold","scourge"}) do
+for index,name in ipairs({"rich","cold","scourge","ruins"}) do
     local cx,cy=index*8000-16000,-8000
     local row={center_marker=name.."_start",player_markers={},monster_markers={},player_bounds={},
         bounds={min_x=cx-3000,max_x=cx+3000,min_y=cy-3000,max_y=cy+3000}}
@@ -45,7 +45,7 @@ local spawns=require("systems/mode_spawn_service")
 local routing=require("systems/wave_spawn_routing")
 local destinations=require("systems/destination_validation_service")
 EntIndexToHScript=function() error("mode routing must not read normal wall quadrants") end
-for _,name in ipairs({"rich","cold","scourge"}) do
+for _,name in ipairs({"rich","cold","scourge","ruins"}) do
     mode=name;regions.init();blocked={}
     local row=config.modes[name]
     local channels,builders={},{}
@@ -131,7 +131,7 @@ DOTA_UNIT_TARGET_BUILDING,DOTA_UNIT_TARGET_FLAG_INVULNERABLE,FIND_ANY_ORDER=4,16
 GetGroundHeight=function() return 128 end
 GridNav.CanFindPath=function() return true end
 local work=require("systems/builder_work_position_service")
-for _,name in ipairs({"rich","cold","scourge"}) do
+for _,name in ipairs({"rich","cold","scourge","ruins"}) do
     mode=name;targets.reset();regions.init()
     local row=config.modes[name]
     local position=markers[row.player_markers[0]]:GetAbsOrigin()
@@ -164,4 +164,4 @@ end
 mode="pure";regions.init()
 assert(regions.validate_position(0,nil) and regions.validate_building_footprint(nil),"normal/pure policy remains untouched")
 assert(not spawns.active())
-print("MODE_SPAWN_REGIONS_PASS: 3 dedicated modes x4 owners, connected terrain, exact player/central monster markers, no normal fallbacks, guard/build/hero destinations, cached routes and missing-marker safety")
+print("MODE_SPAWN_REGIONS_PASS: 4 dedicated modes x4 owners, connected terrain, exact player/central monster markers, no normal fallbacks, guard/build/hero destinations, cached routes and missing-marker safety")

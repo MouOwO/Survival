@@ -1,6 +1,6 @@
 878a22ba1cdef57001202c8d887e62fb  00_START_HERE.md
 fb110b300f7b417755b2f1240e1fd2d0  01_architecture_and_workflow.md
-876c84625964bd6d663b2a482b0c5854  02_core_gameplay.md
+f9eee3b844e5e67515d7e934de7b352f  02_core_gameplay.md
 e1bfa7b7e0fbee40143ec13f3a1086a8  03_progression_save_contract.md
 9d576c647659970add48911bde027755  04_network_auth_official.md
 4177c2c25d4f67763a71f50d9a967147  05_payments_commerce_delivery.md
@@ -12,7 +12,7 @@ bb3780deff6573b79c1336d9d4846e4f  10_runtime_engine_contracts.md
 02e917d898f284488194760afea37626  11_completed_work_catalog.md
 c5d539495e5a99a38be32acd29d3b90b  12_sessions_archive_and_recovery.md
 4a01d2ba009ab5b69e446351a8f34e47  13_art_ui_qa.md
-2939859706cf675341de90537a2f4a26  MANIFEST.json
+f6a961729a7b8a7620cc28e0cc69f132  MANIFEST.json
 7f371090900ed781564a860494ae934d  NEW_CHAT_PROMPT.txt
 043cc6c7c28c7c4b35d7a822d1e4818c  README.md
 33fbd1cc38438efb46442edfabdebbc6  data/completed_work_index.json
@@ -40,6 +40,7 @@ fe7d9c44a2ef175aab61bbb32df54b2f  evidence/login_relay_recovery_20261028.public.
 cb8fc4604e1551df608b4aa4d4895e3b  evidence/rebirth_selection_20261028.md
 3d8a69fef0f476d9e593a17bb121cc6d  evidence/rich_rebirth_balance_20261028.md
 116a7f3b9bad21f8e5d9c222189cd1c2  evidence/rich_tree_edge_positions_20261029.md
+5ebf9702424ad30e6341ef891debb82b  evidence/ruins_spawns_20261029.md
 2952884fbb17f06ecbe1c18d8c429ebb  evidence/scourge_highland_20261029.md
 1f683083326f8944301b99d80fcf5b2f  evidence/ten_sin_startup_20261028.md
 fe736a70e5066f94b0f4630e83e2ed7d  evidence/tooltip_follow_20261028.md

@@ -41,7 +41,7 @@ end
 local function dedicated_region_mode()
     local setup = package.loaded["systems/match_setup_service"]
     local mode = setup and setup.get_mode and setup.get_mode()
-    return mode == "rich" or mode == "cold" or mode == "scourge"
+    return mode == "rich" or mode == "cold" or mode == "scourge" or mode == "ruins"
 end
 
 local M = {}
@@ -370,7 +370,7 @@ local function configured_wave_channel(player_id)
     local marker_name = tostring(slot and slot.wave_spawn_marker or "")
     local setup = package.loaded["systems/match_setup_service"]
     local mode = setup and setup.get_mode and setup.get_mode()
-    if mode == "rich" or mode == "cold" or mode == "scourge" then
+    if mode == "rich" or mode == "cold" or mode == "scourge" or mode == "ruins" then
         local channel, reason = require("systems/mode_spawn_service").wave_marker(player_id)
         if not channel then
             print("[MonsterSpawnMarker] mode=" .. tostring(mode) .. " player="

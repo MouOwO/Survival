@@ -27,7 +27,7 @@ end
 
 local function advanced_mode()
     local mode = current_mode()
-    return mode == "rich" or mode == "cold" or mode == "scourge"
+    return mode == "rich" or mode == "cold" or mode == "scourge" or mode == "ruins"
 end
 
 local function current_scope(player_id)
