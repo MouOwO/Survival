@@ -4,11 +4,15 @@ local model_scale = require("visual/model_scale")
 local definitions = require("config/generated/builder_definitions")
 local player_context = require("systems/player_context_service")
 local presentation = require("systems/builder_presentation_service")
+local scheduler = require("core/scheduler")
 
 local M = {}
 
 local builder_by_player = {}
 local initialized_player = {}
+local spawn_retries = {}
+local SPAWN_RETRY_ATTEMPTS = 4
+local function retry_key(player_id) return "builder_spawn_retry:" .. tostring(player_id) end
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
@@ -69,7 +73,7 @@ local function create_builder(payload)
         print(string.format(
             "[BUILDER_READY] rejected player=%s error=%s",
             tostring(player_id), tostring(spawn_error)))
-        return
+        return false, spawn_error
     end
     local position = spawn.position
     local builder = CreateUnitByName(
@@ -151,6 +155,47 @@ local function create_builder(payload)
         tostring(player_id), tostring(spawn.slot_id), tostring(spawn.marker),
         tostring(spawn.source), tostring(builder:entindex()),
         tostring(config.unit_name)))
+    return true
+end
+
+local function retryable_spawn_error(reason)
+    reason = tostring(reason or "")
+    return reason == "rich_spawn_not_traversable"
+        or reason == "mode_spawn_navigation_unavailable"
+        or reason == "mode_spawn_ground_unavailable"
+        or reason:match("^mode_spawn_navigation_unavailable:") ~= nil
+        or reason:match("^mode_spawn_ground_unavailable:") ~= nil
+        or reason:match("^mode_spawn_not_traversable:") ~= nil
+        or reason:match("^mode_spawn_ground_invalid:") ~= nil
+        or reason:match("^mode_player_landing_outside_cells:") ~= nil
+end
+
+local function on_hero_ready(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil then return end
+    if spawn_retries[player_id] then return end
+    local ready, reason = create_builder(payload)
+    if ready ~= false or not retryable_spawn_error(reason) then return end
+    local pending = {payload = {player_id = player_id, hero = payload.hero, team = payload.team},
+        reason = reason, attempts = 0}
+    spawn_retries[player_id] = pending
+    scheduler.every(1, function()
+        if spawn_retries[player_id] ~= pending then return false end
+        pending.attempts = pending.attempts + 1
+        require("systems/rich_region_service").retry_failed_initialization(pending.reason)
+        local created, invalid = create_builder(pending.payload)
+        if created ~= false or not retryable_spawn_error(invalid)
+            or pending.attempts >= SPAWN_RETRY_ATTEMPTS then
+            spawn_retries[player_id] = nil
+            if created == false then
+                print("[BUILDER_READY] retry_exhausted player=" .. tostring(player_id)
+                    .. " error=" .. tostring(invalid))
+            end
+            return false
+        end
+        pending.reason = invalid
+        return true
+    end, retry_key(player_id))
 end
 
 local function get_builder(payload)
@@ -205,6 +250,8 @@ local function on_player_disconnected(payload)
     local player_id = tonumber(payload and payload.player_id)
     local builder = player_id and builder_by_player[player_id] or nil
     if player_id == nil then return end
+    spawn_retries[player_id] = nil
+    scheduler.cancel(retry_key(player_id))
     builder_by_player[player_id] = nil
     initialized_player[player_id] = nil
     require("systems/rich_region_service").detach_builder(player_id, builder)
@@ -221,10 +268,12 @@ end
 
 function M.init()
     presentation.init()
+    for player_id in pairs(spawn_retries) do scheduler.cancel(retry_key(player_id)) end
+    spawn_retries = {}
     builder_by_player = {}
     initialized_player = {}
     event_bus.handle_request(events.BUILDER_GET_REQUEST, get_builder)
-    event_bus.subscribe(events.HERO_READY, create_builder)
+    event_bus.subscribe(events.HERO_READY, on_hero_ready)
     event_bus.subscribe(events.PLAYER_DISCONNECTED, on_player_disconnected)
 end
 

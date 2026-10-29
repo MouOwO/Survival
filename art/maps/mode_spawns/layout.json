@@ -93,7 +93,7 @@
         [12288, 6656, 15360, 9216],
         [8960, 4352, 12288, 7680]
       ],
-      "build_ground_height": 128,
+      "build_ground_height": 256,
       "build_ground_height_tolerance": 16,
       "center": [
         12672,

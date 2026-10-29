@@ -221,6 +221,17 @@ local function ensure_regions()
     return true
 end
 
+-- A builder may retry a transient terrain/navigation failure. Retain the
+-- normal cached failure for previews, and never reset an already valid court
+-- registry or another player's attached builder to retry one spawn.
+function M.retry_failed_initialization(reason)
+    if not regions and initialization_error ~= nil and initialization_error == reason then
+        initialization_error = nil
+        return true
+    end
+    return false
+end
+
 function M.center()
     if not rich() then return nil, "rich_mode_inactive" end
     local ok, reason = ensure_regions()

@@ -21,9 +21,9 @@ local function on_restored(p)
 end
 local function height(p)
     -- Low road and high cliff inside a court's rectangular envelope.
-    if p.x>=12288 and p.x<12800 and p.y>=11776 and p.y<12544 then return 0 end
-    if p.x>=8960 and p.x<9472 and p.y>=11776 then return 384 end
-    return 128
+    if p.x>=12288 and p.x<12800 and p.y>=11776 and p.y<12544 then return 128 end
+    if p.x>=8960 and p.x<9472 and p.y>=11776 then return 512 end
+    return 256
 end
 GetGroundHeight=function(p) return height(p) end
 GetGroundPosition=function(p) return Vector(p.x,p.y,height(p)) end
@@ -44,11 +44,11 @@ regions.init()
 for id=0,3 do assert(regions.region(id)) end -- initialize while these cells are blocked
 local function place(v,owner,footprint)
     return grid._can_place_for_test({player_id=owner or 0,
-        position=Vector(v[1],v[2],128),footprint=footprint or {x=4,y=4}})
+        position=Vector(v[1],v[2],256),footprint=footprint or {x=4,y=4}})
 end
 for id=0,3 do
     local v=restored[id+1]
-    assert(not spawns.contains(config.player_bounds[id],Vector(v[1],v[2],128)))
+    assert(not spawns.contains(config.player_bounds[id],Vector(v[1],v[2],256)))
     local r=place(v,id)
     assert(not r.ok and r.error=="terrain_blocked","temporary native blockers must still reject construction")
 end
@@ -61,7 +61,7 @@ trees=true
 assert(place(restored[1]).error=="tree_blocked");trees=false
 local p=restored[1]
 units={{IsNull=function() return false end,IsAlive=function() return true end,
-    entindex=function() return 501 end,GetAbsOrigin=function() return Vector(p[1],p[2],128) end,
+    entindex=function() return 501 end,GetAbsOrigin=function() return Vector(p[1],p[2],256) end,
     GetHullRadius=function() return 32 end}}
 assert(place(p).error=="unit_blocked");units={}
 assert(not place({12544,12032}).ok,"lower road inside a rectangular envelope is not snow floor")
