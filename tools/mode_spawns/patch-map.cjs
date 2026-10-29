@@ -3,6 +3,7 @@
 'use strict';
 const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto');
 const L = require('../map_c6/lib.cjs'), Mesh = require('../map_c6/mesh.cjs');
+const {openRichNavigation} = require('./rich-navigation.cjs');
 const root = path.resolve(__dirname, '../..');
 const arg = key => { const i = process.argv.indexOf(key); return i < 0 ? null : process.argv[i + 1]; };
 const assert = (condition, message) => { if (!condition) throw Error(message); };
@@ -144,15 +145,7 @@ const grid = L.blocks(source, 'CMapDotaTileGrid');
 assert(grid.length === 1, 'Expected one native terrain');
 const nav = L.array(grid[0].text, 'gridnavFlags'), water = L.array(grid[0].text, 'verticesWater');
 assert(nav.length === 512 * 512 && water.length === 129 * 129, 'Unexpected native grid size');
-const changedCells = [];
-for (let y = 0; y < 512; y++) for (let x = 0; x < 512; x++) {
-    const p = [-16352 + x * 64, -16352 + y * 64], index = y * 512 + x;
-    if (nav[index] === '0' || !layout.rich_navigation.open_rectangles.some(b => inside(b, p))) continue;
-    const tx = Math.floor(x / 4), ty = Math.floor(y / 4);
-    // Open dry land only: a sea tile or shoreline never becomes a shortcut.
-    if (![ty * 129 + tx, ty * 129 + tx + 1, (ty + 1) * 129 + tx, (ty + 1) * 129 + tx + 1].every(i => water[i] === '0')) continue;
-    nav[index] = '0'; changedCells.push(index);
-}
+const changedCells = openRichNavigation(layout, nav, water, L.array(grid[0].text, 'verticesHeight'));
 edits.push({...grid[0], text: L.setArray(grid[0].text, 'gridnavFlags', nav)});
 edits.sort((a, b) => a.start - b.start);
 let cursor = 0; const parts = [];

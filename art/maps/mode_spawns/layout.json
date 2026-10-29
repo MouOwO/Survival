@@ -269,6 +269,8 @@
   },
   "rich_navigation": {
     "dry_land_only": true,
+    "open_flat_dry_floor": true,
+    "flat_floor_height": 0,
     "open_rectangles": [
       [
         -3136,
