@@ -2,6 +2,8 @@ local building_visual = require("systems/building_visual_service")
 local logger = require("core/logger")
 
 local M = {}
+local RANGE_MODIFIER = "modifier_survival_hero_attack_range"
+local SPEED_MODIFIER = "modifier_survival_hero_projectile_speed"
 
 local function safe_call(target, method_name, ...)
     local method = target and target[method_name]
@@ -11,6 +13,7 @@ end
 
 local function apply_attack_presentation(unit, archetype)
     local ranged = archetype.attack_type == "ranged"
+    local native_ranged = archetype.native_attack_presentation_policy == "ranged_v1"
     local capability = ranged
         and rawget(_G, "DOTA_UNIT_CAP_RANGED_ATTACK")
         or rawget(_G, "DOTA_UNIT_CAP_MELEE_ATTACK")
@@ -24,14 +27,37 @@ local function apply_attack_presentation(unit, archetype)
         return
     end
 
+    -- Live creatures have no attack-range setter. Use the same replicated
+    -- base override as heroes/towers after initializing the melee stat template.
+    local reach = tonumber(archetype.attack_range)
+    if native_ranged and reach and reach > 0 then
+        local modifier = unit.FindModifierByName and unit:FindModifierByName(RANGE_MODIFIER)
+        if modifier and modifier.SetAttackRange then
+            modifier:SetAttackRange(reach)
+        elseif unit.AddNewModifier then
+            unit:AddNewModifier(unit, nil, RANGE_MODIFIER, {attack_range = reach})
+        end
+    end
+
     local projectile = tostring(archetype.projectile_model or "")
     if projectile ~= "" then
         safe_call(unit, "SetRangedProjectileName", projectile)
     end
     local speed = tonumber(archetype.projectile_speed)
     if speed and speed > 0 then
-        safe_call(unit, "SetProjectileSpeed", speed)
         unit.survival_projectile_speed = speed
+        if not safe_call(unit, "SetProjectileSpeed", speed) and native_ranged
+            and unit.GetProjectileSpeed and unit.AddNewModifier then
+            local modifier = unit.FindModifierByName and unit:FindModifierByName(SPEED_MODIFIER)
+            local previous = modifier and modifier:GetStackCount() or 0
+            local bonus = speed - (unit:GetProjectileSpeed() - previous)
+            if modifier then
+                modifier:SetProjectileSpeedBonus(bonus)
+            elseif bonus ~= 0 then
+                unit:AddNewModifier(unit, nil, SPEED_MODIFIER, {projectile_speed_bonus = bonus})
+            end
+            safe_call(unit, "CalculateStatBonus", true)
+        end
     end
 end
 

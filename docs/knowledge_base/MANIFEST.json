@@ -70,8 +70,8 @@
     },
     {
       "path": "13_art_ui_qa.md",
-      "bytes": 6353,
-      "sha256": "635129347fa20cf944f546384e367f127f5c1c5f828551bb5d09373f1ef884df"
+      "bytes": 7063,
+      "sha256": "3befeae81c52c449410f427000009567d36663dde40c46f830440b05af718230"
     },
     {
       "path": "NEW_CHAT_PROMPT.txt",
@@ -282,6 +282,11 @@
       "path": "tools/verify_knowledge.py",
       "bytes": 1993,
       "sha256": "76331e711948f58761439119c684badcc654fa7ce8c9a107c1e440f693c0be7c"
+    },
+    {
+      "path": "evidence/challenge_projectiles_20261029.md",
+      "bytes": 3433,
+      "sha256": "cb7ccb8be54c6dbbba6e2560075666976eaa593237dac0939a283323e98e35e0"
     }
   ]
 }

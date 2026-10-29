@@ -11,8 +11,8 @@ e86cb49a9028b56768551c0ce2d2e156  09_session_digest.md
 bb3780deff6573b79c1336d9d4846e4f  10_runtime_engine_contracts.md
 02e917d898f284488194760afea37626  11_completed_work_catalog.md
 c5d539495e5a99a38be32acd29d3b90b  12_sessions_archive_and_recovery.md
-6871952d2d190953ca8efa82ec836717  13_art_ui_qa.md
-09ad74f3571d6313db28c27ec4674d1f  MANIFEST.json
+02f6b7ad647d2c0507ab92f2db23dc66  13_art_ui_qa.md
+be82d2f33c4c6f861a3e4dbfc3d38dc7  MANIFEST.json
 7f371090900ed781564a860494ae934d  NEW_CHAT_PROMPT.txt
 ea3caf643e5973fd3c27c4a14e1c8f6f  README.md
 33fbd1cc38438efb46442edfabdebbc6  data/completed_work_index.json
@@ -55,3 +55,4 @@ bde0039c868a127225d2ef2272f0d1f4  history/20261024/data/source_manifest.json
 7ac3e3ae5d21b4a78ef4b7a4df32dea2  history/20261024/evidence/workshop_entry_release_20261024.public.json
 ef98af27d691c5160519ae2ab7b23e7c  history/README.md
 af0ee735f9714eca05a9fbc294dbb5b5  tools/verify_knowledge.py
+160f3e51b50fc8ac7de23c69e559e301  evidence/challenge_projectiles_20261029.md

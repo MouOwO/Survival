@@ -1,0 +1,114 @@
+{
+  "date": "2026-10-29",
+  "renderer_radius_factor": 1.6,
+  "enlarged_renderers": 13,
+  "recipes": {
+    "challenge_07_ember_spirit": {
+      "member_id": "challenge_07_molten_minion",
+      "theme": "fire",
+      "projectile": "particles/units/heroes/hero_lina/lina_base_attack.vpcf",
+      "attack_range": 300,
+      "projectile_speed": 1600,
+      "native_sha256": "47ea21c09534927e1bad77150b669acc970d555ea8c5b224ab60b1918ff1b1d9"
+    },
+    "challenge_08_primal_beast_svarog": {
+      "member_id": "challenge_08_boss",
+      "theme": "large_fire",
+      "projectile": "particles/survival/challenge/fire_troll_attack.vpcf",
+      "attack_range": 300,
+      "projectile_speed": 1600
+    },
+    "challenge_09_spectre": {
+      "member_id": "challenge_09_boss",
+      "theme": "ice",
+      "projectile": "particles/units/heroes/hero_ancient_apparition/ancient_apparition_base_attack.vpcf",
+      "attack_range": 300,
+      "projectile_speed": 1600,
+      "native_sha256": "4b9c9b93086aa71391dbd9eb0ef98f8d2dbb74b5b7ae59e594f57f726e4386b6"
+    },
+    "challenge_05_beastmaster": {
+      "member_id": "challenge_05_boss",
+      "theme": "starlight",
+      "projectile": "particles/units/heroes/hero_wisp/wisp_base_attack.vpcf",
+      "attack_range": 300,
+      "projectile_speed": 1600,
+      "native_sha256": "7036727fbbf47126d242a2b89eaab0234419db19e93f9d5b9f365c992f8ab9f1"
+    },
+    "challenge_10_terrorblade_fractal": {
+      "member_id": "seven_sins_minion",
+      "theme": "poison",
+      "projectile": "particles/units/heroes/hero_viper/viper_base_attack.vpcf",
+      "attack_range": 300,
+      "projectile_speed": 1600,
+      "native_sha256": "f6eea7278215e7ebd2cf3ea8d2dec5f34c57067057087e5acd5cb5b5402ece70"
+    }
+  },
+  "outputs": [
+    {
+      "resource": "particles/survival/challenge/fire_troll_attack.vpcf",
+      "native_resource": "particles/units/heroes/hero_lina/lina_base_attack.vpcf",
+      "native_sha256": "47ea21c09534927e1bad77150b669acc970d555ea8c5b224ab60b1918ff1b1d9",
+      "source_sha256": "4f7afe277f81824b050c20895a1765ebaa9d02ce3987b7c30b865ad07bfdfcf6"
+    },
+    {
+      "resource": "particles/survival/challenge/fire_troll_attack_trail_e.vpcf",
+      "native_resource": "particles/units/heroes/hero_lina/lina_base_attack_trail_e.vpcf",
+      "native_sha256": "0b2f005d1204f446f9ad455fdb1452da0e323fe278b9bfaf76facbaaa3767d5e",
+      "source_sha256": "0cf280016f1978dd7d3e4727439b597fc278334fb92ef1b015eba261bf2c1e3d"
+    },
+    {
+      "resource": "particles/survival/challenge/fire_troll_attack_trail.vpcf",
+      "native_resource": "particles/units/heroes/hero_lina/lina_base_attack_trail.vpcf",
+      "native_sha256": "b411a7c6c45adef7ed51311f8307f582781ab00c2e90c0dc4b04879e59863706",
+      "source_sha256": "613000f308bc92ff965796b58a6fcac06a9d27509c9bfc407c48a00ac5bf0fc9"
+    },
+    {
+      "resource": "particles/survival/challenge/fire_troll_attack_trail_b.vpcf",
+      "native_resource": "particles/units/heroes/hero_lina/lina_base_attack_trail_b.vpcf",
+      "native_sha256": "89a561e2daffb8338eccead84feb4b95841227e1840b6b47164fd0bc37743af9",
+      "source_sha256": "c42ee0bad22bba7a5f9b33c3ca485e4073659ff8ac6af8c6cc842eadb504f3be"
+    },
+    {
+      "resource": "particles/survival/challenge/fire_troll_attack_trail_c.vpcf",
+      "native_resource": "particles/units/heroes/hero_lina/lina_base_attack_trail_c.vpcf",
+      "native_sha256": "9d8cf0f8598754ae8c342e5188067ff1f5fcaf2a379d7c7e1b153a0779ec5632",
+      "source_sha256": "6b72f75804579192f2cf9d8b36dcef8fbe6b80dc6bee1de1bbe48e557769ae54"
+    },
+    {
+      "resource": "particles/survival/challenge/fire_troll_attack_trail_d.vpcf",
+      "native_resource": "particles/units/heroes/hero_lina/lina_base_attack_trail_d.vpcf",
+      "native_sha256": "50943e47a16acf4029d31543ad24b74a4f28828cb079903be267b79ca8b93de5",
+      "source_sha256": "b13caf80180bd3b9575d296602b7ebfd6cfd37c6878ada1c9bd866ca06ec77bc"
+    },
+    {
+      "resource": "particles/survival/challenge/fire_troll_attack_explosion.vpcf",
+      "native_resource": "particles/units/heroes/hero_lina/lina_base_attack_explosion.vpcf",
+      "native_sha256": "02b056494e47cd95482c643d53e512f1788450bcc5fe888c9a9e3f5cc080ce4b",
+      "source_sha256": "a7673767958697da26066aeaf591055d8068fdcdae6f7e87fc854e5cb0075c8b"
+    },
+    {
+      "resource": "particles/survival/challenge/fire_troll_attack_explosion_d.vpcf",
+      "native_resource": "particles/units/heroes/hero_lina/lina_base_attack_explosion_d.vpcf",
+      "native_sha256": "d509c7e69c1ca3d9e35455222a2f22d3b71aa0188b0af2a0ce7af168c17d8385",
+      "source_sha256": "590ea0f1507ccb001fe269a4bc07b39b9ac20fe7db609e18f9bb835c6564bd7f"
+    },
+    {
+      "resource": "particles/survival/challenge/fire_troll_attack_explosion_c.vpcf",
+      "native_resource": "particles/units/heroes/hero_lina/lina_base_attack_explosion_c.vpcf",
+      "native_sha256": "a0d61b728c912ad1edefa8b2a424264db2411e258df209d1f21a9d253d97f075",
+      "source_sha256": "1799e944b0b7ad755705a408d8ab059262a9a20800b6d94b6c268492bac50d02"
+    },
+    {
+      "resource": "particles/survival/challenge/fire_troll_attack_explosion_b.vpcf",
+      "native_resource": "particles/units/heroes/hero_lina/lina_base_attack_explosion_b.vpcf",
+      "native_sha256": "7a4bab75ed51b068aaee52a9f7dac79592505feffaa3237ab666ca2bf076bd63",
+      "source_sha256": "2c4799bf6c6ababd898eef4e73532ce07f031ae48fc41aebb610b00c8b636820"
+    },
+    {
+      "resource": "particles/survival/challenge/fire_troll_attack_explosion_e.vpcf",
+      "native_resource": "particles/units/heroes/hero_lina/lina_base_attack_explosion_e.vpcf",
+      "native_sha256": "65be8fe11af7e523a2f61721890e70306abba4448c7b0b662bdb2e94e140ce50",
+      "source_sha256": "0ffd8d3b33383ea252a6ce3f14dd163448a2aae6eb724bdd783cccbf39c98315"
+    }
+  ]
+}

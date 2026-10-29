@@ -19,6 +19,8 @@
 | 地图与小地图 | 当前Hammer源是权威，编译sourceCRC+内部CRC双校验；overview与实际地形要配套检查，避免从旧截图反推新包正确 |
 | 转生怪带饰品ScenePanel试用（接上行原生头像试验） | 2026-10-29用户进一步要求头像显示世界同套饰品。新增build_rebirth_portrait_outfits.py从当前CSV组件ItemDef、模型和本机Valve英雄槽位生成十套/51件预览配置；不将bundle编号当单件，不读取账号穿戴，九转头部9662为Arcana核心，十转旧npc_dota_hero_doom仅在预览映射为官方doom_bringer。combat_stats在原生SetUnit(default,false)后按官方post_game_progress_arcanas.vjs_c调用方式逐槽ReplaceEconItemSlot(slot,itemdef,style=0)，默认镜头缩放1；自制背景和光点继续关闭。其他单位与我方剑圣保持原路径。快照未到、模块缺失或接口missing/false/throw时回退前一版官方头像；失败仅记一次，场景重建后可重试，稳定刷新不重复装备，不新增计时器。十套/51件模型及槽位与本机Valve匹配、选择/迟到快照/多选/重建/失败回退及既有头像专项回归通过。**仅证明接口接线和模拟行为，不证明SetUnit创建的Scene能实际接纳Econ饰品**；本次本机29008原生控制台未取得回执，须重新进入本地开发图验证尤其九转Arcana主体和粒子。若原生接口静默忽略，下一步需独立背景场景按世界组件装配，不能把无异常当实机穿戴成功。未上传游廊。 |
 
+2026-10-29 五类挑战怪远程弹道：熔火核心概率怪火焰、火焰巨魔1.6倍火焰、冰烬挽歌冰、合成宝石星光、精华概率怪毒，统一300射程/1600弹速。仅五个显式ranged_v1原型生效；数据源、生成Lua、native KV、11份content粒子源码及game编译资源配套。原生发现setter缺失后用既有基础射程/弹速modifier修正，五个临时实体真实回读300/1600且粒子创建通过，80次生产spawn及缺API/预加载回归通过；伤害数值/掉落/数量不变。尚未镜头视觉、实际攻击命中或多人验收；旧局单位未热替换，未上传游廊。见[粒子与验证记录](evidence/challenge_projectiles_20261029.md)。
+
 QA资料：docs/validation/UI_DATA_QA_20261025.md/.json、docs/ui_layout_20261028.md、docs/guest_payment_qr_20261027.md、docs/map_resources_20261028.md、docs/ai/CURRENT_TASK.md。测试通过范围与未跑项分别记录，不能把工具mock测试写成双人或实付结果。
 
 开发源码、content镜像、编译资源和已发布冻结包是不同对象；修了源码没有编译/冻结/上传/下载证明时，不能回答玩家“已更新”。UI源码和产物在两仓的实际位置见01/06。

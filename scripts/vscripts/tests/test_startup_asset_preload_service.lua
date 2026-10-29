@@ -211,6 +211,15 @@ assert(failed_async.progress < 100, "failed work never increases successful load
 local static_path = "particles/units/heroes/hero_morphling/morphling_base_attack.vpcf"
 startup, preload, requests, static = new_session({ fail_static = static_path })
 assert(static["particle:" .. static_path], "real challenge projectile is covered")
+for _, projectile in ipairs({
+    "particles/units/heroes/hero_lina/lina_base_attack.vpcf",
+    "particles/survival/challenge/fire_troll_attack.vpcf",
+    "particles/units/heroes/hero_ancient_apparition/ancient_apparition_base_attack.vpcf",
+    "particles/units/heroes/hero_wisp/wisp_base_attack.vpcf",
+    "particles/units/heroes/hero_viper/viper_base_attack.vpcf",
+}) do
+    assert(static["particle:" .. projectile], "challenge projectile missing from startup preload: " .. projectile)
+end
 startup.init()
 for _, request in ipairs(requests) do request.callback() end
 local failed_static = startup.snapshot()

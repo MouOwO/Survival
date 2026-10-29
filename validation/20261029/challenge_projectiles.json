@@ -1,0 +1,185 @@
+{
+  "date": "2026-10-29",
+  "scope": "local development and offline Tools; no Workshop upload",
+  "status": "PASS_NATIVE_RANGED_RANGE_PROJECTILE_BINDINGS_AND_RESOURCE_CREATION",
+  "native": {
+    "created": 5,
+    "existing_gameplay_units_unchanged": true,
+    "no_attack_orders_or_rewards": true,
+    "ok": true,
+    "removed": 5,
+    "units": [
+      {
+        "archetype": "challenge_07_ember_spirit",
+        "attack_range": 300,
+        "native_projectile_speed": 1600,
+        "particle_created": true,
+        "projectile": "particles/units/heroes/hero_lina/lina_base_attack.vpcf",
+        "projectile_speed_api_available": false,
+        "ranged": true
+      },
+      {
+        "archetype": "challenge_08_primal_beast_svarog",
+        "attack_range": 300,
+        "native_projectile_speed": 1600,
+        "particle_created": true,
+        "projectile": "particles/survival/challenge/fire_troll_attack.vpcf",
+        "projectile_speed_api_available": false,
+        "ranged": true
+      },
+      {
+        "archetype": "challenge_09_spectre",
+        "attack_range": 300,
+        "native_projectile_speed": 1600,
+        "particle_created": true,
+        "projectile": "particles/units/heroes/hero_ancient_apparition/ancient_apparition_base_attack.vpcf",
+        "projectile_speed_api_available": false,
+        "ranged": true
+      },
+      {
+        "archetype": "challenge_05_beastmaster",
+        "attack_range": 300,
+        "native_projectile_speed": 1600,
+        "particle_created": true,
+        "projectile": "particles/units/heroes/hero_wisp/wisp_base_attack.vpcf",
+        "projectile_speed_api_available": false,
+        "ranged": true
+      },
+      {
+        "archetype": "challenge_10_terrorblade_fractal",
+        "attack_range": 300,
+        "native_projectile_speed": 1600,
+        "particle_created": true,
+        "projectile": "particles/units/heroes/hero_viper/viper_base_attack.vpcf",
+        "projectile_speed_api_available": false,
+        "ranged": true
+      }
+    ]
+  },
+  "recipes": {
+    "challenge_07_ember_spirit": {
+      "member_id": "challenge_07_molten_minion",
+      "theme": "fire",
+      "projectile": "particles/units/heroes/hero_lina/lina_base_attack.vpcf",
+      "attack_range": 300,
+      "projectile_speed": 1600,
+      "native_sha256": "47ea21c09534927e1bad77150b669acc970d555ea8c5b224ab60b1918ff1b1d9"
+    },
+    "challenge_08_primal_beast_svarog": {
+      "member_id": "challenge_08_boss",
+      "theme": "large_fire",
+      "projectile": "particles/survival/challenge/fire_troll_attack.vpcf",
+      "attack_range": 300,
+      "projectile_speed": 1600
+    },
+    "challenge_09_spectre": {
+      "member_id": "challenge_09_boss",
+      "theme": "ice",
+      "projectile": "particles/units/heroes/hero_ancient_apparition/ancient_apparition_base_attack.vpcf",
+      "attack_range": 300,
+      "projectile_speed": 1600,
+      "native_sha256": "4b9c9b93086aa71391dbd9eb0ef98f8d2dbb74b5b7ae59e594f57f726e4386b6"
+    },
+    "challenge_05_beastmaster": {
+      "member_id": "challenge_05_boss",
+      "theme": "starlight",
+      "projectile": "particles/units/heroes/hero_wisp/wisp_base_attack.vpcf",
+      "attack_range": 300,
+      "projectile_speed": 1600,
+      "native_sha256": "7036727fbbf47126d242a2b89eaab0234419db19e93f9d5b9f365c992f8ab9f1"
+    },
+    "challenge_10_terrorblade_fractal": {
+      "member_id": "seven_sins_minion",
+      "theme": "poison",
+      "projectile": "particles/units/heroes/hero_viper/viper_base_attack.vpcf",
+      "attack_range": 300,
+      "projectile_speed": 1600,
+      "native_sha256": "f6eea7278215e7ebd2cf3ea8d2dec5f34c57067057087e5acd5cb5b5402ece70"
+    }
+  },
+  "radius_factor": 1.6,
+  "assets": [
+    {
+      "resource": "particles/survival/challenge/fire_troll_attack.vpcf",
+      "compiled_bytes": 3012,
+      "compiled_sha256": "fc3dbe7c83c6d237097504d7f076ca971a92e859a73eed8f2ddb3b062dc3ecbe",
+      "source_canonical_sha256": "4f7afe277f81824b050c20895a1765ebaa9d02ce3987b7c30b865ad07bfdfcf6"
+    },
+    {
+      "resource": "particles/survival/challenge/fire_troll_attack_trail_e.vpcf",
+      "compiled_bytes": 3379,
+      "compiled_sha256": "1b34d68dc3e0178d49e77cc515e360bb2c8598765b724870a23aa451c9fa8469",
+      "source_canonical_sha256": "0cf280016f1978dd7d3e4727439b597fc278334fb92ef1b015eba261bf2c1e3d"
+    },
+    {
+      "resource": "particles/survival/challenge/fire_troll_attack_trail.vpcf",
+      "compiled_bytes": 2999,
+      "compiled_sha256": "bcdf8518069d299ed604feef08e63f99b81d2b1d3633ff45c8c2713604afea38",
+      "source_canonical_sha256": "613000f308bc92ff965796b58a6fcac06a9d27509c9bfc407c48a00ac5bf0fc9"
+    },
+    {
+      "resource": "particles/survival/challenge/fire_troll_attack_trail_b.vpcf",
+      "compiled_bytes": 3626,
+      "compiled_sha256": "fddebd864cfbbd0b40138e6cb4453dc89af3f8e1e67764d9bac3869e0e419900",
+      "source_canonical_sha256": "c42ee0bad22bba7a5f9b33c3ca485e4073659ff8ac6af8c6cc842eadb504f3be"
+    },
+    {
+      "resource": "particles/survival/challenge/fire_troll_attack_trail_c.vpcf",
+      "compiled_bytes": 3226,
+      "compiled_sha256": "5cc4a49b7ef2189f6f903ad9481518664798e7f726a7e5c2b87b196ae798db1b",
+      "source_canonical_sha256": "6b72f75804579192f2cf9d8b36dcef8fbe6b80dc6bee1de1bbe48e557769ae54"
+    },
+    {
+      "resource": "particles/survival/challenge/fire_troll_attack_trail_d.vpcf",
+      "compiled_bytes": 2940,
+      "compiled_sha256": "d2bdee8757499959e337111fac5521813507df1b8986cc783d0f4e778b41d958",
+      "source_canonical_sha256": "b13caf80180bd3b9575d296602b7ebfd6cfd37c6878ada1c9bd866ca06ec77bc"
+    },
+    {
+      "resource": "particles/survival/challenge/fire_troll_attack_explosion.vpcf",
+      "compiled_bytes": 3056,
+      "compiled_sha256": "54630c3cb70ae15b127ed7bd333fa0ec9bae2f62c072d40028ccdc62c2338c9a",
+      "source_canonical_sha256": "a7673767958697da26066aeaf591055d8068fdcdae6f7e87fc854e5cb0075c8b"
+    },
+    {
+      "resource": "particles/survival/challenge/fire_troll_attack_explosion_d.vpcf",
+      "compiled_bytes": 2548,
+      "compiled_sha256": "bbee6c5919a9e38b94678352016a955925516081bd3d2bf8103a73b168069c96",
+      "source_canonical_sha256": "590ea0f1507ccb001fe269a4bc07b39b9ac20fe7db609e18f9bb835c6564bd7f"
+    },
+    {
+      "resource": "particles/survival/challenge/fire_troll_attack_explosion_c.vpcf",
+      "compiled_bytes": 2750,
+      "compiled_sha256": "d8b4bbde918173896e5539c5a9041c962d0cde330508aaf513735d8c23a87903",
+      "source_canonical_sha256": "1799e944b0b7ad755705a408d8ab059262a9a20800b6d94b6c268492bac50d02"
+    },
+    {
+      "resource": "particles/survival/challenge/fire_troll_attack_explosion_b.vpcf",
+      "compiled_bytes": 2598,
+      "compiled_sha256": "7422c7141f3d6de91d17ad5c848e0927e987928b7cc04a828448212ed04bb2d0",
+      "source_canonical_sha256": "2c4799bf6c6ababd898eef4e73532ce07f031ae48fc41aebb610b00c8b636820"
+    },
+    {
+      "resource": "particles/survival/challenge/fire_troll_attack_explosion_e.vpcf",
+      "compiled_bytes": 2416,
+      "compiled_sha256": "3031fff8486c4261276c0e13a2b3bd2e7042b36c7da59e6fdc23fa0c779e114c",
+      "source_canonical_sha256": "0ffd8d3b33383ea252a6ce3f14dd163448a2aae6eb724bdd783cccbf39c98315"
+    }
+  ],
+  "compiled_bytes_total": 32550,
+  "checks": {
+    "actual_production_spawn_cases": 80,
+    "modes": 4,
+    "range_and_speed_setters_missing_covered": true,
+    "reapply_and_respawn_idempotent": true,
+    "startup_preload_resources": 581,
+    "monster_appearance_spawn_paths": 247,
+    "wave_batches": 873,
+    "wall_challenge_appearances": 231,
+    "csv_schema_and_rebuild_checks": true,
+    "only_five_source_rows_semantically_changed": true,
+    "only_five_native_unit_blocks_changed": true,
+    "combat_values_counts_rewards_and_models_unchanged": true
+  },
+  "visual_acceptance": "Particle creation and bindings verified; no player attack orders, damage/hit or final camera review performed."
+}
