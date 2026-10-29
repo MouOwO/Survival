@@ -13,6 +13,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "server"))
@@ -28,8 +29,10 @@ class DatabaseContract:
         self.mode, self.session = mode, session
         self.rpc_client = self
         self.calls, self.operations = [], {}
+        self.lose_challenge_reply, self.revision_conflict = False, False
         self.profile = {"account_id": self.account, "revision": 1,
-                        "save": {"archive": {}, "gameplay_stats": {}}}
+                        "save": {"archive": {}, "gameplay_stats": {},
+                                 "content_inventory": {"unrelated_material": 37}}}
 
     def _database_account_id(self, account):
         assert account == "100"
@@ -48,6 +51,7 @@ class DatabaseContract:
                 "terminal": row.get("done", False), "error": row.get("error"),
                 "command": copy.deepcopy(row["command"]),
                 "config_hash": row["hash"], "has_pass": False,
+                "response": copy.deepcopy(row.get("response")),
                 "event_at": 1793232000, "profile": copy.deepcopy(self.profile)}
 
     def rpc(self, method, payload):
@@ -78,10 +82,20 @@ class DatabaseContract:
             if payload["p_id"] not in self.operations:
                 return {"ok": False, "terminal": True, "error": "archive_operation_missing"}
             return self.resume(payload["p_id"])
-        if method == "archive_commit":
+        if method in {"archive_commit", "archive_commit_challenge"}:
             row = self.operations[payload["p_id"]]
-            assert not row.get("done")
-            assert payload["p_revision"] == self.profile["revision"]
+            if method == "archive_commit_challenge":
+                assert row["command"]["kind"] == "challenge"
+                assert "p_inventory" not in payload
+            if row.get("done"):
+                return self.resume(payload["p_id"])
+            if self.revision_conflict:
+                self.revision_conflict = False
+                self.profile["revision"] += 1
+            if payload["p_revision"] != self.profile["revision"]:
+                return {"ok": False, "error": "archive_revision_conflict"}
+            if method == "archive_commit_challenge":
+                assert isinstance(payload["p_response"], dict)
             row["done"], row["error"] = True, payload["p_error"]
             if row["error"] is None:
                 self.profile["save"]["archive"] = copy.deepcopy(payload["p_archive"])
@@ -89,6 +103,11 @@ class DatabaseContract:
                 for key, delta in payload["p_deltas"].items():
                     stats[key] = stats.get(key, 0) + delta
                 self.profile["revision"] += 1
+                if method == "archive_commit_challenge":
+                    row["response"] = copy.deepcopy(payload["p_response"])
+            if method == "archive_commit_challenge" and self.lose_challenge_reply:
+                self.lose_challenge_reply = False
+                raise TimeoutError("challenge reply lost after atomic commit")
             return self.resume(payload["p_id"])
         raise AssertionError("unexpected RPC: " + method)
 
@@ -170,6 +189,87 @@ class ChallengeReceiptFlow(unittest.TestCase):
         self.assertTrue(result["ok"], result)
         self.assertEqual(set(app.operations), {app.session + ":challenge_kind:football"})
         self.assertEqual(app.profile["save"]["archive"]["challenge_points"]["football"], 10)
+        self.assertEqual(result["response"], app.operations[app.session + ":challenge_kind:football"]["response"])
+
+    def test_challenge_lost_ack_returns_exact_durable_roll_without_reducing_again(self):
+        service, app = self.service()
+        command = {"id": "archiveRuntimeA:challenge_kind:shadow_1", "kind": "challenge",
+                   "challenge_id": "shadow_1", "difficulty_id": "N30", "kill_sequence": 9}
+        request = self.payload(app, command)
+        app.lose_challenge_reply = True
+        with patch.object(service, "settle", wraps=service.settle) as worker:
+            with self.assertRaisesRegex(TimeoutError, "lost after atomic commit"):
+                service.command(request)
+            identity = app.session + ":challenge_kind:shadow_1"
+            receipt = copy.deepcopy(app.operations[identity])
+            granted = copy.deepcopy(app.profile)
+            self.assertGreater(receipt["response"]["awarded"], 0)
+            self.assertEqual(sum(row["count"] for row in receipt["response"]["rewards"]),
+                             receipt["response"]["awarded"])
+            result = service.command(request)
+            self.assertTrue(result["done"] and result["ok"])
+            self.assertEqual(result["response"], receipt["response"])
+            self.assertEqual(app.operations[identity], receipt)
+            self.assertEqual(app.profile, granted)
+            self.assertEqual(worker.call_count, 1)
+            self.assertEqual(app.profile["save"]["content_inventory"], {"unrelated_material": 37})
+            self.assertEqual(sum(method == "archive_commit_challenge" for method, _ in app.calls), 1)
+            self.assertFalse(any(method == "archive_commit_lottery" for method, _ in app.calls))
+
+    def test_challenge_conflict_reduces_latest_profile_and_stores_accepted_response(self):
+        service, app = self.service()
+        app.revision_conflict = True
+        command = {"id": "archiveRuntimeA:challenge_kind:football", "kind": "challenge",
+                   "challenge_id": "football", "difficulty_id": "N30", "kill_sequence": 3}
+        result = service.command(self.payload(app, command))
+        commits = [payload for method, payload in app.calls if method == "archive_commit_challenge"]
+        self.assertEqual([row["p_revision"] for row in commits], [1, 2])
+        self.assertEqual(app.profile["revision"], 3)
+        self.assertEqual(result["response"], commits[1]["p_response"])
+        self.assertEqual(app.profile["save"]["archive"]["challenge_points"]["football"], 10)
+
+    def test_old_completed_challenge_without_detail_is_never_reduced_or_supplemented(self):
+        service, app = self.service(mode="standard")
+        command = {"id": "archiveRuntimeA:challenge_kind:hunt_01", "kind": "challenge",
+                   "challenge_id": "hunt_01", "difficulty_id": "n10", "kill_sequence": 1}
+        validated = service.validate(command)
+        fingerprint = hashlib.sha256(json.dumps(validated, sort_keys=True,
+            separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
+        app.operations[command["id"]] = {"command": {**validated, "day_key": "20754"},
+            "hash": self.bundle.hash, "fingerprint": fingerprint, "done": True}
+        previous = copy.deepcopy((app.operations, app.profile))
+        with patch.object(service, "settle", side_effect=AssertionError("completed receipt re-reduced")):
+            result = service.command(self.payload(app, command))
+        self.assertTrue(result["ok"] and result["done"])
+        self.assertIsNone(result["response"])
+        self.assertEqual((app.operations, app.profile), previous)
+        self.assertFalse(any(method == "archive_commit_challenge" for method, _ in app.calls))
+
+    def test_ineligible_recipient_skip_is_durable_and_never_becomes_a_reward_on_retry(self):
+        service, app = self.service()
+        command = {"id": "archiveRuntimeA:challenge_kind:social_wife", "kind": "challenge",
+                   "challenge_id": "social_wife", "difficulty_id": "N30", "kill_sequence": 3}
+        request = self.payload(app, command)
+        result = service.command(request)
+        self.assertTrue(result["ok"] and result["done"])
+        self.assertEqual(result["response"]["awarded"], 0)
+        self.assertTrue(result["response"]["skipped_reason"])
+        before = copy.deepcopy((app.profile, app.operations))
+        with patch.object(service, "settle", side_effect=AssertionError("skip re-reduced")):
+            self.assertEqual(service.command(request)["response"], result["response"])
+        self.assertEqual((app.profile, app.operations), before)
+
+    def test_reducer_rejection_commits_terminal_receipt_without_success_response(self):
+        service, app = self.service()
+        command = {"id": "archiveRuntimeA:challenge_kind:hunt_01", "kind": "challenge",
+                   "challenge_id": "hunt_01", "difficulty_id": "N30", "kill_sequence": 4}
+        before = copy.deepcopy(app.profile)
+        with patch.object(service, "settle", return_value={"ok": False, "error": "fixture_rejected"}):
+            result = service.command(self.payload(app, command))
+        self.assertTrue(result["done"] and result["terminal"])
+        self.assertFalse(result["ok"])
+        self.assertIsNone(result["response"])
+        self.assertEqual(app.profile, before)
 
     def test_batch_scopes_only_after_raw_validation_and_keeps_ack_ids(self):
         service, app = self.service()

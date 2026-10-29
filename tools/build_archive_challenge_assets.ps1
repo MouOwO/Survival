@@ -18,7 +18,37 @@ $tokens=[Collections.Generic.List[string]]::new()
 $abilityNames=[Collections.Generic.HashSet[string]]::new()
 function ConvertTo-ArchiveKvText($value){
     # Localization bodies may contain complete multiline video tooltips.
-    return ([string]$value).Replace('\','\\').Replace('"','\"').Replace("`r`n",'<br>').Replace("`n",'<br>').Replace("`r",'<br>')
+    $source=([string]$value).Replace('\r\n',"`n").Replace('\n',"`n").Replace('\r',"`n")
+    $source=[regex]::Replace($source,'<br\s*/?>',"`n",[Text.RegularExpressions.RegexOptions]::IgnoreCase)
+    $source=[regex]::Replace($source,'<[^>]*>',{
+        param($match)
+        if($match.Value -match '^<font\s+color\s*=\s*["''](#[0-9a-f]{3}|#[0-9a-f]{6}|#[0-9a-f]{8})["'']\s*>$' -or $match.Value -match '^</font\s*>$'){
+            return $match.Value
+        }
+        return ''
+    })
+    return $source.Replace('\','\\').Replace('"','\"').Replace("`r`n",'\n').Replace("`n",'\n').Replace("`r",'\n')
+}
+$qualityColors=@{white='#d7dee4';gray='#aeb8c2';green='#8fc47b';blue='#74c8f2';purple='#b680ee';gold='#f5c65e';red='#ef5350'}
+$shadowItemsPath=Join-Path $root 'archive_shadow_items.csv'
+$shadowItems=@(if(Test-Path -LiteralPath $shadowItemsPath){Import-Csv -LiteralPath $shadowItemsPath | Where-Object {$_.item_id -and -not $_.item_id.StartsWith('#')}})
+function Archive-RewardDescription($definition){
+    $description=[string]$definition.description
+    $phrase='';$quality=''
+    if($definition.reward_kind -eq 'fragment'){
+        $phrase=if($description -match '神器碎片-([^\r\n<]+)'){$Matches[1]}else{''}
+        $quality='gold' # Existing archive fragment snapshot quality; no rarity changes.
+    }elseif($definition.reward_kind -eq 'cage'){
+        $phrase='专属奖励';$quality='purple'
+    }elseif($definition.reward_kind -eq 'shadow'){
+        $phrase='虚空之影道具'
+        $qualities=@($shadowItems | Where-Object {$_.source_boss_difficulty -eq $definition.reward_key} | Select-Object -ExpandProperty quality -Unique)
+        if($qualities.Count -eq 1){$quality=$qualities[0]}
+    }
+    if($phrase -and $quality -and $qualityColors.ContainsKey($quality)){
+        $description=$description.Replace($phrase,('<font color="'+$qualityColors[$quality]+'">'+$phrase+'</font>'))
+    }
+    return $description
 }
 function Add-ArchiveAbility($name,$icon,$cooldown){
     if($name -notmatch '^ability_archive_[a-z0-9_]+$'){throw "Invalid archive ability name: $name"}
@@ -38,7 +68,7 @@ function Add-ArchiveLocalization($name,$title,$description){
 foreach($def in $defs){
     $name='ability_archive_'+$def.challenge_id
     Add-ArchiveAbility $name $def.ability_icon $def.cooldown_seconds
-    Add-ArchiveLocalization $name $def.display_name $def.description
+    Add-ArchiveLocalization $name $def.display_name (Archive-RewardDescription $def)
 }
 foreach($action in $actions){
     $name=if($action.ability_name){$action.ability_name}else{'ability_archive_'+$action.action_id}
@@ -64,7 +94,12 @@ for($i=1;$i -le $buildingCount;$i++){
     $hubModel=$rule.('building_model_'+$i)
     if(-not $hubModel -and $i -eq 4){$hubModel=$rule.building_model_3}
     if(-not $hubModel){$hubModel=$rule.building_model}
-    $values=[ordered]@{BaseClass='npc_dota_creature';Model=$hubModel;ModelScale=$rule.building_model_scale;Level='1';ConsideredHero='0';HasInventory='0';AbilityLayout='12';HealthBarOffset='-1';StatusHealth='2500';StatusMana='0';MovementCapabilities='DOTA_UNIT_CAP_MOVE_NONE';AttackCapabilities='DOTA_UNIT_CAP_NO_ATTACK';ArmorPhysical='0';BoundsHullName='DOTA_HULL_SIZE_BARRACKS';VisionDaytimeRange='1000';VisionNighttimeRange='1000'}
+    $entrySlots=@(@($defs)+@($actions) | Where-Object {[int]$_.building_id -eq $i -and $_.enabled -notin @('0','false')} | ForEach-Object {[int]$_.slot_order} | Sort-Object)
+    for($slot=0;$slot -lt $entrySlots.Count;$slot++){
+        if($entrySlots[$slot] -ne $slot+1){throw "archive building $i has a non-compact ability slot"}
+    }
+    $layout=[string][math]::Max(1,$entrySlots.Count)
+    $values=[ordered]@{BaseClass='npc_dota_creature';Model=$hubModel;ModelScale=$rule.building_model_scale;Level='1';ConsideredHero='0';HasInventory='0';AbilityLayout=$layout;HealthBarOffset='-1';StatusHealth='2500';StatusMana='0';MovementCapabilities='DOTA_UNIT_CAP_MOVE_NONE';AttackCapabilities='DOTA_UNIT_CAP_NO_ATTACK';ArmorPhysical='0';BoundsHullName='DOTA_HULL_SIZE_BARRACKS';VisionDaytimeRange='1000';VisionNighttimeRange='1000'}
     foreach($key in $values.Keys){$units += '        "'+$key+'" "'+(ConvertTo-ArchiveKvText $values[$key])+'"'}
     $units += '    }'
     $tokens.Add('        "npc_archive_challenge_'+$i+'" "存档挑战'+$i+'"')

@@ -76,6 +76,7 @@ class VideoRewardBackend(unittest.TestCase):
             result = self.service.command(self.payload(challenge))
             self.assertTrue(result["ok"])
             self.assertEqual(result["response"]["awarded"], 0)
+            self.assertFalse(result["response"].get("rewards"), "daily cap cannot report items that were not granted")
             archive = self.profile()["save"]["archive"]
             self.assertEqual(archive["challenge_points"][challenge], maximum)
             self.assertEqual(archive["daily"]["20000"][daily_key], maximum)
@@ -92,6 +93,43 @@ class VideoRewardBackend(unittest.TestCase):
         archive = self.profile()["save"]["archive"]
         self.assertEqual(archive["social_tickets"]["salary"], 1)
         self.assertEqual(archive["daily"]["20000"]["salary_total"], 1)
+        self.assertEqual(result["response"]["rewards"], [{"item_id":"salary", "name":"工资", "quality":"gold", "count":1}])
+        revision = self.profile()["revision"]
+        repeated = self.service.command(payload)
+        self.assertEqual(repeated["response"], result["response"], "durable receipt retains original accepted reward detail")
+        self.assertEqual(self.profile()["revision"], revision)
+
+    def test_reward_receipts_exactly_match_actual_inventory_deltas(self):
+        stores = {"fragment":"fragment_counts", "shadow":"shadow_counts", "cage":"cage_counts",
+                  "social_ticket":"social_tickets", "challenge_points":"challenge_points"}
+        cases = ("hunt_01", "hunt_16", "shadow_1", "cage_7", "social_beast", "social_concubine", "football", "watermelon")
+        for number, challenge in enumerate(cases):
+            with self.subTest(challenge=challenge):
+                account = str(200 + number)
+                self.profile(account)["save"]["archive"] = {"social_draw_counts":{"friend":101}}
+                definition = self.bundle.tables["archive_challenge_definitions"][challenge]
+                store = stores[definition["reward_kind"]]
+                before = copy.deepcopy(self.profile(account)["save"]["archive"].get(store, {}))
+                payload = self.payload(challenge, account=account)
+                result = self.service.command(payload)
+                self.assertTrue(result["ok"])
+                response = result["response"]
+                self.assertGreater(response["awarded"], 0)
+                self.assertIsInstance(response["rewards"], list)
+                after = self.profile(account)["save"]["archive"][store]
+                for item in response["rewards"]:
+                    self.assertTrue(item["name"])
+                    self.assertIn(item["quality"], {"white","blue","purple","gold","N","R","SR","SSR","UR"})
+                    self.assertIsInstance(item["count"], int)
+                    self.assertGreater(item["count"], 0)
+                    self.assertEqual(after[item["item_id"]] - before.get(item["item_id"],0), item["count"])
+                    if definition["reward_kind"] == "fragment":
+                        self.assertIn("碎片", item["name"])
+                self.assertEqual(sum(item["count"] for item in response["rewards"]), response["awarded"])
+                saved = copy.deepcopy(self.profile(account))
+                retry = self.service.command(payload)
+                self.assertEqual(retry["response"], response)
+                self.assertEqual(self.profile(account), saved, "retry never grants, rolls or increments revision again")
 
     def test_salary_draw_effect_and_counter_persist_and_retry_once(self):
         self.profile()["save"]["archive"] = {"social_tickets": {"salary": 2}}

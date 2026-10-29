@@ -1,5 +1,5 @@
 challenge_id,building_id,slot_order,display_name,min_difficulty,reward_kind,reward_key,model_path,model_scale,ability_icon,cooldown_seconds,enabled,description,default_wearable_asset_id,unlock_text,reward_requirement_pool,reward_requirement_count
-#中文表头:挑战ID,建筑序号,绝对技能格位1至12,技能名称,最低难度,奖励种类,奖励ID或品质,模型,模型缩放,技能图标,冷却秒,启用,完整说明,饰品资源ID,解锁条件显示,奖励前置累计池,奖励前置次数严格大于
+#中文表头:挑战ID,建筑序号,连续技能序号,技能名称,最低难度,奖励种类,奖励ID或品质,模型,模型缩放,技能图标,冷却秒,启用,完整说明,饰品资源ID,解锁条件显示,奖励前置累计池,奖励前置次数严格大于
 #types:string,number,number,string,number,string,string,string,number,string,number,boolean,string,string,string,string,number
 shadow_1,1,1,虚空之影,1,shadow,n1,models/heroes/shadow_demon/shadow_demon.vmdl,1.1,nevermore_shadowraze1,3.0,1,挑战成功后可获得虚空之影道具,monster_archive_shadow_1,,,0
 shadow_2,1,2,虚空之影,2,shadow,n2,models/heroes/shadow_demon/shadow_demon.vmdl,1.1,nevermore_shadowraze1,3.0,1,挑战成功后可获得虚空之影道具,monster_archive_shadow_2,N2解锁,,0
@@ -114,7 +114,7 @@ hunt_14,4,6,神兽狩猎-佐瓦尔,10,fragment,fragment_14,models/heroes/mars/ma
 hunt_15,4,7,神兽狩猎-阿克蒙德,10,fragment,fragment_15,models/items/spectre/spectre_arcana/spectre_arcana_base.vmdl,1.2,spectre_haunt,3.0,1,"需要：
  - N10解锁
 挑战成功后可获得神器碎片-万军崩裂",monster_archive_hunt_04,N10解锁,,0
-social_wife,4,9,我的老婆挑战,10,social_ticket,wife,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3.0,1,"需要：
+social_wife,4,8,我的老婆挑战,10,social_ticket,wife,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3.0,1,"需要：
  - N10解锁
 召唤我的老婆
 击败后可获得1个玫瑰，可以用于抽奖
@@ -123,7 +123,7 @@ social_wife,4,9,我的老婆挑战,10,social_ticket,wife,models/items/ogre_magi/
 义帖总次数大于100方可获得
 
 会攻击塔",monster_archive_social_wife,N10解锁,friend,100
-social_concubine,4,10,我的侍妾挑战,10,social_ticket,concubine,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3.0,1,"需要：
+social_concubine,4,9,我的侍妾挑战,10,social_ticket,concubine,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3.0,1,"需要：
  - N10解锁
 召唤我的侍妾
 击败后可获得1个工资，可以用于抽奖

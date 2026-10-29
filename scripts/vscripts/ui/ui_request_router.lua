@@ -1434,6 +1434,7 @@ local function on_notification(payload)
         audience = broadcast and "all" or "player",
         player_id = player_id,
         kind = payload.kind or "message",
+        rich_text = payload.kind == "archive_reward" and payload.rich_text == true,
         subject = payload.subject,
         ability_icon = payload.ability_icon,
         actor_name = payload.actor_name,

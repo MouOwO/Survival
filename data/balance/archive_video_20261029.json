@@ -30,13 +30,13 @@
   "decisions": [
     "All archive combat profiles are fixed final values in every mode and difficulty; no wave/challenge multiplier.",
     "User selected condition-video building 3 order: Alleria, Uther, Tarecgosa, Guldan.",
-    "Guarding Radiance uses unused building4 slot4; Pal feature explicitly removed by user and building4 slot8 stays empty.",
     "Tooltip omitted generic N requirement: preserve project N1 for beast/ex/friend/football/watermelon; guard uses peer hunt N10 project baseline.",
     "Reward prerequisite means cumulative draw count strictly greater than 100, not >=100 and not owning 100 tokens.",
     "Football spawns five units as an explicit project decision; video only says a group, not its exact count.",
     "No attached video shows health/armor/attack speed. Preserve v3 or existing social baseline, with evidence provenance.",
     "Rounded 6.49亿 and 3.60亿 are represented by 649000000 and 360000000; exact underlying integers are unknown.",
-    "Black dragon 1.68亿 retains compatible v3 exact value 168000002; last digits are not proven by video."
+    "Black dragon 1.68亿 retains compatible v3 exact value 168000002; last digits are not proven by video.",
+    "2026-10-29 user revision: remove all return actions and empty slots; preserve reference_video_slot_order and original video ordering, compact every building into a single row with 11/10/9/9 entries. Guarding Radiance stays before the remaining high hunts; Pal remains excluded."
   ],
   "rules": {
     "rule_id": "default",
@@ -130,7 +130,8 @@
           "historical_evidence_label": "实机验证"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（实机验证），本次视频不可见；攻击189002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（实机验证），本次视频不可见；攻击189002，视频整数显示",
+      "reference_video_slot_order": 1
     },
     {
       "challenge_id": "shadow_2",
@@ -196,7 +197,8 @@
           "historical_evidence_label": "实机验证"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（实机验证），本次视频不可见；攻击沿用v3未见视频整数"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（实机验证），本次视频不可见；攻击沿用v3未见视频整数",
+      "reference_video_slot_order": 2
     },
     {
       "challenge_id": "shadow_3",
@@ -262,7 +264,8 @@
           "historical_evidence_label": "实机验证"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（实机验证），本次视频不可见；攻击沿用v3未见视频整数"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（实机验证），本次视频不可见；攻击沿用v3未见视频整数",
+      "reference_video_slot_order": 3
     },
     {
       "challenge_id": "shadow_4",
@@ -328,7 +331,8 @@
           "historical_evidence_label": "实机验证"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（实机验证），本次视频不可见；攻击沿用v3未见视频整数"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（实机验证），本次视频不可见；攻击沿用v3未见视频整数",
+      "reference_video_slot_order": 4
     },
     {
       "challenge_id": "hunt_01",
@@ -398,7 +402,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击4500002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击4500002，视频整数显示",
+      "reference_video_slot_order": 5
     },
     {
       "challenge_id": "hunt_02",
@@ -468,7 +473,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示",
+      "reference_video_slot_order": 6
     },
     {
       "challenge_id": "hunt_03",
@@ -538,7 +544,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击7500002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击7500002，视频整数显示",
+      "reference_video_slot_order": 7
     },
     {
       "challenge_id": "hunt_04",
@@ -608,7 +615,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击10500002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击10500002，视频整数显示",
+      "reference_video_slot_order": 8
     },
     {
       "challenge_id": "cage_1",
@@ -678,7 +686,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击15000002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击15000002，视频整数显示",
+      "reference_video_slot_order": 9
     },
     {
       "challenge_id": "cage_2",
@@ -748,7 +757,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击21000002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击21000002，视频整数显示",
+      "reference_video_slot_order": 10
     },
     {
       "challenge_id": "cage_3",
@@ -818,7 +828,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击28000002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击28000002，视频整数显示",
+      "reference_video_slot_order": 11
     },
     {
       "challenge_id": "hunt_05",
@@ -888,7 +899,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击21000002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击21000002，视频整数显示",
+      "reference_video_slot_order": 1
     },
     {
       "challenge_id": "hunt_06",
@@ -958,7 +970,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击42000000，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击42000000，视频整数显示",
+      "reference_video_slot_order": 2
     },
     {
       "challenge_id": "hunt_07",
@@ -1028,7 +1041,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击84000000，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击84000000，视频整数显示",
+      "reference_video_slot_order": 3
     },
     {
       "challenge_id": "hunt_08",
@@ -1099,7 +1113,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击1.68亿，仅视频缩写，配置代表值/末位未证"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击1.68亿，仅视频缩写，配置代表值/末位未证",
+      "reference_video_slot_order": 4
     },
     {
       "challenge_id": "social_beast",
@@ -1164,7 +1179,8 @@
           "observed_in_attached_video": false
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用项目社交基线32M/7992/1次每秒，本次视频不可见；攻击6.49亿，仅视频缩写，配置代表值/末位未证"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用项目社交基线32M/7992/1次每秒，本次视频不可见；攻击6.49亿，仅视频缩写，配置代表值/末位未证",
+      "reference_video_slot_order": 5
     },
     {
       "challenge_id": "social_ex",
@@ -1229,7 +1245,8 @@
           "observed_in_attached_video": false
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用项目社交基线32M/7992/1次每秒，本次视频不可见；攻击6.49亿，仅视频缩写，配置代表值/末位未证"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用项目社交基线32M/7992/1次每秒，本次视频不可见；攻击6.49亿，仅视频缩写，配置代表值/末位未证",
+      "reference_video_slot_order": 6
     },
     {
       "challenge_id": "football",
@@ -1293,7 +1310,8 @@
           "observed_in_attached_video": false
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用项目社交基线32M/7992/1次每秒，本次视频不可见；攻击64901248，视频整数显示；足球群数5为项目配置，视频未列群数"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用项目社交基线32M/7992/1次每秒，本次视频不可见；攻击64901248，视频整数显示；足球群数5为项目配置，视频未列群数",
+      "reference_video_slot_order": 7
     },
     {
       "challenge_id": "cage_4",
@@ -1363,7 +1381,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击15000002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击15000002，视频整数显示",
+      "reference_video_slot_order": 1
     },
     {
       "challenge_id": "cage_5",
@@ -1433,7 +1452,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击15000002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击15000002，视频整数显示",
+      "reference_video_slot_order": 2
     },
     {
       "challenge_id": "cage_6",
@@ -1503,7 +1523,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击15000002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击15000002，视频整数显示",
+      "reference_video_slot_order": 3
     },
     {
       "challenge_id": "social_friend",
@@ -1568,7 +1589,8 @@
           "observed_in_attached_video": false
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用项目社交基线32M/7992/1次每秒，本次视频不可见；攻击6.49亿，仅视频缩写，配置代表值/末位未证"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用项目社交基线32M/7992/1次每秒，本次视频不可见；攻击6.49亿，仅视频缩写，配置代表值/末位未证",
+      "reference_video_slot_order": 4
     },
     {
       "challenge_id": "hunt_09",
@@ -1638,7 +1660,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示",
+      "reference_video_slot_order": 5
     },
     {
       "challenge_id": "hunt_10",
@@ -1708,7 +1731,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示",
+      "reference_video_slot_order": 6
     },
     {
       "challenge_id": "hunt_11",
@@ -1778,7 +1802,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示",
+      "reference_video_slot_order": 7
     },
     {
       "challenge_id": "hunt_12",
@@ -1848,7 +1873,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示",
+      "reference_video_slot_order": 8
     },
     {
       "challenge_id": "watermelon",
@@ -1913,7 +1939,8 @@
           "observed_in_attached_video": false
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用项目社交基线32M/7992/1次每秒，本次视频不可见；攻击3.60亿，仅视频缩写，配置代表值/末位未证"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用项目社交基线32M/7992/1次每秒，本次视频不可见；攻击3.60亿，仅视频缩写，配置代表值/末位未证",
+      "reference_video_slot_order": 9
     },
     {
       "challenge_id": "cage_7",
@@ -1983,7 +2010,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击15000002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击15000002，视频整数显示",
+      "reference_video_slot_order": 1
     },
     {
       "challenge_id": "cage_8",
@@ -2053,7 +2081,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击15000002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击15000002，视频整数显示",
+      "reference_video_slot_order": 2
     },
     {
       "challenge_id": "cage_9",
@@ -2123,7 +2152,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击15000002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击15000002，视频整数显示",
+      "reference_video_slot_order": 3
     },
     {
       "challenge_id": "hunt_16",
@@ -2193,7 +2223,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示",
+      "reference_video_slot_order": 4
     },
     {
       "challenge_id": "hunt_13",
@@ -2263,7 +2294,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示",
+      "reference_video_slot_order": 5
     },
     {
       "challenge_id": "hunt_14",
@@ -2333,7 +2365,8 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示",
+      "reference_video_slot_order": 6
     },
     {
       "challenge_id": "hunt_15",
@@ -2403,12 +2436,13 @@
           "historical_evidence_label": "按规律推导（未实机）"
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用v3（按规律推导（未实机）），本次视频不可见；攻击5500002，视频整数显示",
+      "reference_video_slot_order": 7
     },
     {
       "challenge_id": "social_wife",
       "building_id": 4,
-      "slot_order": 9,
+      "slot_order": 8,
       "display_name": "我的老婆挑战",
       "min_difficulty": 10,
       "reward_kind": "social_ticket",
@@ -2468,12 +2502,13 @@
           "observed_in_attached_video": false
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用项目社交基线32M/7992/1次每秒，本次视频不可见；攻击6.49亿，仅视频缩写，配置代表值/末位未证"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用项目社交基线32M/7992/1次每秒，本次视频不可见；攻击6.49亿，仅视频缩写，配置代表值/末位未证",
+      "reference_video_slot_order": 9
     },
     {
       "challenge_id": "social_concubine",
       "building_id": 4,
-      "slot_order": 10,
+      "slot_order": 9,
       "display_name": "我的侍妾挑战",
       "min_difficulty": 10,
       "reward_kind": "social_ticket",
@@ -2533,7 +2568,8 @@
           "observed_in_attached_video": false
         }
       },
-      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用项目社交基线32M/7992/1次每秒，本次视频不可见；攻击6.49亿，仅视频缩写，配置代表值/末位未证"
+      "stats_notes": "固定终值，所有模式难度共用；HP/甲/攻速沿用项目社交基线32M/7992/1次每秒，本次视频不可见；攻击6.49亿，仅视频缩写，配置代表值/末位未证",
+      "reference_video_slot_order": 10
     }
   ],
   "actions": [
@@ -2541,7 +2577,7 @@
       "action_id": "endless",
       "ability_name": "ability_archive_endless",
       "building_id": 2,
-      "slot_order": 9,
+      "slot_order": 8,
       "display_name": "无尽模式开启",
       "min_difficulty": 3,
       "unlock_text": "N3解锁",
@@ -2553,13 +2589,14 @@
         "source": "conditions",
         "seconds": 20,
         "frame": "frames/t020000.jpg"
-      }
+      },
+      "reference_video_slot_order": 9
     },
     {
       "action_id": "endless_skip",
       "ability_name": "ability_archive_endless_skip",
       "building_id": 2,
-      "slot_order": 10,
+      "slot_order": 9,
       "display_name": "无尽跳关",
       "min_difficulty": 3,
       "unlock_text": "N3解锁",
@@ -2571,13 +2608,14 @@
         "source": "conditions",
         "seconds": 21,
         "frame": "frames/t021000.jpg"
-      }
+      },
+      "reference_video_slot_order": 10
     },
     {
       "action_id": "tower_solo",
       "ability_name": "ability_archive_tower_solo",
       "building_id": 2,
-      "slot_order": 11,
+      "slot_order": 10,
       "display_name": "通天塔(单人)开启",
       "min_difficulty": 10,
       "unlock_text": "极寒或天灾N10解锁",
@@ -2589,79 +2627,8 @@
         "source": "conditions",
         "seconds": 23,
         "frame": "frames/t023000.jpg"
-      }
-    },
-    {
-      "action_id": "return_1",
-      "ability_name": "ability_archive_return_1",
-      "building_id": 1,
-      "slot_order": 12,
-      "display_name": "返回",
-      "min_difficulty": 1,
-      "unlock_text": "",
-      "ability_icon": "kunkka_return",
-      "cooldown_seconds": 0,
-      "enabled": 1,
-      "description": "返回选择自己的英雄；不结束存档挑战。",
-      "evidence": {
-        "source": "project_behavior_decision",
-        "video_return_icon_visible": true,
-        "video_return_tooltip_not_hovered": true
-      }
-    },
-    {
-      "action_id": "return_2",
-      "ability_name": "ability_archive_return_2",
-      "building_id": 2,
-      "slot_order": 12,
-      "display_name": "返回",
-      "min_difficulty": 1,
-      "unlock_text": "",
-      "ability_icon": "kunkka_return",
-      "cooldown_seconds": 0,
-      "enabled": 1,
-      "description": "返回选择自己的英雄；不结束存档挑战。",
-      "evidence": {
-        "source": "project_behavior_decision",
-        "video_return_icon_visible": true,
-        "video_return_tooltip_not_hovered": true
-      }
-    },
-    {
-      "action_id": "return_3",
-      "ability_name": "ability_archive_return_3",
-      "building_id": 3,
-      "slot_order": 12,
-      "display_name": "返回",
-      "min_difficulty": 1,
-      "unlock_text": "",
-      "ability_icon": "kunkka_return",
-      "cooldown_seconds": 0,
-      "enabled": 1,
-      "description": "返回选择自己的英雄；不结束存档挑战。",
-      "evidence": {
-        "source": "project_behavior_decision",
-        "video_return_icon_visible": true,
-        "video_return_tooltip_not_hovered": true
-      }
-    },
-    {
-      "action_id": "return_4",
-      "ability_name": "ability_archive_return_4",
-      "building_id": 4,
-      "slot_order": 12,
-      "display_name": "返回",
-      "min_difficulty": 1,
-      "unlock_text": "",
-      "ability_icon": "kunkka_return",
-      "cooldown_seconds": 0,
-      "enabled": 1,
-      "description": "返回选择自己的英雄；不结束存档挑战。",
-      "evidence": {
-        "source": "project_behavior_decision",
-        "video_return_icon_visible": true,
-        "video_return_tooltip_not_hovered": true
-      }
+      },
+      "reference_video_slot_order": 11
     }
   ],
   "raw_tooltips": [

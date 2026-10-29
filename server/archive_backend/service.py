@@ -368,17 +368,17 @@ class ArchiveService:
                 "p_revision":profile["revision"],"p_archive":archive,"p_deltas":deltas,
                 "p_error":None if result.get("ok") else result.get("error","archive_rejected")}
             rpc="archive_commit"
-            if command["kind"].startswith("lottery_") or command['kind'] in {'commerce_purchase','benefit_claim'}:
+            if command["kind"] == "challenge":
+                # Receipt detail and the actual archive/stat grant must commit
+                # together. A lost HTTP reply is recovered by archive_resume;
+                # never reconstruct a completed operation's roll or response.
+                rpc="archive_commit_challenge"
+                commit_payload["p_response"] = result.get("response", {})
+            elif command["kind"].startswith("lottery_") or command['kind'] in {'commerce_purchase','benefit_claim'}:
                 rpc="archive_commit_lottery"
                 commit_payload.update(p_inventory=result.get("content_inventory",{}),p_response=result.get("response",{}))
             committed=self.app.rpc_client.rpc(rpc,commit_payload)
             if committed.get("error")!="archive_revision_conflict":
-                # A successful first commit can report that this recipient's
-                # own reward prerequisite/quota excluded the drop. Completed
-                # historical receipts above remain immutable and are not
-                # supplemented with a different operation's latest status.
-                if committed.get("ok") and command["kind"] == "challenge" and isinstance(result.get("response"), dict):
-                    committed = dict(committed, response=result["response"])
                 return committed
             prepared=self.app.rpc_client.rpc("archive_resume",{"p_account":account,"p_id":operation_id})
         return {"ok":False,"error":"archive_busy_retry"}

@@ -76,6 +76,10 @@ local function setup()
 end
 local function tick(t) clock=t;scheduler.think() end
 local service=setup()
+local function active_body(state,id)
+    local group=assert(state.active_groups[id])
+    return assert(group.units[next(group.units)])
+end
 local clock_publications=0
 bus.subscribe("archive.challenge_timer_changed",function()clock_publications=clock_publications+1 end)
 assert(service.phase_snapshot().remaining_seconds==1800 and service.phase_snapshot().deadline==1900)
@@ -84,7 +88,7 @@ tick(500);service.begin({difficulty_id="N1",player_ids={0,1}})
 assert(service.phase_snapshot().deadline==1900,"duplicate begin cannot extend deadline")
 local state=service._test.players()[0];local hub=state.hubs[1]
 assert(service.summon(hub,"test",hub:FindAbilityByName("ability_archive_test")))
-local boss=state.active_boss
+local boss=active_body(state,"test")
 pending=true
 tick(1899.9);assert(winners==0 and service.phase_snapshot().remaining_seconds==1)
 assert(clock_publications==0,"no periodic challenge timer broadcast before expiry")
@@ -100,7 +104,8 @@ assert(not service.begin({difficulty_id="N1",player_ids={0,1}}).keep_running)
 service=setup();state=service._test.players()[0];hub=state.hubs[1]
 assert(service.summon(hub,"test",hub:FindAbilityByName("ability_archive_test")))
 clock=1900
-bus.emit(events.ENGINE_ENTITY_KILLED,{victim=state.active_boss,victim_entindex=state.active_boss.id})
+boss=active_body(state,"test")
+bus.emit(events.ENGINE_ENTITY_KILLED,{victim=boss,victim_entindex=boss.id})
 assert(winners==1 and rewards==0,"deadline enforced even before scheduler gets its turn")
 service=setup()
 assert(service.finish(service._test.players()[0].hubs[3]));assert(winners==0)
@@ -136,7 +141,7 @@ assert(boss_runtime.available==0 and boss_runtime.daily_capped==1
 local count_before=#units
 service.cast(boss_ability,"test")
 service.cast(endless_ability,"endless")
-assert(#units==count_before and state.active_boss==nil and endless_starts==0
+assert(#units==count_before and state.active_groups.test==nil and endless_starts==0
     and not endless_state.used.endless and hub.rejected_casts==1 and endless_hub.rejected_casts==1,
     "normal exhausted quotas must also block the actual ability cast")
 acceptance_active=true
@@ -147,7 +152,7 @@ assert(boss_runtime.available==1 and boss_runtime.daily_capped==nil
     "acceptance challenge and endless UI must allow testing with exhausted real quotas")
 service.cast(boss_ability,"test")
 service.cast(endless_ability,"endless")
-assert(state.active_boss and state.used.test and endless_starts==1 and endless_state.used.endless,
+assert(state.active_groups.test and state.used.test and endless_starts==1 and endless_state.used.endless,
     "acceptance must reach the real boss spawn and endless start through ability cast")
 assert(daily_quotas==full_quotas and encoder.encode(full_quotas)==quotas_before,
     "acceptance must not reset, spend or otherwise alter the real daily quotas")

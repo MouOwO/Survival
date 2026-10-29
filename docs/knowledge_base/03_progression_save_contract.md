@@ -42,7 +42,7 @@
 
 ## 4. 所有永久变更都需幂等事务
 
-`/v1/archive/command` 绑定账号、session、`config_hash`、白名单 command。客户端不能上传最终余额、奖励数量、价格或抽中结果。核心是 `archive_prepare` → 可信 reducer → `archive_commit`；库存、抽奖、兑换、福利通过 `archive_commit_lottery` 同一事务提交库存和结果。
+`/v1/archive/command` 绑定账号、session、`config_hash`、白名单 command。客户端不能上传最终余额、奖励数量、价格或抽中结果。核心是 `archive_prepare` → 可信 reducer → `archive_commit`；库存、抽奖、兑换、福利通过 `archive_commit_lottery` 同一事务提交库存和结果。本次新增挑战专用 `archive_commit_challenge` 包装原提交，在同一事务保存真实奖励明细，重试返回原回执；须与SQL／hardening／transport／service配套部署，当前生产未切换，详见后续修复证据。
 
 prepare 固定首次配置、fingerprint 和 event_at；同 operation ID 同请求返回旧凭据，改内容或 hash 冲突。响应丢失重试原 ID，不换 ID 再发一次。commit 使用预计 revision，在一次事务中写属性、库存、档案、回执及版本。付款、通关、领取共用既有锁顺序，避免半份收益混入 baseline。当前 Python revision 冲突会 resume 后基于新快照重算，最多4轮，仍冲突返回 `archive_busy_retry`。
 
@@ -106,7 +106,7 @@ Lua验证账号、session、mode、load generation和账号 revision高水位；
 
 ## 9. 四座视频存档挑战（2026-10-29开发）
 
-四楼完整布局、源视频摘要与数值出处见[专门证据](evidence/archive_video_challenges_20261029.md)。36项怪物挑战均按固定终值生成，7个操作占各楼绝对格位；每个模式使用实际怪物出生点，未增加帕鲁入口或奖励。视频看不到生命／护甲／攻速，因此这些字段沿用v3或原有项目基线，不得声称已逐帧提取。
+源视频摘要与数值出处见[专门证据](evidence/archive_video_challenges_20261029.md)。36项怪物挑战均按固定终值生成，每个模式使用实际怪物出生点，未增加帕鲁入口或奖励。用户随后要求改为紧凑单行、删除返回／空格／快捷键，当前39项按钮为36挑战+3模式控制，四楼11／10／9／9；挑战按ID独立并发。当前交互见[后续修复](evidence/archive_layout_independent_20261029.md)。视频看不到生命／护甲／攻速，因此这些字段沿用v3或原有项目基线，不得声称已逐帧提取。
 
 前女友、好基友、老婆／侍妾的奖励分别要求前一池累计成功抽取严格>100次；持有余额无效，历史抽取计数采用单调兼容。条件不足仍允许打怪，按账号返回已完成但0奖励及中文原因，不会卡保存屏障。绿茵每日100点、西瓜每日10点、侍妾工资每日10份各自记账；工资用于侍妾收藏抽取，月卡不额外增加此新额度。16种神器的旧ID不变，新增13—16解锁N10；九组龙材料每组九种，新材料使用项目自定同类效果。
 

@@ -55,9 +55,11 @@ def validate(manifest):
             assert row['stat_evidence'][attribute]['source'], (key, attribute)
         assert not row['stat_evidence']['health'].get('observed_in_attached_video', False)
         assert not row['stat_evidence']['war3_armor'].get('observed_in_attached_video', False)
-    assert len(challenges) == 36 and len(actions) == 7
-    assert len(occupied) == 43, 'five unused grid slots must remain free'
-    assert (4, 8) not in occupied, 'Pal feature explicitly removed by user'
+    assert len(challenges) == 36 and len(actions) == 3
+    assert len(occupied) == 39
+    assert {row['action_id'] for row in actions} == {'endless', 'endless_skip', 'tower_solo'}
+    for building, count in enumerate((11, 10, 9, 9), 1):
+        assert sorted(slot for owner, slot in occupied if owner == building) == list(range(1, count + 1)), 'archive abilities must be compact'
     assert 'pet' not in ids
 
 
@@ -82,9 +84,9 @@ def outputs(manifest):
                               **row['stats'], enabled=1, notes=row['stats_notes']))
     return {
         'archive_challenge_definitions.csv': csv_text(DEF_FIELDS, DEF_TYPES, manifest['challenges'],
-            ['挑战ID','建筑序号','绝对技能格位1至12','技能名称','最低难度','奖励种类','奖励ID或品质','模型','模型缩放','技能图标','冷却秒','启用','完整说明','饰品资源ID','解锁条件显示','奖励前置累计池','奖励前置次数严格大于']),
+            ['挑战ID','建筑序号','连续技能序号','技能名称','最低难度','奖励种类','奖励ID或品质','模型','模型缩放','技能图标','冷却秒','启用','完整说明','饰品资源ID','解锁条件显示','奖励前置累计池','奖励前置次数严格大于']),
         'archive_challenge_actions.csv': csv_text(ACTION_FIELDS, ACTION_TYPES, manifest['actions'],
-            ['入口ID','技能名称','建筑序号','绝对技能格位1至12','显示名称','最低难度','解锁条件显示','技能图标','冷却秒','启用','完整说明']),
+            ['入口ID','技能名称','建筑序号','连续技能序号','显示名称','最低难度','解锁条件显示','技能图标','冷却秒','启用','完整说明']),
         'archive_challenge_stats.csv': csv_text(STATS_FIELDS, STATS_TYPES, stats,
             ['属性ID','挑战ID','兼容难度键','固定生命','固定攻击','固定魔兽护甲','每秒攻击次数','移速','攻击距离','魔抗百分比','启用','属性来源与不可见边界','怪物数量']),
         'archive_challenge_rules.csv': csv_text(RULE_FIELDS, RULE_TYPES, [manifest['rules']],
@@ -101,14 +103,15 @@ def main():
     for name, body in expected.items():
         path = CSV_ROOT / name
         if args.check:
-            if not path.exists() or path.read_bytes() != body.encode('utf8'):
+            if not path.exists() or path.read_text(encoding='utf-8-sig') != body:
                 drift.append(name)
         else:
-            path.write_bytes(body.encode('utf8'))
+            if not path.exists() or path.read_text(encoding='utf-8-sig') != body:
+                path.write_bytes(body.encode('utf8'))
     if drift:
         print('ARCHIVE_VIDEO_CONFIG_DRIFT: ' + ', '.join(drift))
         return 1
-    print(f'ARCHIVE_VIDEO_CONFIG_{"CHECK" if args.check else "BUILD"}_PASS: 36 challenges, 7 actions, fixed N1-N10 compatibility rows, 4 buildings; Pal excluded')
+    print(f'ARCHIVE_VIDEO_CONFIG_{"CHECK" if args.check else "BUILD"}_PASS: 36 challenges, 3 actions, compact rows 11/10/9/9, fixed N1-N10 compatibility rows, 4 buildings; Pal excluded')
     return 0
 
 

@@ -360,7 +360,8 @@ for _, difficulty in ipairs({"N1", "N2", "N3"}) do
     assert(archive.finish(players[0].hubs[3]) and #winners == 0,
         "one player finishing must not end another player's challenge phase")
     assert(archive.summon(hero_hub, "social_beast", beast))
-    local challenge_boss = players[1].active_boss
+    local challenge_group = assert(players[1].active_groups.social_beast)
+    local challenge_boss = assert(challenge_group.units[next(challenge_group.units)])
     kill(challenge_boss)
     kill(challenge_boss)
     assert(#granted == 2 and granted[1].id==0 and granted[2].id==1

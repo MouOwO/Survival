@@ -1,6 +1,6 @@
 'use strict';
 // Executes the production classification, slot painting and native layout paths.
-// Sparse rows must preserve actual button identity, hover and cooldown overlays.
+// Compact rows must preserve actual button identity, hover and cooldown overlays.
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const source=fs.readFileSync('panorama/src/scripts/custom_game/topnav_remaining_5d5c1152eb.js','utf8');
 function between(first,last){const a=source.indexOf(first),b=source.indexOf(last,a+first.length);assert(a>=0&&b>a,first);return source.slice(a,b);}
@@ -41,38 +41,40 @@ const filter={valid:()=>true,Entities:{GetUnitName:()=>name,IsBuilding:()=>false
 vm.runInNewContext(bootstrap.slice(bootstrap.indexOf('    function fixedTarget('),bootstrap.indexOf('    function cancel(){')),filter);
 for(let i=1;i<=4;i++){name='npc_archive_challenge_'+i;assert(filter.fixedTarget(selected),'fourth hub also stays out of army box selection');}
 name='npc_archive_challenge_5';assert(!filter.fixedTarget(selected));
-name='npc_archive_challenge_4';
-// Runtime slots deliberately differ from compact native enumeration indices.
-const slots=[1,2,3,5,6,7,8,9,10,12];
-env.currentEntries=slots.map((slot,i)=>{const entry={ability:100+i,name:'ability_archive_test_'+i,slot:i};runtime[entry.ability]={ability_entindex:entry.ability,owner_entindex:selected,slot_order:slot};return entry;});
-const g={width:500,height:438,x:300,y:600,scale:.5,portraitSize:264,heroWidth:0,centerWidth:500,inventoryX:500,minimapSize:220,actionOffset:10,archiveChallenge:true};
-assert(env.nativeLayout(g));
-assert.equal(list.style.flowChildren,'none');assert.equal(list.style.height,'356px');assert.equal(branch.style.height,'356px');
-slots.forEach((slot,i)=>{
- const p=buttons[i];assert.equal(p.__handoffArchiveSlot,slot-1);
- assert.equal(p.style.position,`${((slot-1)%4)*120}px ${Math.floor((slot-1)/4)*120}px 0px`);
- assert(p.hittest&&p.hittestchildren,'locked/used buttons retain native hover');
- assert.equal(p.FindChildTraverse('CooldownOverlay').style.clip,'engine_live');
- assert.equal(p.__survivalWindowWidth,58);assert.equal(p.GetParent(),list);
-});
-assert.equal(buttons[10].style.visibility,'collapse');assert.equal(buttons[11].style.visibility,'collapse');
-assert(env.repairNativeLayout(g));assert.equal(list.style.flowChildren,'none');assert.equal(list.style.height,'356px');
-// A stale entity snapshot cannot reposition a current ability.
-runtime[100].owner_entindex=88;env.fitNativeSkills(g);assert.equal(buttons[0].__handoffArchiveSlot,0);
-runtime[100]={ability_entindex:100,owner_entindex:selected,slot_order:12};env.fitNativeSkills(g);assert.equal(buttons[0].__handoffArchiveSlot,11);
+let g;
+for(const [building,count] of [[1,11],[2,10],[3,9],[4,9]]){
+ name='npc_archive_challenge_'+building;
+ env.currentEntries=Array.from({length:count},(_,i)=>{const entry={ability:100+i,name:'ability_archive_test_'+i,slot:i};runtime[entry.ability]={ability_entindex:entry.ability,owner_entindex:selected,slot_order:i+1};return entry;});
+ // A hot-reloaded old grid must be cleared before the first compact paint.
+ for(let i=0;i<count;i++){buttons[i].__handoffArchiveSlot=i;buttons[i].style.position='120px 240px 0px';}
+ g={width:count*120+20,height:205,x:300,y:600,scale:.5,portraitSize:264,heroWidth:0,centerWidth:count*120+20,inventoryX:count*120+20,minimapSize:220,actionOffset:10,archiveChallenge:true};
+ assert(env.nativeLayout(g));
+ assert.equal(list.style.flowChildren,'right');assert.equal(list.style.height,'116px');assert.equal(branch.style.height,'116px');
+ for(let i=0;i<count;i++){
+  const p=buttons[i];assert.equal(p.__handoffArchiveSlot,undefined);assert.equal(p.style.position,'0px 0px 0px');assert.equal(p.style.marginRight,'4px');
+  assert(p.hittest&&p.hittestchildren,'locked/used buttons retain native hover');
+  assert.equal(p.FindChildTraverse('CooldownOverlay').style.clip,'engine_live');
+  assert.equal(p.__survivalWindowWidth,58);assert.equal(p.GetParent(),list);assert.notEqual(p.style.visibility,'collapse');
+ }
+ for(let i=count;i<buttons.length;i++)assert.equal(buttons[i].style.visibility,'collapse','unused native placeholders cannot occupy space');
+ assert(env.repairNativeLayout(g));assert.equal(list.style.flowChildren,'right');assert.equal(list.style.height,'116px');
+ // Runtime updates cannot turn compact engine identity back into grid coordinates.
+ runtime[100]={ability_entindex:100,owner_entindex:88,slot_order:12};env.fitNativeSkills(g);assert.equal(buttons[0].style.position,'0px 0px 0px');
+}
 // Returning to any normal building restores its original one-row native layout.
 assert(env.nativeLayout({...g,archiveChallenge:false,height:205,centerWidth:1218}));
 assert.equal(list.style.flowChildren,'right');assert.equal(list.style.height,'116px');
-for(const p of buttons.slice(0,slots.length)){assert.equal(p.__handoffArchiveSlot,undefined);assert.equal(p.style.position,'0px 0px 0px');assert.equal(p.style.marginRight,'4px');}
+for(const p of buttons.slice(0,9)){assert.equal(p.__handoffArchiveSlot,undefined);assert.equal(p.style.position,'0px 0px 0px');assert.equal(p.style.marginRight,'4px');}
 
-// Execute the real grid geometry branch at common widths/UI scales.
+// Execute the real compact geometry branch at common widths/UI scales.
 const geometry=require('../panorama/src/scripts/custom_game/geometry_remaining_5d5c1152eb.js');
 const start=source.indexOf('        var count=presentation.tree?0:abilityCount(readContext),g=cfg.HandoffGeometry(');
 const end=source.indexOf('        var signature=',start);assert(start>=0&&end>start);
-for(const [w,h] of [[800,600],[1280,720],[1920,1080],[2560,1440],[3440,1440]]){
- const grid={w,h,presentation:{building:true,archive_challenge:true},abilityCount:()=>10,readContext:null,cfg:{HandoffGeometry:geometry}};
+for(const count of [11,10,9,9])for(const [w,h] of [[800,600],[1280,720],[1920,1080],[2560,1440],[3440,1440]]){
+ const grid={w,h,presentation:{building:true,archive_challenge:true},abilityCount:()=>count,readContext:null,cfg:{HandoffGeometry:geometry}};
  vm.runInNewContext(source.slice(start,end)+';this.result=g;',grid);const actual=grid.result;
- assert.equal(actual.centerWidth,500);assert.equal(actual.height,438);assert.equal(actual.count,12);
+ assert.equal(actual.centerWidth,count*120+20);assert.equal(actual.height,205);assert.equal(actual.count,count);
  assert(actual.scale>0&&Number.isFinite(actual.scale));assert(actual.x>=0&&actual.y>=0);assert(actual.x+actual.width*actual.scale<=w);assert(actual.y+actual.height*actual.scale<=h);
 }
-console.log('ARCHIVE_CHALLENGE_UI_PASS: four hubs, sparse 4x3 native slots, hover/cooldown identity, runtime ownership, repair, normal-layout recovery and five viewports');
+assert(!source.includes('Subscribe("survival_archive_return"'),'retired archive return event has no UI listener');
+console.log('ARCHIVE_CHALLENGE_UI_PASS: four compact rows 11/10/9/9, no holes/returns, hover/cooldown identity, repair, normal-layout recovery and five viewports');

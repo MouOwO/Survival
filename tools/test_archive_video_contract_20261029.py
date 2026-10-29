@@ -19,23 +19,23 @@ def rows(name, key):
 
 
 class ArchiveVideoContract(unittest.TestCase):
-    def test_four_sparse_grids_and_user_cancelled_pal(self):
+    def test_four_compact_rows_and_user_cancelled_pal(self):
         definitions = {r['challenge_id']: r for r in rows('archive_challenge_definitions.csv', 'challenge_id')}
         actions = rows('archive_challenge_actions.csv', 'action_id')
         self.assertEqual(len(definitions), 36)
-        self.assertEqual(len(actions), 7)
+        self.assertEqual(len(actions), 3)
+        self.assertEqual({r['action_id'] for r in actions}, {'endless', 'endless_skip', 'tower_solo'})
         slots = {(int(r['building_id']), int(r['slot_order'])) for r in [*definitions.values(), *actions]}
-        self.assertEqual(len(slots), 43)
-        self.assertNotIn((4, 8), slots)
+        self.assertEqual(len(slots), 39)
+        for floor, count in enumerate([11, 10, 9, 9], 1):
+            self.assertEqual(sorted(slot for building, slot in slots if building == floor), list(range(1, count+1)))
         self.assertNotIn('pet', definitions)
         self.assertEqual([definitions[f'hunt_{i:02}']['display_name'] for i in range(9, 13)],
                          ['神兽狩猎-奥蕾莉亚', '神兽狩猎-乌瑟尔', '神兽狩猎-泰蕾苟萨', '神兽狩猎-古尔丹'])
         self.assertEqual([int(definitions[f'hunt_{i:02}']['slot_order']) for i in range(9, 13)], [5, 6, 7, 8])
         self.assertEqual((definitions['hunt_16']['building_id'], definitions['hunt_16']['slot_order']), ('4', '4'))
-        self.assertEqual((definitions['social_wife']['building_id'], definitions['social_wife']['slot_order']), ('4', '9'))
-        for index in range(1, 5):
-            action = next(r for r in actions if r['action_id'] == f'return_{index}')
-            self.assertEqual((action['building_id'], action['slot_order']), (str(index), '12'))
+        self.assertEqual((definitions['social_wife']['building_id'], definitions['social_wife']['slot_order']), ('4', '8'))
+        self.assertEqual([int(r['slot_order']) for r in actions], [8, 9, 10])
 
     def test_evidence_and_unlocks_are_not_fabricated(self):
         by_id = {r['challenge_id']: r for r in FACTS['challenges']}

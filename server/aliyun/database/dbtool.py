@@ -36,7 +36,7 @@ FUNCTIONS = {
     "ensure_player_gameplay_stats", "sync_star_blessing_reward_definitions",
     "grant_out_of_match_reward", "checkpoint_online_time", "archive_sync_config",
     "archive_resume", "archive_prepare", "archive_commit", "archive_capture_online",
-    "archive_online_pending", "archive_pending", "archive_commit_lottery", "match_profile_login", "match_profile_context",
+    "archive_online_pending", "archive_pending", "archive_commit_lottery", "archive_commit_challenge", "match_profile_login", "match_profile_context",
     "archive_fishing_daily_limit", "archive_finalize_fishing_checkpoint",
     "grant_out_of_match_reward_before_daily_limits", "checkpoint_online_time_before_daily_limits",
     "fishing_profile_json_before_daily_limits",
@@ -52,6 +52,7 @@ RPC_SIGNATURES = (
     "archive_commit(text,text,bigint,jsonb,jsonb,text)",
     "archive_online_pending(text,text)", "archive_pending(text)",
     "archive_commit_lottery(text,text,bigint,jsonb,jsonb,text,jsonb,jsonb)",
+    "archive_commit_challenge(text,text,bigint,jsonb,jsonb,text,jsonb)",
     "match_profile_login(text,text,text,jsonb)", "match_profile_context(text,text)",
     "onboarding_state(text,text)", "onboarding_finish(text,text,text)",
 )
@@ -71,7 +72,8 @@ UPGRADE_FILES = (
     ("202609140003_remove_default_wood_income.sql", "202609200003_remove_default_wood_income.sql"),
     ("202609140004_remove_default_attack_growth.sql", "202609200004_remove_default_attack_growth.sql"),
 )
-HARDEN_PATCHES = ("harden_lottery.sql", "harden_match_sessions.sql", "harden_onboarding.sql")
+HARDEN_PATCHES = ("harden_lottery.sql", "harden_match_sessions.sql", "harden_onboarding.sql",
+                  "harden_archive_challenge_receipts.sql")
 # These two files were created with LF for test03. Git autocrlf can change the
 # checkout bytes; only restore the exact reviewed release hash, never accept
 # arbitrary normalization or mutate a deployed ledger to fit edited SQL.

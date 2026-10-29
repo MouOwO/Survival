@@ -18,6 +18,7 @@ local challenge_rewards = require("systems/archive_challenge_rewards")
 local challenge_rules = require("config/generated/archive_challenge_rules").by_id.default
 local M = {}
 local pending, busy, selected, throttles = {}, {}, {}, {}
+local reward_notifications = {}
 local finalizing = false
 local session_id, serial, remote_provider
 local server_clock
@@ -417,10 +418,24 @@ flush = function(player_id)
             if terminal_error or result and result.terminal and not result.ok then
                 bus.emit(events.UI_NOTIFICATION,{player_id=player_id,level="error",message=terminal_error or result.error or "存档请求被拒绝"})
             end
-            if command.kind == "challenge" and result and result.ok and not result.duplicate
-                and type(result.response) == "table" and result.response.skipped_reason then
-                bus.emit(events.UI_NOTIFICATION,{player_id=player_id,level="info",
-                    message="挑战已完成，本次未获得奖励：" .. tostring(result.response.skipped_reason)})
+            if command.kind == "challenge" and result and result.ok == true and not result.pending
+                and type(result.response) == "table" then
+                -- An accepted intent is not a reward. Only a committed server
+                -- receipt may produce a success toast, including a recovered
+                -- duplicate receipt after the first response was lost.
+                reward_notifications[player_id] = reward_notifications[player_id] or {}
+                if not reward_notifications[player_id][id] then
+                    local response = result.response
+                    local message = require("systems/archive_reward_presentation").message(response)
+                    if response.skipped_reason then
+                        message = "挑战已完成，本次未获得奖励：" .. tostring(response.skipped_reason)
+                        bus.emit(events.UI_NOTIFICATION,{player_id=player_id,level="info",message=message})
+                    elseif message then
+                        bus.emit(events.UI_NOTIFICATION,{player_id=player_id,level="success",
+                            kind="archive_reward",rich_text=true,message=message})
+                    end
+                    if message then reward_notifications[player_id][id] = true end
+                end
             end
             send(player_id)
             if command.kind == "social_draw" then
@@ -793,6 +808,7 @@ function M.init()
     for id in pairs(pending) do scheduler.cancel("archive_endless_flush:" .. id) end
     endless_due, endless_force = {}, {}
     pending, busy, selected, throttles = {}, {}, {}, {}
+    reward_notifications = {}
     daily_viewers = {}
     vip_viewers = {}
     archive_players = {}

@@ -15,6 +15,7 @@ local daily_limits = require("systems/archive_daily_limits")
 local calendar = require("systems/archive_calendar")
 local M = {}
 local players, hubs, bosses = {}, {}, {}
+local published_runtime = {}
 local sequence, active = 0, false
 local deadline, ended, expired = nil, false, false
 local TIMER_ID = "archive_challenge_phase_timer"
@@ -43,9 +44,21 @@ local function allowed(state, definition)
     return state and not state.finished and definition and definition.enabled
         and state.difficulty >= definition.min_difficulty
 end
-local function boss_running(state)
-    if state.active_group then return state.active_group.remaining > 0 end
-    return valid(state.active_boss) and state.active_boss:IsAlive()
+local function challenge_running(state, challenge_id)
+    local group = state.active_groups and state.active_groups[challenge_id]
+    return group and (not group.committed or group.remaining > 0) or false
+end
+local function same_runtime(left, right)
+    if type(left) ~= type(right) then return false end
+    if type(left) ~= "table" then return left == right end
+    for key, value in pairs(left) do if not same_runtime(value, right[key]) then return false end end
+    for key in pairs(right) do if left[key] == nil then return false end end
+    return true
+end
+local function write_runtime(key, value)
+    if not CustomNetTables or same_runtime(published_runtime[key], value) then return end
+    CustomNetTables:SetTableValue("survival_ability_runtime", key, value)
+    published_runtime[key] = value
 end
 local function action_allowed(state, action)
     if not allowed(state, action) then return false end
@@ -97,7 +110,6 @@ function M.ability_runtime(caster, ability_name)
     local ready = active and not ended and not state.finished
         and (not deadline or now() < deadline)
     local busy = require("systems/archive_endless_service").is_running(state.player_id)
-    local boss = boss_running(state)
     local challenge_id = tostring(ability_name):match("^ability_archive_(.+)$")
     local definition = challenge_id and definitions.by_id[challenge_id]
     local action = challenge_id and actions.by_id[challenge_id]
@@ -112,11 +124,11 @@ function M.ability_runtime(caster, ability_name)
         if challenge_id == "endless" or challenge_id == "tower_solo" then
             local used = state.used[challenge_id == "tower_solo" and "tower" or "endless"]
             quota = daily_quota(state.player_id, "endless")
-            ready = ready and not used and not busy and not boss
+            ready = ready and not used and not busy
                 and require("systems/archive_endless_config").group(state.difficulty, state.mode) ~= nil
             runtime.status_text = busy and "无尽／通天塔挑战进行中" or used and "本局已开启"
                 or not unlocked and (action.unlock_text or "尚未解锁")
-                or boss and "请先击败当前挑战BOSS" or ready and "可以开启" or "暂不可开启"
+                or ready and "可以开启" or "暂不可开启"
         elseif challenge_id == "endless_skip" then
             local step = require("systems/archive_endless_service").skip_step(state.player_id)
             ready = ready and step < 20
@@ -134,7 +146,11 @@ function M.ability_runtime(caster, ability_name)
         quota = daily_quota(state.player_id, daily_limits.challenge_key(definition))
         local unlocked = allowed(state, definition)
         local used = state.used[challenge_id] == true
-        ready = ready and unlocked and not used and not boss and not busy
+        local running = challenge_running(state, challenge_id)
+        local group = state.active_groups and state.active_groups[challenge_id]
+        ready = ready and unlocked and not used and not running
+        runtime.challenge_active = running and 1 or 0
+        runtime.challenge_remaining = group and group.remaining or 0
         runtime.display_name = definition.display_name
         runtime.slot_order = definition.slot_order
         runtime.upgrade_description = definition.description
@@ -144,9 +160,8 @@ function M.ability_runtime(caster, ability_name)
         if not eligible then
             runtime.fields[#runtime.fields + 1] = {label = "奖励条件", value = reward_reason}
         end
-        runtime.status_text = busy and "无尽挑战进行中" or used and "本局已挑战（每个技能仅限一次）"
+        runtime.status_text = running and "该挑战进行中" or used and "本局已挑战（每个技能仅限一次）"
             or not unlocked and (definition.unlock_text or ("N" .. definition.min_difficulty .. "解锁"))
-            or boss and "请先击败当前挑战BOSS"
             or not eligible and "可以挑战，但尚不满足奖励条件" or "可以挑战"
     else
         ready = false
@@ -182,7 +197,7 @@ local function publish(state)
                 runtime.engine_activated = ready and 1 or 0
                 runtime.passive = 0
                 if CustomNetTables and runtime.ability_entindex then
-                    CustomNetTables:SetTableValue("survival_ability_runtime", tostring(runtime.ability_entindex), runtime)
+                    write_runtime(tostring(runtime.ability_entindex), runtime)
                 end
             end
             for _, definition in ipairs(definitions.rows) do
@@ -192,7 +207,7 @@ local function publish(state)
             end
             hub_actions(hub.survival_archive_hub, function(action) update(action.ability_name) end)
             if CustomNetTables then
-                CustomNetTables:SetTableValue("survival_ability_runtime", "unit:" .. tostring(hub:entindex()), {
+                write_runtime("unit:" .. tostring(hub:entindex()), {
                     owner_entindex = hub:entindex(),
                     ability_count = hub.GetAbilityCount and hub:GetAbilityCount() or count,
                 })
@@ -212,23 +227,32 @@ local function watch_daily_rollover()
         end
     end, DAILY_TIMER_ID)
 end
-local function remove_boss(state)
-    local group = state.active_group
-    local units = group and group.units or {state.active_boss}
-    state.active_group, state.active_boss = nil, nil
-    for _, unit in pairs(units) do
-        if valid(unit) then
-            bosses[unit:entindex()] = nil
-            unit.survival_wave_cleanup = true
-            require("systems/monster_hero_visual_service").clear(unit)
-            UTIL_Remove(unit)
-        end
+local function retire_boss(unit)
+    if not valid(unit) then return end
+    bosses[unit:entindex()] = nil
+    unit.survival_wave_cleanup = true
+    pcall(require("systems/monster_hero_visual_service").clear, unit)
+    if UTIL_Remove then pcall(UTIL_Remove, unit) end
+end
+local function remove_group(state, challenge_id, expected)
+    local group = state.active_groups and state.active_groups[challenge_id]
+    if not group or expected and group ~= expected then return end
+    -- Detach before native removals: their reentrant deaths must never settle
+    -- this group or remove another concurrently running challenge.
+    state.active_groups[challenge_id] = nil
+    for id, unit in pairs(group.units) do
+        bosses[id] = nil
+        retire_boss(unit)
     end
+    group.units, group.remaining = {}, 0
+end
+local function remove_bosses(state)
+    for challenge_id, group in pairs(state.active_groups or {}) do remove_group(state, challenge_id, group) end
 end
 local function cleanup(state)
     scheduler.cancel("archive_hubs_retry:" .. state.player_id)
     require("systems/archive_endless_service").cancel(state.player_id, "结束存档挑战")
-    remove_boss(state)
+    remove_bosses(state)
     for _, unit in pairs(state.hubs) do
         if valid(unit) then
             local unit_index = unit:entindex()
@@ -241,9 +265,11 @@ local function cleanup(state)
                 local function retire(name)
                     local ability = unit:FindAbilityByName(name)
                     if valid(ability) and ability.entindex then
-                        CustomNetTables:SetTableValue("survival_ability_runtime", tostring(ability:entindex()), {
+                        local key = tostring(ability:entindex())
+                        write_runtime(key, {
                             removed = 1, owner_entindex = unit_index, ability_entindex = ability:entindex(),
                         })
+                        published_runtime[key] = nil
                     end
                 end
                 for _, definition in ipairs(definitions.rows) do
@@ -252,9 +278,11 @@ local function cleanup(state)
                     end
                 end
                 hub_actions(unit.survival_archive_hub, function(action) retire(action.ability_name) end)
-                CustomNetTables:SetTableValue("survival_ability_runtime", "unit:" .. tostring(unit_index), {
+                local key = "unit:" .. tostring(unit_index)
+                write_runtime(key, {
                     removed = 1, owner_entindex = unit_index, ability_count = 0,
                 })
+                published_runtime[key] = nil
             end
             require("systems/challenge_guardian_visual_service").clear(unit)
             hubs[unit:entindex()] = nil
@@ -403,7 +431,7 @@ function M.begin(payload)
     publish_phase()
     for _, id in ipairs(payload.player_ids) do
         local state = { player_id = id, difficulty_id = payload.difficulty_id,
-            difficulty = difficulty, mode = mode, hubs = {}, cooldowns = {}, used = {}, finished = false }
+            difficulty = difficulty, mode = mode, hubs = {}, cooldowns = {}, used = {}, active_groups = {}, finished = false }
         players[id] = state
         ensure_hubs(state)
         bus.emit(events.UI_NOTIFICATION, { player_id = id, level = "info",
@@ -423,11 +451,10 @@ function M.summon(caster, challenge_id, ability)
     if not cooperative_rewards.matches_session(state.mode, state.difficulty) then
         return false, "本局模式或难度已变化，挑战不可用"
     end
-    if require("systems/archive_endless_service").is_running(state.player_id) then return false, "请先完成无尽挑战" end
     if state.used[challenge_id] then return false, "本局已挑战，每个技能只能挑战一次" end
     if context.owner_player_id(caster) ~= state.player_id then return false, "挑战建筑不属于当前玩家" end
     if not allowed(state, definition) then return false, "需要当前关卡≥N" .. definition.min_difficulty end
-    if boss_running(state) then return false, "请先击败当前挑战BOSS" end
+    if challenge_running(state, challenge_id) then return false, "该挑战正在生成或进行中" end
     if (state.cooldowns[challenge_id] or 0) > now() then return false, "挑战冷却中" end
     if capped(daily_quota(state.player_id, daily_limits.challenge_key(definition))) then
         publish(state)
@@ -448,7 +475,12 @@ function M.summon(caster, challenge_id, ability)
     sequence = sequence + 1
     local count = math.max(1, math.floor(tonumber(row.count) or 1))
     local group = {units = {}, remaining = 0, challenge_id = challenge_id, sequence = sequence}
-    state.active_group = group
+    state.active_groups[challenge_id] = group
+    local function abort(reason)
+        remove_group(state, challenge_id, group)
+        if active and not state.finished then publish(state) end
+        return false, reason
+    end
     for _ = 1, count do
         local spawn_ok, unit, reason = pcall(wave.spawn_challenge_monster, row, {
             unit_name = "npc_survival_wave_monster", model_path = definition.model_path,
@@ -457,23 +489,32 @@ function M.summon(caster, challenge_id, ability)
             move_speed = row.move_speed, attack_range = row.attack_range,
         }, state.player_id)
         if not spawn_ok or not valid(unit) then
-            remove_boss(state)
-            return false, spawn_ok and (reason or "BOSS生成失败") or "BOSS生成失败，请重试"
+            return abort(spawn_ok and (reason or "BOSS生成失败") or "BOSS生成失败，请重试")
+        end
+        if not active or ended or state.finished or players[state.player_id] ~= state
+            or state.active_groups[challenge_id] ~= group then
+            retire_boss(unit)
+            return abort("挑战阶段已结束")
         end
         group.units[unit:entindex()] = unit
         group.remaining = group.remaining + 1
         bosses[unit:entindex()] = {state = state, unit = unit, group = group,
-            challenge_id = challenge_id, sequence = sequence}
-        state.active_boss = state.active_boss or unit
-        if unit.SetDeathXP then unit:SetDeathXP(0) end
-        if unit.SetMinimumGoldBounty then unit:SetMinimumGoldBounty(0) end
-        if unit.SetMaximumGoldBounty then unit:SetMaximumGoldBounty(0) end
-        if unit.SetBaseMagicalResistanceValue then unit:SetBaseMagicalResistanceValue(row.magic_resistance) end
-        unit.survival_display_name = definition.display_name
+            challenge_id = challenge_id, sequence = group.sequence}
+        local ready = pcall(function()
+            if unit.SetDeathXP then unit:SetDeathXP(0) end
+            if unit.SetMinimumGoldBounty then unit:SetMinimumGoldBounty(0) end
+            if unit.SetMaximumGoldBounty then unit:SetMaximumGoldBounty(0) end
+            if unit.SetBaseMagicalResistanceValue then unit:SetBaseMagicalResistanceValue(row.magic_resistance) end
+            unit.survival_display_name = definition.display_name
+        end)
+        if not ready then return abort("怪物初始化失败，请重试") end
         if unit.IsAlive and not unit:IsAlive() then
-            remove_boss(state)
-            return false, "怪物生成时已失效，请重试"
+            return abort("怪物生成时已失效，请重试")
         end
+    end
+    if not active or ended or state.finished or players[state.player_id] ~= state
+        or state.active_groups[challenge_id] ~= group or not valid(ability) then
+        return abort("挑战阶段已结束")
     end
     group.committed = true
     state.used[challenge_id] = true
@@ -489,17 +530,17 @@ local function killed(payload)
     local meta = id and bosses[id]
     if not meta or meta.state.finished or (unit and meta.unit ~= unit) then return end
     bosses[id] = nil
-    require("systems/monster_hero_visual_service").on_death(meta.unit)
+    -- Cosmetic teardown must not interrupt authoritative group retirement.
+    pcall(require("systems/monster_hero_visual_service").on_death, meta.unit)
     local group = meta.group
-    if not group or meta.state.active_group ~= group then return end
+    if not group or meta.state.active_groups[meta.challenge_id] ~= group then return end
     group.units[id] = nil
     group.remaining = group.remaining - 1
     if group.remaining > 0 or not group.committed then
-        meta.state.active_boss = next(group.units) and group.units[next(group.units)] or nil
         publish(meta.state)
         return
     end
-    meta.state.active_boss, meta.state.active_group = nil, nil
+    meta.state.active_groups[meta.challenge_id] = nil
     local result = cooperative_rewards.record_challenge(meta.state.player_id, meta.challenge_id,
         meta.sequence, meta.state.difficulty_id)
     if not result or not result.ok then
@@ -551,7 +592,6 @@ function M.start_endless(caster, ability, variant)
     if state.finished or context.owner_player_id(caster) ~= state.player_id then return false, "无尽入口不可用" end
     local used_key = variant == "tower" and "tower" or "endless"
     if state.used[used_key] then return false, "本局已开启该挑战" end
-    if boss_running(state) then return false, "请先击败当前挑战BOSS" end
     if capped(daily_quota(state.player_id, "endless")) then
         publish(state)
         return false, "今日奖励已达上限"
@@ -569,18 +609,6 @@ function M.skip_endless(caster, ability)
     publish(hub.state)
     return ok, result
 end
-function M.return_to_hero(caster, ability, action_id)
-    if expire_if_due() then return false, "挑战阶段时间已到" end
-    local hub, reason = action_hub(caster, ability, action_id)
-    if not hub then return false, reason end
-    local result = bus.request(events.HERO_SUMMON_GET_REQUEST, {player_id = hub.state.player_id})
-    local hero = result and result.ok and result.unit
-    if not valid(hero) then return false, "自己的英雄尚未就绪" end
-    local player = PlayerResource:GetPlayer(hub.state.player_id)
-    if not player then return false, "玩家已离线" end
-    CustomGameEventManager:Send_ServerToPlayer(player, "survival_archive_return", {entindex = hero:entindex()})
-    return true
-end
 function M.cast(ability, challenge_id)
     local caster = ability:GetCaster()
     local ok, reason
@@ -588,10 +616,9 @@ function M.cast(ability, challenge_id)
     elseif challenge_id == "endless" then ok, reason = M.start_endless(caster, ability)
     elseif challenge_id == "tower_solo" then ok, reason = M.start_endless(caster, ability, "tower")
     elseif challenge_id == "endless_skip" then ok, reason = M.skip_endless(caster, ability)
-    elseif tostring(challenge_id):match("^return_[1-4]$") then ok, reason = M.return_to_hero(caster, ability, challenge_id)
     else ok, reason = M.summon(caster, challenge_id, ability) end
     if not ok then
-        ability:EndCooldown()
+        if valid(ability) then ability:EndCooldown() end
         local owner = valid(caster) and context.owner_player_id(caster)
         if owner then notify(owner, tostring(reason)) end
     end
@@ -627,6 +654,7 @@ end
 function M.init()
     cooperative_rewards.init()
     players, hubs, bosses = {}, {}, {}
+    published_runtime = {}
     sequence, active = 0, false
     deadline, ended, expired = nil, false, false
     settling, winner_sent = false, false

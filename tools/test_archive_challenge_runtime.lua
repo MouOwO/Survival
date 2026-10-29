@@ -160,6 +160,10 @@ archive.init()
 local checks=0
 local function no_errors() assert(#errors==0,table.concat(errors,'\n')) end
 local function value(a) return assert(rows[tostring(a.id)],'missing runtime '..a.name) end
+local function active_body(state,id)
+    local group=assert(state.active_groups[id],'missing active group '..id)
+    return assert(group.units[next(group.units)],'missing active body '..id)
+end
 local function verify(state,label)
     no_errors()
     for index,hub in pairs(state.hubs) do
@@ -173,7 +177,8 @@ local function verify(state,label)
             local action=actions.by_id[action_id]
             if a.name=='ability_archive_finish' then expected=not state.finished
             elseif action and (action_id=='endless' or action_id=='tower_solo') then
-                expected=not state.finished and not state.used.endless and not state.active_boss and not endless_running[state.player_id]
+                expected=not state.finished and not state.used[action_id=='tower_solo' and 'tower' or 'endless']
+                    and not endless_running[state.player_id]
                     and state.difficulty>=action.min_difficulty
                     and (action_id~='tower_solo' or state.mode=='cold' or state.mode=='scourge')
                 assert(row.slot_order==action.slot_order,label..': action slot was lost '..a.name)
@@ -186,7 +191,7 @@ local function verify(state,label)
                 local id=a.name:sub(#'ability_archive_'+1)
                 local d=assert(definitions.by_id[id])
                 expected=not state.finished and state.difficulty>=d.min_difficulty
-                    and not state.used[id] and not state.active_boss and not endless_running[state.player_id]
+                    and not state.used[id] and not state.active_groups[id]
                 assert(row.upgrade_description==d.description,label..': description overwritten '..a.name)
                 assert(row.fields and row.fields[1] and row.fields[1].value,label..': unlock tooltip lost '..a.name)
                 assert(row.slot_order==d.slot_order,label..': definition slot was lost '..a.name)
@@ -225,12 +230,12 @@ end
 assert(archive.begin({difficulty_id='N5',player_ids={0,1}}).keep_running)
 local state=archive._test.players()[0]
 local wife=assert(definitions.by_id.social_wife,'Wife challenge is absent from the runtime definitions')
-assert(wife.building_id==4 and wife.slot_order==9 and wife.reward_kind=='social_ticket' and wife.reward_key=='wife',
-    'Video wife entry occupies fourth building slot nine and preserves permanent currency identity')
+assert(wife.building_id==4 and wife.reward_kind=='social_ticket' and wife.reward_key=='wife',
+    'Wife entry occupies the fourth building and preserves permanent currency identity')
 assert(#state.hubs==4,'each player must have four independent archive buildings')
 for index=1,4 do
-    assert(state.hubs[index]:FindAbilityByName('ability_archive_return_'..index),
-        'each building retains its own return-to-hero control')
+    assert(not state.hubs[index]:FindAbilityByName('ability_archive_return_'..index),
+        'retired return controls must not be added to archive hubs')
 end
 local wife_asset=require('config/asset_catalog').resolve(wife.default_wearable_asset_id)
 assert(wife_asset and wife_asset.primary_model==wife.model_path and #wife_asset.components==5
@@ -259,10 +264,10 @@ assert(last_spawn_stats.health==9000010 and last_spawn_stats.attack==189002
     'Actual archive summon uses final workbook values at N5, with no scale/difficulty correction repeated')
 assert(last_spawn_visual.model_path==definitions.by_id.shadow_1.model_path,
     'Numeric authority preserves the existing archive model')
-local boss=state.active_boss
+local boss=active_body(state,'shadow_1')
 boss.alive=false
 bus.emit(events.ENGINE_ENTITY_KILLED,{victim=boss,victim_entindex=boss.id})
-assert(rewards==2 and not state.active_boss, 'one shared boss gives both winning accounts a reward')
+assert(rewards==2 and not state.active_groups.shadow_1, 'one shared boss gives both winning accounts a reward')
 verify(state,'boss death');interleave(state,'used persists after death')
 assert(not a.active and hub.abilities.ability_archive_shadow_2.active,'used/unused transition')
 local wife_hub=state.hubs[wife.building_id]
@@ -289,7 +294,7 @@ assert(last_spawn_stats.challenge_id=='social_wife' and last_spawn_stats.difficu
     and last_spawn_visual.default_wearable_asset_id==wife.default_wearable_asset_id,
     'Wife entry forwards the current difficulty stats and its complete outfit')
 verify(state,'wife boss active');interleave(state,'wife active and used')
-local wife_boss=state.active_boss;wife_boss.alive=false
+local wife_boss=active_body(state,'social_wife');wife_boss.alive=false
 bus.emit(events.ENGINE_ENTITY_KILLED,{victim=wife_boss,victim_entindex=wife_boss.id})
 assert(#reward_events==reward_count+2,'One wife boss awards one independent event to each winning account')
 for index=reward_count+1,#reward_events do
@@ -307,7 +312,7 @@ end
 local hub2=state.hubs[2]
 assert(archive.start_endless(hub2,hub2.abilities.ability_archive_endless))
 verify(state,'endless busy');interleave(state,'endless busy')
-assert(not hub.abilities.ability_archive_shadow_2.active,'endless locks other challenge')
+assert(hub.abilities.ability_archive_shadow_2.active,'endless does not lock unrelated ordinary challenges')
 endless_running[0]=nil;endless_callback(0)
 verify(state,'endless ended');interleave(state,'endless used')
 assert(hub.abilities.ability_archive_shadow_2.active and not hub2.abilities.ability_archive_endless.active)
@@ -353,7 +358,7 @@ package.loaded['systems/archive_service'].record_challenge=function(id)
 end
 local first_hub=first.hubs[1]
 assert(archive.summon(first_hub,'shadow_1',first_hub.abilities.ability_archive_shadow_1))
-local first_boss=first.active_boss;first_boss.alive=false
+local first_boss=active_body(first,'shadow_1');first_boss.alive=false
 bus.emit(events.ENGINE_ENTITY_KILLED,{victim=first_boss,victim_entindex=first_boss.id})
 assert(handed_off[0]==1 and handed_off[1]==1,'finished teammate keeps the full shared reward')
 assert(archive.finish(first.hubs[3]))
@@ -377,7 +382,7 @@ package.loaded['systems/archive_service'].begin_finalization=function()
 end
 first_hub=first.hubs[1]
 assert(archive.summon(first_hub,'shadow_1',first_hub.abilities.ability_archive_shadow_1))
-first_boss=first.active_boss;first_boss.alive=false
+first_boss=active_body(first,'shadow_1');first_boss.alive=false
 bus.emit(events.ENGINE_ENTITY_KILLED,{victim=first_boss,victim_entindex=first_boss.id})
 assert(require('systems/archive_cooperative_reward_service').has_pending())
 local prior_winners=winners
@@ -399,18 +404,11 @@ assert(archive.begin({difficulty_id='N10',player_ids={0,1}}).keep_running)
 state=archive._test.players()[0]
 test_wife(state)
 
--- Return controls only select this owner's hero and preserve challenge state.
-local hero=unit('own_hero',Vector(100,100,0))
-bus.handle_request(events.HERO_SUMMON_GET_REQUEST,function(payload)
-    assert(payload.player_id==0);return {ok=true,unit=hero}
-end)
-for index=1,4 do
-    local h=state.hubs[index]
-    assert(archive.return_to_hero(h,h:FindAbilityByName('ability_archive_return_'..index),'return_'..index))
-    local event=client_events[#client_events]
-    assert(event.name=='survival_archive_return' and event.player==0 and event.payload.entindex==hero.id)
+-- The catalog owns every remaining native action; removed return controls
+-- cannot acquire an ability or occupy a stale absolute slot.
+for _,action in ipairs(actions.rows) do
+    assert(not action.action_id:match('^return_'),'retired return action remains configured')
 end
-assert(not state.finished,'return-to-hero does not finish an archive session')
 
 -- Five-monster football challenge commits atomically, grants only after the
 -- full group dies, and cannot be consumed by a stale frozen-difficulty cast.
@@ -431,25 +429,25 @@ package.loaded['systems/wave_system'].spawn_challenge_monster=function(...)
 end
 local football_rewards=#reward_events
 assert(not archive.summon(football_hub,'football',football_ability))
-assert(#partial==1 and partial[1].removed and not state.active_group and not state.active_boss
+assert(#partial==1 and partial[1].removed and not state.active_groups.football
     and not state.used.football and #reward_events==football_rewards,'partial spawn rolls back without consuming/rewarding')
 bus.emit(events.ENGINE_ENTITY_KILLED,{victim=partial[1],victim_entindex=partial[1].id})
 assert(#reward_events==football_rewards,'rolled-back monster death is never rewarded')
 package.loaded['systems/wave_system'].spawn_challenge_monster=factory
 assert(archive.summon(football_hub,'football',football_ability))
-assert(last_spawn_stats.count==5 and state.active_group.remaining==5,'real football configuration spawns five monsters')
-local group={};for _,body in pairs(state.active_group.units) do group[#group+1]=body end
+assert(last_spawn_stats.count==5 and state.active_groups.football.remaining==5,'real football configuration spawns five monsters')
+local group={};for _,body in pairs(state.active_groups.football.units) do group[#group+1]=body end
 for index=1,4 do
     local body=group[index];body.alive=false
     bus.emit(events.ENGINE_ENTITY_KILLED,{victim=body,victim_entindex=body.id})
     bus.emit(events.ENGINE_ENTITY_KILLED,{victim=body,victim_entindex=body.id})
-    assert(#reward_events==football_rewards and state.active_group.remaining==5-index,
+    assert(#reward_events==football_rewards and state.active_groups.football.remaining==5-index,
         'partial group kills and duplicate native events cannot award football')
 end
 local last=group[5];last.alive=false
 bus.emit(events.ENGINE_ENTITY_KILLED,{victim=last,victim_entindex=last.id})
 bus.emit(events.ENGINE_ENTITY_KILLED,{victim=last,victim_entindex=last.id})
-assert(#reward_events==football_rewards+2 and not state.active_group and not state.active_boss,
+assert(#reward_events==football_rewards+2 and not state.active_groups.football,
     'full group completion pays each winning account once')
 
 -- A spoofed client owner field cannot finish somebody else's state.

@@ -429,50 +429,6 @@
         "AbilityManaCost" "0"
         "AbilityCooldown" "0"
     }
-    "ability_archive_return_1"
-    {
-        "BaseClass" "ability_lua"
-        "ScriptFile" "abilities/archive_challenge_abilities"
-        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-        "AbilityTextureName" "kunkka_return"
-        "MaxLevel" "1"
-        "AbilityCastPoint" "0"
-        "AbilityManaCost" "0"
-        "AbilityCooldown" "0"
-    }
-    "ability_archive_return_2"
-    {
-        "BaseClass" "ability_lua"
-        "ScriptFile" "abilities/archive_challenge_abilities"
-        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-        "AbilityTextureName" "kunkka_return"
-        "MaxLevel" "1"
-        "AbilityCastPoint" "0"
-        "AbilityManaCost" "0"
-        "AbilityCooldown" "0"
-    }
-    "ability_archive_return_3"
-    {
-        "BaseClass" "ability_lua"
-        "ScriptFile" "abilities/archive_challenge_abilities"
-        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-        "AbilityTextureName" "kunkka_return"
-        "MaxLevel" "1"
-        "AbilityCastPoint" "0"
-        "AbilityManaCost" "0"
-        "AbilityCooldown" "0"
-    }
-    "ability_archive_return_4"
-    {
-        "BaseClass" "ability_lua"
-        "ScriptFile" "abilities/archive_challenge_abilities"
-        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-        "AbilityTextureName" "kunkka_return"
-        "MaxLevel" "1"
-        "AbilityCastPoint" "0"
-        "AbilityManaCost" "0"
-        "AbilityCooldown" "0"
-    }
     "ability_archive_finish"
     {
         "BaseClass" "ability_lua"

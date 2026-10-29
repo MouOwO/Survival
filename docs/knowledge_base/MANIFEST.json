@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 4656,
-      "sha256": "f4290c79dd90bf7414acb64209efaa5e6800a72e0c25c5386b80cc1c48f91593"
+      "bytes": 4571,
+      "sha256": "d4823553eda3a578ee6ceb31daf7f211f1301130e23d770f85602b4f8f843f48"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -20,8 +20,8 @@
     },
     {
       "path": "03_progression_save_contract.md",
-      "bytes": 15566,
-      "sha256": "595f70c9847003a21e23679498c48fe4224bbe53c96b4d4ba58af56a9498c737"
+      "bytes": 16007,
+      "sha256": "93d6e179b1b0a4c1e400c83d4680c41e3ac9d574e2aa6c9b837083423373bd10"
     },
     {
       "path": "04_network_auth_official.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 15218,
-      "sha256": "d701a3e9babe0c0fb8e93936f5d2dd4f7754aba26925d1a20e3ea31ffc06499f"
+      "bytes": 15904,
+      "sha256": "deefdfb97f40575498a607b1172b8cde656628c2e9e5d8948dbc97dfd10bc9a1"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -124,6 +124,11 @@
       "sha256": "1f0a8d6bc07925521512dc0269f918a16f43e44b7ec35d61934118ac4f166c09"
     },
     {
+      "path": "evidence/archive_layout_independent_20261029.md",
+      "bytes": 5626,
+      "sha256": "206a28ec9c95511d994db1c832e88bc150baaf9fa3836a83aed905b893be186f"
+    },
+    {
       "path": "evidence/archive_menu_performance_20261029.md",
       "bytes": 3311,
       "sha256": "620a49639ca7ea74f63836d7786fe447b9b91772c8bc1324df6b603d80c7de4b"
@@ -135,8 +140,8 @@
     },
     {
       "path": "evidence/archive_video_challenges_20261029.md",
-      "bytes": 9010,
-      "sha256": "4c6af9a5414795cad1e85c22c866ce2998cf008031513eb880867cb11361dd9d"
+      "bytes": 9362,
+      "sha256": "7d6f8d6d46f4e6d2512f64c29c73d8aa6e5c4b6be3bb4c7376487bef227e0c00"
     },
     {
       "path": "evidence/challenge_projectiles_20261029.md",
@@ -307,6 +312,11 @@
       "path": "tools/verify_knowledge.py",
       "bytes": 1993,
       "sha256": "76331e711948f58761439119c684badcc654fa7ce8c9a107c1e440f693c0be7c"
+    },
+    {
+      "path": "validation/20261029/archive_layout_independent.json",
+      "bytes": 13994,
+      "sha256": "b025129b8480e5759a224c0bbc15308f2161deda1194049d6bd23dd4d73310bc"
     }
   ]
 }

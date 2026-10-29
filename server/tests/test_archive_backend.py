@@ -49,8 +49,10 @@ class Database:
                 if op['fingerprint']!=p['p_fingerprint']:return {'ok':False,'terminal':True,'error':'archive_id_conflict'}
                 return self.resume(a,i)
             if name=='archive_resume':return self.resume(a,i) if (a,i) in self.ops else {'ok':False,'terminal':True,'error':'archive_operation_missing'}
-            if name in ('archive_commit','archive_commit_lottery'):
+            if name in ('archive_commit','archive_commit_lottery','archive_commit_challenge'):
                 op=self.ops[(a,i)];profile=self.profile(a)
+                if name=='archive_commit_challenge':
+                    assert op['command']['kind']=='challenge' and 'p_inventory' not in p
                 if op['done']:return self.resume(a,i)
                 if self.conflict:
                     self.conflict=False;profile['revision']+=1;profile['save']['gameplay_stats']['initial_wood']+=100
@@ -59,6 +61,7 @@ class Database:
                     profile['save']['archive']=copy.deepcopy(p['p_archive'])
                     if name=='archive_commit_lottery':
                         profile['save']['content_inventory']=copy.deepcopy(p['p_inventory'])
+                    if name in ('archive_commit_lottery','archive_commit_challenge'):
                         op['response']=copy.deepcopy(p['p_response'])
                     for key,delta in p['p_deltas'].items():profile['save']['gameplay_stats'][key]+=delta
                     profile['revision']+=1

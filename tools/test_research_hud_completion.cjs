@@ -34,7 +34,7 @@ const native=entries.map((entry,i)=>{
  return {id:'Ability'+i,style:{},visible:true,FindChildTraverse:()=>anchor,anchor};
 });
 const list={FindChildTraverse:id=>native.find(p=>p.id===id)};
-const cc={Entities:{GetUnitName:()=> 'building_advanced_research_lab',GetAbility:(unit,slot)=>entries[slot].ability},
+const cc={selectedUnit:()=>10,Entities:{GetUnitName:()=> 'building_advanced_research_lab',GetAbility:(unit,slot)=>entries[slot].ability},
  Abilities:{GetAbilityName:ability=>entries.find(e=>e.ability===ability).name,IsHidden:()=>false},
  abilityIndexForSlot:(unit,slot)=>entries[slot].ability,unitAbilityCount:()=>entries.length,
  orderVisibleAbilities:values=>values,abilityRuntime:runtime,maxAbilityEngineSlots:32,

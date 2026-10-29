@@ -49,19 +49,31 @@ local function roll(items, count, filter, random_int)
     end
     return result
 end
+local function accepted_reward(response, id, name, quality, count)
+    if count <= 0 then return end
+    for _, reward in ipairs(response.rewards) do
+        if reward.item_id == id then reward.count = reward.count + count; return end
+    end
+    response.rewards[#response.rewards + 1] = {
+        item_id=id, name=name, quality=quality, count=count,
+    }
+end
 function M.apply(command, save, stats, pass, apply, random_int)
     local definition = challenges.by_id[command.challenge_id]
     if not definition or not definition.enabled then return false, "archive_challenge_unknown" end
     local eligible, reason = eligibility.check(save, definition)
-    if not eligible then return true, {awarded=0, skipped_reason=reason, challenge_id=command.challenge_id} end
+    if not eligible then return true, {awarded=0, rewards={}, skipped_reason=reason, challenge_id=command.challenge_id} end
     normalize(save)
-    local response = {awarded=0, challenge_id=command.challenge_id}
+    local response = {awarded=0, rewards={}, challenge_id=command.challenge_id}
     if definition.reward_kind == "fragment" then
         local fragment = fragments.by_id[definition.reward_key]
         local remaining = daily_limits.remaining(save, fragment.fragment_id, assert(command.day_key), pass)
         local count = grant_fragment(save, stats, fragment, math.min(fragment.drop_count, remaining), apply)
         daily_limits.grant(save, fragment.fragment_id, count, command.day_key, pass)
         response.awarded = count
+        local name = fragment.display_name
+        if not name:find("碎片", 1, true) then name = name .. "碎片" end
+        accepted_reward(response, fragment.fragment_id, name, "gold", count)
     elseif definition.reward_kind == "shadow" then
         local drop_rule = shadow_drop_rules.by_id[definition.challenge_id]
         if not drop_rule or not drop_rule.enabled then
@@ -83,10 +95,15 @@ function M.apply(command, save, stats, pass, apply, random_int)
                 remaining = remaining - daily_limits.grant(save, "shadow", 1, command.day_key, pass)
                 apply(stats, item)
                 response.awarded = response.awarded + 1
+                accepted_reward(response, id, item.display_name, item.quality, 1)
             end
         end
     elseif definition.reward_kind == "social_ticket" then
-        return require("systems/archive_social_rewards").grant_ticket(command, save, definition.reward_key, pass)
+        local ok, result = require("systems/archive_social_rewards").grant_ticket(command, save, definition.reward_key, pass)
+        if not ok then return false, result end
+        response = result
+        response.challenge_id, response.rewards = command.challenge_id, {}
+        accepted_reward(response, response.currency_id, response.currency_name, "gold", response.awarded)
     elseif definition.reward_kind == "challenge_points" then
         local point = point_rules[definition.reward_key]
         if not point then return false, "archive_challenge_points_unknown" end
@@ -94,6 +111,7 @@ function M.apply(command, save, stats, pass, apply, random_int)
         local accepted = daily_limits.grant(save, definition.reward_key, point.count, assert(command.day_key), pass)
         save.challenge_points[definition.reward_key] = (save.challenge_points[definition.reward_key] or 0) + accepted
         response.awarded, response.currency_id, response.currency_name = accepted, definition.reward_key, point.name
+        accepted_reward(response, definition.reward_key, point.name, "gold", accepted)
     elseif definition.reward_kind == "cage" then
         local remaining = daily_limits.remaining(save, "cage", assert(command.day_key), pass)
         local count = rules.cage_drop_count + (pass and rules.pass_cage_extra_count or 0)
@@ -107,10 +125,11 @@ function M.apply(command, save, stats, pass, apply, random_int)
                 remaining = remaining - daily_limits.grant(save, "cage", 1, command.day_key, pass)
                 apply(stats, item)
                 response.awarded = response.awarded + 1
+                accepted_reward(response, id, item.display_name, "purple", 1)
             end
         end
     else return false, "archive_challenge_reward_unknown" end
-    if response.awarded == 0 then response.skipped_reason = "今日获取次数已达上限或物品已集满" end
+    if response.awarded == 0 then response.skipped_reason = response.skipped_reason or "今日获取次数已达上限或物品已集满" end
     return true, response
 end
 function M.promote(command, save, stats, apply)

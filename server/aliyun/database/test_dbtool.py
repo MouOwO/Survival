@@ -6,7 +6,10 @@ import tempfile
 import unittest
 from unittest.mock import MagicMock, patch
 
-import dbtool
+if __package__:
+    from . import dbtool
+else:
+    import dbtool
 
 
 class DatabaseToolTests(unittest.TestCase):
@@ -67,7 +70,7 @@ class DatabaseToolTests(unittest.TestCase):
                 (legacy / "supabase/migrations" / name).write_bytes(sql)
             (addon / "tools/sql/202609060001_archive_fishing_inventory.sql").write_bytes(sql)
             result = dbtool.collect(legacy, addon, target)
-            self.assertEqual(result["migrations"], 31)
+            self.assertEqual(result["migrations"], 32)
             manifest = dbtool.load_bundle(target)
             old_entries = manifest["entries"][:17]
             self.assertEqual([e["group"] for e in old_entries], ["legacy"] * 12 + ["addon"] * 3 + ["manual", "target"])
@@ -81,7 +84,8 @@ class DatabaseToolTests(unittest.TestCase):
             self.assertEqual(manifest["entries"][24]["id"], "target/202610200002_archive_match_modes.sql")
             self.assertEqual(manifest["entries"][25]["id"], "target/202610200003_archive_daily_limits.sql")
             self.assertEqual(manifest["entries"][26]["id"], "target/202610200004_mode_unlock_chain.sql")
-            self.assertEqual(manifest["entries"][-1]["id"], "target/202610250001_onboarding.sql")
+            self.assertEqual(manifest["entries"][-2]["id"], "target/202610250001_onboarding.sql")
+            self.assertEqual(manifest["entries"][-1]["id"], "target/202610290001_archive_challenge_receipts.sql")
             # All deployed test05 entries remain a complete unchanged prefix.
             latest_applied = {e["id"]: e["sha256"] for e in manifest["entries"][:21]}
             latest_applied["security/harden.sql"] = manifest["harden_sha256"]
@@ -95,6 +99,9 @@ class DatabaseToolTests(unittest.TestCase):
     def test_new_backup_inventory_includes_migration_marker_and_lottery_function(self):
         self.assertIn("survival_data_migrations", dbtool.TABLES)
         self.assertIn("archive_commit_lottery", dbtool.FUNCTIONS)
+        self.assertIn("archive_commit_challenge", dbtool.FUNCTIONS)
+        self.assertIn("archive_commit_challenge(text,text,bigint,jsonb,jsonb,text,jsonb)", dbtool.RPC_SIGNATURES)
+        self.assertIn("harden_archive_challenge_receipts.sql", dbtool.HARDEN_PATCHES)
         self.assertIn("match_profile_sessions", dbtool.TABLES)
         self.assertIn("match_profile_login", dbtool.FUNCTIONS)
 
@@ -212,7 +219,7 @@ class DatabaseToolTests(unittest.TestCase):
 
     def test_app_grants_match_adapter_contract(self):
         sql = "\n".join((dbtool.HERE / name).read_text(encoding="utf-8") for name in ("harden.sql", *dbtool.HARDEN_PATCHES))
-        self.assertEqual(len(dbtool.RPC_SIGNATURES), 16)
+        self.assertEqual(len(dbtool.RPC_SIGNATURES), 17)
         for signature in dbtool.RPC_SIGNATURES:
             self.assertIn("public." + signature, sql)
         self.assertIn("pg_catalog,public,extensions,pg_temp", sql)

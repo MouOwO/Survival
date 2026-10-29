@@ -58,14 +58,15 @@ for index = 1, 4 do
     print(string.format("ARCHIVE_NATIVE_HUB index=%d entindex=%d distance=%.3f position=%s",
         index, unit:entindex(), distance, tostring(position)))
 end
-assert(count == 43, "native archive entries missing")
+assert(count == #definitions.rows + #actions.rows, "native archive entries missing")
 local name = "ability_archive_shadow_1"
 local ability = assert(state.hubs[1]:FindAbilityByName(name))
 if not state.used.shadow_1 then
     local ok, reason = service.summon(state.hubs[1], "shadow_1", ability)
     assert(ok, reason)
 end
-local boss = assert(state.active_boss)
+local group = assert(state.active_groups.shadow_1)
+local boss = assert(group.units[next(group.units)])
 local authored = require("config/human_challenge_balance").archive("shadow_1", difficulty)
 assert(boss.survival_exact_stat_projection == true)
 assert(boss.survival_endless_health == authored.health and boss.survival_endless_attack == authored.attack)
@@ -74,4 +75,4 @@ print(string.format("ARCHIVE_NATIVE_STATS difficulty=%s health=%.17g attack=%.17
 local player = PlayerResource:GetPlayer(0)
 CustomGameEventManager:Send_ServerToPlayer(player, "survival_archive_return", {entindex = state.hubs[4]:entindex()})
 bus.emit(events.UI_SNAPSHOT_REQUESTED, {player_id = 0})
-print("ARCHIVE_NATIVE_PROBE_PASS: 4 native hubs, 43 abilities, exact runtime slots, portal placement, fixed shadow values; no kills or rewards")
+print("ARCHIVE_NATIVE_PROBE_PASS: 4 native hubs, configured abilities, exact runtime slots, portal placement, fixed shadow values; no kills or rewards")

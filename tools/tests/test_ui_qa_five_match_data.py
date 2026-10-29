@@ -79,7 +79,7 @@ class AuditedDatabase(RichDatabase):
     def rpc(self, name, payload):
         account = payload.get("p_account", payload.get("p_account_id"))
         operation = payload.get("p_id")
-        if name not in ("archive_commit", "archive_commit_lottery"):
+        if name not in ("archive_commit", "archive_commit_lottery", "archive_commit_challenge"):
             return super().rpc(name, payload)
         before = deepcopy(self.profile(account))
         try:

@@ -1,5 +1,6 @@
 """Generate only isolated fixture assets, never the real NPC/localization files."""
 import csv
+import re
 import shutil
 import subprocess
 import tempfile
@@ -32,14 +33,27 @@ class ArchiveAssets(unittest.TestCase):
         if fourth_model is not None:
             rule['building_model_4'] = fourth_model
         table('archive_challenge_rules.csv', [rule])
-        table('archive_challenge_definitions.csv', [dict(
+        base = dict(
             challenge_id='shadow_1', display_name='完整"名称"', min_difficulty=3,
             unlock_text='N3解锁，不要重复拼接', ability_icon='nevermore_shadowraze1',
-            cooldown_seconds=3, description='需要：\n - N3解锁\n挑战成功后可获得虚空之影道具',
-        )])
+            cooldown_seconds=3, building_id=1, slot_order=1, enabled=1,
+            reward_kind='shadow', reward_key='1',
+            description='需要：\n - N3解锁<br>挑战成功后可获得虚空之影道具',
+        )
+        definitions = [base,
+            dict(base, challenge_id='fragment_1', slot_order=2, reward_kind='fragment',
+                 description='神器碎片-光明圣器\n需要：N3解锁'),
+            dict(base, challenge_id='cage_1', building_id=3, slot_order=1, reward_kind='cage',
+                 description='挑战成功后获得专属奖励'),
+        ]
+        for tier in range(2, 5):
+            definitions.append(dict(base, challenge_id='shadow_' + str(tier),
+                                    building_id=4, slot_order=tier-1, reward_key=str(tier)))
+        table('archive_challenge_definitions.csv', definitions)
+        table('archive_shadow_items.csv', [dict(item_id='shadow_'+str(i), source_boss_difficulty=str(i), quality=quality)
+                                          for i, quality in enumerate(['white', 'blue', 'purple', 'gold'], 1)])
         actions = []
-        for key, floor, slot in [('endless', 2, 9), ('endless_skip', 2, 10),
-                                  ('tower_solo', 2, 11), *[(f'return_{i}', i, 12) for i in range(1, 5)]]:
+        for key, floor, slot in [('endless', 2, 1), ('endless_skip', 2, 2), ('tower_solo', 2, 3)]:
             actions.append(dict(action_id=key, ability_name='ability_archive_' + key,
                                 building_id=floor, slot_order=slot, display_name='控制：' + key,
                                 min_difficulty=3, unlock_text='N3解锁', ability_icon='chen_hand_of_god',
@@ -64,10 +78,17 @@ class ArchiveAssets(unittest.TestCase):
             self.assertEqual(units.count('"npc_archive_challenge_'), 4)
             fourth = units.split('"npc_archive_challenge_4"')[1]
             self.assertIn('"Model" "models/three.vmdl"', fourth)
-            for key in ['endless', 'endless_skip', 'tower_solo', 'return_1', 'return_2', 'return_3', 'return_4', 'finish']:
+            for key in ['endless', 'endless_skip', 'tower_solo', 'finish']:
                 self.assertEqual(abilities.count('"ability_archive_' + key + '"'), 1)
+            self.assertNotIn('ability_archive_return_', abilities + localization)
+            self.assertEqual(re.findall(r'"AbilityLayout" "(\d+)"', units), ['2', '3', '1', '3'])
             self.assertIn('完整\\"名称\\"', localization)
-            self.assertIn('需要：<br> - N3解锁<br>挑战成功后可获得虚空之影道具', localization)
+            self.assertIn('需要：\\n - N3解锁\\n挑战成功后可获得', localization)
+            self.assertNotIn('<br>', localization)
+            for color in ['#d7dee4', '#74c8f2', '#b680ee', '#f5c65e']:
+                self.assertIn('<font color=\\"' + color + '\\">', localization)
+            self.assertIn('<font color=\\"#f5c65e\\">光明圣器</font>', localization)
+            self.assertIn('<font color=\\"#b680ee\\">专属奖励</font>', localization)
             self.assertNotIn('当前关卡≥', localization)
             self.assertNotIn('不要重复拼接', localization)
             self.assertIn('完整正文：endless_skip', localization)

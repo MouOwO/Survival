@@ -1,0 +1,320 @@
+{
+  "date": "2026-10-29",
+  "scope": "archive compact rows, independent challenges, supported quality markup and durable server reward receipts",
+  "status": "PASS",
+  "challenge_layout": [
+    11,
+    10,
+    9,
+    9
+  ],
+  "challenges": 36,
+  "controls": 3,
+  "pal_enabled": false,
+  "lua_regression_programs": 24,
+  "python_contract_tests": 65,
+  "panorama_regression_programs": 10,
+  "catalog_check": "PASS",
+  "business_programs": [
+    {
+      "name": "test_archive_four_hub_placement",
+      "exit_code": 0,
+      "last_line": "PASS archive four-hub placement: 2235 checks; real cold shared routing, 16 hubs, all modes, bounded 24 candidates, terrain/bounds/unit rejection, safe recovery"
+    },
+    {
+      "name": "test_archive_high_difficulty_variants",
+      "exit_code": 0,
+      "last_line": "PASS archive high difficulty/variants: 233 checks; mode bounds, frozen identities, exact score admission, skipped waves, solo tower and callbacks"
+    },
+    {
+      "name": "test_archive_phase_admission",
+      "exit_code": 0,
+      "last_line": "ARCHIVE_PHASE_ADMISSION_PASS: strict human/config failures, late handler, fixed 30s retry, disconnected/cooperative/clear save barriers"
+    },
+    {
+      "name": "test_archive_post_win_defeat",
+      "exit_code": 0,
+      "last_line": "ARCHIVE_POST_WIN_DEFEAT_PASS: real bootstrap listener preserves saved victory; ordinary defeat remains effective"
+    },
+    {
+      "name": "test_archive_fixed_all_modes",
+      "exit_code": 0,
+      "last_line": "ARCHIVE_FIXED_ALL_MODES_PASS: 8460 valid combinations / 7 configured modes / 67680 exact field comparisons; Pal excluded"
+    },
+    {
+      "name": "test_archive_challenge_gear",
+      "exit_code": 0,
+      "last_line": "ARCHIVE_CHALLENGE_GEAR_PASS: 68 checks; real effects, cadence, skip crossings, independent cursors, quality boundaries, full inventory, inspectable rows"
+    },
+    {
+      "name": "test_archive_reward_ack",
+      "exit_code": 0,
+      "last_line": "ARCHIVE_REWARD_ACK_PASS: real persistence, failed writes, lost responses, stale callbacks, retry identity, recipient isolation, caps and legacy receipts"
+    },
+    {
+      "name": "test_archive_reward_presentation",
+      "exit_code": 0,
+      "last_line": "ARCHIVE_REWARD_PRESENTATION_PASS: 21 quality colors, escaped names, exact accepted quantities and no invented legacy rewards"
+    },
+    {
+      "name": "test_archive_reward_notification_route",
+      "exit_code": 0,
+      "last_line": "ARCHIVE_REWARD_ROUTE_PASS: recipient privacy, trusted rich marker, ordinary notification and research/resource behavior"
+    },
+    {
+      "name": "test_daily_cap_entry_guards",
+      "exit_code": 0,
+      "last_line": "DAILY_CAP_ENTRY_GUARDS_PASS: authority refresh, engine grey state, direct summon/endless guard, per-account isolation and finish"
+    },
+    {
+      "name": "test_archive_concurrent_challenges",
+      "exit_code": 0,
+      "last_line": "ARCHIVE_CONCURRENT_CHALLENGES_PASS: all36 entries/40 bodies/72 real recipient settlements, isolated runtime writes, duplicate kills, football rollback, eligibility/daily limits, endless coexistence and phase cleanup"
+    },
+    {
+      "name": "test_archive_challenge_timer",
+      "exit_code": 0,
+      "last_line": "ARCHIVE_ENDLESS_DEADLINE_PASS: no late wave, no boundary reward, no expired start"
+    },
+    {
+      "name": "test_archive_challenge_hub_positions",
+      "exit_code": 0,
+      "last_line": "PASS archive hub recovery: shared wall area, grounded bounded placement, blocked/water/occupied rejection, fog, retry and partial setup reuse"
+    },
+    {
+      "name": "test_archive_endless_rewards",
+      "exit_code": 0,
+      "last_line": "ARCHIVE_ENDLESS_RUNTIME_PASS: all effect fields projected, real damage grants wood/attributes, owner-only"
+    },
+    {
+      "name": "test_wave_population_endgame",
+      "exit_code": 0,
+      "last_line": "PASS fishing wave isolation: no difficulty/countdown/preload/spawn/challenge/clear; direct, event and debug requests denied; two-hour lifecycle stays playable; standard/pure still start real waves"
+    },
+    {
+      "name": "test_archive_challenge_runtime",
+      "exit_code": 0,
+      "last_line": "ARCHIVE_RUNTIME_FLICKER_REGRESSION_PASS 73 UI checks plus team early-finish and reward handoff barrier: identity, N gates, used, active boss, endless busy/end, shared refresh, activation and cleanup"
+    },
+    {
+      "name": "test_archive_cooperative_rewards",
+      "exit_code": 0,
+      "last_line": "ARCHIVE_COOPERATIVE_REWARDS_PASS 249 checks: roster, source authority, account isolation, monthly perks, delayed profile, disconnect, failure retries, highest team floor, bounded transport, terminal flush and independent wife daily rewards"
+    },
+    {
+      "name": "test_archive_portal_hubs",
+      "exit_code": 0,
+      "last_line": "ARCHIVE_PORTAL_HUBS_PASS: production rules, four owners/16 hubs, cardinal/diagonal offsets, old-anchor rejection, lower ground, occupancy/trees/navigation, bounded retries, idempotency, shared portal, native clear-space disabled"
+    },
+    {
+      "name": "test_archive_hub_placement",
+      "exit_code": 0,
+      "last_line": "PASS archive hub placement: four-player wall/builder ownership, missing/blocked/occupied base refuses portals, bounded search, legacy compatibility"
+    },
+    {
+      "name": "test_archive_clear_flow",
+      "exit_code": 0,
+      "last_line": "ARCHIVE_CLEAR_FLOW_PASS 6 cases plus failure/dev guards: normal/early, final-wave guards, co-op flag, HTTP failure/timeout retries, duplicate death, stale receipt isolation, authoritative revision and HUD refresh"
+    },
+    {
+      "name": "test_archive_video_rewards",
+      "exit_code": 0,
+      "last_line": "ARCHIVE_VIDEO_REWARDS_PASS 162 checks"
+    },
+    {
+      "name": "test_endless_spawn_cost",
+      "exit_code": 0,
+      "last_line": "ENDLESS_STARTUP_MODEL_PRECACHE_PASS model=models/heroes/nevermore/nevermore.vmdl calls=1 static_ready=345 failed=0"
+    },
+    {
+      "name": "test_endless_death_cost",
+      "exit_code": 0,
+      "last_line": "ENDLESS_DEATH_COST_PASS players=4 waves=200 births=4000 deaths=4000 duplicate_deaths=4000 removed=4000 max_corpses=16 max_retained=20 max_tasks=14 pending=0 world_scans=0 outfit_props=0 particles=0 corpse_moves=54952"
+    },
+    {
+      "name": "test_endless_gameplay_continuity",
+      "exit_code": 0,
+      "last_line": "ENDLESS_GAMEPLAY_CONTINUITY_PASS: endless harvesting, upgrade spending, passive income, wave rollover, multiplayer finish, save barriers, spawn/setup failures, terminal lock/reset, queued reset, duplicate lifecycle events"
+    },
+    {
+      "name": "python_contracts",
+      "exit_code": 0,
+      "last_line": "OK"
+    },
+    {
+      "name": "catalog_check",
+      "exit_code": 0,
+      "last_line": "ARCHIVE_VIDEO_CONFIG_CHECK_PASS: 36 challenges, 3 actions, compact rows 11/10/9/9, fixed N1-N10 compatibility rows, 4 buildings; Pal excluded"
+    }
+  ],
+  "panorama_programs": [
+    {
+      "path": "tools/test_archive_challenge_ui_20261029.cjs",
+      "exit_code": 0
+    },
+    {
+      "path": "tools/test_archive_compact_input_20261029.cjs",
+      "exit_code": 0
+    },
+    {
+      "path": "tools/test_archive_rich_text_20261029.cjs",
+      "exit_code": 0
+    },
+    {
+      "path": "tools/test_archive_reward_notifications.cjs",
+      "exit_code": 0
+    },
+    {
+      "path": "tools/test_notification_presentation.cjs",
+      "exit_code": 0
+    },
+    {
+      "path": "tools/test_archive_ability_runtime_flicker.cjs",
+      "exit_code": 0
+    },
+    {
+      "path": "tools/test_ability_button_states.cjs",
+      "exit_code": 0
+    },
+    {
+      "path": "tools/test_hero_passive_hotkeys.cjs",
+      "exit_code": 0
+    },
+    {
+      "path": "tools/test_research_hud_completion.cjs",
+      "exit_code": 0
+    },
+    {
+      "path": "tools/test_box_selection_filter.cjs",
+      "exit_code": 0
+    }
+  ],
+  "compiled_resources": [
+    {
+      "game_source": "panorama/src/scripts/custom_game/ui_bootstrap.js",
+      "source_sha256": "3f5890cb9a869f92f10c88e6720a77667d6c1a466cf8a8366a685e0153646674",
+      "compiled_sha256": "c5dd21681f202b368899186f27371cf1c578b5d3dbbb364908a46776f2643fb0"
+    },
+    {
+      "game_source": "panorama/src/scripts/custom_game/topnav_remaining_5d5c1152eb.js",
+      "source_sha256": "729e157c1c9bbd4752e92463a290971bac85f50ad62f1b13a3c6bced668ff919",
+      "compiled_sha256": "733a0b6d91e8dbe47d8455198542edb4f429c2ae967108e325c2fc3fc189b0db"
+    },
+    {
+      "game_source": "panorama/src/scripts/custom_game/combat_stats.js",
+      "source_sha256": "78b9b73183922086d5a5f62f67a22836e39472bc013d82ba40b3e798c8f10e0a",
+      "compiled_sha256": "eb348c427d89ed2d10df08facf77f66a09ef44b4e677dba1754b2703b18af4d4"
+    },
+    {
+      "game_source": "panorama/src/scripts/custom_game/survival_ui.js",
+      "source_sha256": "02c7779d53c98ecb93776b2c9202707f9ff6945bcf01991197ab2b545b768403",
+      "compiled_sha256": "65152ccb4fbaec06f335593836e945f13ac14da254df131254878d583b68e2e5"
+    },
+    {
+      "game_source": "panorama/src/scripts/custom_game/ability_tooltip.js",
+      "source_sha256": "b553f4fd7515bb414816a01dd6ba6270a8634bda64143d5e41eb93814df866b4",
+      "compiled_sha256": "fb3b44bd8e72fe0d88b7b11d1eb7d788ad06d3785444c78535848cb87e615a7d"
+    },
+    {
+      "game_source": "panorama/src/scripts/custom_game/hud_takeover.js",
+      "source_sha256": "6a161f3cee980f93a9abcd4a81c0b18a259196c12eb3e102c54b87d8cbde313d",
+      "compiled_sha256": "7e2beab51691e1862c20fee51a4a1ac4dbdd7b9fe069ddb878c32d4abd6b55f6"
+    },
+    {
+      "game_source": "panorama/src/scripts/custom_game/common/archive_tooltip.js",
+      "source_sha256": "a63af17f9f5b213cf282b7b84441fdb6a82313dd78adfb394363aa764b4da350",
+      "compiled_sha256": "cff858871588bba81cc65f872d6db9d01541d8bf1a1b0c8488a5b0a6bf131d94"
+    },
+    {
+      "game_source": "panorama/src/scripts/custom_game/common/archive_text.js",
+      "source_sha256": "e52d267a1fc568747d2b0d09d381c4411beda03f16cf3b9259d1faf2351de7b1",
+      "compiled_sha256": "4bc4a69ac717210057d36bf4130e854937a3c29da2360b513baad021b92ad505"
+    },
+    {
+      "game_source": "panorama/src/layout/custom_game/archive.xml",
+      "source_sha256": "4c69faad4953b34f323334d817a50f4260801f6fb4ce40e79385d23b3edf72a2",
+      "compiled_sha256": "7aa137e91c38f7122b13d143713e888bcc807ca48fa0cc2a251ba4b7cec11231"
+    },
+    {
+      "game_source": "panorama/src/layout/custom_game/survival_hud.xml",
+      "source_sha256": "a64cabf5d55fcf3950b19367df4ab6de7ed45718ba509e1f395c8e50ffe78307",
+      "compiled_sha256": "4d8f6dae9d57a27a6100ba11c89cce23fc173d92fdcc8070595690940076921a"
+    }
+  ],
+  "localization": {
+    "status": "PASS",
+    "archive_tokens": 84,
+    "unrelated_tokens_preserved": 601,
+    "content_sha256": "8a5637bcc3110fb2c46b556335343f75653bf8b362facdc3beeb2a33e3011499",
+    "original_sha256": "16640e78c3886d4a021d898cdaa2151f54fcb5c3774a722059602631f4b3282a",
+    "existing_format_preserved": "flat dota root; only managed challenge block replaced"
+  },
+  "bundle": {
+    "status": "PASS",
+    "candidate_hash": "d573588b64d2ea6d1431c856d52e0515b5ed471cfdf6af4456ff618d0f568488",
+    "sources_verified": 34,
+    "csv_hashes_verified": 54,
+    "counts": {
+      "archive_challenge_actions": 3,
+      "archive_challenge_definitions": 36,
+      "archive_challenge_gear_items": 10,
+      "archive_challenge_gear_quality_rules": 4,
+      "archive_challenge_modes": 7,
+      "archive_challenge_rules": 1,
+      "archive_challenge_stats": 360
+    },
+    "active_bundle_unchanged": "47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e",
+    "deployed": false
+  },
+  "isolated_postgres": {
+    "status": "PASS",
+    "engine": "PostgreSQL 18.6 (PGlite 0.5.13) on wasm32-unknown-emscripten, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.5 (1db513782be24469589d7cb8a1f1834e9a33f271), 32-bit",
+    "bootstrap_files": [
+      "202608170001_fishing_rewards.sql",
+      "202608200001_player_gameplay_stats.sql",
+      "202608210001_out_of_match_reward_grants.sql",
+      "202608210002_online_time_checkpoints.sql",
+      "202608220003_fix_reward_grant_pgcrypto_search_path.sql",
+      "202608230001_star_blessing_reward_definitions.sql",
+      "202608230002_sync_star_blessing_v3.sql",
+      "202608230003_remove_legacy_fishing_persistence.sql",
+      "202608230004_add_star_blessing_gameplay_stats.sql",
+      "202608230005_fix_gameplay_stats_attack_interval.sql",
+      "202608230006_include_definition_version_in_online_grant_id.sql",
+      "202608230007_finalize_online_time_session.sql",
+      "202609060001_archive_stat_columns.sql",
+      "202609060002_all_archive.sql",
+      "202609060003_archive_buildings.sql",
+      "202609190001_attack_interval_semantics.sql",
+      "202609140001_http_lottery.sql",
+      "202609140002_gameplay_stats_csv_bounds.sql",
+      "202609140003_remove_default_wood_income.sql",
+      "202609140004_remove_default_attack_growth.sql",
+      "harden.sql",
+      "harden_lottery.sql",
+      "202610290001_archive_challenge_receipts.sql",
+      "harden_archive_challenge_receipts.sql"
+    ],
+    "test": "server/tests/archive_challenge_receipts_database.sql",
+    "atomic_commit_and_response": true,
+    "lost_response_replay": true,
+    "revision_conflict": true,
+    "rollback_on_response_write_error": true,
+    "legacy_null_receipts_unchanged": true,
+    "inventory_preserved": true,
+    "least_privilege_checked": true,
+    "fixtures_rolled_back": true,
+    "external_database_connections": 0
+  },
+  "deployment": {
+    "production_database_changed": false,
+    "cloud_service_changed": false,
+    "active_bundle_changed": false,
+    "workshop_uploaded": false
+  },
+  "remaining_acceptance": [
+    "fresh native game: compact rows, hover continuity and visual stability",
+    "native crowded spawn placement and multiplayer summons",
+    "coordinated backend migration/service/transport/bundle rollout and real-account receipt"
+  ]
+}
