@@ -20,6 +20,10 @@ function M.apply(unit, snapshot)
         if ok then snapshot.portrait_model_name = tostring(model or "") end
     end
     unit = unit or {}
+    -- This is an authoritative presentation role, independent of wearable
+    -- identity. Actual combat monsters can share the same model/asset/name.
+    -- Always clear stale/client-supplied values, including asset-less units.
+    snapshot.portrait_display_only = unit.survival_rebirth_scene_display == true and 1 or 0
     local asset_id = tostring(unit.survival_model_asset_id or "")
     if asset_id == "" then
         -- Monster hero visuals keep their asset identity separately from the

@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "date": "2026-10-29",
+  "scope": "user_requested_portrait_trial_rollback_official_background_and_query_display_fixes",
+  "rollback": {
+    "native_entity_portrait_restored": true,
+    "withdrawn_econ_and_background_world_trials": true,
+    "world_models_cameras_wearables_changed": false,
+    "original_hero_corner_and_builder_paths_preserved": true,
+    "own_game_trial_files_retired": 49,
+    "own_content_trial_files_retired": 22,
+    "private_backups_preserved": true
+  },
+  "background": {
+    "source": "Valve original vtex dependencies of native PortraitBackgroundTexture materials",
+    "main_and_query_trees_supported": true,
+    "rebirth_units": 10,
+    "extra_uniform_tint": false,
+    "new_art_generated": false,
+    "custom_rebirth_particles_disabled": true,
+    "native_shader_reproduction_claimed": false
+  },
+  "silence": {
+    "root_cause": "display modifier SILENCED/MUTED activates native face overlay",
+    "server_flag": "portrait_display_only",
+    "flag_source": "unit.survival_rebirth_scene_display == true",
+    "display_only_icons_hidden": true,
+    "formal_same_name_and_hero_status_preserved": true,
+    "isolation_modifier_unchanged": true,
+    "stats_only_and_partial_snapshots_keep_role": true
+  },
+  "hotkeys": {
+    "root_causes": [
+      "Valve separate QueryVertical/AbilitiesHealthMana/abilities tree",
+      "command Resolve differs from inspected ResolveDisplayUnit"
+    ],
+    "query_native_and_custom_keys_cleared": true,
+    "real_ability_icons_preserved": true,
+    "command_cast_identity_unchanged": true,
+    "dual_tree_full_hud_regression_passed": true
+  },
+  "cold": {
+    "fix_preserved": true,
+    "authored_height": 256,
+    "tolerance": 16,
+    "native_samples": 144,
+    "prior_real_offline_starts_passed": 2,
+    "max_retries": 4,
+    "retry_seconds": 1
+  },
+  "verification": {
+    "lua_suites_passed": 4,
+    "node_suites_passed": 7,
+    "official_ui_compile_failures": 0,
+    "source_pairs": 4,
+    "current_native_visual_acceptance": false,
+    "online_acceptance": false
+  },
+  "workshop_uploaded_this_fix": false,
+  "server_backend_changed": false,
+  "source_sha256": {
+    "panorama/src/scripts/custom_game/combat_stats.js": "fc8960514716de65d926980ada941340f591fd5fc0ae1fa3c9c43075ed722242",
+    "panorama/src/scripts/custom_game/portrait_presentation.js": "c085deee0f35541e2bb82385936548dbb9e83468b89af98032f129c8f0c89fa3",
+    "panorama/src/scripts/custom_game/portrait_palette.js": "81a77124c677b1c44317787406f0df4d1d2213dc5f41681511dfe61ad2176a11",
+    "scripts/vscripts/ui/portrait_metadata.lua": "17e090b4aa73e2970802213b7f7bb64454d071ab3c81b03ff69882581ec9dde9",
+    "tools/build_portrait_palette.py": "102d402e4c372b666c3f7ff7a477820874f8f0351429f2bbbceb782694e14a06",
+    "tools/test_portrait_presentation.cjs": "a169ebffacd242ad80c8cda924d06c16a38b06f6dd8d6a29023afa2b2ce8c87e",
+    "tools/test_combat_stats_callbacks.cjs": "b98e2fb17eab8fa04baa1b233af9eb5ac6896388790728c23d72d2040ea575e9",
+    "tools/test_topnav_hotkey_mirror_recovery.cjs": "eceb7667e4d3d91193f0d7158170a223235d51a65255bebd06eddf25ad903a0a",
+    "tools/test_portrait_metadata_sync.lua": "fc1e4f3aa965b7f0290c7681539a83f7d363cc6723284a8d25ade2665df141aa",
+    "tools/test_rebirth_scene_selection.lua": "c0bb5809a5b4afc9e2235e6f4859de9596b0342c96f25953eaebb585d590c93b"
+  },
+  "compiled_ui": [
+    {
+      "source": "scripts/custom_game/combat_stats.js",
+      "source_sha256": "fc8960514716de65d926980ada941340f591fd5fc0ae1fa3c9c43075ed722242",
+      "compiled": "panorama/scripts/custom_game/combat_stats.vjs_c",
+      "compiled_sha256": "367cb9f73768b8c9be63c760c0b81af383675047c30b2d1eb144b37ab7bd9d34",
+      "compiler_exit": 0
+    },
+    {
+      "source": "scripts/custom_game/portrait_palette.js",
+      "source_sha256": "81a77124c677b1c44317787406f0df4d1d2213dc5f41681511dfe61ad2176a11",
+      "compiled": "panorama/scripts/custom_game/portrait_palette.vjs_c",
+      "compiled_sha256": "aee42925bf509d44b60f652b64b701b1ade46ff2ca026e2ab1f44313b839f050",
+      "compiler_exit": 0
+    },
+    {
+      "source": "scripts/custom_game/portrait_presentation.js",
+      "source_sha256": "c085deee0f35541e2bb82385936548dbb9e83468b89af98032f129c8f0c89fa3",
+      "compiled": "panorama/scripts/custom_game/portrait_presentation.vjs_c",
+      "compiled_sha256": "f1dfcf77a33324e5bfb6beb6a00ca2da1f672974128fbab80de6fd180db2f73c",
+      "compiler_exit": 0
+    },
+    {
+      "source": "layout/custom_game/survival_hud.xml",
+      "source_sha256": "ca700bdac4f14ef82261d7370777033c7d726184fd025cf452c1a4258d192767",
+      "compiled": "panorama/layout/custom_game/survival_hud.vxml_c",
+      "compiled_sha256": "189c8c6d9bb5fde7083101db36cf3255461c698bda47d34d682d6503a8b5cd15",
+      "compiler_exit": 0
+    }
+  ]
+}

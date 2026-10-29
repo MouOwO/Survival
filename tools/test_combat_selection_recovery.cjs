@@ -170,16 +170,17 @@ function setup() {
     }
     function key(index) { return abilities.FindChildTraverse('Ability' + index)?.FindChildTraverse('SurvivalAbilityHotkey'); }
     function native(index) { return abilities.FindChildTraverse('Ability' + index)?.FindChildTraverse('HotkeyContainer'); }
-    function assertKeys(expected, passiveSlots = []) {
+    function assertKeys(expected, passiveSlots = [], nativeFallbackSlots = []) {
         expected.forEach((text, index) => {
             const label = key(index);
             if (!text) {
                 assert(!label || label.text === '' || label.style.visibility === 'collapse');
-                if (passiveSlots.includes(index)) {
-                    assert.equal(native(index)?.style.opacity, '0', 'passive native shortcuts must stay hidden');
-                    assert.equal(native(index)?.hittest, false);
+                if (nativeFallbackSlots.includes(index)) {
+                    assert.notEqual(native(index)?.style.opacity, '0', 'a real active ability without a custom binding retains its native fallback');
                 } else {
-                    assert.notEqual(native(index)?.style.opacity, '0', 'unbound active/cleared selection restores native shortcuts');
+                    assert.equal(native(index)?.style.opacity, '0', passiveSlots.includes(index)
+                        ? 'passive native shortcuts must stay hidden' : 'empty or cleared native placeholders must not restore Q/W/E');
+                    assert.equal(native(index)?.hittest, false);
                 }
                 return;
             }
@@ -315,6 +316,21 @@ for (const replaceContainer of [false, true]) {
 
 // The match check must use the same key assignment as rendering: passive
 // abilities consume no key, and research/builder abilities use runtime slots.
+{
+    const t = setup();
+    const skills = Array.from({ length: 8 }, (_, index) => ({ id: 100 + index, name: 'real_active_' + index }));
+    t.define(10, 'npc_dota_hero_test', skills);
+    t.mount(8);
+    t.api.refresh(false);
+    t.assertKeys(['Q', 'W', 'E', 'R', 'T', 'Y', 'U', ''], [], [7]);
+    t.define(20, 'npc_survival_named_rebirth_boss_10', []);
+    t.select(20);
+    t.api.refresh(false);
+    t.assertKeys(Array(8).fill(''));
+    t.native(0).style.opacity = '1';
+    t.api.vitals();
+    t.assertKeys(Array(8).fill(''));
+}
 for (const example of [
     {
         name: 'npc_dota_hero_test',

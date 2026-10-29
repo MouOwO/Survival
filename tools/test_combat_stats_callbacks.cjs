@@ -215,6 +215,43 @@ const doomSnapshot=(version=1)=>({entindex:7,refresh_version:version,model_asset
  portrait_unit_name:'npc_dota_hero_doom_bringer',portrait_item_def:'',attack_min:10,attack_max:10});
 function portraitGeometry(panel){return {position:panel.values.position,width:panel.values.width,height:panel.values.height}}
 {
+ const delivered=[];
+ const t=setup({portrait:true,config:{SurvivalPortraitPresentation:{SetSnapshot:snapshot=>{
+  delivered.push(JSON.parse(JSON.stringify(snapshot)));
+ }}}});
+ const asset='monster_boss_rebirth_10_darkness_foretold';
+ t.select(7,'npc_survival_named_rebirth_boss_10');
+ t.api.updateSnapshot({entindex:7,refresh_version:1,model_asset_id:asset,
+  portrait_unit_name:'npc_dota_hero_doom',portrait_display_only:1,health:100});
+ assert.equal(delivered.at(-1).portrait_display_only,1);
+ t.api.updateSnapshot({entindex:7,refresh_version:2,health:99});
+ assert.equal(delivered.at(-1).portrait_display_only,1,'stats-only updates retain authoritative presentation role');
+ assert.equal(delivered.at(-1).model_asset_id,asset);
+ t.api.updateSnapshot({entindex:7,refresh_version:3,model_asset_id:asset,health:98});
+ assert.equal(delivered.at(-1).portrait_display_only,1,'partial portrait metadata must independently retain the role');
+ t.api.updateSnapshot({entindex:7,refresh_version:4,portrait_display_only:0,health:97});
+ assert.equal(delivered.at(-1).portrait_display_only,0,'explicit zero clears an earlier presentation role');
+ t.api.updateSnapshot({entindex:7,refresh_version:5,health:96});
+ assert.equal(delivered.at(-1).portrait_display_only,0,'following stats-only update retains explicit zero');
+ const beforeStale=delivered.length;
+ t.api.updateSnapshot({entindex:7,refresh_version:4,portrait_display_only:1});
+ assert.equal(delivered.length,beforeStale,'old version cannot reactivate the display role');
+ t.select(8,'npc_survival_named_rebirth_boss_10');
+ t.api.updateSnapshot({entindex:7,refresh_version:99,portrait_display_only:1});
+ assert.equal(delivered.length,beforeStale,'late prior-entity snapshot never reaches presentation');
+ t.api.updateSnapshot({entindex:8,refresh_version:1,model_asset_id:asset,
+  portrait_unit_name:'npc_dota_hero_doom',health:100});
+ assert.equal(delivered.at(-1).portrait_display_only,undefined,'new same-name/asset entity cannot inherit previous entity role');
+ t.api.updateSnapshot({entindex:8,refresh_version:2,portrait_display_only:0});
+ t.api.updateSnapshot({entindex:8,refresh_version:3,model_asset_id:asset});
+ assert.equal(delivered.at(-1).portrait_display_only,0,'formal combat role survives partial portrait metadata');
+ assert.equal(t.metrics.setUnit.length,0,'rebirth background/status correction never replaces native entity portrait');
+ assert.equal(t.metrics.econHero.length,0);assert.equal(t.metrics.econItem.length,0);
+ assert.equal(t.metrics.created.filter(entry=>entry.type==='DOTAScenePanel').length,0,'no experimental rebirth 3D scenes');
+ t.api.shutdown('display_role_complete');assert.equal(t.jobs.size,0);
+}
+console.log('PORTRAIT_DISPLAY_SNAPSHOT_PASS: real HUD update passes authoritative roles through stats-only/partial metadata, explicit zero, same-name entity changes and stale replies without any rebirth 3D replacement');
+{
  const t=setup({portrait:true});t.api.updateSnapshot(doomSnapshot());
  assert.equal(t.metrics.setUnit.length,1);assert.equal(t.overlay.GetParent(),t.nativeHost());
  assert.equal(t.native().values.opacity,'1');assert.equal(t.native().values.washColor,undefined);assert.equal(t.overlay.values.visibility,'visible');

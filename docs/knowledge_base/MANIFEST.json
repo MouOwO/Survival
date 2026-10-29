@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 5512,
-      "sha256": "7c4bd306015673f9918c0940de09ef3e1271c09e49690975c82fb41f5295cccb"
+      "bytes": 6192,
+      "sha256": "9f3468fbe979fbf303bcb741368e2f9514c3045247ea209e8378f6ee6d2f1c52"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 17701,
-      "sha256": "e1f30bd0ab474392dfd5583feaa81bd98dda8a53b7f595026322f1c8240df8fa"
+      "bytes": 18172,
+      "sha256": "3979c08573917ef7164c56050e0208592fdd720368c12b1933c1be4ed62895b9"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -70,8 +70,8 @@
     },
     {
       "path": "13_art_ui_qa.md",
-      "bytes": 9042,
-      "sha256": "1ef2ffcf9223258c1b8d21b58b309cec42663d53bccca983b091e116d84cc396"
+      "bytes": 9513,
+      "sha256": "ac4051939adecb31218fb8e35a0f228882ee46ae91613da9c6d6f47a0c4b676d"
     },
     {
       "path": "NEW_CHAT_PROMPT.txt",
@@ -192,6 +192,11 @@
       "path": "evidence/offline_early_clear_scene_20261029.md",
       "bytes": 4321,
       "sha256": "add74adc282e550f6983eba92584481d3c735b78b19065992e1ebc17a7da287c"
+    },
+    {
+      "path": "evidence/portrait_rollback_official_20261029.md",
+      "bytes": 3195,
+      "sha256": "7aae316ec173f0b1a976ca5f31011a55f935cfebe4a82290b7b046e2a2b0545d"
     },
     {
       "path": "evidence/rebirth_n15_preview_20261028.md",
@@ -372,6 +377,11 @@
       "path": "validation/20261029/offline_early_clear_scene.json",
       "bytes": 1899,
       "sha256": "554d1c738da8b0be9b2df8d614ca81acf5de993813a84180253fb479bba5e801"
+    },
+    {
+      "path": "validation/20261029/portrait_rollback_official.json",
+      "bytes": 4766,
+      "sha256": "a474fd01fdad434ee24c5eb9358b7f23fbaed769f6ef66be435c5ca308171385"
     },
     {
       "path": "validation/20261029/redemption_codes.json",

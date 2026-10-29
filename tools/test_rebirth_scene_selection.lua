@@ -55,6 +55,7 @@ if arg and arg[1] then
     package.loaded['systems/rebirth_scene_display_service']=assert(loadfile(arg[1]))()
 end
 local service=require('systems/rebirth_scene_display_service')
+local portrait_metadata=require('ui/portrait_metadata')
 local started=service.start();assert(started.ok and started.displayed==10)
 local function check()
     for _,body in ipairs(created) do if not body.removed then
@@ -70,6 +71,8 @@ local function check()
         assert(body.survival_display_name==encounter.display_name)
         assert(body.health<=100000000 and body.attack_max<=100000000)
         assert(body.mods.modifier_rebirth_scene_display and body.no_health_bar)
+        assert(portrait_metadata.apply(body, {portrait_display_only=0}).portrait_display_only==1,
+            'Actual stationary preview creation must project its authoritative display-only role')
         assert(body.gold_min==0 and body.gold_max==0 and body.xp==0 and body.hull==0)
     end end
 end
@@ -114,5 +117,5 @@ for index,name in ipairs({'INVULNERABLE','UNSELECTABLE','NO_HEALTH_BAR','NO_UNIT
 local modifier=assert(loadfile('scripts/vscripts/modifiers/modifier_rebirth_scene_display.lua'))()
 local flags=modifier:CheckState()
 assert(flags[MODIFIER_STATE_UNSELECTABLE]~=true,'Idle rebirth bosses must be selectable')
-for _,name in ipairs({'INVULNERABLE','NO_HEALTH_BAR','NO_UNIT_COLLISION','COMMAND_RESTRICTED','DISARMED','ROOTED'}) do assert(flags[_G['MODIFIER_STATE_'..name]]) end
+for _,name in ipairs({'INVULNERABLE','NO_HEALTH_BAR','NO_UNIT_COLLISION','COMMAND_RESTRICTED','DISARMED','ROOTED','SILENCED','MUTED'}) do assert(flags[_G['MODIFIER_STATE_'..name]]) end
 print('REBIRTH_SCENE_SELECTION_PASS: real event bus; N15 selection after GAME_STARTED; user-supplied N15 reference; 100 clock events without rewrites; all rich tiers; standard/pure/cold; restore/reset isolation')

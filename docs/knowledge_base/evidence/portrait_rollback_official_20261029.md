@@ -1,0 +1,21 @@
+# 按用户要求回退头像试验并使用官方背景（2026-10-29）
+
+用户最新决定：先回退之前的头像版本，再换官方背景图；同轮继续指出沉默标记和空QWER。此前Econ／专属背景地图试验已撤回，49个本轮game临时文件、22个content试验文件均留私有备份后移出资源目录。恢复本轮前原生实体头像，不再为转生怪新建3D场景、换相机或改世界饰品；已有我方英雄角落和建造者方案保留。不得将已放弃的SceneLoaded／v1截图作为本次最终方案验收。
+
+## 背景
+
+从本机Valve原生PortraitBackgroundTexture材质读取真实vtex依赖，十个转生单位／美术身份直接引用s2r原图。不生成背景美术，不施加额外统一染色，不复制完整四角或motion_swoops动态shader。现有原生模型及引擎内部背景照原路径渲染，2D原图放在模型后。主PortraitGroup和独立QueryVertical→MidSection→PortraitContainer→QueryUnitHeroPortrait分别处理，查询树没有主头像组时仍更新；切回建造者／英雄隐藏转生背景，不改变头像镜头/缩放/输入。
+
+## 沉默与QWER的真实遗漏
+
+截图白面具红叉是沉默状态覆盖层。展示怪真实添加modifier_rebirth_scene_display，其SILENCED/MUTED负责隔离；原UI主动显示状态face三秒再淡出。服务端现在按真实survival_rebirth_scene_display==true投影portrait_display_only=1，其他实体显式0，资产缺失时也投影；只对匹配实体的展示标记隐藏沉默/物品禁用遮罩。真实战斗怪与英雄仍显示真实状态，未删除服务端隔离。状态标记独立跨同实体stats-only/partial元数据保留，明确0清除，迟到实体不串。
+
+空QWER并非三转偷偷配了技能。Valve查询栏另有abilities，旧代码只清主树；操作单位Resolve与查看单位ResolveDisplayUnit也可不同。旧单树测试漏掉这两点。现独立清理查询栏native/custom热键，保留技能图标；查看对象不同于操作英雄时不把英雄QWER写到怪物栏，施法单位不变。整份combat+topnav双树回归覆盖查询零技能／有技能敌人、返回英雄、原生重写、有效但脱离旧scope的HUD重建及旧owner回调退役。
+
+## 验证与边界
+
+四份相关Lua测试、七份Node专项通过；双树／部分快照／官方URI／背景复用／切换／状态重写都使用实际业务脚本，仅原生边缘为夹具。三份UI源码双仓一致，HUD回退源码配套检查，官方编译0failed。极寒Z256／有限重试修复保留，其先前144次原生地形探测及两次真实离线生成已PASS；不将其当成本次新头像的像素验收。
+
+最终回退方案尚无重新开局后的原生完整画面验收，在线未测。当前用户游戏进程不擅自关闭，不热重载业务Lua；新服务端角色投影需新局加载。未将此次修复上传游廊，未更改云端服务器或既有冻结包。Git提交与发布是独立状态。
+
+安全摘要与文件SHA见[机器记录](../validation/20261029/portrait_rollback_official.json)。原始回执和试验备份仅在本机output/cold_portrait_20261029/，不入Git。

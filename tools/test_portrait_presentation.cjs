@@ -2,12 +2,17 @@ const fs=require('fs'),vm=require('vm'),assert=require('assert');
 let now=0,selected=7,unitName="unknown_unit";
 const cfg={};
 vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/portrait_palette.js','utf8'),{GameUI:{CustomUIConfig:()=>cfg}});
-vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/portrait_presentation.js','utf8'),{GameUI:{CustomUIConfig:()=>cfg},Players:{GetLocalPlayerPortraitUnit:()=>selected},Entities:{GetUnitName:()=>unitName},Date:{now:()=>now},$:{CreatePanel:(type,parent,id)=>new Panel(id,parent)}});
+vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/portrait_presentation.js','utf8'),{GameUI:{CustomUIConfig:()=>cfg},Players:{GetLocalPlayerPortraitUnit:()=>selected},Entities:{GetUnitName:()=>unitName},Date:{now:()=>now},$:{CreatePanel:(type,parent,id)=>{
+ assert.notEqual(type,'DOTAScenePanel','background/status presentation must not create another 3D portrait');
+ return new Panel(id,parent,type);
+}}});
 class Panel {
- constructor(id,parent){this.id=id;this.parent=parent;this.children=[];this.style={};this.hittest=true;this.hittestchildren=true;if(parent)parent.children.push(this);}
+ constructor(id,parent,type='Panel'){this.id=id;this.paneltype=type;this.parent=parent;this.children=[];this.style={};this.hittest=true;this.hittestchildren=true;this.imageCalls=[];if(parent)parent.children.push(this);}
  IsValid(){return !this.removed;}
  GetParent(){return this.parent;}
  AddClass(name){if(!this.classes)this.classes=new Set();this.classes.add(name);}
+ SetImage(uri){this.image=uri;this.imageCalls.push(uri);}
+ MoveChildBefore(child,anchor){this.children=this.children.filter(value=>value!==child);this.children.splice(this.children.indexOf(anchor),0,child);}
  BAscendantHasClass(name){for(let p=this;p;p=p.parent)if(p.classes&&p.classes.has(name))return true;return false;}
  FindChildTraverse(id){if(this.id===id&&!this.removed)return this;for(const c of this.children){if(c.removed)continue;const found=c.FindChildTraverse(id);if(found)return found;}return null;}
 }
@@ -65,6 +70,40 @@ assert.equal(rebuilt.group.FindChildTraverse('SilenceIcon').style.visibility,'co
 f.group.classes.clear();cfg.SurvivalPortraitPresentation.Refresh(f.group);
 f.group.classes.add('UnitSilenced');now=21000;cfg.SurvivalPortraitPresentation.Refresh(f.group);assert.equal(silence.style.opacity,'1','new status episode restarts the three second window');
 console.log('PORTRAIT_STATUS_TIMER_PASS: 3s display + 250ms fade; no repeated continuous status, independent units, reselection/HUD rebuild, status reapplication');
+
+// Isolation flags on a presentation body must not cover its face. The same
+// unit name/asset on a formal monster retains genuine status feedback.
+const displayStatus=fixture();selected=8800;unitName='npc_survival_named_rebirth_boss_10';
+displayStatus.group.classes=new Set(['UnitSilenced','UnitMuted']);
+cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:selected,portrait_display_only:1});
+for(const stamp of [0,100,2999,3000,3250,10000]){
+ now=40000+stamp;
+ for(const id of ['SilenceIcon','MutedIcon']){
+  const icon=displayStatus.group.FindChildTraverse(id);icon.style.visibility='visible';icon.style.opacity='1';
+ }
+ cfg.SurvivalPortraitPresentation.Refresh(displayStatus.group);
+ for(const id of ['SilenceIcon','MutedIcon']){
+  const icon=displayStatus.group.FindChildTraverse(id);
+  assert.equal(icon.style.visibility,'collapse','display-only isolation never paints '+id);
+  assert.equal(icon.style.opacity,'0');
+ }
+}
+cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:selected,portrait_display_only:0});now=51000;
+cfg.SurvivalPortraitPresentation.Refresh(displayStatus.group);
+assert.equal(displayStatus.group.FindChildTraverse('SilenceIcon').style.visibility,'visible','explicit role clear restores real silence feedback');
+assert.equal(displayStatus.group.FindChildTraverse('SilenceIcon').style.opacity,'1');
+selected=8801;now=52000;
+cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:8800,portrait_display_only:1});
+cfg.SurvivalPortraitPresentation.Refresh(displayStatus.group);
+assert.equal(displayStatus.group.FindChildTraverse('SilenceIcon').style.visibility,'visible','late snapshot for another entity cannot hide formal same-name monster state');
+assert.equal(displayStatus.group.FindChildTraverse('SilenceIcon').style.opacity,'1');
+cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:selected,portrait_display_only:0});
+displayStatus.group.classes=new Set(['UnitMuted']);now=52100;
+cfg.SurvivalPortraitPresentation.Refresh(displayStatus.group);
+assert.equal(displayStatus.group.FindChildTraverse('SilenceIcon').style.visibility,'collapse');
+assert.equal(displayStatus.group.FindChildTraverse('MutedIcon').style.visibility,'visible','formal same-name monster keeps a genuine mute episode');
+cfg.SurvivalPortraitPresentation.SetSnapshot(null);unitName='unknown_unit';
+console.log('PORTRAIT_DISPLAY_ROLE_PASS: matching authoritative preview stays unobscured, explicit zero/formal same-name monsters retain real status and late entity snapshots cannot cross selection');
 
 selected=-1;cfg.SurvivalPortraitPresentation.Refresh(f.group);assert.equal(silence.style.visibility,"collapse","clearing selection removes any pending face");
 
@@ -143,6 +182,11 @@ cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:selected,model_asset_id:'
 cfg.SurvivalPortraitPresentation.Refresh(nativeRebirth.group);
 // The visible native host already has motes from the builder refresh above.
 new Panel('SurvivalPortraitMotes',nativeRebirth.custom);
+const expectedNativeTextures=['graveyard_psd_cadcdea4','desert_psd_a61ef989','gradient_btm_psd_dfa949cf',
+ 'darkclouds_psd_c19b9d70','motion_swoops_color_psd_60163809','darkclouds_psd_c19b9d70',
+ 'graveyard_psd_cadcdea4','bluebloom_psd_e431a05c','gradient_btm_psd_dfa949cf','gradient_btm_psd_dfa949cf'];
+const rebirthAssets=['phalanx','bloodforge','silverwurm','stormwrought','lucid_torment','obsidian_atrocity',
+ 'fairy_godmummer','reaper_elegy','phantom_advent','darkness_foretold'];
 for(let rank=1;rank<=10;rank++){
  selected=790+rank;unitName='npc_survival_named_rebirth_boss_'+String(rank).padStart(2,'0');
  cfg.SurvivalPortraitPresentation.Refresh(nativeRebirth.group);
@@ -153,12 +197,96 @@ for(let rank=1;rank<=10;rank++){
   assert.equal(nativeRebirth.container.style[key],'','native rebirth clears custom '+key);
  for(const parent of [nativeRebirth.container,nativeRebirth.custom])
   assert.equal(parent.FindChildTraverse('SurvivalPortraitMotes').style.visibility,'collapse');
+ const image=nativeRebirth.container.FindChildTraverse('SurvivalOfficialPortraitBackground');
+ const expected='s2r://materials/vgui/hud/heroportraits/portraitbackground_'+expectedNativeTextures[rank-1]+'.vtex';
+ assert(image&&image.paneltype==='Image','official background is a two-dimensional image');
+ assert.equal(image.image,expected,'pending snapshot uses the actual named unit native texture');
+ assert.equal(image.style.washColor,'#ffffff','official original texture must never receive an extra uniform tint');
+ assert.equal(image.style.visibility,'visible');assert.equal(image.hittest,false);assert.equal(image.hittestchildren,false);
+ assert(nativeRebirth.container.children.indexOf(image)<nativeRebirth.container.children.indexOf(nativeRebirth.native),'background paints behind existing native portrait');
+ const before=image.imageCalls.length;
+ cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:selected,
+  model_asset_id:'monster_boss_rebirth_'+String(rank).padStart(2,'0')+'_'+rebirthAssets[rank-1]});
+ for(let tick=0;tick<64;tick++)cfg.SurvivalPortraitPresentation.Refresh(nativeRebirth.group);
+ assert.equal(image.image,expected);assert.equal(image.imageCalls.length,before,'stable identity does not repeatedly load its native texture');
 }
+selected=8100;unitName='npc_survival_named_rebirth_boss_10';
+cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:8099,model_asset_id:'monster_boss_rebirth_01_phalanx',portrait_display_only:1});
+cfg.SurvivalPortraitPresentation.Refresh(nativeRebirth.group);
+assert.equal(nativeRebirth.container.FindChildTraverse('SurvivalOfficialPortraitBackground').image,
+ 's2r://materials/vgui/hud/heroportraits/portraitbackground_gradient_btm_psd_dfa949cf.vtex',
+ 'late other-entity metadata cannot replace the selected Doom background');
+selected=809;unitName='npc_survival_builder_proxy';
+cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:selected,model_asset_id:'builder_io_benevolent_companion'});
+cfg.SurvivalPortraitPresentation.Refresh(nativeRebirth.group);
+assert.equal(nativeRebirth.container.FindChildTraverse('SurvivalOfficialPortraitBackground').style.visibility,'collapse','returning to builder hides the rebirth background');
+assert.equal(nativeRebirth.container.style.backgroundImage,builderImage);
 selected=810;unitName='npc_dota_hero_juggernaut';
 cfg.SurvivalPortraitPresentation.Refresh(nativeRebirth.group);
 assert.equal(cfg.SurvivalPortraitPresentation.InspectBackdrop().nativeRebirth,false);
 assert(nativeRebirth.container.style.backgroundColor.includes('gradient('),'other heroes retain their background');
-console.log('NATIVE_REBIRTH_BACKDROP_PASS: ten named units restore native backdrop before snapshots; stale Io image and both mote layers cleared, other heroes preserved');
+console.log('NATIVE_REBIRTH_BACKDROP_PASS: ten exact untinted Valve texture URIs, stable Image reuse behind existing native portrait, no new 3D scene, builder/hero restoration and stale Io/motes cleared');
+
+// The real inspected-unit portrait lives under QueryVertical/MidSection and
+// has no SilenceIcon. Its duplicate PortraitContainer ID must not accidentally
+// make a global lookup reuse the main portrait's background Image.
+function queryFixture(root){
+ const vertical=new Panel('QueryVertical',root),middle=new Panel('MidSection',vertical);
+ const container=new Panel('PortraitContainer',middle);
+ const portrait=new Panel('QueryUnitHeroPortrait',container,'DOTAPortrait');
+ portrait.style.position='native-query-position';portrait.style.transform='native-query-transform';
+ portrait.SetUnit=()=>assert.fail('query background must keep the existing native portrait model');
+ portrait.SetScenePanelToLocalHero=()=>assert.fail('query background must never create an Econ portrait');
+ return {vertical,middle,container,portrait};
+}
+const dual=fixture(),dualRoot=new Panel('Hud');dual.block.parent=dualRoot;dualRoot.children.push(dual.block);
+const query=queryFixture(dualRoot),officialDoom='s2r://materials/vgui/hud/heroportraits/portraitbackground_gradient_btm_psd_dfa949cf.vtex';
+selected=8910;unitName='npc_survival_named_rebirth_boss_10';dual.group.classes=new Set(['UnitSilenced','UnitMuted']);
+cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:selected,portrait_display_only:1});
+for(let tick=0;tick<64;tick++)cfg.SurvivalPortraitPresentation.Refresh(dual.group);
+const mainImage=dual.container.FindChildTraverse('SurvivalOfficialPortraitBackground');
+const queryImage=query.container.FindChildTraverse('SurvivalOfficialPortraitBackground');
+assert(mainImage&&queryImage&&mainImage!==queryImage,'main and query trees own separate named background Images');
+for(const [container,portrait,image] of [[dual.container,dual.native,mainImage],[query.container,query.portrait,queryImage]]){
+ assert.equal(image.parent,container);assert.equal(image.paneltype,'Image');assert.equal(image.image,officialDoom);
+ assert.equal(image.imageCalls.length,1,'each real portrait tree independently caches its native texture');
+ assert.equal(image.style.washColor,'#ffffff');assert.equal(image.style.visibility,'visible');
+ assert(container.children.indexOf(image)<container.children.indexOf(portrait),'each background belongs behind its own native portrait');
+}
+assert.equal(query.portrait.style.blur,'gaussian(0)');
+assert.equal(query.portrait.style.position,'native-query-position');
+assert.equal(query.portrait.style.transform,'native-query-transform');
+assert.equal(query.vertical.FindChildTraverse('SilenceIcon'),null,'query fixture and correction must not invent a silence icon');
+assert.equal(query.vertical.FindChildTraverse('MutedIcon'),null);
+assert.equal(dual.group.FindChildTraverse('SilenceIcon').style.visibility,'collapse','main group alone owns preview state-face suppression');
+selected=8920;unitName='npc_survival_builder_proxy';
+cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:selected,model_asset_id:'builder_io_benevolent_companion',portrait_display_only:0});
+cfg.SurvivalPortraitPresentation.Refresh(dual.group);
+assert.equal(mainImage.style.visibility,'collapse');assert.equal(queryImage.style.visibility,'collapse','returning to builder also hides the independent query background');
+assert.equal(dual.container.style.backgroundImage,builderImage);
+
+// Handoff can call the corner/query refresh directly while no PortraitGroup
+// or local-hero corner exists. The query correction must precede those exits.
+const queryOnlyRoot=new Panel('HudWithoutMainPortrait'),queryOnly=queryFixture(queryOnlyRoot);
+assert.equal(queryOnlyRoot.FindChildTraverse('PortraitGroup'),null);
+assert.equal(queryOnlyRoot.FindChildTraverse('SurvivalLocalHeroPortrait'),null);
+selected=8930;unitName='npc_survival_named_rebirth_boss_10';
+cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:selected,portrait_display_only:1});
+cfg.SurvivalPortraitPresentation.RefreshLocalHeroPortrait(queryOnlyRoot);
+const onlyImage=queryOnly.container.FindChildTraverse('SurvivalOfficialPortraitBackground');
+assert(onlyImage&&onlyImage.image===officialDoom&&onlyImage.style.visibility==='visible','query-only refresh works before a missing hero corner early return');
+assert.equal(onlyImage.style.washColor,'#ffffff');
+assert.equal(queryOnly.portrait.style.blur,'gaussian(0)');
+selected=8931;
+cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:8930,model_asset_id:'monster_boss_rebirth_01_phalanx',portrait_display_only:1});
+cfg.SurvivalPortraitPresentation.RefreshLocalHeroPortrait(queryOnlyRoot);
+assert.equal(onlyImage.image,officialDoom,'late different-entity snapshot cannot change the query-only background');
+unitName='npc_survival_builder_proxy';
+cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:selected,model_asset_id:'builder_io_benevolent_companion'});
+cfg.SurvivalPortraitPresentation.RefreshLocalHeroPortrait(queryOnlyRoot);
+assert.equal(onlyImage.style.visibility,'collapse');
+assert.equal(queryOnly.vertical.FindChildTraverse('SilenceIcon'),null);assert.equal(queryOnly.vertical.FindChildTraverse('MutedIcon'),null);
+console.log('NATIVE_QUERY_BACKGROUND_PASS: actual independent query tree, separate untinted Images, cached native URI behind each own portrait, no invented query state faces, query-only early-return coverage and builder restoration');
 
 // Use the production scene controller with separate state so the native HUD
 // assertions above remain independent of the corner shortcut's live identity.

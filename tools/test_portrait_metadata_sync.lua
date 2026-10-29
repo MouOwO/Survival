@@ -10,11 +10,12 @@ bus.reset();require("ui/combat_stats_ui_service").init()
 for _,hero in ipairs({"doom","blademaster"}) do
     local full=metadata.apply({survival_hero_id="hero_"..hero},{entindex=7})
     assert(full.portrait_unit_name~="")
+    assert(full.portrait_display_only==0)
     for i=1,30 do
         bus.emit(events.HERO_COMBAT_STATS_CHANGED,{player_id=0,snapshot={entindex=7,hero_id="hero_"..hero,health=100-i}})
         local regular=published[#published]
         assert(regular and regular.health==100-i)
-        for _,key in ipairs({"model_asset_id","portrait_unit_name","portrait_item_def"}) do
+        for _,key in ipairs({"model_asset_id","portrait_unit_name","portrait_item_def","portrait_display_only"}) do
             assert(regular[key]==full[key], "periodic stats erased "..key)
         end
     end
@@ -22,6 +23,7 @@ end
 assert(#published==60)
 local empty=metadata.apply(nil,{entindex=8})
 assert(empty.model_asset_id=="" and empty.portrait_unit_name=="")
+assert(empty.portrait_display_only==0)
 print("PORTRAIT_METADATA_SYNC_PASS: 60 real event/nettable publications match selected-unit identities")
 -- Model swaps on shared monster unit names must reach regular snapshots.
 local real = {GetModelName=function() return "models/heroes/rubick/rubick.vmdl" end}
@@ -34,3 +36,28 @@ assert(metadata.apply(nil,{entindex=999,portrait_model_name="stale"}).portrait_m
 EntIndexToHScript=function() error("removed entity") end
 assert(metadata.apply(nil,{entindex=99}).portrait_model_name=="")
 print("PORTRAIT_RUNTIME_MODEL_PASS: actual entity, model swap, clear and removed entity")
+
+-- The same rebirth asset belongs both to stationary previews and to separately
+-- spawned formal combat monsters. Neither its asset nor a caller's snapshot
+-- can confer the presentation role.
+local rebirth_asset="monster_boss_rebirth_10_darkness_foretold"
+local preview={survival_model_asset_id=rebirth_asset,survival_rebirth_scene_display=true}
+local formal={survival_model_asset_id=rebirth_asset}
+assert(metadata.apply(preview,{}).portrait_display_only==1)
+assert(metadata.apply(formal,{portrait_display_only=1}).portrait_display_only==0,
+    "A formal rebirth monster must not inherit its stationary preview's role")
+for _,value in ipairs({false,1,"true"}) do
+    formal.survival_rebirth_scene_display=value
+    assert(metadata.apply(formal,{portrait_display_only=1}).portrait_display_only==0,
+        "Only the exact authoritative boolean true grants the preview role")
+end
+local missing_asset={survival_model_asset_id="missing_portrait_asset",survival_rebirth_scene_display=true}
+local missing=metadata.apply(missing_asset,{portrait_display_only=0})
+assert(missing.model_asset_id=="" and missing.portrait_display_only==1,
+    "Preview isolation must project before an unavailable asset returns early")
+assert(metadata.apply({survival_model_asset_id="missing_portrait_asset"},{portrait_display_only=1}).portrait_display_only==0)
+assert(metadata.apply(nil,{entindex=999,portrait_display_only=1}).portrait_display_only==0)
+EntIndexToHScript=function(index) if index==101 then return preview elseif index==102 then return formal end end
+assert(metadata.apply(nil,{entindex=101,portrait_display_only=0}).portrait_display_only==1)
+assert(metadata.apply(nil,{entindex=102,portrait_display_only=1}).portrait_display_only==0)
+print("PORTRAIT_DISPLAY_ROLE_PASS: exact authoritative preview flag, shared formal asset/hero defaults, asset-less/removed entities and entindex resolution")

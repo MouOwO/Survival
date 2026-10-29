@@ -78,6 +78,98 @@ f.state.runtime[101].passive=true;f.notifyRuntime(101);f.advance(1500);assert.de
 f.state.runtime[101].passive=false;f.notifyRuntime(101);f.advance(1500);assert.deepEqual(f.keys(),["Q","","W","E"]);
 const primaryRecovery={...f.recovery()},primaryKeys=f.keys();
 
+// Reproduce the selected ten-turn creature with zero real abilities while
+// Valve still retains all the hero's native slot/hotkey descendants.
+const empty=fixture(tested);empty.advance(1500);
+empty.env.Entities.GetUnitName=unit=>unit===19?'npc_survival_named_rebirth_boss_10':'npc_dota_hero_axe';
+empty.setAbilities(19,[]);empty.state.unit=19;
+empty.emit('dota_player_update_selected_unit',{PlayerID:0});empty.advance(1500);
+assert.deepEqual(empty.keys(),[], 'skill-less creature has no independent Q/W/E mirror');
+for(const panel of empty.map.abilities.children){
+ const hotkey=panel.FindChildTraverse('HotkeyContainer');if(hotkey)assert.equal(hotkey.style.opacity,'0');
+}
+empty.map.abilities.children[0].FindChildTraverse('HotkeyContainer').style.opacity='1';
+empty.advance(500);assert.equal(empty.map.abilities.children[0].FindChildTraverse('HotkeyContainer').style.opacity,'0',
+ 'the native rewrite is repaired while the real topnav mirror stays empty');
+empty.state.unit=7;empty.emit('dota_player_update_selected_unit',{PlayerID:0});empty.advance(1500);
+assert.deepEqual(empty.keys(),['Q','','W','E'],'genuine hero shortcuts return through the original writer');
+
+// Valve's query HUD owns a second DOTAAbilityList named "abilities". Its
+// real nesting differs from the command HUD, and query identity can differ
+// from the unit still selected for orders. Run both complete production IIFEs.
+const dual=fixture(tested);dual.advance(1500);
+const gameRoot=dual.ctx.GetParent();
+let commandUnit=7;
+dual.env.Players.GetPlayerHeroEntityIndex=()=>commandUnit;
+dual.cfg.SurvivalSelectionResolver={Resolve:()=>commandUnit,ResolveDisplayUnit:()=>dual.state.unit};
+dual.env.Entities.GetUnitName=unit=>unit===19?'npc_survival_named_rebirth_boss_03':unit===29?'npc_enemy_with_spell':'npc_dota_hero_axe';
+dual.setAbilities(19,[]);dual.setAbilities(29,[301,302]);dual.ownRuntime(29);
+const queryHost=new dual.Panel('DOTAQueryUnit','QueryContainer',gameRoot);
+function queryTree(){
+    const vertical=new dual.Panel('Panel','QueryVertical',queryHost);
+    const body=new dual.Panel('Panel','AbilitiesHealthMana',vertical);
+    const list=new dual.Panel('DOTAAbilityList','abilities',body),panels=[];
+    for(let i=0;i<4;i++){
+        const panel=new dual.Panel('DOTAAbilityPanel','Ability'+i,list),button=new dual.Panel('Panel','AbilityButton',panel);
+        new dual.Panel('DOTAAbilityImage','AbilityImage',button).abilityname='native_query_icon_'+i;
+        const container=new dual.Panel('Panel','HotkeyContainer',panel);container.style.opacity='1';
+        const plate=new dual.Panel('Panel','Hotkey',container);
+        new dual.Panel('Label','HotkeyText',plate).text=['Q','W','E','R'][i];panels.push(panel);
+    }
+    return {vertical,list,panels};
+}
+let query=queryTree();
+const queryKeys=()=>query.panels.map(panel=>panel.FindChildTraverse('HotkeyContainer'));
+function assertQueryKeyless(){
+    for(const panel of query.panels){
+        assert.equal(panel.FindChildTraverse('HotkeyContainer').style.opacity,'0','query native QWER must be suppressed in its own tree');
+        const own=panel.FindChildTraverse('SurvivalAbilityHotkey');
+        assert(!own||!own.text||own.style.visibility==='collapse','query cards never inherit command-unit keys');
+    }
+}
+const queryCastBaseline=dual.sent.filter(packet=>/cast|ability_request/.test(packet.name)).length;
+dual.state.unit=19;dual.emit('dota_player_update_query_unit',{PlayerID:0});dual.advance(1500);
+assert.equal(dual.cfg.SurvivalMainHUD.Inspect().unit,19);assert.deepEqual(dual.keys(),[]);assertQueryKeyless();
+for(const panel of dual.map.abilities.children){
+    const own=panel.FindChildTraverse('SurvivalAbilityHotkey');assert(!own||!own.text||own.style.visibility==='collapse','owner hero QWER cannot be written into a monster view');
+}
+queryKeys()[0].style.opacity='1';
+const stale=new dual.Panel('Label','SurvivalAbilityHotkey',query.panels[1].FindChildTraverse('AbilityButton'));stale.text='W';stale.style.visibility='visible';
+dual.advance(500);assertQueryKeyless();
+// Querying a unit with genuine spells preserves native icons without adding
+// command shortcuts or changing the still-selected friendly hero.
+dual.state.unit=29;dual.emit('dota_player_update_query_unit',{PlayerID:0});dual.advance(1500);
+assertQueryKeyless();assert(dual.keys().every(key=>key===''));
+assert.equal(commandUnit,7);
+assert.equal(query.panels[0].visible,true);assert.equal(query.panels[0].FindChildTraverse('AbilityImage').abilityname,'native_query_icon_0');
+dual.state.unit=7;dual.emit('dota_player_update_selected_unit',{PlayerID:0});dual.advance(1500);
+assert.deepEqual(dual.keys(),['Q','','W','E']);assertQueryKeyless();
+queryKeys()[2].style.opacity='1';dual.advance(500);assertQueryKeyless();
+assert.deepEqual(dual.keys(),['Q','','W','E'],'query repair must not erase same-ID main-HUD mirror bindings');
+// A native HUD rebuild can leave old handles valid but detached. Both fresh
+// scopes must be resolved, rather than trusting the old first-match cache.
+const oldBranch=dual.map.abilities.GetParent(),branchParent=oldBranch.GetParent();oldBranch.SetParent(null);
+const newBranch=new dual.Panel('Panel','AbilitiesAndStatBranch',branchParent);
+dual.map.abilities=new dual.Panel('DOTAAbilityList','abilities',newBranch);
+for(let i=0;i<8;i++)dual.skill('Ability'+i,dual.map.abilities);
+const oldQuery=query;oldQuery.vertical.SetParent(null);query=queryTree();
+oldQuery.panels[0].FindChildTraverse('HotkeyContainer').style.opacity='1';
+dual.state.unit=19;dual.emit('dota_player_update_query_unit',{PlayerID:0});dual.advance(1500);assertQueryKeyless();
+assert.equal(oldQuery.panels[0].FindChildTraverse('HotkeyContainer').style.opacity,'1','retained detached scopes must not be repainted');
+dual.state.unit=7;dual.emit('dota_player_update_selected_unit',{PlayerID:0});dual.advance(1500);
+assert.deepEqual(dual.keys(),['Q','','W','E']);assertQueryKeyless();
+// Replacing the combat owner retires the old writer. A retained callback must
+// not restore or clear the replacement owner's current native key states.
+const retiredWriter=dual.cfg.SurvivalAbilityHotkeys;
+vm.runInContext(combat,dual.env,{filename:'replacement_real_combat_stats.js'});dual.advance(500);
+queryKeys()[0].style.opacity='1';retiredWriter.Refresh();
+assert.equal(queryKeys()[0].style.opacity,'1','retired owner cannot mutate the replacement HUD');
+dual.cfg.SurvivalAbilityHotkeys.Refresh();assertQueryKeyless();
+assert.deepEqual(dual.keys(),['Q','','W','E']);
+assert.equal(dual.sent.filter(packet=>/cast|ability_request/.test(packet.name)).length,queryCastBaseline,'query-key repair never casts or sends an ability request');
+dual.cfg.SurvivalAbilityHotkeys.Shutdown('dual_tree_done');
+for(const key of queryKeys())assert.equal(key.style.opacity,'1','current query native ownership is restored on shutdown');
+
 const late=fixture(tested,{missingWriter:true});late.load();late.advance(3000);
 assert.equal(late.writerCalls(),0,"missing writer consumes no retries");late.installWriter();late.advance(500);
 assert.deepEqual(late.keys(),["Q","","W","E"],"writer installed after long HUD idle recovers new mirror");
@@ -108,7 +200,8 @@ const previous=throwing.recovery();throwing.cfg.HandoffGeneration++;throwing.adv
 const evidence={scope:"Whole actual combat_stats and whole actual topnav IIFEs in the same VM; only native APIs mocked, no startup/function-body seam; code-executed key assignments, not actual screenshot/FPS",
     sameUnitReload:{keys:primaryKeys,recovery:primaryRecovery,writerReplays:steady},
     passiveNoFabricatedKeys:true,normalSelectionWriterOwnership:true,lateWriter:true,emptyToActualSkills:true,lateNativeGeometry:true,
+    valveDualAbilityTrees:true,distinctCommandAndQueryIdentity:true,queryNativeRewrites:true,detachedNativeScopeReplacement:true,retiredCombatOwnerIgnored:true,
     boundedAllPassiveReplayPerGeneration:capped-priorPassiveCalls,boundedErrors:failures,stableWriterCallsOver10s:0,originalNativeLabelReused:true,
     oldSourceNegativeControl:"Preserved actual topnav loses all visible key mirrors after same-unit reload while actual combat native labels/signature still match"};
 if(process.argv.includes("--write-evidence"))fs.writeFileSync("output/ui_refresh_audit_20261013/hotkey_mirror_vm_evidence.json",JSON.stringify(evidence,null,2)+"\n");
-console.log("TOPNAV_HOTKEY_MIRROR_RECOVERY_PASS: full real combat+topnav IIFEs; same-entity active/passive hot reload, actual selection/runtime changes, late writer/skills/native anchors, four-attempt failure cap, zero steady forced writer calls, no casts. VM only.");
+console.log("TOPNAV_HOTKEY_MIRROR_RECOVERY_PASS: full real combat+topnav IIFEs; Valve dual ability trees, distinct command/query identity, zero-skill and real-spell queries, native rewrites, detached HUD rebuild, owner replacement, hero restoration and existing bounded mirror recovery; no casts. VM only.");
