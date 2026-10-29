@@ -222,23 +222,30 @@ local function rich_socket(player_id, city, origin)
     local region, reason = regions.region(player_id)
     if not region then return nil, nil, nil, reason end
     release_ordinary_reservations()
-    local region_id = tostring(require("systems/mode_spawn_service").mode()) .. ":" .. region.id
+    local mode = require("systems/mode_spawn_service").mode()
+    local region_id = tostring(mode) .. ":" .. region.id
     region_slots[region_id] = region_slots[region_id] or {}
     local slots, candidates = region_slots[region_id], {}
     local size = tonumber(config.grid_cell_size) or 64
-    for _, cell in ipairs(region.cells) do
-        local point = { x = (cell[1] + math.floor(config.footprint.x / 2)) * size,
-            y = (cell[2] + math.floor(config.footprint.y / 2)) * size, z = origin.z }
-        local distance = (point.x - origin.x) ^ 2 + (point.y - origin.y) ^ 2
-        if distance >= (size * 4) ^ 2 then
-            candidates[#candidates + 1] = { point = point, distance = distance }
+    if mode == "rich" then
+        for _, point in ipairs(config.rich_spawn_regions[region.id] or {}) do
+            candidates[#candidates + 1] = { point = { x = point.x, y = point.y, z = origin.z } }
         end
+    else
+        for _, cell in ipairs(region.cells) do
+            local point = { x = (cell[1] + math.floor(config.footprint.x / 2)) * size,
+                y = (cell[2] + math.floor(config.footprint.y / 2)) * size, z = origin.z }
+            local distance = (point.x - origin.x) ^ 2 + (point.y - origin.y) ^ 2
+            if distance >= (size * 4) ^ 2 then
+                candidates[#candidates + 1] = { point = point, distance = distance }
+            end
+        end
+        table.sort(candidates, function(left, right)
+            if left.distance ~= right.distance then return left.distance < right.distance end
+            if left.point.x ~= right.point.x then return left.point.x < right.point.x end
+            return left.point.y < right.point.y
+        end)
     end
-    table.sort(candidates, function(left, right)
-        if left.distance ~= right.distance then return left.distance < right.distance end
-        if left.point.x ~= right.point.x then return left.point.x < right.point.x end
-        return left.point.y < right.point.y
-    end)
     for index, candidate in ipairs(candidates) do
         local point = candidate.point
         local reserved = tree_grid(point)

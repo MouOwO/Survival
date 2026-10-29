@@ -1,6 +1,8 @@
 -- Actual tree lifecycle, region discovery and grid collision/occupancy code;
 -- only engine entities/navigation and rendering/feedback are doubled.
 package.path = "scripts/vscripts/?.lua;" .. package.path
+-- The placement fixture begins after admission; it does not test account gates.
+package.loaded["core/test_access_policy"] = {enabled = function() return false end}
 local vector_meta = { __add = function(a, b) return Vector(a.x + b.x, a.y + b.y, a.z + b.z) end }
 Vector = function(x, y, z) return setmetatable({x = x, y = y, z = z or 0}, vector_meta) end
 DOTA_TEAM_GOODGUYS, DOTA_TEAM_BADGUYS, DOTA_UNIT_CAP_NO_ATTACK = 2, 3, 0
@@ -77,6 +79,12 @@ print = function(message) if tostring(message):find("handler error") then error(
 local bus, events = require("core/event_bus"), require("core/events")
 local grid, regions = require("systems/grid_placement_system"), require("systems/rich_region_service")
 local trees, config = require("systems/tree_system"), require("config/tree_config")
+local edge_anchors = {east = {832, -10048}, south = {-2816, -14080},
+    west = {-6528, -10048}, north = {-2816, -6208}}
+for id, point in pairs(edge_anchors) do
+    assert(config.rich_spawn_regions[id][1].x == point[1] and config.rich_spawn_regions[id][1].y == point[2],
+        "rich tree anchors stay at the approved outer-edge locations")
+end
 local fixed_points = {}
 for id, points in pairs(config.spawn_regions) do
     fixed_points[id] = {}; for index, point in ipairs(points) do fixed_points[id][index] = {point.x, point.y, point.z} end
@@ -114,7 +122,10 @@ mode = "rich"
 local cities, blocker = {}, nil
 for id = 0, 3 do
     local spawn = assert(regions.resolve_spawn(id, slots[id]))
-    if id == 0 then blocker = unit(spawn.position, "standing_unit", 290) end
+    if id == 0 then
+        local point = config.rich_spawn_regions.east[1]
+        blocker = unit(Vector(point.x, point.y, ground_height), "standing_unit", 32)
+    end
     cities[id] = build_city(id, spawn.position)
     local tree = assert(by_player[id], "each rich city gets one resource tree")
     assert(tree.survival_tree_owner_id == id)
@@ -123,9 +134,8 @@ for id = 0, 3 do
     assert(regions.validate_building_footprint(id, footprint.grid_x * 64, footprint.grid_y * 64,
         (footprint.grid_x + 2) * 64, (footprint.grid_y + 2) * 64))
     local point = tree:GetAbsOrigin()
-    local distance = math.sqrt((point.x - spawn.position.x) ^ 2 + (point.y - spawn.position.y) ^ 2)
-    assert(distance >= 256 and distance < 600, "choose the nearest safe socket near that player's city")
-    if id == 0 then assert(distance > 340, "live unit hulls reject the otherwise nearer socket") end
+    local expected = config.rich_spawn_regions[slots[id]][id == 0 and 2 or 1]
+    assert(point.x == expected.x and point.y == expected.y, "trees use fixed outer-edge sockets, not city-relative positions")
     cell_occupants(point, tree:entindex())
     local old_queries, old_created = queries, #created
     bus.emit(events.BUILDING_CREATED, {building_id = "main_city", player_id = id, unit = cities[id]})
@@ -152,7 +162,8 @@ tree.survival_tree_depleted_callback(tree)
 assert(tree.survival_tree_level == 2 and tree:GetAbsOrigin() == position and tree.moves == moves, "level progression never moves the tree")
 local worker = unit(cities[0]:GetAbsOrigin(), "npc_survival_lumberjack")
 bus.emit(events.TREE_HIT, {player_id = 0, attacker = worker, target = tree, source = "lumberjack", base_lumber_efficiency = 10})
-assert(wood == 10 + trees._lumber_efficiency_buff_for_test(2), "normal per-level harvest formula is unchanged")
+assert(wood == 10 + trees._lumber_efficiency_buff_for_test(2) + config.rich_level2_reward.lumber_efficiency,
+    "normal per-level harvest and the existing rich Lv2 reward are unchanged")
 local income = wood
 bus.emit(events.TREE_HIT, {player_id = 0, attacker = cities[0], target = tree, source = "lumberjack", base_lumber_efficiency = 100})
 assert(wood == income, "a building does not gain a new harvest bypass")
@@ -168,6 +179,25 @@ assert(#created == count, "cached membership cannot bypass newly blocked navigat
 blocked_all = false; blocker.removed = true
 bus.emit(events.BUILDING_CREATED, {building_id = "main_city", player_id = 0, unit = cities[0]})
 assert(#created == count + 1 and by_player[0] ~= tree and by_player[0].survival_tree_level == 1)
+
+-- A different city location cannot move the patch. Shared courts use each of
+-- its four authored sockets once and reuse only the released owner's slot.
+entities = {}; created = {}; by_player = {}; queries = 0
+slots = {[0] = "east", [1] = "east", [2] = "east", [3] = "east"}
+init()
+for id = 0, 3 do
+    build_city(id, Vector(-640 + id * 128, -9408, 128))
+    local tree = assert(by_player[id], "four players in one court each retain their own tree")
+    local expected = config.rich_spawn_regions.east[id + 1]
+    assert(tree:GetAbsOrigin().x == expected.x and tree:GetAbsOrigin().y == expected.y)
+    cell_occupants(tree:GetAbsOrigin(), tree:entindex())
+end
+local freed = by_player[1]:GetAbsOrigin()
+bus.emit(events.PLAYER_DISCONNECTED, {player_id = 1})
+cell_occupants(freed, nil)
+build_city(1, Vector(0, -10880, 128))
+assert(by_player[1]:GetAbsOrigin().x == freed.x and by_player[1]:GetAbsOrigin().y == freed.y)
+
 -- The ordinary mode keeps its authored sockets and primary reservation policy.
 mode = "standard"; entities = {}; created = {}; by_player = {}; queries = 0
 init()
@@ -187,4 +217,4 @@ for id, points in pairs(config.spawn_regions) do
     end
 end
 print = original_print
-print("RICH_TREE_SPAWN_PASS: four components, live collision/full footprint, one tree per player, unchanged income, bounded placement, release/rejoin and legacy reservations")
+print("RICH_TREE_SPAWN_PASS: fixed outer-edge patches, city-independent positions, four shared-court slots, live collision/full footprint, release/rejoin, unchanged income and ordinary reservations")

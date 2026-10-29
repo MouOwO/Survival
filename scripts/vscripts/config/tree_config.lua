@@ -81,4 +81,38 @@ for rotation, region_id in ipairs(region_ids) do
     M.spawn_regions[region_id] = points
 end
 
+-- Rich courts have fixed outer-edge patches, independent of the city's
+-- position and live navigation. Four nearby sockets support shared courts.
+M.rich_spawn_regions = {}
+local rich_bounds = require("config/mode_spawn_config").modes.rich.player_bounds
+local edge_inset, socket_spacing = 256, 192
+local rich_directions = { "east", "south", "west", "north" }
+for index, region_id in ipairs(rich_directions) do
+    local bounds = rich_bounds[index - 1]
+    local x = math.floor((bounds.min_x + bounds.max_x) / 2 / M.grid_cell_size + 0.5) * M.grid_cell_size
+    local y = math.floor((bounds.min_y + bounds.max_y) / 2 / M.grid_cell_size + 0.5) * M.grid_cell_size
+    local inward_x, inward_y, tangent_x, tangent_y
+    if region_id == "east" then
+        x = bounds.max_x - edge_inset
+        inward_x, inward_y, tangent_x, tangent_y = -1, 0, 0, -1
+    elseif region_id == "south" then
+        y = bounds.min_y + edge_inset
+        inward_x, inward_y, tangent_x, tangent_y = 0, 1, -1, 0
+    elseif region_id == "west" then
+        x = bounds.min_x + edge_inset
+        inward_x, inward_y, tangent_x, tangent_y = 1, 0, 0, 1
+    else
+        y = bounds.max_y - edge_inset
+        inward_x, inward_y, tangent_x, tangent_y = 0, -1, 1, 0
+    end
+    local points = {}
+    for _, offset in ipairs({ {0, 0}, {0, 1}, {1, 0}, {1, 1} }) do
+        points[#points + 1] = {
+            x = x + socket_spacing * (offset[1] * inward_x + offset[2] * tangent_x),
+            y = y + socket_spacing * (offset[1] * inward_y + offset[2] * tangent_y),
+        }
+    end
+    M.rich_spawn_regions[region_id] = points
+end
+
 return M
