@@ -60,17 +60,17 @@
       "sha256": "a951c2374339e7007d350fe22ae5600f1d27169d03ee41f6b6ae0e2bedfc7f6d"
     }
   ],
-  "uploaded": false,
+  "uploaded": true,
   "download_verified": false,
   "ready_for_public_release": false,
-  "status": "SIGNED_NATIVE_STARTUP_SERVER_VERIFIED_PENDING_UPLOAD",
+  "status": "UPLOADED_STEAM_CONTENT_DOWNLOAD_FAILED_NATIVE_STARTUP_ONLY_GAMEPLAY_PENDING",
   "release_record": "publishing/workshop/archive_all_20261029.json",
   "previous_release_record": "publishing/workshop/ten_sin_startup_20261028_v02.json",
   "native_test": "PASS_ISOLATED_PRODUCTION_STARTUP_ONLY",
   "native_guest_layout_acceptance": "NOT_RETESTED",
   "payment_acceptance": "PAYMENT_SERVICE_UNCHANGED_NO_NEW_PAYMENT_TEST",
   "orders_created_by_agent": 0,
-  "workshop_upload_performed": false,
+  "workshop_upload_performed": true,
   "guest_update_issue": "GUEST_STILL_OLD09_METADATA_RESTART_DID_NOT_RESOLVE_PENDING_ACCOUNT_QUERY",
   "package_report_sha256": "39a6877ce20132efcf96cdfb3f435ab6f759d5ba6ab5bd2258fefe2fd0501cd7",
   "inherited_map_acceptance": {
@@ -80,5 +80,18 @@
   "native_map_acceptance": "PASS_ISOLATED_SIGNED_STARTUP_PRE_AUTH_ONLY",
   "archive_bundle_hash": "d573588b64d2ea6d1431c856d52e0515b5ed471cfdf6af4456ff618d0f568488",
   "backend_release": "20261029-archive-d573588b64d2",
-  "database_ledger_entries": 37
+  "database_ledger_entries": 37,
+  "upload_log_sha256": "edd1fb3643da42d5dcc19be3762f86c2ed1226636300859767671ced57585ff6",
+  "official_download": {
+    "verified": false,
+    "installed_manifest": null,
+    "receipt": null,
+    "receipt_sha256": null,
+    "remote_manifest_observed": "1297565240173722470",
+    "failed_attempt_diagnosis": "output/release_archive_20261029/download_failure_diagnosis.json",
+    "failed_attempt_diagnosis_sha256": "36dc31835f01a898d1f3f7ac77daa2be034de9ba4ab8c60a38a44ee6f48e0549",
+    "second_attempt": "REFUSED_BEFORE_DOWNLOAD_SUBSCRIPTION_NOT_STABLE",
+    "second_attempt_log_sha256": "26e87e3447f9aed29104796f7c1c733ff43fde73859de37a0357201e50ff75b3",
+    "canonical_journal_modified_by_verifier": false
+  }
 }

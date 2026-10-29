@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 4571,
-      "sha256": "d4823553eda3a578ee6ceb31daf7f211f1301130e23d770f85602b4f8f843f48"
+      "bytes": 4304,
+      "sha256": "c221b85358ef10b285d222fe7e12b62749c277f394885b549319857bc9fffb82"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -20,8 +20,8 @@
     },
     {
       "path": "03_progression_save_contract.md",
-      "bytes": 16007,
-      "sha256": "93d6e179b1b0a4c1e400c83d4680c41e3ac9d574e2aa6c9b837083423373bd10"
+      "bytes": 16510,
+      "sha256": "47dca90349120453c02049b3e009c2d0d992be6b4c8c00eb3fd2f4211e4f56ca"
     },
     {
       "path": "04_network_auth_official.md",
@@ -35,13 +35,13 @@
     },
     {
       "path": "06_build_release_ops.md",
-      "bytes": 16185,
-      "sha256": "b74e5b4ce4058d98c152f6fe8600762bde74562dd29e20845058f8a826beaa20"
+      "bytes": 17315,
+      "sha256": "aeb48da7ca5732e72289d08ab75da903660114a03d334cbdc5f9801677e3259f"
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 15904,
-      "sha256": "deefdfb97f40575498a607b1172b8cde656628c2e9e5d8948dbc97dfd10bc9a1"
+      "bytes": 17169,
+      "sha256": "3359d734dde67e0286f4ec95a24f99ec1b98321d6872f363253825bdbae2d19e"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -72,16 +72,6 @@
       "path": "13_art_ui_qa.md",
       "bytes": 8418,
       "sha256": "fe244d4ac107c1e9654b9e5c60d5e31a1bd79d092c968e46effdc2663e429a4a"
-    },
-    {
-      "path": "NEW_CHAT_PROMPT.txt",
-      "bytes": 829,
-      "sha256": "59e6930906e62202d56d95ce3dd7390a7a90a6133c6ac204da10fd62f4fee10d"
-    },
-    {
-      "path": "README.md",
-      "bytes": 3183,
-      "sha256": "4b15ce46664c9e9f400b529e84845ee05e64206bdb82a3eaeb394eaca8817ac4"
     },
     {
       "path": "data/completed_work_index.json",
@@ -119,14 +109,19 @@
       "sha256": "dd22616e57ab56e16490fd3fe910bc57f394da64ef3b2545965850c53ea1b02e"
     },
     {
+      "path": "evidence/archive_all_release_20261029.md",
+      "bytes": 16231,
+      "sha256": "9f4e7ce3e9b104a8fe07c920a54a32cc634b859cb82cfc838b639b60e88fd841"
+    },
+    {
       "path": "evidence/archive_artifact_clarity_20261029.md",
       "bytes": 2255,
       "sha256": "1f0a8d6bc07925521512dc0269f918a16f43e44b7ec35d61934118ac4f166c09"
     },
     {
       "path": "evidence/archive_layout_independent_20261029.md",
-      "bytes": 5626,
-      "sha256": "206a28ec9c95511d994db1c832e88bc150baaf9fa3836a83aed905b893be186f"
+      "bytes": 5847,
+      "sha256": "030ee922782a38168f296cc378bbdd7f053b8fe41764d91eb55aa99979f112f2"
     },
     {
       "path": "evidence/archive_menu_performance_20261029.md",
@@ -259,11 +254,6 @@
       "sha256": "3e9d78ecd41b1e4aaa4335fc0c33fdca621d5e94a98a4d082af5d299d00a2380"
     },
     {
-      "path": "history/20261024/README.md",
-      "bytes": 3523,
-      "sha256": "8fb412555efbff16e4191ae220fb68c521283ef11131c5d4a5c8ad6f8820868b"
-    },
-    {
       "path": "history/20261024/data/commerce_facts.json",
       "bytes": 10585,
       "sha256": "6105f8496427aab2540ee0572bd1e084247114c6b36dc50cec305269c0bf864e"
@@ -304,14 +294,34 @@
       "sha256": "40bd838081c9322b471aa29977d19958932c9cbb87c14d7b54728f9883a86817"
     },
     {
+      "path": "history/20261024/README.md",
+      "bytes": 3523,
+      "sha256": "8fb412555efbff16e4191ae220fb68c521283ef11131c5d4a5c8ad6f8820868b"
+    },
+    {
       "path": "history/README.md",
       "bytes": 449,
       "sha256": "5ebf48f3b52e07d03945ecfb8e7c2883c1905c48a7ed6fb544604525da474bec"
     },
     {
+      "path": "NEW_CHAT_PROMPT.txt",
+      "bytes": 829,
+      "sha256": "59e6930906e62202d56d95ce3dd7390a7a90a6133c6ac204da10fd62f4fee10d"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3183,
+      "sha256": "80240328ada9cff6e607b6d36dba6dacee9c402546a21722305abfff5445c163"
+    },
+    {
       "path": "tools/verify_knowledge.py",
       "bytes": 1993,
       "sha256": "76331e711948f58761439119c684badcc654fa7ce8c9a107c1e440f693c0be7c"
+    },
+    {
+      "path": "validation/20261029/archive_all_release.json",
+      "bytes": 3277,
+      "sha256": "ecf88fed36a81be82f35b7a5924d96393f51005376f64fa256a1a96115d5801f"
     },
     {
       "path": "validation/20261029/archive_layout_independent.json",

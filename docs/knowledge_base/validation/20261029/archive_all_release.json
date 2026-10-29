@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "observed_utc": "2026-10-29T04:22:28.898697+00:00",
+  "workshop_id": "3824360109",
+  "release_sequence": 2026102901,
+  "status": "UPLOADED_STEAM_CONTENT_DOWNLOAD_FAILED_NATIVE_STARTUP_ONLY_GAMEPLAY_PENDING",
+  "content_sha256": "7eee7d5b975573da3e26b2f8fcf079cbc346e33e4a06dc7f7c1c7280691e46ba",
+  "container_bytes": 3777996435,
+  "signed_resources": 6695,
+  "protected_modules_rebuilt": 184,
+  "protected_modules_preserved": 0,
+  "package_report_sha256": "39a6877ce20132efcf96cdfb3f435ab6f759d5ba6ab5bd2258fefe2fd0501cd7",
+  "package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 275607,
+      "sha256": "ccfcc45828f8ce758f43cb4749dd90edf33ed8659a1cdc259bfdc9f762786109"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1071697318,
+      "sha256": "87b335f40a4fe133b7901a70e5b49a6d634a08b078259ba28ddb792208fcb4f2"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1071529200,
+      "sha256": "3046a3ae720dd0e80950e14562bf8c8c556f095a4ab068773d7f34dd78ca2b49"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379215,
+      "sha256": "e03f21542c7c283460e21c60c6350587a8b100b9ab5789d7cfa2ebe41fd1206a"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 562115095,
+      "sha256": "a951c2374339e7007d350fe22ae5600f1d27169d03ee41f6b6ae0e2bedfc7f6d"
+    }
+  ],
+  "upload_succeeded": true,
+  "upload_log_sha256": "edd1fb3643da42d5dcc19be3762f86c2ed1226636300859767671ced57585ff6",
+  "official_download": {
+    "verified": false,
+    "installed_manifest": null,
+    "receipt": null,
+    "receipt_sha256": null,
+    "remote_manifest_observed": "1297565240173722470",
+    "failed_attempt_diagnosis": "output/release_archive_20261029/download_failure_diagnosis.json",
+    "failed_attempt_diagnosis_sha256": "36dc31835f01a898d1f3f7ac77daa2be034de9ba4ab8c60a38a44ee6f48e0549",
+    "second_attempt": "REFUSED_BEFORE_DOWNLOAD_SUBSCRIPTION_NOT_STABLE",
+    "second_attempt_log_sha256": "26e87e3447f9aed29104796f7c1c733ff43fde73859de37a0357201e50ff75b3",
+    "canonical_journal_modified_by_verifier": false
+  },
+  "backend": {
+    "bundle": "d573588b64d2ea6d1431c856d52e0515b5ed471cfdf6af4456ff618d0f568488",
+    "ledger_entries": 37,
+    "native_real_player_reward_verified": false,
+    "ok": true,
+    "payment_untouched": true,
+    "phase": "LIVE_VERIFIED",
+    "release": "20261029-archive-d573588b64d2"
+  },
+  "original_player_rows_unchanged": true,
+  "application_rpcs": 19,
+  "isolated_pg17_clone_verified": true,
+  "server_evidence": {
+    "remote_backup.json": "943f0cd8570a581839b03e50815f8e75f86f2b72838b5e8db12b12ce221038e7",
+    "remote_validate-clone.json": "3d206faf172e6c884ab5e3b977d732c473b03bf4d526aacfe65422b23e851ef0",
+    "remote_activate.json": "92443d3432cef07647f71dab91cc3e262c192f3fcca863f8a723a29454287a58",
+    "remote_verify.json": "1dbe9d5b18e066031af9b320f012935ce059f0706de1c3f187762c2e1dbb1024"
+  },
+  "native_signed_startup_verified": true,
+  "native_engine_log_sha256": "a4e2e706db6c3c06134d5f94f085d1e5c3ce1766dcf579a154b113011bb84136",
+  "real_native_player_reward_verified": false,
+  "multiplayer_verified": false,
+  "challenge_ui_visual_acceptance": false,
+  "payment_service_unchanged": true,
+  "orders_created": 0,
+  "ready_for_public_release": false
+}

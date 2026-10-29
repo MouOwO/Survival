@@ -3,7 +3,7 @@
   "workshop_id": "3824360109",
   "release_sequence": 2026102901,
   "revision": "WS4-ARCHIVE-ALL-01",
-  "uploaded": false,
+  "uploaded": true,
   "download_verified": false,
   "ready_for_public_release": false,
   "package": {
@@ -113,5 +113,20 @@
     "release": "20261029-archive-d573588b64d2"
   },
   "source_plan_sha256": "92fd6092a11fd17cf1b22bf3362ace00b33797d192dd75ebcfe5d406d3d6d22a",
-  "previous_release_record": "publishing/workshop/ten_sin_startup_20261028_v02.json"
+  "previous_release_record": "publishing/workshop/ten_sin_startup_20261028_v02.json",
+  "status": "UPLOADED_STEAM_CONTENT_DOWNLOAD_FAILED_NATIVE_STARTUP_ONLY_GAMEPLAY_PENDING",
+  "workshop_upload_performed": true,
+  "upload_log_sha256": "edd1fb3643da42d5dcc19be3762f86c2ed1226636300859767671ced57585ff6",
+  "official_download": {
+    "verified": false,
+    "installed_manifest": null,
+    "receipt": null,
+    "receipt_sha256": null,
+    "remote_manifest_observed": "1297565240173722470",
+    "failed_attempt_diagnosis": "output/release_archive_20261029/download_failure_diagnosis.json",
+    "failed_attempt_diagnosis_sha256": "36dc31835f01a898d1f3f7ac77daa2be034de9ba4ab8c60a38a44ee6f48e0549",
+    "second_attempt": "REFUSED_BEFORE_DOWNLOAD_SUBSCRIPTION_NOT_STABLE",
+    "second_attempt_log_sha256": "26e87e3447f9aed29104796f7c1c733ff43fde73859de37a0357201e50ff75b3",
+    "canonical_journal_modified_by_verifier": false
+  }
 }

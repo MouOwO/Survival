@@ -1,6 +1,6 @@
 # 03 账号成长、云存档与结算契约
 
-核对时间：2026-10-28（北京时间）。本次只读审阅旧知识包和当前 Lua/Python/CSV/SQL 路径及已有验证文档；没有连接数据库、造余额、抽奖、兑换、付费或启动对局。规则、源码实现、已部署版本及真实验收必须分别标注。永久结算能力存在不代表当前开发验收局会写账户。
+事实截点：2026-10-29（北京时间）。10/28规则梳理来自只读源码审阅；本轮新增隔离PG17验证及d573配套部署，见第9节与发行证据。规则、源码实现、已部署版本及真实验收分别标注；未在活动库造余额、抽奖、兑换或付费。永久结算能力存在不代表离线开发局会写账户。
 
 路径以 game 仓库为根；`core/`、`systems/`、`config/`、`combat/`、`research/` 均为 `scripts/vscripts/` 下的缩写。基础玩法见模块02，引擎及原生入口见模块10。
 
@@ -42,7 +42,7 @@
 
 ## 4. 所有永久变更都需幂等事务
 
-`/v1/archive/command` 绑定账号、session、`config_hash`、白名单 command。客户端不能上传最终余额、奖励数量、价格或抽中结果。核心是 `archive_prepare` → 可信 reducer → `archive_commit`；库存、抽奖、兑换、福利通过 `archive_commit_lottery` 同一事务提交库存和结果。本次新增挑战专用 `archive_commit_challenge` 包装原提交，在同一事务保存真实奖励明细，重试返回原回执；须与SQL／hardening／transport／service配套部署，当前生产未切换，详见后续修复证据。
+`/v1/archive/command` 绑定账号、session、`config_hash`、白名单 command。客户端不能上传最终余额、奖励数量、价格或抽中结果。核心是 `archive_prepare` → 可信 reducer → `archive_commit`；库存、抽奖、兑换、福利通过 `archive_commit_lottery` 同一事务提交库存和结果。本次新增挑战专用 `archive_commit_challenge` 包装原提交，在同一事务保存真实奖励明细，重试返回原回执；须与SQL／hardening／transport／service配套部署，已于2026-10-29随d573 bundle部署，现役37项ledger／19个应用RPC；保留既有排行榜授权。隔离PG17实际事务与线上配置健康验证通过，真实玩家击杀到账仍待验，详见[配套发行证据](evidence/archive_all_release_20261029.md)。
 
 prepare 固定首次配置、fingerprint 和 event_at；同 operation ID 同请求返回旧凭据，改内容或 hash 冲突。响应丢失重试原 ID，不换 ID 再发一次。commit 使用预计 revision，在一次事务中写属性、库存、档案、回执及版本。付款、通关、领取共用既有锁顺序，避免半份收益混入 baseline。当前 Python revision 冲突会 resume 后基于新快照重算，最多4轮，仍冲突返回 `archive_busy_retry`。
 
@@ -102,7 +102,7 @@ Lua验证账号、session、mode、load generation和账号 revision高水位；
 
 运行角色应保留最小 RPC 权限、无直接表DML/owner/BYPASSRLS，业务表RLS与 SECURITY DEFINER固定 search_path。旧知识包的“12个RPC”等数量不应照搬，应按当前追加迁移审计。历史SQL、ledger hash、完成回执不重写；新增字段追加迁移。恢复同时覆盖支付账本和游戏档案，不能只恢复部分业务表。
 
-维护定位：`server/aliyun/database/dbtool.py`、`server/maintenance/reconcile_unique_points.py`、`server/aliyun/database/target/` 追加迁移；新项目需连同权限、事务和测试迁移，不只复制Markdown。现有回归包括 `scripts/vscripts/tests/test_player_profile_modes.lua`、档案重试/纯净永久收益/叠加投影、archive receipt与模式范围、每日上限、数据库福利与最小权限专项。本文没有重跑这些测试，也没有对远端私库作任何读取或变更。
+维护定位：`server/aliyun/database/dbtool.py`、`server/maintenance/reconcile_unique_points.py`、`server/aliyun/database/target/` 追加迁移；新项目需连同权限、事务和测试迁移，不只复制Markdown。现有回归包括 `scripts/vscripts/tests/test_player_profile_modes.lua`、档案重试/纯净永久收益/叠加投影、archive receipt与模式范围、每日上限、数据库福利与最小权限专项。最初10/28规则梳理没有重跑这些测试或连接远端；后续10/29配套上线与隔离PG17验证按第9节及独立发行证据记录。
 
 ## 9. 四座视频存档挑战（2026-10-29开发）
 
@@ -112,4 +112,4 @@ Lua验证账号、session、mode、load generation和账号 revision高水位；
 
 普通无尽和单人塔可依次各开启一次；塔结束即结束本人的存档阶段。跳关按1→2→5→10→20，仅实打层得积分／装备；普通每20层、塔每15层跨档至多一件装备，跳多档不补发。装备按对局+variant保留幂等游标，满收藏仍正常终态。塔准入仅当前极寒／天灾N10以上，实际允许难度来自不可变模式表；预留未来模式不会因此开放。
 
-后台新高难度／塔 operation 在prepare前绑定可信启动match session，不能用游戏存档阶段runtime ID查错局；旧已接受高难度操作按原不可变bundle和原ID恢复，低难度旧回执身份不改。首次commit和重试都保留reducer的逐账号结果，失败与0奖励可读。获胜后准入暂时失败最多重试30秒，再走合作奖励与通关保存屏障；个人阵亡不能取消已经获胜的保存流程。当前仅本地真实Lua worker与模拟RPC事务回归，不是远端数据库或真实账号到账验收。
+后台新高难度／塔 operation 在prepare前绑定可信启动match session，不能用游戏存档阶段runtime ID查错局；旧已接受高难度操作按原不可变bundle和原ID恢复，低难度旧回执身份不改。首次commit和重试都保留reducer的逐账号结果，失败与0奖励可读。获胜后准入暂时失败最多重试30秒，再走合作奖励与通关保存屏障；个人阵亡不能取消已经获胜的保存流程。开发阶段本地真实Lua worker与模拟RPC事务证据保留；本轮另已用线上备份的隔离PG17克隆验证真实worker、事务回滚、丢ACK重试与精确RPC权限，并部署d573配置及新回执RPC。尚无真实玩家击杀到账验收，边界见[配套发行证据](evidence/archive_all_release_20261029.md)。

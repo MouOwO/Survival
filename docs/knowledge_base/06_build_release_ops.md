@@ -1,6 +1,6 @@
 # 06｜构建、签名、工坊分发与恢复
 
-事实截点：2026-10-28。原不公开列出条目 `3824360109` 最新为 `2026102805 / WS4-TEN-SIN-STARTUP-02`：十戒开局展示/选定档案刷新/逐段当前英雄绑定。上传和官方完整下载已通过，安装manifest字符串 `3734424561061643436`；6658签名资源、五个VPK和180个保护模块均核对。原生新版十戒开局画面和多人完整挑战未验收。首轮EResult=2、2804验证恢复和一次显式重试均有独立证据，见[记录](evidence/ten_sin_startup_20261028.md)。
+事实截点：2026-10-29。**本轮配套发行（2026-10-29）**：原不公开列出条目 `3824360109` 已更新为 `2026102901 / WS4-ARCHIVE-ALL-01`，总包3,777,996,435字节（约3.78 GB），6695项签名资源、184个模块全部重新保护。Steam上传成功，官方重新下载在内容分发阶段返回 No Download Source／No connection to content servers；当前未取得新版完整下载回执，不能把新远端manifest当安装成功。 服务器已激活 `20261029-archive-d573588b64d2`，不可变bundle `d573588b64d2ea6d1431c856d52e0515b5ed471cfdf6af4456ff618d0f568488`，PG17 ledger37项／应用RPC19项；原玩家行未变、支付服务未改。原生仅验签名候选启动，四楼交互／多人击杀／真实云端到账待实机确认。详见[本轮发行证据](evidence/archive_all_release_20261029.md)。
 
 ## 五种身份分开记录
 
@@ -23,8 +23,9 @@ Git push 不发布游廊；上传成功不证明下载成功；下载成功不�
 | 2803 `WS4-REBIRTH-INSPECT-01` | 只替换转生展示modifier与service | 6658／3767364782 | 未单独重下载；已由后续版继承 | 原生10个展示实体状态/属性PASS，两份Lua与候选相同；完整候选游廊点选/两人挑战未测 |
 | 2804 `WS4-TEN-SIN-STARTUP-01` | 开局预备十戒及属性刷新 | 6658／3767365890 | `8833388868921862808` | 官方全量PASS；已由2805补正英雄索引，未做原生画面验收 |
 | 2805 `WS4-TEN-SIN-STARTUP-02` | 再补每段绑定当前英雄 | 6658／3767366244 | `3734424561061643436` | 官方全量PASS；原生十戒开局/多人挑战未验收 |
+| 2901 `WS4-ARCHIVE-ALL-01` | 全量当前runtime、四楼／奖励回执／服务器d573配套 | 6695／3777996435 | 未取得完整安装回执；远端新manifest已观察 | 签名候选原生启动PASS；新局交互／多人真实奖励待验 |
 
-历史领域记录包括 `publishing/workshop/native_arcade_cloud_20261027.json`、`ui_layout_20261028.json`、`map_resources_20261028.json`；当前入口总状态为 `test_listing.json`，最新十戒记录为 `ten_sin_startup_20261028_v02.json`。2802继承QR和布局字节，不自动继承新版双人／支付验收。`ready_for_public_release=false`。
+历史领域记录包括 `publishing/workshop/native_arcade_cloud_20261027.json`、`ui_layout_20261028.json`、`map_resources_20261028.json`；当前入口总状态为 `test_listing.json`，历史十戒记录为 `ten_sin_startup_20261028_v02.json`，最新完整发行记录为 `archive_all_20261029.json`。2802继承QR和布局字节，不自动继承新版双人／支付验收。`ready_for_public_release=false`。
 
 | 版本 | 内容SHA256 | 索引VPK SHA256 | 封包报告原始SHA256 |
 | --- | --- | --- | --- |
@@ -34,6 +35,7 @@ Git push 不发布游廊；上传成功不证明下载成功；下载成功不�
 | 2803 | `7d39ab251f4c8f20d8338a49a8335b0447c0e4e8f6a196978312b40f8981ab96` | `c293d9335610df50417f3f06b86e14e9f576cee4993892c166054b7b9ef78a2e` | `a9492685a24d871dc003a02bf08b2145952f7171409e3bc7088b44c5b21c2320` |
 | 2804 | `71a5d2cb2413a427c5c919724ff8384281692700b1fbf48520245525814c4d9e` | `7de376afb1380df8003dc7a5b61728cc7483433d5421e3f235090331c273c4df` | `4ea5b673fdd21fd1753dfd08d627bff0a50313a324c5063cd73e4c820d511555` |
 | 2805 | `549afe0f4125a5f880884f1f5a42d1a6ae307b7b7ea97ddacc400e34dcfd0776` | `d6d2f75f530539abe58f69457c41b31f01a362546b573034c860440c9afe8fcc` | `102bbeec95e21acc777ac2418473cc652e01246981adc162c3f0bb36f7a64155` |
+| 2901 | `7eee7d5b975573da3e26b2f8fcf079cbc346e33e4a06dc7f7c1c7280691e46ba` | `ccfcc45828f8ce758f43cb4749dd90edf33ed8659a1cdc259bfdc9f762786109` | `39a6877ce20132efcf96cdfb3f435ab6f759d5ba6ab5bd2258fefe2fd0501cd7` |
 
 2802官方完整下载回执原始SHA256：`5babf60a6c7c06bd3867dfb45f9defae57d477ac3728bedea66394ab03f3b948`。原路径为 `output/map_resources_20261028/download_evidence/20261028T010453Z_f4ad7619af99475c859dad247cb377d3/verification.json`。路径仅作证据索引，不能因文件名存在就认定证据内容有效；恢复后的文件仍须核对记录摘要。
 
@@ -41,9 +43,9 @@ Git push 不发布游廊；上传成功不证明下载成功；下载成功不�
 
 game和content是独立仓库。content存可编辑地图、Panorama与美术；game存Lua、编译资源及相应源码镜像。源码与Valve编译产物配套，遵循 `.gitattributes`，已有LFS资源继续LFS。
 
-当前版本链使用安装目录外的新建候选、薄overlay、trusted source和完整view。builder默认只读，显式构建才写新目录；不覆盖旧候选、旧builder、旧verifier或运行addon。每版固定基准内容、源hash、实际编译hash、允许变化路径、清单和总大小，构建前后防漂移。报告／内容／索引／总大小未填实际pins的verifier必须在SDK之前拒绝，不拿旧manifest补空。
+本轮2901使用当前完整runtime重新生成生产源、重新保护184模块，并配套d573后端；冻结可信门禁和仅7项生产覆盖。此前增量版本链使用安装目录外的新建候选、薄overlay、trusted source和完整view。builder默认只读，显式构建才写新目录；不覆盖旧候选、旧builder、旧verifier或运行addon。每版固定基准内容、源hash、实际编译hash、允许变化路径、清单和总大小，构建前后防漂移。报告／内容／索引／总大小未填实际pins的verifier必须在SDK之前拒绝，不拿旧manifest补空。
 
-180份受保护Lua逐字节沿用；native2708的14份受审门禁源码构成冻结信任边界，2709再加入QR源码，2801再加入layout源码，共16份review source，2802继续保留。原认证、支付、四账号门禁、名单要求和其余玩法代码不随资源修复重建。不能用最新dirty主入口或明文保护模块覆盖已签候选。
+2708至2805的历史增量链逐字节沿用180份受保护Lua，认证、支付、四账号门禁与名单要求不随当时的资源修复重建。2901改为全量受审源码重新保护184模块，旧保护模块复用数为0；本轮review source精确为14份代码加policy／公钥，共16项，按实际清单校验。新入口与玩法代码经生产配置覆盖和完整源清单审阅后构建，不能用未审工作区文件或明文保护模块临时覆盖已签候选。
 
 老工具曾以 `git diff HEAD` 取补丁，提交后差异变空；现有候选应固定明确的任务起始基准，并另外记录当前HEAD／工作区身份。“补丁比较基准”和“构建时HEAD”不得混用。构建candidate成功不表示当前开发玩法变更全已发布。
 
