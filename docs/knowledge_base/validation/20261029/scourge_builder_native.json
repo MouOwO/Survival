@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-29",
+  "timezone": "Asia/Shanghai",
+  "scope": "native_offline_tools",
+  "root_cause": "new_highland_bounds_with_old_lowland_map_markers",
+  "previous_failure": "mode_spawn_outside_bounds:mode_scourge_player_0_spawn",
+  "runtime_map_sha256": "a4c79aa5cf85d766b9de1788b0725fbfa0b2bf559e349dbd37370fee3a1f7a1a",
+  "source_map_sha256": "8152ef9e1d8bd9d7e8a73025b7591b4bb1d26283d17decc5a352a60c97987568",
+  "installed": true,
+  "native_mode_selection": "scourge",
+  "builder": {
+    "player_id": 0,
+    "unit_name": "npc_survival_builder_proxy",
+    "entindex": 765,
+    "start": [
+      -10368,
+      13056,
+      768
+    ],
+    "after_move": [
+      -10240,
+      13056,
+      768
+    ],
+    "movement_distance": 128,
+    "speed": 500,
+    "rooted": false,
+    "stunned": false,
+    "project_ownership_and_identity_verified": true,
+    "normal_player_order": true,
+    "direct_creation": false,
+    "teleport_used": false
+  },
+  "native_routes": [
+    {
+      "player_id": 0,
+      "highland_z": 768,
+      "western_wave_z": 256,
+      "can_find_path": true
+    },
+    {
+      "player_id": 1,
+      "highland_z": 768,
+      "western_wave_z": 256,
+      "can_find_path": true
+    },
+    {
+      "player_id": 2,
+      "highland_z": 768,
+      "western_wave_z": 256,
+      "can_find_path": true
+    },
+    {
+      "player_id": 3,
+      "highland_z": 768,
+      "western_wave_z": 256,
+      "can_find_path": true
+    }
+  ],
+  "business_module_reload": false,
+  "native_ruins_acceptance": false,
+  "workshop_uploaded": false
+}
