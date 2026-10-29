@@ -55,8 +55,8 @@ for (const mode of ['rich', 'cold', 'scourge', 'ruins']) {
     config += '            player_bounds = {\n';
     row.player_bounds.forEach((b, id) => { config += `                [${id}] = ${bounds(b)},\n`; });
     config += '            },\n';
-    if (['scourge', 'ruins'].includes(mode) || row.build_ground_height !== undefined || row.player_build_bounds) {
-        assert(['cold', 'scourge', 'ruins'].includes(mode) && Number.isFinite(row.build_ground_height)
+    if (['rich', 'scourge', 'ruins'].includes(mode) || row.build_ground_height !== undefined || row.player_build_bounds) {
+        assert(['rich', 'cold', 'scourge', 'ruins'].includes(mode) && Number.isFinite(row.build_ground_height)
             && Number.isFinite(row.build_ground_height_tolerance) && row.build_ground_height_tolerance >= 0
             && row.build_ground_height_tolerance < 64, 'Invalid platform height');
         config += `            build_ground_height = ${row.build_ground_height},\n`

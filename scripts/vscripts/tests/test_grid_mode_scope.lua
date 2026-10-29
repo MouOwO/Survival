@@ -37,7 +37,10 @@ local regions = {
     scourge={min_x=-200,max_x=-189,min_y=-12,max_y=1,position={z=-128}},
 }
 local cold_bounds={min_x=8448,max_x=15872,min_y=3584,max_y=15360}
-package.loaded["systems/mode_spawn_service"]={config=function() return {bounds=cold_bounds} end}
+local rich_bounds={min_x=-7680,max_x=1536,min_y=-14848,max_y=-5120}
+package.loaded["systems/mode_spawn_service"]={config=function()
+    return {bounds=state.mode=="rich" and rich_bounds or cold_bounds}
+end}
 package.loaded["systems/rich_region_service"] = {region=function(player_id)
     assert(player_id==0 or player_id==1)
     if state.region_pending then return nil,"mode_spawn_layout_pending" end
@@ -134,11 +137,11 @@ local function assert_region(payload,mode)
     local grid=assert(payload.static_grid,"ready layout supplies geometry")
     assert(payload.layout_ready==1 and #payload.profiles==1)
     assert(grid.height==region.position.z,"arena replaces ordinary construction Z")
-    local expected=mode=="cold" and cold_bounds or {min_x=region.min_x*64,min_y=region.min_y*64,
+    local expected=mode=="cold" and cold_bounds or mode=="rich" and rich_bounds or {min_x=region.min_x*64,min_y=region.min_y*64,
         max_x=(region.max_x+1)*64,max_y=(region.max_y+1)*64}
     assert(grid.build_bounds.min_x==expected.min_x and grid.build_bounds.min_y==expected.min_y
         and grid.build_bounds.max_x==expected.max_x
-        and grid.build_bounds.max_y==expected.max_y,"cold previews all shared courts; other arenas retain private bounds")
+        and grid.build_bounds.max_y==expected.max_y,"rich/cold preview all shared courts; other arenas retain private bounds")
     assert(grid.bounds.min_x==display_bounds.min_x and grid.bounds.max_x==display_bounds.max_x,
         "global white-grid display extent remains separate from placement permission")
 end

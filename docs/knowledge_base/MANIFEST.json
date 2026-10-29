@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 6192,
-      "sha256": "9f3468fbe979fbf303bcb741368e2f9514c3045247ea209e8378f6ee6d2f1c52"
+      "bytes": 6751,
+      "sha256": "93cce77167e35798af32550aaaf199208f7e9211665f9d51666c7c03085d7e39"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -15,8 +15,8 @@
     },
     {
       "path": "02_core_gameplay.md",
-      "bytes": 31063,
-      "sha256": "291dc63a82d5a217c751183463c1077c10de284e5bbed15b80c39887dbe82a3a"
+      "bytes": 32080,
+      "sha256": "59592823a86123d498f1c9ffe4462b3d5eccf30e3b2a8c4e94dfe9b2b9a4c2a9"
     },
     {
       "path": "03_progression_save_contract.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 18172,
-      "sha256": "3979c08573917ef7164c56050e0208592fdd720368c12b1933c1be4ed62895b9"
+      "bytes": 18658,
+      "sha256": "5c563489897bdebff0c98f04d527610a0900cb90affea0d50eb0166cb15e8e55"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -219,6 +219,11 @@
       "sha256": "8761a37a0ff0439a4f41cc620851170e3227aa678d7186aef1e0ce523b81eb28"
     },
     {
+      "path": "evidence/rich_shared_building_20261029.md",
+      "bytes": 3098,
+      "sha256": "319a6a2ae6548561a0708aeef21dd15c8ca04b1b9417ca3da227ef5996a34ec7"
+    },
+    {
       "path": "evidence/rich_tree_edge_positions_20261029.md",
       "bytes": 2300,
       "sha256": "ccbe1a3273d7481ebc11f062cd7fc630c569dd16899b5fb31e322af4cddd597c"
@@ -387,6 +392,11 @@
       "path": "validation/20261029/redemption_codes.json",
       "bytes": 1817,
       "sha256": "fd3bda6a9729bc246d5b8bc4f7489318096ea58d8402db8943a9c14f20667b87"
+    },
+    {
+      "path": "validation/20261029/rich_shared_building.json",
+      "bytes": 4328,
+      "sha256": "6a10e76255e46ff7885fc18701341b8f59d8baae42b5098b7fa0f410c0a54d4b"
     },
     {
       "path": "validation/20261029/ruins_stair_geometry.json.gz",

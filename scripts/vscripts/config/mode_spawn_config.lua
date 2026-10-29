@@ -24,6 +24,8 @@ return {
                 [2] = { min_x = -6784, min_y = -11392, max_x = -4480, max_y = -8768 },
                 [3] = { min_x = -4096, min_y = -8256, max_x = -1600, max_y = -5952 },
             },
+            build_ground_height = 256,
+            build_ground_height_tolerance = 16,
         },
         cold = {
             center_marker = "cold_start",

@@ -69,14 +69,20 @@ local function space_groups(groups, hull_multiplier)
     end
 end
 
-local function cold_route(player_id, wall_index, config)
-    if not config then return nil, "mode_spawn_config_missing:cold" end
-    local buildings = package.loaded["systems/building_system"]
-    local city = buildings and buildings.main_city_for_player and buildings.main_city_for_player(player_id)
-    local position = origin(city)
-    if not position and wall_index and type(EntIndexToHScript) == "function" then
+local function shared_base_route(player_id, wall_index, config, mode)
+    if not config then return nil, "mode_spawn_config_missing:" .. mode end
+    local function wall_position()
+        if not wall_index or type(EntIndexToHScript) ~= "function" then return nil end
         local ok, wall = pcall(EntIndexToHScript, wall_index)
-        if ok then position = origin(wall) end
+        return ok and origin(wall) or nil
+    end
+    -- Rich players can move their defensive wall to another court while the
+    -- city stays put. Cold retains its established main-city-first routing.
+    local position = mode == "rich" and wall_position() or nil
+    if not position then
+        local buildings = package.loaded["systems/building_system"]
+        local city = buildings and buildings.main_city_for_player and buildings.main_city_for_player(player_id)
+        position = origin(city) or wall_position()
     end
     if not position then return player_id end
     local mode_spawns = require("systems/mode_spawn_service")
@@ -84,7 +90,7 @@ local function cold_route(player_id, wall_index, config)
     for id = 0, 3 do
         if mode_spawns.contains(courts and courts[id], position) then return id end
     end
-    return nil, "cold_wave_base_outside_courts"
+    return nil, mode .. "_wave_base_outside_courts"
 end
 
 function M.refresh(channels, wall_by_player, hull_multiplier)
@@ -92,10 +98,11 @@ function M.refresh(channels, wall_by_player, hull_multiplier)
     local mode = setup and setup.get_mode and setup.get_mode()
     if mode == "rich" or mode == "cold" or mode == "scourge" or mode == "ruins" then
         local mode_spawns = require("systems/mode_spawn_service")
-        local config, groups = mode == "cold" and mode_spawns.config() or nil, {}
+        local shared = mode == "cold" or mode == "rich"
+        local config, groups = shared and mode_spawns.config() or nil, {}
         for player_id, channel in pairs(channels) do
             local route_id, route_error = player_id, nil
-            if mode == "cold" then route_id, route_error = cold_route(player_id, wall_by_player[player_id], config) end
+            if shared then route_id, route_error = shared_base_route(player_id, wall_by_player[player_id], config, mode) end
             local selected, reason
             if not route_error then selected, reason = mode_spawns.wave_marker(player_id, route_id) end
             channel.spawn_offset_x, channel.spawn_offset_y = 0, 0
@@ -106,7 +113,8 @@ function M.refresh(channels, wall_by_player, hull_multiplier)
                 channel.marker, channel.marker_name = selected.marker, selected.marker_name
                 channel.spawn_position = selected.position
                 channel.route_error = nil
-                if mode == "cold" then
+                if shared then
+                    if mode == "rich" then channel.spawn_side = sides[route_id + 1] end
                     groups[selected.marker_name] = groups[selected.marker_name] or {}
                     groups[selected.marker_name][#groups[selected.marker_name] + 1] = channel
                 end
@@ -115,9 +123,9 @@ function M.refresh(channels, wall_by_player, hull_multiplier)
                 channel.route_error = route_error or reason or "mode_wave_spawn_missing"
             end
         end
-        -- All four arrows run along world X. Spread owners across Y without
-        -- changing their individual wave quantities, targets or reward identity.
-        if mode == "cold" then space_groups(groups, hull_multiplier) end
+        -- Snow arrows run along world X; rich entrances point toward their
+        -- actual court. Only the formation axis changes, never wave ownership.
+        if shared then space_groups(groups, hull_multiplier) end
         return
     end
     local portals, center = layout()

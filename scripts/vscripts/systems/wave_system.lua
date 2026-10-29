@@ -2279,9 +2279,12 @@ function M.init()
     end)
     event_bus.subscribe(events.WAVE_START_NEXT, start_next_wave)
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_killed)
+    local function shared_base_mode()
+        local mode = require("systems/mode_spawn_service").mode()
+        return mode == "cold" or mode == "rich"
+    end
     local function on_wall_changed(payload)
-        if payload.building_id == "main_city"
-            and require("systems/mode_spawn_service").mode() == "cold" then
+        if payload.building_id == "main_city" and shared_base_mode() then
             if payload.stats_only ~= true then refresh_wave_routes() end
             return
         end
@@ -2305,8 +2308,7 @@ function M.init()
     event_bus.subscribe(events.BUILDING_DESTROYED, function(payload)
         if payload.building_id ~= "wall" then
             if type(wall_targets.navigation_changed) == "function" then wall_targets.navigation_changed() end
-            if payload.building_id == "main_city"
-                and require("systems/mode_spawn_service").mode() == "cold" then refresh_wave_routes() end
+            if payload.building_id == "main_city" and shared_base_mode() then refresh_wave_routes() end
             return
         end
         if type(wall_targets.remove) == "function" and not wall_targets.remove(payload.entindex) then return end

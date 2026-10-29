@@ -33,7 +33,8 @@ end
 assert(samples==4)
 for _=1,1000 do for id=0,3 do assert(routing.position(channels[id])) end end
 assert(samples==4,"Per-monster placement reuses cached channel offsets")
--- Completed walls cannot redirect a rich player to another player's portal.
+-- Unresolvable wall handles retain the authored initial rich marker instead
+-- of borrowing the ordinary island's quadrant/portal algorithm.
 EntIndexToHScript=function() error("Rich routing must not rotate by ordinary wall quadrants") end
 routing.refresh(channels,{[0]=100,[1]=101,[2]=102,[3]=103},1)
 for id=0,3 do local at=routing.position(channels[id]);assert(at.x==points[id].x and at.y==points[id].y) end

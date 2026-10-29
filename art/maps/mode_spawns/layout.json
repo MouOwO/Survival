@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "map_name": "template_map",
-  "note": "Player IDs are zero based. Rich: east, south, west, north. Cold: four shared snow courts ordered north to south (+Y); spawn arrows alternate +X,-X,+X,-X. Scourge: builders/trees on four eastern high plateaus; monsters in the western clearing, north to south.",
+  "note": "Player IDs are zero based. Rich: four shared courts ordered east, south, west, north; builders may travel within the rich arena. Cold: four shared snow courts ordered north to south (+Y); spawn arrows alternate +X,-X,+X,-X. Scourge: builders/trees on four eastern high plateaus; monsters in the western clearing, north to south.",
   "modes": {
     "rich": {
       "center": [
@@ -63,6 +63,8 @@
           -5952
         ]
       ],
+      "build_ground_height": 256,
+      "build_ground_height_tolerance": 16,
       "monsters": [
         [
           -2848,

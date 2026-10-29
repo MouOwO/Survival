@@ -219,10 +219,14 @@ end
 
 local function rich_socket(player_id, city, origin)
     local regions = require("systems/rich_region_service")
-    local region, reason = regions.region(player_id)
+    local mode = require("systems/mode_spawn_service").mode()
+    -- Shared rich courts use the city's physical court for the fixed patch;
+    -- the personal tree and every reward still belong to its original owner.
+    local region, reason
+    if mode == "rich" then region, reason = regions.region_at(origin)
+    else region, reason = regions.region(player_id) end
     if not region then return nil, nil, nil, reason end
     release_ordinary_reservations()
-    local mode = require("systems/mode_spawn_service").mode()
     local region_id = tostring(mode) .. ":" .. region.id
     region_slots[region_id] = region_slots[region_id] or {}
     local slots, candidates = region_slots[region_id], {}

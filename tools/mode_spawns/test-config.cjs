@@ -18,6 +18,9 @@ assert.equal(fs.readFileSync(valid.output, 'utf8'),
     fs.readFileSync(path.join(root, 'scripts/vscripts/config/mode_spawn_config.lua'), 'utf8').replace(/\r\n/g, '\n'));
 assert.equal(layout.modes.scourge.monster_bounds.length, 4);
 for (const [name, mutate] of [
+    ['rich_height_invalid', data => { data.modes.rich.build_ground_height = '256'; }],
+    ['rich_height_missing', data => { delete data.modes.rich.build_ground_height; }],
+    ['rich_height_includes_road', data => { data.modes.rich.build_ground_height_tolerance = 256; }],
     ['build_court_outside_mode', data => { data.modes.cold.player_build_bounds[0][2] = 16384; }],
     ['build_court_overlap', data => { data.modes.cold.player_build_bounds[1][2] = 12800; }],
     ['missing_build_court', data => { data.modes.cold.player_build_bounds.pop(); }],

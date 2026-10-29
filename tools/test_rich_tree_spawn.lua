@@ -148,8 +148,9 @@ local function placement(point, owner, policy_only)
         footprint = {x = 2, y = 2}, policy_only = policy_only, team = 2})
 end
 for _, policy_only in ipairs({false, true}) do
-    assert(not placement(cities[1]:GetAbsOrigin(), 0, policy_only).ok, "real grid rejects another player's component, including policy-only queries")
-    assert(not placement(Vector(-17 * 64, -150 * 64, 128), 0, policy_only).ok, "a footprint crossing the own-component boundary is rejected")
+    assert(placement(Vector(-3200, -13824, 128), 0, policy_only).ok,
+        "real grid permits an empty full footprint in another court, including policy-only queries")
+    assert(not placement(Vector(-17 * 64, -150 * 64, 128), 0, policy_only).ok, "a footprint crossing any court boundary is rejected")
     assert(not placement(Vector(64, -156 * 64, 128), 0, policy_only).ok, "a footprint touching an interior red hole is rejected")
 end
 assert(placement(Vector(12 * 64, -142 * 64, 128), 0).ok, "rich ground at height 128 remains buildable")
@@ -183,7 +184,9 @@ assert(#created == count + 1 and by_player[0] ~= tree and by_player[0].survival_
 -- A different city location cannot move the patch. Shared courts use each of
 -- its four authored sockets once and reuse only the released owner's slot.
 entities = {}; created = {}; by_player = {}; queries = 0
-slots = {[0] = "east", [1] = "east", [2] = "east", [3] = "east"}
+-- Keep all four original spawn assignments: physical city position now owns
+-- patch selection even when those players build together in the east court.
+slots = {[0] = "east", [1] = "south", [2] = "west", [3] = "north"}
 init()
 for id = 0, 3 do
     build_city(id, Vector(-640 + id * 128, -9408, 128))

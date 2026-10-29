@@ -384,7 +384,8 @@ local function send_profiles(player_id)
         bounds = {min_x=region.min_x*64,min_y=region.min_y*64,
             max_x=(region.max_x+1)*64,max_y=(region.max_y+1)*64}
         height = region.position.z
-        if require("systems/match_setup_service").get_mode() == "cold" then
+        local mode = require("systems/match_setup_service").get_mode()
+        if mode == "cold" or mode == "rich" then
             -- Permission remains cell-based on the four lawns, but the preview
             -- must reach every court so teammates can build together.
             local config = require("systems/mode_spawn_service").config()

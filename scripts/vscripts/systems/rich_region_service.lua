@@ -1,4 +1,4 @@
--- Cache four authored courts at load. Snow court membership uses platform
+-- Cache four authored courts at load. Shared court membership uses platform
 -- height; exact placement checks live navigation and occupancy separately.
 local M = {}
 local CELL, SEARCH_RADIUS, MAX_REGION_CELLS = 64, 6144, 8192
@@ -22,8 +22,9 @@ local function rich()
     return mode == "rich" or mode == "cold" or mode == "scourge" or mode == "ruins"
 end
 
-local function shared_cold()
-    return require("systems/mode_spawn_service").mode() == "cold"
+local function shared_courts()
+    local mode = require("systems/mode_spawn_service").mode()
+    return mode == "rich" or mode == "cold"
 end
 
 local function number(value)
@@ -91,7 +92,8 @@ local function build_authored_regions()
     if not service.contains(config.bounds, center) then return nil, "mode_center_outside_bounds" end
     origin = center
     local result, compiled = {}, {}
-    local terrain_floor = (service.mode() == "cold" and config.player_build_bounds ~= nil
+    local terrain_floor = (service.mode() == "rich"
+        or service.mode() == "cold" and config.player_build_bounds ~= nil
         or service.mode() == "scourge" or service.mode() == "ruins") and config.build_ground_height ~= nil
     for index, direction in ipairs(DIRECTIONS) do
         local player_id = index - 1
@@ -104,7 +106,7 @@ local function build_authored_regions()
         if not landing then return nil, invalid .. ":" .. tostring(name) end
         if not service.contains(config.bounds, landing) then return nil, "mode_player_outside_bounds:" .. name end
         -- Explicit Hammer courts remain separate even when walkable attack
-        -- roads join the central monster area. Connectivity is not ownership.
+        -- roads join the central monster area. A building must fit one court.
         local region = { id = direction.id, player_index = player_id, marker = name,
             position = landing, cells = {}, min_x = math.huge, min_y = math.huge,
             max_x = -math.huge, max_y = -math.huge }
@@ -315,14 +317,27 @@ function M.wave_spawn(player_id)
     return nil, "rich_wave_spawn_not_traversable"
 end
 
+-- Physical court identity is separate from the player's initial spawn slot.
+-- Resource sockets and shared construction follow the chosen building site.
+function M.region_at(position)
+    if not rich() then return nil, "rich_mode_inactive" end
+    local x, y = cell(position)
+    if not x then return nil, "rich_invalid_destination" end
+    local ok, reason = ensure_regions()
+    if not ok then return nil, reason end
+    local id = labels[key(x, y)]
+    if not id then return nil, "mode_position_outside_courts" end
+    return regions[id]
+end
+
 function M.validate_position(player_id, position)
     if not rich() then return true end
     local region, reason = M.region(player_id)
     if not region then return false, reason end
     local x, y = cell(position)
     if not x then return false, "rich_invalid_destination" end
-    if shared_cold() then
-        -- Cold courts share their roads: builders may join another player's
+    if shared_courts() then
+        -- Shared courts share their roads: builders may join another player's
         -- base. Native navigation still validates the destination itself.
         return require("systems/mode_spawn_service").validate_position(position)
     end
@@ -344,13 +359,14 @@ function M.validate_building_footprint(player_id, min_x, min_y, max_x, max_y)
     -- interior holes in the platform must remain outside court membership.
     local first_x, first_y = math.floor(min_x / CELL), math.floor(min_y / CELL)
     local last_x, last_y = math.ceil(max_x / CELL) - 1, math.ceil(max_y / CELL) - 1
-    if shared_cold() then
+    if shared_courts() then
+        local outside = require("systems/mode_spawn_service").mode() .. "_building_outside_courts"
         local court = labels[key(first_x, first_y)]
-        if not court then return false, "cold_building_outside_courts" end
+        if not court then return false, outside end
         local shared = regions[court]
-        if last_x > shared.max_x or last_y > shared.max_y then return false, "cold_building_outside_courts" end
+        if last_x > shared.max_x or last_y > shared.max_y then return false, outside end
         for x = first_x, last_x do for y = first_y, last_y do
-            if labels[key(x, y)] ~= court then return false, "cold_building_outside_courts" end
+            if labels[key(x, y)] ~= court then return false, outside end
         end end
         return true
     end

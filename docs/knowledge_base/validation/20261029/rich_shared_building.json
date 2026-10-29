@@ -1,0 +1,112 @@
+{
+  "task": "rich_shared_building",
+  "date": "2026-10-29",
+  "scope": "development_only",
+  "rule": "Rich builders may travel within rich bounds and build in any one of its four high courts.",
+  "platform_height": 256,
+  "platform_tolerance": 16,
+  "related_checks_passed": 18,
+  "full_grid_scope_known_failure": {
+    "baseline_line": 220,
+    "current_line": 223,
+    "same_partial_area_assertion": true
+  },
+  "native_readonly": {
+    "candidate_modules_isolated": true,
+    "actual_world": "rich/template_map",
+    "courts": 4,
+    "legal_wall_samples": 36,
+    "courts_with_reachable_work_position": 4,
+    "low_water_rejected": true,
+    "outside_mode_rejected": true,
+    "rows": [
+      "[RICH_SHARED_RO] mode=rich time=151.23333740234",
+      "[RICH_SHARED_RO] court=0 z=256 legal_walls=9 reachable_worker=true move_allowed=true",
+      "[RICH_SHARED_RO] court=1 z=256 legal_walls=9 reachable_worker=true move_allowed=true",
+      "[RICH_SHARED_RO] court=2 z=256 legal_walls=9 reachable_worker=true move_allowed=true",
+      "[RICH_SHARED_RO] court=3 z=256 legal_walls=9 reachable_worker=true move_allowed=true",
+      "[RICH_SHARED_RO] low_water_allowed=false outside_mode_allowed=false total_legal=36 courts_with_work=4"
+    ]
+  },
+  "not_performed": [
+    "live_business_module_reload",
+    "actual_native_blink_or_construction",
+    "online_multiplayer",
+    "workshop_upload",
+    "backend_deploy"
+  ],
+  "files": [
+    {
+      "path": "art/maps/mode_spawns/layout.json",
+      "sha256_lf": "e41f4c6c39c3dc6f802e139f39c5e6ff5cd21a7173588cb2a48e2db20ffd5401"
+    },
+    {
+      "path": "scripts/vscripts/config/mode_spawn_config.lua",
+      "sha256_lf": "877bf80fd795ec763fdf6f0f28b7d64dc935b330dd47b216a724cef5fe189fcc"
+    },
+    {
+      "path": "scripts/vscripts/systems/rich_region_service.lua",
+      "sha256_lf": "f9e351b998ec3653a38deaf3f2fec8cefb7d60798d6685fd8a780f5f6e504a8d"
+    },
+    {
+      "path": "scripts/vscripts/systems/builder_work_position_service.lua",
+      "sha256_lf": "14b7ea28f2f56cf2a563c86cca01aaa905581c7c4214582980569d7c9b62fdca"
+    },
+    {
+      "path": "scripts/vscripts/ui/grid_placement_router.lua",
+      "sha256_lf": "0d81882aaadc710694ad1ad4895d4d7bd8c94c4f9277e61fd6c5b683f8ffe84a"
+    },
+    {
+      "path": "scripts/vscripts/systems/wave_spawn_routing.lua",
+      "sha256_lf": "831bb65807264e397702639c656f57830b834d68375c84038e36df91d761e217"
+    },
+    {
+      "path": "scripts/vscripts/systems/wave_system.lua",
+      "sha256_lf": "43f88fd89ea5f2fd771f393970fe086b1a82a825836357a59441751b08ba341b"
+    },
+    {
+      "path": "scripts/vscripts/systems/tree_system.lua",
+      "sha256_lf": "03ae843a3c60da25f2cd6b93dd0d42c6294788f37c03e8df13bb78fa62719ddd"
+    },
+    {
+      "path": "tools/mode_spawns/patch-map.cjs",
+      "sha256_lf": "e17298c1e0e971a13ca69269500e136568b1e743deb2248f4bf9148a2afaa245"
+    },
+    {
+      "path": "tools/mode_spawns/test-config.cjs",
+      "sha256_lf": "bbddf19768a5695716dae2a52badb594e280e98344e5544d2a8f1cb986939eba"
+    },
+    {
+      "path": "scripts/vscripts/tests/test_rich_shared_building.lua",
+      "sha256_lf": "f01b02c20e6d9d96ae108cefaa9b6ec67f3c84f50ec319bdd1e595d1c2e89e1e"
+    },
+    {
+      "path": "scripts/vscripts/tests/test_rich_shared_wave_routes.lua",
+      "sha256_lf": "b38b1e72a69619f9100577de34a34ef5eec7536868e2cc7bc35bc1a6c2aec107"
+    },
+    {
+      "path": "scripts/vscripts/tests/test_rich_shared_trees.lua",
+      "sha256_lf": "fa6d02a4001048f128eefabd578657b40a6291eb8cbc4f46d5cda15c38ed0b89"
+    },
+    {
+      "path": "scripts/vscripts/tests/test_mode_spawn_regions.lua",
+      "sha256_lf": "2fb71a85864b404185632ea9d6e21544d3833e95c384fc2dac154c878f9d03dd"
+    },
+    {
+      "path": "scripts/vscripts/tests/test_cold_wave_city_events.lua",
+      "sha256_lf": "f6c36b0d4dfb6de55e5baf89bc12383ddf6e8181ef15f046e77081e53208d4e5"
+    },
+    {
+      "path": "scripts/vscripts/tests/test_grid_mode_scope.lua",
+      "sha256_lf": "9f4a9bef08be9ce173abf540b18298604d2c23a9540e7d5c435939f9009f07dc"
+    },
+    {
+      "path": "tools/test_rich_tree_spawn.lua",
+      "sha256_lf": "125b12a9b85c83d0c308c7f650092904feba2611fedcb73e91f679e847c686a2"
+    },
+    {
+      "path": "tools/test_rich_wave_routes.lua",
+      "sha256_lf": "91b74a0a4ad03a10f119d5b65718210667560f8a6b8ec0060b57db010db41d52"
+    }
+  ]
+}
