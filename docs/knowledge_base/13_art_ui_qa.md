@@ -25,4 +25,6 @@
 
 QA资料：docs/validation/UI_DATA_QA_20261025.md/.json、docs/ui_layout_20261028.md、docs/guest_payment_qr_20261027.md、docs/map_resources_20261028.md、docs/ai/CURRENT_TASK.md。测试通过范围与未跑项分别记录，不能把工具mock测试写成双人或实付结果。
 
+2026-10-29后续用户要求回到原生方式：**上述十转换装ScenePanel试用已撤回**。十转Boss在等待快照、真实饰品元数据到达、多选切回和迟到回包时均保持Valve实体头像，不再创建默认英雄Scene或调用ReplaceEconItemSlot；遗留试用节点被隐藏并退役。官方十模型的镜头／背景沿用现有原件，不改变世界饰品和其他单位头像。game／content的JS与XML同步、两份官方编译产物完成，6份头像专项回归通过；离线实际画面和在线尚未验收，见[本轮记录](evidence/offline_early_clear_scene_20261029.md)。
+
 开发源码、content镜像、编译资源和已发布冻结包是不同对象；修了源码没有编译/冻结/上传/下载证明时，不能回答玩家“已更新”。UI源码和产物在两仓的实际位置见01/06。

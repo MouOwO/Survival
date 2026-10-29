@@ -669,12 +669,15 @@ local function settle_victory_once()
     state.timer = 0
     publish("final_wave_cleared")
     local archive_players = {}
-    if not dev_mode then
-        for _, player_id in ipairs(player_context.active_player_ids()) do
-            if disconnected_players[player_id] ~= true then
-                archive_players[#archive_players + 1] = player_id
-            end
+    -- Development waves suppress permanent clear credit, not the playable
+    -- archive phase. A shop early-final request can complete while dev/monster
+    -- has paused ordinary waves; those surviving players still need their hubs.
+    for _, player_id in ipairs(player_context.active_player_ids()) do
+        if disconnected_players[player_id] ~= true then
+            archive_players[#archive_players + 1] = player_id
         end
+    end
+    if not dev_mode then
         -- Determine the complete winning roster before emitting any per-player rewards.
         -- Active players are allied, non-defeated participants; disconnected lanes were excluded above.
         local human_winners, human_count = {}, 0

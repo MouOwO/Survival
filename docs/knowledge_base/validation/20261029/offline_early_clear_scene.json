@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "date": "2026-10-29",
+  "user_context": {
+    "offline": true,
+    "mode": "rich",
+    "difficulty": "unknown",
+    "used_addhero": true,
+    "online_tested": false
+  },
+  "reproducible_cause": "dev_mode_suppressed_archive_roster_along_with_permanent_clear_credit",
+  "addhero_sets_dev_mode": false,
+  "offline_onboarding_sets_dev_mode": true,
+  "actual_final_wave_spawn_death_handoffs": 6,
+  "rich_cases": [
+    "N1",
+    "N20"
+  ],
+  "original_code_negative_control_failed": true,
+  "dev_clear_credit_still_suppressed": true,
+  "bot_only_rejection_and_save_barriers_verified": true,
+  "related_lua_suites_passed": 6,
+  "portrait_node_suites_passed": 6,
+  "rebirth_portrait": "VALVE_ENTITY_BOUND_NATIVE_WITH_OFFICIAL_BACKGROUND",
+  "official_compile_failures": 0,
+  "sources_and_compiled_pair_verified": true,
+  "native_user_final_wave_acceptance": false,
+  "native_portrait_visual_acceptance": false,
+  "online_acceptance": false,
+  "workshop_uploaded_this_fix": false,
+  "server_changed": false,
+  "evidence_sha256": {
+    "scripts/vscripts/systems/wave_system.lua": "5ad32d25a3950dfd26b9b125888eccff55844313cca8bcf21a134ac4e2122e7f",
+    "scripts/vscripts/tests/test_early_final_archive_phase.lua": "b2d362e86b859d84c5ee65333c09826b9909f4fafac5746ad4da405081ed26a6",
+    "panorama/src/scripts/custom_game/combat_stats.js": "9950879ffaccf4da26639fcc99ca0e514fd7609ab14bdd4029f55e3e1174d74a",
+    "panorama/src/layout/custom_game/survival_hud.xml": "ca700bdac4f14ef82261d7370777033c7d726184fd025cf452c1a4258d192767",
+    "tools/test_seven_sins_portrait.cjs": "e8ee09894f41cb7fee6658be4f14c2ff9239a1dc894abe741445f40ae02fd510",
+    "panorama/scripts/custom_game/combat_stats.vjs_c": "5e106ece62a3cac31eed0c0a15b4f15f0e7b5f1e96be1d118e06353721e4e299",
+    "panorama/layout/custom_game/survival_hud.vxml_c": "189c8c6d9bb5fde7083101db36cf3255461c698bda47d34d682d6503a8b5cd15"
+  }
+}

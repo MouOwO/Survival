@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 4304,
-      "sha256": "c221b85358ef10b285d222fe7e12b62749c277f394885b549319857bc9fffb82"
+      "bytes": 4918,
+      "sha256": "85316be2b40956c9b8cbdb1b84ca8c7ac1a28dbdb541b32e784c2376dc6b3df8"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -15,8 +15,8 @@
     },
     {
       "path": "02_core_gameplay.md",
-      "bytes": 25597,
-      "sha256": "ab964fb62dae95ace32d86f9da1e5a872ffcfa9d82d3223ec79cd4075efffb02"
+      "bytes": 26631,
+      "sha256": "3526697729e9b688cdab042f0c3da5510c0d3c8fd9a93bb5dbc854103a928bd9"
     },
     {
       "path": "03_progression_save_contract.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 17169,
-      "sha256": "3359d734dde67e0286f4ec95a24f99ec1b98321d6872f363253825bdbae2d19e"
+      "bytes": 17701,
+      "sha256": "e1f30bd0ab474392dfd5583feaa81bd98dda8a53b7f595026322f1c8240df8fa"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -70,8 +70,8 @@
     },
     {
       "path": "13_art_ui_qa.md",
-      "bytes": 8418,
-      "sha256": "fe244d4ac107c1e9654b9e5c60d5e31a1bd79d092c968e46effdc2663e429a4a"
+      "bytes": 9042,
+      "sha256": "1ef2ffcf9223258c1b8d21b58b309cec42663d53bccca983b091e116d84cc396"
     },
     {
       "path": "data/completed_work_index.json",
@@ -167,6 +167,11 @@
       "path": "evidence/native_arcade_cloud_20261027.public.json",
       "bytes": 1694,
       "sha256": "3d57d439d339f2655e98d9b690735cf65de3945a15e7b52b77ac29e1bc7d657b"
+    },
+    {
+      "path": "evidence/offline_early_clear_scene_20261029.md",
+      "bytes": 4321,
+      "sha256": "add74adc282e550f6983eba92584481d3c735b78b19065992e1ebc17a7da287c"
     },
     {
       "path": "evidence/rebirth_n15_preview_20261028.md",
@@ -327,6 +332,11 @@
       "path": "validation/20261029/archive_layout_independent.json",
       "bytes": 13994,
       "sha256": "b025129b8480e5759a224c0bbc15308f2161deda1194049d6bd23dd4d73310bc"
+    },
+    {
+      "path": "validation/20261029/offline_early_clear_scene.json",
+      "bytes": 1899,
+      "sha256": "554d1c738da8b0be9b2df8d614ca81acf5de993813a84180253fb479bba5e801"
     }
   ]
 }
