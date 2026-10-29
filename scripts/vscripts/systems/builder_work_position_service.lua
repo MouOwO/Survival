@@ -49,7 +49,8 @@ local function grounded_clear(caster, candidate, reference_height, units)
     local owner = tonumber(caster.survival_player_id)
     if local_mode then
         local config = require("systems/mode_spawn_service").config()
-        bounds = config and config.player_bounds and config.player_bounds[owner]
+        bounds = mode == "cold" and config and config.bounds
+            or config and config.player_bounds and config.player_bounds[owner]
         if not bounds then return nil end
     end
     local margin = math.max(16, unit_hull(caster))

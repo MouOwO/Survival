@@ -289,6 +289,11 @@ local function final_ready(state)
 end
 
 -- The real rules admit N1/N2 but retain individual challenge difficulty gates.
+local fixture_hook = rawget(_G, "SURVIVAL_WAVE_POPULATION_FIXTURE")
+if fixture_hook then
+    fixture_hook({bus=bus,events=events,restart=restart,prepare_lanes=prepare_lanes,upvalue=upvalue})
+    return
+end
 for _, difficulty in ipairs({"N1", "N2", "N3"}) do
     local state, enemies = restart(difficulty)
     prepare_lanes()

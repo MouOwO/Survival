@@ -28,6 +28,18 @@
 
 丰饶/极寒沿用常规战斗投影，但持久模式身份与通关表独立；纯净压制历史永久战斗加成，资格和商城仍使用认证的永久账号视图。维护入口：`config/mode_progression.lua`、`config/difficulty_config.lua`、`config/mode_release_config.lua`、`systems/match_setup_service.lua`、`systems/player_profile_service.lua`。
 
+### 极寒四路与合建（2026-10-29，开发版未上传游廊）
+
+用户指定雪地图箭头，从图左到右对应世界Y递减的四个平台，方向依次为世界+X、-X、+X、-X。四个Hammer出怪标记改为XY `(9600,14080)`、`(14464,11264)`、`(9856,8448)`、`(14208,5632)`，出生时取实际地面高度。沿保留的原生地形通路寻路至目标平台城墙，不新增强制直线移动、每帧路由扫描或寻路穿墙。
+
+极寒允许建造者沿模式内通路前往任一雪地平台，完整建筑占地仍须位于同一块已登记可建平台内，通路/跨平台占地拒绝；丰饶、天灾的私人区域不变。预览范围扩到整个极寒区，施工/维修落脚点支持其他平台；初始建造者出生点保持原配置。
+
+选入口优先读取本玩家已完成且存活的主基地所在平台；没有主基地时用已登记城墙，尚未建造时用初始平台。主基地创建、移动、销毁以及城墙/参局名单变化触发重算。N名有效玩家同平台时，共用相应入口并在附近按玩家编号横向错开，通常间隔80，仍每个出生节拍各一只、各自完整波次配额；不合并通道、不额外重复乘人数，归属/存活上限/奖励/败退沿用个人状态。出生的完整Hull、地面高差、树木、目标平台可达性及原生ClearSpace后的实际落点继续检查。
+
+实现：mode_spawn_config/layout.json、mode_spawn_service、wave_spawn_routing、building_system.main_city_for_player、wave_system建筑事件、rich_region_service、builder_work_position_service、grid_placement_router。新检查test_cold_wave_routes覆盖四路×1–4人、混合分组/主基地优先与移动、通道/配额保留、无出生期实体扫描、缺标记/不可达/落点越界；test_cold_wave_city_events复用真实wave_system和事件总线验证基地创建/移动/销毁。现有区域、普通路由、丰饶路由、安全出生及模式UI profiles定向检查通过，13份Lua 5.1语法通过。完整test_grid_mode_scope的旧partial-area断言与test_wave_population_endgame的旧80只计数断言仍失败，修改前源码亦可复现（原行216／425），未改无关行为或宣称全套通过。当前Hammer保存地图为输入，仅四个出生标记外的DMX字节全部保留；编译/包CRC结果以本轮输出为准。**尚未完成原生四条实际行走和多人合建实机验收**；记录/备份在output/cold_routes_20261029，不等于上传工坊或已发布冻结包改变。
+
+本轮地图官方编译为307 compiled／0 failed／1 skipped，包内312项CRC均通过；当前源码与嵌入源码CRC同为2877025149。源码SHA256为004cb2eb53ed9de3c9675d4ab611cf8f1a37e2d3bc841e536f687716b80feae2，运行VPK为401166527316effe59e6f13090a1ee6220cc17751787648ad553ffed511778f1。content原有手工保存版本作为本轮地图输入，四个标记外的数据均保留，源码继续按LFS与编译资源配套交付；原始保存版本另有本地备份。
+
 ## 3. 金币、木材、人口与建筑
 
 `systems/resource_system.lua` 的账户按玩家维护。CSV 的兜底初始值为金币0、木材10、已用人口0、人口上限0；实际初始化还会应用档案、建筑与权益，不能把兜底值硬编码成所有玩家最终开局资源。档案 `initial_wood` 是完整起始值，不是额外再发一次基础木材；档案重复刷新只应用有意义的差额。

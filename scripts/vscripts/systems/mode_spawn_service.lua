@@ -67,16 +67,17 @@ function M.landing(position, bounds)
     return Vector(position.x, position.y, ground.z)
 end
 
-function M.wave_marker(player_id)
+function M.wave_marker(player_id, route_id)
     local config, reason = M.config()
     if not config then return nil, reason end
     player_id = tonumber(player_id)
-    local name = config.monster_markers and config.monster_markers[player_id]
+    route_id = tonumber(route_id) or player_id
+    local name = config.monster_markers and config.monster_markers[route_id]
     local marker, position, missing = M.marker(name)
     if not marker then return nil, missing end
     local landing, invalid = M.landing(position, config.bounds)
     if not landing then return nil, invalid .. ":" .. tostring(name) end
-    return { player_id = player_id, marker = marker, marker_name = name,
+    return { player_id = player_id, route_id = route_id, marker = marker, marker_name = name,
         mode = M.mode(), position = landing }
 end
 
@@ -91,7 +92,7 @@ end
 -- marker cache. A white navigation cell alone does not prove that a complete
 -- monster hull fits beside a tree, model edge or change in ground height.
 local function spawn_bounds(config, channel)
-    local authored = config.monster_bounds and config.monster_bounds[channel.player_id]
+    local authored = config.monster_bounds and config.monster_bounds[channel.route_id or channel.player_id]
     if channel.mode == "scourge" and authored then return authored end
     local p = channel.spawn_position
     local radius = channel.mode == "scourge" and 256 or 192
@@ -127,9 +128,10 @@ local function ground(position, bounds, radius, reference_z, unit)
 end
 
 local function attack_goals(config, channel)
-    local _, player = M.marker(config.player_markers and config.player_markers[channel.player_id])
+    local route_id = channel.route_id or channel.player_id
+    local _, player = M.marker(config.player_markers and config.player_markers[route_id])
     if not player then return nil end
-    local anchor, court = channel.spawn_position, config.player_bounds and config.player_bounds[channel.player_id]
+    local anchor, court = channel.spawn_position, config.player_bounds and config.player_bounds[route_id]
     local x, y = player.x, player.y
     if court then
         x = math.max(court.min_x, math.min(court.max_x, anchor.x))
@@ -168,7 +170,8 @@ local function spawn_context(channel)
     local goals = attack_goals(config, channel)
     if not goals or #goals == 0 then return nil, "mode_wave_attack_path_missing" end
     return { bounds = spawn_bounds(config, channel), reference_z = channel.spawn_position.z,
-        goals = goals, anchor = channel.spawn_position }
+        goals = goals, anchor = Vector(channel.spawn_position.x + (channel.spawn_offset_x or 0),
+            channel.spawn_position.y + (channel.spawn_offset_y or 0), channel.spawn_position.z) }
 end
 
 local function safe(position, context, radius, unit)

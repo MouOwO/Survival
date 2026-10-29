@@ -52,25 +52,71 @@ function M.side_for(position, center)
     return quadrant_sides[quadrant]
 end
 
+local function space_groups(groups, hull_multiplier)
+    local spacing = math.max(tonumber(rules.wave_shared_spawn_spacing) or 80,
+        2 * (tonumber(rules.wave_ground_monster_hull_radius) or 32)
+            * (tonumber(hull_multiplier) or 1))
+    for _, group in pairs(groups) do
+        table.sort(group, function(a, b) return a.player_id < b.player_id end)
+        for index, channel in ipairs(group) do
+            local offset = (index - (#group + 1) / 2) * spacing
+            if channel.spawn_side == "north" or channel.spawn_side == "south" then
+                channel.spawn_offset_x = offset
+            else
+                channel.spawn_offset_y = offset
+            end
+        end
+    end
+end
+
+local function cold_route(player_id, wall_index, config)
+    if not config then return nil, "mode_spawn_config_missing:cold" end
+    local buildings = package.loaded["systems/building_system"]
+    local city = buildings and buildings.main_city_for_player and buildings.main_city_for_player(player_id)
+    local position = origin(city)
+    if not position and wall_index and type(EntIndexToHScript) == "function" then
+        local ok, wall = pcall(EntIndexToHScript, wall_index)
+        if ok then position = origin(wall) end
+    end
+    if not position then return player_id end
+    local mode_spawns = require("systems/mode_spawn_service")
+    for id = 0, 3 do
+        if mode_spawns.contains(config.player_bounds and config.player_bounds[id], position) then return id end
+    end
+    return nil, "cold_wave_base_outside_courts"
+end
+
 function M.refresh(channels, wall_by_player, hull_multiplier)
     local setup = package.loaded["systems/match_setup_service"]
     local mode = setup and setup.get_mode and setup.get_mode()
     if mode == "rich" or mode == "cold" or mode == "scourge" then
         local mode_spawns = require("systems/mode_spawn_service")
+        local config, groups = mode == "cold" and mode_spawns.config() or nil, {}
         for player_id, channel in pairs(channels) do
-            local selected, reason = mode_spawns.wave_marker(player_id)
+            local route_id, route_error = player_id, nil
+            if mode == "cold" then route_id, route_error = cold_route(player_id, wall_by_player[player_id], config) end
+            local selected, reason
+            if not route_error then selected, reason = mode_spawns.wave_marker(player_id, route_id) end
             channel.spawn_offset_x, channel.spawn_offset_y = 0, 0
             channel.mode = mode
+            channel.route_id = route_id
             channel.spawn_side = nil
             if selected then
                 channel.marker, channel.marker_name = selected.marker, selected.marker_name
                 channel.spawn_position = selected.position
                 channel.route_error = nil
+                if mode == "cold" then
+                    groups[selected.marker_name] = groups[selected.marker_name] or {}
+                    groups[selected.marker_name][#groups[selected.marker_name] + 1] = channel
+                end
             else
                 channel.marker, channel.spawn_position = nil, nil
-                channel.route_error = reason or "mode_wave_spawn_missing"
+                channel.route_error = route_error or reason or "mode_wave_spawn_missing"
             end
         end
+        -- All four arrows run along world X. Spread owners across Y without
+        -- changing their individual wave quantities, targets or reward identity.
+        if mode == "cold" then space_groups(groups, hull_multiplier) end
         return
     end
     local portals, center = layout()
@@ -80,7 +126,7 @@ function M.refresh(channels, wall_by_player, hull_multiplier)
         channel.default_marker_name = channel.default_marker_name or channel.marker_name
         channel.marker, channel.marker_name = channel.default_marker, channel.default_marker_name
         channel.mode, channel.spawn_position = nil, nil
-        channel.spawn_side, channel.route_error = nil, nil
+        channel.spawn_side, channel.route_error, channel.route_id = nil, nil, nil
         channel.spawn_offset_x, channel.spawn_offset_y = 0, 0
         local wall_index = wall_by_player[player_id]
         local wall
@@ -109,27 +155,15 @@ function M.refresh(channels, wall_by_player, hull_multiplier)
             end
         end
     end
-    local spacing = math.max(tonumber(rules.wave_shared_spawn_spacing) or 80,
-        2 * (tonumber(rules.wave_ground_monster_hull_radius) or 32)
-            * (tonumber(hull_multiplier) or 1))
-    for _, group in pairs(groups) do
-        table.sort(group, function(a, b) return a.player_id < b.player_id end)
-        for index, channel in ipairs(group) do
-            local offset = (index - (#group + 1) / 2) * spacing
-            if channel.spawn_side == "north" or channel.spawn_side == "south" then
-                channel.spawn_offset_x = offset
-            else
-                channel.spawn_offset_y = offset
-            end
-        end
-    end
+    space_groups(groups, hull_multiplier)
 end
 
 function M.position(channel)
     if channel and channel.mode then
         local position = channel.marker and channel.spawn_position
         if not position or channel.route_error then return nil end
-        return Vector(position.x, position.y, position.z)
+        return Vector(position.x + (channel.spawn_offset_x or 0),
+            position.y + (channel.spawn_offset_y or 0), position.z)
     end
     local position = channel and origin(channel.marker)
     if not position then return nil end

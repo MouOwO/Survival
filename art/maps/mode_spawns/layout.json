@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "map_name": "template_map",
-  "note": "Player IDs are zero based. Rich: east, south, west, north. Cold: four marked snow lawns, north to south. Scourge: left clearing, north to south.",
+  "note": "Player IDs are zero based. Rich: east, south, west, north. Cold: four shared snow courts ordered north to south (+Y); spawn arrows alternate +X,-X,+X,-X. Scourge: left clearing, north to south.",
   "modes": {
     "rich": {
       "center": [
@@ -148,23 +148,23 @@
       ],
       "monsters": [
         [
-          12576,
-          9568,
+          9600,
+          14080,
           0
         ],
         [
-          12768,
-          9568,
+          14464,
+          11264,
           0
         ],
         [
-          12576,
-          9376,
+          9856,
+          8448,
           0
         ],
         [
-          12768,
-          9376,
+          14208,
+          5632,
           0
         ]
       ]

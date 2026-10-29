@@ -22,6 +22,10 @@ local function rich()
     return mode == "rich" or mode == "cold" or mode == "scourge"
 end
 
+local function shared_cold()
+    return require("systems/mode_spawn_service").mode() == "cold"
+end
+
 local function number(value)
     value = tonumber(value)
     return value and value == value and value > -math.huge and value < math.huge and value or nil
@@ -292,6 +296,11 @@ function M.validate_position(player_id, position)
     if not region then return false, reason end
     local x, y = cell(position)
     if not x then return false, "rich_invalid_destination" end
+    if shared_cold() then
+        -- Cold courts share their roads: builders may join another player's
+        -- base. Native navigation still validates the destination itself.
+        return require("systems/mode_spawn_service").validate_position(position)
+    end
     if labels[key(x, y)] ~= region.id then return false, "rich_destination_outside_own_region" end
     return true
 end
@@ -310,6 +319,16 @@ function M.validate_building_footprint(player_id, min_x, min_y, max_x, max_y)
     -- interior red navigation hole must remain unbuildable as well.
     local first_x, first_y = math.floor(min_x / CELL), math.floor(min_y / CELL)
     local last_x, last_y = math.ceil(max_x / CELL) - 1, math.ceil(max_y / CELL) - 1
+    if shared_cold() then
+        local court = labels[key(first_x, first_y)]
+        if not court then return false, "cold_building_outside_courts" end
+        local shared = regions[court]
+        if last_x > shared.max_x or last_y > shared.max_y then return false, "cold_building_outside_courts" end
+        for x = first_x, last_x do for y = first_y, last_y do
+            if labels[key(x, y)] ~= court then return false, "cold_building_outside_courts" end
+        end end
+        return true
+    end
     if first_x < region.min_x or first_y < region.min_y or last_x > region.max_x or last_y > region.max_y then
         return false, "rich_building_outside_own_region"
     end

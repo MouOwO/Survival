@@ -55,8 +55,15 @@ for _,name in ipairs({"rich","cold","scourge"}) do
         assert(spawn.mode==name and spawn.source=="mode_hammer_marker" and spawn.marker==row.player_markers[id])
         assert(spawn.position.x==expected.x and spawn.position.y==expected.y and spawn.position.z==128)
         assert(regions.validate_position(id,spawn.position))
-        assert(not regions.validate_position((id+1)%4,spawn.position),"connected terrain does not merge owners")
-        assert(not regions.validate_position(id,markers[row.center_marker]:GetAbsOrigin()),"central monster area is not a player court")
+        if name == "cold" then
+            assert(regions.validate_position((id+1)%4,spawn.position),"cold teammates can visit the same court")
+            assert(regions.validate_position(id,markers[row.center_marker]:GetAbsOrigin()),"cold roads connect the shared courts")
+            assert(regions.validate_building_footprint((id+1)%4,spawn.position.x-128,spawn.position.y-128,
+                spawn.position.x+128,spawn.position.y+128),"cold teammates can build together")
+        else
+            assert(not regions.validate_position((id+1)%4,spawn.position),"other modes retain private courts")
+            assert(not regions.validate_position(id,markers[row.center_marker]:GetAbsOrigin()))
+        end
         channels[id]=assert(spawns.wave_marker(id))
         local builder={survival_builder_id="default_builder",survival_player_id=id,position=spawn.position}
         function builder:IsNull() return false end
@@ -73,14 +80,22 @@ for _,name in ipairs({"rich","cold","scourge"}) do
         local expected=markers[row.monster_markers[id]]:GetAbsOrigin()
         assert(p.x==expected.x and p.y==expected.y and p.z==128)
         assert(channels[id].marker_name==row.monster_markers[id] and channels[id].mode==name)
-        assert(not regions.validate_position(id,p),"monster spawn must be central, not inside a private player court")
+        assert(not regions.validate_building_footprint(id,p.x-32,p.y-32,p.x+32,p.y+32),"spawn roads remain unbuildable")
         for _=1,100 do assert(routing.position(channels[id])) end
         p.x=0;assert(routing.position(channels[id]).x==expected.x,"returned vectors cannot move map markers/cache")
     end
     assert(nav_reads==steady,"per-monster routing never rescans map markers/navigation")
     local home=builders[0].position
     builders[0].position=builders[1].position
-    assert(regions.guard() and builders[0].stopped and builders[0].position.x==home.x)
+    if name == "cold" then
+        assert(regions.guard() and not builders[0].stopped,"cold guard must allow joining a teammate")
+        local shared=builders[0].position
+        builders[0].position=Vector(row.bounds.max_x+64,row.bounds.max_y+64,128)
+        assert(regions.guard() and builders[0].stopped
+            and builders[0].position.x==shared.x and builders[0].position.y==shared.y)
+    else
+        assert(regions.guard() and builders[0].stopped and builders[0].position.x==home.x)
+    end
     local r=assert(regions.region(0))
     assert(regions.validate_building_footprint(0,home.x-128,home.y-128,home.x+128,home.y+128))
     assert(not regions.validate_building_footprint(0,r.min_x*64-64,r.min_y*64,r.min_x*64+64,r.min_y*64+128))
@@ -139,6 +154,12 @@ for _,name in ipairs({"rich","cold","scourge"}) do
     FindUnitsInRadius=function() return {caster} end
     local point=assert(work.find(caster,{footprint={x=2,y=2},hull_radius=48},spawn.position))
     assert(regions.validate_position(0,point),"construction/repair work points use the local court instead of ordinary bounds")
+    if name=="cold" then
+        local shared=markers[row.player_markers[1]]:GetAbsOrigin()
+        local joined=assert(work.find(caster,{footprint={x=2,y=2},hull_radius=48},shared))
+        assert(regions.validate_position(0,joined),"cold work points must also reach a teammate's court")
+        assert(not regions.validate_building_footprint(0,0,-8064,128,-7936),"cold roads remain unbuildable")
+    end
 end
 mode="pure";regions.init()
 assert(regions.validate_position(0,nil) and regions.validate_building_footprint(nil),"normal/pure policy remains untouched")

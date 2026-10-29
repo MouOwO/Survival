@@ -1506,6 +1506,19 @@ function M.main_city_for_team(team)
     return nil
 end
 
+function M.main_city_for_player(player_id)
+    player_id = tonumber(player_id)
+    if player_id == nil then return nil end
+    for _, state in pairs(buildings) do
+        if state.player_id == player_id and state.building_id == "main_city"
+            and not state.constructing and not state.cleaned
+            and valid_entity(state.unit) and state.unit:IsAlive() then
+            return state.unit
+        end
+    end
+    return nil
+end
+
 function M.wall_for_player(player_id)
     player_id = tonumber(player_id)
     for _, state in pairs(buildings) do
