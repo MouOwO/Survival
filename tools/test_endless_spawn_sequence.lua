@@ -18,6 +18,7 @@ local rules = {monsters_per_wave = 5, spawn_interval = 0.5, time_limit_seconds =
 
 package.loaded["systems/archive_endless_config"] = {
     rules = rules,
+    allowed_variant = function() return true end,
     wave = function(_, number)
         if wave_limit and number > wave_limit then return nil end
         return {health = 100 * number, attack = number, war3_armor = number}
@@ -113,6 +114,8 @@ UTIL_Remove = function(unit)
     removed[unit.id] = (removed[unit.id] or 0) + 1
     bus.emit(events.ENGINE_ENTITY_KILLED, {victim = unit, victim_entindex = unit.id})
 end
+-- This fixture isolates combat after entry; countdown has its own timing test.
+require("systems/archive_endless_config").rules.start_delay_seconds = 0
 local endless = require("systems/archive_endless_service")
 
 local assertions = 0

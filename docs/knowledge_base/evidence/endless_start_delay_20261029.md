@@ -1,0 +1,11 @@
+# 无尽挑战20秒准备期｜2026-10-29
+
+用户要求点击无尽挑战后20秒才开始，每隔5秒提示剩余时间。配置源archive_endless_rules.csv新增start_delay_seconds=20，经现有CSV生成器单表生成archive_endless_rules.lua，不批量重建其他配置。
+
+archive_endless_service复用已有0.25秒服务计时器：接受请求后占用本人的挑战入口，向本人发送UI_NOTIFICATION“还有20秒开启无尽挑战”，之后正常节奏为15/10/5秒；满20秒生成第一只怪，再发送“无尽挑战现在开始！”。前置阶段不发布虚假的第0波战斗HUD，不生成怪物或发奖，单波60秒限时到实际出怪才建立。普通玩法窗口保持，墙重建特权仍须真实开始战斗；通天塔不增加准备期。
+
+重复点击、跨玩家独立计时、败退、已过期/途中到期、世界重初始化及通知回调同步取消均有回归；清理会停止后续提示和出怪。按钮原有本局一次限制继续在接受请求时保留，不提前结算波次或奖励。
+
+tools/test_endless_start_delay.lua以真实service、scheduler和event_bus验证20/15/10/5提示、20秒出怪、60秒单波限时等边界。另六组既有出生顺序、玩法连续性、尸体/出生开销、挑战阶段截止和高难度准入回归通过；这些夹具显式使用0秒准备，只测试原战斗过程，新测试使用真实生成配置20秒。出生顺序夹具补齐当前已有的allowed_variant准入接口。通过日志位于output/endless_start_delay_20261029/tests.json。
+
+旧test_endless_monster_visual_integration.lua在未修改service基线上也因旧会话/出生路线夹具无法启动，不在通过名单，本任务保留该脚本原逻辑；基线回执位于output/endless_start_delay_20261029/legacy_visual_baseline.log。模拟测试不等于原生提示画面或完整多人实机验收。本次仅修改本地并提交同步Git，未上传游廊，已发布2901身份不变。

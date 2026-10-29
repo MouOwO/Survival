@@ -100,6 +100,8 @@ for index=1,100 do
 end
 assert(replaced,"fixture must enter the production player spawn channels")
 package.loaded["systems/wave_system"]=wave
+-- This fixture isolates combat after entry; countdown has its own timing test.
+require("systems/archive_endless_config").rules.start_delay_seconds = 0
 local endless=require("systems/archive_endless_service")
 local config=require("systems/archive_endless_config")
 local guard=require("systems/gameplay_phase_guard")

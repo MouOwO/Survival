@@ -58,6 +58,8 @@ package.loaded["systems/archive_service"]={record_endless_wave=reward,
         records[#records+1]={id=id,challenge=challenge,tier=tier};return {ok=true}
     end,flush_endless_rewards=function() end}
 local cooperative=require("systems/archive_cooperative_reward_service")
+-- This fixture isolates combat after entry; countdown has its own timing test.
+require("systems/archive_endless_config").rules.start_delay_seconds = 0
 local endless=require("systems/archive_endless_service")
 local function reset(next_mode,tier)
     -- Reset the real engine before changing its native fixture world.

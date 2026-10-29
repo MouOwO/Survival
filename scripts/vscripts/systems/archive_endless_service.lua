@@ -40,10 +40,10 @@ end
 function M.snapshot(id)
     local run = runs[id]
     if not run then return { status = "idle", wave = 0, score = 0, remaining = 0, pending = 0, seconds = 0 } end
-    return { status = run.status, variant = run.variant, skip_step = M.skip_step(id),
+    return { status = run.preparing and run.status == "running" and "preparing" or run.status, variant = run.variant, skip_step = M.skip_step(id),
         wave = run.wave, cleared = run.cleared, score = run.score,
         remaining = run.remaining + (run.pending or 0), pending = run.pending or 0,
-        seconds = math.max(0, math.ceil((run.deadline or now()) - now())),
+        seconds = math.max(0, math.ceil((run.preparing and run.start_at or run.deadline or now()) - now())),
         reason = run.reason or "", health = tostring(run.row and run.row.health or 0),
         attack = tostring(run.row and run.row.attack or 0), armor = tostring(run.row and run.row.war3_armor or 0) }
 end
@@ -51,6 +51,9 @@ local function publish(run, availability_changed)
     -- Counts and countdown ticks do not change challenge-button availability.
     -- Rebuilding all archive hubs here rewrote every ability once a second.
     if availability_changed and changed then changed(run.player_id) end
+    -- Preparation has its own player notifications; the battle HUD must not
+    -- show a fictitious wave zero or treat preparation as a finished battle.
+    if run.preparing and run.status == "running" then return end
     if PlayerResource and CustomGameEventManager then
         local player = PlayerResource:GetPlayer(run.player_id)
         if player then CustomGameEventManager:Send_ServerToPlayer(player, "survival_endless_state", M.snapshot(run.player_id)) end
@@ -84,6 +87,7 @@ end
 local function stop(run, reason)
     if run.status ~= "running" then return end
     run.status, run.reason = "finished", reason
+    run.preparing = false
     phase_guard.set_endless_active(run.player_id, false)
     cleanup(run)
     stop_idle_timer()
@@ -101,6 +105,9 @@ function M.cancel(id, reason)
     if M.is_running(id) then stop(runs[id], reason or "主动结束") end
 end
 local function check_deadline(run)
+    if run.preparing and require("systems/player_context_service").is_defeated(run.player_id) then
+        stop(run, "本局失败"); return false, "本局失败"
+    end
     local phase = bus.request("archive.challenge_state", {})
     if phase and phase.expired == 1 then stop(run, "挑战阶段时间已到"); return false, "挑战阶段时间已到" end
     if run.deadline and now() >= run.deadline then stop(run, "本波60秒超时"); return false, "本波60秒超时" end
@@ -235,14 +242,31 @@ try_spawn_wave = function(run, number)
     if ok then return result, reason end
     return spawn_failed(run, result)
 end
+local function announce_start(run, seconds)
+    bus.emit(events.UI_NOTIFICATION, {player_id = run.player_id, level = "info",
+        message = seconds > 0 and ("还有" .. seconds .. "秒开启无尽挑战") or "无尽挑战现在开始！"})
+end
 local function ensure_timer()
     if timer_active then return end
     timer_active = true
     scheduler.every(0.25, function()
         for _, run in pairs(runs) do
             if run.status == "running" and not run.wave_cleared and check_deadline(run) then
-                local second = math.ceil(run.deadline - now())
-                if run.last_second ~= second then run.last_second = second; publish(run) end
+                if run.preparing then
+                    local seconds = math.max(0, math.ceil(run.start_at - now()))
+                    if seconds == 0 then
+                        run.preparing = false
+                        local ok = try_spawn_wave(run, 1)
+                        run.started = ok == true
+                        if ok and run.status == "running" then announce_start(run, 0); publish(run, true) end
+                    elseif now() >= run.next_notice_at then
+                        announce_start(run, seconds)
+                        run.next_notice_at = now() + 5
+                    end
+                else
+                    local second = math.ceil(run.deadline - now())
+                    if run.last_second ~= second then run.last_second = second; publish(run) end
+                end
             end
         end
         stop_idle_timer()
@@ -259,6 +283,8 @@ function M.start(id, difficulty, variant)
     if not cooperative_rewards.matches_session(mode, difficulty) then return false, "cooperative_session_invalid" end
     if not config.allowed_variant(difficulty, mode, variant) then return false, "endless_variant_unavailable" end
     if not config.wave(difficulty, 1, mode) then return false, "该难度无尽属性尚未配置" end
+    local phase = bus.request("archive.challenge_state", {})
+    if phase and phase.expired == 1 then return false, "挑战阶段时间已到" end
     if not phase_guard.set_endless_active(id, true) then return false, "本局已结束" end
     local previous = runs[id]
     local previous_skip = skip_indices[id]
@@ -267,8 +293,17 @@ function M.start(id, difficulty, variant)
         cleared = 0, score = 0, units = {}, remaining = 0, pending = 0 }
     runs[id] = run
     -- Keep ordinary gameplay alive, including the queued frame between waves.
-    local ok, reason = try_spawn_wave(run, 1)
-    run.started = ok == true
+    local delay = variant == "endless" and math.max(0, tonumber(rules.start_delay_seconds) or 20) or 0
+    local ok, reason
+    if delay > 0 then
+        run.preparing, run.start_at, run.next_notice_at = true, now() + delay, now() + 5
+        ok = true
+        announce_start(run, math.ceil(delay))
+        if runs[id] ~= run or run.status ~= "running" then return false, run.reason or "无尽准备已取消" end
+    else
+        ok, reason = try_spawn_wave(run, 1)
+    end
+    run.started = ok == true and not run.preparing
     if ok then
         started_variants[id] = started_variants[id] or {}
         started_variants[id][variant] = true

@@ -2,7 +2,7 @@
 -- Source: archive_endless_rules.csv
 local M = {}
 M.rows = {
-    { rule_id = "default", monsters_per_wave = 5, time_limit_seconds = 60, score_block_size = 10, score_multiplier = 1, score_offset = 0, model_path = "models/heroes/nevermore/nevermore.vmdl", model_scale = 0.9, move_speed = 280, attack_speed = 1, attack_range = 160, magic_resistance = 0, spawn_interval = 0.5, tower_score_multiplier = 2 },
+    { rule_id = "default", monsters_per_wave = 5, time_limit_seconds = 60, score_block_size = 10, score_multiplier = 1, score_offset = 0, model_path = "models/heroes/nevermore/nevermore.vmdl", model_scale = 0.9, move_speed = 280, attack_speed = 1, attack_range = 160, magic_resistance = 0, spawn_interval = 0.5, tower_score_multiplier = 2, start_delay_seconds = 20 },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do

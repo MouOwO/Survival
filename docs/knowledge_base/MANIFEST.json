@@ -15,8 +15,8 @@
     },
     {
       "path": "02_core_gameplay.md",
-      "bytes": 26631,
-      "sha256": "3526697729e9b688cdab042f0c3da5510c0d3c8fd9a93bb5dbc854103a928bd9"
+      "bytes": 27222,
+      "sha256": "e34dd76ac269c223c5f954d413b450bb0e40c52951cab6c8b98bdb7ae4c81b95"
     },
     {
       "path": "03_progression_save_contract.md",
@@ -72,6 +72,16 @@
       "path": "13_art_ui_qa.md",
       "bytes": 9042,
       "sha256": "1ef2ffcf9223258c1b8d21b58b309cec42663d53bccca983b091e116d84cc396"
+    },
+    {
+      "path": "NEW_CHAT_PROMPT.txt",
+      "bytes": 829,
+      "sha256": "59e6930906e62202d56d95ce3dd7390a7a90a6133c6ac204da10fd62f4fee10d"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3183,
+      "sha256": "80240328ada9cff6e607b6d36dba6dacee9c402546a21722305abfff5445c163"
     },
     {
       "path": "data/completed_work_index.json",
@@ -152,6 +162,11 @@
       "path": "evidence/directory_cleanup_20261028.public.json",
       "bytes": 3245,
       "sha256": "0513bc1daeca98655081b92520b1c2f882ad875076fa4b0b2138925acb9db720"
+    },
+    {
+      "path": "evidence/endless_start_delay_20261029.md",
+      "bytes": 1981,
+      "sha256": "478e1ecdedc962c2195f88b5814ca0fca9a2ba8aac20be15672917619d1ca034"
     },
     {
       "path": "evidence/login_relay_recovery_20261028.public.json",
@@ -259,6 +274,11 @@
       "sha256": "3e9d78ecd41b1e4aaa4335fc0c33fdca621d5e94a98a4d082af5d299d00a2380"
     },
     {
+      "path": "history/20261024/README.md",
+      "bytes": 3523,
+      "sha256": "8fb412555efbff16e4191ae220fb68c521283ef11131c5d4a5c8ad6f8820868b"
+    },
+    {
       "path": "history/20261024/data/commerce_facts.json",
       "bytes": 10585,
       "sha256": "6105f8496427aab2540ee0572bd1e084247114c6b36dc50cec305269c0bf864e"
@@ -299,24 +319,9 @@
       "sha256": "40bd838081c9322b471aa29977d19958932c9cbb87c14d7b54728f9883a86817"
     },
     {
-      "path": "history/20261024/README.md",
-      "bytes": 3523,
-      "sha256": "8fb412555efbff16e4191ae220fb68c521283ef11131c5d4a5c8ad6f8820868b"
-    },
-    {
       "path": "history/README.md",
       "bytes": 449,
       "sha256": "5ebf48f3b52e07d03945ecfb8e7c2883c1905c48a7ed6fb544604525da474bec"
-    },
-    {
-      "path": "NEW_CHAT_PROMPT.txt",
-      "bytes": 829,
-      "sha256": "59e6930906e62202d56d95ce3dd7390a7a90a6133c6ac204da10fd62f4fee10d"
-    },
-    {
-      "path": "README.md",
-      "bytes": 3183,
-      "sha256": "80240328ada9cff6e607b6d36dba6dacee9c402546a21722305abfff5445c163"
     },
     {
       "path": "tools/verify_knowledge.py",

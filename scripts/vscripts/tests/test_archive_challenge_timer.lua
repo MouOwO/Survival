@@ -171,6 +171,8 @@ package.loaded["systems/archive_endless_config"]={rules={monsters_per_wave=1,tim
     wave=function() return {health=100,attack=1,war3_armor=0} end,score=function() return 1 end}
 package.loaded["systems/archive_service"].record_endless_wave=function() rewards=rewards+1;return {ok=true} end
 package.loaded["systems/archive_endless_service"]=nil
+-- This fixture isolates combat after entry; countdown has its own timing test.
+require("systems/archive_endless_config").rules.start_delay_seconds = 0
 local endless=require("systems/archive_endless_service")
 local phase_expired=false
 local function endless_setup()
