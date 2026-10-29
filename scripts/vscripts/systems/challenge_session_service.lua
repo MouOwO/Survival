@@ -968,7 +968,7 @@ function M.start(payload)
         if abyss_stage == nil then
             return {
                 ok = false,
-                error = "需要持有【传说：深渊审判】才能进入罪渊第一层",
+                error = "需要持有【传说：深渊审判】才能进入七罪深渊第一层",
             }
         end
         local completion_limit = math.max(

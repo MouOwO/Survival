@@ -131,7 +131,10 @@ class ArchiveService:
             tier_id=c.get("tier_id")
             tier = (self.bundle.tables.get("archive_benefit_rewards", {}).get(tier_id)
                     if isinstance(tier_id,str) and isinstance(c.get("track"),str) else None)
-            if not tier or tier.get("enabled") is not True or tier.get("track") != c.get("track"):
+            # The public-beta switch stops new settlement in Lua, while a
+            # completed receipt remains recoverable after a lost reply.
+            beta_replay = tier_id == "public_beta_login"
+            if not tier or (tier.get("enabled") is not True and not beta_replay) or tier.get("track") != c.get("track"):
                 raise ArchiveError("archive_benefit_invalid")
         if kind.startswith("lottery_"):
             if c.get("pool_id") not in self.bundle.tables["lottery_pool_definitions"]: raise ArchiveError("lottery_pool_invalid")
@@ -213,6 +216,8 @@ class ArchiveService:
         command=scope_challenge(self, payload, original_command)
         from .match_modes import scope_clear
         command=scope_clear(self,payload,command)
+        from .public_beta_gift import scope as scope_public_beta_gift
+        command=scope_public_beta_gift(self,payload,command)
         if command['kind'] == 'commerce_catalog':
             profile = self.profile({'account_id': account})
             return self.settle(profile, command, False)
@@ -284,6 +289,10 @@ class ArchiveService:
         for _ in range(4):
             if not prepared.get("ok") or prepared.get("done"): return prepared
             profile,command=prepared["profile"],dict(prepared["command"])
+            from .public_beta_gift import validate_pending as validate_public_beta_gift
+            validate_public_beta_gift(self,account,command)
+            from .public_beta_gift import current_activity_error
+            public_beta_error=current_activity_error(self,command)
             from .challenge_sessions import bound_receipt, validate as validate_challenge_session
             version=prepared.get("config_hash",self.bundle.hash)
             recorded_bundle = None
@@ -345,7 +354,9 @@ class ArchiveService:
                     and version != self.bundle.hash and product.get('currency') == 'shop_points'):
                 price_bundle = reducer.bundle if reducer is not self else Bundle(self.bundle.directory.parent/version)
                 recorded_price = price_bundle.tables.get('commerce_catalog', {}).get(command.get('sku'), {}).get('price')
-            if legacy_error:
+            if public_beta_error:
+                result={'ok':False,'error':public_beta_error}
+            elif legacy_error:
                 result={'ok':False,'error':legacy_error}
             elif command['kind'] == 'commerce_purchase' and product.get('currency') == 'shop_gold':
                 # A currency pause applies to uncommitted older-client intents too.

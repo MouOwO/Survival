@@ -154,7 +154,7 @@
         "DOTA_Tooltip_ability_item_survival_small_polar_crystal_Description" "+1000 all attributes. Upgrades after 200 Ice Wraith kills."
         "DOTA_Tooltip_ability_item_survival_large_polar_crystal" "Large Polar Crystal"
         "DOTA_Tooltip_ability_item_survival_large_polar_crystal_Description" "+2000 all attributes."
-        "DOTA_Tooltip_ability_item_survival_growth_sword_01_Description" "英雄每次攻击增加1点攻击力  攻击200次使该武器进化    成长之剑Lvmax＋吸血面罩 自动合成幻影之剑"
+        "DOTA_Tooltip_ability_item_survival_growth_sword_01_Description" "英雄每次攻击增加1点攻击力  攻击200次使该武器进化    渐锋之剑Lvmax＋吸血面罩 自动合成幻影之剑"
         "DOTA_Tooltip_ability_item_survival_growth_sword_02" "weapon_growth_sword_02"
         "DOTA_Tooltip_ability_item_survival_growth_sword_02_Description" "英雄每次攻击增加2点攻击力  攻击200次使该武器进化"
         "DOTA_Tooltip_ability_item_survival_growth_sword_03" "weapon_growth_sword_03"

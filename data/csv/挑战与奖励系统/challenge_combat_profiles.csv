@@ -26,11 +26,11 @@ N2_challenge_05_boss,N2,challenge_05_boss,12500,4400,600,待确认,N2工作簿�
 N3_challenge_05_boss,N3,challenge_05_boss,15000,4800,600,待确认,特殊目标对照,合成宝石（宝石Boss）,1
 N4_challenge_05_boss,N4,challenge_05_boss,175000,5200,600,面板确认,特殊目标对照,合成宝石（宝石Boss）,1
 N5_challenge_05_boss,N5,challenge_05_boss,250000,5600,750,面板确认,特殊目标对照,合成宝石（宝石Boss）,1
-N1_challenge_06_ice_wraith,N1,challenge_06_ice_wraith,40000,6000,300,面板确认,N1工作簿：特殊Boss与材料怪,冰之幽魂（小极地晶石小怪）,1
-N2_challenge_06_ice_wraith,N2,challenge_06_ice_wraith,50000,6600,600,面板确认,N2工作簿：特殊Boss与材料怪,冰之幽魂（小极地晶石小怪）,1
-N3_challenge_06_ice_wraith,N3,challenge_06_ice_wraith,60000,7200,600,规律推定,特殊目标对照,冰之幽魂（小极地晶石小怪）,1
-N4_challenge_06_ice_wraith,N4,challenge_06_ice_wraith,70000,7800,600,面板确认,特殊目标对照,冰之幽魂（小极地晶石小怪）,1
-N5_challenge_06_ice_wraith,N5,challenge_06_ice_wraith,100000,8400,750,面板确认,特殊目标对照,冰之幽魂（小极地晶石小怪）,1
+N1_challenge_06_ice_wraith,N1,challenge_06_ice_wraith,40000,6000,300,面板确认,N1工作簿：特殊Boss与材料怪,冰之幽魂（寒原晶石小怪）,1
+N2_challenge_06_ice_wraith,N2,challenge_06_ice_wraith,50000,6600,600,面板确认,N2工作簿：特殊Boss与材料怪,冰之幽魂（寒原晶石小怪）,1
+N3_challenge_06_ice_wraith,N3,challenge_06_ice_wraith,60000,7200,600,规律推定,特殊目标对照,冰之幽魂（寒原晶石小怪）,1
+N4_challenge_06_ice_wraith,N4,challenge_06_ice_wraith,70000,7800,600,面板确认,特殊目标对照,冰之幽魂（寒原晶石小怪）,1
+N5_challenge_06_ice_wraith,N5,challenge_06_ice_wraith,100000,8400,750,面板确认,特殊目标对照,冰之幽魂（寒原晶石小怪）,1
 N1_challenge_07_molten_minion,N1,challenge_07_molten_minion,240000,16000,300,面板确认,N1工作簿：特殊Boss与材料怪,概率掉落熔火核心,1
 N2_challenge_07_molten_minion,N2,challenge_07_molten_minion,300000,17600,600,面板确认,N2工作簿：特殊Boss与材料怪,概率掉落熔火核心,1
 N3_challenge_07_molten_minion,N3,challenge_07_molten_minion,360000,19200,600,规律推定,特殊目标对照,概率掉落熔火核心,1

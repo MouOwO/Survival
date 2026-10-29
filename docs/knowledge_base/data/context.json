@@ -112,5 +112,25 @@
   },
   "old_snapshot": "history/20261024/",
   "no_secrets_included": true,
-  "raw_chat_backup_is_separate": true
+  "raw_chat_backup_is_separate": true,
+  "current_development_20261030": {
+    "status": "APPROVED_NAMES_PORTRAITS_AND_BETA_GIFT_IMPLEMENTED_NOT_DEPLOYED",
+    "evidence": "evidence/approved_content_names_beta_gift_20261030.md",
+    "preserved_groups": [
+      "hunt",
+      "cage",
+      "fragment",
+      "cage_materials"
+    ],
+    "portraits": 80,
+    "daily_gift": {
+      "id": "special_lottery_ticket",
+      "count": 2,
+      "day_boundary": "Asia/Shanghai 05:00"
+    },
+    "candidate_bundle": "0032aa44a794acf19e0895936fc9fedb21c6151f1c0a16326e213bda87403cbf",
+    "active_server_unchanged": true,
+    "workshop_uploaded": false,
+    "real_account_grants_verified": false
+  }
 }

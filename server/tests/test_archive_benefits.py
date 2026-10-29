@@ -117,7 +117,7 @@ class BenefitTests(unittest.TestCase):
 
     def test_configuration_adds_login_tier_and_preserves_all_existing_tiers(self):
         rows = self.bundle.tables["archive_benefit_rewards"]
-        self.assertEqual(len(rows), 20)
+        self.assertEqual(len(rows), 21)
         login=rows["daily_time_0"]
         self.assertEqual(login["required"],0)
         self.assertTrue(login["monthly_only"])

@@ -1433,7 +1433,7 @@ local function request_early_final()
         return { ok = false, error = "游戏尚未开始" }
     end
     if state.early_final_used then
-        return { ok = false, error = "本局已购买提前通关" }
+        return { ok = false, error = "本局已购买提前终战" }
     end
     if state.victory_settled or state.defeat_settled or state.current_wave >= final_wave then
         return { ok = false, error = "最终波已经开始" }

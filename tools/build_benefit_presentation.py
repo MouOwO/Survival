@@ -94,6 +94,9 @@ def build_data(root=ROOT):
         if not flag(row["enabled"]):
             continue
         identity, track = row["reward_id"], row["track"]
+        # This fixed tier belongs only to the login popup, never this menu.
+        if identity == track == "public_beta_login":
+            continue
         if not identity or identity in seen or track not in TRACKS:
             raise ValueError("benefit_identity:" + identity)
         seen.add(identity)

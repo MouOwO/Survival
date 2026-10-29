@@ -91,7 +91,7 @@ function M.evaluate(player_id, entry, context)
             return false, "游戏开始1分钟后可用", count
         end
         if wave.early_final_used == true then
-            return false, "本局已购买提前通关", count
+            return false, "本局已购买提前终战", count
         end
         if wave.victory_settled == true
             or (tonumber(wave.current_wave) or 0) >= (tonumber(wave.total_waves) or 30) then
@@ -210,7 +210,7 @@ function M.evaluate(player_id, entry, context)
             "weapon_legend_abyss_"
         )
         if abyss_stage == nil and context.debug_all_unlocked ~= true then
-            return false, "需要持有【传说：深渊审判】才能进入罪渊第一层", count
+            return false, "需要持有【传说：深渊审判】才能进入七罪深渊第一层", count
         end
         local completion_limit = math.max(
             1,

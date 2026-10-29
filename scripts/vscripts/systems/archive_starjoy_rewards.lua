@@ -62,7 +62,7 @@ function M.project(profile)
                 id = row.tier_id, name = row.display_name, description = row.description,
                 count = score, target = row.required_points, level = row.level,
                 unlocked = active and 1 or 0, completed = active and 1 or 0,
-                unlock_condition = '累计获得星悦积分达到 ' .. row.required_points .. '，自动解锁；不消耗积分',
+                unlock_condition = '累计获得曙光积分达到 ' .. row.required_points .. '，自动解锁；不消耗积分',
                 pending_effect = row.pending_effect, quality = 'gold',
                 icon_type = 'image', icon = 's2r://panorama/images/custom_game/starjoy_v1/starjoy.vtex',
             }

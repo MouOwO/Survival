@@ -57,7 +57,7 @@ local function publish(id)
         ultimate=effects.owned(id,'tower_seal') and 1 or 0,
         immortal=effects.owned(id,'immortal') and 1 or 0,
         barrier=effects.owned(id,'barrier') and 1 or 0,
-        cooldown=s.cooldown,title=effects.owned(id,'sovereign') and '君临天下' or '',
+        cooldown=s.cooldown,title=effects.owned(id,'sovereign') and '统御王印' or '',
     })
 end
 function M.orbital(id,key)
@@ -166,7 +166,7 @@ local function tick()
             s.aura=ParticleManager:CreateParticle('particles/survival/weapons/weapon_glow.vpcf',PATTACH_ABSORIGIN_FOLLOW,h)
         end
         if alive(h) and effects.owned(id,'sovereign') and not h.survival_commerce_title then
-            h.survival_commerce_title=true;h.survival_display_name='【君临天下】'..tostring(h.survival_display_name or '')
+            h.survival_commerce_title=true;h.survival_display_name='【统御王印】'..tostring(h.survival_display_name or '')
         end
         local cannon_owned=effects.owned(id,'orbital')
         if s.cannon and (s.cannon:IsNull() or s.cannon_wall~=wall or not alive(wall) or not cannon_owned) then

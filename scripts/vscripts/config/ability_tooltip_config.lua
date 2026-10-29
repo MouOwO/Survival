@@ -143,12 +143,12 @@ local M = {
     ability_open_hero_altar = {
         abilityid = "ability_open_hero_altar",
         abilityname = "召唤英雄",
-        abilitydesc = "从斧王、斯拉克、主宰、齐天大圣和宙斯中选择一个英雄。每位玩家只能选择一次，齐天大圣和宙斯需要VIP。",
+        abilitydesc = "从斧王、斯拉克、主宰、云霄战猿和宙斯中选择一个英雄。每位玩家只能选择一次，云霄战猿和宙斯需要VIP。",
         abilityicon = "chen_hand_of_god",
     },
     ability_enter_endless_training = {
         abilityid = "ability_enter_endless_training",
-        abilityname = "进入无尽年轮圣殿",
+        abilityname = "进入长青轮纹圣殿",
         abilitydesc = "消耗50000金币传送。每秒再消耗50000金币；攻击练功建筑时攻击力与三围成长收益为15倍。",
         abilityicon = "survival/native/skill_endless",
         is_active = true,
@@ -187,8 +187,8 @@ ability_summon_drow_ranger = {
 },
 ability_summon_monkey_king = {
     abilityid = "ability_summon_monkey_king",
-    abilityname = "召唤齐天大圣",
-    abilitydesc = "拥有本局可用的齐天大圣存档道具或VIP权限后可召唤。专属技能随转职等级激活。",
+    abilityname = "召唤云霄战猿",
+    abilitydesc = "拥有本局可用的云霄战猿存档道具或VIP权限后可召唤。专属技能随转职等级激活。",
     abilityicon = "survival/native/portrait_monkey_king",
 },
 ability_summon_blademaster = {

@@ -1951,7 +1951,7 @@
     },
     {
       "id": "building_01",
-      "name": "玲珑心",
+      "name": "灵枢核心",
       "kind": "image",
       "uri": "file://{images}/items/octarine_core.png",
       "aliases": [],
@@ -1964,7 +1964,7 @@
     },
     {
       "id": "building_02",
-      "name": "圣剑",
+      "name": "破甲圣刃",
       "kind": "image",
       "uri": "file://{images}/items/rapier.png",
       "aliases": [],
@@ -1977,7 +1977,7 @@
     },
     {
       "id": "building_03",
-      "name": "赤红甲",
+      "name": "绯钢壁甲",
       "kind": "image",
       "uri": "file://{images}/items/crimson_guard.png",
       "aliases": [],
@@ -1990,7 +1990,7 @@
     },
     {
       "id": "building_04",
-      "name": "大剑",
+      "name": "叠锋重剑",
       "kind": "image",
       "uri": "file://{images}/items/claymore.png",
       "aliases": [],
@@ -2003,7 +2003,7 @@
     },
     {
       "id": "building_05",
-      "name": "深渊之刃",
+      "name": "震岳重刃",
       "kind": "image",
       "uri": "file://{images}/items/abyssal_blade.png",
       "aliases": [],
@@ -2016,7 +2016,7 @@
     },
     {
       "id": "building_06",
-      "name": "板甲",
+      "name": "堡垒板甲",
       "kind": "image",
       "uri": "file://{images}/items/platemail.png",
       "aliases": [],
@@ -2029,7 +2029,7 @@
     },
     {
       "id": "building_07",
-      "name": "秘法鞋",
+      "name": "流金行靴",
       "kind": "image",
       "uri": "file://{images}/items/arcane_boots.png",
       "aliases": [],
@@ -2042,7 +2042,7 @@
     },
     {
       "id": "building_08",
-      "name": "狂战斧",
+      "name": "积锋战斧",
       "kind": "image",
       "uri": "file://{images}/items/bfury.png",
       "aliases": [],
@@ -2055,7 +2055,7 @@
     },
     {
       "id": "building_09",
-      "name": "雷神之锤",
+      "name": "万象雷锤",
       "kind": "image",
       "uri": "file://{images}/items/mjollnir.png",
       "aliases": [],
@@ -2600,7 +2600,7 @@
     },
     {
       "id": "challenge_01",
-      "name": "challenge_01",
+      "name": "木材试炼场",
       "kind": "image",
       "uri": "file://{images}/spellicons/undying_tombstone.png",
       "aliases": [
@@ -2611,7 +2611,7 @@
     },
     {
       "id": "challenge_02",
-      "name": "challenge_02",
+      "name": "金币试炼场",
       "kind": "image",
       "uri": "file://{images}/spellicons/axe_counter_helix.png",
       "aliases": [
@@ -2622,7 +2622,7 @@
     },
     {
       "id": "challenge_03",
-      "name": "challenge_03",
+      "name": "属性试炼场",
       "kind": "image",
       "uri": "file://{images}/spellicons/clinkz_strafe.png",
       "aliases": [
@@ -2633,7 +2633,7 @@
     },
     {
       "id": "challenge_04",
-      "name": "challenge_04",
+      "name": "高阶属性试炼场",
       "kind": "image",
       "uri": "file://{images}/spellicons/beastmaster_primal_roar.png",
       "aliases": [
@@ -2644,7 +2644,7 @@
     },
     {
       "id": "challenge_05",
-      "name": "challenge_05",
+      "name": "合成晶石挑战",
       "kind": "image",
       "uri": "file://{images}/spellicons/beastmaster_primal_roar.png",
       "aliases": [
@@ -2655,7 +2655,7 @@
     },
     {
       "id": "challenge_06",
-      "name": "challenge_06",
+      "name": "进入寒霜领域",
       "kind": "image",
       "uri": "file://{images}/spellicons/morphling_waveform.png",
       "aliases": [
@@ -2666,7 +2666,7 @@
     },
     {
       "id": "challenge_07",
-      "name": "challenge_07",
+      "name": "熔核试炼Lv1–3",
       "kind": "image",
       "uri": "file://{images}/spellicons/ember_spirit_sleight_of_fist.png",
       "aliases": [
@@ -2677,7 +2677,7 @@
     },
     {
       "id": "challenge_08",
-      "name": "challenge_08",
+      "name": "熔核首领试炼Lv4",
       "kind": "image",
       "uri": "file://{images}/spellicons/primal_beast_pulverize.png",
       "aliases": [
@@ -2688,7 +2688,7 @@
     },
     {
       "id": "challenge_09",
-      "name": "challenge_09",
+      "name": "霜烬双生挑战",
       "kind": "image",
       "uri": "file://{images}/spellicons/spectre_haunt.png",
       "aliases": [
@@ -2699,7 +2699,7 @@
     },
     {
       "id": "challenge_10",
-      "name": "challenge_10",
+      "name": "进入七罪深渊",
       "kind": "image",
       "uri": "file://{images}/spellicons/terrorblade_metamorphosis.png",
       "aliases": [
@@ -2710,7 +2710,7 @@
     },
     {
       "id": "challenge_11",
-      "name": "challenge_11",
+      "name": "进入十罪领域",
       "kind": "image",
       "uri": "file://{images}/spellicons/necrolyte_reapers_scythe.png",
       "aliases": [
@@ -2730,7 +2730,7 @@
     },
     {
       "id": "clear_n1_1",
-      "name": "N1（1次）",
+      "name": "常规 N1（1次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2738,7 +2738,7 @@
     },
     {
       "id": "clear_n1_3",
-      "name": "N1（3次）",
+      "name": "常规 N1（3次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2746,7 +2746,7 @@
     },
     {
       "id": "clear_n1_5",
-      "name": "N1（5次）",
+      "name": "常规 N1（5次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2754,7 +2754,7 @@
     },
     {
       "id": "clear_n10_10",
-      "name": "N10（10次）",
+      "name": "常规 N10（10次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2762,7 +2762,7 @@
     },
     {
       "id": "clear_n10_5",
-      "name": "N10（5次）",
+      "name": "常规 N10（5次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2770,7 +2770,7 @@
     },
     {
       "id": "clear_n2_1",
-      "name": "N2（1次）",
+      "name": "常规 N2（1次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2778,7 +2778,7 @@
     },
     {
       "id": "clear_n2_10",
-      "name": "N2（10次）",
+      "name": "常规 N2（10次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2786,7 +2786,7 @@
     },
     {
       "id": "clear_n2_3",
-      "name": "N2（3次）",
+      "name": "常规 N2（3次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2794,7 +2794,7 @@
     },
     {
       "id": "clear_n2_5",
-      "name": "N2（5次）",
+      "name": "常规 N2（5次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2802,7 +2802,7 @@
     },
     {
       "id": "clear_n3_1",
-      "name": "N3（1次）",
+      "name": "常规 N3（1次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2810,7 +2810,7 @@
     },
     {
       "id": "clear_n3_10",
-      "name": "N3（10次）",
+      "name": "常规 N3（10次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2818,7 +2818,7 @@
     },
     {
       "id": "clear_n3_20",
-      "name": "N3（20次）",
+      "name": "常规 N3（20次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2826,7 +2826,7 @@
     },
     {
       "id": "clear_n3_3",
-      "name": "N3（3次）",
+      "name": "常规 N3（3次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2834,7 +2834,7 @@
     },
     {
       "id": "clear_n3_5",
-      "name": "N3（5次）",
+      "name": "常规 N3（5次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2842,7 +2842,7 @@
     },
     {
       "id": "clear_n4_1",
-      "name": "N4（1次）",
+      "name": "常规 N4（1次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2850,7 +2850,7 @@
     },
     {
       "id": "clear_n4_10",
-      "name": "N4（10次）",
+      "name": "常规 N4（10次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2858,7 +2858,7 @@
     },
     {
       "id": "clear_n4_20",
-      "name": "N4（20次）",
+      "name": "常规 N4（20次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2866,7 +2866,7 @@
     },
     {
       "id": "clear_n4_3",
-      "name": "N4（3次）",
+      "name": "常规 N4（3次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2874,7 +2874,7 @@
     },
     {
       "id": "clear_n4_5",
-      "name": "N4（5次）",
+      "name": "常规 N4（5次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2882,7 +2882,7 @@
     },
     {
       "id": "clear_n5_1",
-      "name": "N5（1次）",
+      "name": "常规 N5（1次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2890,7 +2890,7 @@
     },
     {
       "id": "clear_n5_10",
-      "name": "N5（10次）",
+      "name": "常规 N5（10次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2898,7 +2898,7 @@
     },
     {
       "id": "clear_n5_20",
-      "name": "N5（20次）",
+      "name": "常规 N5（20次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2906,7 +2906,7 @@
     },
     {
       "id": "clear_n5_3",
-      "name": "N5（3次）",
+      "name": "常规 N5（3次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2914,7 +2914,7 @@
     },
     {
       "id": "clear_n5_5",
-      "name": "N5（5次）",
+      "name": "常规 N5（5次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2922,7 +2922,7 @@
     },
     {
       "id": "clear_n6_1",
-      "name": "N6（1次）",
+      "name": "常规 N6（1次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2930,7 +2930,7 @@
     },
     {
       "id": "clear_n6_10",
-      "name": "N6（10次）",
+      "name": "常规 N6（10次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2938,7 +2938,7 @@
     },
     {
       "id": "clear_n6_20",
-      "name": "N6（20次）",
+      "name": "常规 N6（20次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2946,7 +2946,7 @@
     },
     {
       "id": "clear_n6_3",
-      "name": "N6（3次）",
+      "name": "常规 N6（3次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2954,7 +2954,7 @@
     },
     {
       "id": "clear_n6_5",
-      "name": "N6（5次）",
+      "name": "常规 N6（5次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2962,7 +2962,7 @@
     },
     {
       "id": "clear_n7_1",
-      "name": "N7（1次）",
+      "name": "常规 N7（1次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2970,7 +2970,7 @@
     },
     {
       "id": "clear_n7_10",
-      "name": "N7（10次）",
+      "name": "常规 N7（10次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2978,7 +2978,7 @@
     },
     {
       "id": "clear_n7_20",
-      "name": "N7（20次）",
+      "name": "常规 N7（20次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2986,7 +2986,7 @@
     },
     {
       "id": "clear_n7_3",
-      "name": "N7（3次）",
+      "name": "常规 N7（3次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -2994,7 +2994,7 @@
     },
     {
       "id": "clear_n7_5",
-      "name": "N7（5次）",
+      "name": "常规 N7（5次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -3002,7 +3002,7 @@
     },
     {
       "id": "clear_n8_1",
-      "name": "N8（1次）",
+      "name": "常规 N8（1次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -3010,7 +3010,7 @@
     },
     {
       "id": "clear_n8_10",
-      "name": "N8（10次）",
+      "name": "常规 N8（10次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -3018,7 +3018,7 @@
     },
     {
       "id": "clear_n8_20",
-      "name": "N8（20次）",
+      "name": "常规 N8（20次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -3026,7 +3026,7 @@
     },
     {
       "id": "clear_n8_3",
-      "name": "N8（3次）",
+      "name": "常规 N8（3次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -3034,7 +3034,7 @@
     },
     {
       "id": "clear_n8_5",
-      "name": "N8（5次）",
+      "name": "常规 N8（5次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -3042,7 +3042,7 @@
     },
     {
       "id": "clear_n9_1",
-      "name": "N9（1次）",
+      "name": "常规 N9（1次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -3050,7 +3050,7 @@
     },
     {
       "id": "clear_n9_10",
-      "name": "N9（10次）",
+      "name": "常规 N9（10次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -3058,7 +3058,7 @@
     },
     {
       "id": "clear_n9_20",
-      "name": "N9（20次）",
+      "name": "常规 N9（20次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -3066,7 +3066,7 @@
     },
     {
       "id": "clear_n9_3",
-      "name": "N9（3次）",
+      "name": "常规 N9（3次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -3074,7 +3074,7 @@
     },
     {
       "id": "clear_n9_5",
-      "name": "N9（5次）",
+      "name": "常规 N9（5次）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
       "aliases": [],
@@ -3110,7 +3110,7 @@
     },
     {
       "id": "commerce_p004",
-      "name": "清暑符·永久",
+      "name": "清风灵符",
       "kind": "image",
       "uri": "file://{images}/econ/crafting/crafting_recipe_scroll_evergreen.png",
       "aliases": [
@@ -3124,7 +3124,7 @@
     },
     {
       "id": "commerce_p005",
-      "name": "双倍通关卡·永久",
+      "name": "双誉通关契",
       "kind": "image",
       "uri": "file://{images}/econ/crafting/crafting_recipe_scroll_common.png",
       "aliases": [
@@ -3138,7 +3138,7 @@
     },
     {
       "id": "commerce_p011",
-      "name": "炫彩足球·永久",
+      "name": "流彩战球",
       "kind": "image",
       "uri": "file://{images}/econ/tools/seasonal_ti10_soccerball.png",
       "aliases": [
@@ -3152,7 +3152,7 @@
     },
     {
       "id": "commerce_p012",
-      "name": "剑圣·永久",
+      "name": "锋刃宗师",
       "kind": "image",
       "uri": "file://{images}/spellicons/juggernaut_blade_fury.png",
       "aliases": [
@@ -3162,7 +3162,7 @@
     },
     {
       "id": "commerce_p013",
-      "name": "精良工匠·永久",
+      "name": "精艺匠师",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/shop_icons_hd_v1/item_forging_hammer.vtex",
       "aliases": [
@@ -3176,7 +3176,7 @@
     },
     {
       "id": "commerce_p014",
-      "name": "硬质涂层·永久",
+      "name": "坚垒涂剂",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_protection_crystal.vtex",
       "aliases": [
@@ -3190,7 +3190,7 @@
     },
     {
       "id": "commerce_p015",
-      "name": "金斧头·永久",
+      "name": "鎏金伐斧",
       "kind": "image",
       "uri": "file://{images}/econ/items/beastmaster/chimeras_rage_weapon/chimeras_rage_weapon.png",
       "aliases": [
@@ -3204,7 +3204,7 @@
     },
     {
       "id": "commerce_p016",
-      "name": "泰坦护盾·永久（功能版）",
+      "name": "山岳守护",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/commerce_art_v1/titan_shield.vtex",
       "aliases": [
@@ -3215,7 +3215,7 @@
     },
     {
       "id": "commerce_p017",
-      "name": "铜斧头·永久",
+      "name": "赤铜伐斧",
       "kind": "image",
       "uri": "file://{images}/econ/items/axe/axe_executioner.png",
       "aliases": [
@@ -3229,7 +3229,7 @@
     },
     {
       "id": "commerce_p018",
-      "name": "时间科技·永久",
+      "name": "流时工艺",
       "kind": "image",
       "uri": "file://{images}/spellicons/faceless_void_time_lock.png",
       "aliases": [
@@ -3239,7 +3239,7 @@
     },
     {
       "id": "commerce_p019",
-      "name": "淬火剂·永久",
+      "name": "熔锋淬液",
       "kind": "image",
       "uri": "file://{images}/econ/items/alchemist/alchemeyerflask/alchemeyerflask.png",
       "aliases": [
@@ -3253,7 +3253,7 @@
     },
     {
       "id": "commerce_p020",
-      "name": "地精油锯·永久",
+      "name": "轰鸣链锯",
       "kind": "image",
       "uri": "file://{images}/spellicons/shredder_whirling_death.png",
       "aliases": [
@@ -3263,7 +3263,7 @@
     },
     {
       "id": "commerce_p021",
-      "name": "优质装备·永久",
+      "name": "精制战装",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/shop_icons_hd_v1/equipment_iron_armor_01.vtex",
       "aliases": [
@@ -3277,7 +3277,7 @@
     },
     {
       "id": "commerce_p022",
-      "name": "高级伐木场·永久",
+      "name": "丰林工坊",
       "kind": "image",
       "uri": "file://{images}/spellicons/shredder_timber_chain.png",
       "aliases": [
@@ -3287,7 +3287,7 @@
     },
     {
       "id": "commerce_p023",
-      "name": "古董收藏家·永久",
+      "name": "珍藏鉴赏家",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_kings_treasure.vtex",
       "aliases": [
@@ -3301,7 +3301,7 @@
     },
     {
       "id": "commerce_p024",
-      "name": "建筑手册·永久",
+      "name": "营造图录",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/shop_icons_hd_v1/item_knowledge_book.vtex",
       "aliases": [
@@ -3315,7 +3315,7 @@
     },
     {
       "id": "commerce_p025",
-      "name": "文玩收藏家·永久",
+      "name": "瑰宝鉴赏家",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_wealth_talisman.vtex",
       "aliases": [
@@ -3329,7 +3329,7 @@
     },
     {
       "id": "commerce_p026",
-      "name": "侏儒传送器·永久",
+      "name": "折跃信标",
       "kind": "image",
       "uri": "file://{images}/spellicons/tinker_keen_teleport.png",
       "aliases": [
@@ -3343,7 +3343,7 @@
     },
     {
       "id": "commerce_p027",
-      "name": "精英装备·永久",
+      "name": "锐锋战装",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_crystalline_armor.vtex",
       "aliases": [
@@ -3357,7 +3357,7 @@
     },
     {
       "id": "commerce_p028",
-      "name": "熟练工头·永久（功能版）",
+      "name": "老练工监",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/commerce_art_v1/master_foreman.vtex",
       "aliases": [
@@ -3368,7 +3368,7 @@
     },
     {
       "id": "commerce_p029",
-      "name": "工作效率·永久",
+      "name": "勤作工契",
       "kind": "image",
       "uri": "file://{images}/spellicons/alchemist_goblins_greed.png",
       "aliases": [
@@ -3378,7 +3378,7 @@
     },
     {
       "id": "commerce_p030",
-      "name": "银斧头·永久",
+      "name": "霜银伐斧",
       "kind": "image",
       "uri": "file://{images}/econ/items/axe/greek_weapon.png",
       "aliases": [
@@ -3392,7 +3392,7 @@
     },
     {
       "id": "commerce_p031",
-      "name": "强化箭塔·永久",
+      "name": "强弩塔契",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_tower_retrofit.vtex",
       "aliases": [
@@ -3406,7 +3406,7 @@
     },
     {
       "id": "commerce_p032",
-      "name": "快速建造·永久",
+      "name": "疾筑工契",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_universal_tool.vtex",
       "aliases": [
@@ -3420,7 +3420,7 @@
     },
     {
       "id": "commerce_p033",
-      "name": "伐木斧·永久",
+      "name": "开拓伐斧",
       "kind": "image",
       "uri": "file://{images}/econ/items/beastmaster/korosh_peaks_weapon/korosh_peaks_weapon.png",
       "aliases": [
@@ -3434,7 +3434,7 @@
     },
     {
       "id": "commerce_p037",
-      "name": "新手木材·永久",
+      "name": "启程木料",
       "kind": "image",
       "uri": "file://{images}/items/branches.png",
       "aliases": [
@@ -3444,7 +3444,7 @@
     },
     {
       "id": "commerce_p038",
-      "name": "新手金币·永久",
+      "name": "启程金袋",
       "kind": "image",
       "uri": "file://{images}/items/hand_of_midas.png",
       "aliases": [
@@ -3455,7 +3455,7 @@
     {
       "id": "commerce_p147",
       "quality": "ur",
-      "name": "悲叹之种·永久",
+      "name": "暮影种核",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/commerce_art_v1/lament_seed.vtex",
       "aliases": [
@@ -3467,7 +3467,7 @@
     {
       "id": "commerce_p151",
       "quality": "ur",
-      "name": "斩魄刀·永久",
+      "name": "断魂长刀",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/commerce_art_v1/spirit_katana.vtex",
       "aliases": [
@@ -3478,7 +3478,7 @@
     },
     {
       "id": "commerce_video_bundle_b001",
-      "name": "大佬礼包",
+      "name": "城主珍藏礼包",
       "kind": "image",
       "uri": "file://{images}/econ/tools/treasure_chest_dragon_knight.png",
       "aliases": [
@@ -3492,7 +3492,7 @@
     },
     {
       "id": "commerce_video_bundle_b002",
-      "name": "剑圣D闪礼包",
+      "name": "锋刃折跃礼包",
       "kind": "image",
       "uri": "file://{images}/econ/tools/treasure_chest_juggernaut.png",
       "aliases": [
@@ -3506,7 +3506,7 @@
     },
     {
       "id": "commerce_video_bundle_b003",
-      "name": "新手礼包",
+      "name": "开拓启程礼包",
       "kind": "image",
       "uri": "file://{images}/econ/tools/treasure_chest_ursa.png",
       "aliases": [
@@ -3520,7 +3520,7 @@
     },
     {
       "id": "commerce_video_bundle_b004",
-      "name": "新人礼包",
+      "name": "守城新锐礼包",
       "kind": "image",
       "uri": "file://{images}/econ/tools/treasure_chest_bounty_hunter.png",
       "aliases": [
@@ -3534,7 +3534,7 @@
     },
     {
       "id": "commerce_video_bundle_b005",
-      "name": "新皮肤礼包",
+      "name": "流光外观礼包",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/commerce_jade_v1/gift_light_png.vtex",
       "aliases": [
@@ -4866,7 +4866,7 @@
     },
     {
       "id": "equipment_attack_gloves_01",
-      "name": "equipment_attack_gloves_01",
+      "name": "疾攻护手LV1",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/shop_icons_hd_v1/equipment_attack_gloves_01.vtex",
       "aliases": [],
@@ -4921,7 +4921,7 @@
     },
     {
       "id": "equipment_burning_blade_01",
-      "name": "equipment_burning_blade_01",
+      "name": "赤炽战刃LV1",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/shop_icons_hd_v1/equipment_burning_blade_01.vtex",
       "aliases": [],
@@ -5031,7 +5031,7 @@
     },
     {
       "id": "equipment_iron_armor_01",
-      "name": "equipment_iron_armor_01",
+      "name": "铸钢战甲LV1",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/shop_icons_hd_v1/equipment_iron_armor_01.vtex",
       "aliases": [],
@@ -5086,9 +5086,9 @@
     },
     {
       "id": "ex_01",
-      "name": "胡桃",
+      "name": "金穗禾宁",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_01.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_01.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5099,9 +5099,9 @@
     },
     {
       "id": "ex_02",
-      "name": "雷电将军",
+      "name": "青枝洛栖",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_02.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_02.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5112,9 +5112,9 @@
     },
     {
       "id": "ex_03",
-      "name": "刻晴",
+      "name": "流金晴砚",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_03.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_03.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5125,9 +5125,9 @@
     },
     {
       "id": "ex_04",
-      "name": "芙宁娜",
+      "name": "林息岑溪",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_04.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_04.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5138,9 +5138,9 @@
     },
     {
       "id": "ex_05",
-      "name": "神里绫华",
+      "name": "星育闻芷",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_05.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_05.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5151,9 +5151,9 @@
     },
     {
       "id": "ex_06",
-      "name": "2B",
+      "name": "晨誓锦遥",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_06.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_06.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5164,9 +5164,9 @@
     },
     {
       "id": "ex_07",
-      "name": "春田",
+      "name": "飞翎弦夏",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_07.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_07.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5177,9 +5177,9 @@
     },
     {
       "id": "ex_08",
-      "name": "雏田",
+      "name": "岩垒岚柯",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_08.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_08.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5190,9 +5190,9 @@
     },
     {
       "id": "ex_09",
-      "name": "纲手",
+      "name": "药泉苓音",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_09.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_09.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5203,9 +5203,9 @@
     },
     {
       "id": "ex_10",
-      "name": "蒂法",
+      "name": "苔生沐棠",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_10.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_10.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5216,9 +5216,9 @@
     },
     {
       "id": "ex_11",
-      "name": "姬如雪",
+      "name": "铁纹砺秋",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_11.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_11.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5229,9 +5229,9 @@
     },
     {
       "id": "ex_12",
-      "name": "爱蜜莉雅",
+      "name": "迅斧榆星",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_12.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_12.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5242,9 +5242,9 @@
     },
     {
       "id": "ex_13",
-      "name": "雪乃",
+      "name": "断锋烬芒",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_13.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_13.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5255,9 +5255,9 @@
     },
     {
       "id": "ex_14",
-      "name": "罗宾",
+      "name": "四象知蘅",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_14.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_14.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5268,9 +5268,9 @@
     },
     {
       "id": "ex_15",
-      "name": "薇尔莉特",
+      "name": "采薪槿禾",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_15.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_15.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5281,9 +5281,9 @@
     },
     {
       "id": "ex_16",
-      "name": "爱莉希雅",
+      "name": "流矢澄羽",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_16.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_16.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5294,9 +5294,9 @@
     },
     {
       "id": "ex_17",
-      "name": "符华",
+      "name": "蚀甲溶月",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_17.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_17.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5307,9 +5307,9 @@
     },
     {
       "id": "ex_18",
-      "name": "琪亚娜",
+      "name": "砺弦映砂",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_18.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_18.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5320,9 +5320,9 @@
     },
     {
       "id": "ex_19",
-      "name": "银狼",
+      "name": "慧眼昭霓",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_19.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_19.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5333,9 +5333,9 @@
     },
     {
       "id": "ex_20",
-      "name": "镜流",
+      "name": "星弩弦歌",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_20.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_20.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5346,9 +5346,9 @@
     },
     {
       "id": "ex_21",
-      "name": "祢豆子",
+      "name": "淬刃焰汐",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_21.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_21.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5359,9 +5359,9 @@
     },
     {
       "id": "ex_22",
-      "name": "绫波丽",
+      "name": "灵纹绘岚",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_22.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_22.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5372,9 +5372,9 @@
     },
     {
       "id": "ex_23",
-      "name": "明日香",
+      "name": "砂金沄岫",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_23.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_23.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5385,9 +5385,9 @@
     },
     {
       "id": "ex_24",
-      "name": "三笠",
+      "name": "层盾砌雪",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_24.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_24.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5398,9 +5398,9 @@
     },
     {
       "id": "ex_25",
-      "name": "蕾姆",
+      "name": "根垒青珞",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_25.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_25.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5411,9 +5411,9 @@
     },
     {
       "id": "ex_26",
-      "name": "蝴蝶忍",
+      "name": "霜镀凝岑",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_26.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_26.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5424,9 +5424,9 @@
     },
     {
       "id": "ex_27",
-      "name": "祈",
+      "name": "三曜星蘅",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_27.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_27.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5437,9 +5437,9 @@
     },
     {
       "id": "ex_28",
-      "name": "云韵",
+      "name": "终曜夕照",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_28.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_28.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5450,9 +5450,9 @@
     },
     {
       "id": "ex_29",
-      "name": "火灵儿",
+      "name": "碎铠绯砾",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_29.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_29.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5463,9 +5463,9 @@
     },
     {
       "id": "ex_30",
-      "name": "宁荣荣",
+      "name": "绝矢落辰",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_30.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_30.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5476,9 +5476,9 @@
     },
     {
       "id": "ex_31",
-      "name": "美杜莎女王",
+      "name": "丰脉锻澜",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_31.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_31.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5489,9 +5489,9 @@
     },
     {
       "id": "ex_32",
-      "name": "涂山雅雅",
+      "name": "战意灼岚",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_32.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_32.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5502,9 +5502,9 @@
     },
     {
       "id": "ex_33",
-      "name": "贞德",
+      "name": "薪火槐青",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_33.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_33.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5515,9 +5515,9 @@
     },
     {
       "id": "ex_34",
-      "name": "阿尔托莉雅",
+      "name": "护幕纱棱",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_34.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_34.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5528,9 +5528,9 @@
     },
     {
       "id": "ex_35",
-      "name": "玛修",
+      "name": "森匠栖萝",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_35.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_35.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5541,9 +5541,9 @@
     },
     {
       "id": "ex_36",
-      "name": "德克萨斯",
+      "name": "百弩霁弦",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_36.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_36.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5554,9 +5554,9 @@
     },
     {
       "id": "ex_37",
-      "name": "阿米娅",
+      "name": "锐虹照璃",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_37.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_37.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5567,9 +5567,9 @@
     },
     {
       "id": "ex_38",
-      "name": "时崎狂三",
+      "name": "万象曜宁",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_38.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_38.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5580,9 +5580,9 @@
     },
     {
       "id": "ex_39",
-      "name": "宝儿姐",
+      "name": "破晓昭烬",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_39.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_39.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5593,9 +5593,9 @@
     },
     {
       "id": "ex_40",
-      "name": "小舞",
+      "name": "同盟岚汀",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/ex_40.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/ex_40.vtex",
       "aliases": [],
       "quality": "N",
       "category_id": "ex",
@@ -5816,7 +5816,7 @@
     },
     {
       "id": "friend_01",
-      "name": "哆啦A梦",
+      "name": "金筹砚舟",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_01.vtex",
       "aliases": [],
@@ -5829,7 +5829,7 @@
     },
     {
       "id": "friend_02",
-      "name": "孙悟空",
+      "name": "林仓木衡",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_02.vtex",
       "aliases": [],
@@ -5842,7 +5842,7 @@
     },
     {
       "id": "friend_03",
-      "name": "路飞",
+      "name": "盈泉金渡",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_03.vtex",
       "aliases": [],
@@ -5855,7 +5855,7 @@
     },
     {
       "id": "friend_04",
-      "name": "漩涡鸣人",
+      "name": "森息枝远",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_04.vtex",
       "aliases": [],
@@ -5868,7 +5868,7 @@
     },
     {
       "id": "friend_05",
-      "name": "江户川柯南",
+      "name": "星砺闻川",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_05.vtex",
       "aliases": [],
@@ -5881,7 +5881,7 @@
     },
     {
       "id": "friend_06",
-      "name": "樱木花道",
+      "name": "晨锋岳棱",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_06.vtex",
       "aliases": [],
@@ -5894,7 +5894,7 @@
     },
     {
       "id": "friend_07",
-      "name": "宇智波佐助",
+      "name": "弦卫寒翎",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_07.vtex",
       "aliases": [],
@@ -5907,7 +5907,7 @@
     },
     {
       "id": "friend_08",
-      "name": "贝吉塔",
+      "name": "磐城岩铎",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_08.vtex",
       "aliases": [],
@@ -5920,7 +5920,7 @@
     },
     {
       "id": "friend_09",
-      "name": "流川枫",
+      "name": "泉卫清砾",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_09.vtex",
       "aliases": [],
@@ -5933,7 +5933,7 @@
     },
     {
       "id": "friend_10",
-      "name": "旗木卡卡西",
+      "name": "苔垒林砌",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_10.vtex",
       "aliases": [],
@@ -5946,7 +5946,7 @@
     },
     {
       "id": "friend_11",
-      "name": "利威尔",
+      "name": "玄甲铁峦",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_11.vtex",
       "aliases": [],
@@ -5959,7 +5959,7 @@
     },
     {
       "id": "friend_12",
-      "name": "艾伦·耶格尔",
+      "name": "迅薪斧澈",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_12.vtex",
       "aliases": [],
@@ -5972,7 +5972,7 @@
     },
     {
       "id": "friend_13",
-      "name": "黑崎一护",
+      "name": "决锋昼烬",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_13.vtex",
       "aliases": [],
@@ -5985,7 +5985,7 @@
     },
     {
       "id": "friend_14",
-      "name": "灶门炭治郎",
+      "name": "四曜观澜",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_14.vtex",
       "aliases": [],
@@ -5998,7 +5998,7 @@
     },
     {
       "id": "friend_15",
-      "name": "五条悟",
+      "name": "森作榫青",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_15.vtex",
       "aliases": [],
@@ -6011,7 +6011,7 @@
     },
     {
       "id": "friend_16",
-      "name": "坂田银时",
+      "name": "流弩长弦",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_16.vtex",
       "aliases": [],
@@ -6024,7 +6024,7 @@
     },
     {
       "id": "friend_17",
-      "name": "犬夜叉",
+      "name": "蚀铠玄针",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_17.vtex",
       "aliases": [],
@@ -6037,7 +6037,7 @@
     },
     {
       "id": "friend_18",
-      "name": "宇智波鼬",
+      "name": "连矢绞轮",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_18.vtex",
       "aliases": [],
@@ -6050,7 +6050,7 @@
     },
     {
       "id": "friend_19",
-      "name": "埼玉",
+      "name": "准星明隼",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_19.vtex",
       "aliases": [],
@@ -6063,7 +6063,7 @@
     },
     {
       "id": "friend_20",
-      "name": "鲁路修",
+      "name": "星弩云衡",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_20.vtex",
       "aliases": [],
@@ -6076,7 +6076,7 @@
     },
     {
       "id": "friend_21",
-      "name": "夜神月",
+      "name": "砺战焰川",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_21.vtex",
       "aliases": [],
@@ -6089,7 +6089,7 @@
     },
     {
       "id": "friend_22",
-      "name": "爱德华",
+      "name": "纹契青篆",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_22.vtex",
       "aliases": [],
@@ -6102,7 +6102,7 @@
     },
     {
       "id": "friend_23",
-      "name": "自来也",
+      "name": "采金矿徊",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_23.vtex",
       "aliases": [],
@@ -6115,7 +6115,7 @@
     },
     {
       "id": "friend_24",
-      "name": "桐谷和人",
+      "name": "叠盾砌垣",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_24.vtex",
       "aliases": [],
@@ -6128,7 +6128,7 @@
     },
     {
       "id": "friend_25",
-      "name": "萧炎",
+      "name": "生垒根岳",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_25.vtex",
       "aliases": [],
@@ -6141,7 +6141,7 @@
     },
     {
       "id": "friend_26",
-      "name": "唐三",
+      "name": "坚城铸霖",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_26.vtex",
       "aliases": [],
@@ -6154,7 +6154,7 @@
     },
     {
       "id": "friend_27",
-      "name": "石昊",
+      "name": "三相曜峤",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_27.vtex",
       "aliases": [],
@@ -6167,7 +6167,7 @@
     },
     {
       "id": "friend_28",
-      "name": "叶凡",
+      "name": "终锋破霁",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_28.vtex",
       "aliases": [],
@@ -6180,7 +6180,7 @@
     },
     {
       "id": "friend_29",
-      "name": "韩立",
+      "name": "穿甲裂镐",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_29.vtex",
       "aliases": [],
@@ -6193,7 +6193,7 @@
     },
     {
       "id": "friend_30",
-      "name": "叶修",
+      "name": "绝弩星沉",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_30.vtex",
       "aliases": [],
@@ -6206,7 +6206,7 @@
     },
     {
       "id": "friend_31",
-      "name": "王林",
+      "name": "丰脉金阙",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_31.vtex",
       "aliases": [],
@@ -6219,7 +6219,7 @@
     },
     {
       "id": "friend_32",
-      "name": "张小凡",
+      "name": "战意锐砾",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_32.vtex",
       "aliases": [],
@@ -6232,7 +6232,7 @@
     },
     {
       "id": "friend_33",
-      "name": "范闲",
+      "name": "薪火槐朔",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_33.vtex",
       "aliases": [],
@@ -6245,7 +6245,7 @@
     },
     {
       "id": "friend_34",
-      "name": "许七安",
+      "name": "庇垒玄岑",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_34.vtex",
       "aliases": [],
@@ -6258,7 +6258,7 @@
     },
     {
       "id": "friend_35",
-      "name": "秦羽",
+      "name": "森匠木棱",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_35.vtex",
       "aliases": [],
@@ -6271,7 +6271,7 @@
     },
     {
       "id": "friend_36",
-      "name": "徐凤年",
+      "name": "箭潮霁川",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_36.vtex",
       "aliases": [],
@@ -6284,7 +6284,7 @@
     },
     {
       "id": "friend_37",
-      "name": "牧尘",
+      "name": "裂虹锋曜",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_37.vtex",
       "aliases": [],
@@ -6297,7 +6297,7 @@
     },
     {
       "id": "friend_38",
-      "name": "老天师",
+      "name": "万象澄岳",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_38.vtex",
       "aliases": [],
@@ -6310,7 +6310,7 @@
     },
     {
       "id": "friend_39",
-      "name": "唐三",
+      "name": "同盟长汀",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_39.vtex",
       "aliases": [],
@@ -6323,7 +6323,7 @@
     },
     {
       "id": "friend_40",
-      "name": "袁天罡",
+      "name": "终曜烬衡",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/friend_40.vtex",
       "aliases": [],
@@ -6501,7 +6501,7 @@
     },
     {
       "id": "item_death_mask",
-      "name": "item_death_mask",
+      "name": "血契面罩",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/shop_icons_hd_v1/item_death_mask.vtex",
       "aliases": [],
@@ -6512,7 +6512,7 @@
     },
     {
       "id": "item_forging_hammer",
-      "name": "item_forging_hammer",
+      "name": "淬锋匠锤",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/shop_icons_hd_v1/item_forging_hammer.vtex",
       "aliases": [],
@@ -6523,7 +6523,7 @@
     },
     {
       "id": "item_knowledge_book",
-      "name": "item_knowledge_book",
+      "name": "悟道卷册",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/shop_icons_hd_v1/item_knowledge_book.vtex",
       "aliases": [],
@@ -6637,7 +6637,7 @@
     },
     {
       "id": "item_small_polar_crystal",
-      "name": "item_small_polar_crystal",
+      "name": "寒原晶石",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/shop_icons_hd_v1/item_small_polar_crystal.vtex",
       "aliases": [],
@@ -6648,7 +6648,7 @@
     },
     {
       "id": "item_super_knowledge_book",
-      "name": "item_super_knowledge_book",
+      "name": "悟道秘卷",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/shop_icons_hd_v1/item_super_knowledge_book.vtex",
       "aliases": [],
@@ -7326,7 +7326,7 @@
     },
     {
       "id": "lottery_aaron_cannon",
-      "name": "亚伦巨炮·永久",
+      "name": "轰雷巨炮",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_aaron_cannon.vtex",
       "aliases": [
@@ -7338,7 +7338,7 @@
     },
     {
       "id": "lottery_abundance_blessing",
-      "name": "丰饶赐福·永久",
+      "name": "丰穰契印",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_abundance_blessing.vtex",
       "aliases": [
@@ -7350,7 +7350,7 @@
     },
     {
       "id": "lottery_ancient_pine_fortification",
-      "name": "苍松固城·永久",
+      "name": "松根固垒",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_ancient_pine_fortification.vtex",
       "aliases": [
@@ -7362,7 +7362,7 @@
     },
     {
       "id": "lottery_attribute_crystal",
-      "name": "属性结晶·永久",
+      "name": "均衡灵晶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_attribute_crystal.vtex",
       "aliases": [
@@ -7374,7 +7374,7 @@
     },
     {
       "id": "lottery_bombardment_crystal",
-      "name": "炮击结晶·永久",
+      "name": "轰鸣灵晶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_bombardment_crystal.vtex",
       "aliases": [
@@ -7387,7 +7387,7 @@
     },
     {
       "id": "lottery_candle_dragon_wing",
-      "name": "烛龙之翼",
+      "name": "赤曜龙翼",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_candle_dragon_wing.vtex",
       "aliases": [],
@@ -7396,7 +7396,7 @@
     },
     {
       "id": "lottery_chief_god_blessing",
-      "name": "主神赐福·永久",
+      "name": "天枢战契",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_chief_god_blessing.vtex",
       "aliases": [
@@ -7408,7 +7408,7 @@
     },
     {
       "id": "lottery_chosen_hero",
-      "name": "神选英雄·永久",
+      "name": "英杰授印",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_chosen_hero.vtex",
       "aliases": [
@@ -7420,7 +7420,7 @@
     },
     {
       "id": "lottery_crystalline_armor",
-      "name": "晶态护甲·永久",
+      "name": "凝晶战甲",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_crystalline_armor.vtex",
       "aliases": [
@@ -7439,7 +7439,7 @@
     },
     {
       "id": "lottery_cyber_overlord",
-      "name": "赛博主宰",
+      "name": "械域统领",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_cyber_overlord.vtex",
       "aliases": [],
@@ -7448,7 +7448,7 @@
     },
     {
       "id": "lottery_cybernetic_implant",
-      "name": "义体插件·永久",
+      "name": "战躯增幅器",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_cybernetic_implant.vtex",
       "aliases": [
@@ -7460,7 +7460,7 @@
     },
     {
       "id": "lottery_darksteel_wall",
-      "name": "玄铁城墙·永久",
+      "name": "乌金坚墙",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_darksteel_wall.vtex",
       "aliases": [
@@ -7472,7 +7472,7 @@
     },
     {
       "id": "lottery_data_unit",
-      "name": "数据单元·永久",
+      "name": "演算单元",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_data_unit.vtex",
       "aliases": [
@@ -7484,7 +7484,7 @@
     },
     {
       "id": "lottery_dimensional_barrier",
-      "name": "次元屏障·永久",
+      "name": "棱光屏障",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_dimensional_barrier.vtex",
       "aliases": [
@@ -7496,7 +7496,7 @@
     },
     {
       "id": "lottery_divine_spirit",
-      "name": "神赐精神",
+      "name": "天授精华",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_divine_spirit.vtex",
       "aliases": [],
@@ -7505,7 +7505,7 @@
     },
     {
       "id": "lottery_divine_tower_blessing",
-      "name": "神塔赐福·永久",
+      "name": "镇塔圣契",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_divine_tower_blessing.vtex",
       "aliases": [
@@ -7517,7 +7517,7 @@
     },
     {
       "id": "lottery_dragon_knight_vanguard_mk1",
-      "name": "龙骑尖兵1型",
+      "name": "苍龙先驱一型",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_dragon_knight_vanguard_mk1.vtex",
       "aliases": [],
@@ -7526,7 +7526,7 @@
     },
     {
       "id": "lottery_echo_compass",
-      "name": "回响罗盘·永久",
+      "name": "鸣纹罗盘",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_echo_compass.vtex",
       "aliases": [
@@ -7539,7 +7539,7 @@
     },
     {
       "id": "lottery_ember_of_legacy",
-      "name": "薪火余烬",
+      "name": "传承余烬",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_ember_of_legacy.vtex",
       "aliases": [
@@ -7553,7 +7553,7 @@
     },
     {
       "id": "lottery_emerald_wood_origin",
-      "name": "翠木归元·永久",
+      "name": "翠林归源",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_emerald_wood_origin.vtex",
       "aliases": [
@@ -7565,7 +7565,7 @@
     },
     {
       "id": "lottery_endless_growth_ring",
-      "name": "无尽年轮·永久",
+      "name": "长青轮纹",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_endless_growth_ring.vtex",
       "aliases": [
@@ -7577,7 +7577,7 @@
     },
     {
       "id": "lottery_expansion_crystal",
-      "name": "膨胀结晶·永久",
+      "name": "生长灵晶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_expansion_crystal.vtex",
       "aliases": [
@@ -7589,7 +7589,7 @@
     },
     {
       "id": "lottery_fallen_sky_mine",
-      "name": "陨落天矿·永久",
+      "name": "坠星矿核",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_fallen_sky_mine.vtex",
       "aliases": [
@@ -7601,7 +7601,7 @@
     },
     {
       "id": "lottery_flame_wall",
-      "name": "烈焰城墙·永久",
+      "name": "赤焰护墙",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_flame_wall.vtex",
       "aliases": [
@@ -7613,7 +7613,7 @@
     },
     {
       "id": "lottery_forest_burning_edge",
-      "name": "焚林之锋",
+      "name": "灼木战锋",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_forest_burning_edge.vtex",
       "aliases": [],
@@ -7622,7 +7622,7 @@
     },
     {
       "id": "lottery_forestcast_thousand_bolts",
-      "name": "林铸千矢·永久",
+      "name": "森铸连矢",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_forestcast_thousand_bolts.vtex",
       "aliases": [
@@ -7634,7 +7634,7 @@
     },
     {
       "id": "lottery_gale_bow",
-      "name": "疾风弓·永久",
+      "name": "追风长弓",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_gale_bow.vtex",
       "aliases": [
@@ -7653,7 +7653,7 @@
     },
     {
       "id": "lottery_gathering_divine_codex",
-      "name": "采集神典·永久",
+      "name": "万林丰收录",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_gathering_divine_codex.vtex",
       "aliases": [
@@ -7672,7 +7672,7 @@
     },
     {
       "id": "lottery_gathering_grimoire",
-      "name": "采集秘典·永久",
+      "name": "百林采集册",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_gathering_grimoire.vtex",
       "aliases": [
@@ -7691,7 +7691,7 @@
     },
     {
       "id": "lottery_greenwood_nirvana",
-      "name": "青林涅槃·永久",
+      "name": "青林复生",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_greenwood_nirvana.vtex",
       "aliases": [
@@ -7703,7 +7703,7 @@
     },
     {
       "id": "lottery_greenwood_rampart",
-      "name": "青林筑垣·永久",
+      "name": "青木坚垣",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_greenwood_rampart.vtex",
       "aliases": [
@@ -7715,7 +7715,7 @@
     },
     {
       "id": "lottery_heaven_devouring_pill",
-      "name": "万噬通天丹",
+      "name": "吞岳灵丹",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_heaven_devouring_pill.vtex",
       "aliases": [],
@@ -7724,7 +7724,7 @@
     },
     {
       "id": "lottery_heaven_reaching_tower_seal",
-      "name": "通天塔印·永久",
+      "name": "凌霄塔纹",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_heaven_reaching_tower_seal.vtex",
       "aliases": [
@@ -7736,7 +7736,7 @@
     },
     {
       "id": "lottery_heavenly_puppet",
-      "name": "天道傀儡",
+      "name": "苍穹机关偶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_heavenly_puppet.vtex",
       "aliases": [],
@@ -7745,7 +7745,7 @@
     },
     {
       "id": "lottery_hero_medal",
-      "name": "英雄勋章·永久",
+      "name": "勇者徽印",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_hero_medal.vtex",
       "aliases": [
@@ -7764,7 +7764,7 @@
     },
     {
       "id": "lottery_hippogryph_onslaught",
-      "name": "角鹰魔攻·永久",
+      "name": "苍翼战纹",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_hippogryph_onslaught.vtex",
       "aliases": [
@@ -7776,7 +7776,7 @@
     },
     {
       "id": "lottery_immortal_nirvana",
-      "name": "不灭涅槃·永久",
+      "name": "不熄新生",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_immortal_nirvana.vtex",
       "aliases": [
@@ -7788,7 +7788,7 @@
     },
     {
       "id": "lottery_immortal_slaying_sword_array",
-      "name": "诛仙剑阵·永久",
+      "name": "裂穹剑阵",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_immortal_slaying_sword_array.vtex",
       "aliases": [
@@ -7800,7 +7800,7 @@
     },
     {
       "id": "lottery_investiture_of_gods",
-      "name": "封神榜",
+      "name": "英灵录卷",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_investiture_of_gods.vtex",
       "aliases": [],
@@ -7809,7 +7809,7 @@
     },
     {
       "id": "lottery_jade_purity_sword_immortal",
-      "name": "玉清剑仙",
+      "name": "霁空剑客",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_jade_purity_sword_immortal.vtex",
       "aliases": [],
@@ -7818,7 +7818,7 @@
     },
     {
       "id": "lottery_kings_treasure",
-      "name": "王之财宝·永久",
+      "name": "万象秘库",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_kings_treasure.vtex",
       "aliases": [
@@ -7831,7 +7831,7 @@
     },
     {
       "id": "lottery_law_of_cycles",
-      "name": "圆环之理",
+      "name": "星环法则",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_law_of_cycles.vtex",
       "aliases": [],
@@ -7840,7 +7840,7 @@
     },
     {
       "id": "lottery_life_spirit",
-      "name": "城墙初始血量 +100",
+      "name": "厚生精华",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_life_spirit.vtex",
       "aliases": [
@@ -7854,7 +7854,7 @@
     },
     {
       "id": "lottery_lumber_crystal",
-      "name": "初始木材 +100",
+      "name": "储木灵晶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_lumber_crystal.vtex",
       "aliases": [
@@ -7868,7 +7868,7 @@
     },
     {
       "id": "lottery_lumber_expert",
-      "name": "伐木高手·永久",
+      "name": "斫木能手",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_lumber_expert.vtex",
       "aliases": [
@@ -7880,7 +7880,7 @@
     },
     {
       "id": "lottery_lumber_fury",
-      "name": "伐木之怒·永久",
+      "name": "森斧怒意",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_lumber_fury.vtex",
       "aliases": [
@@ -7892,7 +7892,7 @@
     },
     {
       "id": "lottery_lumber_immortal",
-      "name": "伐木仙人·永久",
+      "name": "万林宗匠",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_lumber_immortal.vtex",
       "aliases": [
@@ -7904,7 +7904,7 @@
     },
     {
       "id": "lottery_lumber_legacy",
-      "name": "伐木传承·永久",
+      "name": "斫木传习录",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_lumber_legacy.vtex",
       "aliases": [
@@ -7916,7 +7916,7 @@
     },
     {
       "id": "lottery_magic_book",
-      "name": "魔法书·永久",
+      "name": "星纹法典",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_magic_book.vtex",
       "aliases": [
@@ -7936,7 +7936,7 @@
     },
     {
       "id": "lottery_magical_girl_juggernaut",
-      "name": "魔法少女（剑圣）",
+      "name": "星辉战姬",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_magical_girl_juggernaut.vtex",
       "aliases": [],
@@ -7945,7 +7945,7 @@
     },
     {
       "id": "lottery_magnetic_disruption_turret",
-      "name": "磁扰炮台·永久",
+      "name": "涡磁炮台",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_magnetic_disruption_turret.vtex",
       "aliases": [
@@ -7957,7 +7957,7 @@
     },
     {
       "id": "lottery_monkey_king",
-      "name": "齐天大圣·永久",
+      "name": "云霄战猿",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_monkey_king.vtex",
       "aliases": [
@@ -7969,7 +7969,7 @@
     },
     {
       "id": "lottery_mountain_sea_kunpeng",
-      "name": "山海鲲鹏·永久",
+      "name": "云海巨翼",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_mountain_sea_kunpeng.vtex",
       "aliases": [
@@ -7981,7 +7981,7 @@
     },
     {
       "id": "lottery_muramasa",
-      "name": "妖刀村正·永久",
+      "name": "妖刀烬霜",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_muramasa.vtex",
       "aliases": [
@@ -8001,7 +8001,7 @@
     },
     {
       "id": "lottery_nano_cluster",
-      "name": "纳米集群·永久",
+      "name": "微械群核",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_nano_cluster.vtex",
       "aliases": [
@@ -8013,7 +8013,7 @@
     },
     {
       "id": "lottery_nature_crystal",
-      "name": "自然结晶·永久",
+      "name": "青枝灵晶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_nature_crystal.vtex",
       "aliases": [
@@ -8026,7 +8026,7 @@
     },
     {
       "id": "lottery_nature_spirit",
-      "name": "自然精粹·永久",
+      "name": "青木精华",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_nature_spirit.vtex",
       "aliases": [
@@ -8038,7 +8038,7 @@
     },
     {
       "id": "lottery_neural_reconstruction_module",
-      "name": "神经重构模块",
+      "name": "思维重塑模块",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_neural_reconstruction_module.vtex",
       "aliases": [],
@@ -8047,7 +8047,7 @@
     },
     {
       "id": "lottery_nitride_alloy_wall",
-      "name": "氮化合金护墙·永久",
+      "name": "复合坚壁",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_nitride_alloy_wall.vtex",
       "aliases": [
@@ -8059,7 +8059,7 @@
     },
     {
       "id": "lottery_oak_bulwark",
-      "name": "橡木壁垒·永久",
+      "name": "古橡坚垒",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_oak_bulwark.vtex",
       "aliases": [
@@ -8071,7 +8071,7 @@
     },
     {
       "id": "lottery_omniscience_blessing",
-      "name": "全知赐福·永久",
+      "name": "洞明契印",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_omniscience_blessing.vtex",
       "aliases": [
@@ -8083,7 +8083,7 @@
     },
     {
       "id": "lottery_orbital_cannon_core",
-      "name": "轨道炮核心·永久",
+      "name": "星轨炮核",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_orbital_cannon_core.vtex",
       "aliases": [
@@ -8095,7 +8095,7 @@
     },
     {
       "id": "lottery_protection_crystal",
-      "name": "城墙初始护甲 +100",
+      "name": "坚壁灵晶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_protection_crystal.vtex",
       "aliases": [
@@ -8109,7 +8109,7 @@
     },
     {
       "id": "lottery_pulse_conduction_turret",
-      "name": "脉冲传导炮台·永久",
+      "name": "雷脉炮台",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_pulse_conduction_turret.vtex",
       "aliases": [
@@ -8121,7 +8121,7 @@
     },
     {
       "id": "lottery_quick_dry_cement",
-      "name": "速干水泥·永久",
+      "name": "凝石灰浆",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_quick_dry_cement.vtex",
       "aliases": [
@@ -8133,7 +8133,7 @@
     },
     {
       "id": "lottery_raven_eye",
-      "name": "渡鸦之眼·永久",
+      "name": "玄鸦瞳石",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_raven_eye.vtex",
       "aliases": [
@@ -8153,7 +8153,7 @@
     },
     {
       "id": "lottery_recovery_crystal",
-      "name": "回复结晶·永久",
+      "name": "回春灵晶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_recovery_crystal.vtex",
       "aliases": [
@@ -8165,7 +8165,7 @@
     },
     {
       "id": "lottery_recovery_spirit",
-      "name": "回复精粹·永久",
+      "name": "复苏精华",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_recovery_spirit.vtex",
       "aliases": [
@@ -8177,7 +8177,7 @@
     },
     {
       "id": "lottery_reincarnation_immortal_stele",
-      "name": "轮回仙碑·永久",
+      "name": "复生古碑",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_reincarnation_immortal_stele.vtex",
       "aliases": [
@@ -8189,7 +8189,7 @@
     },
     {
       "id": "lottery_reincarnation_orb",
-      "name": "轮回宝珠·永久",
+      "name": "转生灵珠",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_reincarnation_orb.vtex",
       "aliases": [
@@ -8201,7 +8201,7 @@
     },
     {
       "id": "lottery_resistance_crystal",
-      "name": "抵抗结晶·永久",
+      "name": "磐石灵晶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_resistance_crystal.vtex",
       "aliases": [
@@ -8213,7 +8213,7 @@
     },
     {
       "id": "lottery_rift_implant",
-      "name": "裂解插件·永久",
+      "name": "裂能增幅器",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_rift_implant.vtex",
       "aliases": [
@@ -8225,7 +8225,7 @@
     },
     {
       "id": "lottery_seed_of_all_wood",
-      "name": "万木之种·永久",
+      "name": "千林种核",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_seed_of_all_wood.vtex",
       "aliases": [
@@ -8237,7 +8237,7 @@
     },
     {
       "id": "lottery_sharp_spirit",
-      "name": "锋锐精粹·永久",
+      "name": "锐锋精华",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_sharp_spirit.vtex",
       "aliases": [
@@ -8251,7 +8251,7 @@
     },
     {
       "id": "lottery_sharpwood_tower_core",
-      "name": "锐木塔源·永久",
+      "name": "穿林塔芯",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_sharpwood_tower_core.vtex",
       "aliases": [
@@ -8263,7 +8263,7 @@
     },
     {
       "id": "lottery_shooting_crystal",
-      "name": "射击结晶·永久",
+      "name": "劲弩灵晶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_shooting_crystal.vtex",
       "aliases": [
@@ -8275,7 +8275,7 @@
     },
     {
       "id": "lottery_signal_hub",
-      "name": "信号枢元·永久",
+      "name": "讯流中枢",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_signal_hub.vtex",
       "aliases": [
@@ -8287,7 +8287,7 @@
     },
     {
       "id": "lottery_sky_turning_seal",
-      "name": "焕天印·永久",
+      "name": "裂空印章",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_sky_turning_seal.vtex",
       "aliases": [
@@ -8299,7 +8299,7 @@
     },
     {
       "id": "lottery_soul_devouring_blade",
-      "name": "噬魂灵剑·永久",
+      "name": "摄魄长剑",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_soul_devouring_blade.vtex",
       "aliases": [
@@ -8318,7 +8318,7 @@
     },
     {
       "id": "lottery_soul_lock_box",
-      "name": "锁魂匣",
+      "name": "拘魄秘匣",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_soul_lock_box.vtex",
       "aliases": [],
@@ -8327,7 +8327,7 @@
     },
     {
       "id": "lottery_sovereign_under_heaven",
-      "name": "君临天下·永久",
+      "name": "统御王印",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_sovereign_under_heaven.vtex",
       "aliases": [
@@ -8339,7 +8339,7 @@
     },
     {
       "id": "lottery_spear_of_longinus",
-      "name": "朗基努斯枪·永久",
+      "name": "破穹战枪",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_spear_of_longinus.vtex",
       "aliases": [
@@ -8359,7 +8359,7 @@
     },
     {
       "id": "lottery_steel_wall",
-      "name": "钢铁城墙·永久",
+      "name": "精钢护墙",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_steel_wall.vtex",
       "aliases": [
@@ -8371,7 +8371,7 @@
     },
     {
       "id": "lottery_struggle_diary",
-      "name": "奋斗日记·永久",
+      "name": "奋进手札",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_struggle_diary.vtex",
       "aliases": [
@@ -8383,7 +8383,7 @@
     },
     {
       "id": "lottery_supreme_fishing_rod",
-      "name": "极品钓鱼杆·永久",
+      "name": "澄渊钓竿",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_supreme_fishing_rod.vtex",
       "aliases": [
@@ -8395,7 +8395,7 @@
     },
     {
       "id": "lottery_swift_emblem",
-      "name": "快速绞盘·永久",
+      "name": "迅击纹盘",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/commerce_art_v1/swift_winch.vtex",
       "aliases": [
@@ -8408,7 +8408,7 @@
     },
     {
       "id": "lottery_sword_of_promise",
-      "name": "誓约之剑",
+      "name": "晨誓长剑",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_sword_of_promise.vtex",
       "aliases": [],
@@ -8437,7 +8437,7 @@
     },
     {
       "id": "lottery_time_orb",
-      "name": "时间宝珠·永久",
+      "name": "流时宝珠",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_time_orb.vtex",
       "aliases": [
@@ -8449,7 +8449,7 @@
     },
     {
       "id": "lottery_titan_shield",
-      "name": "泰坦巨盾·永久",
+      "name": "山岳重盾",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_titan_shield.vtex",
       "aliases": [
@@ -8468,7 +8468,7 @@
     },
     {
       "id": "lottery_tower_retrofit",
-      "name": "箭塔改造·永久",
+      "name": "箭塔精工图",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_tower_retrofit.vtex",
       "aliases": [
@@ -8480,7 +8480,7 @@
     },
     {
       "id": "lottery_unbreakable_fortress",
-      "name": "不破要塞·永久",
+      "name": "磐城堡垒",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_unbreakable_fortress.vtex",
       "aliases": [
@@ -8492,7 +8492,7 @@
     },
     {
       "id": "lottery_universal_tool",
-      "name": "万能工具·永久",
+      "name": "百工工具匣",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_universal_tool.vtex",
       "aliases": [
@@ -8504,7 +8504,7 @@
     },
     {
       "id": "lottery_void_signal_terminal",
-      "name": "虚空信号终端",
+      "name": "深域讯号终端",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_void_signal_terminal.vtex",
       "aliases": [],
@@ -8513,7 +8513,7 @@
     },
     {
       "id": "lottery_wealth_crystal",
-      "name": "财富结晶·永久",
+      "name": "聚金灵晶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_wealth_crystal.vtex",
       "aliases": [
@@ -8527,7 +8527,7 @@
     },
     {
       "id": "lottery_windspeed_bowstring",
-      "name": "风速弓弦·永久",
+      "name": "逐风弓弦",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_windspeed_bowstring.vtex",
       "aliases": [
@@ -8539,7 +8539,7 @@
     },
     {
       "id": "lottery_withered_branch_lantern",
-      "name": "枯枝灯·永久",
+      "name": "余枝明灯",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_withered_branch_lantern.vtex",
       "aliases": [
@@ -8552,7 +8552,7 @@
     },
     {
       "id": "lottery_woodcraft_grandmaster",
-      "name": "斫木宗师·永久",
+      "name": "百木宗匠",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_woodcraft_grandmaster.vtex",
       "aliases": [
@@ -8564,7 +8564,7 @@
     },
     {
       "id": "lottery_woodforged_thousand_arrows",
-      "name": "木筑万锋·永久",
+      "name": "林垒千锋",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_woodforged_thousand_arrows.vtex",
       "aliases": [
@@ -9399,7 +9399,7 @@
     },
     {
       "id": "pay_archive_pass_monthly",
-      "name": "签到月卡（30天）",
+      "name": "守城月卡（30天）",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_wealth_talisman.vtex",
       "aliases": [
@@ -9423,7 +9423,7 @@
     },
     {
       "id": "pay_starter_bundle_v4",
-      "name": "启程礼包",
+      "name": "初行补给礼包",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/commerce_jade_v1/gift_light_png.vtex",
       "aliases": [
@@ -9485,7 +9485,7 @@
     },
     {
       "id": "rebirth_challenge_01",
-      "name": "rebirth_challenge_01",
+      "name": "转生试炼·1转",
       "kind": "image",
       "uri": "file://{images}/heroes/selection/npc_dota_hero_undying.png",
       "aliases": [
@@ -9498,7 +9498,7 @@
     },
     {
       "id": "rebirth_challenge_02",
-      "name": "rebirth_challenge_02",
+      "name": "转生试炼·2转",
       "kind": "image",
       "uri": "file://{images}/heroes/selection/npc_dota_hero_bloodseeker.png",
       "aliases": [
@@ -9511,7 +9511,7 @@
     },
     {
       "id": "rebirth_challenge_03",
-      "name": "rebirth_challenge_03",
+      "name": "转生试炼·3转",
       "kind": "image",
       "uri": "file://{images}/heroes/selection/npc_dota_hero_dragon_knight.png",
       "aliases": [
@@ -9524,7 +9524,7 @@
     },
     {
       "id": "rebirth_challenge_04",
-      "name": "rebirth_challenge_04",
+      "name": "转生试炼·4转",
       "kind": "image",
       "uri": "file://{images}/heroes/selection/npc_dota_hero_sven.png",
       "aliases": [
@@ -9537,7 +9537,7 @@
     },
     {
       "id": "rebirth_challenge_05",
-      "name": "rebirth_challenge_05",
+      "name": "转生试炼·5转",
       "kind": "image",
       "uri": "file://{images}/heroes/selection/npc_dota_hero_bane.png",
       "aliases": [
@@ -9550,7 +9550,7 @@
     },
     {
       "id": "rebirth_challenge_06",
-      "name": "rebirth_challenge_06",
+      "name": "转生试炼·6转",
       "kind": "image",
       "uri": "file://{images}/heroes/selection/npc_dota_hero_life_stealer.png",
       "aliases": [
@@ -9563,7 +9563,7 @@
     },
     {
       "id": "rebirth_challenge_07",
-      "name": "rebirth_challenge_07",
+      "name": "转生试炼·7转",
       "kind": "image",
       "uri": "file://{images}/heroes/selection/npc_dota_hero_dark_willow.png",
       "aliases": [
@@ -9576,7 +9576,7 @@
     },
     {
       "id": "rebirth_challenge_08",
-      "name": "rebirth_challenge_08",
+      "name": "转生试炼·8转",
       "kind": "image",
       "uri": "file://{images}/heroes/selection/npc_dota_hero_grimstroke.png",
       "aliases": [
@@ -9589,7 +9589,7 @@
     },
     {
       "id": "rebirth_challenge_09",
-      "name": "rebirth_challenge_09",
+      "name": "转生试炼·9转",
       "kind": "image",
       "uri": "file://{images}/heroes/selection/npc_dota_hero_spectre_alt1.png",
       "aliases": [
@@ -9602,7 +9602,7 @@
     },
     {
       "id": "rebirth_challenge_10",
-      "name": "rebirth_challenge_10",
+      "name": "转生试炼·10转",
       "kind": "image",
       "uri": "file://{images}/heroes/selection/npc_dota_hero_doom_bringer.png",
       "aliases": [
@@ -12486,7 +12486,7 @@
     },
     {
       "id": "service_early_final_boss",
-      "name": "service_early_final_boss",
+      "name": "提前终战",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/shop_icons_hd_v1/service_early_final_boss.vtex",
       "aliases": [],
@@ -12553,7 +12553,7 @@
     },
     {
       "id": "shadow_05",
-      "name": "shadow_05",
+      "name": "虚空箭头",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_icons_hd_v1/shadow_05.vtex",
       "aliases": [],
@@ -12564,7 +12564,7 @@
     },
     {
       "id": "shadow_06",
-      "name": "shadow_06",
+      "name": "阴暗附着",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_icons_hd_v1/shadow_06.vtex",
       "aliases": [],
@@ -12575,7 +12575,7 @@
     },
     {
       "id": "shadow_07",
-      "name": "shadow_07",
+      "name": "阴影碎布",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_icons_hd_v1/shadow_07.vtex",
       "aliases": [],
@@ -12586,7 +12586,7 @@
     },
     {
       "id": "shadow_08",
-      "name": "shadow_08",
+      "name": "空明碎甲",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_icons_hd_v1/shadow_08.vtex",
       "aliases": [],
@@ -12597,7 +12597,7 @@
     },
     {
       "id": "shadow_09",
-      "name": "shadow_09",
+      "name": "虚空护罩",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_icons_hd_v1/shadow_09.vtex",
       "aliases": [],
@@ -12608,7 +12608,7 @@
     },
     {
       "id": "shadow_10",
-      "name": "shadow_10",
+      "name": "大虚之锤",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_icons_hd_v1/shadow_10.vtex",
       "aliases": [],
@@ -12619,7 +12619,7 @@
     },
     {
       "id": "shadow_11",
-      "name": "shadow_11",
+      "name": "虚无之盾",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_icons_hd_v1/shadow_11.vtex",
       "aliases": [],
@@ -12630,7 +12630,7 @@
     },
     {
       "id": "shadow_12",
-      "name": "shadow_12",
+      "name": "坚韧甲壳",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_icons_hd_v1/shadow_12.vtex",
       "aliases": [],
@@ -12641,7 +12641,7 @@
     },
     {
       "id": "shadow_13",
-      "name": "shadow_13",
+      "name": "动力齿轮",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_icons_hd_v1/shadow_13.vtex",
       "aliases": [],
@@ -12652,7 +12652,7 @@
     },
     {
       "id": "shadow_14",
-      "name": "shadow_14",
+      "name": "无形之斧",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_icons_hd_v1/shadow_14.vtex",
       "aliases": [],
@@ -12663,7 +12663,7 @@
     },
     {
       "id": "shadow_15",
-      "name": "shadow_15",
+      "name": "弹匣之弦",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_icons_hd_v1/shadow_15.vtex",
       "aliases": [],
@@ -12674,7 +12674,7 @@
     },
     {
       "id": "shadow_16",
-      "name": "shadow_16",
+      "name": "魔魇之能",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_icons_hd_v1/shadow_16.vtex",
       "aliases": [],
@@ -12685,7 +12685,7 @@
     },
     {
       "id": "shadow_17",
-      "name": "shadow_17",
+      "name": "相位之力",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_icons_hd_v1/shadow_17.vtex",
       "aliases": [],
@@ -12696,7 +12696,7 @@
     },
     {
       "id": "shadow_18",
-      "name": "shadow_18",
+      "name": "虚空炼金",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_icons_hd_v1/shadow_18.vtex",
       "aliases": [],
@@ -12707,7 +12707,7 @@
     },
     {
       "id": "shadow_19",
-      "name": "shadow_19",
+      "name": "腐蚀魔能",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_icons_hd_v1/shadow_19.vtex",
       "aliases": [],
@@ -12718,7 +12718,7 @@
     },
     {
       "id": "shadow_20",
-      "name": "shadow_20",
+      "name": "膨胀药剂",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_icons_hd_v1/shadow_20.vtex",
       "aliases": [],
@@ -12729,7 +12729,7 @@
     },
     {
       "id": "shadow_21",
-      "name": "shadow_21",
+      "name": "梦魔狂飙",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_icons_hd_v1/shadow_21.vtex",
       "aliases": [],
@@ -12740,7 +12740,7 @@
     },
     {
       "id": "shadow_22",
-      "name": "shadow_22",
+      "name": "虚无之锋",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_icons_hd_v1/shadow_22.vtex",
       "aliases": [],
@@ -12751,7 +12751,7 @@
     },
     {
       "id": "shadow_23",
-      "name": "shadow_23",
+      "name": "虚无之眼",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_icons_hd_v1/shadow_23.vtex",
       "aliases": [],
@@ -12773,7 +12773,7 @@
     },
     {
       "id": "shop_equipment_attack_gloves_01",
-      "name": "加速手套LV1",
+      "name": "疾攻护手LV1",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/shop_equipment_attack_gloves_01.vtex",
       "aliases": [],
@@ -12781,7 +12781,7 @@
     },
     {
       "id": "shop_equipment_burning_blade_01",
-      "name": "灼热之刃LV1",
+      "name": "赤炽战刃LV1",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/shop_equipment_burning_blade_01.vtex",
       "aliases": [],
@@ -12789,7 +12789,7 @@
     },
     {
       "id": "shop_equipment_iron_armor_01",
-      "name": "铁甲LV1",
+      "name": "铸钢战甲LV1",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/shop_equipment_iron_armor_01.vtex",
       "aliases": [],
@@ -12797,7 +12797,7 @@
     },
     {
       "id": "shop_item_death_mask",
-      "name": "死亡面罩",
+      "name": "血契面罩",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/shop_item_death_mask.vtex",
       "aliases": [],
@@ -12805,7 +12805,7 @@
     },
     {
       "id": "shop_item_forging_hammer",
-      "name": "锻造之锤",
+      "name": "淬锋匠锤",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/shop_item_forging_hammer.vtex",
       "aliases": [],
@@ -12813,7 +12813,7 @@
     },
     {
       "id": "shop_item_knowledge_book",
-      "name": "知识之书",
+      "name": "悟道卷册",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/shop_item_knowledge_book.vtex",
       "aliases": [],
@@ -12821,7 +12821,7 @@
     },
     {
       "id": "shop_item_small_polar_crystal",
-      "name": "小极地晶石",
+      "name": "寒原晶石",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/shop_item_small_polar_crystal.vtex",
       "aliases": [],
@@ -12829,7 +12829,7 @@
     },
     {
       "id": "shop_item_super_knowledge_book",
-      "name": "超级知识之书",
+      "name": "悟道秘卷",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/shop_item_super_knowledge_book.vtex",
       "aliases": [],
@@ -12870,7 +12870,7 @@
     },
     {
       "id": "shop_service_early_final_boss",
-      "name": "提前通关",
+      "name": "提前终战",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/shop_service_early_final_boss.vtex",
       "aliases": [],
@@ -12878,7 +12878,7 @@
     },
     {
       "id": "shop_weapon_growth_sword_01",
-      "name": "成长之剑",
+      "name": "渐锋之剑",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/shop_weapon_growth_sword_01.vtex",
       "aliases": [],
@@ -13111,7 +13111,7 @@
     },
     {
       "id": "star_blessing_025",
-      "name": "霍云",
+      "name": "云铸",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/star_blessing_025.vtex",
       "aliases": [],
@@ -13129,7 +13129,7 @@
     },
     {
       "id": "starjoy_lv01",
-      "name": "星悦LV1",
+      "name": "曙光LV1",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank1_psd.vtex",
       "aliases": [],
@@ -13143,7 +13143,7 @@
     },
     {
       "id": "starjoy_lv02",
-      "name": "星悦LV2",
+      "name": "曙光LV2",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank1_psd.vtex",
       "aliases": [],
@@ -13157,7 +13157,7 @@
     },
     {
       "id": "starjoy_lv03",
-      "name": "星悦LV3",
+      "name": "曙光LV3",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank1_psd.vtex",
       "aliases": [],
@@ -13171,7 +13171,7 @@
     },
     {
       "id": "starjoy_lv04",
-      "name": "星悦LV4",
+      "name": "曙光LV4",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank2_psd.vtex",
       "aliases": [],
@@ -13185,7 +13185,7 @@
     },
     {
       "id": "starjoy_lv05",
-      "name": "星悦LV5",
+      "name": "曙光LV5",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank2_psd.vtex",
       "aliases": [],
@@ -13199,7 +13199,7 @@
     },
     {
       "id": "starjoy_lv06",
-      "name": "星悦LV6",
+      "name": "曙光LV6",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank2_psd.vtex",
       "aliases": [],
@@ -13213,7 +13213,7 @@
     },
     {
       "id": "starjoy_lv07",
-      "name": "星悦LV7",
+      "name": "曙光LV7",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank3_psd.vtex",
       "aliases": [],
@@ -13227,7 +13227,7 @@
     },
     {
       "id": "starjoy_lv08",
-      "name": "星悦LV8",
+      "name": "曙光LV8",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank3_psd.vtex",
       "aliases": [],
@@ -13241,7 +13241,7 @@
     },
     {
       "id": "starjoy_lv09",
-      "name": "星悦LV9",
+      "name": "曙光LV9",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank3_psd.vtex",
       "aliases": [],
@@ -13255,7 +13255,7 @@
     },
     {
       "id": "starjoy_lv10",
-      "name": "星悦LV10",
+      "name": "曙光LV10",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank4_psd.vtex",
       "aliases": [],
@@ -13269,7 +13269,7 @@
     },
     {
       "id": "starjoy_lv11",
-      "name": "星悦LV11",
+      "name": "曙光LV11",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank4_psd.vtex",
       "aliases": [],
@@ -13283,7 +13283,7 @@
     },
     {
       "id": "starjoy_lv12",
-      "name": "星悦LV12",
+      "name": "曙光LV12",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank4_psd.vtex",
       "aliases": [],
@@ -13297,7 +13297,7 @@
     },
     {
       "id": "starjoy_lv13",
-      "name": "星悦LV13",
+      "name": "曙光LV13",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank5_psd.vtex",
       "aliases": [],
@@ -13311,7 +13311,7 @@
     },
     {
       "id": "starjoy_lv14",
-      "name": "星悦LV14",
+      "name": "曙光LV14",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank5_psd.vtex",
       "aliases": [],
@@ -13325,7 +13325,7 @@
     },
     {
       "id": "starjoy_lv15",
-      "name": "星悦LV15",
+      "name": "曙光LV15",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank5_psd.vtex",
       "aliases": [],
@@ -13339,7 +13339,7 @@
     },
     {
       "id": "starjoy_lv16",
-      "name": "星悦LV16",
+      "name": "曙光LV16",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank6_psd.vtex",
       "aliases": [],
@@ -13353,7 +13353,7 @@
     },
     {
       "id": "starjoy_lv17",
-      "name": "星悦LV17",
+      "name": "曙光LV17",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank6_psd.vtex",
       "aliases": [],
@@ -13367,7 +13367,7 @@
     },
     {
       "id": "starjoy_lv18",
-      "name": "星悦LV18",
+      "name": "曙光LV18",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank6_psd.vtex",
       "aliases": [],
@@ -13381,7 +13381,7 @@
     },
     {
       "id": "starjoy_lv19",
-      "name": "星悦LV19",
+      "name": "曙光LV19",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank7_psd.vtex",
       "aliases": [],
@@ -13395,7 +13395,7 @@
     },
     {
       "id": "starjoy_lv20",
-      "name": "星悦LV20",
+      "name": "曙光LV20",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank7_psd.vtex",
       "aliases": [],
@@ -13409,7 +13409,7 @@
     },
     {
       "id": "starjoy_lv21",
-      "name": "星悦LV21",
+      "name": "曙光LV21",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank7_psd.vtex",
       "aliases": [],
@@ -13423,7 +13423,7 @@
     },
     {
       "id": "starjoy_lv22",
-      "name": "星悦LV22",
+      "name": "曙光LV22",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank8_psd.vtex",
       "aliases": [],
@@ -13437,7 +13437,7 @@
     },
     {
       "id": "starjoy_lv23",
-      "name": "星悦LV23",
+      "name": "曙光LV23",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank8_psd.vtex",
       "aliases": [],
@@ -13451,7 +13451,7 @@
     },
     {
       "id": "starjoy_lv24",
-      "name": "星悦LV24",
+      "name": "曙光LV24",
       "kind": "tier_badge",
       "uri": "s2r://panorama/images/rank_tier_icons/rank8_psd.vtex",
       "aliases": [],
@@ -14425,7 +14425,7 @@
     },
     {
       "id": "vip_package_01",
-      "name": "VIP1专属礼包",
+      "name": "V1守城特惠包",
       "kind": "image",
       "uri": "file://{images}/econ/tools/treasure_chest_kunkka.png",
       "aliases": [
@@ -14440,7 +14440,7 @@
     },
     {
       "id": "vip_package_02",
-      "name": "VIP2专属礼包",
+      "name": "V2守城特惠包",
       "kind": "image",
       "uri": "file://{images}/econ/tools/treasure_chest_morphling.png",
       "aliases": [
@@ -14455,7 +14455,7 @@
     },
     {
       "id": "vip_package_03",
-      "name": "VIP3专属礼包",
+      "name": "V3守城特惠包",
       "kind": "image",
       "uri": "file://{images}/econ/tools/treasure_chest_bloodseeker.png",
       "aliases": [
@@ -14470,7 +14470,7 @@
     },
     {
       "id": "vip_package_04",
-      "name": "VIP4专属礼包",
+      "name": "V4守城特惠包",
       "kind": "image",
       "uri": "file://{images}/econ/tools/treasure_chest_faceless_void.png",
       "aliases": [
@@ -14485,7 +14485,7 @@
     },
     {
       "id": "vip_package_05",
-      "name": "VIP5专属礼包",
+      "name": "V5守城特惠包",
       "kind": "image",
       "uri": "file://{images}/econ/tools/treasure_chest_tidehunter.png",
       "aliases": [
@@ -14500,7 +14500,7 @@
     },
     {
       "id": "vip_package_06",
-      "name": "VIP6专属礼包",
+      "name": "V6守城特惠包",
       "kind": "image",
       "uri": "file://{images}/econ/tools/treasure_chest_drow.png",
       "aliases": [
@@ -14515,7 +14515,7 @@
     },
     {
       "id": "vip_package_07",
-      "name": "VIP7专属礼包",
+      "name": "V7守城特惠包",
       "kind": "image",
       "uri": "file://{images}/econ/tools/treasure_chest_invoker.png",
       "aliases": [
@@ -14530,7 +14530,7 @@
     },
     {
       "id": "vip_package_08",
-      "name": "VIP8专属礼包",
+      "name": "V8守城特惠包",
       "kind": "image",
       "uri": "file://{images}/econ/tools/treasure_chest_sven.png",
       "aliases": [
@@ -14545,7 +14545,7 @@
     },
     {
       "id": "vip_package_09",
-      "name": "VIP9专属礼包",
+      "name": "V9守城特惠包",
       "kind": "image",
       "uri": "file://{images}/econ/tools/treasure_chest_witchdoctor.png",
       "aliases": [
@@ -14560,7 +14560,7 @@
     },
     {
       "id": "vip_package_10",
-      "name": "VIP10专属礼包",
+      "name": "V10守城特惠包",
       "kind": "image",
       "uri": "file://{images}/econ/tools/treasure_chest_omniknight.png",
       "aliases": [
@@ -15006,7 +15006,7 @@
     },
     {
       "id": "weapon_growth_sword_01",
-      "name": "weapon_growth_sword_01",
+      "name": "渐锋之剑",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/shop_icons_hd_v1/weapon_growth_sword_01.vtex",
       "aliases": [],
@@ -15705,7 +15705,7 @@
     },
     {
       "id": "welfare_zongzi",
-      "name": "粽子",
+      "name": "青叶粽",
       "kind": "image",
       "uri": "s2r://panorama/images/items/tango_png.vtex",
       "aliases": [],
@@ -15721,9 +15721,9 @@
     },
     {
       "id": "wife_01",
-      "name": "约尔福杰",
+      "name": "金契霓川",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_01.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_01.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "N",
@@ -15737,9 +15737,9 @@
     },
     {
       "id": "wife_02",
-      "name": "星野爱",
+      "name": "森藏云檀",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_02.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_02.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "N",
@@ -15753,9 +15753,9 @@
     },
     {
       "id": "wife_03",
-      "name": "波雅汉库克",
+      "name": "泊金锦漪",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_03.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_03.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "N",
@@ -15769,9 +15769,9 @@
     },
     {
       "id": "wife_04",
-      "name": "艾达王",
+      "name": "枝涌晴麓",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_04.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_04.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "N",
@@ -15785,9 +15785,9 @@
     },
     {
       "id": "wife_05",
-      "name": "御坂美琴",
+      "name": "育星望岑",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_05.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_05.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "N",
@@ -15801,9 +15801,9 @@
     },
     {
       "id": "wife_06",
-      "name": "博丽灵梦",
+      "name": "战誓赤葵",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_06.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_06.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "R",
@@ -15817,9 +15817,9 @@
     },
     {
       "id": "wife_07",
-      "name": "樱岛麻衣",
+      "name": "星弦落璃",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_07.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_07.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "R",
@@ -15833,9 +15833,9 @@
     },
     {
       "id": "wife_08",
-      "name": "芙莉莲",
+      "name": "苍垒岚绡",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_08.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_08.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "R",
@@ -15849,9 +15849,9 @@
     },
     {
       "id": "wife_09",
-      "name": "零二",
+      "name": "潮愈霁蓝",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_09.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_09.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "R",
@@ -15865,9 +15865,9 @@
     },
     {
       "id": "wife_10",
-      "name": "赤瞳",
+      "name": "磐生苔音",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_10.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_10.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "R",
@@ -15881,9 +15881,9 @@
     },
     {
       "id": "wife_11",
-      "name": "伊蕾娜",
+      "name": "玄铸黛砚",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_11.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_11.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "R",
@@ -15897,9 +15897,9 @@
     },
     {
       "id": "wife_12",
-      "name": "赫萝",
+      "name": "迅薪栾叶",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_12.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_12.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "R",
@@ -15913,9 +15913,9 @@
     },
     {
       "id": "wife_13",
-      "name": "桔梗",
+      "name": "天锋烛瑶",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_13.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_13.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "R",
@@ -15929,9 +15929,9 @@
     },
     {
       "id": "wife_14",
-      "name": "托尔",
+      "name": "合曜弥星",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_14.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_14.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "R",
@@ -15945,9 +15945,9 @@
     },
     {
       "id": "wife_15",
-      "name": "康娜",
+      "name": "森衡芩露",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_15.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_15.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "R",
@@ -15961,9 +15961,9 @@
     },
     {
       "id": "wife_16",
-      "name": "远坂凛",
+      "name": "箭雨凌穗",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_16.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_16.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "SR",
@@ -15977,9 +15977,9 @@
     },
     {
       "id": "wife_17",
-      "name": "斯卡哈",
+      "name": "镂甲霜荻",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_17.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_17.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "SR",
@@ -15993,9 +15993,9 @@
     },
     {
       "id": "wife_18",
-      "name": "艾露莎",
+      "name": "连弦灼羽",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_18.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_18.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "SR",
@@ -16009,9 +16009,9 @@
     },
     {
       "id": "wife_19",
-      "name": "祈",
+      "name": "准星璃澈",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_19.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_19.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "SR",
@@ -16025,9 +16025,9 @@
     },
     {
       "id": "wife_20",
-      "name": "宫水三叶",
+      "name": "虹弩绫音",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_20.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_20.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "SR",
@@ -16041,9 +16041,9 @@
     },
     {
       "id": "wife_21",
-      "name": "佩罗娜",
+      "name": "砺战朱翎",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_21.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_21.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "SR",
@@ -16057,9 +16057,9 @@
     },
     {
       "id": "wife_22",
-      "name": "蜜璃",
+      "name": "流纹绘霞",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_22.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_22.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "SR",
@@ -16073,9 +16073,9 @@
     },
     {
       "id": "wife_23",
-      "name": "香奈乎",
+      "name": "深脉熔珀",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_23.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_23.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "SR",
@@ -16089,9 +16089,9 @@
     },
     {
       "id": "wife_24",
-      "name": "堕姬",
+      "name": "叠垒砌云",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_24.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_24.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "SR",
@@ -16105,9 +16105,9 @@
     },
     {
       "id": "wife_25",
-      "name": "五河琴里",
+      "name": "长青琼柯",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_25.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_25.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "SR",
@@ -16121,9 +16121,9 @@
     },
     {
       "id": "wife_26",
-      "name": "鸢一折纸",
+      "name": "坚辉银苇",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_26.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_26.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "SR",
@@ -16137,9 +16137,9 @@
     },
     {
       "id": "wife_27",
-      "name": "四糸乃",
+      "name": "三辉晓棂",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_27.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_27.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "SR",
@@ -16153,9 +16153,9 @@
     },
     {
       "id": "wife_28",
-      "name": "涂山苏苏",
+      "name": "终焰赤岫",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_28.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_28.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "SSR",
@@ -16169,9 +16169,9 @@
     },
     {
       "id": "wife_29",
-      "name": "夏禾",
+      "name": "穿铠砂翎",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_29.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_29.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "SSR",
@@ -16185,9 +16185,9 @@
     },
     {
       "id": "wife_30",
-      "name": "拉普兰德",
+      "name": "天弩皓岑",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_30.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_30.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "SSR",
@@ -16201,9 +16201,9 @@
     },
     {
       "id": "wife_31",
-      "name": "凯尔希",
+      "name": "符契镜禾",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_31.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_31.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "SSR",
@@ -16217,9 +16217,9 @@
     },
     {
       "id": "wife_32",
-      "name": "春野樱",
+      "name": "炽意绯芒",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_32.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_32.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "SSR",
@@ -16233,9 +16233,9 @@
     },
     {
       "id": "wife_33",
-      "name": "黑雪姬",
+      "name": "巨斧枫砚",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_33.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_33.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "SSR",
@@ -16249,9 +16249,9 @@
     },
     {
       "id": "wife_34",
-      "name": "莉伍德",
+      "name": "庇城晏澜",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_34.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_34.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "SSR",
@@ -16265,9 +16265,9 @@
     },
     {
       "id": "wife_35",
-      "name": "白井黑子",
+      "name": "森裁栖桐",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_35.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_35.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "SSR",
@@ -16281,9 +16281,9 @@
     },
     {
       "id": "wife_36",
-      "name": "千反田爱",
+      "name": "箭潮汀雪",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_36.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_36.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "SSR",
@@ -16297,9 +16297,9 @@
     },
     {
       "id": "wife_37",
-      "name": "菲伦",
+      "name": "裂星烁铃",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_37.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_37.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "SSR",
@@ -16313,9 +16313,9 @@
     },
     {
       "id": "wife_38",
-      "name": "纱雾",
+      "name": "万曜澄霄",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_38.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_38.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "UR",
@@ -16329,9 +16329,9 @@
     },
     {
       "id": "wife_39",
-      "name": "夜刀神十香",
+      "name": "夜幕青垒",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_39.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_39.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "UR",
@@ -16345,9 +16345,9 @@
     },
     {
       "id": "wife_40",
-      "name": "亚丝娜",
+      "name": "决曜长烬",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_40.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_40.vtex",
       "aliases": [],
       "category": "wife",
       "quality": "UR",
@@ -16383,7 +16383,7 @@
     },
     {
       "id": "work_01",
-      "name": "老板凝视",
+      "name": "凝视",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_boss.vtex",
       "aliases": [],
@@ -16391,7 +16391,7 @@
     },
     {
       "id": "work_02",
-      "name": "996lv1",
+      "name": "7*24·Ⅰ",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_tired.vtex",
       "aliases": [],
@@ -16399,7 +16399,7 @@
     },
     {
       "id": "work_03",
-      "name": "继续努力",
+      "name": "疾战训练",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_happy.vtex",
       "aliases": [],
@@ -16407,7 +16407,7 @@
     },
     {
       "id": "work_04",
-      "name": "不要猝死",
+      "name": "长垣固守",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_tired.vtex",
       "aliases": [],
@@ -16415,7 +16415,7 @@
     },
     {
       "id": "work_05",
-      "name": "老板买车",
+      "name": "铁壁营垒",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_boss.vtex",
       "aliases": [],
@@ -16423,7 +16423,7 @@
     },
     {
       "id": "work_06",
-      "name": "带薪拉屎",
+      "name": "聚金规划",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_happy.vtex",
       "aliases": [],
@@ -16431,7 +16431,7 @@
     },
     {
       "id": "work_07",
-      "name": "今晚加班",
+      "name": "生息回环",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_tired.vtex",
       "aliases": [],
@@ -16439,7 +16439,7 @@
     },
     {
       "id": "work_08",
-      "name": "拼好饭",
+      "name": "金脉增益",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_happy.vtex",
       "aliases": [],
@@ -16447,7 +16447,7 @@
     },
     {
       "id": "work_09",
-      "name": "脂肪肝",
+      "name": "生机充盈",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_tired.vtex",
       "aliases": [],
@@ -16455,7 +16455,7 @@
     },
     {
       "id": "work_10",
-      "name": "胃结石",
+      "name": "护体铭文",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_tired.vtex",
       "aliases": [],
@@ -16463,7 +16463,7 @@
     },
     {
       "id": "work_11",
-      "name": "高血压",
+      "name": "疾攻节拍",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_tired.vtex",
       "aliases": [],
@@ -16471,7 +16471,7 @@
     },
     {
       "id": "work_12",
-      "name": "鸡汤",
+      "name": "勤修要诀",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_happy.vtex",
       "aliases": [],
@@ -16479,7 +16479,7 @@
     },
     {
       "id": "work_13",
-      "name": "画饼",
+      "name": "连弩机芯",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_boss.vtex",
       "aliases": [],
@@ -16487,7 +16487,7 @@
     },
     {
       "id": "work_14",
-      "name": "摸鱼",
+      "name": "林间积蓄",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_happy.vtex",
       "aliases": [],
@@ -16495,7 +16495,7 @@
     },
     {
       "id": "work_15",
-      "name": "咖啡",
+      "name": "战意凝露",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_happy.vtex",
       "aliases": [],
@@ -16503,7 +16503,7 @@
     },
     {
       "id": "work_16",
-      "name": "健身房",
+      "name": "百炼根基",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_happy.vtex",
       "aliases": [],
@@ -16511,7 +16511,7 @@
     },
     {
       "id": "work_17",
-      "name": "内卷",
+      "name": "精工伐木",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_tired.vtex",
       "aliases": [],
@@ -16519,7 +16519,7 @@
     },
     {
       "id": "work_18",
-      "name": "老板凝视",
+      "name": "凝视·进阶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_boss.vtex",
       "aliases": [],
@@ -16527,7 +16527,7 @@
     },
     {
       "id": "work_19",
-      "name": "996lv2",
+      "name": "7*24·Ⅱ",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_tired.vtex",
       "aliases": [],
@@ -16535,7 +16535,7 @@
     },
     {
       "id": "work_20",
-      "name": "继续努力",
+      "name": "疾战训练·进阶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_happy.vtex",
       "aliases": [],
@@ -16543,7 +16543,7 @@
     },
     {
       "id": "work_21",
-      "name": "不要猝死",
+      "name": "长垣固守·进阶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_tired.vtex",
       "aliases": [],
@@ -16551,7 +16551,7 @@
     },
     {
       "id": "work_22",
-      "name": "老板买车",
+      "name": "铁壁营垒·进阶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_boss.vtex",
       "aliases": [],
@@ -16559,7 +16559,7 @@
     },
     {
       "id": "work_23",
-      "name": "带薪拉屎",
+      "name": "聚金规划·进阶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_happy.vtex",
       "aliases": [],
@@ -16567,7 +16567,7 @@
     },
     {
       "id": "work_24",
-      "name": "今晚加个班",
+      "name": "生息回环·进阶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_tired.vtex",
       "aliases": [],
@@ -16575,7 +16575,7 @@
     },
     {
       "id": "work_25",
-      "name": "拼好饭",
+      "name": "战意昂扬",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_happy.vtex",
       "aliases": [],
@@ -16583,7 +16583,7 @@
     },
     {
       "id": "work_26",
-      "name": "脂肪肝",
+      "name": "生机充盈·进阶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_tired.vtex",
       "aliases": [],
@@ -16591,7 +16591,7 @@
     },
     {
       "id": "work_27",
-      "name": "胃结石",
+      "name": "护体铭文·进阶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_tired.vtex",
       "aliases": [],
@@ -16599,7 +16599,7 @@
     },
     {
       "id": "work_28",
-      "name": "高血压",
+      "name": "疾攻节拍·进阶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_tired.vtex",
       "aliases": [],
@@ -16607,7 +16607,7 @@
     },
     {
       "id": "work_29",
-      "name": "鸡汤",
+      "name": "勤修要诀·进阶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_happy.vtex",
       "aliases": [],
@@ -16615,7 +16615,7 @@
     },
     {
       "id": "work_30",
-      "name": "画饼",
+      "name": "连弩机芯·进阶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_boss.vtex",
       "aliases": [],
@@ -16623,7 +16623,7 @@
     },
     {
       "id": "work_31",
-      "name": "摸鱼",
+      "name": "林间积蓄·进阶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_happy.vtex",
       "aliases": [],
@@ -16631,7 +16631,7 @@
     },
     {
       "id": "work_32",
-      "name": "咖啡",
+      "name": "战意凝露·进阶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_happy.vtex",
       "aliases": [],
@@ -16639,7 +16639,7 @@
     },
     {
       "id": "work_33",
-      "name": "健身房",
+      "name": "百炼根基·进阶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_happy.vtex",
       "aliases": [],
@@ -16647,7 +16647,7 @@
     },
     {
       "id": "work_34",
-      "name": "内卷",
+      "name": "精工伐木·进阶",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_work_head_tired.vtex",
       "aliases": [],
@@ -16666,7 +16666,7 @@
       "id": "concubine_01",
       "name": "灯火守望者",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_01.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_01.vtex",
       "aliases": [],
       "category": "concubine",
       "quality": "N",
@@ -16682,7 +16682,7 @@
       "id": "concubine_02",
       "name": "林间药师",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_02.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_02.vtex",
       "aliases": [],
       "category": "concubine",
       "quality": "R",
@@ -16698,7 +16698,7 @@
       "id": "concubine_03",
       "name": "雾海旅人",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_03.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_03.vtex",
       "aliases": [],
       "category": "concubine",
       "quality": "SR",
@@ -16714,7 +16714,7 @@
       "id": "concubine_04",
       "name": "星辰咏者",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_04.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_04.vtex",
       "aliases": [],
       "category": "concubine",
       "quality": "SSR",
@@ -16730,7 +16730,7 @@
       "id": "concubine_05",
       "name": "长夜之誓",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/collection_portraits_grid_v2/wife_05.vtex",
+      "uri": "s2r://panorama/images/custom_game/collection_original_v1/wife_05.vtex",
       "aliases": [],
       "category": "concubine",
       "quality": "UR",

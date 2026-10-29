@@ -2,7 +2,7 @@
 -- Source: data_issues.csv
 local M = {}
 M.rows = {
-    { issue_id = "ISSUE-001", severity = "high", content_id = "weapon_growth_sword_max", issue_type = "合成结果命名冲突", description = "成长之剑描述同时出现“幻影之剑”和“霜之剑刃”。", recommended_action = "确认最终产物名称与ID；当前配方暂指向weapon_frost_blade_01。" },
+    { issue_id = "ISSUE-001", severity = "high", content_id = "weapon_growth_sword_max", issue_type = "合成结果命名冲突", description = "渐锋之剑描述同时出现“幻影之剑”和“霜之剑刃”。", recommended_action = "确认最终产物名称与ID；当前配方暂指向weapon_frost_blade_01。" },
     { issue_id = "ISSUE-002", severity = "high", content_id = "item_death_mask", issue_type = "商店价格冲突", description = "建筑商店为木材10000+金币300；武器表为木材10000+金币500。", recommended_action = "建议以建筑商店为当前UI价格，策划确认后统一。" },
     { issue_id = "ISSUE-003", severity = "high", content_id = "multiple", issue_type = "可疑价格18", description = "武器表中大量后续等级购买金币为18，疑似占位或解析残留。", recommended_action = "已进入ShopEntries候选但默认enabled=0。" },
     { issue_id = "ISSUE-004", severity = "medium", content_id = "equipment_infernal_armor_04", issue_type = "核心等级疑似笔误", description = "Lv4描述写“熔火核心Lv3升级装备狱火熔铠Lv4”，与系列规律不一致。", recommended_action = "当前按核心Lv4升MAX建模，标记description_inferred。" },

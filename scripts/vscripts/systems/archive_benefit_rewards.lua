@@ -5,6 +5,7 @@ local calendar = require("systems/archive_calendar")
 local M = {}
 local OFFSET, DAY = 3 * 3600, 86400
 local MAX_INTEGER = 9007199254740991
+local PUBLIC_BETA_TIER = "public_beta_login"
 local names = {
     lottery_ticket = {name="普通抽奖券", description="用于地图抽奖。"},
     special_lottery_ticket = {name="金色抽奖券", description="用于修仙、龙骑与暑期宝箱。"},
@@ -15,6 +16,27 @@ local function integer(value)
 end
 function M.day(timestamp) return math.floor((timestamp + OFFSET) / DAY) end
 function M.week(timestamp) return math.floor((M.day(timestamp) + 3) / 7) end
+local function active(row, timestamp)
+    if not row or row.enabled ~= true then return false end
+    local starts, finishes = tonumber(row.starts_at) or 0, tonumber(row.ends_at) or 0
+    return (starts == 0 or timestamp >= starts) and (finishes == 0 or timestamp < finishes)
+end
+-- Read-only account projection. The popup cannot create a bucket, a claim, or
+-- inventory merely by requesting its eligibility.
+function M.public_beta_snapshot(profile, timestamp)
+    timestamp = timestamp or calendar.now()
+    local row, day = config.by_id[PUBLIC_BETA_TIER], M.day(timestamp)
+    local archive = profile and profile.save and profile.save.archive or {}
+    local days = archive.benefits and archive.benefits.days or {}
+    local bucket = days[tostring(day)] or {}
+    local claimed = (bucket.claimed or {})[PUBLIC_BETA_TIER] ~= nil
+    local enabled = active(row, timestamp)
+    return {active=enabled and 1 or 0, day_key=tostring(day),
+        refresh_at=(day+1)*DAY-OFFSET, eligible=enabled and not claimed and 1 or 0,
+        claimed=claimed and 1 or 0, ticket_id="special_lottery_ticket",
+        ticket_name="金色抽奖券", ticket_count=2,
+        revision=profile and profile.revision or 0}
+end
 local function event_time(command)
     -- HTTP supplies the immutable database operation time. The local observer
     -- supplies its server sample time. Never fall back to a client date.
@@ -144,6 +166,7 @@ function M.apply(command, archive, stats, inventory, pass, source_save)
     -- daily claim; buying a month card later that day still earns the reward.
     if row.monthly_only and pass~=true then return false,"该福利需要有效月卡" end
     local timestamp=event_time(command)
+    if not active(row, timestamp) then return false,"活动尚未开始或已结束" end
     local key=row.period=="week" and M.week(timestamp) or M.day(timestamp)
     local s=state(archive)
     local saved=period(s,row.period,key)

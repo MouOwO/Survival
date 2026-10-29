@@ -2,7 +2,7 @@
 -- Source: recipes.csv
 local M = {}
 M.rows = {
-    { recipe_id = "recipe_growth_max_mask_to_frost_01", result_content_id = "weapon_frost_blade_01", result_count = 1, recipe_type = "auto_synthesis", enabled = true, review_status = "needs_confirmation", notes = "成长之剑MAX+死亡面罩；源表同时出现“幻影之剑/霜之剑刃”命名冲突。" },
+    { recipe_id = "recipe_growth_max_mask_to_frost_01", result_content_id = "weapon_frost_blade_01", result_count = 1, recipe_type = "auto_synthesis", enabled = true, review_status = "needs_confirmation", notes = "渐锋之剑MAX+血契面罩；源表同时出现“幻影之剑/霜之剑刃”命名冲突。" },
     { recipe_id = "recipe_equipment_set_to_infernal_01", result_content_id = "equipment_infernal_armor_01", result_count = 1, recipe_type = "synthesis", enabled = true, review_status = "ok" },
     { recipe_id = "recipe_molten_core_01_to_02", result_content_id = "material_molten_core_02", result_count = 1, recipe_type = "combine_3_to_1", enabled = true, review_status = "ok" },
     { recipe_id = "recipe_molten_core_02_to_03", result_content_id = "material_molten_core_03", result_count = 1, recipe_type = "combine_3_to_1", enabled = true, review_status = "ok" },

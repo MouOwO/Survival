@@ -41,7 +41,7 @@ function Archive-RewardDescription($definition){
     }elseif($definition.reward_kind -eq 'cage'){
         $phrase='专属奖励';$quality='purple'
     }elseif($definition.reward_kind -eq 'shadow'){
-        $phrase='虚空之影道具'
+        $phrase='破碎之影道具'
         $qualities=@($shadowItems | Where-Object {$_.source_boss_difficulty -eq $definition.reward_key} | Select-Object -ExpandProperty quality -Unique)
         if($qualities.Count -eq 1){$quality=$qualities[0]}
     }

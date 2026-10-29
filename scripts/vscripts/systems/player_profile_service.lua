@@ -1076,10 +1076,17 @@ end
 -- validated and persisted before it becomes the live profile, so inventory
 -- ownership and a lottery item's gameplay-stat deltas cannot split across
 -- two revisions.
-function M.update_save_sections(player_id, replacements, reason)
+local offline_public_beta_capability = {}
+local function offline_public_beta_provider()
+    return injected_provider and offline_logic_provider and provider ~= nil
+        and require("debug/offline_logic_test").is_provider(provider)
+        and type(provider.archive_enabled) == "function" and provider.archive_enabled() == false
+end
+local function update_save_sections(player_id, replacements, reason, capability)
     if not test_access_policy.enforce(tonumber(player_id)) then return { ok=false, error="test_access_denied" } end
     local mode_test = package.loaded["debug/mode_unlock_test"]
-    if mode_test and mode_test.is_enabled() then
+    if mode_test and mode_test.is_enabled()
+        and not (capability == offline_public_beta_capability and offline_public_beta_provider()) then
         return { ok = false, error = "mode_unlock_test_read_only" }
     end
     -- HTTP-authoritative rooms must never acknowledge a local-only permanent write.
@@ -1132,6 +1139,43 @@ function M.update_save_sections(player_id, replacements, reason)
         reason = tostring(reason or "save_changed"),
     })
     return { ok = true, revision = next_profile.revision }
+end
+
+function M.update_save_sections(player_id, replacements, reason)
+    return update_save_sections(player_id,replacements,reason)
+end
+
+-- A controlled local preview, not a general read-only-mode escape. This API
+-- accepts only the fixed gift intent and recomputes its complete atomic delta;
+-- no caller can supply arbitrary inventory, stats, archive state, or capability.
+function M.apply_offline_public_beta_gift(player_id, command)
+    local mode_test=package.loaded["debug/mode_unlock_test"]
+    if not (mode_test and mode_test.is_enabled() and offline_public_beta_provider()) then
+        return {ok=false,terminal=true,error="offline_public_beta_provider_required"}
+    end
+    if type(command)~="table" or command.kind~="benefit_claim"
+        or command.track~="public_beta_login" or command.tier_id~="public_beta_login"
+        or type(command.id)~="string" or #command.id<8 or #command.id>200
+        or command.id:find("[^%w_:%.%-]") then
+        return {ok=false,terminal=true,error="offline_public_beta_intent_invalid"}
+    end
+    for key in pairs(command) do
+        if key~="id" and key~="kind" and key~="track" and key~="tier_id" then
+            return {ok=false,terminal=true,error="offline_public_beta_intent_invalid"}
+        end
+    end
+    local profile=loaded_profile(tonumber(player_id))
+    if not profile then return {ok=false,terminal=true,error="profile_not_loaded"} end
+    local archive,stats,inventory=copy(profile.save.archive or {}),
+        copy(profile.save.gameplay_stats or {}),copy(profile.save.content_inventory or {})
+    local accepted,response=require("systems/archive_benefit_rewards").apply(copy(command),
+        archive,stats,inventory,require("systems/archive_calendar").has_pass(profile),profile.save)
+    if not accepted then return {ok=false,terminal=true,error=response} end
+    local committed=update_save_sections(player_id,{archive=archive,
+        gameplay_stats=stats,content_inventory=inventory},
+        "archive_benefit_claim",offline_public_beta_capability)
+    if committed.ok then committed.response=copy(response) end
+    return committed
 end
 
 -- Apply a small account-scoped save section update from a server subsystem.

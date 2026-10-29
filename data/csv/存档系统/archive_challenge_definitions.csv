@@ -1,14 +1,14 @@
 challenge_id,building_id,slot_order,display_name,min_difficulty,reward_kind,reward_key,model_path,model_scale,ability_icon,cooldown_seconds,enabled,description,default_wearable_asset_id,unlock_text,reward_requirement_pool,reward_requirement_count
 #中文表头:挑战ID,建筑序号,连续技能序号,技能名称,最低难度,奖励种类,奖励ID或品质,模型,模型缩放,技能图标,冷却秒,启用,完整说明,饰品资源ID,解锁条件显示,奖励前置累计池,奖励前置次数严格大于
 #types:string,number,number,string,number,string,string,string,number,string,number,boolean,string,string,string,string,number
-shadow_1,1,1,虚空之影,1,shadow,n1,models/heroes/shadow_demon/shadow_demon.vmdl,1.1,nevermore_shadowraze1,3.0,1,挑战成功后可获得虚空之影道具,monster_archive_shadow_1,,,0
-shadow_2,1,2,虚空之影,2,shadow,n2,models/heroes/shadow_demon/shadow_demon.vmdl,1.1,nevermore_shadowraze1,3.0,1,挑战成功后可获得虚空之影道具,monster_archive_shadow_2,N2解锁,,0
-shadow_3,1,3,虚空之影,3,shadow,n3,models/heroes/shadow_demon/shadow_demon.vmdl,1.1,nevermore_shadowraze1,3.0,1,"需要：
+shadow_1,1,1,破碎之影,1,shadow,n1,models/heroes/shadow_demon/shadow_demon.vmdl,1.1,nevermore_shadowraze1,3.0,1,挑战成功后可获得破碎之影道具,monster_archive_shadow_1,,,0
+shadow_2,1,2,破碎之影,2,shadow,n2,models/heroes/shadow_demon/shadow_demon.vmdl,1.1,nevermore_shadowraze1,3.0,1,挑战成功后可获得破碎之影道具,monster_archive_shadow_2,N2解锁,,0
+shadow_3,1,3,破碎之影,3,shadow,n3,models/heroes/shadow_demon/shadow_demon.vmdl,1.1,nevermore_shadowraze1,3.0,1,"需要：
  - N3解锁
-挑战成功后可获得虚空之影道具",monster_archive_shadow_3,N3解锁,,0
-shadow_4,1,4,虚空之影,4,shadow,n4,models/heroes/shadow_demon/shadow_demon.vmdl,1.1,nevermore_shadowraze1,3.0,1,"需要：
+挑战成功后可获得破碎之影道具",monster_archive_shadow_3,N3解锁,,0
+shadow_4,1,4,破碎之影,4,shadow,n4,models/heroes/shadow_demon/shadow_demon.vmdl,1.1,nevermore_shadowraze1,3.0,1,"需要：
  - N4解锁
-挑战成功后可获得虚空之影道具",monster_archive_shadow_4,N4解锁,,0
+挑战成功后可获得破碎之影道具",monster_archive_shadow_4,N4解锁,,0
 hunt_01,1,5,神兽狩猎-巫妖王,5,fragment,fragment_01,models/heroes/sven/sven.vmdl,1.2,sven_gods_strength,3.0,1,"需要：
  - N5解锁
 挑战成功后可获得神器碎片-霜之哀伤",monster_archive_hunt_01,N5解锁,,0
@@ -42,17 +42,17 @@ hunt_07,2,3,神兽狩猎-风王子,10,fragment,fragment_07,models/heroes/kunkka/
 hunt_08,2,4,神兽狩猎-黑龙王子,10,fragment,fragment_08,models/items/pudge/arcana/pudge_arcana_base.vmdl,1.2,pudge_dismember,3.0,1,"需要：
  - N10解锁
 挑战成功后可获得神器碎片-阿什坎迪兄弟会之剑",monster_archive_hunt_08,N10解锁,,0
-social_beast,2,5,瑞兽挑战,1,social_ticket,beast,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3.0,1,"召唤瑞兽
+social_beast,2,5,祥瑞挑战,1,social_ticket,beast,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3.0,1,"召唤瑞兽
 击败后可获得1个赐福，可以用于抽奖
 
 每天最多获得10个赐福
 
 会攻击塔",monster_archive_social_beast,,,0
-social_ex,2,6,前女友挑战,1,social_ticket,ex,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3.0,1,"召唤前女友
+social_ex,2,6,二次元挑战,1,social_ticket,ex,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3.0,1,"召唤二次元挑战
 击败后可获得1个邀请函，可以用于抽奖
 
 每天最多获得10个邀请函
-瑞兽赐福总次数大于100方可获得
+祥瑞挑战总次数大于100方可获得
 
 会攻击塔",monster_archive_social_ex,,beast,100
 football,2,7,绿茵挑战,1,challenge_points,football,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3.0,1,"召唤一群足球怪
@@ -70,7 +70,7 @@ cage_5,3,2,秘法牢笼-蓝龙玛里苟斯,10,cage,cage_5,models/heroes/jakiro/j
 cage_6,3,3,秘法牢笼-青铜龙诺兹多姆,10,cage,cage_6,models/heroes/jakiro/jakiro.vmdl,1.5,visage_summon_familiars,3.0,1,"需要：
  - N10解锁
 挑战成功后可获得专属奖励",monster_archive_cage_6,N10解锁,,0
-social_friend,3,4,好基友挑战,1,social_ticket,friend,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3.0,1,"召唤好基友
+social_friend,3,4,动漫挑战,1,social_ticket,friend,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3.0,1,"召唤动漫挑战
 击败后可获得1个义帖，可以用于抽奖
 
 每天最多获得10个义帖
@@ -114,9 +114,9 @@ hunt_14,4,6,神兽狩猎-佐瓦尔,10,fragment,fragment_14,models/heroes/mars/ma
 hunt_15,4,7,神兽狩猎-阿克蒙德,10,fragment,fragment_15,models/items/spectre/spectre_arcana/spectre_arcana_base.vmdl,1.2,spectre_haunt,3.0,1,"需要：
  - N10解锁
 挑战成功后可获得神器碎片-万军崩裂",monster_archive_hunt_04,N10解锁,,0
-social_wife,4,8,我的老婆挑战,10,social_ticket,wife,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3.0,1,"需要：
+social_wife,4,8,二次元挑战2,10,social_ticket,wife,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3.0,1,"需要：
  - N10解锁
-召唤我的老婆
+召唤二次元挑战2
 击败后可获得1个玫瑰，可以用于抽奖
 
 每天最多获得10个玫瑰

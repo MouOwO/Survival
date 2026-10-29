@@ -668,7 +668,7 @@ end
 
 local function add_test_hero(context, hero_id, display_name)
     hero_id = hero_id or "hero_monkey_king"
-    display_name = display_name or "齐天大圣"
+    display_name = display_name or "云霄战猿"
     local function finish_test_environment(result)
         if not release_policy.development_allowed() then return false end
         if result and result.cancelled then return true end
@@ -1123,7 +1123,7 @@ local function unlock_skill(context)
     end
     local owned = find_owned_skill(snapshot, MONKEY_KING_E_SKILL)
     if owned and owned.locked ~= 1 and (tonumber(owned.level) or 0) > 0 then
-        notify(context, "齐天大圣 E 已解锁")
+        notify(context, "云霄战猿 E 已解锁")
         return true
     end
     local result = event_bus.request(events.HERO_SKILL_GRANT_REQUEST, {
@@ -1135,7 +1135,7 @@ local function unlock_skill(context)
     if not result or not result.ok then
         return false, result and result.error or "unlock_e_failed"
     end
-    notify(context, "已解锁齐天大圣 E：齐天")
+    notify(context, "已解锁云霄战猿 E：齐天")
     return true
 end
 
@@ -1266,7 +1266,7 @@ local COMMANDS = {
     addhero = add_test_hero,
     addhero1 = add_test_hero,
     addhero2 = function(context)
-        return add_test_hero(context, "hero_blademaster", "剑圣")
+        return add_test_hero(context, "hero_blademaster", "锋刃宗师")
     end,
     deletehero = delete_test_hero,
     wudi = wudi,

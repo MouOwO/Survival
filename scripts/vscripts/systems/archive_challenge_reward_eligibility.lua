@@ -2,7 +2,7 @@
 local items = require("config/generated/archive_social_items")
 local M = {}
 local prerequisites = {ex="beast", friend="ex", wife="friend", concubine="friend"}
-local names = {beast="瑞兽赐福", ex="前女友", friend="好基友", wife="老婆", concubine="侍妾"}
+local names = {beast="祥瑞挑战", ex="二次元挑战", friend="动漫挑战", wife="老婆", concubine="侍妾"}
 local function counter(value)
     local number = tonumber(value)
     if not number or number ~= number or number < 0 or number == math.huge

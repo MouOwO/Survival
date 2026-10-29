@@ -25,116 +25,116 @@
     {
       "kind": "product",
       "source_id": "P033",
-      "name": "伐木斧",
+      "name": "开拓伐斧·永久",
       "sku": "video_p033"
     },
     {
       "kind": "unavailable",
       "source_id": "P008",
-      "name": "焚天曜轮"
+      "name": "曜焰翼轮"
     },
     {
       "kind": "product",
       "source_id": "P029",
-      "name": "工作效率",
+      "name": "勤作工契·永久",
       "sku": "video_p029"
     },
     {
       "kind": "product",
       "source_id": "P012",
-      "name": "剑圣",
+      "name": "锋刃宗师·永久",
       "sku": "video_p012"
     },
     {
       "kind": "product",
       "source_id": "P032",
-      "name": "快速建造",
+      "name": "疾筑工契·永久",
       "sku": "video_p032"
     },
     {
       "kind": "product",
       "source_id": "P005",
-      "name": "双倍通关卡",
+      "name": "双誉通关契·永久",
       "sku": "video_p005"
     },
     {
       "kind": "product",
       "source_id": "P018",
-      "name": "时间科技",
+      "name": "流时工艺·永久",
       "sku": "video_p018"
     },
     {
       "kind": "unavailable",
       "source_id": "P006",
-      "name": "兔女郎城墙"
+      "name": "绒月主题护墙"
     },
     {
       "kind": "unavailable",
       "source_id": "P007",
-      "name": "昭穹羽君"
+      "name": "曦羽行者"
     },
     {
       "kind": "product",
       "source_id": "P004",
-      "name": "清暑符",
+      "name": "清风灵符·永久",
       "sku": "video_p004"
     },
     {
       "kind": "product",
       "source_id": "P066",
-      "name": "陨落天矿",
+      "name": "坠星矿核·永久",
       "sku": "video_p066"
     },
     {
       "kind": "product",
       "source_id": "P067",
-      "name": "山海鲲鹏",
+      "name": "云海巨翼·永久",
       "sku": "video_p067"
     },
     {
       "kind": "product",
       "source_id": "P068",
-      "name": "轮回仙碑",
+      "name": "复生古碑·永久",
       "sku": "video_p068"
     },
     {
       "kind": "product",
       "source_id": "P072",
-      "name": "苍松固城",
+      "name": "松根固垒·永久",
       "sku": "video_p072"
     },
     {
       "kind": "product",
       "source_id": "P071",
-      "name": "斫木宗师",
+      "name": "百木宗匠·永久",
       "sku": "video_p071"
     },
     {
       "kind": "product",
       "source_id": "P070",
-      "name": "林铸千矢",
+      "name": "森铸连矢·永久",
       "sku": "video_p070"
     },
     {
       "kind": "product",
       "source_id": "P069",
-      "name": "翠木归元",
+      "name": "翠林归源·永久",
       "sku": "video_p069"
     },
     {
       "kind": "unavailable",
       "source_id": "P073",
-      "name": "天道傀儡"
+      "name": "苍穹机关偶"
     },
     {
       "kind": "unavailable",
       "source_id": "P074",
-      "name": "封神榜"
+      "name": "英灵录卷"
     },
     {
       "kind": "product",
       "source_id": "P075",
-      "name": "诛仙剑阵",
+      "name": "裂穹剑阵·永久",
       "sku": "video_p075"
     }
   ]

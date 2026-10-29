@@ -1376,7 +1376,7 @@ function M.commit_lumberjack_fusion(materials, target, data)
     if not registered or not registered.ok then
         return registered or { ok = false, error = "fusion_target_register_failed" }
     end
-    if data.commerce_immortal then target.survival_commerce_immortal=true;target.survival_display_name='伐木仙人' end
+    if data.commerce_immortal then target.survival_commerce_immortal=true;target.survival_display_name='万林宗匠' end
     if data.model_name and data.model_name ~= "" then
         target:SetModel(data.model_name)
         target:SetOriginalModel(data.model_name)
@@ -1424,7 +1424,7 @@ function M.commerce_spawn_immortal(player_id,city)
         base_attack=row.base_attack,wood_per_hit=row.wood_per_hit,attack_speed=row.attack_rate,health=row.health,
         model_name=row.model_name,ability_names={},fusion_count=1})
     if not result or not result.ok then unit:RemoveSelf();return false end
-    unit.survival_commerce_immortal=true;unit.survival_display_name='伐木仙人'
+    unit.survival_commerce_immortal=true;unit.survival_display_name='万林宗匠'
     if row.model_name then unit:SetModel(row.model_name);unit:SetOriginalModel(row.model_name) end
     FindClearSpaceForUnit(unit,position,true)
     return true
@@ -1435,7 +1435,7 @@ function M.commerce_fuse_immortal(player_id)
     for _,s in pairs(workers) do
         if s.player_id==player_id and valid_entity(s.unit) and s.unit:IsAlive() and s.unit.survival_commerce_immortal then target=s.unit;break end
     end
-    if not target then return {ok=false,error='伐木仙人未在场'} end
+    if not target then return {ok=false,error='万林宗匠未在场'} end
     for _,s in pairs(workers) do
         if s.player_id==player_id and s.unit~=target and valid_entity(s.unit) and s.unit:IsAlive()
             and s.unit.survival_super_lumberjack and (s.unit:GetAbsOrigin()-target:GetAbsOrigin()):Length2D()<=1200 then material=s.unit;break end

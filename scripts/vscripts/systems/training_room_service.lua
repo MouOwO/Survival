@@ -97,7 +97,7 @@ local function spawn_target(player_id, action, marker)
     )
     if not valid(target) then return nil end
     target.survival_training_owner_player_id = player_id
-    target.survival_display_name = "无尽年轮"
+    target.survival_display_name = "长青轮纹"
     local health = math.max(1, tonumber(action.target_health) or 1000000000)
     target:SetBaseMaxHealth(health)
     target:SetMaxHealth(health)

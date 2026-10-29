@@ -26,7 +26,7 @@ M.rows = {
     { reward_id = "star_blessing_022", display_name = "太玄", max_owned = 11, description = "伐木效率+1", workbook_description = "伐木效率+1", quality = "N", enabled = true },
     { reward_id = "star_blessing_023", display_name = "归墟", max_owned = 60, description = "英雄三围加成+0.5%", workbook_description = "英雄三围加成+0.5%", quality = "N", enabled = true },
     { reward_id = "star_blessing_024", display_name = "坤舆", max_owned = 15, description = "英雄攻击减甲+0.5", workbook_description = "英雄攻击减甲+0.5", quality = "N", enabled = true },
-    { reward_id = "star_blessing_025", display_name = "霍云", max_owned = 60, description = "箭塔造成伤害攻击+1", workbook_description = "英雄造成伤害攻击+1", quality = "N", enabled = true },
+    { reward_id = "star_blessing_025", display_name = "云铸", max_owned = 60, description = "箭塔造成伤害攻击+1", workbook_description = "英雄造成伤害攻击+1", quality = "N", enabled = true },
     { reward_id = "star_blessing_026", display_name = "北冥", max_owned = 11, description = "箭塔造成伤害攻击+1", workbook_description = "箭塔造成伤害攻击+1", quality = "N", enabled = true },
 }
 M.by_id = {}

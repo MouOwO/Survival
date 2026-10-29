@@ -342,7 +342,7 @@ local function equipment_description(content_id, content, weapon, has_effects)
     local series = tostring(weapon.series_id or "")
     local descriptions = {
         growth_sword = "随普通攻击不断成长的主武器。下列数值为当前阶段实际生效增益。",
-        frost_blade = "由成长之剑与吸血面罩合成的进阶主武器，兼具成长与吸血。",
+        frost_blade = "由渐锋之剑与吸血面罩合成的进阶主武器，兼具成长与吸血。",
         ice_blade = "由霜之剑刃、极地晶石与合成宝石铸成，以击杀推动进化。",
         attack_gloves = "提升英雄攻击速度的基础装备，可通过重复购买逐级强化。",
         burning_blade = "直接提升英雄攻击力的基础装备，可通过重复购买逐级强化。",

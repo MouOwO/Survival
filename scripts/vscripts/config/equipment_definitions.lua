@@ -3,7 +3,7 @@ local M = {}
 
 M.aliases = {
     death_mask = {
-        source_name = "死亡面罩",
+        source_name = "血契面罩",
         canonical_name = "吸血面罩",
         content_id = "item_death_mask",
         reason = "需求指定映射；保留生成表 ID，避免破坏配方引用。",

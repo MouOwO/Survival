@@ -5,7 +5,7 @@ local function add(id, sentence, status, mapping)
     M.rows[#M.rows + 1] = { content_id = id, sentence = sentence, status = status, mapping = mapping }
 end
 
-add("item_death_mask", "死亡面罩（需求别名：吸血面罩）", "mapped", "aliases.death_mask")
+add("item_death_mask", "血契面罩（需求别名：吸血面罩）", "mapped", "aliases.death_mask")
 add("item_death_mask", "攻击伤害50%转为生命", "mapped", "lifesteal_pct=50")
 for level = 1, 4 do
     add(string.format("weapon_growth_sword_%02d", level), "每次攻击增加对应等级攻击力", "mapped", "attack_gain_on_attack")

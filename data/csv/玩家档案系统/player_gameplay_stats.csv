@@ -10,7 +10,7 @@ lumberjack_attack_efficiency,integer,13,wood_per_attack,0,,1,伐木工每次攻�
 gold_per_second,decimal,0,gold_per_second,0,,1,玩家每秒金币增加量。
 gold_mine_efficiency_pct,percentage,0,percent,0,10000,1,金矿收益百分比；15表示15%。
 initial_population_cap,integer,0,population,0,,1,玩家初始人口上限。
-starjoy_points,integer,0,points,0,,1,星悦积分。
+starjoy_points,integer,0,points,0,,1,曙光积分。
 map_level,integer,0,level,0,,1,玩家永久地图等级；等级本身是成长维度，实际加成由map_level_effect_rules派生。
 hero_initial_attack,integer,100,attack,0,,1,英雄初始攻击力。
 hero_damage_attack_growth,decimal,0,attack_per_damage,0,,1,默认不随伤害增加攻击力；仅计入实际获得的成长奖励。
@@ -106,7 +106,7 @@ hero_attack_pct_per_minute,percentage,0,percent,0,100,1,每60秒累计增加英�
 tower_attack_pct_per_minute,percentage,0,percent,0,100,1,每60秒累计增加箭塔攻击加成百分比。
 hero_attributes_pct_per_minute,percentage,0,percent,0,100,1,每60秒累计增加英雄全属性加成百分比。
 
-starjoy_points_earned,integer,0,points,0,,1,累计获得星悦积分；兑换不扣减；旧存档以余额初始化。
+starjoy_points_earned,integer,0,points,0,,1,累计获得曙光积分；兑换不扣减；旧存档以余额初始化。
 starjoy_reward_level,integer,0,level,0,24,1,已结算的星悦奖励等级；每阶段奖励只发一次。
 hero_execute_health_threshold_pct,percentage,0,percent,0,100,1,英雄有效伤害后斩杀生命比例严格低于该值的敌人；包含BOSS；非光环。
 

@@ -2,7 +2,7 @@ category_id,display_name,renderer,sort_order,enabled
 #types:string,string,string,number,boolean
 endless,无尽存档,achievements,60,1
 clear,通关存档,achievements,10,1
-shadow,虚空之影,inventory,20,1
+shadow,破碎之影,inventory,20,1
 points,积分道具,inventory,30,1
 map_level,地图等级,achievements,41,1
 work,上班福利,upgrades,51,1
@@ -11,13 +11,13 @@ fragment,神兵碎片,inventory,40,1
 pet,秘法牢笼,inventory,50,1
 boss,boss存档,achievements,90,1
 shop,商城道具,placeholder,100,0
-friend,我的好基友,collection,61,1
-ex,我的前女友,collection,62,1
-beast,瑞兽赐福,collection,63,1
+friend,动漫挑战,collection,61,1
+ex,二次元挑战,collection,62,1
+beast,祥瑞挑战,collection,63,1
 fishing,钓鱼存档,inventory,64,1
 building,存档神器,upgrades,65,1
-starjoy_points,星悦积分,achievements,31,1
+starjoy_points,曙光积分,achievements,31,1
 titles,称号,titles,33,1
-wife,我的老婆,collection,66,1
+wife,二次元挑战2,collection,66,1
 commerce_goods,商城道具,commerce_goods,99,1
 concubine,我的侍妾,collection,67,1

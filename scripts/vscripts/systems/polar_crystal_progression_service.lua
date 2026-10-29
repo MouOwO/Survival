@@ -61,7 +61,7 @@ local function upgrade(player_id)
         remaining_by_player[player_id] = nil
         event_bus.emit(events.UI_NOTIFICATION, {
             player_id = player_id,
-            message = "小极地晶石已自动升阶为大极地晶石",
+            message = "寒原晶石已自动升阶为大极地晶石",
             level = "success",
         })
     end

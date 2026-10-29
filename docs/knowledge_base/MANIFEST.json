@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "snapshot_date": "2026-10-29",
+  "snapshot_date": "2026-10-30",
   "scope": "Curated project knowledge and historical snapshot; raw chat excluded",
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 6751,
-      "sha256": "93cce77167e35798af32550aaaf199208f7e9211665f9d51666c7c03085d7e39"
+      "bytes": 7375,
+      "sha256": "b10f69c964e75563e780774635f1f757618a75e8d89ed3cf5aae4dcb4fd17a58"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 18658,
-      "sha256": "5c563489897bdebff0c98f04d527610a0900cb90affea0d50eb0166cb15e8e55"
+      "bytes": 19183,
+      "sha256": "6023cc360ccb4fb9db15d78439e14b778bead388078bf679f54c626d46bb590c"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -90,8 +90,8 @@
     },
     {
       "path": "data/context.json",
-      "bytes": 4429,
-      "sha256": "2292c9f6cba6e63181e97ead18933903d69edf42dab6b9797343fbb62920f008"
+      "bytes": 5077,
+      "sha256": "e3918bf14f5bf5636d6754d21d3247071e35d28a5ace8b7f0b0aeda380737c60"
     },
     {
       "path": "data/repository_files.json",
@@ -117,6 +117,11 @@
       "path": "data/source_manifest.json",
       "bytes": 31769,
       "sha256": "dd22616e57ab56e16490fd3fe910bc57f394da64ef3b2545965850c53ea1b02e"
+    },
+    {
+      "path": "evidence/approved_content_names_beta_gift_20261030.md",
+      "bytes": 5627,
+      "sha256": "33ba5251aefa3283d6806a416e9468a69bcdd5f7d5eaf7bd5eed3829158a29c8"
     },
     {
       "path": "evidence/archive_all_release_20261029.md",

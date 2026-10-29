@@ -22,6 +22,7 @@ M.rows = {
     { reward_id = "weekly_time_840", track = "weekly_time", period = "week", metric = "minutes", required = 840, base_item_ids = {"lottery_ticket"}, base_counts = {"5"}, pass_item_ids = {"lottery_ticket", "special_lottery_ticket"}, pass_counts = {"5", "1"}, enabled = true },
     { reward_id = "weekly_time_960", track = "weekly_time", period = "week", metric = "minutes", required = 960, base_item_ids = {"lottery_ticket"}, base_counts = {"5"}, pass_item_ids = {"lottery_ticket", "special_lottery_ticket"}, pass_counts = {"5", "1"}, enabled = true },
     { reward_id = "weekly_time_1080", track = "weekly_time", period = "week", metric = "minutes", required = 1080, base_item_ids = {"lottery_ticket"}, base_counts = {"5"}, pass_item_ids = {"lottery_ticket", "special_lottery_ticket"}, pass_counts = {"5", "1"}, enabled = true },
+    { reward_id = "public_beta_login", track = "public_beta_login", period = "day", metric = "minutes", required = 0, base_item_ids = {"special_lottery_ticket"}, base_counts = {"2"}, enabled = true, monthly_only = false, auto_claim = false, starts_at = 0, ends_at = 0 },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do

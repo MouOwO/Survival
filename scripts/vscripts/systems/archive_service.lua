@@ -26,6 +26,8 @@ local daily_viewers, purchase_provider = {}, nil
 local vip_viewers = {}
 local archive_players = {}
 local sent_pages = {}
+local public_beta_viewers, public_beta_sequences, public_beta_claims = {}, {}, {}
+local PUBLIC_BETA_TIER = "public_beta_login"
 local ENDLESS_FLUSH_INTERVAL, ENDLESS_BATCH_LIMIT = 5, 32
 local endless_due, endless_force = {}, {}
 local endless_generation = 0
@@ -54,6 +56,39 @@ end
 local function integer(value)
     return type(value) == "number" and value == value and value >= 0
         and value < math.huge and value == math.floor(value)
+end
+
+local function public_beta_command(command)
+    return command.kind == "benefit_claim" and command.tier_id == PUBLIC_BETA_TIER
+        and command.track == PUBLIC_BETA_TIER
+end
+local function public_beta_memory_provider()
+    -- The exception below belongs solely to the explicitly latched, real
+    -- session-memory provider. A read-only HTTP test arena cannot grant gifts.
+    return require("debug/offline_logic_test").is_provider(profiles.get_provider())
+        and not require("systems/archive_http_adapter").enabled()
+end
+local function public_beta_writable()
+    return not require("debug/mode_unlock_test").is_enabled() or public_beta_memory_provider()
+end
+local function public_beta_receipt_applied(player_id, result)
+    local profile, receipt = account_profile(player_id), result and result.response
+    if not profile or type(receipt) ~= "table" or receipt.ok ~= true
+        or receipt.tier_id ~= PUBLIC_BETA_TIER or receipt.track ~= PUBLIC_BETA_TIER
+        or type(receipt.period_id) ~= "string" or type(receipt.rewards) ~= "table"
+        or #receipt.rewards ~= 1 or receipt.rewards[1].id ~= "special_lottery_ticket"
+        or receipt.rewards[1].count ~= 2 then return false end
+    if remote_provider then
+        local received = result.profile
+        -- HTTP acceptance alone is insufficient. The adapter must have applied
+        -- the authoritative profile before the queue can acknowledge success.
+        return type(received) == "table" and integer(received.revision)
+            and integer(profile.revision) and profile.revision >= received.revision
+            and tostring(profile.account_id) == tostring(received.account_id)
+    end
+    local benefits = (profile.save.archive or {}).benefits or {}
+    local day = (benefits.days or {})[receipt.period_id] or {}
+    return (day.claimed or {})[PUBLIC_BETA_TIER] ~= nil
 end
 
 -- Correlate UI intent with the existing transaction; this event never grants
@@ -276,6 +311,12 @@ local function send(player_id)
 end
 
 local function local_settle(player_id, command)
+    if public_beta_command(command) and require("debug/mode_unlock_test").is_enabled()
+        and public_beta_memory_provider() then
+        -- The profile service owns the private, strictly memory-only write
+        -- capability and recomputes this fixed gift intent itself.
+        return profiles.apply_offline_public_beta_gift(player_id,command)
+    end
     local profile = account_profile(player_id)
     if not profile then return { ok = false, error = "profile_not_loaded" } end
     local provider = profiles.get_provider()
@@ -400,6 +441,12 @@ flush = function(player_id)
             if busy[player_id] ~= attempt then return end
             busy[player_id] = nil
             scheduler.cancel("archive_remote_timeout:" .. player_id)
+            if public_beta_command(command) and result and result.ok == true
+                and not result.pending and not public_beta_receipt_applied(player_id, result) then
+                -- Keep the exact accepted intent for retry/readback. A missing
+                -- or unapplied snapshot is not a successful inventory grant.
+                result = {ok=false,pending=true,error="public_beta_profile_refresh_pending"}
+            end
             local terminal_error
             if batch then
                 local submitted = {}
@@ -438,6 +485,17 @@ flush = function(player_id)
                 end
             end
             send(player_id)
+            if public_beta_command(command) then
+                local claim = public_beta_claims[player_id]
+                if claim and claim.operation_id == command.id then
+                    claim.pending = not (result and (result.ok == true or result.terminal == true))
+                    claim.result = {request_id=claim.request_id,ok=result and result.ok == true,
+                        pending=claim.pending,terminal=result and (result.ok == true or result.terminal == true),
+                        error=result and result.error,
+                        day_key=result and result.response and result.response.period_id or claim.day_key}
+                    M.send_public_beta_gift(player_id,claim.result)
+                elseif public_beta_viewers[player_id] then M.send_public_beta_gift(player_id) end
+            end
             if command.kind == "social_draw" then
                 -- Keep the trusted backend's strict command schema/fingerprint
                 -- unchanged; the client nonce is already encoded in this ID.
@@ -487,7 +545,12 @@ end
 
 local function enqueue(player_id, command)
     if require("debug/mode_unlock_test").is_enabled() then
-        return {ok=true, skipped=true, test_only=true}
+        if not (public_beta_command(command) and public_beta_memory_provider()) then
+            return {ok=true, skipped=true, test_only=true}
+        end
+        -- The verified offline provider persists only this match's memory.
+        -- Never retain a previously injected HTTP adapter for this exception.
+        remote_provider = nil
     end
     if finalizing then return {ok=false,error="正在保存本局奖励，请等待结算"} end
     local adapter = require("systems/archive_http_adapter")
@@ -585,6 +648,56 @@ function M.benefit_claim(player_id,track,tier_id)
     if not row or not row.enabled or row.track~=track then return {ok=false,error="福利档位不存在"} end
     serial=(serial or 0)+1
     return enqueue(player_id,{id=session_id..":benefit:"..serial,kind="benefit_claim",track=track,tier_id=tier_id})
+end
+function M.public_beta_gift_snapshot(player_id)
+    local profile=account_profile(player_id)
+    local snapshot=require("systems/archive_benefit_rewards").public_beta_snapshot(profile)
+    public_beta_sequences[player_id]=(public_beta_sequences[player_id] or 0)+1
+    snapshot.ok,snapshot.login_key,snapshot.sequence=profile~=nil,session_id or "",public_beta_sequences[player_id]
+    if not profile then snapshot.eligible,snapshot.error=0,"档案尚未载入" end
+    snapshot.claim_pending=public_beta_claims[player_id] and public_beta_claims[player_id].pending and 1 or 0
+    if not public_beta_writable() then snapshot.eligible,snapshot.read_only=0,1 end
+    return snapshot
+end
+function M.send_public_beta_gift(player_id,result)
+    if not PlayerResource or not CustomGameEventManager then return end
+    local player=PlayerResource:GetPlayer(player_id)
+    if not player then return end
+    local snapshot=M.public_beta_gift_snapshot(player_id)
+    -- Re-query/hot reload can recover a lost ACK without creating a fresh
+    -- claim. Keep the nonce and original receipt date from this world.
+    result=result or public_beta_claims[player_id] and public_beta_claims[player_id].result
+    if result then snapshot.claim_result={request_id=result.request_id,day_key=result.day_key,
+        ok=result.ok==true and 1 or 0,pending=result.pending==true and 1 or 0,
+        terminal=result.terminal==true and 1 or 0,error=result.error} end
+    CustomGameEventManager:Send_ServerToPlayer(player,"survival_public_beta_gift_snapshot",snapshot)
+end
+function M.public_beta_gift_claim(player_id,request_id)
+    if type(request_id)~="string" or #request_id<8 or #request_id>64
+        or request_id:find("[^A-Za-z0-9_-]") then
+        return {ok=false,terminal=true,error="领取请求无效"}
+    end
+    local existing=public_beta_claims[player_id]
+    if existing and existing.pending then return copy(existing.result or {
+        request_id=existing.request_id,day_key=existing.day_key,ok=true,pending=true}) end
+    local snapshot=M.public_beta_gift_snapshot(player_id)
+    if not snapshot.ok then return {request_id=request_id,ok=false,terminal=true,error=snapshot.error} end
+    if not public_beta_writable() then return {request_id=request_id,ok=false,terminal=true,error="当前测试局仅可查看活动"} end
+    if snapshot.active~=1 then return {request_id=request_id,ok=false,terminal=true,error="活动尚未开始或已结束"} end
+    if snapshot.claimed==1 then return {request_id=request_id,day_key=snapshot.day_key,
+        ok=false,terminal=true,error="今日好礼已领取"} end
+    local claim={request_id=request_id,day_key=snapshot.day_key,pending=true,
+        operation_id=session_id..":public_beta_gift:"..snapshot.day_key}
+    claim.result={request_id=request_id,day_key=claim.day_key,ok=true,pending=true,terminal=false}
+    public_beta_claims[player_id]=claim
+    local submitted=enqueue(player_id,{id=claim.operation_id,kind="benefit_claim",
+        track=PUBLIC_BETA_TIER,tier_id=PUBLIC_BETA_TIER})
+    if not submitted.ok and not (pending[player_id] or {})[claim.operation_id] then
+        claim.pending=false
+        claim.result={request_id=request_id,day_key=claim.day_key,ok=false,
+            terminal=true,error=submitted.error}
+    end
+    return copy(claim.result or {request_id=request_id,day_key=claim.day_key,ok=true,pending=true})
 end
 function M.set_purchase_provider(provider)
     assert(provider==nil or type(provider.open_checkout)=="function" or type(provider.create_order)=="function")
@@ -809,6 +922,7 @@ function M.init()
     endless_due, endless_force = {}, {}
     pending, busy, selected, throttles = {}, {}, {}, {}
     reward_notifications = {}
+    public_beta_viewers, public_beta_sequences, public_beta_claims = {}, {}, {}
     daily_viewers = {}
     vip_viewers = {}
     archive_players = {}
@@ -838,6 +952,7 @@ function M.init()
             end
             send(id)
             if daily_viewers[id] then M.send_daily(id) end
+            if public_beta_viewers[id] then M.send_public_beta_gift(id) end
             if vip_viewers[id] then M.send_vip(id) end
             if not busy[id] then flush(id) end
         end
@@ -873,6 +988,21 @@ function M.init()
         else M.send_vip(id) end
     end)
     local daily_times, pass_states = {}, {}
+    local public_beta_times={}
+    CustomGameEventManager:RegisterListener("survival_public_beta_gift_request",function(_,payload)
+        local id=tonumber(payload.PlayerID)
+        if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end
+        public_beta_viewers[id]=true
+        M.send_public_beta_gift(id)
+    end)
+    CustomGameEventManager:RegisterListener("survival_public_beta_gift_claim",function(_,payload)
+        local id=tonumber(payload.PlayerID)
+        if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end
+        local now=GameRules:GetGameTime()
+        if public_beta_times[id] and now-public_beta_times[id]<0.3 then return end
+        public_beta_times[id]=now;public_beta_viewers[id]=true;archive_players[id]=true
+        M.send_public_beta_gift(id,M.public_beta_gift_claim(id,payload.request_id))
+    end)
     CustomGameEventManager:RegisterListener("survival_daily_request",function(_,payload)
         local id=tonumber(payload.PlayerID)
         if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end
@@ -939,6 +1069,7 @@ function M.init()
                     bus.emit(events.PLAYER_PROFILE_CHANGED,{player_id=id,reason="archive_boss_refresh"})
                 end
                 if daily_viewers[id] then M.send_daily(id) end
+                if public_beta_viewers[id] then M.send_public_beta_gift(id) end
             end
         end
     end,"archive_daily_clock")
