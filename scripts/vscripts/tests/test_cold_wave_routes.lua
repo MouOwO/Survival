@@ -78,6 +78,16 @@ local retained=active[1];city_at(1,2);routing.refresh(active,{},1)
 assert(active[1]==retained and retained.route_id==2 and retained.spawn_offset_y==0)
 assert(active[0].spawn_offset_y==0)
 active[2]=nil;routing.refresh(active,{},1);assert(active[3].spawn_offset_y==0)
+-- Bases on the newly restored snow floor use the same original arrow entrance.
+local restored={{13824,12288},{10240,11520},{14080,7168},{10240,6656}}
+for route=0,3 do
+    local p=restored[route+1]
+    assert(not service.contains(config.player_bounds[route],Vector(p[1],p[2],128)))
+    cities[0]=entity(p[1],p[2]);local expanded=channels(1)
+    routing.refresh(expanded,{},1);expected_route=route
+    assert(expanded[0].route_id==route and service.wave_position(expanded[0],32),
+        "building outside the old small rectangle must retain the court's original attack front")
+end
 -- No city: use a registered wall's court; no base yet: retain the initial court.
 cities={};walls[100]=entity(unpack(players[3]));active=channels(1)
 routing.refresh(active,{[0]=100},1);assert(active[0].route_id==2)

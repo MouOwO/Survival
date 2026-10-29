@@ -46,6 +46,14 @@ return {
                 [2] = { min_x = 12800, min_y = 7680, max_x = 15104, max_y = 8960 },
                 [3] = { min_x = 9216, min_y = 4608, max_x = 11264, max_y = 6144 },
             },
+            build_ground_height = 128,
+            build_ground_height_tolerance = 16,
+            player_build_bounds = {
+                [0] = { min_x = 12288, min_y = 11776, max_x = 15360, max_y = 14336 },
+                [1] = { min_x = 8960, min_y = 9216, max_x = 12288, max_y = 12544 },
+                [2] = { min_x = 12288, min_y = 6656, max_x = 15360, max_y = 9216 },
+                [3] = { min_x = 8960, min_y = 4352, max_x = 12288, max_y = 7680 },
+            },
         },
         scourge = {
             center_marker = "scourge_start",

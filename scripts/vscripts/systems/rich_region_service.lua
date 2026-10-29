@@ -1,5 +1,5 @@
--- The Hammer navigation mask is authoritative. Discover only the four local
--- islands once while loading; normal orders and placement use cached cells.
+-- Cache four authored courts at load. Snow court membership uses platform
+-- height; exact placement checks live navigation and occupancy separately.
 local M = {}
 local CELL, SEARCH_RADIUS, MAX_REGION_CELLS = 64, 6144, 8192
 local GUARD_TASK = "rich_builder_region_guard"
@@ -91,9 +91,11 @@ local function build_authored_regions()
     if not service.contains(config.bounds, center) then return nil, "mode_center_outside_bounds" end
     origin = center
     local result, compiled = {}, {}
+    local cold_floor = service.mode() == "cold" and config.player_build_bounds ~= nil
     for index, direction in ipairs(DIRECTIONS) do
         local player_id = index - 1
         local bounds = config.player_bounds and config.player_bounds[player_id]
+        local build_bounds = config.player_build_bounds and config.player_build_bounds[player_id] or bounds
         local name = config.player_markers and config.player_markers[player_id]
         local entity, position, error = service.marker(name)
         if not entity then return nil, error end
@@ -105,15 +107,26 @@ local function build_authored_regions()
         local region = { id = direction.id, player_index = player_id, marker = name,
             position = landing, cells = {}, min_x = math.huge, min_y = math.huge,
             max_x = -math.huge, max_y = -math.huge }
-        local min_x, max_x = math.ceil(bounds.min_x / CELL), math.floor(bounds.max_x / CELL) - 1
-        local min_y, max_y = math.ceil(bounds.min_y / CELL), math.floor(bounds.max_y / CELL) - 1
+        local min_x, max_x = math.ceil(build_bounds.min_x / CELL), math.floor(build_bounds.max_x / CELL) - 1
+        local min_y, max_y = math.ceil(build_bounds.min_y / CELL), math.floor(build_bounds.max_y / CELL) - 1
         if (max_x - min_x + 1) * (max_y - min_y + 1) > MAX_REGION_CELLS then
             return nil, "mode_player_region_too_large:" .. name
         end
         for x = min_x, max_x do for y = min_y, max_y do
             local id = key(x, y)
             if compiled[id] then return nil, "mode_player_regions_overlap:" .. name end
-            if traversable(point(x, y)) then
+            local allowed
+            if cold_floor then
+                -- Court membership is terrain geometry, not a snapshot of live
+                -- obstructions. Exact placement separately checks fresh native
+                -- navigation, trees, slope, units and registered footprints.
+                local surface = grounded(point(x, y))
+                allowed = surface and math.abs(surface.z - config.build_ground_height)
+                    <= config.build_ground_height_tolerance
+            else
+                allowed = traversable(point(x, y))
+            end
+            if allowed then
                 compiled[id] = direction.id
                 region.cells[#region.cells + 1] = { x, y }
                 region.min_x, region.max_x = math.min(region.min_x, x), math.max(region.max_x, x)
@@ -315,8 +328,8 @@ function M.validate_building_footprint(player_id, min_x, min_y, max_x, max_y)
     if not min_x or not min_y or not max_x or not max_y or min_x >= max_x or min_y >= max_y then
         return false, "rich_invalid_footprint"
     end
-    -- Include every cell touched by the footprint, not just four corners: an
-    -- interior red navigation hole must remain unbuildable as well.
+    -- Include every cell touched by the footprint, not just four corners:
+    -- interior holes in the platform must remain outside court membership.
     local first_x, first_y = math.floor(min_x / CELL), math.floor(min_y / CELL)
     local last_x, last_y = math.ceil(max_x / CELL) - 1, math.ceil(max_y / CELL) - 1
     if shared_cold() then

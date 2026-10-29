@@ -80,8 +80,9 @@ local function cold_route(player_id, wall_index, config)
     end
     if not position then return player_id end
     local mode_spawns = require("systems/mode_spawn_service")
+    local courts = config.player_build_bounds or config.player_bounds
     for id = 0, 3 do
-        if mode_spawns.contains(config.player_bounds and config.player_bounds[id], position) then return id end
+        if mode_spawns.contains(courts and courts[id], position) then return id end
     end
     return nil, "cold_wave_base_outside_courts"
 end
