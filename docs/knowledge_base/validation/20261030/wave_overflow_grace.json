@@ -1,0 +1,81 @@
+{
+  "date": "2026-10-30",
+  "trigger_count": 91,
+  "safe_initial_count": 90,
+  "recovery_max_count": 89,
+  "grace_seconds": 20,
+  "notice_seconds": [
+    20,
+    19,
+    18,
+    17,
+    16,
+    15,
+    14,
+    13,
+    12,
+    11,
+    10,
+    9,
+    8,
+    7,
+    6,
+    5,
+    4,
+    3,
+    2,
+    1
+  ],
+  "checks": {
+    "test_wave_population_endgame": {
+      "exit_code": 0,
+      "passed": true
+    },
+    "test_wave_spawn_routing": {
+      "exit_code": 0,
+      "passed": true
+    },
+    "test_player_elimination": {
+      "exit_code": 1,
+      "passed": false,
+      "baseline_same_failure": true
+    },
+    "test_player_elimination_baseline": {
+      "exit_code": 1,
+      "passed": false
+    },
+    "test_personal_wave_projection": {
+      "exit_code": 1,
+      "passed": false,
+      "baseline_same_failure": true
+    },
+    "test_personal_wave_projection_baseline": {
+      "exit_code": 1,
+      "passed": false
+    },
+    "archive_center_tip": {
+      "exit_code": 0,
+      "passed": true
+    },
+    "source_mirrors": {
+      "passed": true,
+      "files": 2
+    }
+  },
+  "compiled_scripts": 2,
+  "compile_failed": 0,
+  "native_new_match_tested": false,
+  "workshop_uploaded": false,
+  "assets": {
+    "data/csv/公共规则/global_rules.csv": "4861b29d8412d458c023f969d67213236326c317e1bab3574a1a0ccb29540500",
+    "scripts/vscripts/config/generated/global_rules.lua": "5d6913df3949517a784d44772c50240d21550f43a5ba6e55aae29ae036e20afc",
+    "scripts/vscripts/config/global_rules.lua": "ce89968fba222177404639fd37b49663db169cdfc77b4d6645bf294743f1576f",
+    "scripts/vscripts/systems/wave_system.lua": "5c8d9dfdd8148c46860800a8af3c4374499ad54e68cbbbe69d0796e05f2f92fd",
+    "scripts/vscripts/tests/test_wave_population_endgame.lua": "c45bbab81d9b6b6fc160fe7c6c89b96ea255dfc7075ba196dde7fc617c2a019b",
+    "panorama/src/scripts/custom_game/survival_ui.js": "a88c04337428a59e41212917c8689faaf21c36872caf380679eab2a6996b4019",
+    "panorama/src/scripts/custom_game/archive_180de7e38b_titles_compact_v6.js": "6fcb99a99cfee9df134522a42fdd02267a860a4575690160d30221e8436e438d",
+    "panorama/scripts/custom_game/survival_ui.vjs_c": "672aa7f40aab8dad77f90f6cc8c157d64e5a932baf2f1841ff64bedebb38f89d",
+    "panorama/scripts/custom_game/archive_180de7e38b_titles_compact_v6.vjs_c": "b8ca2940d4ca76286280a2c2a278c0c15152a9a894ecb861aa999b087597db09",
+    "tools/tests/archive_endless_refresh.test.cjs": "e17fd6c887424efbf077435e13ec9fb782dfa3e72ba572e5c6b6a440df855a2d"
+  }
+}

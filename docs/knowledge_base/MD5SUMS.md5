@@ -1,6 +1,6 @@
 72b6c2bbd43bf4ce4f12f714aa0c52d4  00_START_HERE.md
 fb110b300f7b417755b2f1240e1fd2d0  01_architecture_and_workflow.md
-34b1017f80cd6157d37bcc5b4f1ee7a4  02_core_gameplay.md
+557ee3de90b4ad3f451e88c713e11da3  02_core_gameplay.md
 e1bfa7b7e0fbee40143ec13f3a1086a8  03_progression_save_contract.md
 9d576c647659970add48911bde027755  04_network_auth_official.md
 0232cbc7b43203b0d8057ff5f96c8992  05_payments_commerce_delivery.md
@@ -12,7 +12,7 @@ bb3780deff6573b79c1336d9d4846e4f  10_runtime_engine_contracts.md
 02e917d898f284488194760afea37626  11_completed_work_catalog.md
 c5d539495e5a99a38be32acd29d3b90b  12_sessions_archive_and_recovery.md
 ea1a326679b390c6aab22deee73b2e1f  13_art_ui_qa.md
-5599d87111414045723af3c286518371  MANIFEST.json
+981280e006d8e45cfbd9688040e4d146  MANIFEST.json
 7f371090900ed781564a860494ae934d  NEW_CHAT_PROMPT.txt
 81fe3fd314b606004d1589396c4790e2  README.md
 33fbd1cc38438efb46442edfabdebbc6  data/completed_work_index.json
@@ -54,6 +54,7 @@ dffe8425f3111a8ccdea847c8c307af0  evidence/ruins_spawns_20261029.md
 1f683083326f8944301b99d80fcf5b2f  evidence/ten_sin_startup_20261028.md
 fe736a70e5066f94b0f4630e83e2ed7d  evidence/tooltip_follow_20261028.md
 398fb2c90a42a51ef982c08dc2926ba5  evidence/ui_layout_20261028.public.json
+aeec7ceaea906940b7b74ef3465c1f3d  evidence/wave_overflow_grace_20261030.md
 15a808f422b557cb3db1b800dd108783  history/20261024/00_START_HERE.md
 a0da9a4ca306b95dea8b69097c114301  history/20261024/01_architecture_and_workflow.md
 55ae98f80d10ef7c61fdcc83023353a8  history/20261024/02_core_gameplay.md
@@ -85,3 +86,4 @@ c63b69a82b9cc69a993fdf55e239cf50  validation/20261029/archive_all_release.json
 0010796edee73df56695bedf6ebd1c39  validation/20261029/ruins_stair_geometry.json.gz
 7e208dacd853af88478b3c30a93e5916  validation/20261029/scourge_builder_native.json
 b8d0ef048f61d6d12979fbaa6bc15f78  validation/20261030/map_minimap_sync.json
+f0e1770669607ef31c7a5a3b57b1601e  validation/20261030/wave_overflow_grace.json

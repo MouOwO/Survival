@@ -15,8 +15,8 @@
     },
     {
       "path": "02_core_gameplay.md",
-      "bytes": 32080,
-      "sha256": "59592823a86123d498f1c9ffe4462b3d5eccf30e3b2a8c4e94dfe9b2b9a4c2a9"
+      "bytes": 32371,
+      "sha256": "3b74e16e290a8f29ea20858e2b8ae7cd994ff5f710bd9d6c1b17b7e3ca315eaa"
     },
     {
       "path": "03_progression_save_contract.md",
@@ -279,6 +279,11 @@
       "sha256": "0aac529de67f55cfd7ea0fa6c05407b24e85fb62daa205bc4c6613d7d6380326"
     },
     {
+      "path": "evidence/wave_overflow_grace_20261030.md",
+      "bytes": 2548,
+      "sha256": "5c7e6344347122ab9bff108c46a2acec7cd0dba693efc453ff4c40e5f87d02a3"
+    },
+    {
       "path": "history/20261024/00_START_HERE.md",
       "bytes": 2945,
       "sha256": "9518ec86a675a8cb29de5ef631c151be6eef4546a55ceb73f699bdbbbbc64b28"
@@ -432,6 +437,11 @@
       "path": "validation/20261030/map_minimap_sync.json",
       "bytes": 4093,
       "sha256": "df7ac2295e7d76ebb49559de201048a7615ef3cccb6a6719f0bbee3e331629d3"
+    },
+    {
+      "path": "validation/20261030/wave_overflow_grace.json",
+      "bytes": 2478,
+      "sha256": "2f68e103d414f79e4bf96f56ee25d26274779d190ef7e552de778b1969fa13d6"
     }
   ]
 }

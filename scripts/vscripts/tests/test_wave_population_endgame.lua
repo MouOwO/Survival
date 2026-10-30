@@ -20,6 +20,7 @@ local match_mode, preload_calls, scheduled_count = "standard", 0, 0
 local cooperative_payloads, fake_players = {}, {}
 local visual_deaths, hero_visual_deaths, visual_cleanups, boss_rewards
 local death_metadata
+local overflow_notices
 local function active_player(id)
     for _, value in ipairs(active_players or {}) do if value==id then return true end end
     return false
@@ -222,6 +223,7 @@ local function restart(difficulty, without_archive, players, mode)
     visual_deaths, hero_visual_deaths, visual_cleanups, boss_rewards = {}, {}, {}, {}
     active_players, markers_ready, reward_pending = players or {0, 1}, true, {}
     defeated, last_projection, personal_finalized = {}, nil, {}
+    overflow_notices = {}
     multiplayer._reset_for_test()
     for _, id in ipairs(active_players) do multiplayer.mark_connected(id) end
     bus.reset()
@@ -232,6 +234,9 @@ local function restart(difficulty, without_archive, players, mode)
             require("systems/online_time_service").finish("all_players_defeated")
             GameRules:SetGameWinner(DOTA_TEAM_BADGUYS)
         end
+    end)
+    bus.subscribe(events.UI_NOTIFICATION, function(payload)
+        if payload.kind == "wave_overflow_tip" then overflow_notices[#overflow_notices+1] = payload end
     end)
     wave.init()
     if not without_archive then archive.init() end
@@ -453,6 +458,46 @@ prepare_lanes()
 for id = 0, 1 do assert(scheduled["archive_hubs_retry:" .. id]() == false) end
 assert(#created == 8)
 
+-- Every second has exactly one private center-tip; other publications cannot spam it.
+state = restart("N1", true, {0, 1})
+prepare_lanes()
+local warned = spawn_lane(0, 91)
+assert(#overflow_notices == 1 and overflow_notices[1].message == "您需在20s内清理怪物")
+assert(overflow_notices[1].player_id == 0 and not snapshot(1).overflow_active)
+for second = 1, 19 do
+    tick(second, 0)
+    assert(#defeated == 0 and #winners == 0, "no loss before twenty seconds")
+    assert(#overflow_notices == second+1)
+    assert(overflow_notices[#overflow_notices].message == "您需在" .. (20-second) .. "s内清理怪物")
+    assert(overflow_notices[#overflow_notices].player_id == 0)
+    publish("unrelated_hud_refresh")
+    tick(second, 0) -- game time does not advance while paused
+    assert(#overflow_notices == second+1, "duplicate publishes/paused ticks cannot duplicate tips")
+end
+kill(warned[1])
+assert(snapshot(0).alive == 90 and snapshot(0).overflow_active, "ninety does not cancel an existing warning")
+tick(20, 0)
+assert(snapshot(0).player_defeated and not snapshot(1).player_defeated)
+assert(#overflow_notices == 20, "expiry sends no zero/negative countdown")
+assert(#winners == 0 and #defeated == 1, "only the overflowing player loses")
+-- Clearing before the deadline cancels the task; subsequent overload gets a full new grace.
+state = restart("N1", true, {0})
+prepare_lanes()
+local recovered = spawn_lane(0, 91)
+clock = 19.99
+kill(recovered[1]); kill(recovered[2])
+assert(snapshot(0).alive == 89 and not snapshot(0).overflow_active)
+assert(scheduled["wave_monster_overflow:0"] == nil and #defeated == 0)
+assert(overflow_notices[#overflow_notices].message == "怪物数量已恢复，警报解除")
+clock = 25
+spawn_lane(0, 2)
+assert(snapshot(0).overflow_deadline == 45 and snapshot(0).overflow_remaining == 20)
+tick(44.99, 0)
+assert(#defeated == 0)
+tick(45, 0)
+assert(#defeated == 1 and #winners == 1)
+print("PASS overflow grace: private center tips 20..1, no duplicate/paused tips, strict recovery below 90, fresh grace, expiry at 20s")
+
 -- All four players have independent capacity: combined population is not a cap.
 local enemies
 state, enemies = restart("N1", false, {0, 1, 2, 3})
@@ -472,20 +517,20 @@ local lane_counts = { [0] = 0, [1] = 0, [2] = 0, [3] = 0 }
 for _, meta in pairs(enemies) do lane_counts[meta.player_id] = lane_counts[meta.player_id] + 1 end
 for id = 0, 3 do assert(lane_counts[id] == 80) end
 
--- The 91st enemy starts only its owner's ten seconds. Each deadline is independent.
+-- The 91st enemy starts only its owner's twenty seconds. Each deadline is independent.
 spawn_lane(0, 10)
 assert(snapshot(0).alive == 90 and not snapshot(0).overflow_active)
 local extra_zero = spawn_lane(0, 1)
-assert(snapshot(0).alive == 91 and snapshot(0).overflow_remaining == 10)
+assert(snapshot(0).alive == 91 and snapshot(0).overflow_remaining == 20)
 assert(snapshot(0).overflow_active and not snapshot(1).overflow_active)
 assert(not snapshot(2).overflow_active and not snapshot(3).overflow_active)
 clock = 2
 spawn_lane(1, 11)
-assert(snapshot(1).overflow_active and snapshot(1).overflow_remaining == 10)
+assert(snapshot(1).overflow_active and snapshot(1).overflow_remaining == 20)
 tick(3.2, 0)
 assert(last_projection.hud_clock_only==true,"clock ticks do not request HUD rebuilds")
-assert(snapshot(0).overflow_deadline==10 and snapshot(1).overflow_deadline==12,"absolute personal deadlines are exposed")
-assert(snapshot(0).overflow_remaining == 7 and snapshot(1).overflow_remaining == 9,
+assert(snapshot(0).overflow_deadline==20 and snapshot(1).overflow_deadline==22,"absolute personal deadlines are exposed")
+assert(snapshot(0).overflow_remaining == 17 and snapshot(1).overflow_remaining == 19,
     "a later owner's timer must not inherit the first owner's deadline")
 kill(lanes[2][1])
 assert(last_projection.hud_player_id==2,"enemy count change targets its lane owner")
@@ -494,29 +539,31 @@ assert(snapshot(2).alive == 79 and snapshot(0).overflow_active and snapshot(1).o
 local unrelated = unit("practice_or_archive_monster")
 local before = snapshot().alive
 kill(unrelated)
-assert(snapshot().alive == before and snapshot(0).overflow_remaining == 7,
+assert(snapshot().alive == before and snapshot(0).overflow_remaining == 17,
     "independent challenge monsters do not enter assault-wave population")
 clock = 4
 local extra = spawn_lane(0, 5)
-assert(snapshot(0).alive == 96 and snapshot(0).overflow_remaining == 6,
+assert(snapshot(0).alive == 96 and snapshot(0).overflow_remaining == 16,
     "additional spawns must not restart the warning")
 clock = 5
 for _, value in ipairs(extra) do kill(value) end
 kill(extra_zero[1])
-assert(snapshot(0).alive == 90 and not snapshot(0).overflow_active)
+assert(snapshot(0).alive == 90 and snapshot(0).overflow_active)
+kill(lanes[0][1])
+assert(snapshot(0).alive == 89 and not snapshot(0).overflow_active)
 assert(snapshot(0).overflow_remaining == 0 and scheduled["wave_monster_overflow:0"] == nil)
-assert(snapshot(1).overflow_active and snapshot(1).overflow_remaining == 7)
+assert(snapshot(1).overflow_active and snapshot(1).overflow_remaining == 17)
 kill(extra_zero[1])
-assert(snapshot(0).alive == 90, "a duplicate death cannot lower the count again")
+assert(snapshot(0).alive == 89, "a duplicate death cannot lower the count again")
 clock = 7
-spawn_lane(0, 1)
-assert(snapshot(0).overflow_remaining == 10 and snapshot(1).overflow_remaining == 5,
+spawn_lane(0, 2)
+assert(snapshot(0).overflow_remaining == 20 and snapshot(1).overflow_remaining == 15,
     "a recovered lane starts a fresh warning without resetting another player")
 active_players = {0, 2, 3}
 bus.emit(events.PLAYER_DISCONNECTED, { player_id = 1 })
 assert(snapshot(1).alive == 0 and not snapshot(1).overflow_active)
 assert(scheduled["wave_monster_overflow:1"] == nil and upvalue("wave_channels")[1] == nil)
-assert(snapshot(0).alive == 91 and snapshot(0).overflow_remaining == 10)
+assert(snapshot(0).alive == 91 and snapshot(0).overflow_remaining == 20)
 assert(snapshot().alive == 250 and #winners == 0,
     "disconnect removes only the disconnected lane's registered enemies")
 
@@ -527,9 +574,9 @@ local old_zero_channel = upvalue("wave_channels")[0]
 spawn_lane(0, 91)
 clock = 2
 spawn_lane(2, 91)
-tick(9.99, 0)
+tick(19.99, 0)
 assert(snapshot(0).overflow_remaining == 1 and #defeated == 0)
-tick(10, 0)
+tick(20, 0)
 assert(#defeated == 1 and defeated[1].player_id == 0 and defeated[1].reason == "monster_limit_exceeded")
 assert(#personal_finalized == 1 and personal_finalized[1] == 0 and #finalized == 0,
     "personal defeat finalizes only the defeated player online session")
@@ -545,15 +592,15 @@ upvalue("spawn_one")({archetype_id="humanoid_white_melee", health=200, attack=2}
     upvalue("generation_token"), 1, 1, nil, old_zero_channel)
 assert(#created == produced, "a queued spawn cannot resurrect a defeated player's channel")
 spawn_lane(1, 91)
-assert(snapshot(1).alive == 91 and snapshot(1).overflow_remaining == 10,
+assert(snapshot(1).alive == 91 and snapshot(1).overflow_remaining == 20,
     "surviving players must continue real generation after another player's defeat")
-tick(12, 2)
+tick(22, 2)
 assert(#defeated == 2 and snapshot(2).player_defeated and #winners == 0)
-assert(snapshot(1).alive == 91 and snapshot(1).overflow_remaining == 8)
+assert(snapshot(1).alive == 91 and snapshot(1).overflow_remaining == 18)
 spawn_lane(3, 91)
-tick(20, 1)
+tick(40, 1)
 assert(#defeated == 3 and #winners == 0 and not state.defeat_settled)
-tick(22, 3)
+tick(42, 3)
 assert(#defeated == 4 and state.defeat_settled and state.status == "defeat")
 assert(#winners == 1 and winners[1] == DOTA_TEAM_BADGUYS)
 assert(#finalized == 1 and finalized[1] == "all_players_defeated")
@@ -570,7 +617,7 @@ state = restart("N1", false, {0, 1, 2, 3})
 prepare_lanes()
 for id = 0, 3 do spawn_lane(id, 91) end
 final_ready(state)
-tick(10, 0)
+tick(20, 0)
 assert(#defeated == 4 and #personal_finalized == 4)
 assert(state.defeat_settled and not state.victory_settled and #archive_clears == 0)
 assert(snapshot().alive == 0 and #winners == 1 and winners[1] == DOTA_TEAM_BADGUYS)
@@ -587,7 +634,7 @@ state = restart("N1", false, {0, 1})
 prepare_lanes()
 spawn_lane(0, 91)
 local surviving_tail = spawn_lane(1, 1)[1]
-tick(10, 0)
+tick(20, 0)
 assert(snapshot(0).player_defeated and snapshot().alive == 1 and #winners == 0)
 final_ready(state)
 final_check()
@@ -606,14 +653,14 @@ state = restart("N1", false, {0})
 prepare_lanes()
 upvalue("start_countdown")(60)
 spawn_lane(0, 91)
-clock = 10
+clock = 20
 assert(scheduled.wave_countdown() == false)
 assert(state.status == "defeat" and scheduled.wave_countdown == nil and #winners == 1)
 state = restart("N1", false, {0})
 prepare_lanes()
 spawn_lane(0, 91)
 assert(upvalue("start_wave")(state.total_waves, "fixture"))
-clock = 10
+clock = 20
 scheduled.wave_generation_complete()
 assert(state.status == "defeat" and state.defeat_settled and #winners == 1)
 
@@ -621,9 +668,12 @@ assert(state.status == "defeat" and state.defeat_settled and #winners == 1)
 state = restart("N1", false, {0, 1})
 prepare_lanes()
 local victims = spawn_lane(0, 91)
-clock = 10
+clock = 19.99
 kill(victims[1])
-assert(snapshot(0).alive == 90 and not snapshot(0).overflow_active and #defeated == 0)
+assert(snapshot(0).alive == 90 and snapshot(0).overflow_active)
+clock = 20
+kill(victims[2])
+assert(snapshot(0).alive == 89 and not snapshot(0).overflow_active and #defeated == 0)
 assert(#winners == 0)
 
 -- Removal without a death event and forced cleanup cannot strand private counts or warnings.
@@ -632,11 +682,12 @@ prepare_lanes()
 local orphaned = spawn_lane(0, 91)
 spawn_lane(1, 91)
 orphaned[1].removed = true
+orphaned[3].removed = true
 upvalue("update_targets")()
-assert(snapshot(0).alive == 90 and not snapshot(0).overflow_active)
+assert(snapshot(0).alive == 89 and not snapshot(0).overflow_active)
 assert(snapshot(1).alive == 91 and snapshot(1).overflow_active)
-assert(snapshot().alive == 181)
-assert(upvalue("clear_normal_wave_enemies")() == 181)
+assert(snapshot().alive == 180)
+assert(upvalue("clear_normal_wave_enemies")() == 180)
 assert(snapshot().alive == 0 and #defeated == 0 and #archive_clears == 0)
 local cleaned=orphaned[2]
 assert(visual_cleanups[cleaned]==1 and visual_deaths[cleaned]==nil and hero_visual_deaths[cleaned]==nil,

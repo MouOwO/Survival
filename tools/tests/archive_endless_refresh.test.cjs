@@ -161,6 +161,10 @@ assert.equal(nodes.EndlessStatus.text, '无尽结束 · 已通过1000波 · 1005
 subscriptions.survival_endless_state({status: 'idle', score: 0});
 assert(nodes.EndlessStatus.BHasClass('ArchiveHidden'), 'idle still hides the gameplay banner');
 const tipTimers = () => [...scheduled.values()].filter(timer => timer.delay === 3);
+function fireTimer(timer) {
+    for (const [id, entry] of scheduled) if (entry === timer) scheduled.delete(id);
+    timer.callback();
+}
 subscriptions.ui_notification({kind:'endless_tip',player_id:1,message:'其他玩家的提示'});
 assert(nodes.EndlessStatus.BHasClass('ArchiveHidden'), 'another player cannot display a local tip');
 subscriptions.ui_notification({kind:'endless_tip',player_id:0,message:'还有20秒开启无尽挑战'});
@@ -170,13 +174,23 @@ const staleHide=tipTimers()[0].callback;
 subscriptions.ui_notification({kind:'endless_tip',player_id:0,message:'还有15秒开启无尽挑战'});
 assert.equal(tipTimers().length,1,'only one transient tip timer survives replacement');
 staleHide();assert(!nodes.EndlessStatus.BHasClass('ArchiveHidden'),'an old hide callback cannot hide the next reminder');
-tipTimers()[0].callback();assert(nodes.EndlessStatus.BHasClass('ArchiveHidden'),'tips automatically hide after three seconds');
+fireTimer(tipTimers()[0]);assert(nodes.EndlessStatus.BHasClass('ArchiveHidden'),'tips automatically hide after three seconds');
 subscriptions.survival_endless_state({...latestState,wave:1001});
-const waveTip=tipTimers().at(-1).callback;waveTip();
+fireTimer(tipTimers().at(-1));
 subscriptions.survival_endless_state({...latestState,wave:1001,seconds:59,remaining:3});
 assert(nodes.EndlessStatus.BHasClass('ArchiveHidden'),'ordinary per-second state changes do not reopen the tip');
 subscriptions.survival_endless_state({...latestState,wave:1002});
 assert(!nodes.EndlessStatus.BHasClass('ArchiveHidden'),'a new wave gets a fresh brief tip');
+for(let seconds=20;seconds>0;seconds--){
+    subscriptions.ui_notification({kind:'wave_overflow_tip',player_id:0,message:'您需在'+seconds+'s内清理怪物'});
+    assert.equal(nodes.EndlessStatus.text,'您需在'+seconds+'s内清理怪物');
+    assert(!nodes.EndlessStatus.BHasClass('ArchiveHidden'));
+    assert.equal(tipTimers().length,1,'per-second warnings replace the existing center-tip timer');
+}
+subscriptions.ui_notification({kind:'wave_overflow_tip',player_id:1,message:'其他玩家的警报'});
+assert.equal(nodes.EndlessStatus.text,'您需在1s内清理怪物','another player cannot replace the local warning');
+subscriptions.ui_notification({kind:'wave_overflow_tip',player_id:0,message:'怪物数量已恢复，警报解除'});
+assert.equal(nodes.EndlessStatus.text,'怪物数量已恢复，警报解除');
 api.Dispose();assert(nodes.EndlessStatus.BHasClass('ArchiveHidden'),'controller disposal hides its tip');
 const css=fs.readFileSync(path.join(project,'panorama/src/styles/custom_game/archive.css'),'utf8');
 const tipStyle=css.match(/#EndlessStatus\s*\{([^}]+)\}/)[1];
@@ -184,7 +198,7 @@ assert.match(tipStyle,/horizontal-align:\s*center/);assert.match(tipStyle,/verti
 assert.match(tipStyle,/margin:\s*0px/);
 const ui=fs.readFileSync(path.join(project,'panorama/src/scripts/custom_game/survival_ui.js'),'utf8');
 const first=ui.indexOf('    function showNotification('),last=ui.indexOf('    function sendClientDiagnostic(',first);
-vm.runInNewContext(ui.slice(first,last)+'\nshowNotification({kind:"endless_tip",message:"倒计时"});',{
+vm.runInNewContext(ui.slice(first,last)+'\nshowNotification({kind:"endless_tip",message:"倒计时"});\nshowNotification({kind:"wave_overflow_tip",message:"您需在20s内清理怪物"});',{
     panel(){throw new Error('endless tips must not create an ordinary top notification');}
 });
 console.log('ARCHIVE_ENDLESS_REFRESH_PASS: cached snapshots, bounded center-tip timer, stale-hide guard, local countdown, wave/end dedup, no top duplicate, disposal and centered styling');

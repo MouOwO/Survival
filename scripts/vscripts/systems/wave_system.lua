@@ -479,7 +479,7 @@ local function reset()
         victory_settled = false,
         defeat_settled = false,
         alive_limit = math.max(0, tonumber(global_rules.wave_alive_limit) or 90),
-        overflow_grace_seconds = math.max(0, tonumber(global_rules.wave_overflow_grace_seconds) or 10),
+        overflow_grace_seconds = math.max(0, tonumber(global_rules.wave_overflow_grace_seconds) or 20),
         overflow_active = false, overflow_remaining = 0, overflow_deadline = nil,
         post_clear_frozen = false }
 end
@@ -525,6 +525,7 @@ local function clear_player_overflow(player_id, population)
     end
     population.overflow_active, population.overflow_remaining = false, 0
     population.overflow_deadline = nil
+    population.overflow_notified_remaining = nil
 end
 
 local function clear_overflow()
@@ -586,8 +587,15 @@ local function update_population_limit()
     local expired = {}
     for player_id, population in pairs(player_populations) do
         if population.player_defeated or disconnected_players[player_id]
-            or population.alive <= state.alive_limit then
+            or population.alive < state.alive_limit
+            or (not population.overflow_active and population.alive <= state.alive_limit) then
+            local recovered = population.overflow_active and not population.player_defeated
+                and not disconnected_players[player_id]
             clear_player_overflow(player_id, population)
+            if recovered then
+                event_bus.emit(events.UI_NOTIFICATION, {player_id = player_id, level = "info",
+                    kind = "wave_overflow_tip", message = "怪物数量已恢复，警报解除"})
+            end
         else
             if not population.overflow_active then
                 population.overflow_active = true
@@ -602,6 +610,13 @@ local function update_population_limit()
             end
             population.overflow_remaining = math.max(0,
                 math.ceil(population.overflow_deadline - current_game_time()))
+            if population.overflow_remaining > 0
+                and population.overflow_notified_remaining ~= population.overflow_remaining then
+                population.overflow_notified_remaining = population.overflow_remaining
+                event_bus.emit(events.UI_NOTIFICATION, {player_id = player_id, level = "warning",
+                    kind = "wave_overflow_tip",
+                    message = "您需在" .. population.overflow_remaining .. "s内清理怪物"})
+            end
             if population.overflow_remaining <= 0 then expired[#expired + 1] = player_id end
         end
     end
