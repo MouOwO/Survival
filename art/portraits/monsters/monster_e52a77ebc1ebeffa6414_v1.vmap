@@ -1,0 +1,1255 @@
+<!-- dmx encoding keyvalues2 4 format vmap 40 -->
+"$prefix_element$"
+{
+"id" "elementid" "993aaee3-eb98-5eb1-9317-9143082c9df7"
+}
+"CMapRootElement"
+{
+	"id" "elementid" "acb3d91f-b00b-4c3a-afe4-271cc6884c0b"
+	"isprefab" "bool" "0"
+	"editorbuild" "int" "10050"
+	"editorversion" "int" "400"
+	"itemFile" "string" ""
+	"defaultcamera" "CStoredCamera"
+	{
+		"id" "elementid" "7150b846-e4b7-45bb-b7fa-bab186ebc70e"
+		"position" "vector3" "140.0803375244 -281.559387207 383.584197998"
+		"lookat" "vector3" "139.7157592773 -280.9477539062 382.8820800781"
+	}
+
+	"3dcameras" "CStoredCameras"
+	{
+		"id" "elementid" "f8b567ed-4cdc-4d6b-8cea-436f3d3877d3"
+		"activecamera" "int" "-1"
+		"cameras" "element_array" 
+		[
+		]
+	}
+
+	"world" "CMapWorld"
+	{
+		"id" "elementid" "ff914d0d-f61b-4eba-948a-4845c3aadc8f"
+		"nodeID" "int" "1"
+		"referenceID" "uint64" "0x0"
+		"children" "element_array" 
+		[
+"CMapEntity"
+			{
+				"id" "elementid" "5e212d7f-d599-510e-8dbf-5b7cd629bc37"
+				"nodeID" "int" "1"
+				"referenceID" "uint64" "0xc12bbeb96a37b72a"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "1fc85162-da90-55ca-9c01-f7943b33999a"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "6b422deb-70fe-56a3-833f-c98422b18ef3"
+					"classname" "string" "prop_dynamic"
+					"targetname" "string" "monster_portrait_body"
+					"parentname" "string" ""
+					"parentAttachmentName" "string" ""
+					"local.origin" "string" "0 0 0"
+					"local.angles" "string" "0 0 0"
+					"local.scales" "string" "1 1 1"
+					"useLocalOffset" "string" "0"
+					"globalname" "string" ""
+					"model" "string" "models/heroes/spirit_breaker/spirit_breaker.vmdl"
+					"skin" "string" "0"
+					"bodygroups" "string" ""
+					"disableshadows" "string" "0"
+					"vscripts" "string" ""
+					"damagefilter" "string" ""
+					"ExplodeDamage" "string" "0"
+					"ExplodeRadius" "string" "0"
+					"PerformanceMode" "string" "PM_NORMAL"
+					"spawnflags" "string" "0"
+					"pressuredelay" "string" "0"
+					"mincpulevel" "string" "0"
+					"maxcpulevel" "string" "0"
+					"mingpulevel" "string" "0"
+					"maxgpulevel" "string" "0"
+					"disableX360" "string" "0"
+					"renderfx" "string" "kRenderFxNone"
+					"rendermode" "string" "kRenderNormal"
+					"renderamt" "string" "255"
+					"rendercolor" "string" "255 255 255 255"
+					"disablereceiveshadows" "string" "0"
+					"lightgroup" "string" ""
+					"fademindist" "string" "-1"
+					"fademaxdist" "string" "0"
+					"fadescale" "string" "1"
+					"rendertocubemaps" "string" "1"
+					"lightmapstatic" "string" "0"
+					"glowstate" "string" "0"
+					"glowrange" "string" "0"
+					"glowrangemin" "string" "0"
+					"glowcolor" "string" "0 0 0"
+					"solid" "string" "0"
+					"disablelowviolence" "string" "0"
+					"RandomAnimation" "string" "0"
+					"randomizecycle" "string" "0"
+					"MinAnimTime" "string" "5"
+					"MaxAnimTime" "string" "10"
+					"LagCompensate" "string" "0"
+					"AnimateOnServer" "string" "0"
+					"ScriptedMovement" "string" "0"
+					"velocity" "string" ""
+					"avelocity" "string" ""
+					"lightingorigin" "string" ""
+					"updatechildren" "string" "0"
+					"use_animgraph" "string" "0"
+					"CreateNavObstacle" "string" "0"
+					"forcenpcexclude" "string" "0"
+					"StartDisabled" "string" "0"
+					"clothScale" "string" "1"
+					"clientSideEntity" "string" "0"
+					"object_culling" "string" "0"
+					"glowteam" "string" "-1"
+					"add_attribute" "string" ""
+					"add_modifier" "string" ""
+					"StartingAnim" "string" "idle_anim"
+					"StartingAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+					"IdleAnim" "string" "idle_anim"
+					"IdleAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 0"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1 1 1"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+"CMapEntity"
+			{
+				"id" "elementid" "454d0b70-0e3d-552e-b34c-87d7d401b926"
+				"nodeID" "int" "2"
+				"referenceID" "uint64" "0xc12bbeb96a37b72a"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "4ceec656-eb2a-52ae-b86b-b74ddd65dd39"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "35a24c8f-9ef4-5922-a704-75f03e51459f"
+					"classname" "string" "prop_dynamic"
+					"targetname" "string" "monster_part_weapon"
+					"parentname" "string" "monster_portrait_body"
+					"parentAttachmentName" "string" "!bonemerge"
+					"local.origin" "string" "0 0 0"
+					"local.angles" "string" "0 0 0"
+					"local.scales" "string" "1.0 1.0 1.0"
+					"useLocalOffset" "string" "1"
+					"globalname" "string" ""
+					"model" "string" "models/items/spirit_breaker/sb_ice_weapon_final/sb_ice_weapon_final.vmdl"
+					"skin" "string" "0"
+					"bodygroups" "string" ""
+					"disableshadows" "string" "0"
+					"vscripts" "string" ""
+					"damagefilter" "string" ""
+					"ExplodeDamage" "string" "0"
+					"ExplodeRadius" "string" "0"
+					"PerformanceMode" "string" "PM_NORMAL"
+					"spawnflags" "string" "0"
+					"pressuredelay" "string" "0"
+					"mincpulevel" "string" "0"
+					"maxcpulevel" "string" "0"
+					"mingpulevel" "string" "0"
+					"maxgpulevel" "string" "0"
+					"disableX360" "string" "0"
+					"renderfx" "string" "kRenderFxNone"
+					"rendermode" "string" "kRenderNormal"
+					"renderamt" "string" "255"
+					"rendercolor" "string" "255 255 255 255"
+					"disablereceiveshadows" "string" "0"
+					"lightgroup" "string" ""
+					"fademindist" "string" "-1"
+					"fademaxdist" "string" "0"
+					"fadescale" "string" "1"
+					"rendertocubemaps" "string" "1"
+					"lightmapstatic" "string" "0"
+					"glowstate" "string" "0"
+					"glowrange" "string" "0"
+					"glowrangemin" "string" "0"
+					"glowcolor" "string" "0 0 0"
+					"solid" "string" "0"
+					"disablelowviolence" "string" "0"
+					"RandomAnimation" "string" "0"
+					"randomizecycle" "string" "0"
+					"MinAnimTime" "string" "5"
+					"MaxAnimTime" "string" "10"
+					"LagCompensate" "string" "0"
+					"AnimateOnServer" "string" "0"
+					"ScriptedMovement" "string" "0"
+					"velocity" "string" ""
+					"avelocity" "string" ""
+					"lightingorigin" "string" ""
+					"updatechildren" "string" "0"
+					"use_animgraph" "string" "0"
+					"CreateNavObstacle" "string" "0"
+					"forcenpcexclude" "string" "0"
+					"StartDisabled" "string" "0"
+					"clothScale" "string" "1"
+					"clientSideEntity" "string" "0"
+					"object_culling" "string" "0"
+					"glowteam" "string" "-1"
+					"add_attribute" "string" ""
+					"add_modifier" "string" ""
+					"StartingAnim" "string" ""
+					"StartingAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+					"IdleAnim" "string" ""
+					"IdleAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 0"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1.0 1.0 1.0"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+"CMapEntity"
+			{
+				"id" "elementid" "5f65edc6-1c65-5d6e-9e35-0f9b6d72f306"
+				"nodeID" "int" "3"
+				"referenceID" "uint64" "0xc12bbeb96a37b72a"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "582ebb9d-69af-5cf3-a49e-a35960bf21e4"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "c76e8bbd-366a-5e6e-970d-2985f48a14e0"
+					"classname" "string" "prop_dynamic"
+					"targetname" "string" "monster_part_shoulder"
+					"parentname" "string" "monster_portrait_body"
+					"parentAttachmentName" "string" "!bonemerge"
+					"local.origin" "string" "0 0 0"
+					"local.angles" "string" "0 0 0"
+					"local.scales" "string" "1.0 1.0 1.0"
+					"useLocalOffset" "string" "1"
+					"globalname" "string" ""
+					"model" "string" "models/items/spirit_breaker/sb_ice_shoulder_final/sb_ice_shoulder_final.vmdl"
+					"skin" "string" "0"
+					"bodygroups" "string" ""
+					"disableshadows" "string" "0"
+					"vscripts" "string" ""
+					"damagefilter" "string" ""
+					"ExplodeDamage" "string" "0"
+					"ExplodeRadius" "string" "0"
+					"PerformanceMode" "string" "PM_NORMAL"
+					"spawnflags" "string" "0"
+					"pressuredelay" "string" "0"
+					"mincpulevel" "string" "0"
+					"maxcpulevel" "string" "0"
+					"mingpulevel" "string" "0"
+					"maxgpulevel" "string" "0"
+					"disableX360" "string" "0"
+					"renderfx" "string" "kRenderFxNone"
+					"rendermode" "string" "kRenderNormal"
+					"renderamt" "string" "255"
+					"rendercolor" "string" "255 255 255 255"
+					"disablereceiveshadows" "string" "0"
+					"lightgroup" "string" ""
+					"fademindist" "string" "-1"
+					"fademaxdist" "string" "0"
+					"fadescale" "string" "1"
+					"rendertocubemaps" "string" "1"
+					"lightmapstatic" "string" "0"
+					"glowstate" "string" "0"
+					"glowrange" "string" "0"
+					"glowrangemin" "string" "0"
+					"glowcolor" "string" "0 0 0"
+					"solid" "string" "0"
+					"disablelowviolence" "string" "0"
+					"RandomAnimation" "string" "0"
+					"randomizecycle" "string" "0"
+					"MinAnimTime" "string" "5"
+					"MaxAnimTime" "string" "10"
+					"LagCompensate" "string" "0"
+					"AnimateOnServer" "string" "0"
+					"ScriptedMovement" "string" "0"
+					"velocity" "string" ""
+					"avelocity" "string" ""
+					"lightingorigin" "string" ""
+					"updatechildren" "string" "0"
+					"use_animgraph" "string" "0"
+					"CreateNavObstacle" "string" "0"
+					"forcenpcexclude" "string" "0"
+					"StartDisabled" "string" "0"
+					"clothScale" "string" "1"
+					"clientSideEntity" "string" "0"
+					"object_culling" "string" "0"
+					"glowteam" "string" "-1"
+					"add_attribute" "string" ""
+					"add_modifier" "string" ""
+					"StartingAnim" "string" ""
+					"StartingAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+					"IdleAnim" "string" ""
+					"IdleAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 0"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1.0 1.0 1.0"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+"CMapEntity"
+			{
+				"id" "elementid" "38ce9c84-da15-5162-8f77-e96c6914617e"
+				"nodeID" "int" "4"
+				"referenceID" "uint64" "0xc12bbeb96a37b72a"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "cadcc0ad-f713-5b0a-b63b-b22538ffac91"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "1c1e3595-9de3-5e1f-b2a6-97aeb943ca27"
+					"classname" "string" "prop_dynamic"
+					"targetname" "string" "monster_part_head"
+					"parentname" "string" "monster_portrait_body"
+					"parentAttachmentName" "string" "!bonemerge"
+					"local.origin" "string" "0 0 0"
+					"local.angles" "string" "0 0 0"
+					"local.scales" "string" "1.0 1.0 1.0"
+					"useLocalOffset" "string" "1"
+					"globalname" "string" ""
+					"model" "string" "models/items/spirit_breaker/sb_ice_head_final/sb_ice_head_final.vmdl"
+					"skin" "string" "0"
+					"bodygroups" "string" ""
+					"disableshadows" "string" "0"
+					"vscripts" "string" ""
+					"damagefilter" "string" ""
+					"ExplodeDamage" "string" "0"
+					"ExplodeRadius" "string" "0"
+					"PerformanceMode" "string" "PM_NORMAL"
+					"spawnflags" "string" "0"
+					"pressuredelay" "string" "0"
+					"mincpulevel" "string" "0"
+					"maxcpulevel" "string" "0"
+					"mingpulevel" "string" "0"
+					"maxgpulevel" "string" "0"
+					"disableX360" "string" "0"
+					"renderfx" "string" "kRenderFxNone"
+					"rendermode" "string" "kRenderNormal"
+					"renderamt" "string" "255"
+					"rendercolor" "string" "255 255 255 255"
+					"disablereceiveshadows" "string" "0"
+					"lightgroup" "string" ""
+					"fademindist" "string" "-1"
+					"fademaxdist" "string" "0"
+					"fadescale" "string" "1"
+					"rendertocubemaps" "string" "1"
+					"lightmapstatic" "string" "0"
+					"glowstate" "string" "0"
+					"glowrange" "string" "0"
+					"glowrangemin" "string" "0"
+					"glowcolor" "string" "0 0 0"
+					"solid" "string" "0"
+					"disablelowviolence" "string" "0"
+					"RandomAnimation" "string" "0"
+					"randomizecycle" "string" "0"
+					"MinAnimTime" "string" "5"
+					"MaxAnimTime" "string" "10"
+					"LagCompensate" "string" "0"
+					"AnimateOnServer" "string" "0"
+					"ScriptedMovement" "string" "0"
+					"velocity" "string" ""
+					"avelocity" "string" ""
+					"lightingorigin" "string" ""
+					"updatechildren" "string" "0"
+					"use_animgraph" "string" "0"
+					"CreateNavObstacle" "string" "0"
+					"forcenpcexclude" "string" "0"
+					"StartDisabled" "string" "0"
+					"clothScale" "string" "1"
+					"clientSideEntity" "string" "0"
+					"object_culling" "string" "0"
+					"glowteam" "string" "-1"
+					"add_attribute" "string" ""
+					"add_modifier" "string" ""
+					"StartingAnim" "string" ""
+					"StartingAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+					"IdleAnim" "string" ""
+					"IdleAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 0"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1.0 1.0 1.0"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+"CMapEntity"
+			{
+				"id" "elementid" "8780e710-18a9-5d43-a9aa-6d8a6293c7a9"
+				"nodeID" "int" "5"
+				"referenceID" "uint64" "0xc12bbeb96a37b72a"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "8209a970-d542-572c-b15f-c26eed21ad8a"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "6aa6e03d-7bf6-5181-a6df-9602b0846b59"
+					"classname" "string" "prop_dynamic"
+					"targetname" "string" "monster_part_tail"
+					"parentname" "string" "monster_portrait_body"
+					"parentAttachmentName" "string" "!bonemerge"
+					"local.origin" "string" "0 0 0"
+					"local.angles" "string" "0 0 0"
+					"local.scales" "string" "1.0 1.0 1.0"
+					"useLocalOffset" "string" "1"
+					"globalname" "string" ""
+					"model" "string" "models/items/spirit_breaker/sb_ice_tail_final/sb_ice_tail_final.vmdl"
+					"skin" "string" "0"
+					"bodygroups" "string" ""
+					"disableshadows" "string" "0"
+					"vscripts" "string" ""
+					"damagefilter" "string" ""
+					"ExplodeDamage" "string" "0"
+					"ExplodeRadius" "string" "0"
+					"PerformanceMode" "string" "PM_NORMAL"
+					"spawnflags" "string" "0"
+					"pressuredelay" "string" "0"
+					"mincpulevel" "string" "0"
+					"maxcpulevel" "string" "0"
+					"mingpulevel" "string" "0"
+					"maxgpulevel" "string" "0"
+					"disableX360" "string" "0"
+					"renderfx" "string" "kRenderFxNone"
+					"rendermode" "string" "kRenderNormal"
+					"renderamt" "string" "255"
+					"rendercolor" "string" "255 255 255 255"
+					"disablereceiveshadows" "string" "0"
+					"lightgroup" "string" ""
+					"fademindist" "string" "-1"
+					"fademaxdist" "string" "0"
+					"fadescale" "string" "1"
+					"rendertocubemaps" "string" "1"
+					"lightmapstatic" "string" "0"
+					"glowstate" "string" "0"
+					"glowrange" "string" "0"
+					"glowrangemin" "string" "0"
+					"glowcolor" "string" "0 0 0"
+					"solid" "string" "0"
+					"disablelowviolence" "string" "0"
+					"RandomAnimation" "string" "0"
+					"randomizecycle" "string" "0"
+					"MinAnimTime" "string" "5"
+					"MaxAnimTime" "string" "10"
+					"LagCompensate" "string" "0"
+					"AnimateOnServer" "string" "0"
+					"ScriptedMovement" "string" "0"
+					"velocity" "string" ""
+					"avelocity" "string" ""
+					"lightingorigin" "string" ""
+					"updatechildren" "string" "0"
+					"use_animgraph" "string" "0"
+					"CreateNavObstacle" "string" "0"
+					"forcenpcexclude" "string" "0"
+					"StartDisabled" "string" "0"
+					"clothScale" "string" "1"
+					"clientSideEntity" "string" "0"
+					"object_culling" "string" "0"
+					"glowteam" "string" "-1"
+					"add_attribute" "string" ""
+					"add_modifier" "string" ""
+					"StartingAnim" "string" ""
+					"StartingAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+					"IdleAnim" "string" ""
+					"IdleAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 0"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1.0 1.0 1.0"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+"CMapEntity"
+			{
+				"id" "elementid" "93378915-b2ce-54b8-9910-2e63dee7b547"
+				"nodeID" "int" "6"
+				"referenceID" "uint64" "0xc12bbeb96a37b72a"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "a026aa4e-8968-5706-94d6-5c2984f70c67"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "d18619ee-87a2-5908-a92c-a21f13b954fb"
+					"classname" "string" "prop_dynamic"
+					"targetname" "string" "monster_part_arms"
+					"parentname" "string" "monster_portrait_body"
+					"parentAttachmentName" "string" "!bonemerge"
+					"local.origin" "string" "0 0 0"
+					"local.angles" "string" "0 0 0"
+					"local.scales" "string" "1.0 1.0 1.0"
+					"useLocalOffset" "string" "1"
+					"globalname" "string" ""
+					"model" "string" "models/items/spirit_breaker/sb_ice_arms_final/sb_ice_arms_final.vmdl"
+					"skin" "string" "0"
+					"bodygroups" "string" ""
+					"disableshadows" "string" "0"
+					"vscripts" "string" ""
+					"damagefilter" "string" ""
+					"ExplodeDamage" "string" "0"
+					"ExplodeRadius" "string" "0"
+					"PerformanceMode" "string" "PM_NORMAL"
+					"spawnflags" "string" "0"
+					"pressuredelay" "string" "0"
+					"mincpulevel" "string" "0"
+					"maxcpulevel" "string" "0"
+					"mingpulevel" "string" "0"
+					"maxgpulevel" "string" "0"
+					"disableX360" "string" "0"
+					"renderfx" "string" "kRenderFxNone"
+					"rendermode" "string" "kRenderNormal"
+					"renderamt" "string" "255"
+					"rendercolor" "string" "255 255 255 255"
+					"disablereceiveshadows" "string" "0"
+					"lightgroup" "string" ""
+					"fademindist" "string" "-1"
+					"fademaxdist" "string" "0"
+					"fadescale" "string" "1"
+					"rendertocubemaps" "string" "1"
+					"lightmapstatic" "string" "0"
+					"glowstate" "string" "0"
+					"glowrange" "string" "0"
+					"glowrangemin" "string" "0"
+					"glowcolor" "string" "0 0 0"
+					"solid" "string" "0"
+					"disablelowviolence" "string" "0"
+					"RandomAnimation" "string" "0"
+					"randomizecycle" "string" "0"
+					"MinAnimTime" "string" "5"
+					"MaxAnimTime" "string" "10"
+					"LagCompensate" "string" "0"
+					"AnimateOnServer" "string" "0"
+					"ScriptedMovement" "string" "0"
+					"velocity" "string" ""
+					"avelocity" "string" ""
+					"lightingorigin" "string" ""
+					"updatechildren" "string" "0"
+					"use_animgraph" "string" "0"
+					"CreateNavObstacle" "string" "0"
+					"forcenpcexclude" "string" "0"
+					"StartDisabled" "string" "0"
+					"clothScale" "string" "1"
+					"clientSideEntity" "string" "0"
+					"object_culling" "string" "0"
+					"glowteam" "string" "-1"
+					"add_attribute" "string" ""
+					"add_modifier" "string" ""
+					"StartingAnim" "string" ""
+					"StartingAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+					"IdleAnim" "string" ""
+					"IdleAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 0"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1.0 1.0 1.0"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+"CMapEntity"
+			{
+				"id" "elementid" "de3e2845-ddf1-562a-a8aa-1aac4f13b506"
+				"nodeID" "int" "7"
+				"referenceID" "uint64" "0xc12bbeb96a37b72a"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "f5ba1c23-036f-5656-8755-20f862fcfbcc"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "07f43072-adb9-569f-82a9-3bf083590901"
+					"classname" "string" "prop_dynamic"
+					"targetname" "string" "monster_part_belt"
+					"parentname" "string" "monster_portrait_body"
+					"parentAttachmentName" "string" "!bonemerge"
+					"local.origin" "string" "0 0 0"
+					"local.angles" "string" "0 0 0"
+					"local.scales" "string" "1.0 1.0 1.0"
+					"useLocalOffset" "string" "1"
+					"globalname" "string" ""
+					"model" "string" "models/items/spirit_breaker/sb_ice_belt_final/sb_ice_belt_final.vmdl"
+					"skin" "string" "0"
+					"bodygroups" "string" ""
+					"disableshadows" "string" "0"
+					"vscripts" "string" ""
+					"damagefilter" "string" ""
+					"ExplodeDamage" "string" "0"
+					"ExplodeRadius" "string" "0"
+					"PerformanceMode" "string" "PM_NORMAL"
+					"spawnflags" "string" "0"
+					"pressuredelay" "string" "0"
+					"mincpulevel" "string" "0"
+					"maxcpulevel" "string" "0"
+					"mingpulevel" "string" "0"
+					"maxgpulevel" "string" "0"
+					"disableX360" "string" "0"
+					"renderfx" "string" "kRenderFxNone"
+					"rendermode" "string" "kRenderNormal"
+					"renderamt" "string" "255"
+					"rendercolor" "string" "255 255 255 255"
+					"disablereceiveshadows" "string" "0"
+					"lightgroup" "string" ""
+					"fademindist" "string" "-1"
+					"fademaxdist" "string" "0"
+					"fadescale" "string" "1"
+					"rendertocubemaps" "string" "1"
+					"lightmapstatic" "string" "0"
+					"glowstate" "string" "0"
+					"glowrange" "string" "0"
+					"glowrangemin" "string" "0"
+					"glowcolor" "string" "0 0 0"
+					"solid" "string" "0"
+					"disablelowviolence" "string" "0"
+					"RandomAnimation" "string" "0"
+					"randomizecycle" "string" "0"
+					"MinAnimTime" "string" "5"
+					"MaxAnimTime" "string" "10"
+					"LagCompensate" "string" "0"
+					"AnimateOnServer" "string" "0"
+					"ScriptedMovement" "string" "0"
+					"velocity" "string" ""
+					"avelocity" "string" ""
+					"lightingorigin" "string" ""
+					"updatechildren" "string" "0"
+					"use_animgraph" "string" "0"
+					"CreateNavObstacle" "string" "0"
+					"forcenpcexclude" "string" "0"
+					"StartDisabled" "string" "0"
+					"clothScale" "string" "1"
+					"clientSideEntity" "string" "0"
+					"object_culling" "string" "0"
+					"glowteam" "string" "-1"
+					"add_attribute" "string" ""
+					"add_modifier" "string" ""
+					"StartingAnim" "string" ""
+					"StartingAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+					"IdleAnim" "string" ""
+					"IdleAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 0"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1.0 1.0 1.0"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+"CMapEntity"
+			{
+				"id" "elementid" "031e3470-d947-504b-8620-1c0dae25ddbd"
+				"nodeID" "int" "8"
+				"referenceID" "uint64" "0xc12bbeb96a37b72a"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "add95c3b-7b50-55f7-aee2-d41bb18c74d8"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "e37a8e3f-ce4a-5280-965f-f3cbda406230"
+					"classname" "string" "prop_dynamic"
+					"targetname" "string" "monster_part_body_head"
+					"parentname" "string" "monster_portrait_body"
+					"parentAttachmentName" "string" "!bonemerge"
+					"local.origin" "string" "0 0 0"
+					"local.angles" "string" "0 0 0"
+					"local.scales" "string" "1.0 1.0 1.0"
+					"useLocalOffset" "string" "1"
+					"globalname" "string" ""
+					"model" "string" "models/heroes/spirit_breaker/spirit_breaker_head.vmdl"
+					"skin" "string" "0"
+					"bodygroups" "string" ""
+					"disableshadows" "string" "0"
+					"vscripts" "string" ""
+					"damagefilter" "string" ""
+					"ExplodeDamage" "string" "0"
+					"ExplodeRadius" "string" "0"
+					"PerformanceMode" "string" "PM_NORMAL"
+					"spawnflags" "string" "0"
+					"pressuredelay" "string" "0"
+					"mincpulevel" "string" "0"
+					"maxcpulevel" "string" "0"
+					"mingpulevel" "string" "0"
+					"maxgpulevel" "string" "0"
+					"disableX360" "string" "0"
+					"renderfx" "string" "kRenderFxNone"
+					"rendermode" "string" "kRenderNormal"
+					"renderamt" "string" "255"
+					"rendercolor" "string" "255 255 255 255"
+					"disablereceiveshadows" "string" "0"
+					"lightgroup" "string" ""
+					"fademindist" "string" "-1"
+					"fademaxdist" "string" "0"
+					"fadescale" "string" "1"
+					"rendertocubemaps" "string" "1"
+					"lightmapstatic" "string" "0"
+					"glowstate" "string" "0"
+					"glowrange" "string" "0"
+					"glowrangemin" "string" "0"
+					"glowcolor" "string" "0 0 0"
+					"solid" "string" "0"
+					"disablelowviolence" "string" "0"
+					"RandomAnimation" "string" "0"
+					"randomizecycle" "string" "0"
+					"MinAnimTime" "string" "5"
+					"MaxAnimTime" "string" "10"
+					"LagCompensate" "string" "0"
+					"AnimateOnServer" "string" "0"
+					"ScriptedMovement" "string" "0"
+					"velocity" "string" ""
+					"avelocity" "string" ""
+					"lightingorigin" "string" ""
+					"updatechildren" "string" "0"
+					"use_animgraph" "string" "0"
+					"CreateNavObstacle" "string" "0"
+					"forcenpcexclude" "string" "0"
+					"StartDisabled" "string" "0"
+					"clothScale" "string" "1"
+					"clientSideEntity" "string" "0"
+					"object_culling" "string" "0"
+					"glowteam" "string" "-1"
+					"add_attribute" "string" ""
+					"add_modifier" "string" ""
+					"StartingAnim" "string" ""
+					"StartingAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+					"IdleAnim" "string" ""
+					"IdleAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 0"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1.0 1.0 1.0"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+"CMapEntity"
+					{
+						"id" "elementid" "113f97a1-2a2c-57ac-bb1c-1d3698fc7616"
+						"nodeID" "int" "9"
+						"referenceID" "uint64" "0x38261179cbe10b6a"
+						"children" "element_array" 
+						[
+						]
+						"variableTargetKeys" "string_array" 
+						[
+						]
+						"variableNames" "string_array" 
+						[
+						]
+						"relayPlugData" "DmePlugList"
+						{
+							"id" "elementid" "bb98848b-9536-5c46-98c7-cc9f6a44ba7b"
+							"names" "string_array" 
+							[
+							]
+							"dataTypes" "int_array" 
+							[
+							]
+							"plugTypes" "int_array" 
+							[
+							]
+							"descriptions" "string_array" 
+							[
+							]
+						}
+
+						"connectionsData" "element_array" 
+						[
+						]
+						"entity_properties" "EditGameClassProps"
+						{
+							"id" "elementid" "fcbeed5c-b47b-521a-920b-7bb867ef9f4d"
+							"classname" "string" "point_camera"
+							"targetname" "string" "monster_portrait_camera"
+							"parentname" "string" ""
+							"parentAttachmentName" "string" ""
+							"local.origin" "string" "0 0 0"
+							"local.angles" "string" "0 0 0"
+							"local.scales" "string" "1 1 1"
+							"useLocalOffset" "string" "0"
+							"vscripts" "string" ""
+							"clientSideEntity" "string" "0"
+							"spawnflags" "string" "0"
+							"FOV" "string" "22"
+							"ZNear" "string" "4"
+							"ZFar" "string" "7000"
+							"UseScreenAspectRatio" "string" "0"
+							"aspectRatio" "string" "1"
+							"fogEnable" "string" "0"
+							"fogColor" "string" "0 0 0"
+							"fogStart" "string" "2048"
+							"fogEnd" "string" "4096"
+							"fogMaxDensity" "string" "1"
+							"rendercolor" "string" "128 128 128 255"
+							"override_shadow_farz" "string" "800"
+							"dof_enabled" "string" "0"
+							"dof_near_blurry" "string" "125"
+							"dof_near_crisp" "string" "250"
+							"dac_dof_far_crisp" "string" "300"
+							"dac_dof_far_blurry" "string" "700"
+							"dac_dof_tilt_to_ground" "string" "0.75"
+							"hltvUsable" "string" "0"
+						}
+
+						"hitNormal" "vector3" "0 0 1"
+						"isProceduralEntity" "bool" "0"
+						"origin" "vector3" "246.88 -62.42 152.38"
+						"angles" "qangle" "8.53 160.33 0.69"
+						"scales" "vector3" "1 1 1"
+						"transformLocked" "bool" "0"
+						"force_hidden" "bool" "0"
+						"editorOnly" "bool" "0"
+					},
+"CMapEntity"
+					{
+						"id" "elementid" "385bf02c-da3e-5ac6-8c81-2754b403f63e"
+						"nodeID" "int" "10"
+						"referenceID" "uint64" "0xc150b39fc4fd5de9"
+						"children" "element_array" 
+						[
+						]
+						"variableTargetKeys" "string_array" 
+						[
+						]
+						"variableNames" "string_array" 
+						[
+						]
+						"relayPlugData" "DmePlugList"
+						{
+							"id" "elementid" "d063d567-e805-517a-a8c7-2d89ccf951fc"
+							"names" "string_array" 
+							[
+							]
+							"dataTypes" "int_array" 
+							[
+							]
+							"plugTypes" "int_array" 
+							[
+							]
+							"descriptions" "string_array" 
+							[
+							]
+						}
+
+						"connectionsData" "element_array" 
+						[
+						]
+						"entity_properties" "EditGameClassProps"
+						{
+							"id" "elementid" "e67a7909-1f98-58cb-8871-a9581f5c1ea5"
+							"classname" "string" "env_global_light"
+							"targetname" "string" "monster_portrait_light"
+							"vscripts" "string" ""
+							"StartDisabled" "string" "0"
+							"ambientangles" "string" "4.44514414 -50.16731768 0"
+							"color" "string" "218 240 254 1"
+							"lightscale" "string" "1.200000"
+							"ambientcolor1" "string" "244 129 131 1"
+							"ambientscale1" "string" "2.275000"
+							"ambientcolor2" "string" "74 74 74 1"
+							"ambientscale2" "string" "5.000000"
+							"ambientcolor3" "string" "63 57 57 255"
+							"groundscale" "string" "1.500000"
+							"specularangles" "string" "90 180 0"
+							"specularpower" "string" "16"
+							"specularindependence" "string" "0"
+							"specularcolor" "string" "251 74 84 1"
+							"fov" "string" "58"
+							"nearz" "string" "4"
+							"enableshadows" "string" "1"
+							"fow_darkness" "string" "2.7"
+							"background_clear_not_required" "string" "0"
+							"SkyboxSlot" "string" ""
+							"enable_separate_skybox_fog" "string" "0"
+							"height_fog_color" "string" "255 255 255 0"
+							"height_fog_max_z" "string" "512.0"
+							"height_fog_density" "string" "0"
+							"height_fog_falloff" "string" "1.0"
+							"height_fog_texture0" "string" "materials/dev/fow_clouds_00.vtex"
+							"height_fog_texture1" "string" "materials/dev/fow_drifts_00.vtex"
+							"height_fog_rotation0" "string" "0.0"
+							"height_fog_scale0" "string" "4096.0"
+							"height_fog_scroll0U" "string" "5"
+							"height_fog_scroll0V" "string" "-5"
+							"height_fog_rotation1" "string" "0.0"
+							"height_fog_scale1" "string" "2048.0"
+							"height_fog_scroll1U" "string" "10"
+							"height_fog_scroll1V" "string" "-10"
+							"height_fog_exclusion_inner_radius" "string" "0"
+							"height_fog_exclusion_height_bias" "string" "128"
+							"height_fog_type" "string" "0"
+							"height_fog_caustic_speed_scale" "string" "1"
+							"height_fog_caustic_amplitude_scale" "string" "0.1"
+						
+"parentname" "string" ""
+}
+
+						"hitNormal" "vector3" "0 0 1"
+						"isProceduralEntity" "bool" "0"
+						"origin" "vector3" "177.22 115.81 262.32"
+						"angles" "qangle" "53.36 205.58 0.00"
+						"scales" "vector3" "1 1 1"
+						"transformLocked" "bool" "0"
+						"force_hidden" "bool" "0"
+						"editorOnly" "bool" "0"
+					}
+]
+		"variableTargetKeys" "string_array" 
+		[
+		]
+		"variableNames" "string_array" 
+		[
+		]
+		"relayPlugData" "DmePlugList"
+		{
+			"id" "elementid" "1d8f3a3e-fffb-49bf-b6d9-0cc011118197"
+			"names" "string_array" 
+			[
+			]
+			"dataTypes" "int_array" 
+			[
+			]
+			"plugTypes" "int_array" 
+			[
+			]
+			"descriptions" "string_array" 
+			[
+			]
+		}
+
+		"connectionsData" "element_array" 
+		[
+		]
+		"entity_properties" "EditGameClassProps"
+		{
+			"id" "elementid" "18a5d3c1-efd5-49ee-945c-c41432b8588b"
+			"classname" "string" "worldspawn"
+			"targetname" "string" ""
+			"skyname" "string" "sky_day01_01"
+			"startdark" "string" "0"
+			"startcolor" "string" "0 0 0"
+			"pvstype" "string" "0"
+			"newunit" "string" "0"
+			"maxpropscreenwidth" "string" "-1"
+			"minpropscreenwidth" "string" "0"
+			"vrchaperone" "string" "0"
+			"vrmovement" "string" "0"
+			"OptimizedHeightFieldName" "string" ""
+			"prefab_has_runtime_entity_by_default" "string" "0"
+		}
+
+		"nextDecalID" "int" "0"
+		"fixupEntityNames" "bool" "1"
+		"mapUsageType" "string" "background"
+		"origin" "vector3" "0 0 0"
+		"angles" "qangle" "0 0 0"
+		"scales" "vector3" "1 1 1"
+		"transformLocked" "bool" "0"
+		"force_hidden" "bool" "0"
+		"editorOnly" "bool" "0"
+	}
+
+	"visbility" "CVisibilityMgr"
+	{
+		"id" "elementid" "96f995e0-f4df-4225-94ca-162c72be19fd"
+		"nodeID" "int" "0"
+		"referenceID" "uint64" "0x0"
+		"children" "element_array" 
+		[
+		]
+		"variableTargetKeys" "string_array" 
+		[
+		]
+		"variableNames" "string_array" 
+		[
+		]
+		"nodes" "element_array" 
+		[
+		]
+		"hiddenFlags" "int_array" 
+		[
+		]
+		"origin" "vector3" "0 0 0"
+		"angles" "qangle" "0 0 0"
+		"scales" "vector3" "1 1 1"
+		"editorOnly" "bool" "0"
+		"force_hidden" "bool" "0"
+		"transformLocked" "bool" "0"
+	}
+
+	"mapVariables" "CMapVariableSet"
+	{
+		"id" "elementid" "46e41d1f-f07d-4436-8142-be3142bb6ecc"
+		"variableNames" "string_array" 
+		[
+		]
+		"variableValues" "string_array" 
+		[
+		]
+		"variableTypeNames" "string_array" 
+		[
+		]
+		"variableTypeParameters" "string_array" 
+		[
+		]
+		"m_ChoiceGroups" "element_array" 
+		[
+		]
+	}
+
+	"rootSelectionSet" "CMapSelectionSet"
+	{
+		"id" "elementid" "d97ad795-623a-4348-a62a-3b7c1d48e482"
+		"children" "element_array" 
+		[
+		]
+		"selectionSetName" "string" ""
+		"selectionSetData" "element" ""
+	}
+
+	"m_ReferencedMeshSnapshots" "element_array" 
+	[
+	]
+	"m_bIsCordoning" "bool" "0"
+	"m_bCordonsVisible" "bool" "0"
+	"nodeInstanceData" "element_array" 
+	[
+	]
+	"showgrid" "bool" "1"
+	"snaprotationangle" "int" "15"
+	"gridspacing" "float" "64"
+	"show3dgrid" "bool" "1"
+	"TweakedHoldAnimation" "int" "1"
+}
+

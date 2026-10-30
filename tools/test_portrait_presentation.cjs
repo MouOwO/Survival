@@ -194,7 +194,7 @@ for(let rank=1;rank<=10;rank++){
  assert.equal(nativeRebirth.custom.style.backgroundColor,'transparent','native outfit scene keeps its own authored backdrop');
  assert.equal(nativeRebirth.custom.style.backgroundImage,'none');
  for(const key of ['backgroundColor','backgroundImage','backgroundSize','backgroundPosition','backgroundRepeat'])
-  assert.equal(nativeRebirth.container.style[key],'','native rebirth clears custom '+key);
+  assert.equal(nativeRebirth.container.style[key],key==='backgroundColor'?'transparent':'','native rebirth clears custom '+key);
  for(const parent of [nativeRebirth.container,nativeRebirth.custom])
   assert.equal(parent.FindChildTraverse('SurvivalPortraitMotes').style.visibility,'collapse');
  const image=nativeRebirth.container.FindChildTraverse('SurvivalOfficialPortraitBackground');
@@ -478,3 +478,14 @@ assert.equal(isolatedDoom.calls.clear,0);assert.equal(isolatedDoom.scene.__survi
 assert.equal(isolatedDoom.scene.hittest,false);assert.equal(isolatedDoom.scene.hittestchildren,false);
 assert.equal(shortcutState.selected,selectionBeforeDoom,'scene switching never changes the current game selection');
 console.log('DOOM_CORNER_ISOLATED_SCENE_PASS: one lazy map across 300-tick Doom/Monkey/Doom round trip, no Doom SetUnit, native cache, visibility switching and noninteractive scenes');
+
+// Matching authoritative assets choose the UI-compatible conversion of the
+// exact Valve background. Partial or stale identity must not apply another
+// monster's texture to the native host.
+vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/monster_portrait_scenes.js','utf8'),{GameUI:{CustomUIConfig:()=>cfg}});
+selected=9101;unitName='npc_survival_named_rebirth_boss_01';
+cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:selected,model_asset_id:'monster_boss_rebirth_01_phalanx'});
+cfg.SurvivalPortraitPresentation.Refresh(nativeRebirth.group);
+assert.equal(nativeRebirth.container.FindChildTraverse('SurvivalOfficialPortraitBackground').image,
+ cfg.SurvivalMonsterPortraitScenes.monster_boss_rebirth_01_phalanx.background);
+console.log('MONSTER_NATIVE_BACKGROUND_PASS: authoritative asset selects the original texture converted for Panorama');

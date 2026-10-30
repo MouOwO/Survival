@@ -1,0 +1,1255 @@
+<!-- dmx encoding keyvalues2 4 format vmap 40 -->
+"$prefix_element$"
+{
+"id" "elementid" "57a73244-747f-5a3f-af0e-d553d03bc160"
+}
+"CMapRootElement"
+{
+	"id" "elementid" "acb3d91f-b00b-4c3a-afe4-271cc6884c0b"
+	"isprefab" "bool" "0"
+	"editorbuild" "int" "10050"
+	"editorversion" "int" "400"
+	"itemFile" "string" ""
+	"defaultcamera" "CStoredCamera"
+	{
+		"id" "elementid" "7150b846-e4b7-45bb-b7fa-bab186ebc70e"
+		"position" "vector3" "140.0803375244 -281.559387207 383.584197998"
+		"lookat" "vector3" "139.7157592773 -280.9477539062 382.8820800781"
+	}
+
+	"3dcameras" "CStoredCameras"
+	{
+		"id" "elementid" "f8b567ed-4cdc-4d6b-8cea-436f3d3877d3"
+		"activecamera" "int" "-1"
+		"cameras" "element_array" 
+		[
+		]
+	}
+
+	"world" "CMapWorld"
+	{
+		"id" "elementid" "ff914d0d-f61b-4eba-948a-4845c3aadc8f"
+		"nodeID" "int" "1"
+		"referenceID" "uint64" "0x0"
+		"children" "element_array" 
+		[
+"CMapEntity"
+			{
+				"id" "elementid" "54a09e49-10b0-5c7d-b0f9-34a130946387"
+				"nodeID" "int" "1"
+				"referenceID" "uint64" "0xc12bbeb96a37b72a"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "63315e10-5bb2-584f-86c2-5d68f62f7e9d"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "fb13e07b-9108-5e9e-b11b-49a0d2bf4bea"
+					"classname" "string" "prop_dynamic"
+					"targetname" "string" "monster_portrait_body"
+					"parentname" "string" ""
+					"parentAttachmentName" "string" ""
+					"local.origin" "string" "0 0 0"
+					"local.angles" "string" "0 0 0"
+					"local.scales" "string" "1 1 1"
+					"useLocalOffset" "string" "0"
+					"globalname" "string" ""
+					"model" "string" "models/heroes/blood_seeker/blood_seeker.vmdl"
+					"skin" "string" "1"
+					"bodygroups" "string" ""
+					"disableshadows" "string" "0"
+					"vscripts" "string" ""
+					"damagefilter" "string" ""
+					"ExplodeDamage" "string" "0"
+					"ExplodeRadius" "string" "0"
+					"PerformanceMode" "string" "PM_NORMAL"
+					"spawnflags" "string" "0"
+					"pressuredelay" "string" "0"
+					"mincpulevel" "string" "0"
+					"maxcpulevel" "string" "0"
+					"mingpulevel" "string" "0"
+					"maxgpulevel" "string" "0"
+					"disableX360" "string" "0"
+					"renderfx" "string" "kRenderFxNone"
+					"rendermode" "string" "kRenderNormal"
+					"renderamt" "string" "255"
+					"rendercolor" "string" "255 255 255 255"
+					"disablereceiveshadows" "string" "0"
+					"lightgroup" "string" ""
+					"fademindist" "string" "-1"
+					"fademaxdist" "string" "0"
+					"fadescale" "string" "1"
+					"rendertocubemaps" "string" "1"
+					"lightmapstatic" "string" "0"
+					"glowstate" "string" "0"
+					"glowrange" "string" "0"
+					"glowrangemin" "string" "0"
+					"glowcolor" "string" "0 0 0"
+					"solid" "string" "0"
+					"disablelowviolence" "string" "0"
+					"RandomAnimation" "string" "0"
+					"randomizecycle" "string" "0"
+					"MinAnimTime" "string" "5"
+					"MaxAnimTime" "string" "10"
+					"LagCompensate" "string" "0"
+					"AnimateOnServer" "string" "0"
+					"ScriptedMovement" "string" "0"
+					"velocity" "string" ""
+					"avelocity" "string" ""
+					"lightingorigin" "string" ""
+					"updatechildren" "string" "0"
+					"use_animgraph" "string" "0"
+					"CreateNavObstacle" "string" "0"
+					"forcenpcexclude" "string" "0"
+					"StartDisabled" "string" "0"
+					"clothScale" "string" "1"
+					"clientSideEntity" "string" "0"
+					"object_culling" "string" "0"
+					"glowteam" "string" "-1"
+					"add_attribute" "string" ""
+					"add_modifier" "string" ""
+					"StartingAnim" "string" "blood_seeker_idle_anim"
+					"StartingAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+					"IdleAnim" "string" "blood_seeker_idle_anim"
+					"IdleAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 0"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1 1 1"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+"CMapEntity"
+			{
+				"id" "elementid" "9ac6ddf5-8de8-549c-95fe-a8f2113d6758"
+				"nodeID" "int" "2"
+				"referenceID" "uint64" "0xc12bbeb96a37b72a"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "faed8d7d-d2d5-56a6-833e-8a0898b92d20"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "e67baffc-77ab-520e-813a-b0c02b6ae426"
+					"classname" "string" "prop_dynamic"
+					"targetname" "string" "monster_part_shoulder"
+					"parentname" "string" "monster_portrait_body"
+					"parentAttachmentName" "string" "!bonemerge"
+					"local.origin" "string" "0 0 0"
+					"local.angles" "string" "0 0 0"
+					"local.scales" "string" "1.0 1.0 1.0"
+					"useLocalOffset" "string" "1"
+					"globalname" "string" ""
+					"model" "string" "models/heroes/blood_seeker/neck.vmdl"
+					"skin" "string" "1"
+					"bodygroups" "string" ""
+					"disableshadows" "string" "0"
+					"vscripts" "string" ""
+					"damagefilter" "string" ""
+					"ExplodeDamage" "string" "0"
+					"ExplodeRadius" "string" "0"
+					"PerformanceMode" "string" "PM_NORMAL"
+					"spawnflags" "string" "0"
+					"pressuredelay" "string" "0"
+					"mincpulevel" "string" "0"
+					"maxcpulevel" "string" "0"
+					"mingpulevel" "string" "0"
+					"maxgpulevel" "string" "0"
+					"disableX360" "string" "0"
+					"renderfx" "string" "kRenderFxNone"
+					"rendermode" "string" "kRenderNormal"
+					"renderamt" "string" "255"
+					"rendercolor" "string" "255 255 255 255"
+					"disablereceiveshadows" "string" "0"
+					"lightgroup" "string" ""
+					"fademindist" "string" "-1"
+					"fademaxdist" "string" "0"
+					"fadescale" "string" "1"
+					"rendertocubemaps" "string" "1"
+					"lightmapstatic" "string" "0"
+					"glowstate" "string" "0"
+					"glowrange" "string" "0"
+					"glowrangemin" "string" "0"
+					"glowcolor" "string" "0 0 0"
+					"solid" "string" "0"
+					"disablelowviolence" "string" "0"
+					"RandomAnimation" "string" "0"
+					"randomizecycle" "string" "0"
+					"MinAnimTime" "string" "5"
+					"MaxAnimTime" "string" "10"
+					"LagCompensate" "string" "0"
+					"AnimateOnServer" "string" "0"
+					"ScriptedMovement" "string" "0"
+					"velocity" "string" ""
+					"avelocity" "string" ""
+					"lightingorigin" "string" ""
+					"updatechildren" "string" "0"
+					"use_animgraph" "string" "0"
+					"CreateNavObstacle" "string" "0"
+					"forcenpcexclude" "string" "0"
+					"StartDisabled" "string" "0"
+					"clothScale" "string" "1"
+					"clientSideEntity" "string" "0"
+					"object_culling" "string" "0"
+					"glowteam" "string" "-1"
+					"add_attribute" "string" ""
+					"add_modifier" "string" ""
+					"StartingAnim" "string" ""
+					"StartingAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+					"IdleAnim" "string" ""
+					"IdleAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 0"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1.0 1.0 1.0"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+"CMapEntity"
+			{
+				"id" "elementid" "4c30faca-e970-5701-b069-a9cc4930a79e"
+				"nodeID" "int" "3"
+				"referenceID" "uint64" "0xc12bbeb96a37b72a"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "aa7e6605-2bd7-57cd-b0bf-854d75a5ed0d"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "382d6d1a-a53a-5aa0-a710-218746da8518"
+					"classname" "string" "prop_dynamic"
+					"targetname" "string" "monster_part_belt"
+					"parentname" "string" "monster_portrait_body"
+					"parentAttachmentName" "string" "!bonemerge"
+					"local.origin" "string" "0 0 0"
+					"local.angles" "string" "0 0 0"
+					"local.scales" "string" "1.0 1.0 1.0"
+					"useLocalOffset" "string" "1"
+					"globalname" "string" ""
+					"model" "string" "models/heroes/blood_seeker/belt.vmdl"
+					"skin" "string" "1"
+					"bodygroups" "string" ""
+					"disableshadows" "string" "0"
+					"vscripts" "string" ""
+					"damagefilter" "string" ""
+					"ExplodeDamage" "string" "0"
+					"ExplodeRadius" "string" "0"
+					"PerformanceMode" "string" "PM_NORMAL"
+					"spawnflags" "string" "0"
+					"pressuredelay" "string" "0"
+					"mincpulevel" "string" "0"
+					"maxcpulevel" "string" "0"
+					"mingpulevel" "string" "0"
+					"maxgpulevel" "string" "0"
+					"disableX360" "string" "0"
+					"renderfx" "string" "kRenderFxNone"
+					"rendermode" "string" "kRenderNormal"
+					"renderamt" "string" "255"
+					"rendercolor" "string" "255 255 255 255"
+					"disablereceiveshadows" "string" "0"
+					"lightgroup" "string" ""
+					"fademindist" "string" "-1"
+					"fademaxdist" "string" "0"
+					"fadescale" "string" "1"
+					"rendertocubemaps" "string" "1"
+					"lightmapstatic" "string" "0"
+					"glowstate" "string" "0"
+					"glowrange" "string" "0"
+					"glowrangemin" "string" "0"
+					"glowcolor" "string" "0 0 0"
+					"solid" "string" "0"
+					"disablelowviolence" "string" "0"
+					"RandomAnimation" "string" "0"
+					"randomizecycle" "string" "0"
+					"MinAnimTime" "string" "5"
+					"MaxAnimTime" "string" "10"
+					"LagCompensate" "string" "0"
+					"AnimateOnServer" "string" "0"
+					"ScriptedMovement" "string" "0"
+					"velocity" "string" ""
+					"avelocity" "string" ""
+					"lightingorigin" "string" ""
+					"updatechildren" "string" "0"
+					"use_animgraph" "string" "0"
+					"CreateNavObstacle" "string" "0"
+					"forcenpcexclude" "string" "0"
+					"StartDisabled" "string" "0"
+					"clothScale" "string" "1"
+					"clientSideEntity" "string" "0"
+					"object_culling" "string" "0"
+					"glowteam" "string" "-1"
+					"add_attribute" "string" ""
+					"add_modifier" "string" ""
+					"StartingAnim" "string" ""
+					"StartingAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+					"IdleAnim" "string" ""
+					"IdleAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 0"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1.0 1.0 1.0"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+"CMapEntity"
+			{
+				"id" "elementid" "9af6d69e-fde5-54b8-b11c-30189466bb18"
+				"nodeID" "int" "4"
+				"referenceID" "uint64" "0xc12bbeb96a37b72a"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "f56448c7-02b0-52b6-8099-17076675fd28"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "25bb32d8-bf07-5a57-8a03-fd9752e11e0a"
+					"classname" "string" "prop_dynamic"
+					"targetname" "string" "monster_part_arms"
+					"parentname" "string" "monster_portrait_body"
+					"parentAttachmentName" "string" "!bonemerge"
+					"local.origin" "string" "0 0 0"
+					"local.angles" "string" "0 0 0"
+					"local.scales" "string" "1.0 1.0 1.0"
+					"useLocalOffset" "string" "1"
+					"globalname" "string" ""
+					"model" "string" "models/heroes/blood_seeker/bracer.vmdl"
+					"skin" "string" "1"
+					"bodygroups" "string" ""
+					"disableshadows" "string" "0"
+					"vscripts" "string" ""
+					"damagefilter" "string" ""
+					"ExplodeDamage" "string" "0"
+					"ExplodeRadius" "string" "0"
+					"PerformanceMode" "string" "PM_NORMAL"
+					"spawnflags" "string" "0"
+					"pressuredelay" "string" "0"
+					"mincpulevel" "string" "0"
+					"maxcpulevel" "string" "0"
+					"mingpulevel" "string" "0"
+					"maxgpulevel" "string" "0"
+					"disableX360" "string" "0"
+					"renderfx" "string" "kRenderFxNone"
+					"rendermode" "string" "kRenderNormal"
+					"renderamt" "string" "255"
+					"rendercolor" "string" "255 255 255 255"
+					"disablereceiveshadows" "string" "0"
+					"lightgroup" "string" ""
+					"fademindist" "string" "-1"
+					"fademaxdist" "string" "0"
+					"fadescale" "string" "1"
+					"rendertocubemaps" "string" "1"
+					"lightmapstatic" "string" "0"
+					"glowstate" "string" "0"
+					"glowrange" "string" "0"
+					"glowrangemin" "string" "0"
+					"glowcolor" "string" "0 0 0"
+					"solid" "string" "0"
+					"disablelowviolence" "string" "0"
+					"RandomAnimation" "string" "0"
+					"randomizecycle" "string" "0"
+					"MinAnimTime" "string" "5"
+					"MaxAnimTime" "string" "10"
+					"LagCompensate" "string" "0"
+					"AnimateOnServer" "string" "0"
+					"ScriptedMovement" "string" "0"
+					"velocity" "string" ""
+					"avelocity" "string" ""
+					"lightingorigin" "string" ""
+					"updatechildren" "string" "0"
+					"use_animgraph" "string" "0"
+					"CreateNavObstacle" "string" "0"
+					"forcenpcexclude" "string" "0"
+					"StartDisabled" "string" "0"
+					"clothScale" "string" "1"
+					"clientSideEntity" "string" "0"
+					"object_culling" "string" "0"
+					"glowteam" "string" "-1"
+					"add_attribute" "string" ""
+					"add_modifier" "string" ""
+					"StartingAnim" "string" ""
+					"StartingAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+					"IdleAnim" "string" ""
+					"IdleAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 0"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1.0 1.0 1.0"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+"CMapEntity"
+			{
+				"id" "elementid" "cc9a1105-d796-5240-93ae-489f5a292b15"
+				"nodeID" "int" "5"
+				"referenceID" "uint64" "0xc12bbeb96a37b72a"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "23a9a464-2c51-5a02-b9fe-326be3b3ca80"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "97f667e1-e282-5271-ac28-5dcfb507b2b1"
+					"classname" "string" "prop_dynamic"
+					"targetname" "string" "monster_part_back"
+					"parentname" "string" "monster_portrait_body"
+					"parentAttachmentName" "string" "!bonemerge"
+					"local.origin" "string" "0 0 0"
+					"local.angles" "string" "0 0 0"
+					"local.scales" "string" "1.0 1.0 1.0"
+					"useLocalOffset" "string" "1"
+					"globalname" "string" ""
+					"model" "string" "models/heroes/blood_seeker/cape.vmdl"
+					"skin" "string" "1"
+					"bodygroups" "string" ""
+					"disableshadows" "string" "0"
+					"vscripts" "string" ""
+					"damagefilter" "string" ""
+					"ExplodeDamage" "string" "0"
+					"ExplodeRadius" "string" "0"
+					"PerformanceMode" "string" "PM_NORMAL"
+					"spawnflags" "string" "0"
+					"pressuredelay" "string" "0"
+					"mincpulevel" "string" "0"
+					"maxcpulevel" "string" "0"
+					"mingpulevel" "string" "0"
+					"maxgpulevel" "string" "0"
+					"disableX360" "string" "0"
+					"renderfx" "string" "kRenderFxNone"
+					"rendermode" "string" "kRenderNormal"
+					"renderamt" "string" "255"
+					"rendercolor" "string" "255 255 255 255"
+					"disablereceiveshadows" "string" "0"
+					"lightgroup" "string" ""
+					"fademindist" "string" "-1"
+					"fademaxdist" "string" "0"
+					"fadescale" "string" "1"
+					"rendertocubemaps" "string" "1"
+					"lightmapstatic" "string" "0"
+					"glowstate" "string" "0"
+					"glowrange" "string" "0"
+					"glowrangemin" "string" "0"
+					"glowcolor" "string" "0 0 0"
+					"solid" "string" "0"
+					"disablelowviolence" "string" "0"
+					"RandomAnimation" "string" "0"
+					"randomizecycle" "string" "0"
+					"MinAnimTime" "string" "5"
+					"MaxAnimTime" "string" "10"
+					"LagCompensate" "string" "0"
+					"AnimateOnServer" "string" "0"
+					"ScriptedMovement" "string" "0"
+					"velocity" "string" ""
+					"avelocity" "string" ""
+					"lightingorigin" "string" ""
+					"updatechildren" "string" "0"
+					"use_animgraph" "string" "0"
+					"CreateNavObstacle" "string" "0"
+					"forcenpcexclude" "string" "0"
+					"StartDisabled" "string" "0"
+					"clothScale" "string" "1"
+					"clientSideEntity" "string" "0"
+					"object_culling" "string" "0"
+					"glowteam" "string" "-1"
+					"add_attribute" "string" ""
+					"add_modifier" "string" ""
+					"StartingAnim" "string" ""
+					"StartingAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+					"IdleAnim" "string" ""
+					"IdleAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 0"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1.0 1.0 1.0"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+"CMapEntity"
+			{
+				"id" "elementid" "871fdcd7-4691-5186-ae95-87285be05ed0"
+				"nodeID" "int" "6"
+				"referenceID" "uint64" "0xc12bbeb96a37b72a"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "3395ccba-3355-5672-acef-6552ac15d2f9"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "503e1304-d4ba-5482-8798-134cbfd5b5ae"
+					"classname" "string" "prop_dynamic"
+					"targetname" "string" "monster_part_head"
+					"parentname" "string" "monster_portrait_body"
+					"parentAttachmentName" "string" "!bonemerge"
+					"local.origin" "string" "0 0 0"
+					"local.angles" "string" "0 0 0"
+					"local.scales" "string" "1.0 1.0 1.0"
+					"useLocalOffset" "string" "1"
+					"globalname" "string" ""
+					"model" "string" "models/heroes/blood_seeker/helmet.vmdl"
+					"skin" "string" "1"
+					"bodygroups" "string" ""
+					"disableshadows" "string" "0"
+					"vscripts" "string" ""
+					"damagefilter" "string" ""
+					"ExplodeDamage" "string" "0"
+					"ExplodeRadius" "string" "0"
+					"PerformanceMode" "string" "PM_NORMAL"
+					"spawnflags" "string" "0"
+					"pressuredelay" "string" "0"
+					"mincpulevel" "string" "0"
+					"maxcpulevel" "string" "0"
+					"mingpulevel" "string" "0"
+					"maxgpulevel" "string" "0"
+					"disableX360" "string" "0"
+					"renderfx" "string" "kRenderFxNone"
+					"rendermode" "string" "kRenderNormal"
+					"renderamt" "string" "255"
+					"rendercolor" "string" "255 255 255 255"
+					"disablereceiveshadows" "string" "0"
+					"lightgroup" "string" ""
+					"fademindist" "string" "-1"
+					"fademaxdist" "string" "0"
+					"fadescale" "string" "1"
+					"rendertocubemaps" "string" "1"
+					"lightmapstatic" "string" "0"
+					"glowstate" "string" "0"
+					"glowrange" "string" "0"
+					"glowrangemin" "string" "0"
+					"glowcolor" "string" "0 0 0"
+					"solid" "string" "0"
+					"disablelowviolence" "string" "0"
+					"RandomAnimation" "string" "0"
+					"randomizecycle" "string" "0"
+					"MinAnimTime" "string" "5"
+					"MaxAnimTime" "string" "10"
+					"LagCompensate" "string" "0"
+					"AnimateOnServer" "string" "0"
+					"ScriptedMovement" "string" "0"
+					"velocity" "string" ""
+					"avelocity" "string" ""
+					"lightingorigin" "string" ""
+					"updatechildren" "string" "0"
+					"use_animgraph" "string" "0"
+					"CreateNavObstacle" "string" "0"
+					"forcenpcexclude" "string" "0"
+					"StartDisabled" "string" "0"
+					"clothScale" "string" "1"
+					"clientSideEntity" "string" "0"
+					"object_culling" "string" "0"
+					"glowteam" "string" "-1"
+					"add_attribute" "string" ""
+					"add_modifier" "string" ""
+					"StartingAnim" "string" ""
+					"StartingAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+					"IdleAnim" "string" ""
+					"IdleAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 0"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1.0 1.0 1.0"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+"CMapEntity"
+			{
+				"id" "elementid" "7eab6ee1-c179-5e42-b836-5e548f767bf7"
+				"nodeID" "int" "7"
+				"referenceID" "uint64" "0xc12bbeb96a37b72a"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "824e60b1-c400-5d94-85d2-9e323bc28f38"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "3f573921-c78f-5e1e-a805-9270b751c69e"
+					"classname" "string" "prop_dynamic"
+					"targetname" "string" "monster_part_weapon"
+					"parentname" "string" "monster_portrait_body"
+					"parentAttachmentName" "string" "!bonemerge"
+					"local.origin" "string" "0 0 0"
+					"local.angles" "string" "0 0 0"
+					"local.scales" "string" "1.0 1.0 1.0"
+					"useLocalOffset" "string" "1"
+					"globalname" "string" ""
+					"model" "string" "models/heroes/blood_seeker/weapon.vmdl"
+					"skin" "string" "1"
+					"bodygroups" "string" ""
+					"disableshadows" "string" "0"
+					"vscripts" "string" ""
+					"damagefilter" "string" ""
+					"ExplodeDamage" "string" "0"
+					"ExplodeRadius" "string" "0"
+					"PerformanceMode" "string" "PM_NORMAL"
+					"spawnflags" "string" "0"
+					"pressuredelay" "string" "0"
+					"mincpulevel" "string" "0"
+					"maxcpulevel" "string" "0"
+					"mingpulevel" "string" "0"
+					"maxgpulevel" "string" "0"
+					"disableX360" "string" "0"
+					"renderfx" "string" "kRenderFxNone"
+					"rendermode" "string" "kRenderNormal"
+					"renderamt" "string" "255"
+					"rendercolor" "string" "255 255 255 255"
+					"disablereceiveshadows" "string" "0"
+					"lightgroup" "string" ""
+					"fademindist" "string" "-1"
+					"fademaxdist" "string" "0"
+					"fadescale" "string" "1"
+					"rendertocubemaps" "string" "1"
+					"lightmapstatic" "string" "0"
+					"glowstate" "string" "0"
+					"glowrange" "string" "0"
+					"glowrangemin" "string" "0"
+					"glowcolor" "string" "0 0 0"
+					"solid" "string" "0"
+					"disablelowviolence" "string" "0"
+					"RandomAnimation" "string" "0"
+					"randomizecycle" "string" "0"
+					"MinAnimTime" "string" "5"
+					"MaxAnimTime" "string" "10"
+					"LagCompensate" "string" "0"
+					"AnimateOnServer" "string" "0"
+					"ScriptedMovement" "string" "0"
+					"velocity" "string" ""
+					"avelocity" "string" ""
+					"lightingorigin" "string" ""
+					"updatechildren" "string" "0"
+					"use_animgraph" "string" "0"
+					"CreateNavObstacle" "string" "0"
+					"forcenpcexclude" "string" "0"
+					"StartDisabled" "string" "0"
+					"clothScale" "string" "1"
+					"clientSideEntity" "string" "0"
+					"object_culling" "string" "0"
+					"glowteam" "string" "-1"
+					"add_attribute" "string" ""
+					"add_modifier" "string" ""
+					"StartingAnim" "string" ""
+					"StartingAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+					"IdleAnim" "string" ""
+					"IdleAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 0"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1.0 1.0 1.0"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+"CMapEntity"
+			{
+				"id" "elementid" "99b900fd-df95-512b-856f-64494fef453c"
+				"nodeID" "int" "8"
+				"referenceID" "uint64" "0xc12bbeb96a37b72a"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "12840b48-0c0f-5f17-9731-6e2dfba6f457"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "0939557e-3804-5f17-896c-6cd8501fef4c"
+					"classname" "string" "prop_dynamic"
+					"targetname" "string" "monster_part_offhand_weapon"
+					"parentname" "string" "monster_portrait_body"
+					"parentAttachmentName" "string" "!bonemerge"
+					"local.origin" "string" "0 0 0"
+					"local.angles" "string" "0 0 0"
+					"local.scales" "string" "1.0 1.0 1.0"
+					"useLocalOffset" "string" "1"
+					"globalname" "string" ""
+					"model" "string" "models/heroes/blood_seeker/weapon_offhand.vmdl"
+					"skin" "string" "1"
+					"bodygroups" "string" ""
+					"disableshadows" "string" "0"
+					"vscripts" "string" ""
+					"damagefilter" "string" ""
+					"ExplodeDamage" "string" "0"
+					"ExplodeRadius" "string" "0"
+					"PerformanceMode" "string" "PM_NORMAL"
+					"spawnflags" "string" "0"
+					"pressuredelay" "string" "0"
+					"mincpulevel" "string" "0"
+					"maxcpulevel" "string" "0"
+					"mingpulevel" "string" "0"
+					"maxgpulevel" "string" "0"
+					"disableX360" "string" "0"
+					"renderfx" "string" "kRenderFxNone"
+					"rendermode" "string" "kRenderNormal"
+					"renderamt" "string" "255"
+					"rendercolor" "string" "255 255 255 255"
+					"disablereceiveshadows" "string" "0"
+					"lightgroup" "string" ""
+					"fademindist" "string" "-1"
+					"fademaxdist" "string" "0"
+					"fadescale" "string" "1"
+					"rendertocubemaps" "string" "1"
+					"lightmapstatic" "string" "0"
+					"glowstate" "string" "0"
+					"glowrange" "string" "0"
+					"glowrangemin" "string" "0"
+					"glowcolor" "string" "0 0 0"
+					"solid" "string" "0"
+					"disablelowviolence" "string" "0"
+					"RandomAnimation" "string" "0"
+					"randomizecycle" "string" "0"
+					"MinAnimTime" "string" "5"
+					"MaxAnimTime" "string" "10"
+					"LagCompensate" "string" "0"
+					"AnimateOnServer" "string" "0"
+					"ScriptedMovement" "string" "0"
+					"velocity" "string" ""
+					"avelocity" "string" ""
+					"lightingorigin" "string" ""
+					"updatechildren" "string" "0"
+					"use_animgraph" "string" "0"
+					"CreateNavObstacle" "string" "0"
+					"forcenpcexclude" "string" "0"
+					"StartDisabled" "string" "0"
+					"clothScale" "string" "1"
+					"clientSideEntity" "string" "0"
+					"object_culling" "string" "0"
+					"glowteam" "string" "-1"
+					"add_attribute" "string" ""
+					"add_modifier" "string" ""
+					"StartingAnim" "string" ""
+					"StartingAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+					"IdleAnim" "string" ""
+					"IdleAnimationLoopMode" "string" "ANIM_LOOP_MODE_LOOPING"
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 0"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1.0 1.0 1.0"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+"CMapEntity"
+					{
+						"id" "elementid" "88978877-3f1e-5f5a-8522-5334484ab78d"
+						"nodeID" "int" "9"
+						"referenceID" "uint64" "0x38261179cbe10b6a"
+						"children" "element_array" 
+						[
+						]
+						"variableTargetKeys" "string_array" 
+						[
+						]
+						"variableNames" "string_array" 
+						[
+						]
+						"relayPlugData" "DmePlugList"
+						{
+							"id" "elementid" "34087d46-8d37-5f42-9858-38ace70c80ed"
+							"names" "string_array" 
+							[
+							]
+							"dataTypes" "int_array" 
+							[
+							]
+							"plugTypes" "int_array" 
+							[
+							]
+							"descriptions" "string_array" 
+							[
+							]
+						}
+
+						"connectionsData" "element_array" 
+						[
+						]
+						"entity_properties" "EditGameClassProps"
+						{
+							"id" "elementid" "dda546ba-2d10-50cb-9d8a-4dc9b6f92c64"
+							"classname" "string" "point_camera"
+							"targetname" "string" "monster_portrait_camera"
+							"parentname" "string" ""
+							"parentAttachmentName" "string" ""
+							"local.origin" "string" "0 0 0"
+							"local.angles" "string" "0 0 0"
+							"local.scales" "string" "1 1 1"
+							"useLocalOffset" "string" "0"
+							"vscripts" "string" ""
+							"clientSideEntity" "string" "0"
+							"spawnflags" "string" "0"
+							"FOV" "string" "10"
+							"ZNear" "string" "4"
+							"ZFar" "string" "7000"
+							"UseScreenAspectRatio" "string" "0"
+							"aspectRatio" "string" "1"
+							"fogEnable" "string" "0"
+							"fogColor" "string" "0 0 0"
+							"fogStart" "string" "2048"
+							"fogEnd" "string" "4096"
+							"fogMaxDensity" "string" "1"
+							"rendercolor" "string" "128 128 128 255"
+							"override_shadow_farz" "string" "800"
+							"dof_enabled" "string" "0"
+							"dof_near_blurry" "string" "125"
+							"dof_near_crisp" "string" "250"
+							"dac_dof_far_crisp" "string" "300"
+							"dac_dof_far_blurry" "string" "700"
+							"dac_dof_tilt_to_ground" "string" "0.75"
+							"hltvUsable" "string" "0"
+						}
+
+						"hitNormal" "vector3" "0 0 1"
+						"isProceduralEntity" "bool" "0"
+						"origin" "vector3" "303.57 -56.52 148.95"
+						"angles" "qangle" "12.54 168.72 0.00"
+						"scales" "vector3" "1 1 1"
+						"transformLocked" "bool" "0"
+						"force_hidden" "bool" "0"
+						"editorOnly" "bool" "0"
+					},
+"CMapEntity"
+					{
+						"id" "elementid" "5b419295-74f1-532c-8d68-bf4a50bfba12"
+						"nodeID" "int" "10"
+						"referenceID" "uint64" "0xc150b39fc4fd5de9"
+						"children" "element_array" 
+						[
+						]
+						"variableTargetKeys" "string_array" 
+						[
+						]
+						"variableNames" "string_array" 
+						[
+						]
+						"relayPlugData" "DmePlugList"
+						{
+							"id" "elementid" "2cf5dcee-bda5-5bd3-9e04-20d374654553"
+							"names" "string_array" 
+							[
+							]
+							"dataTypes" "int_array" 
+							[
+							]
+							"plugTypes" "int_array" 
+							[
+							]
+							"descriptions" "string_array" 
+							[
+							]
+						}
+
+						"connectionsData" "element_array" 
+						[
+						]
+						"entity_properties" "EditGameClassProps"
+						{
+							"id" "elementid" "a421c5e8-020b-55d9-8dc3-eb4996681458"
+							"classname" "string" "env_global_light"
+							"targetname" "string" "monster_portrait_light"
+							"vscripts" "string" ""
+							"StartDisabled" "string" "0"
+							"ambientangles" "string" "8.49704249 110.48627785 0"
+							"color" "string" "254 228 217 1"
+							"lightscale" "string" "1.150000"
+							"ambientcolor1" "string" "0 84 165 1"
+							"ambientscale1" "string" "5.000000"
+							"ambientcolor2" "string" "97 38 38 1"
+							"ambientscale2" "string" "1.500000"
+							"ambientcolor3" "string" "63 57 57 255"
+							"groundscale" "string" "1.500000"
+							"specularangles" "string" "90 180 0"
+							"specularpower" "string" "16"
+							"specularindependence" "string" "0"
+							"specularcolor" "string" "251 74 84 1"
+							"fov" "string" "70"
+							"nearz" "string" "4"
+							"enableshadows" "string" "1"
+							"fow_darkness" "string" "2.7"
+							"background_clear_not_required" "string" "0"
+							"SkyboxSlot" "string" ""
+							"enable_separate_skybox_fog" "string" "0"
+							"height_fog_color" "string" "255 255 255 0"
+							"height_fog_max_z" "string" "512.0"
+							"height_fog_density" "string" "0"
+							"height_fog_falloff" "string" "1.0"
+							"height_fog_texture0" "string" "materials/dev/fow_clouds_00.vtex"
+							"height_fog_texture1" "string" "materials/dev/fow_drifts_00.vtex"
+							"height_fog_rotation0" "string" "0.0"
+							"height_fog_scale0" "string" "4096.0"
+							"height_fog_scroll0U" "string" "5"
+							"height_fog_scroll0V" "string" "-5"
+							"height_fog_rotation1" "string" "0.0"
+							"height_fog_scale1" "string" "2048.0"
+							"height_fog_scroll1U" "string" "10"
+							"height_fog_scroll1V" "string" "-10"
+							"height_fog_exclusion_inner_radius" "string" "0"
+							"height_fog_exclusion_height_bias" "string" "128"
+							"height_fog_type" "string" "0"
+							"height_fog_caustic_speed_scale" "string" "1"
+							"height_fog_caustic_amplitude_scale" "string" "0.1"
+						
+"parentname" "string" ""
+}
+
+						"hitNormal" "vector3" "0 0 1"
+						"isProceduralEntity" "bool" "0"
+						"origin" "vector3" "113.60 -6.61 151.22"
+						"angles" "qangle" "38.10 189.72 0.00"
+						"scales" "vector3" "1 1 1"
+						"transformLocked" "bool" "0"
+						"force_hidden" "bool" "0"
+						"editorOnly" "bool" "0"
+					}
+]
+		"variableTargetKeys" "string_array" 
+		[
+		]
+		"variableNames" "string_array" 
+		[
+		]
+		"relayPlugData" "DmePlugList"
+		{
+			"id" "elementid" "1d8f3a3e-fffb-49bf-b6d9-0cc011118197"
+			"names" "string_array" 
+			[
+			]
+			"dataTypes" "int_array" 
+			[
+			]
+			"plugTypes" "int_array" 
+			[
+			]
+			"descriptions" "string_array" 
+			[
+			]
+		}
+
+		"connectionsData" "element_array" 
+		[
+		]
+		"entity_properties" "EditGameClassProps"
+		{
+			"id" "elementid" "18a5d3c1-efd5-49ee-945c-c41432b8588b"
+			"classname" "string" "worldspawn"
+			"targetname" "string" ""
+			"skyname" "string" "sky_day01_01"
+			"startdark" "string" "0"
+			"startcolor" "string" "0 0 0"
+			"pvstype" "string" "0"
+			"newunit" "string" "0"
+			"maxpropscreenwidth" "string" "-1"
+			"minpropscreenwidth" "string" "0"
+			"vrchaperone" "string" "0"
+			"vrmovement" "string" "0"
+			"OptimizedHeightFieldName" "string" ""
+			"prefab_has_runtime_entity_by_default" "string" "0"
+		}
+
+		"nextDecalID" "int" "0"
+		"fixupEntityNames" "bool" "1"
+		"mapUsageType" "string" "background"
+		"origin" "vector3" "0 0 0"
+		"angles" "qangle" "0 0 0"
+		"scales" "vector3" "1 1 1"
+		"transformLocked" "bool" "0"
+		"force_hidden" "bool" "0"
+		"editorOnly" "bool" "0"
+	}
+
+	"visbility" "CVisibilityMgr"
+	{
+		"id" "elementid" "96f995e0-f4df-4225-94ca-162c72be19fd"
+		"nodeID" "int" "0"
+		"referenceID" "uint64" "0x0"
+		"children" "element_array" 
+		[
+		]
+		"variableTargetKeys" "string_array" 
+		[
+		]
+		"variableNames" "string_array" 
+		[
+		]
+		"nodes" "element_array" 
+		[
+		]
+		"hiddenFlags" "int_array" 
+		[
+		]
+		"origin" "vector3" "0 0 0"
+		"angles" "qangle" "0 0 0"
+		"scales" "vector3" "1 1 1"
+		"editorOnly" "bool" "0"
+		"force_hidden" "bool" "0"
+		"transformLocked" "bool" "0"
+	}
+
+	"mapVariables" "CMapVariableSet"
+	{
+		"id" "elementid" "46e41d1f-f07d-4436-8142-be3142bb6ecc"
+		"variableNames" "string_array" 
+		[
+		]
+		"variableValues" "string_array" 
+		[
+		]
+		"variableTypeNames" "string_array" 
+		[
+		]
+		"variableTypeParameters" "string_array" 
+		[
+		]
+		"m_ChoiceGroups" "element_array" 
+		[
+		]
+	}
+
+	"rootSelectionSet" "CMapSelectionSet"
+	{
+		"id" "elementid" "d97ad795-623a-4348-a62a-3b7c1d48e482"
+		"children" "element_array" 
+		[
+		]
+		"selectionSetName" "string" ""
+		"selectionSetData" "element" ""
+	}
+
+	"m_ReferencedMeshSnapshots" "element_array" 
+	[
+	]
+	"m_bIsCordoning" "bool" "0"
+	"m_bCordonsVisible" "bool" "0"
+	"nodeInstanceData" "element_array" 
+	[
+	]
+	"showgrid" "bool" "1"
+	"snaprotationangle" "int" "15"
+	"gridspacing" "float" "64"
+	"show3dgrid" "bool" "1"
+	"TweakedHoldAnimation" "int" "1"
+}
+
