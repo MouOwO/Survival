@@ -7,7 +7,7 @@ vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/portrait_pr
  return new Panel(id,parent,type);
 }}});
 class Panel {
- constructor(id,parent,type='Panel'){this.id=id;this.paneltype=type;this.parent=parent;this.children=[];this.style={};this.hittest=true;this.hittestchildren=true;this.imageCalls=[];if(parent)parent.children.push(this);}
+ constructor(id,parent,type='Panel'){this.id=id;this.paneltype=type;this.parent=parent;this.children=[];this.style=new Proxy({},{set:(o,k,v)=>{if(/^background(?:Color|Image|Size|Position|Repeat)$/.test(k))assert.notEqual(v,'','native background style cannot be empty: '+k);o[k]=v;return true;}});this.hittest=true;this.hittestchildren=true;this.imageCalls=[];if(parent)parent.children.push(this);}
  IsValid(){return !this.removed;}
  GetParent(){return this.parent;}
  AddClass(name){if(!this.classes)this.classes=new Set();this.classes.add(name);}
@@ -194,7 +194,7 @@ for(let rank=1;rank<=10;rank++){
  assert.equal(nativeRebirth.custom.style.backgroundColor,'transparent','native outfit scene keeps its own authored backdrop');
  assert.equal(nativeRebirth.custom.style.backgroundImage,'none');
  for(const key of ['backgroundColor','backgroundImage','backgroundSize','backgroundPosition','backgroundRepeat'])
-  assert.equal(nativeRebirth.container.style[key],key==='backgroundColor'?'transparent':'','native rebirth clears custom '+key);
+  assert.equal(nativeRebirth.container.style[key],{backgroundColor:'transparent',backgroundImage:'none',backgroundSize:'100% 100%',backgroundPosition:'50% 50%',backgroundRepeat:'no-repeat'}[key],'native rebirth uses valid neutral '+key);
  for(const parent of [nativeRebirth.container,nativeRebirth.custom])
   assert.equal(parent.FindChildTraverse('SurvivalPortraitMotes').style.visibility,'collapse');
  const image=nativeRebirth.container.FindChildTraverse('SurvivalOfficialPortraitBackground');

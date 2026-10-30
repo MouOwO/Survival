@@ -89,7 +89,7 @@ for(const panel of empty.map.abilities.children){
  const hotkey=panel.FindChildTraverse('HotkeyContainer');if(hotkey)assert.equal(hotkey.style.opacity,'0');
 }
 empty.map.abilities.children[0].FindChildTraverse('HotkeyContainer').style.opacity='1';
-empty.advance(500);assert.equal(empty.map.abilities.children[0].FindChildTraverse('HotkeyContainer').style.opacity,'0',
+empty.advance(120);assert.equal(empty.map.abilities.children[0].FindChildTraverse('HotkeyContainer').style.opacity,'0',
  'the native rewrite is repaired while the real topnav mirror stays empty');
 empty.state.unit=7;empty.emit('dota_player_update_selected_unit',{PlayerID:0});empty.advance(1500);
 assert.deepEqual(empty.keys(),['Q','','W','E'],'genuine hero shortcuts return through the original writer');
@@ -135,7 +135,7 @@ for(const panel of dual.map.abilities.children){
 }
 queryKeys()[0].style.opacity='1';
 const stale=new dual.Panel('Label','SurvivalAbilityHotkey',query.panels[1].FindChildTraverse('AbilityButton'));stale.text='W';stale.style.visibility='visible';
-dual.advance(500);assertQueryKeyless();
+dual.advance(120);assertQueryKeyless();
 // Querying a unit with genuine spells preserves native icons without adding
 // command shortcuts or changing the still-selected friendly hero.
 dual.state.unit=29;dual.emit('dota_player_update_query_unit',{PlayerID:0});dual.advance(1500);

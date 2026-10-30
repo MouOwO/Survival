@@ -11,7 +11,7 @@ sys.path.insert(0,str(build.ROOT/'tools'))
 import steam_workshop_upload as publisher
 def main():
  p=argparse.ArgumentParser(description=__doc__);p.add_argument('--apply',action='store_true');a=p.parse_args()
- report=build.REPORT/'package_v02.json';package=build.base.load(report)
+ report=build.REPORT/'package_v03.json';package=build.base.load(report)
  build.need(package['release_sequence']==build.SEQUENCE and package['full_runtime_validator_passed'],'Completed signed portrait build required')
  original=build.ROOT/'publishing/workshop/test_listing.json';listing=build.base.load(original)
  build.need(listing['workshop_id']==build.ITEM and listing['visibility_requested']=='unlisted','Original restricted listing required')

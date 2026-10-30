@@ -11,14 +11,14 @@ ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT/'tools'))
 spec=importlib.util.spec_from_file_location('portrait_map_parent',ROOT/'tools/map_release_20261029/build_release.py')
 base=importlib.util.module_from_spec(spec);spec.loader.exec_module(base)
 inc,pack,need=base.inc,base.pack,base.need
-SEQUENCE=2026103001;REVISION='WS4-MONSTER-PORTRAITS-01';ITEM=base.ITEM
+SEQUENCE=2026103002;REVISION='WS4-UNIT-PORTRAITS-PREWARM-02';ITEM=base.ITEM
 SOURCE='HEAD'
-PREFIX='20261030_ws4_monster_portraits_v02'
+PREFIX='20261030_ws4_unit_portraits_v03'
 OVERLAY=Path('D:/Survival_发布候选')/(PREFIX+'_overlay')
 TRUSTED=Path('D:/Survival_发布候选')/(PREFIX+'_trusted_source')
 VIEW=Path('D:/Survival_发布候选')/(PREFIX+'_view')
 OUTPUT=Path('D:/Survival_工坊输出')/PREFIX
-REPORT=ROOT/'output/monster_portrait_publish_20261030'
+REPORT=ROOT/'output/portrait_optimization_publish_20261030'
 def saved(name):
  for tree in (SOURCE,SOURCE+'^3'):
   result=subprocess.run(['git','cat-file','blob',tree+':'+name],cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
@@ -27,10 +27,11 @@ def saved(name):
 @contextmanager
 def portrait_scene_maps(values):
  # The frozen publisher permits only its exact background-map allowlist.
- # Extend it for this invocation with the 88 reviewed, signed portrait maps;
+ # Extend it for this invocation with the 188 reviewed, signed portrait maps;
  # arbitrary gameplay maps remain rejected by the original guard.
  additions={n for n in values if re.fullmatch(r'maps/portraits/monster_[0-9a-f]{20}_v1\.vpk',n)}
- need(len(additions)==88,'Exact reviewed portrait map set required')
+ expected={'maps/'+s['map']+'.vpk' for s in json.loads(saved('art/portraits/monsters/manifest.json'))['assets'].values()}
+ need(len(additions)==188 and additions==expected,'Exact reviewed portrait map set required')
  previous=pack.runtime.SCENE_MAPS
  try:
   pack.runtime.SCENE_MAPS=previous|additions
@@ -39,14 +40,14 @@ def portrait_scene_maps(values):
 def payloads():
  values=base.payloads()
  manifest=json.loads(saved('art/portraits/monsters/manifest.json'))
- need(len(manifest['assets'])==97 and manifest['unique_scenes']==88 and len(manifest['backgrounds'])==24,'Verified portrait inventory differs')
- names={'panorama/layout/custom_game/survival_hud.vxml_c',*('panorama/scripts/custom_game/'+n+'.vjs_c' for n in ('combat_stats','portrait_presentation','monster_portrait_scenes','monster_portrait_renderer'))}
+ need(len(manifest['assets'])==197 and manifest['unique_scenes']==188 and len(manifest['backgrounds'])==29,'Verified portrait inventory differs')
+ names={'panorama/layout/custom_game/survival_hud.vxml_c',*('panorama/scripts/custom_game/'+n+'.vjs_c' for n in ('combat_stats','portrait_presentation','monster_portrait_scenes','monster_portrait_renderer','topnav_remaining_5d5c1152eb'))}
  names.update('maps/'+s['map']+'.vpk' for s in manifest['assets'].values())
  names.update(s['texture'].removeprefix('s2r://')+'_c' for s in manifest['backgrounds'].values())
- need(len(names)==117,'Exact compiled portrait inventory required')
+ need(len(names)==223,'Exact compiled portrait inventory required')
  for name in sorted(names):values[name]=saved(name)
- qa=base.load(ROOT/'output/rebirth_native_20261030/verification.json')
- need(qa['status']=='PASS' and qa['all_assets_loaded']==97 and qa['rebirth_bottom_hud_bindings']==10 and qa['animated_portrait_changed_pixels']>0 and qa['test_only_panels_removed'],'Actual offline receipt required')
+ qa=base.load(ROOT/'output/portrait_optimization_20261030/verification.json')
+ need(qa['status']=='PASS' and qa['all_assets_loaded']==197 and qa['prewarmed_worlds']==188 and qa['first_click_scene_allocations']==0 and qa['offline_cycle_units']==12 and qa['all_six_heroes_visual'] and qa['empty_monster_keys'] and qa['test_only_panels_removed'],'Actual offline receipt required')
  need(b'portrait_qa_probe' not in values['panorama/layout/custom_game/survival_hud.vxml_c'],'Temporary UI must be absent')
  return values
 def run(build=False,key=None,reviewed=None):
@@ -90,7 +91,8 @@ def run(build=False,key=None,reviewed=None):
  inc.materialize(VIEW,sources,changed,after,metadata)
  with portrait_scene_maps(values),inc.trusted_source(TRUSTED):_,verified,signature,_=pack.authenticate(VIEW)
  need(verified==after and signature['release_sequence']==SEQUENCE,'Final signed view differs')
- verification,files=inc.build_volumes(VIEW,OUTPUT,base.BASE_VPK,tree,groups,rewritten,after,'hardlink')
+ with portrait_scene_maps(values):
+  verification,files=inc.build_volumes(VIEW,OUTPUT,base.BASE_VPK,tree,groups,rewritten,after,'hardlink')
  need(pack.package_inventory(base.BASE_VPK)==inventory and pack.runtime.verify(base.BASE,before)['ok'],'Original baseline changed')
  need(pack.runtime.digest(base.JOURNAL)==journal,'Upload journal must remain untouched')
  current=payloads();need(all(current[n]==v for n,v in values.items()),'Task inputs changed during build')

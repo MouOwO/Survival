@@ -15,7 +15,10 @@ function fixture(){
  return t;
 }
 const t=fixture(),r=t.cfg.SurvivalMonsterPortraitRenderer,assets=Object.keys(t.cfg.SurvivalMonsterPortraitScenes);
-assert.equal(assets.length,97);
+assert.equal(assets.length,197);
+assert.equal(r.ResolveAsset('',t.cfg.SurvivalMonsterPortraitScenes.worker_lumberjack.model),'worker_lumberjack');
+assert.equal(r.ResolveAsset('',t.cfg.SurvivalMonsterPortraitScenes.world_resource_tree.model),'world_resource_tree');
+assert.equal(r.ResolveAsset('', 'models/unknown.vmdl'),'','unknown appearances must remain native');
 const asset=assets[0],entry=r.Prepare(t.overlay,asset);
 assert.equal(entry.ready,false);assert.equal(entry.scene.parent.values.visibility,'visible','loading scenes must render before SceneLoaded');
 assert.equal(entry.scene.attributes.drawbackground,'true');assert.equal(entry.scene.attributes.map,t.cfg.SurvivalMonsterPortraitScenes[asset].map);
@@ -24,11 +27,12 @@ for(let i=0;i<300;i++){t.advance(100);assert.equal(r.Prepare(t.overlay,asset).sc
 assert.equal(t.metrics.created.filter(x=>x.type==='DOTAScenePanel').length,1,'stable identity must reuse its map');
 r.Hide();assert.equal(entry.scene.parent.values.visibility,'collapse');
 r.Prepare(t.overlay,asset);assert.equal(entry.scene.parent.values.visibility,'visible');
-for(const id of assets){t.advance(100);const v=r.Prepare(t.overlay,id);assert(v);t.ready(v.scene);assert.equal(r.Prepare(t.overlay,id).ready,true);assert(r.Inspect().cached<=3)}
+for(const id of assets){t.advance(100);const v=r.Prepare(t.overlay,id);assert(v);t.ready(v.scene);assert.equal(r.Prepare(t.overlay,id).ready,true);assert(r.Inspect().cached<=188)}
 assert.equal(t.metrics.setUnit.length,0,'world component maps must never be replaced by naked SetUnit heroes');
 const last=r.Prepare(t.overlay,assets.at(-1));
-const nextParent=new t.Panel('RebuiltOverlay',t.context);assert.notEqual(r.Prepare(nextParent,assets.at(-1)).scene,last.scene,'rebuilt native hosts need a new map host');
-const slow=r.Prepare(nextParent,assets[0]);t.advance(10001);assert.equal(r.Prepare(nextParent,assets[0]),null);assert.equal(slow.scene.parent.alive,false);assert.equal(r.Prepare(nextParent,assets[0]),null,'failed resources must not thrash every sentinel tick');
+const nextParent=new t.Panel('RebuiltOverlay',t.context);assert.equal(r.Prepare(nextParent,assets.at(-1)).scene,last.scene,'ready scenes reparent without reloading the world');
+const slowFixture=fixture(),slowRenderer=slowFixture.cfg.SurvivalMonsterPortraitRenderer;
+const slow=slowRenderer.Prepare(slowFixture.overlay,assets[0]);slowFixture.advance(10001);assert.equal(slowRenderer.Prepare(slowFixture.overlay,assets[0]),null);assert.equal(slow.scene.parent.alive,false);assert.equal(slowRenderer.Prepare(slowFixture.overlay,assets[0]),null,'failed resources must not thrash every sentinel tick');
 assert.equal(r.Prepare(nextParent,'__proto__'),null);assert.equal(r.HasAsset('constructor'),false);
 const broken=new t.Panel('Released',t.context);broken.alive='throw';assert.doesNotThrow(()=>r.Prepare(broken,assets[2]));
 t.reload();assert.equal(r.Inspect().cached,0);assert.equal(r.Prepare(nextParent,assets[1]),null,'old owner cannot recreate resources after reload');
@@ -40,17 +44,35 @@ let version=0;
 for(const id of [...rebirth,...assets.filter(a=>!rebirth.includes(a))]){
  const spec=c.cfg.SurvivalMonsterPortraitScenes[id];c.select(8,'npc_survival_wave_monster');
  const snap={entindex:8,refresh_version:++version,model_asset_id:id,portrait_unit_name:spec.unit};
+ const warmed=cr.Prepare(c.overlay,id);c.ready(warmed.scene);
  c.api.updateSnapshot(snap);const state=c.api.portraitState();assert.equal(state.mode,'monster_scene',id);assert(state.scene);
  assert.equal(state.scene.values.transform,'scale3d(1, 1, 1)','official camera must not receive tower enlargement');
  c.ready(state.scene);for(let n=0;n<4;n++)c.api.updateSnapshot({...snap,refresh_version:++version});
- assert.equal(c.api.portraitState().scene,state.scene);assert(cr.Inspect().cached<=3);
+ assert.equal(c.api.portraitState().scene,state.scene);assert(cr.Inspect().cached<=188);
  c.setMulti(true);c.api.portraitUpdate(snap);assert.equal(c.overlay.values.visibility,'collapse');c.setMulti(false);
  c.api.portraitUpdate(snap);assert.equal(c.api.portraitState().scene,state.scene);
 }
 assert.equal(c.metrics.setUnit.length,0);
 const old=c.api.portraitState().snapshot;c.select(7,'npc_dota_hero_juggernaut');c.api.portraitTransition('pending_hero');assert.equal(c.api.portraitState().scene.parent.values.visibility,'collapse');
 c.api.updateSnapshot({entindex:7,refresh_version:++version,model_asset_id:'hero_permanent_hero_blademaster',portrait_unit_name:'npc_dota_hero_juggernaut'});
-assert.equal(c.api.portraitState().mode,'tower_scene');assert.equal(c.metrics.setUnit.length,1,'owned Juggernaut keeps its special scene');
+assert.equal(c.api.portraitState().mode,'monster_scene');assert.equal(c.metrics.setUnit.length,0,'owned Juggernaut uses its exact decorated world scene');
 c.api.updateSnapshot({...old,refresh_version:++version});assert.equal(c.api.portraitState().entity,7,'late monster snapshot cannot replace player hero');
 c.api.shutdown('test_done');
-console.log('MONSTER_PORTRAITS_PASS: 97 real identities; visible initial loading, LRU cap, stable reuse, timeout fallback, HUD rebuild/reload, released handles, real combat metadata, multiselect and owned Juggernaut');
+// Sequential background warmup must not allocate worlds again on first selection.
+const w=fixture(),wr=w.cfg.SurvivalMonsterPortraitRenderer;
+wr.Prewarm(w.nativeHost());
+for(let step=0;step<500&&w.jobs.size;step++){
+ w.advance(60);w.run([...w.jobs.keys()][0]);
+ for(const item of w.metrics.created.filter(x=>x.type==='DOTAScenePanel'))if(item.panel&&item.panel.alive)w.ready(item.panel);
+ // CreatePanel metrics contain the real fixture handle under `panel`.
+ const stage=w.nativeHost().FindChildTraverse('SurvivalPortraitPrewarm');
+ if(stage)for(const host of stage.children){const scene=host.FindChildTraverse('Scene');if(scene)w.ready(scene);}
+}
+assert.equal(wr.Inspect().loaded,188);assert.equal(wr.Inspect().queued,0);
+const warmStage=w.nativeHost().FindChildTraverse('SurvivalPortraitPrewarm'),stageParent=warmStage.GetParent();
+wr.Prewarm(warmStage.children[0]);assert.equal(warmStage.GetParent(),stageParent,'reject a stage/child parenting cycle');
+const allocations=wr.Inspect().created;
+for(const id of assets){const ready=wr.Prepare(w.overlay,id);assert(ready.ready,id);assert.equal(ready.scene.parent.GetParent(),w.overlay);}
+assert.equal(wr.Inspect().created,allocations,'first clicks reuse every prewarmed world');
+wr.Shutdown();
+console.log('MONSTER_PORTRAITS_PASS: 197 identities / 188 worlds; sequential prewarm, zero first-click allocations, persistent reuse, timeout/native fallback, HUD rebuild/reload, multiselect and all six heroes');

@@ -15,7 +15,7 @@ import re
 import subprocess
 import uuid
 
-from build_unit_portraits import ENGINE, ROOT, Vpk, parse_kv, rows
+from build_unit_portraits import ENGINE, ROOT, Vpk, parse_kv, rows, fitted_camera, mesh_bounds
 
 WORK = ROOT / 'output/monster_portraits_build'
 ART = ROOT / 'art/portraits/monsters'
@@ -118,9 +118,10 @@ def angle(value):
 
 
 def read_sequences(vpk, model):
-    path = WORK / Path(model).name
-    path = path.with_suffix('.vmdl_c')
-    path.write_bytes(vpk.read(model + '_c'))
+    path = ROOT / (model + '_c')
+    if not path.is_file():
+        path = WORK / (digest(model.encode())[:12] + '.vmdl_c')
+        path.write_bytes(vpk.read(model + '_c'))
     result = subprocess.run([str(INFO), '-i', str(path), '-b', 'ASEQ', '-baremode'], capture_output=True)
     assert result.returncode == 0, model
     text = result.stdout.decode('utf8', 'replace')
@@ -128,11 +129,13 @@ def read_sequences(vpk, model):
     for match in re.finditer(r'\{\s*m_sName = "([^"]+)"\s*m_flags', text):
         block = text[match.start():balanced(text, match.start()) + 1]
         sequences.append((match[1], re.findall(r'm_name = "([^"]+)"', block)))
-    assert sequences, 'No authored sequences: ' + model
+    # Static architecture has no ASEQ animation; do not invent an idle name.
     return sequences
 
 
 def sequence_for(sequences, activity, modifiers):
+    if not sequences:
+        return ''
     for wanted in (activity, 'ACT_DOTA_CAPTURE', 'ACT_DOTA_IDLE'):
         candidates = []
         for index, (name, activities) in enumerate(sequences):
@@ -182,6 +185,7 @@ def build(check=False, compile_resources=False):
     WORK.mkdir(parents=True, exist_ok=True)
     vpk = Vpk(ENGINE / 'game/dota/pak01_dir.vpk')
     portraits = parse_kv(vpk.read('scripts/npc/portraits.txt').decode('utf8'))['Portraits']
+    custom_profiles = parse_kv((ROOT / 'scripts/npc/portraits_custom.txt').read_text('utf8'))['Portraits']
     template = (ROOT / 'tools/jugg_portrait_template.vmap').read_text('utf8')
     body_template, camera_template, light_template = [entity(template, c) for c in ('prop_dynamic', 'point_camera', 'env_global_light')]
     components, activities = {}, {}
@@ -191,24 +195,58 @@ def build(check=False, compile_resources=False):
     for row in rows('asset_activity_modifiers.csv'):
         if row.get('enabled') == '1':
             activities.setdefault(row['asset_id'], set()).add(row['modifier_name'])
-    assets = [r for r in rows('asset_catalog.csv') if r.get('enabled') == '1' and
-              (r['load_group'] == 'monster_default_wearables' or r['asset_id'].startswith('challenge_monster_'))]
+    assets = [r for r in rows('asset_catalog.csv') if r.get('enabled') == '1'
+              and r.get('primary_model', '').endswith('.vmdl')]
+    tree_model = next(r['model_name'] for r in rows('world_visual_definitions.csv') if r['visual_id'] == 'world_resource_tree')
+    for asset in assets:
+        if asset['asset_id'] == 'world_resource_tree':
+            asset['primary_model'] = tree_model
     sequences, backgrounds, scenes, config = {}, {}, {}, {}
     for asset in sorted(assets, key=lambda r: r['asset_id']):
         asset_id, model = asset['asset_id'], asset['primary_model']
+        profile_model = ('models/heroes/juggernaut/juggernaut.vmdl'
+                         if model == 'models/heroes/juggernaut/juggernaut_arcana.vmdl' else model)
         profile = copy.deepcopy(portraits['default'])
-        profile.update(copy.deepcopy(portraits.get(model, {})))
+        profile.update(copy.deepcopy(portraits.get(profile_model, {})))
+        if model == 'models/heroes/axe/axe.vmdl':
+            # Equipped axes cross the face in the world idle. Valve's authored
+            # portrait pose keeps the complete outfit clear of its native camera.
+            profile['PortraitAnimationActivity'] = 'ACT_DOTA_CAPTURE'
+        for color in ('PortraitLightColor', 'PortraitAmbientColor', 'PortraitShadowColor', 'PortraitSpecularColor'):
+            channels = [float(c) for c in profile[color].split()]
+            if max(channels) <= 1:
+                profile[color] = ' '.join(str(round(c * 255)) for c in channels)
+        if profile_model not in portraits and model in custom_profiles:
+            # Custom buildings/creeps have fitted native cameras. Keep the
+            # original Valve background instead of the old shared slate material.
+            profile.update({k: copy.deepcopy(v) for k, v in custom_profiles[model].items()
+                            if not k.startswith('PortraitBackground')})
+        elif profile_model not in portraits:
+            lo, hi = mesh_bounds(model, vpk)
+            profile['cameras'] = {'default': fitted_camera(lo, hi, model.startswith('models/props_structures/'))}
         assert 'cameras' in profile, model
         camera = profile['cameras'].get('default', next(iter(profile['cameras'].values())))
+        if asset_id == 'builder_io_benevolent_companion':
+            model = 'models/items/io/io_ti7/io_ti7.vmdl'
         if model not in sequences:
             sequences[model] = read_sequences(vpk, model)
         sequence = sequence_for(sequences[model], profile.get('PortraitAnimationActivity', 'ACT_DOTA_CAPTURE'), activities.get(asset_id, set()))
+        if asset_id == 'builder_io_benevolent_companion':
+            assert any(name == 'ti7_io_idle' for name, _ in sequences[model])
+            sequence = 'ti7_io_idle'
         material = profile['PortraitBackgroundTexture']
         if material not in backgrounds:
             backgrounds[material] = background(vpk, profile, check)
         backdrop = dict(backgrounds[material])
         backdrop['colors'] = [profile.get('PortraitBackgroundColor' + str(i), '1 1 1') for i in range(1, 5)]
         parts = sorted(components.get(asset_id, []), key=lambda r: (float(r.get('sort_order') or 0), r['component_key']))
+        if not parts and asset_id != 'builder_io_benevolent_companion':
+            # Older world appearances still use the catalog's flat attachment
+            # list (notably the free Keeper hero). Preserve those default parts.
+            parts = [dict(component_id='legacy_' + str(i), model_path=path,
+                          parent_component_id='', attach_mode='bone_merge',
+                          attachment_point='', model_scale='1', model_skin='0', material_group='')
+                     for i, path in enumerate(asset.get('attachment_models', '').split('|')) if path]
         signature = {'model': model, 'skin': asset.get('model_skin') or '0', 'sequence': sequence,
                      'parts': [{k: p.get(k, '') for k in ('component_id', 'model_path', 'parent_component_id', 'attach_mode', 'attachment_point', 'model_scale', 'model_skin', 'material_group')} for p in parts],
                      'profile': profile}
@@ -256,6 +294,9 @@ def build(check=False, compile_resources=False):
         config[asset_id] = {'map': 'portraits/' + map_name, 'camera': 'monster_portrait_camera', 'light': 'monster_portrait_light',
             'unit': asset.get('portrait_unit_name') or '', 'model': model, 'background': backdrop['texture'],
             'colors': backdrop['colors'], 'sequence': sequence, 'components': len(parts)}
+        config[asset_id]['priority'] = (0 if asset_id.startswith(('builder_', 'hero_permanent_'))
+                                        else 1 if asset['load_group'] == 'initial_required' else 2)
+        config[asset_id]['modelFallback'] = not parts and not asset_id.startswith(('builder_', 'hero_', 'tower_', 'challenge_'))
     write(JS, '// Generated by tools/build_monster_portraits.py; world components and Valve camera profiles.\n(function(){GameUI.CustomUIConfig().SurvivalMonsterPortraitScenes = ' + json.dumps(config, ensure_ascii=False, indent=2) + ';})();\n', check)
     receipt = {'schema': 1, 'assets': config, 'backgrounds': backgrounds, 'unique_scenes': len(scenes),
                'camera_source': 'Valve scripts/npc/portraits.txt', 'world_model_source': 'asset_catalog / asset_components CSV',
@@ -263,9 +304,16 @@ def build(check=False, compile_resources=False):
     write(ART / 'manifest.json', json.dumps(receipt, ensure_ascii=False, indent=2) + '\n', check)
     if compile_resources:
         content = ENGINE / 'content/dota_addons/Survival'
+        stamp_file = WORK / 'compiled_sources.json'
+        stamps = json.loads(stamp_file.read_text('utf8')) if stamp_file.exists() else {}
         for source in sorted(IMAGE.glob('*')) + sorted(scenes.values()):
             relative = source.relative_to(ROOT / 'panorama/src') if source.is_relative_to(ROOT / 'panorama/src') else Path('maps/portraits') / source.name
             destination = content / ('panorama' if source.is_relative_to(IMAGE) else '') / relative
+            runtime = ROOT / ('maps/portraits/' + source.stem + '.vpk' if source.suffix == '.vmap'
+                              else 'panorama/images/custom_game/monster_portrait_backgrounds/' + source.stem + '.vtex_c')
+            stamp = dict(source=digest(source.read_bytes()), runtime=digest(runtime.read_bytes()) if runtime.is_file() else '')
+            if source.suffix in ('.vmap', '.vtex') and destination.is_file() and stamp['runtime'] and stamps.get(str(source.relative_to(ROOT))) == stamp:
+                continue
             destination.parent.mkdir(parents=True, exist_ok=True)
             if source.suffix == '.vmap':
                 result = subprocess.run([str(ENGINE / 'game/bin/win64/dmxconvert.exe'), '-i', str(source), '-o', str(destination), '-oe', 'binary', '-of', 'vmap'], capture_output=True)
@@ -277,6 +325,8 @@ def build(check=False, compile_resources=False):
             result = subprocess.run([str(ENGINE / 'game/bin/win64/resourcecompiler.exe'), '-i', str(destination), '-game', str(ENGINE / 'game/dota'), '-fshallow', '-nop4'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             (WORK / (source.stem + '_compile.log')).write_bytes(result.stdout)
             assert result.returncode == 0 and b'0 failed' in result.stdout, (source, result.stdout[-2000:])
+            stamps[str(source.relative_to(ROOT))] = dict(source=digest(source.read_bytes()), runtime=digest(runtime.read_bytes()))
+            stamp_file.write_text(json.dumps(stamps, indent=2), encoding='utf8')
     print(json.dumps({'status': 'PASS', 'assets': len(config), 'scenes': len(scenes), 'backgrounds': len(backgrounds), 'compiled': compile_resources}))
 
 
