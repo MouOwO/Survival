@@ -1,0 +1,128 @@
+{
+  "date": "2026-10-30",
+  "timezone": "Asia/Shanghai",
+  "map": {
+    "status": "PASS",
+    "source_sha256": "9f87e852e45e6bec5674897e0940365bbf61e749075106a9a91ef86823b3cc01",
+    "runtime_sha256": "59c5856b44a75a3db5659fb15dd2038480a102c450ae5a27141e890b201bcf33",
+    "source_match": {
+      "source_name": "maps/template_map.vmap",
+      "compiled_search_path": "dota_addons/survival",
+      "raw_source_crc32": 32374298,
+      "compiled_source_crc32": 32374298,
+      "matches": true
+    },
+    "crc_entries": 310,
+    "compile_success": 306,
+    "compile_failed": 0,
+    "compile_skipped": 0
+  },
+  "minimap": {
+    "status": "resource_chain_pass",
+    "material": "materials/overviews/template_map.vmat",
+    "texture": "materials/overviews/template_map.tga",
+    "source_image": "materials/overviews/template_map.tga",
+    "compiled_texture": "materials/overviews/template_map_tga_d9088edf.vtex_c",
+    "settings": "materials/overviews/template_map.txt",
+    "tga": {
+      "width": 2048,
+      "height": 2048,
+      "bits_per_pixel": 24
+    },
+    "bounds": {
+      "pos_x": -16384.0,
+      "pos_y": 16384.0,
+      "scale": 32.0,
+      "reference_pixels": 1024,
+      "min_x": -16384.0,
+      "max_x": 16384.0,
+      "min_y": -16384.0,
+      "max_y": 16384.0
+    },
+    "compiler_dependencies_checked": true,
+    "generation_observed": true,
+    "tools_map_confirmed": true,
+    "map_source_and_package_unchanged": true,
+    "source_files": [
+      {
+        "path": "materials/overviews/template_map.vmat",
+        "bytes": 109,
+        "sha256": "d6a143ec8e2206cf37a9405df67ec6f0f6652ae6d51ee45f26de7d92e7600d24",
+        "modified_utc": "2026-10-30T12:18:00.1521562Z"
+      },
+      {
+        "path": "materials/overviews/template_map.tga",
+        "bytes": 12582930,
+        "sha256": "4fd5a8c2548a1788e7f119ee2d8c93bedbf09107668161508df0a2839d552d7e",
+        "modified_utc": "2026-10-30T12:18:00.1511594Z"
+      },
+      {
+        "path": "maps/template_map.vmap",
+        "bytes": 72520118,
+        "sha256": "9f87e852e45e6bec5674897e0940365bbf61e749075106a9a91ef86823b3cc01",
+        "modified_utc": "2026-10-30T12:09:53.1404510Z"
+      },
+      {
+        "path": "materials/overviews/template_map.txt",
+        "bytes": 83,
+        "sha256": "19f1af4a24489c3276c414ec35ace7a0e3cb0bf3b5ff63ff7029425d442bb507",
+        "modified_utc": "2026-10-30T12:18:00.1521562Z"
+      }
+    ],
+    "game_files": [
+      {
+        "path": "resource/overviews/template_map.txt",
+        "bytes": 115,
+        "sha256": "77164a99d1c6b6ba91c707416ba9c95b31f203cd3abeeb26fec62eeecf6ea877",
+        "modified_utc": "2026-10-30T12:18:00.9409113Z"
+      },
+      {
+        "path": "maps/template_map.vpk",
+        "bytes": 65192769,
+        "sha256": "59c5856b44a75a3db5659fb15dd2038480a102c450ae5a27141e890b201bcf33",
+        "modified_utc": "2026-10-30T12:16:32.9395515Z"
+      },
+      {
+        "path": "materials/overviews/template_map.vmat_c",
+        "bytes": 2265,
+        "sha256": "780df9932cd13b418f21fe2e949e0b4c821d4105777c779ddaae029d138ea062",
+        "modified_utc": "2026-10-30T12:18:00.8653333Z"
+      },
+      {
+        "path": "materials/overviews/template_map_tga_d9088edf.vtex_c",
+        "bytes": 16779300,
+        "sha256": "9eb783fa9f000dc90fb815e8a9c0f6f97d4f49f2c7a224678a8925a22f3ba0fd",
+        "modified_utc": "2026-10-30T12:18:00.8572417Z"
+      }
+    ]
+  },
+  "image": {
+    "size": [
+      2048,
+      2048
+    ],
+    "changed_pixels": 4101958,
+    "total_pixels": 4194304,
+    "difference_bounds": [
+      0,
+      0,
+      2048,
+      2048
+    ],
+    "source_image_sha256": "4fd5a8c2548a1788e7f119ee2d8c93bedbf09107668161508df0a2839d552d7e",
+    "art_mirror_matches": true
+  },
+  "preview_inspected": true,
+  "offline_minimap_checks_passed": true,
+  "multiplayer_navigation_verified": false,
+  "workshop_uploaded": false,
+  "native_reload": {
+    "ok": true,
+    "map": "template_map",
+    "tools": true,
+    "client_restarted_after_minimap_generation": true,
+    "native_scene_reloaded": true,
+    "read_only": true
+  },
+  "user_map_source_preserved": true
+}

@@ -4,7 +4,7 @@ fb110b300f7b417755b2f1240e1fd2d0  01_architecture_and_workflow.md
 e1bfa7b7e0fbee40143ec13f3a1086a8  03_progression_save_contract.md
 9d576c647659970add48911bde027755  04_network_auth_official.md
 0232cbc7b43203b0d8057ff5f96c8992  05_payments_commerce_delivery.md
-cbb8e200260f49304a908c1596671e2a  06_build_release_ops.md
+77304811cd5fda83fd8cf85f07079b41  06_build_release_ops.md
 982df4c1e122f0ed4988e66ad0506f96  07_decisions_incidents_pending.md
 09cc7762f1f48697dd72117174ab1baf  08_new_project_reuse.md
 e86cb49a9028b56768551c0ce2d2e156  09_session_digest.md
@@ -12,6 +12,7 @@ bb3780deff6573b79c1336d9d4846e4f  10_runtime_engine_contracts.md
 02e917d898f284488194760afea37626  11_completed_work_catalog.md
 c5d539495e5a99a38be32acd29d3b90b  12_sessions_archive_and_recovery.md
 ea1a326679b390c6aab22deee73b2e1f  13_art_ui_qa.md
+5599d87111414045723af3c286518371  MANIFEST.json
 7f371090900ed781564a860494ae934d  NEW_CHAT_PROMPT.txt
 81fe3fd314b606004d1589396c4790e2  README.md
 33fbd1cc38438efb46442edfabdebbc6  data/completed_work_index.json
@@ -33,6 +34,7 @@ da968ec106f304daefb80924924a2f24  evidence/commerce_prices_20261028.md
 0303586f2dbfaca6593c5ba60b94c52b  evidence/directory_cleanup_20261028.public.json
 bcaee3cc64d6032008b4b941c1cb1e29  evidence/endless_start_delay_20261029.md
 fe7d9c44a2ef175aab61bbb32df54b2f  evidence/login_relay_recovery_20261028.public.json
+0947ef6a39b15c30785f83b3f241d265  evidence/map_minimap_sync_20261030.md
 6343b517e8b058a545957d35b14bd602  evidence/map_resources_20261028.public.json
 ea6618a5d052bf5fd310c02722aa2047  evidence/map_update_release_20261029.md
 16e414b8cb9603166fd609a7f588731d  evidence/monster_portraits_20261030.md
@@ -82,3 +84,4 @@ c63b69a82b9cc69a993fdf55e239cf50  validation/20261029/archive_all_release.json
 5a516cdaffba23f61126f32dd18d4fcb  validation/20261029/rich_shared_building.json
 0010796edee73df56695bedf6ebd1c39  validation/20261029/ruins_stair_geometry.json.gz
 7e208dacd853af88478b3c30a93e5916  validation/20261029/scourge_builder_native.json
+b8d0ef048f61d6d12979fbaa6bc15f78  validation/20261030/map_minimap_sync.json

@@ -35,8 +35,8 @@
     },
     {
       "path": "06_build_release_ops.md",
-      "bytes": 17909,
-      "sha256": "2d06fcc7bfb07eb47a81b3a3f01bb1aaac30da9b7d586be7385427a644a34556"
+      "bytes": 18348,
+      "sha256": "139bf8ab8664643a384d54bb7b4b83a8975175a985d81fe1ecbf797a7fa73c8c"
     },
     {
       "path": "07_decisions_incidents_pending.md",
@@ -177,6 +177,11 @@
       "path": "evidence/login_relay_recovery_20261028.public.json",
       "bytes": 1810,
       "sha256": "30cfd2a0304da53e3a2fd95f72b1c269e97520a5ded629caea796b82c02e6d04"
+    },
+    {
+      "path": "evidence/map_minimap_sync_20261030.md",
+      "bytes": 2940,
+      "sha256": "f6a90f0eb5a915da0051a02500a49970422837e0e8af1389d6129e44f37749b6"
     },
     {
       "path": "evidence/map_resources_20261028.public.json",
@@ -422,6 +427,11 @@
       "path": "validation/20261029/scourge_builder_native.json",
       "bytes": 1564,
       "sha256": "9b564103302fb83f71127b07307d780faf9ceef789461c0dd1ad1000ed8dbab3"
+    },
+    {
+      "path": "validation/20261030/map_minimap_sync.json",
+      "bytes": 4093,
+      "sha256": "df7ac2295e7d76ebb49559de201048a7615ef3cccb6a6719f0bbee3e331629d3"
     }
   ]
 }
