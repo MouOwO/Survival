@@ -76,3 +76,14 @@
 - 本轮官方编译与九条相关 Node 回归通过。离线新局普通模式 N1 暂停后，痛苦女王至宝近景和背景、无 asset 的尸王波次原版背景、真实沉默／禁用无头像遮罩、实际标题“敬神”均已看图核对。另录取并逐张核对 340 帧，120 个对应采样状态没有未遮挡原生底图；未见原皮／白色目标闪现，仍有短暂背景过渡，不宣称完全零加载。
 - 私有证据为 `output/portrait_followup_20261030/verification.json`、`qop_status_frames/full.png`、`wave_frames/frame_000.png`、`frames_v2` 和六张 `all-frames-v2-*`。三个临时测试文件已移到备份，正式布局与用户原有编译布局逐字节恢复，仅关闭本次专用离线进程。
 - 上一候选 3003 已签名并原生启动通过，但原条目上传 callback 3404 返回 EResult 2；Steam 日志明确为 106130 字节 manifest 上传超时。失败 pending 原样保留，不能声称已经同步。当前追加修改使用独立新候选 3004 / v05，旧候选不覆盖、不重发。发行保留原成功基线的 184 个受保护模块；原名由本地化和新 HUD 展示修复，不把开发分支其他玩法改动夹带进发行。
+
+
+### 3004 发行结果（已上传并完整重新下载核验）
+
+- game 功能提交 `fc75b575f6002fe2738ab6a39db30c9ce2e83bec` 已推送 dev；content `5e24c3dd70c9251c0ca4a6bc11df43befffb86c0` 已推送 master。两边均执行了 stash→pull→pop→commit→push。game 首次 stash 清理被另一个离线进程持有的新 VPK 阻断；记录 stash `8a2fdfb9c651bf3d1d97ecfb5a12401ecba2384a`，pull 后 pop 因原位文件已存在而保留 stash，逐个核对全部已保存文件恢复一致后仅移除本次 stash；历史 stash 未动。content 本次 stash `3d1de15f4aa14303623b14b6623fcaae3508b095` 已正确弹回。
+- 3003 失败记录在锁内保留备份后，重新官方完整下载 2901 成功，验证 manifest `1297565240173722470`，6695 资源和184受保护模块通过；CAS 恢复发布状态。新回执 SHA256 `a27797d678e06ec7c972dca4dbc67d5984e00d95e8c55715e84d7e5905fd5ea3`，没有重发旧候选。
+- 新候选 `2026103004 / WS4-UNIT-PORTRAITS-CAMERAS-NAMES-04`，前缀 `20261030_ws4_unit_portraits_v05`，固定源码为前述 game 功能提交；6913 项资源，内容 SHA256 `5cdb3ad487e7f70ad22ba37658a4a10c14d56ad96ed566a223b787d058f87913`，完整报告 SHA256 `41727267f775e7fb9cd42826c9361b503322bc7f55042b62e6d351b73dcd260f`。原184保护模块／16份门禁审阅文件原样保留。
+- 独立 `svt_m3004` 原生 production 启动 PASS，`sv_cheats=0`，6913 资源全量再次验 hash；初始化、modifier、Panorama、无脚本运行异常均通过，仅证明启动。冻结日志 SHA256 `1bc4eb5dc67d2bacac8e52ffb85ca9370b787a72faa2e78b8216d2b20847758b`。该测试进程已正常关闭。
+- 3004 官方上传成功，原 Unlisted 条目不变。资源差分约82 MB，曾在约73 MB 时剩余9块超时，随后传输恢复并获得3404成功回调。官方重新订阅1313和下载3406均成功，完整6913资源、全部5个VPK、签名／CRC／双hash、184保护模块核对一致，前后查询均为未缓存。manifest `3264952902924404843`（保留字符串），内容总大小 `3788057010`，下载回执 SHA256 `762d84ae2092f0688a2d220fab4ad32145b1432bb79c75463233e07e9f75899c`。第一次下载校验在实际下载前因另一场已结算离线局持有文件而拒绝，正常关闭后重新执行成功；没有重复提交上传。`verify_followup_download.py --download` 继续绑定同版本成功上传记录和完成报告，官方协议11项回归通过。
+
+- 正式可审阅记录为 `publishing/workshop/unit_portraits_20261030_v05.json`。下载副本未另起原生局；正式配置启动证据来自同字节的签名候选，完整头像视觉来自开发离线局，不扩展为多人或账号权益验收。canonical 上传日志未由下载验证器擅自改写。

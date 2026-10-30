@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "status": "UPLOADED_AND_OFFICIAL_DOWNLOAD_FULLY_VERIFIED",
+  "workshop_id": "3824360109",
+  "release_sequence": 2026103004,
+  "revision": "WS4-UNIT-PORTRAITS-CAMERAS-NAMES-04",
+  "visibility": "unlisted",
+  "content_sha256": "5cdb3ad487e7f70ad22ba37658a4a10c14d56ad96ed566a223b787d058f87913",
+  "steam_manifest": "3264952902924404843",
+  "runtime_files": 6913,
+  "protected_modules_preserved": 184,
+  "package_bytes": 3788057010,
+  "package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 286462,
+      "sha256": "97668e81d5f62279d1ff374266cfa9fbd27da00b8845438b30a9c90c8963ca4e"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1071714084,
+      "sha256": "dfc873bf07a6f78380cfc92d0e7dfcdc5acf495edee8e91914550b82d201554e"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1071529200,
+      "sha256": "3046a3ae720dd0e80950e14562bf8c8c556f095a4ab068773d7f34dd78ca2b49"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379215,
+      "sha256": "e03f21542c7c283460e21c60c6350587a8b100b9ab5789d7cfa2ebe41fd1206a"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 572148049,
+      "sha256": "4ebe066b69fded8c24c7d9e69ff5d9e89d8f6c7767a1f3656c27df81ec8e0999"
+    }
+  ],
+  "source_git_head": "fc75b575f6002fe2738ab6a39db30c9ce2e83bec",
+  "content_source_git_head": "5e24c3dd70c9251c0ca4a6bc11df43befffb86c0",
+  "package_report_sha256": "41727267f775e7fb9cd42826c9361b503322bc7f55042b62e6d351b73dcd260f",
+  "download_receipt": "output/portrait_followup_publish_20261030/download_evidence/20261030T145849Z_e9443fa00e2b4451bd5c7769e47efa7c/verification.json",
+  "download_receipt_sha256": "762d84ae2092f0688a2d220fab4ad32145b1432bb79c75463233e07e9f75899c",
+  "signed_candidate_native_startup": "PASS_NATIVE_SIGNED_PRODUCTION_STARTUP_ONLY",
+  "native_log_sha256": "1bc4eb5dc67d2bacac8e52ffb85ca9370b787a72faa2e78b8216d2b20847758b",
+  "offline_visual_receipt": "output/portrait_followup_20261030/verification.json",
+  "reviewed_native_frames": 340,
+  "temporary_probes_removed": true,
+  "original_account_gates_preserved": true,
+  "downloaded_copy_native_launch": "NOT_RUN",
+  "multiplayer": "NOT_RUN",
+  "public_release": false
+}
