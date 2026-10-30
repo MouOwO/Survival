@@ -44,7 +44,7 @@ def payloads():
  names={'panorama/layout/custom_game/survival_hud.vxml_c',*('panorama/scripts/custom_game/'+n+'.vjs_c' for n in ('combat_stats','portrait_presentation','monster_portrait_scenes','monster_portrait_renderer','topnav_remaining_5d5c1152eb'))}
  names.update('maps/'+s['map']+'.vpk' for s in manifest['assets'].values())
  names.update(s['texture'].removeprefix('s2r://')+'_c' for s in manifest['backgrounds'].values())
- need(len(names)==223,'Exact compiled portrait inventory required')
+ need(len({s['texture'] for s in manifest['backgrounds'].values()})==28 and len(names)==222,'Exact compiled portrait inventory required')
  for name in sorted(names):values[name]=saved(name)
  qa=base.load(ROOT/'output/portrait_optimization_20261030/verification.json')
  need(qa['status']=='PASS' and qa['all_assets_loaded']==197 and qa['prewarmed_worlds']==188 and qa['first_click_scene_allocations']==0 and qa['offline_cycle_units']==12 and qa['all_six_heroes_visual'] and qa['empty_monster_keys'] and qa['test_only_panels_removed'],'Actual offline receipt required')
