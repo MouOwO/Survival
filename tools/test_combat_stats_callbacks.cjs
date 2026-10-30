@@ -9,7 +9,7 @@ const instrumented=source.replace(seam,`    __test({applyAbilityRuntime:applyAbi
         hotkeyForAbilityEntry:hotkeyForAbilityEntry,orderVisibleAbilities:orderVisibleAbilities,
         refreshOfficialUtilityHotkeys:refreshOfficialUtilityHotkeys,officialAbilityHotkeysMatch:officialAbilityHotkeysMatch,
         refreshHotkeys:refreshAbilityHotkeysIfChanged,refreshVitalsTick:refreshHeroVitalsTick,
-        beginNameTransition:beginUnitNameTransition,
+        beginNameTransition:beginUnitNameTransition,selectionEvent:onUnitSelectionEvent,refreshHeroPanel:refreshHeroPanel,
         executeAbility:executeAbility,scheduleActive:scheduleActive, cosmeticPortraitSentinel:cosmeticPortraitSentinel,
         resetScale:resetTowerPortraitContentScale, applyScale:applyTowerPortraitContentScale,
         restoreHotkey:restoreNativeAbilityHotkey, suppressHotkey:suppressNativeAbilityHotkey,
@@ -107,7 +107,7 @@ function setup(options={}){
  vm.runInNewContext(instrumented,{$,GameUI:Object.assign({CustomUIConfig:()=>cfg},options.gameUI||{}),Game:Object.assign({GetLocalPlayerID:()=>0,GetGameTime:()=>time},options.game||{}),
   Players:{GetPlayerHeroEntityIndex:()=>selected},
   Entities:Object.assign({GetUnitName:id=>unitNames.get(Number(id))||'npc_dota_hero_test',GetAbility:()=>-1,GetLevel:()=>1,IsHero:()=>true},options.entities||{}),
-  Abilities:options.abilities||{},
+  Abilities:options.abilities||{},Date:options.date||Date,
   CustomNetTables:{GetTableValue:(name,key)=>runtime[key]||null,SubscribeNetTableListener:subscribe,UnsubscribeNetTableListener:id=>subscriptions.delete(id)},
   GameEvents:Object.assign({Subscribe:subscribe,Unsubscribe:id=>subscriptions.delete(id)},options.events||{}),__test:x=>api=x},{filename:'combat_stats.js'});
  function run(id){const job=jobs.get(id);assert(job);jobs.delete(id);job.fn()}

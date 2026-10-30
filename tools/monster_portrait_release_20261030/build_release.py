@@ -11,14 +11,15 @@ ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT/'tools'))
 spec=importlib.util.spec_from_file_location('portrait_map_parent',ROOT/'tools/map_release_20261029/build_release.py')
 base=importlib.util.module_from_spec(spec);spec.loader.exec_module(base)
 inc,pack,need=base.inc,base.pack,base.need
-SEQUENCE=2026103002;REVISION='WS4-UNIT-PORTRAITS-PREWARM-02';ITEM=base.ITEM
+SEQUENCE=2026103003;REVISION='WS4-UNIT-PORTRAITS-TRANSITION-03';ITEM=base.ITEM
 SOURCE='HEAD'
-PREFIX='20261030_ws4_unit_portraits_v03'
+PREFIX='20261030_ws4_unit_portraits_v04'
 OVERLAY=Path('D:/Survival_发布候选')/(PREFIX+'_overlay')
 TRUSTED=Path('D:/Survival_发布候选')/(PREFIX+'_trusted_source')
 VIEW=Path('D:/Survival_发布候选')/(PREFIX+'_view')
 OUTPUT=Path('D:/Survival_工坊输出')/PREFIX
-REPORT=ROOT/'output/portrait_optimization_publish_20261030'
+REPORT=ROOT/'output/portrait_transition_publish_20261030'
+PACKAGE_REPORT='package_v04.json'
 def saved(name):
  for tree in (SOURCE,SOURCE+'^3'):
   result=subprocess.run(['git','cat-file','blob',tree+':'+name],cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
@@ -48,7 +49,14 @@ def payloads():
  for name in sorted(names):values[name]=saved(name)
  qa=base.load(ROOT/'output/portrait_optimization_20261030/verification.json')
  need(qa['status']=='PASS' and qa['all_assets_loaded']==197 and qa['prewarmed_worlds']==188 and qa['first_click_scene_allocations']==0 and qa['offline_cycle_units']==12 and qa['all_six_heroes_visual'] and qa['empty_monster_keys'] and qa['test_only_panels_removed'],'Actual offline receipt required')
- need(b'portrait_qa_probe' not in values['panorama/layout/custom_game/survival_hud.vxml_c'],'Temporary UI must be absent')
+ transition=base.load(ROOT/'output/portrait_transition_20261030/verification.json')
+ need(transition['status']=='PASS_OFFLINE_PORTRAIT_TRANSITIONS' and transition['reviewed_frames']==340
+      and transition['uncovered_painted_states']==0 and not transition['native_body_flash_seen']
+      and not transition['white_render_target_flash_seen'] and transition['native_opacity']==1
+      and transition['test_only_panels_removed'],'Final native transition receipt required')
+ for name in ('combat_stats','monster_portrait_renderer'):
+  need(base.sha(saved('panorama/src/scripts/custom_game/'+name+'.js').replace(b'\r\n',b'\n'))==transition['source_lf_sha256'][name],'Native-verified portrait source changed')
+ need(all(marker not in values['panorama/layout/custom_game/survival_hud.vxml_c'] for marker in (b'portrait_qa_probe',b'portrait_transition_qa')),'Temporary UI must be absent')
  return values
 def run(build=False,key=None,reviewed=None):
  for p in (OVERLAY,TRUSTED,VIEW,OUTPUT):pack.handoff.regular_path(p,must_exist=False);need(not p.exists(),'New candidate paths required')

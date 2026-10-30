@@ -7,7 +7,7 @@ from pathlib import Path
 import argparse,hashlib,importlib.util,json,subprocess,sys
 sys.dont_write_bytecode=True
 import build_release as b
-ROOT=b.ROOT;OUT=b.REPORT;ADDON='svt_m3002'
+ROOT=b.ROOT;OUT=b.REPORT;ADDON='svt_m3003'
 def load(name):return b.base.load(OUT/name)
 def write(name,value):
  with (OUT/name).open('x',encoding='utf8') as stream:stream.write(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
@@ -15,7 +15,7 @@ def write(name,value):
 def entry():
  spec=importlib.util.spec_from_file_location('portrait_native_entry',ROOT/'tools/workshop_test/test_entry.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);return m
 def install():
- package=load('package_v03.json');b.need(package['release_sequence']==b.SEQUENCE and package['full_runtime_validator_passed'],'Completed signed build required')
+ package=load(b.PACKAGE_REPORT);b.need(package['release_sequence']==b.SEQUENCE and package['full_runtime_validator_passed'],'Completed signed build required')
  handoff=b.pack.handoff;original=handoff.require_reviewed_gate
  def reviewed(candidate,manifest):
   with b.inc.trusted_source(b.TRUSTED):return original(candidate,manifest)
@@ -34,7 +34,7 @@ def evidence():
  raw=(OUT/'native_smoke_engine.log').read_bytes();log=raw.decode('utf8','replace')
  markers=dict(signed_addon_selected=("[Server] SV:  addon='"+ADDON+"'") in log,server_activated='[SURVIVAL_LAUNCH_RULES] phase=activate ok=true' in log,addon_initialized='[Survival][INFO][Addon] initialized' in log,modifier_registry_loaded='[SURVIVAL_MODIFIER_BOOTSTRAP] phase=activate registry_refreshed=true' in log,panorama_layout_loaded='[STARTUP_UI]' in log and 'layout_ready' in log,no_script_runtime_error='Script Runtime Error' not in log,no_vscript_error='VScript Error' not in log)
  b.need(all(markers.values()),str(markers));manifest=b.base.load(b.VIEW/b.pack.handoff.MANIFEST);installed=ROOT.parent/ADDON
- with b.portrait_scene_maps(load('package_v03.json')['target_pins']):verification=b.pack.runtime.verify(installed,manifest)
+ with b.portrait_scene_maps(load(b.PACKAGE_REPORT)['target_pins']):verification=b.pack.runtime.verify(installed,manifest)
  b.need(verification['ok'],'Installed candidate changed')
  b.need('channel = "production"' in (installed/'scripts/vscripts/config/release_profile.lua').read_text('utf8'),'Production profile required')
  with (OUT/'native_smoke_engine_frozen.log').open('xb') as stream:stream.write(raw)

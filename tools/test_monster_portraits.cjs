@@ -75,4 +75,19 @@ const allocations=wr.Inspect().created;
 for(const id of assets){const ready=wr.Prepare(w.overlay,id);assert(ready.ready,id);assert.equal(ready.scene.parent.GetParent(),w.overlay);}
 assert.equal(wr.Inspect().created,allocations,'first clicks reuse every prewarmed world');
 wr.Shutdown();
+// A click overtakes background work. Its loading host must remain renderable
+// through Hide(), and time spent paused in the queue is not a load timeout.
+const p=fixture(),pr=p.cfg.SurvivalMonsterPortraitRenderer;
+pr.Prewarm(p.nativeHost());p.run([...p.jobs.keys()][0]);
+const firstWarm=pr.Inspect().warming;
+const selected=assets.find(a=>a!==firstWarm&&p.cfg.SurvivalMonsterPortraitScenes[a].map!==p.cfg.SurvivalMonsterPortraitScenes[firstWarm].map);
+const priority=pr.Prepare(p.overlay,selected);pr.Hide();
+assert.equal(pr.Inspect().warming,selected);
+assert.equal(priority.scene.parent.values.visibility,'visible','pending selected scene renders behind the opaque transition cover');
+const pause=pr.Prepare(p.overlay,firstWarm);p.advance(10001);
+assert(pr.Prepare(p.overlay,selected),'an entry paused in the queue does not fail because wall time passed');
+assert.equal(pr.Inspect().warming,selected);
+p.ready(priority.scene);assert(pr.Prepare(p.overlay,selected).ready);pr.Hide();
+assert.equal(priority.scene.parent.values.visibility,'collapse','a completed warming scene is not retained over the next unit');
+pr.Shutdown();
 console.log('MONSTER_PORTRAITS_PASS: 197 identities / 188 worlds; sequential prewarm, zero first-click allocations, persistent reuse, timeout/native fallback, HUD rebuild/reload, multiselect and all six heroes');
