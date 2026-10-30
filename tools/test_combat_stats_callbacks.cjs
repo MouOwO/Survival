@@ -17,6 +17,7 @@ const instrumented=source.replace(seam,`    __test({applyAbilityRuntime:applyAbi
         positionNumber:positionRelativeToNativeNumber, positionRow:positionRelativeToStatRow,
         positionAttributes:positionLogicalAttributeOverlay, positionPortrait:positionCosmeticPortrait,
         portraitRect:portraitRect, portraitUpdate:updateCosmeticPortrait, updateSnapshot:update,
+        resolveUnitDisplayName:resolveUnitDisplayName,
         portraitHide:hideCosmeticPortrait, portraitTransition:transitionCosmeticPortrait,
         portraitState:function(){return {key:activePortraitKey,mode:activePortraitMode,unit:activePortraitUnit,
             entity:activePortraitEntity,scene:activePortraitScene,geometry:portraitGeometrySignature,

@@ -11,15 +11,15 @@ ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT/'tools'))
 spec=importlib.util.spec_from_file_location('portrait_map_parent',ROOT/'tools/map_release_20261029/build_release.py')
 base=importlib.util.module_from_spec(spec);spec.loader.exec_module(base)
 inc,pack,need=base.inc,base.pack,base.need
-SEQUENCE=2026103003;REVISION='WS4-UNIT-PORTRAITS-TRANSITION-03';ITEM=base.ITEM
+SEQUENCE=2026103004;REVISION='WS4-UNIT-PORTRAITS-CAMERAS-NAMES-04';ITEM=base.ITEM
 SOURCE='HEAD'
-PREFIX='20261030_ws4_unit_portraits_v04'
+PREFIX='20261030_ws4_unit_portraits_v05'
 OVERLAY=Path('D:/Survival_发布候选')/(PREFIX+'_overlay')
 TRUSTED=Path('D:/Survival_发布候选')/(PREFIX+'_trusted_source')
 VIEW=Path('D:/Survival_发布候选')/(PREFIX+'_view')
 OUTPUT=Path('D:/Survival_工坊输出')/PREFIX
-REPORT=ROOT/'output/portrait_transition_publish_20261030'
-PACKAGE_REPORT='package_v04.json'
+REPORT=ROOT/'output/portrait_followup_publish_20261030'
+PACKAGE_REPORT='package_v05.json'
 MAP_PROOF=ROOT/'output/map_minimap_sync_20261030/installed_map_verification.json'
 MAP_SOURCE_SHA='9f87e852e45e6bec5674897e0940365bbf61e749075106a9a91ef86823b3cc01'
 MAP_PACKAGE_SHA='59c5856b44a75a3db5659fb15dd2038480a102c450ae5a27141e890b201bcf33'
@@ -71,9 +71,10 @@ def payloads():
  manifest=json.loads(saved('art/portraits/monsters/manifest.json'))
  need(len(manifest['assets'])==197 and manifest['unique_scenes']==188 and len(manifest['backgrounds'])==29,'Verified portrait inventory differs')
  names={'panorama/layout/custom_game/survival_hud.vxml_c',*('panorama/scripts/custom_game/'+n+'.vjs_c' for n in ('combat_stats','portrait_presentation','monster_portrait_scenes','monster_portrait_renderer','topnav_remaining_5d5c1152eb'))}
+ names.update({'panorama/styles/custom_game/survival_hud.vcss_c','resource/addon_schinese.txt','resource/localization/addon_schinese.txt'})
  names.update('maps/'+s['map']+'.vpk' for s in manifest['assets'].values())
  names.update(s['texture'].removeprefix('s2r://')+'_c' for s in manifest['backgrounds'].values())
- need(len({s['texture'] for s in manifest['backgrounds'].values()})==28 and len(names)==222,'Exact compiled portrait inventory required')
+ need(len({s['texture'] for s in manifest['backgrounds'].values()})==28 and len(names)==225,'Exact compiled portrait and localized-name inventory required')
  for name in sorted(names):values[name]=saved(name)
  qa=base.load(ROOT/'output/portrait_optimization_20261030/verification.json')
  need(qa['status']=='PASS' and qa['all_assets_loaded']==197 and qa['prewarmed_worlds']==188 and qa['first_click_scene_allocations']==0 and qa['offline_cycle_units']==12 and qa['all_six_heroes_visual'] and qa['empty_monster_keys'] and qa['test_only_panels_removed'],'Actual offline receipt required')
@@ -82,8 +83,15 @@ def payloads():
       and transition['uncovered_painted_states']==0 and not transition['native_body_flash_seen']
       and not transition['white_render_target_flash_seen'] and transition['native_opacity']==1
       and transition['test_only_panels_removed'],'Final native transition receipt required')
- for name in ('combat_stats','monster_portrait_renderer'):
-  need(base.sha(saved('panorama/src/scripts/custom_game/'+name+'.js').replace(b'\r\n',b'\n'))==transition['source_lf_sha256'][name],'Native-verified portrait source changed')
+ followup=base.load(ROOT/'output/portrait_followup_20261030/verification.json')
+ need(followup['status']=='PASS_OFFLINE_PORTRAIT_FOLLOWUP' and followup['reviewed_frames']==340
+      and followup['uncovered_painted_states']==0 and not followup['native_body_flash_seen']
+      and not followup['white_render_target_flash_seen'] and followup['native_opacity']==1
+      and followup['qop_arcana_closeup'] and followup['wave_undying_original_graveyard']
+      and followup['actual_silence_and_mute_hidden'] and followup['actual_ten_commandment_09_name']=='敬神'
+      and followup['test_only_panels_removed'],'Latest offline camera/background/name receipt required')
+ for name,sha in followup['source_lf_sha256'].items():
+  need(base.sha(saved(name).replace(b'\r\n',b'\n'))==sha,'Native-verified followup source changed')
  need(all(marker not in values['panorama/layout/custom_game/survival_hud.vxml_c'] for marker in (b'portrait_qa_probe',b'portrait_transition_qa')),'Temporary UI must be absent')
  return values
 def run(build=False,key=None,reviewed=None):
@@ -93,7 +101,7 @@ def run(build=False,key=None,reviewed=None):
  prior=state if state.get('uploaded') else state.get('previous_release',{})
  need(prior.get('release_sequence')==2026102901 and prior.get('uploaded') is True and prior.get('content_sha256')==base.BASE_CONTENT,'Known last uploaded release required')
  if not state.get('uploaded'):
-  need(state.get('status')=='SUBMIT_REQUEST_PENDING' and state.get('release_sequence')==2026102902,'Only known failed pending state may remain during local preparation')
+  need(state.get('status')=='SUBMIT_REQUEST_PENDING' and state.get('release_sequence')==2026103003,'Only known failed pending state may remain during local preparation')
  with inc.trusted_source(base.BASE_TRUSTED):_,before,signed,_=pack.authenticate(base.BASE)
  need(before['content_sha256']==base.BASE_CONTENT and signed['release_sequence']==2026102901,'Signed baseline mismatch')
  inventory=pack.package_inventory(base.BASE_VPK);need(inventory==base.load(base.BASE_REPORT)['package_files']==prior['package_files'],'Base archives changed')

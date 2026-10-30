@@ -54,58 +54,29 @@ for(const file of ['topnav_remaining_5d5c1152eb.js','handoff_hud.js']){
 }
 console.log('PORTRAIT_PRESENTATION_PASS: old-size blur and native XP/badges removed; native/custom 3D, gold frame, level and multiselect preserved; state rewrites and HUD rebuild covered');
 
-const f=fixture();selected=88;f.group.classes=new Set(['UnitSilenced','UnitMuted']);
-now=10000;cfg.SurvivalPortraitPresentation.Refresh(f.group);
-const silence=f.group.FindChildTraverse('SilenceIcon'),muted=f.group.FindChildTraverse('MutedIcon');
-assert.equal(silence.style.opacity,'1');assert.equal(silence.style.visibility,'visible');
-assert.equal(muted.style.visibility,'collapse','overlapping native faces must not double-draw');
-now=12999;cfg.SurvivalPortraitPresentation.Refresh(f.group);assert.equal(silence.style.opacity,'1');
-now=13000;cfg.SurvivalPortraitPresentation.Refresh(f.group);assert.equal(silence.style.opacity,'0');assert.equal(silence.style.transitionDuration,'0.25s');
-now=13250;cfg.SurvivalPortraitPresentation.Refresh(f.group);assert.equal(silence.style.visibility,'collapse');
-now=20000;cfg.SurvivalPortraitPresentation.Refresh(f.group);assert.equal(silence.style.visibility,'collapse','continuous status cannot restart');
-selected=89;cfg.SurvivalPortraitPresentation.Refresh(f.group);assert.equal(silence.style.opacity,'1','new selected entity gets its own three seconds');
-selected=88;cfg.SurvivalPortraitPresentation.Refresh(f.group);assert.equal(silence.style.visibility,'collapse','reselecting the same ongoing status must not replay');
-const rebuilt=fixture();rebuilt.group.classes=new Set(['UnitSilenced']);cfg.SurvivalPortraitPresentation.Refresh(rebuilt.group);
-assert.equal(rebuilt.group.FindChildTraverse('SilenceIcon').style.visibility,'collapse','HUD rebuilding must not replay an ongoing status');
-f.group.classes.clear();cfg.SurvivalPortraitPresentation.Refresh(f.group);
-f.group.classes.add('UnitSilenced');now=21000;cfg.SurvivalPortraitPresentation.Refresh(f.group);assert.equal(silence.style.opacity,'1','new status episode restarts the three second window');
-console.log('PORTRAIT_STATUS_TIMER_PASS: 3s display + 250ms fade; no repeated continuous status, independent units, reselection/HUD rebuild, status reapplication');
-
-// Isolation flags on a presentation body must not cover its face. The same
-// unit name/asset on a formal monster retains genuine status feedback.
-const displayStatus=fixture();selected=8800;unitName='npc_survival_named_rebirth_boss_10';
-displayStatus.group.classes=new Set(['UnitSilenced','UnitMuted']);
-cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:selected,portrait_display_only:1});
-for(const stamp of [0,100,2999,3000,3250,10000]){
- now=40000+stamp;
- for(const id of ['SilenceIcon','MutedIcon']){
-  const icon=displayStatus.group.FindChildTraverse(id);icon.style.visibility='visible';icon.style.opacity='1';
+const f=fixture();selected=88;
+for(const role of [undefined,0,1])for(const status of [['UnitSilenced'],['UnitMuted'],['UnitSilenced','UnitMuted']]){
+ f.group.classes=new Set(status);
+ cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:selected,portrait_display_only:role});
+ for(const stamp of [0,100,2999,3000,3250,10000]){
+  now=stamp;
+  for(const id of ['SilenceIcon','MutedIcon']){
+   const icon=f.group.FindChildTraverse(id);icon.style.visibility='visible';icon.style.opacity='1';
+  }
+  cfg.SurvivalPortraitPresentation.Refresh(f.group);
+  for(const id of ['SilenceIcon','MutedIcon']){
+   const icon=f.group.FindChildTraverse(id);
+   assert.equal(icon.style.visibility,'collapse');assert.equal(icon.style.opacity,'0');
+   assert.equal(icon.style.width,'0px');assert.equal(icon.style.height,'0px');
+  }
+  assert(f.block.classes.has('SurvivalPortraitNoStatusFaces'));
  }
- cfg.SurvivalPortraitPresentation.Refresh(displayStatus.group);
- for(const id of ['SilenceIcon','MutedIcon']){
-  const icon=displayStatus.group.FindChildTraverse(id);
-  assert.equal(icon.style.visibility,'collapse','display-only isolation never paints '+id);
-  assert.equal(icon.style.opacity,'0');
- }
+ selected++;
 }
-cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:selected,portrait_display_only:0});now=51000;
-cfg.SurvivalPortraitPresentation.Refresh(displayStatus.group);
-assert.equal(displayStatus.group.FindChildTraverse('SilenceIcon').style.visibility,'visible','explicit role clear restores real silence feedback');
-assert.equal(displayStatus.group.FindChildTraverse('SilenceIcon').style.opacity,'1');
-selected=8801;now=52000;
-cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:8800,portrait_display_only:1});
-cfg.SurvivalPortraitPresentation.Refresh(displayStatus.group);
-assert.equal(displayStatus.group.FindChildTraverse('SilenceIcon').style.visibility,'visible','late snapshot for another entity cannot hide formal same-name monster state');
-assert.equal(displayStatus.group.FindChildTraverse('SilenceIcon').style.opacity,'1');
-cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:selected,portrait_display_only:0});
-displayStatus.group.classes=new Set(['UnitMuted']);now=52100;
-cfg.SurvivalPortraitPresentation.Refresh(displayStatus.group);
-assert.equal(displayStatus.group.FindChildTraverse('SilenceIcon').style.visibility,'collapse');
-assert.equal(displayStatus.group.FindChildTraverse('MutedIcon').style.visibility,'visible','formal same-name monster keeps a genuine mute episode');
+const silence=f.group.FindChildTraverse('SilenceIcon');
+selected=-1;cfg.SurvivalPortraitPresentation.Refresh(f.group);assert.equal(silence.style.visibility,'collapse');
 cfg.SurvivalPortraitPresentation.SetSnapshot(null);unitName='unknown_unit';
-console.log('PORTRAIT_DISPLAY_ROLE_PASS: matching authoritative preview stays unobscured, explicit zero/formal same-name monsters retain real status and late entity snapshots cannot cross selection');
-
-selected=-1;cfg.SurvivalPortraitPresentation.Refresh(f.group);assert.equal(silence.style.visibility,"collapse","clearing selection removes any pending face");
+console.log('PORTRAIT_STATUS_HIDDEN_PASS: real and staged silence/mute stay hidden through status rewrites and selection changes');
 
 // Native heroes and cosmetic model overrides share the actual visible fill.
 selected=777;
@@ -489,3 +460,17 @@ cfg.SurvivalPortraitPresentation.Refresh(nativeRebirth.group);
 assert.equal(nativeRebirth.container.FindChildTraverse('SurvivalOfficialPortraitBackground').image,
  cfg.SurvivalMonsterPortraitScenes.monster_boss_rebirth_01_phalanx.background);
 console.log('MONSTER_NATIVE_BACKGROUND_PASS: authoritative asset selects the original texture converted for Panorama');
+
+// Waves without cosmetic metadata still use the original hero backdrop;
+// genuinely unknown wave models receive the neutral default.
+vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/monster_portrait_renderer.js','utf8'),{GameUI:{CustomUIConfig:()=>cfg},Date:{now:()=>now}});
+selected=9201;unitName='npc_survival_wave_named_humanoid_white_melee';
+cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:selected,model_asset_id:'',portrait_model_name:''});
+cfg.SurvivalPortraitPresentation.Refresh(nativeRebirth.group);
+assert.equal(nativeRebirth.container.FindChildTraverse('SurvivalOfficialPortraitBackground').image,
+ cfg.SurvivalMonsterPortraitScenes.monster_undying.background);
+selected=9202;unitName='npc_survival_wave_unknown';
+cfg.SurvivalPortraitPresentation.Refresh(nativeRebirth.group);
+assert.equal(nativeRebirth.container.FindChildTraverse('SurvivalOfficialPortraitBackground').image,
+ 's2r://panorama/images/custom_game/monster_portrait_backgrounds/portraitbackground_coolinterior.vtex');
+console.log('WAVE_NATIVE_BACKGROUND_PASS: metadata-free named wave and unknown model default do not borrow stale selected assets');

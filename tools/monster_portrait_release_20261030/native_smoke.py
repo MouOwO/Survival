@@ -7,7 +7,7 @@ from pathlib import Path
 import argparse,hashlib,importlib.util,json,subprocess,sys
 sys.dont_write_bytecode=True
 import build_release as b
-ROOT=b.ROOT;OUT=b.REPORT;ADDON='svt_m3003'
+ROOT=b.ROOT;OUT=b.REPORT;ADDON='svt_m3004'
 def load(name):return b.base.load(OUT/name)
 def write(name,value):
  with (OUT/name).open('x',encoding='utf8') as stream:stream.write(json.dumps(value,ensure_ascii=False,indent=2)+'\n')

@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 8393,
-      "sha256": "cc25e7af87c5325fe646479e99991b5d0a5c7ffb7b14b1a0a9c0ee7d1355f943"
+      "bytes": 8791,
+      "sha256": "f6af0264a407e8268315099a7dd71b198d705c46bfe6e0768a7b3d64670e3646"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 20232,
-      "sha256": "8818aa46c4171187410806bb55531b7ca666ee483b0b3473dd2478a105fa8100"
+      "bytes": 21063,
+      "sha256": "cda9dfac54f4adfe3a61ffd2cae433b16c917eafb3e5a1a99bb911a8534a9d24"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -195,8 +195,8 @@
     },
     {
       "path": "evidence/monster_portraits_20261030.md",
-      "bytes": 9239,
-      "sha256": "32f4f0b91b1400d268140e828878dd626c04038ab5f39404618c25ad3cf46e9a"
+      "bytes": 15711,
+      "sha256": "54048cac8a67a21735c4de761956243484a4b092567f50f4719a86d10b3748af"
     },
     {
       "path": "evidence/native_arcade_cloud_20261027.public.json",
