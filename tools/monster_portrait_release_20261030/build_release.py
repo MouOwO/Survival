@@ -20,6 +20,10 @@ VIEW=Path('D:/Survival_发布候选')/(PREFIX+'_view')
 OUTPUT=Path('D:/Survival_工坊输出')/PREFIX
 REPORT=ROOT/'output/portrait_transition_publish_20261030'
 PACKAGE_REPORT='package_v04.json'
+MAP_PROOF=ROOT/'output/map_minimap_sync_20261030/installed_map_verification.json'
+MAP_SOURCE_SHA='9f87e852e45e6bec5674897e0940365bbf61e749075106a9a91ef86823b3cc01'
+MAP_PACKAGE_SHA='59c5856b44a75a3db5659fb15dd2038480a102c450ae5a27141e890b201bcf33'
+MAP_LUA_REVISION='2f0eb30c159ce76294b90d95ea2de8377873f0da'
 def saved(name):
  for tree in (SOURCE,SOURCE+'^3'):
   result=subprocess.run(['git','cat-file','blob',tree+':'+name],cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
@@ -39,7 +43,31 @@ def portrait_scene_maps(values):
   yield
  finally:pack.runtime.SCENE_MAPS=previous
 def payloads():
- values=base.payloads()
+ proof=base.load(MAP_PROOF)
+ need(proof['source']['sha256']==MAP_SOURCE_SHA and proof['package']['sha256']==MAP_PACKAGE_SHA,'Reviewed saved-world map identity required')
+ previous_proof=base.PROOF
+ try:
+  # Reuse every original source/package/CRC check with the newer verified map.
+  base.PROOF=MAP_PROOF;values=base.payloads()
+ finally:base.PROOF=previous_proof
+ need(values[base.MAP]==saved(base.MAP),'Compiled map must match fixed release revision')
+ # Other tasks have newer gameplay commits on dev. Retain only the already
+ # approved map companion Lua from the previous signed portrait candidate.
+ for name in base.LUA_NAMES:
+  relative='scripts/vscripts/'+name
+  values[relative]=subprocess.check_output(['git','show',MAP_LUA_REVISION+':'+relative],cwd=ROOT)
+ minimap=base.load(ROOT/'output/map_minimap_sync_20261030/final_resources.json')
+ need(minimap['status']=='resource_chain_pass' and minimap['compiler_dependencies_checked'] and minimap['tga']['width']==2048 and minimap['tga']['height']==2048,'Matching minimap compilation required')
+ pins={row['path']:row for row in minimap['game_files']}
+ minimap_paths={'resource/overviews/template_map.txt','materials/overviews/template_map.vmat_c','materials/overviews/template_map_tga_d9088edf.vtex_c'}
+ need(set(pins)==minimap_paths|{base.MAP} and pins[base.MAP]['sha256']==MAP_PACKAGE_SHA,'Exact matching map/minimap resource set required')
+ for name in minimap_paths:
+  raw=saved(name)
+  if name.endswith('.txt'):
+   installed=(ROOT/name).read_bytes()
+   need(installed.replace(b'\r\n',b'\n')==raw.replace(b'\r\n',b'\n'),'Minimap settings differ from fixed revision')
+   raw=installed # Preserve the exact verified CRLF runtime bytes.
+  need(base.sha(raw)==pins[name]['sha256'] and len(raw)==pins[name]['bytes'],'Matching committed minimap resource changed');values[name]=raw
  manifest=json.loads(saved('art/portraits/monsters/manifest.json'))
  need(len(manifest['assets'])==197 and manifest['unique_scenes']==188 and len(manifest['backgrounds'])==29,'Verified portrait inventory differs')
  names={'panorama/layout/custom_game/survival_hud.vxml_c',*('panorama/scripts/custom_game/'+n+'.vjs_c' for n in ('combat_stats','portrait_presentation','monster_portrait_scenes','monster_portrait_renderer','topnav_remaining_5d5c1152eb'))}
@@ -85,6 +113,7 @@ def run(build=False,key=None,reviewed=None):
  sizes=[sum(x['row']['bytes'] for x in g) for g in groups]
  disk=inc.capacity(VIEW,OUTPUT,sum(map(len,values.values()))*2+2**22,sum(sizes[i] for i in rewritten),pack.HEADER.size+len(tree)+48,0)
  plan=dict(schema=1,revision=REVISION,release_sequence=SEQUENCE,workshop_id=ITEM,source_git_head=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),portrait_source_revision=SOURCE,baseline_release_sequence=2026102901,baseline_content_sha256=base.BASE_CONTENT,canonical_journal_sha256=journal,pending_journal_preserved=not state.get('uploaded'),content_sha256=after['content_sha256'],files=after['file_count'],changed_runtime_paths=sorted(values),target_pins={n:base.checks(v) for n,v in values.items()},protected_modules_preserved=184,protected_modules_rebuilt=0,account_gates_payment_backend_preserved=True,trusted_review_files=16,rebuilt_archives=sorted(rewritten),archive_migrations=moves,disk_preflight=disk,candidate=str(VIEW),trusted_source=str(TRUSTED),output=str(OUTPUT/(ITEM+'.vpk')),container_bytes=after['bytes']+pack.HEADER.size+len(tree)+48)
+ plan.update(map_lua_revision=MAP_LUA_REVISION,map_source_sha256=MAP_SOURCE_SHA,map_package_sha256=MAP_PACKAGE_SHA,minimap_matched=True)
  need(pack.runtime.digest(base.JOURNAL)==journal,'Journal changed during plan')
  if not build:return plan
  need(reviewed and base.same_plan(base.load(reviewed),plan),'Reviewed input plan changed')
