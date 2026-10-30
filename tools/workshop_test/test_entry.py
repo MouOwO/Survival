@@ -69,18 +69,15 @@ def process_inventory():
     return json.loads(result.stdout.decode("utf-8-sig"))
 
 
-def launch_arguments(mode, log, *, onboarding=False):
+def launch_arguments(mode, log):
     need(mode in ("offline", "online"), "test_mode_invalid")
-    need(not onboarding or mode == "offline", "onboarding_offline_only")
     addon = ROOT.name if mode == "offline" else ONLINE_ADDON
     result = ["-steam", "-tools", "-noassetbrowser", "-addon", addon, "-dev", "-novid",
-              "-vconport", "29008" if onboarding else "29006" if mode == "offline" else "29005",
+              "-vconport", "29006" if mode == "offline" else "29005",
               "-condebug", "-con_logfile", str(log), "+sv_cheats", "1" if mode == "offline" else "0",
               "+host_timescale", "1"]
     if mode == "offline":
         result.extend(("+survival_offline_logic_test", "1"))
-        if onboarding:
-            result.extend(("+survival_offline_onboarding_test", "1"))
     result.extend(("+dota_launch_custom_game", addon, "template_map"))
     return result
 
@@ -140,13 +137,8 @@ def check(mode):
             "game_started": False}
 
 
-def run(mode, *, check_only=False, onboarding=False):
-    need(not onboarding or mode == "offline", "onboarding_offline_only")
+def run(mode, *, check_only=False):
     result = check(mode)
-    if onboarding:
-        need((ROOT / "scripts/vscripts/debug/offline_onboarding_test.lua").is_file(),
-             "offline_onboarding_code_missing")
-        result.update(onboarding_test=True, tutorial_every_match=True, wave_spawning=False, vcon_port=29008)
     if check_only:
         return result
     inventory = process_inventory()
@@ -159,7 +151,7 @@ def run(mode, *, check_only=False, onboarding=False):
     RUNTIME.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_%f")
     log = RUNTIME / (mode + "_" + stamp + ".log")
-    arguments = launch_arguments(mode, log, onboarding=onboarding)
+    arguments = launch_arguments(mode, log)
     process = subprocess.Popen([str(GAME / "bin/win64/dota2.exe"), *arguments], cwd=GAME / "dota")
     result.update(status="GAME_STARTED", pid=process.pid, log_file=str(log), game_started=True,
                   started_utc=datetime.now(timezone.utc).isoformat())
@@ -171,10 +163,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("mode", choices=("offline", "online"))
     parser.add_argument("--check", action="store_true")
-    parser.add_argument("--onboarding", action="store_true", help="Offline-only tutorial preview for any account")
     args = parser.parse_args()
     try:
-        result = run(args.mode, check_only=args.check, onboarding=args.onboarding)
+        result = run(args.mode, check_only=args.check)
     except (RuntimeError, OSError, ValueError, KeyError) as error:
         code = str(error) if isinstance(error, RuntimeError) else "test_entry_failed"
         if not code.replace("_", "").isalnum() or len(code) > 80:

@@ -3,7 +3,7 @@
 local M = {}
 local enabled = false
 local provider = {}
-local profiles, accounts, onboarding = {}, {}, {}
+local profiles, accounts = {}, {}
 local current_session = nil
 local revision_serial = 0
 
@@ -25,19 +25,17 @@ local function requested()
 end
 
 function M.configure()
-    enabled, profiles, accounts, onboarding, current_session = false, {}, {}, {}, nil
+    enabled, profiles, accounts, current_session = false, {}, {}, nil
     if Convars and type(Convars.RegisterConvar) == "function" then
         -- Registration preserves an existing explicit server value.
         pcall(Convars.RegisterConvar, Convars, "survival_offline_logic_test", "0",
             "Opt-in development Workshop Tools offline logic arena", 0)
     end
-    require("debug/offline_onboarding_test").configure()
     if not requested() then return false end
     assert(tools_allowed(), "offline_logic_tools_required")
     assert(not require("systems/player_web_auth").enabled(),
         "offline_logic_web_auth_conflict")
     enabled = true
-    require("debug/offline_onboarding_test").configure()
     print("[OFFLINE_LOGIC_TEST] enabled=true storage=session_memory cloud=false")
     return true
 end
@@ -61,7 +59,7 @@ local function setup()
     local session = value.get_session_id()
     assert(type(session) == "string" and #session >= 8, "match_session_missing")
     if current_session ~= session then
-        current_session, profiles, accounts, onboarding = session, {}, {}, {}
+        current_session, profiles, accounts = session, {}, {}
     end
     return value, session
 end
@@ -107,18 +105,12 @@ end
 
 function provider.init()
     assert(M.is_enabled(), "offline_logic_not_enabled")
-    profiles, accounts, onboarding, current_session, revision_serial = {}, {}, {}, nil, 0
+    profiles, accounts, current_session, revision_serial = {}, {}, nil, 0
 end
 
 function provider.resolve_account_id(player_id)
     setup()
     if type(player_id) ~= "number" or player_id < 0 or player_id ~= math.floor(player_id) then return nil end
-    local preview = require("debug/offline_onboarding_test")
-    if preview.is_enabled() then
-        local account = preview.account_id(player_id)
-        if account then accounts[account] = true end
-        return account
-    end
     if not require("core/test_access_policy").allowed(player_id) then return nil end
     -- Admission compares this identity with the engine's Steam account ID.
     -- Isolation belongs to this memory-only provider/session, not a fake ID.
@@ -174,46 +166,6 @@ function provider.persist_isolated_gameplay_stat(account, field_id, value, revis
     current.save.gameplay_stats, current.revision = stats, revision
     revision_serial = math.max(revision_serial, tonumber(revision) or 0)
     return true
-end
-
-local function onboarding_request(payload, outcome, success, failure)
-    local _, session = setup()
-    local account = type(payload) == "table" and payload.account_id or nil
-    if type(account) ~= "string" or not accounts[account] then
-        failure("offline_account_unavailable")
-        return
-    end
-    if payload.match_session_id ~= nil and payload.match_session_id ~= session then
-        failure("match_profile_mismatch")
-        return
-    end
-    local preview = require("debug/offline_onboarding_test").is_enabled()
-    if not preview and outcome then
-        failure("offline_onboarding_not_enabled")
-        return
-    end
-    -- Metadata is shared across profile modes, but never across matches. Only
-    -- the dedicated guide preview starts required; ordinary offline QA keeps
-    -- the previous unrestricted gameplay flow without consulting cloud state.
-    local status = preview and (onboarding[account] or "required") or "legacy"
-    if status == "required" and outcome then status = outcome end
-    onboarding[account] = status
-    success({ok=true, account_id=account, match_session_id=session, version=1,
-        required=status == "required", status=status})
-end
-
-function provider.onboarding_state(payload, success, failure)
-    onboarding_request(payload, nil, success, failure)
-end
-
-function provider.onboarding_finish(payload, success, failure)
-    assert(M.is_enabled(), "offline_logic_not_enabled")
-    local outcome = type(payload) == "table" and payload.outcome or nil
-    if outcome ~= "completed" and outcome ~= "skipped" then
-        failure("onboarding_outcome_invalid")
-        return
-    end
-    onboarding_request(payload, outcome, success, failure)
 end
 
 function provider.archive_enabled() return false end

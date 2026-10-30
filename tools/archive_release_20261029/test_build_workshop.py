@@ -24,7 +24,7 @@ class FullReleaseGates(unittest.TestCase):
         block = ('if type(GetMapName) == "function" and GetMapName() == "ws4_entry" then\n'
                  '    local entry = require("systems/native_cloud_handoff")\n')
         self.assertTrue(result.startswith(marker + block))
-        self.assertIn('require("systems/onboarding_service").init()', result)
+        self.assertNotIn('require("systems/onboarding_service")', result)
         self.assertIn('victory_settled == true', result)
         with self.assertRaises(ValueError):
             tool.main_source(b'print("unreviewed prefix")\n' + current)

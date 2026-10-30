@@ -132,5 +132,15 @@
     "active_server_unchanged": true,
     "workshop_uploaded": false,
     "real_account_grants_verified": false
+  },
+  "onboarding_removed_20261030": {
+    "status": "REMOVED_FROM_DEVELOPMENT_RUNTIME",
+    "evidence": "evidence/onboarding_removed_20261030.md",
+    "guide_ui_and_build_gate_removed": true,
+    "normal_login_saves_and_gift_preserved": true,
+    "historical_sql_and_player_rows_retained": true,
+    "requires_new_match": true,
+    "server_deployed": false,
+    "workshop_uploaded": false
   }
 }

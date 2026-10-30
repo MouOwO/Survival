@@ -202,14 +202,6 @@ class ArchiveService:
                 return redeem(self, payload)
             except ValueError as error:
                 raise ArchiveError(str(error)) from error
-        # Account tutorial metadata has its own protocol and SQL persistence.
-        # It neither settles rewards nor depends on a reward configuration hash.
-        from .onboarding import KINDS as onboarding_kinds, command as onboarding_command
-        if isinstance(kind, str) and kind in onboarding_kinds:
-            try:
-                return onboarding_command(self.app, payload)
-            except ValueError as error:
-                raise ArchiveError(str(error)) from error
         if not accepts(self.bundle, requested_hash, kind): return {"ok":False,"terminal":True,"error":"archive_config_mismatch","config_hash":self.bundle.hash}
         original_command=self.validate(payload.get("command"))
         from .challenge_sessions import legacy_receipt, scope as scope_challenge

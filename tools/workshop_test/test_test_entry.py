@@ -14,25 +14,21 @@ spec.loader.exec_module(entry)
 
 
 class TestEntryBoundaryTest(unittest.TestCase):
-    def test_tutorial_preview_is_explicit_and_offline_only(self):
-        args = entry.launch_arguments("offline", Path("preview.log"), onboarding=True)
+    def test_regular_launch_arguments_keep_their_mode_and_port(self):
+        args = entry.launch_arguments("offline", Path("normal.log"))
         self.assertEqual(args[args.index("+survival_offline_logic_test") + 1], "1")
-        self.assertEqual(args[args.index("+survival_offline_onboarding_test") + 1], "1")
-        self.assertEqual(args[args.index("-vconport") + 1], "29008")
-        self.assertNotIn("+survival_offline_onboarding_test", entry.launch_arguments("offline", Path("normal.log")))
-        with self.assertRaisesRegex(RuntimeError, "onboarding_offline_only"):
-            entry.launch_arguments("online", Path("online.log"), onboarding=True)
-        with patch.object(entry, "check", side_effect=AssertionError("online preview must reject before any launch preparation")):
-            with self.assertRaisesRegex(RuntimeError, "onboarding_offline_only"):
-                entry.run("online", onboarding=True)
+        self.assertEqual(args[args.index("-vconport") + 1], "29006")
+        online = entry.launch_arguments("online", Path("online.log"))
+        self.assertEqual(online[online.index("-vconport") + 1], "29005")
+        self.assertNotIn("+survival_offline_logic_test", online)
 
-    def test_preview_launcher_preserves_live_game_and_never_contacts_cloud(self):
+    def test_offline_launcher_preserves_live_game_and_never_contacts_cloud(self):
         with patch.object(entry, "check", return_value={"ok": True}), \
                 patch.object(entry, "process_inventory", return_value={"steam_running": True, "dota_pids": [456]}), \
                 patch.object(entry, "ensure_relay", side_effect=AssertionError("offline cloud access")), \
                 patch.object(entry.subprocess, "Popen") as launch:
             with self.assertRaisesRegex(RuntimeError, "dota_already_running"):
-                entry.run("offline", onboarding=True)
+                entry.run("offline")
             launch.assert_not_called()
 
     def test_offline_launch_never_touches_cloud_transport(self):

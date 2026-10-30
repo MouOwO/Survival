@@ -154,11 +154,10 @@ test("activity disabled or loading cover restored releases input",()=>{
     const f=fixture();f.eligible();f.snapshot({active:0});assert.equal(f.inspect().open,false);
     f.snapshot();assert.equal(f.inspect().open,true);f.admit(false);assert.equal(f.inspect().open,false);
 });
-test("automatic popup waits for another modal and for onboarding",()=>{
+test("automatic popup waits for another modal and ignores retired guide state",()=>{
     const f=fixture();const other={IsValid:()=>true,GetParent:()=>null,SetAcceptsFocus(){},SetFocus(){},style:{}};
     f.cfg.SurvivalUILayers.Open("other",other,()=>{});f.eligible();assert.equal(f.inspect().open,false);
-    f.cfg.SurvivalUILayers.Close("other");f.cfg.SurvivalOnboarding={Inspect:()=>({shown:true})};f.tick();assert.equal(f.inspect().open,false);
-    f.cfg.SurvivalOnboarding={Inspect:()=>({shown:false})};f.tick();assert.equal(f.inspect().open,true);
+    f.cfg.SurvivalUILayers.Close("other");f.cfg.SurvivalOnboarding={Inspect:()=>({shown:true})};f.tick();assert.equal(f.inspect().open,true);
 });
 test("dispose removes event listeners, timers and modal input",()=>{
     const f=fixture();f.eligible();f.cfg.SurvivalPublicBetaGift.Dispose();assert.equal(f.events.size,0);assert.equal(f.tables.size,0);

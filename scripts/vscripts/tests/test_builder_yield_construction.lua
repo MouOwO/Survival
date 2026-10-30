@@ -362,3 +362,34 @@ assert(tower_count() == 6 and replacement ~= seventh_task,
     "canceling the replacement travel order returns its reservation")
 config.arrow_tower.unlock_city_level = original_unlock
 print("PLAYER_TOWER_PENDING_CAP_PASS: promoted totals, seventh-order reservation, authenticated recheck, same-team owner isolation, atomic construction, death/refund and cancellation")
+
+-- Retiring the guide must release construction even if an old listener is
+-- still present in an embedding fixture. Real ownership/resource/terrain
+-- checks, movement, charging and construction completion remain in force.
+reset()
+local retired_gate_calls=0
+bus.handle_request("onboarding.build_allowed.request",function()
+    retired_gate_calls=retired_gate_calls+1
+    return {ok=false,error="retired_tutorial_must_not_gate_construction"}
+end)
+for _,position in ipairs({Vector(510,511,128),Vector(1022,1023,128)}) do
+    local allowed,err=bus.request(events.BUILD_CAN_PLACE_REQUEST,
+        {player_id=0,caster=caster,building_id="main_city",position=position})
+    assert(not err and allowed and allowed.ok,
+        "a legal alternate city position cannot depend on tutorial progress")
+end
+local illegal=bus.request(events.BUILD_CAN_PLACE_REQUEST,
+    {player_id=0,caster=caster,building_id="main_city",position=Vector(100000,100000,128)})
+assert(illegal and not illegal.ok,"retiring the guide must preserve real placement boundaries")
+assert(build(Vector(510,511,128)).ok and caster.survival_build_task,
+    "ordinary accepted construction still starts the builder's travel task")
+arrived();tick(0.1)
+assert(created==1 and paid==1 and retired_gate_calls==0)
+tick(100)
+assert(completed_events==1 and retired_gate_calls==0,
+    "normal construction completes without reading any retired guide state")
+for _,name in ipairs({"systems/onboarding_service","systems/onboarding_persistence",
+    "systems/onboarding_targets","debug/offline_onboarding_test"}) do
+    assert(not package.loaded[name],"construction must not load a retired guide module: "..name)
+end
+print("REMOVED_TUTORIAL_CONSTRUCTION_PASS: alternate legal positions, retired listener ignored, terrain boundary retained, real travel/spend/completion, no guide modules loaded")

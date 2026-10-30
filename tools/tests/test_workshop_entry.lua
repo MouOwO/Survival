@@ -49,7 +49,7 @@ local function fixture(server, client, map)
         state.requires[#state.requires + 1] = name
         if name == "config/test_access" then return state.config end
         if name == "config/release_profile" then return {channel = "production"} end
-        if name == "debug/offline_onboarding_test" or name == "core/release_policy" then
+        if name == "core/release_policy" then
             if not env.package.loaded[name] then
                 env.package.loaded[name] = load("scripts/vscripts/" .. name .. ".lua", env)
             end

@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][ValidateSet('Offline','Online')][string]$Mode,[switch]$CheckOnly,[switch]$Onboarding)
+param([Parameter(Mandatory=$true)][ValidateSet('Offline','Online')][string]$Mode,[switch]$CheckOnly)
 $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path
 . (Join-Path $repo 'tools/backend_python.ps1')
@@ -6,7 +6,6 @@ try {
     $python=Resolve-SurvivalBackendPython -RepoRoot $repo
     $entryArguments=@('-B','-X','utf8',(Join-Path $PSScriptRoot 'test_entry.py'),$Mode.ToLowerInvariant())
     if($CheckOnly){$entryArguments+='--check'}
-    if($Onboarding){$entryArguments+='--onboarding'}
     Push-Location $repo
     try {
         $reply=& $python @entryArguments
@@ -18,8 +17,7 @@ try {
         exit $code
     }
     if(-not $CheckOnly){
-        if($Onboarding){Write-Output 'Offline tutorial preview: every account starts the tutorial each match. Memory-only, waves paused, no cloud login.'}
-        elseif($Mode -eq 'Offline'){Write-Output 'Offline logic test: memory-only profile, no cloud login. Cheats and debug commands are enabled.'}
+        if($Mode -eq 'Offline'){Write-Output 'Offline logic test: memory-only profile, no cloud login. Cheats and debug commands are enabled.'}
         else{Write-Output 'Online login test: cheats and data-changing debug commands are disabled. Confirm this match on the web page. Keep this PC and its Steam connection online.'}
     }
 } catch {

@@ -40,7 +40,6 @@ local function fixture()
         SetCustomGameTeamMaxPlayers = function() error("read-only roster cannot set team capacity") end,
     }
     local modules = {['core/test_access_policy'] = "scripts/vscripts/core/test_access_policy.lua",
-        ['debug/offline_onboarding_test'] = "scripts/vscripts/debug/offline_onboarding_test.lua",
         ['core/release_policy'] = "scripts/vscripts/core/release_policy.lua"}
     e.require = function(name)
         s.required[#s.required + 1] = name

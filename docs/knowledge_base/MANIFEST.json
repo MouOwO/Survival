@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 7375,
-      "sha256": "b10f69c964e75563e780774635f1f757618a75e8d89ed3cf5aae4dcb4fd17a58"
+      "bytes": 8393,
+      "sha256": "cc25e7af87c5325fe646479e99991b5d0a5c7ffb7b14b1a0a9c0ee7d1355f943"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 19183,
-      "sha256": "6023cc360ccb4fb9db15d78439e14b778bead388078bf679f54c626d46bb590c"
+      "bytes": 20232,
+      "sha256": "8818aa46c4171187410806bb55531b7ca666ee483b0b3473dd2478a105fa8100"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 3183,
-      "sha256": "80240328ada9cff6e607b6d36dba6dacee9c402546a21722305abfff5445c163"
+      "bytes": 3402,
+      "sha256": "68510e5db4a1be04c4c50d2471cb04db180a136e31ec937bc8402e2f156bfc40"
     },
     {
       "path": "data/completed_work_index.json",
@@ -90,8 +90,8 @@
     },
     {
       "path": "data/context.json",
-      "bytes": 5077,
-      "sha256": "e3918bf14f5bf5636d6754d21d3247071e35d28a5ace8b7f0b0aeda380737c60"
+      "bytes": 5468,
+      "sha256": "ccf8ae744d06027aca249f47a6658d90ef4c58325546c61bd735553693fb8a24"
     },
     {
       "path": "data/repository_files.json",
@@ -189,6 +189,11 @@
       "sha256": "4820b73d8484f4c1b5a02d1a63ffffaac3d4ccbce6a6a5b7c00de21ec9e0607d"
     },
     {
+      "path": "evidence/monster_portraits_20261030.md",
+      "bytes": 9239,
+      "sha256": "32f4f0b91b1400d268140e828878dd626c04038ab5f39404618c25ad3cf46e9a"
+    },
+    {
       "path": "evidence/native_arcade_cloud_20261027.public.json",
       "bytes": 1694,
       "sha256": "3d57d439d339f2655e98d9b690735cf65de3945a15e7b52b77ac29e1bc7d657b"
@@ -197,6 +202,11 @@
       "path": "evidence/offline_early_clear_scene_20261029.md",
       "bytes": 4321,
       "sha256": "add74adc282e550f6983eba92584481d3c735b78b19065992e1ebc17a7da287c"
+    },
+    {
+      "path": "evidence/onboarding_removed_20261030.md",
+      "bytes": 3562,
+      "sha256": "abbe3e6910e7cebc3322bcdcc7db0a44018e9cf1901cd3d43b8d16425dd8d97f"
     },
     {
       "path": "evidence/portrait_rollback_official_20261029.md",

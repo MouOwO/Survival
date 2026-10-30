@@ -59,6 +59,10 @@ local original_open = io.open
 io.open = function() file_calls = file_calls + 1; error("offline read or wrote a fixture file") end
 profiles.init(options)
 local provider = assert(profiles.get_provider())
+assert(provider.onboarding_state == nil and provider.onboarding_finish == nil
+    and values.survival_offline_onboarding_test == nil
+    and not package.loaded["debug/offline_onboarding_test"],
+    "ordinary offline profiles expose no retired tutorial API, flag, or dependency")
 local account = assert(provider.resolve_account_id(0))
 assert(account == "885195478", "memory-only storage must preserve the engine Steam identity used by admission")
 assert(provider.resolve_account_id(1) == nil, "restricted player policy remains active")

@@ -350,7 +350,7 @@ local function on_player_disconnected(keys)
 end
 
 local function schedule_unbuilt_wall_defeat_check()
-    if is_fishing_mode() or require("debug/offline_onboarding_test").is_enabled() then return end
+    if is_fishing_mode() then return end
     local delay = require("config/wave_timing_config").initial_delay_seconds
     scheduler.after(delay, function()
         if is_fishing_mode() then return false end
@@ -1042,7 +1042,6 @@ local function initialize_services()
     require("systems/tower_visual_service").init()
     tree_system.init()
     worker_system.init()
-    require("systems/onboarding_service").init()
     require("systems/lumberjack_fusion_service").init()
     hero_skill_system.init()
     hero_skill_pool_service.init()
@@ -1077,7 +1076,6 @@ local function initialize_services()
     challenge_session_service.init()
     monster_spawn_service.init()
     wave_system.init()
-    if require("debug/offline_onboarding_test").is_enabled() then wave_system.set_dev_mode(true) end
     require("systems/fishing_service").init()
     require("systems/building_challenge_service").init()
     shop_system.init()

@@ -7,7 +7,6 @@ local match_setup = require("systems/match_setup_service")
 local test_access_policy = require("core/test_access_policy")
 local web_auth = require("systems/player_web_auth")
 local native_cloud_roster = require("systems/native_cloud_roster")
-local offline_onboarding = require("debug/offline_onboarding_test")
 
 local M = {}
 local generation, session_id, started_at = 0, "", 0
@@ -57,7 +56,6 @@ local function resource(method, id)
 end
 
 local function account_id(id)
-    if offline_onboarding.is_enabled() then return offline_onboarding.account_id(id) end
     local steam = tonumber(resource("GetSteamAccountID", id))
     if not steam or steam <= 0 then return nil end
     return string.format("%.0f", steam)
