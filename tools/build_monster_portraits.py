@@ -229,6 +229,15 @@ def build(check=False, compile_resources=False):
             lo, hi = mesh_bounds(model, vpk)
             profile['cameras'] = {'default': fitted_camera(lo, hi, model.startswith('models/props_structures/'))}
         assert 'cameras' in profile, model
+        if asset_id == 'hero_permanent_hero_blademaster':
+            # The favorite head has a gold front and a white mane behind it.
+            # Frame this outfit from above while retaining its front face; the
+            # low base camera hides the mane. Keep other profiles/poses intact.
+            profile = copy.deepcopy(profile)
+            profile['cameras'] = copy.deepcopy(profile['cameras'])
+            profile['cameras']['default'].update({
+                'PortraitPosition': '321.856619 12.880622 257.916392',
+                'PortraitAngles': '25 185 0', 'PortraitFOV': '14'})
         camera = profile['cameras'].get('default', next(iter(profile['cameras'].values())))
         if asset_id == 'builder_io_benevolent_companion':
             model = 'models/items/io/io_ti7/io_ti7.vmdl'

@@ -1,5 +1,7 @@
 # 孤城逐晓／Survival 统一知识库
 
+最新头像对照：[2026-10-30 锋刃宗师头饰、皮肤与镜头](evidence/blademaster_portrait_match_20261030.md)。
+
 最新决定：[2026-10-30 移除新手引导](evidence/onboarding_removed_20261030.md)。
 
 最新专题：[2026-10-30 怪物动态头像、原版镜头与饰品实机修复](evidence/monster_portraits_20261030.md)。

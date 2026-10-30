@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 8863,
-      "sha256": "812f38b71594f7461c50eaba8bb2a543a753695464f0510573d6fb1b9a2a1728"
+      "bytes": 9263,
+      "sha256": "f40c04099c9507bb1a0887de86109509147a0027c0c44350046b3b25af6cad86"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 21135,
-      "sha256": "2b996bc5ebbebe47b897d45242112ceb132b0442f70046c24682eeee5f1d73e9"
+      "bytes": 21524,
+      "sha256": "df8237a7e1300263d11eb8151c0568901421d65217cd81cee3438c43b26054c0"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 3402,
-      "sha256": "68510e5db4a1be04c4c50d2471cb04db180a136e31ec937bc8402e2f156bfc40"
+      "bytes": 3526,
+      "sha256": "432f04940fd0a6d7e5d01a2a36277d00b0480116420049c11f5ce4793a6b95da"
     },
     {
       "path": "data/completed_work_index.json",
@@ -90,8 +90,8 @@
     },
     {
       "path": "data/context.json",
-      "bytes": 5468,
-      "sha256": "ccf8ae744d06027aca249f47a6658d90ef4c58325546c61bd735553693fb8a24"
+      "bytes": 5879,
+      "sha256": "b87df0fc86487a8ca4151662f38379084aae3a5623e84e3fc8ec1b064a9db01c"
     },
     {
       "path": "data/repository_files.json",
@@ -152,6 +152,11 @@
       "path": "evidence/archive_video_challenges_20261029.md",
       "bytes": 9362,
       "sha256": "7d6f8d6d46f4e6d2512f64c29c73d8aa6e5c4b6be3bb4c7376487bef227e0c00"
+    },
+    {
+      "path": "evidence/blademaster_portrait_match_20261030.md",
+      "bytes": 3037,
+      "sha256": "e0e617d922b258eba820418d23ad3811d85da220e9f1f6d23acf5aca4aaa88d3"
     },
     {
       "path": "evidence/challenge_projectiles_20261029.md",

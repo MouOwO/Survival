@@ -142,5 +142,15 @@
     "requires_new_match": true,
     "server_deployed": false,
     "workshop_uploaded": false
+  },
+  "blademaster_portrait_match_20261030": {
+    "status": "DEVELOPMENT_COMPILED_AND_OFFLINE_VISUALLY_CHECKED",
+    "evidence": "evidence/blademaster_portrait_match_20261030.md",
+    "scene": "portraits/monster_1bc348e8932e1cfc065b_v1",
+    "same_head_model_confirmed": true,
+    "world_body_skin": 0,
+    "other_196_appearances_preserved": true,
+    "server_deployed": false,
+    "workshop_uploaded": false
   }
 }
