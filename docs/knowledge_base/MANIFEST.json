@@ -70,8 +70,8 @@
     },
     {
       "path": "13_art_ui_qa.md",
-      "bytes": 9513,
-      "sha256": "ac4051939adecb31218fb8e35a0f228882ee46ae91613da9c6d6f47a0c4b676d"
+      "bytes": 10211,
+      "sha256": "d66e4309d83d9e139aa71f1d94df01b1b5d0d5bd8319658fd7e9c7d7e1e9d6ba"
     },
     {
       "path": "NEW_CHAT_PROMPT.txt",
@@ -274,6 +274,11 @@
       "sha256": "b9a922eae4934e4694953d470b269ca38811bb8ba224114f66bd6ee649cfe82a"
     },
     {
+      "path": "evidence/teammate_builder_portrait_20261031.md",
+      "bytes": 4136,
+      "sha256": "b44dd0dac820a7add7a0909c664e009dab51ac3643d7224712c25dd76f82672a"
+    },
+    {
       "path": "evidence/ten_sin_startup_20261028.md",
       "bytes": 3892,
       "sha256": "6b886a61b5f50cf4941f68023fa54603251443785cd5ff103dc759d03faf0884"
@@ -452,6 +457,11 @@
       "path": "validation/20261030/wave_overflow_grace.json",
       "bytes": 2478,
       "sha256": "2f68e103d414f79e4bf96f56ee25d26274779d190ef7e552de778b1969fa13d6"
+    },
+    {
+      "path": "validation/20261031/teammate_builder_portrait.json",
+      "bytes": 2718,
+      "sha256": "5e0b748604de932edb2a5a7a61720a7cdfe6b634c41c491a700843695553e114"
     }
   ]
 }

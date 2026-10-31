@@ -1,0 +1,110 @@
+{
+  "date": "2026-10-31",
+  "baseline_reproduced": true,
+  "initial_failure": "a teammate builder must mount inside the inspected-unit portrait",
+  "checks": [
+    {
+      "scope": "working",
+      "test": "test_teammate_builder_portrait",
+      "exit_code": 0
+    },
+    {
+      "scope": "working",
+      "test": "test_combat_stats_callbacks",
+      "exit_code": 0
+    },
+    {
+      "scope": "working",
+      "test": "test_portrait_selection_transition",
+      "exit_code": 0
+    },
+    {
+      "scope": "working",
+      "test": "test_portrait_presentation",
+      "exit_code": 0
+    },
+    {
+      "scope": "scoped",
+      "test": "test_teammate_builder_portrait",
+      "exit_code": 0
+    },
+    {
+      "scope": "scoped",
+      "test": "test_combat_stats_callbacks",
+      "exit_code": 0
+    },
+    {
+      "scope": "scoped",
+      "test": "test_portrait_selection_transition",
+      "exit_code": 0
+    },
+    {
+      "scope": "scoped",
+      "test": "test_portrait_presentation",
+      "exit_code": 0
+    },
+    {
+      "scope": "working",
+      "test": "test_monster_portraits",
+      "exit_code": 0
+    },
+    {
+      "scope": "working",
+      "test": "test_portrait_pending_unit_index",
+      "exit_code": 0
+    },
+    {
+      "scope": "working",
+      "test": "test_monster_portrait_prewarm_budget",
+      "exit_code": 0
+    },
+    {
+      "scope": "working",
+      "test": "teammate_builder_metadata",
+      "exit_code": 0
+    },
+    {
+      "scope": "working",
+      "test": "syntax",
+      "exit_code": 0
+    },
+    {
+      "scope": "scoped",
+      "test": "syntax",
+      "exit_code": 0
+    }
+  ],
+  "compile": [
+    {
+      "scope": "scoped",
+      "compiled": 1,
+      "failed": 0,
+      "source_sha256": "28fe876dafb2e0a8f1fd5881de8462128a95cda2374084027b4e8f4c731a094b",
+      "runtime_sha256": "e04a88688bbcdbd0a8e488ca6b9a00595bea686b7f667d8b7bdcd62c4bc72222"
+    },
+    {
+      "scope": "working",
+      "compiled": 1,
+      "failed": 0,
+      "source_sha256": "a2812d197ef4838397f7794a3f022e48f602c0a30c75a6192bd88e5ac540ec0a",
+      "runtime_sha256": "14293e8289a47691765529a5af94f048345a73e84b3c2f33d3722eef656a1203"
+    }
+  ],
+  "counts": {
+    "stable_updates": 600,
+    "stable_anchor_searches": 0,
+    "rebuild_anchor_searches": 2,
+    "created_scenes": 1,
+    "set_unit_calls": 0,
+    "server_viewer_builder_combinations": 16,
+    "extra_network_polls": 0
+  },
+  "complexity": {
+    "initialization": "O(V) HUD anchor lookup",
+    "steady": "O(D), D <= 32, independent of appearance/HUD collection size",
+    "space": "O(1) anchor references",
+    "missing_query_retry": "bounded existing selection event window"
+  },
+  "native_multiplayer_verified": false,
+  "workshop_uploaded": false
+}
