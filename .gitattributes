@@ -178,6 +178,9 @@ docs/knowledge_base/** text eol=lf
 tools/ws4_catalog_sync_20261031/*.py text eol=lf
 tools/ws4_catalog_sync_20261031/README.md text eol=lf
 server/player_web_auth/game_diagnostics.py text eol=lf
+tools/shop_recovery_20261031/*.py text eol=lf
+tools/shop_recovery_20261031/README.md text eol=lf
+tools/test_online_account_actions_20261031.lua text eol=lf
 
 # Preserve the reviewed ten-sin startup patch and its pinned source bytes.
 scripts/vscripts/systems/challenge_session_service.lua text eol=crlf

@@ -1,5 +1,7 @@
 # 孤城逐晓／Survival 统一知识库
 
+最新商城/福利根因：[3101只读验收误入发布、最小修复及兑换码缺项](evidence/shop_readonly_root_cause_20261031.md)。
+
 最新登录自助入口：[2026-10-31 Steam验签再次恢复、双击自检/恢复和限制](evidence/steam_login_manual_repair_20261031.md)。
 
 最新未解问题：[2026-10-31 商城空白／每日领取等待与有界诊断](evidence/shop_daily_transport_20261031.md)。

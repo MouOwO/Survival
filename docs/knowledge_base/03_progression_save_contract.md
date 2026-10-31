@@ -18,7 +18,7 @@
 | 请求指纹、首次事件日期、完成回执 | `archive_operations` |
 | 不可变配置、在线事件 | `archive_config_sets`、`archive_online_outbox` |
 
-当前开发 `all_difficulties_unlocked=true` 会把验收局账户写入隔离到整局结束。测试中应明确该标记、provider、构建身份和冻结配置，不能把本局资源增长称为持久到账。离线只在本局内存中保存，不能把离线收益回灌云档。
+2026-10-31正常开发默认已改false，原3101现役仍为true；该验收开关会把账户写入隔离到整局结束，更新后须新开正常局。测试中应明确该标记、provider、构建身份和冻结配置，不能把本局资源增长称为持久到账。离线只在本局内存中保存，不能把离线收益回灌云档。
 
 源码：`scripts/vscripts/systems/player_profile_service.lua`、`systems/player_profile_providers/http_fishing_provider.lua`、`config/generated/player_profile_rules.lua`，以及 `data/csv/玩家档案系统/`。
 

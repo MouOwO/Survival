@@ -1,9 +1,9 @@
 -- Keep all combat formulas configured while admitting only the initial four modes.
 local M = {}
--- Temporary read-only acceptance: each new match opens all released-mode tiers,
--- bypasses entry clears/quotas, and isolates account writes. Set false and start
--- a new match to restore normal admission, progression and settlement.
-M.all_difficulties_unlocked = true
+-- Normal matches obey saved progression and keep authenticated account actions.
+-- Explicit acceptance can still open every released tier and isolate all writes;
+-- the guarded offline provider opens preview tiers without this shipping flag.
+M.all_difficulties_unlocked = false
 local released = { standard = true, cold = true, rich = true, pure = true }
 local known = { standard = true, cold = true, rich = true, pure = true,
     scourge = true, ruins = true, celestial = true, fishing = true }

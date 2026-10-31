@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 12221,
-      "sha256": "aadca058f03a23e891607dc06ec4e9086b6cd9b8fdd0a2a6e929c4bac9d6ef4a"
+      "bytes": 12644,
+      "sha256": "492e12635b51d049477e4d70fd33dbf07b301bc48eb7134bf6a0bc5b1883278e"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -15,23 +15,23 @@
     },
     {
       "path": "02_core_gameplay.md",
-      "bytes": 32415,
-      "sha256": "4e2b38c4059e86eaff2fee7e2ebbd6fc208ddac753c4454b0a875d7956691dc9"
+      "bytes": 32432,
+      "sha256": "713749ffbbfb07610a524ccd52990881ec2aa792d5010549cff26ac47061d40e"
     },
     {
       "path": "03_progression_save_contract.md",
-      "bytes": 16510,
-      "sha256": "47dca90349120453c02049b3e009c2d0d992be6b4c8c00eb3fd2f4211e4f56ca"
+      "bytes": 16568,
+      "sha256": "9fb4dad32d57118179f8939ec9f1ba3724c71f1d72c56e068970906518ba4451"
     },
     {
       "path": "04_network_auth_official.md",
-      "bytes": 15317,
-      "sha256": "3cc1e05ca4d07b6e4e8b2bc678cf32f657717b5d99722ec6aa451b48ccc72a57"
+      "bytes": 15544,
+      "sha256": "cee8f3cd609ea591f04c53648d93a08b695da3a2b0bd315f47f9b8bb391277a6"
     },
     {
       "path": "05_payments_commerce_delivery.md",
-      "bytes": 15967,
-      "sha256": "f0ab69b08ef5b9e2a378fee38c8e3667b967235ac231d8f74b3a025575dca934"
+      "bytes": 16236,
+      "sha256": "fed0c3182ebba2baa2070b5a71c8270449bf865095040990cb0712b4c3b1111f"
     },
     {
       "path": "06_build_release_ops.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 24596,
-      "sha256": "4ca1dbbf2e08c2ac00bdbc436c341d657150a5ad688629d541367782269dab93"
+      "bytes": 24961,
+      "sha256": "99f24c19fa8f343ea870c8f2f53a1564615ae4b1c7a0bb8f0374f6281c3a2fbb"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 4330,
-      "sha256": "4ec85c764708dab6e7c91a6dbbc59a9fbd7017da3d32e354e3bf23e655587a35"
+      "bytes": 4473,
+      "sha256": "015598459255775c929d3eae373752b2e30360dfb54d14c5ed6ad3d37ec99be2"
     },
     {
       "path": "data/completed_work_index.json",
@@ -287,6 +287,11 @@
       "path": "evidence/shop_daily_transport_20261031.md",
       "bytes": 4545,
       "sha256": "783d5376a19c5f5452b1224fe660c60e5fb39d598fedd36b3b62419ef5388aca"
+    },
+    {
+      "path": "evidence/shop_readonly_root_cause_20261031.md",
+      "bytes": 4621,
+      "sha256": "1fb57dc4055641feef4d7dca9a68941b6e20ed7cd3dce29bf3cfaeba95f74b38"
     },
     {
       "path": "evidence/steam_login_manual_repair_20261031.md",
