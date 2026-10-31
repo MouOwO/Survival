@@ -4,6 +4,10 @@ from pathlib import Path
 import unittest
 import subprocess
 import sys
+import hashlib
+import io
+import json
+from unittest.mock import patch
 
 FILE = Path(__file__).with_name('remote_operator.py')
 
@@ -58,11 +62,36 @@ class OperatorContracts(unittest.TestCase):
                 self.assertNotRegex(clause, rb'\b(?:anon|authenticated)\b')
 
     def test_live_actions_require_explicit_apply_before_any_remote_work(self):
-        for action in ['quiesce', 'protect-backup', 'activate']:
+        for action in ['quiesce', 'protect-backup', 'activate', 'reconcile']:
             result = subprocess.run([sys.executable, '-B', str(FILE.with_name('driver.py')), action],
                                     capture_output=True, timeout=5)
             self.assertNotEqual(result.returncode, 0)
             self.assertIn(b'explicit_apply_required_for_live_changes', result.stderr)
+
+    def health_files(self, *, approved=True):
+        token = 'unit-test-approved-upstream-credential'
+        files = {'/proc/42/environ': b'PLAYER_WEB_AUTH_UPSTREAM_BEARER=' + token.encode() + b'\x00',
+                 '/etc/goufayu-ws4/pins.json': json.dumps({'workshop_id': '3824360109',
+                    'sha256': [hashlib.sha256(token.encode()).hexdigest()] if approved else []}).encode()}
+        return token, lambda path: files[path.as_posix()]
+
+    def test_health_uses_existing_pinned_upstream_identity(self):
+        token, read = self.health_files()
+        def response(request, **kwargs):
+            self.assertEqual(request.get_header('Authorization'), 'Bearer ' + token)
+            return io.StringIO(json.dumps({'ok': True, 'config_hash': 'expected-test-hash'}))
+        with patch.dict(self.scope, {'command': lambda args: b'42\n'}), patch.object(Path, 'read_bytes', read), \
+                patch('urllib.request.urlopen', side_effect=response) as call:
+            self.assertTrue(self.scope['health']('expected-test-hash'))
+            self.assertEqual(call.call_count, 1)
+
+    def test_health_rejects_unapproved_identity_before_http(self):
+        token, read = self.health_files(approved=False)
+        with patch.dict(self.scope, {'command': lambda args: b'42\n'}), patch.object(Path, 'read_bytes', read), \
+                patch('urllib.request.urlopen') as call:
+            with self.assertRaisesRegex(RuntimeError, 'approved_upstream_pin_required'):
+                self.scope['health']('expected-test-hash')
+            call.assert_not_called()
 
 
 if __name__ == '__main__':

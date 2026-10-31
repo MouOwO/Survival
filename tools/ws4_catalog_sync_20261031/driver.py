@@ -167,10 +167,10 @@ print(json.dumps({'status':'ENCRYPTED_OFFSITE_BACKUP_VERIFIED'}))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=['plan', 'upload', 'prepare', 'clone', 'quiesce', 'protect-backup', 'activate', 'resume'])
+    parser.add_argument('action', choices=['plan', 'upload', 'prepare', 'clone', 'quiesce', 'protect-backup', 'activate', 'resume', 'reconcile'])
     parser.add_argument('--apply', action='store_true', help='Explicitly authorized live API maintenance or encrypted backup transfer')
     args = parser.parse_args(); action = args.action
-    if action in ('quiesce', 'protect-backup', 'activate') and not args.apply:
+    if action in ('quiesce', 'protect-backup', 'activate', 'reconcile') and not args.apply:
         raise SystemExit('explicit_apply_required_for_live_changes')
     if action == 'plan': plan()
     elif action == 'upload': upload()

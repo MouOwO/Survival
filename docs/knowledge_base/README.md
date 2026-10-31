@@ -1,5 +1,7 @@
 # 孤城逐晓／Survival 统一知识库
 
+最新商城恢复：[2026-10-31 四人WS4合同版本对齐、备份与验收边界](evidence/shop_catalog_sync_20261031.md)。
+
 最新性能规则与修复：[2026-10-31 开局移动卡顿、每日提示及复杂度](evidence/movement_daily_hint_20261031.md)。
 
 最新登录恢复：[2026-10-31 Steam验签中转恢复](evidence/login_relay_recovery_20261031.public.json)。

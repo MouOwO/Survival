@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 10260,
-      "sha256": "f70a7c4a7cb331f12385f4f9282f4ed6ced488fb123d8aaa346dc18330cfa451"
+      "bytes": 10803,
+      "sha256": "4b1363e193cf9e1648d739ff3fa419d3a62a2375f72a433a139e840b8ee1d099"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -25,23 +25,23 @@
     },
     {
       "path": "04_network_auth_official.md",
-      "bytes": 14763,
-      "sha256": "65c8a9daef6ed7465a2ea7d3720efa97a1130b4e6d289acf52915000b5a6426c"
+      "bytes": 14829,
+      "sha256": "ab5608f4253abacbc3932671690e3b7a5e4b20d91d6770058cbf5fe7e469fe11"
     },
     {
       "path": "05_payments_commerce_delivery.md",
-      "bytes": 15699,
-      "sha256": "ec9985757d9ab1df2d08059140063fe3366f06e4ddaa37e8230b61f987ef48ae"
+      "bytes": 15765,
+      "sha256": "edab12a37ea9147ef283c9247647b8f3b9a2932a543f490d00153c77a955de3c"
     },
     {
       "path": "06_build_release_ops.md",
-      "bytes": 18720,
-      "sha256": "2ef04690cd7d7a11af26ce7f3d4f5ab5a15bb69611ced474dc406198500b13ed"
+      "bytes": 18786,
+      "sha256": "378aa230eefe3befec2831d1860018f3b84beedd6bace770e43484eb7adb00a8"
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 22640,
-      "sha256": "c5582c830f19b5f4597e81136384b03b833d820ac532a4db3d1689644c147ea1"
+      "bytes": 23225,
+      "sha256": "ea107571a93dc65b476453c8da4a11537c913200bc821b1ff37701e52c30e739"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 3775,
-      "sha256": "187445345d58021d0b7d4633e7ad9047a42fa36171cf11ef6651f4b52b8db61d"
+      "bytes": 3905,
+      "sha256": "ad42148ae111e055b97a49ab1154d383d7d098f9860f550a527f2f4bfdea22c1"
     },
     {
       "path": "data/completed_work_index.json",
@@ -280,8 +280,8 @@
     },
     {
       "path": "evidence/shop_catalog_sync_20261031.md",
-      "bytes": 4389,
-      "sha256": "189895ee228ad8f14d402962611466ec78b75c37b25b33c58d8e2b70672ad8f1"
+      "bytes": 7376,
+      "sha256": "9985b0fd087b7ea808f1a6d0dd5b55368f5f0f171d2056a8ff9bd19d448c529d"
     },
     {
       "path": "evidence/teammate_builder_portrait_20261031.md",

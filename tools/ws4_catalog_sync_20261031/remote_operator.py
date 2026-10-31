@@ -79,8 +79,12 @@ def pending(conn):
     need(conn.execute("SELECT count(*) FROM payments.orders WHERE state IN ('created','pending','paid_review')").fetchone()[0] == 0, 'pending_cash_orders')
 
 
-def verify_source():
-    need(sha(UNIT.read_bytes()) == PLAN['unit_sha256'] and sha(ENV.read_bytes()) == PLAN['env_sha256'], 'ws4_launch_baseline_changed')
+def verify_source(*, launch_root=None):
+    if launch_root is None:
+        need(sha(UNIT.read_bytes()) == PLAN['unit_sha256'] and sha(ENV.read_bytes()) == PLAN['env_sha256'], 'ws4_launch_baseline_changed')
+    else:
+        expected_unit, expected_env = launch_bytes(launch_root)
+        need(UNIT.read_bytes() == expected_unit and ENV.read_bytes() == expected_env, 'ws4_launch_baseline_changed')
     manifest = json.loads((SOURCE / 'release_manifest.json').read_bytes())
     need(sha((SOURCE / 'release_manifest.json').read_bytes()) == PLAN['source_manifest_sha256'], 'frozen_source_manifest_changed')
     need(json.loads((SOURCE / 'addon/server/bundles/current.json').read_bytes())['hash'] == HASH, 'published_source_bundle_changed')
@@ -266,7 +270,7 @@ def quiesce():
         raise
 
 
-def switch(root):
+def launch_bytes(root):
     need(root in (NEW, SAFE), 'release_scope_invalid')
     original_unit = (STAGE / 'unit.original').read_bytes()
     original_env = (STAGE / 'env.original').read_bytes()
@@ -276,6 +280,11 @@ def switch(root):
     env, count = re.subn(rb'(?m)^(SURVIVAL_ADDON_ROOT=)[^\r\n]+',
                         lambda m: m[1] + json.dumps(str(root / 'addon')).encode(), original_env)
     need(count == 1, 'addon_root_anchor_invalid')
+    return unit, env
+
+
+def switch(root):
+    unit, env = launch_bytes(root)
     for target, raw in ((UNIT, unit), (ENV, env)):
         info = target.stat(); temporary = target.with_name(target.name + '.ws4-catalog-' + secrets.token_hex(6))
         with temporary.open('xb') as stream:
@@ -287,14 +296,19 @@ def switch(root):
 
 def health(expected):
     import urllib.request
-    values = {}
-    for line in ENV.read_text().splitlines():
-        if line and not line.startswith('#') and '=' in line:
-            key, value = line.split('=', 1); values[key] = ''.join(shlex.split(value))
+    # The Workshop wrapper accepts pinned upstream credentials, not the base
+    # API's FISHING_API_TOKEN. Reuse the existing approved sidecar identity.
+    pid = command(['systemctl', 'show', 'goufayu-ws4-web.service', '--property=MainPID', '--value']).decode().strip()
+    need(pid.isdigit() and int(pid) > 1, 'approved_upstream_not_running')
+    values = dict(row.split(b'=', 1) for row in Path('/proc/' + pid + '/environ').read_bytes().split(b'\x00') if b'=' in row)
+    token = values[b'PLAYER_WEB_AUTH_UPSTREAM_BEARER'].decode('ascii')
+    pins = json.loads(Path('/etc/goufayu-ws4/pins.json').read_bytes())
+    need(pins.get('workshop_id') == '3824360109' and sha(token.encode('ascii')) in pins.get('sha256', []),
+         'approved_upstream_pin_required')
     for attempt in range(20):
         try:
             request = urllib.request.Request('http://127.0.0.1:18765/v1/archive/config', data=b'{}',
-                headers={'Authorization': 'Bearer ' + values['FISHING_API_TOKEN'], 'Content-Type': 'application/json'})
+                headers={'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'})
             with urllib.request.urlopen(request, timeout=3) as response:
                 result = json.load(response)
             if result.get('ok') and result.get('config_hash') == expected:
@@ -325,7 +339,7 @@ def activate():
     except Exception:
         # Preserve new receipts/data. Never restore a database dump over live rows.
         if committed:
-            switch(SAFE); control('start'); health(PLAN['old_bundle'])
+            control('stop'); switch(SAFE); control('start'); health(PLAN['old_bundle'])
         else:
             UNIT.write_bytes((STAGE / 'unit.original').read_bytes())
             ENV.write_bytes((STAGE / 'env.original').read_bytes())
@@ -347,8 +361,45 @@ def resume():
         control('start'); health(PLAN['old_bundle'])
     else:
         need((STAGE / 'activation_failure.json').is_file(), 'unowned_database_change')
-        switch(SAFE); control('start'); health(PLAN['old_bundle'])
+        control('stop'); switch(SAFE); control('start'); health(PLAN['old_bundle'])
     return dict(status='WS4_API_RESUMED', database_restored=False)
+
+
+def reconcile_activation():
+    # v6's wrong health credential triggered a disk-only fallback: systemctl
+    # start on the already-running NEW process did not restart it. Only repair
+    # that exact state, without another migration or a running API restart.
+    verify_source(launch_root=SAFE)
+    validated = json.loads((STAGE / 'validated_clone.json').read_bytes())
+    backup = json.loads((STAGE / 'final_backup.json').read_bytes())
+    ack = json.loads((STAGE / 'offsite_ack.json').read_bytes())
+    need(ack['encrypted_verified'] and ack['sha256'] == backup['sha256']
+         and sha(Path(backup['path']).read_bytes()) == backup['sha256'], 'verified_offsite_backup_required')
+    need(sha((STAGE / 'unit.original').read_bytes()) == PLAN['unit_sha256']
+         and sha((STAGE / 'env.original').read_bytes()) == PLAN['env_sha256'], 'original_launch_backup_changed')
+    with connect() as live, connect(validated['clone']) as clone_conn:
+        live.execute('SET TRANSACTION READ ONLY'); clone_conn.execute('SET TRANSACTION READ ONLY')
+        need(state(live) == state(clone_conn), 'validated_contract_state_required')
+    for name, digest in json.loads((SOURCE / 'release_manifest.json').read_bytes())['files'].items():
+        path = NEW / name
+        need(path.is_file() and not path.is_symlink() and path.resolve().is_relative_to(NEW)
+             and sha(path.read_bytes()) == PLAN['ws4_wrappers'].get(name, digest), 'candidate_source_changed')
+    for name, digest in PLAN['ws4_wrappers'].items():
+        need(sha((NEW / name).read_bytes()) == digest, 'candidate_auth_wrapper_changed')
+    pid = command(['systemctl', 'show', 'goufayu-ws4.service', '--property=MainPID', '--value']).decode().strip()
+    need(pid.isdigit() and int(pid) > 1 and Path('/proc/' + pid + '/cwd').resolve() == NEW / 'backend',
+         'new_process_must_already_be_running')
+    environment = dict(row.split(b'=', 1) for row in Path('/proc/' + pid + '/environ').read_bytes().split(b'\x00') if b'=' in row)
+    need(environment.get(b'SURVIVAL_ADDON_ROOT') == str(NEW / 'addon').encode(), 'new_runtime_root_required')
+    health(HASH)
+    switch(NEW); health(HASH)
+    need(services() == PLAN['retained_services'] and pid == command([
+        'systemctl', 'show', 'goufayu-ws4.service', '--property=MainPID', '--value']).decode().strip(),
+         'retained_service_changed')
+    return save('activated', dict(ok=True, status='LIVE_WS4_CATALOG_SYNCHRONIZED', bundle=HASH,
+        config_digest=validated['config_digest'], existing_tables_unchanged=validated['existing_tables_unchanged'],
+        new_migrations=validated['new_migrations'], payment_untouched=True, health_credential_corrected=True,
+        running_api_restarted=False, database_reapplied=False))
 
 
 def run(action):
@@ -356,4 +407,5 @@ def run(action):
     need(STAGE.parent == Path('/root/goufayu_upload') and not STAGE.is_symlink(), 'stage_scope_invalid')
     with (STAGE / 'operator.lock').open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        return {'prepare': prepare, 'clone': clone, 'quiesce': quiesce, 'activate': activate, 'resume': resume}[action]()
+        return {'prepare': prepare, 'clone': clone, 'quiesce': quiesce, 'activate': activate, 'resume': resume,
+                'reconcile': reconcile_activation}[action]()
