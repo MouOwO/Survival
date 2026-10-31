@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 12644,
-      "sha256": "492e12635b51d049477e4d70fd33dbf07b301bc48eb7134bf6a0bc5b1883278e"
+      "bytes": 12711,
+      "sha256": "3a7382c6639b89ff920a833d9b47a08350102a0073e3e4848e04e3546ce87b4c"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -30,18 +30,18 @@
     },
     {
       "path": "05_payments_commerce_delivery.md",
-      "bytes": 16236,
-      "sha256": "fed0c3182ebba2baa2070b5a71c8270449bf865095040990cb0712b4c3b1111f"
+      "bytes": 16467,
+      "sha256": "ed0e2c3273ad68721614ac482a7ff72b73718af802eef5ddd7aab7f362e99428"
     },
     {
       "path": "06_build_release_ops.md",
-      "bytes": 19732,
-      "sha256": "3e0a45ae4ddcc9504a4e59b13d5f8db76af4d4fbdb294e6caf0bae9f2713ee1e"
+      "bytes": 20017,
+      "sha256": "74ee60de336c33a443e0ba024ecb5e9f56d3197f0f2d17cc7cc0797983a6da05"
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 24961,
-      "sha256": "99f24c19fa8f343ea870c8f2f53a1564615ae4b1c7a0bb8f0374f6281c3a2fbb"
+      "bytes": 25089,
+      "sha256": "8012ac5dc24d32605bf36871d08d5d190af99fcd7e29bac8d7b60e8b88bc45d5"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 4473,
-      "sha256": "015598459255775c929d3eae373752b2e30360dfb54d14c5ed6ad3d37ec99be2"
+      "bytes": 4487,
+      "sha256": "f50af13f0d5412111a32c6b2da0071bea98ade28b97c8680b03d2ccf2b633c71"
     },
     {
       "path": "data/completed_work_index.json",
@@ -290,8 +290,18 @@
     },
     {
       "path": "evidence/shop_readonly_root_cause_20261031.md",
-      "bytes": 6344,
-      "sha256": "fc2b5d8cb88d8be3a66c0c7745397cdeae2255a121f91bb392cd072dd4287dd9"
+      "bytes": 6400,
+      "sha256": "e22877ef169cbb62fcc5e0f2d1d29836e067cdd8be70deb43a244a4fff364ab7"
+    },
+    {
+      "path": "evidence/shop_recovery_release_20261031.md",
+      "bytes": 4816,
+      "sha256": "5fc081129a2f9bffd2562cbcf330e37ff728ee7046da77773e3b08ee04988897"
+    },
+    {
+      "path": "evidence/shop_recovery_release_20261031.public.json",
+      "bytes": 5045,
+      "sha256": "cdff00e8f042ee61baee39d7aa198409bd5d3ee1e94c3084da60781eb7ea7df8"
     },
     {
       "path": "evidence/steam_login_manual_repair_20261031.md",

@@ -1,10 +1,10 @@
 # 孤城逐晓／Survival 统一知识库
 
-最新商城/福利根因：[3101只读验收误入发布、最小修复及兑换码缺项](evidence/shop_readonly_root_cause_20261031.md)。
+最新商城/福利/兑换码发行：[3102客户端更新、WS4接入及验证边界](evidence/shop_recovery_release_20261031.md)。
 
 最新登录自助入口：[2026-10-31 Steam验签再次恢复、双击自检/恢复和限制](evidence/steam_login_manual_repair_20261031.md)。
 
-最新未解问题：[2026-10-31 商城空白／每日领取等待与有界诊断](evidence/shop_daily_transport_20261031.md)。
+历史共同通路排查（3102之前）：[2026-10-31 商城空白／每日领取等待与有界诊断](evidence/shop_daily_transport_20261031.md)。
 
 最新城墙攻击修复：[2026-10-31 三处等待/首次攻击修复与3101官方全量下载证明](evidence/wall_attack_hotfix_20261031.md)。
 

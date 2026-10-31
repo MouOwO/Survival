@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "status": "UPLOADED_AND_OFFICIAL_DOWNLOAD_FULLY_VERIFIED",
+  "observed_utc": "2026-10-31T14:08:37.921875+00:00",
+  "workshop_id": "3824360109",
+  "release_sequence": 2026103102,
+  "revision": "WS4-SHOP-BENEFITS-REDEMPTION-01",
+  "visibility": "unlisted",
+  "content_sha256": "318491d5f839653d888c350dcaa7fb639189ec427779004879819d3ac9b45352",
+  "steam_manifest": "2484609663754935010",
+  "runtime_files": 6917,
+  "protected_modules": 184,
+  "package_bytes": 3788092110,
+  "package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 286616,
+      "sha256": "49aa8a19beaa7a01c9ac59d1db8a58d4d5e84c655ecf4f69acc7827af7458560"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1071722622,
+      "sha256": "599d5874cc982514cc2055b78b5abac751164c830785c2e2acbd26300b10c2f4"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1071529200,
+      "sha256": "3046a3ae720dd0e80950e14562bf8c8c556f095a4ab068773d7f34dd78ca2b49"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379215,
+      "sha256": "e03f21542c7c283460e21c60c6350587a8b100b9ab5789d7cfa2ebe41fd1206a"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 572174457,
+      "sha256": "0553d3fd3dad2b30e3f2778d6c25e5f63e1f263ee1d052259cff77c7b0cfe577"
+    }
+  ],
+  "source_revision": "3dfb0b498d715f35086f8d9445c003f968d97d00",
+  "content_source_git_head": "54c7c6eac222f63f21cccc42fc961ad5ba0ce500",
+  "changed_runtime_paths": [
+    "panorama/layout/custom_game/redemption_code.vxml_c",
+    "panorama/scripts/custom_game/black_lion_market.vjs_c",
+    "panorama/styles/custom_game/redemption_code.vcss_c",
+    "scripts/vscripts/config/mode_release_config.lua",
+    "scripts/vscripts/debug/mode_unlock_test.lua",
+    "scripts/vscripts/systems/commerce_service.lua"
+  ],
+  "package_report": {
+    "path": "output/shop_recovery_20261031/package.json",
+    "sha256": "fede692a9d442c7ae4dc24032300d9a4620f1646e963bb7aeb758ff2866dc555"
+  },
+  "download_receipt": {
+    "path": "output/shop_recovery_20261031/download_evidence/20261031T140727Z_244c8dd6d41a44ac9a653d29f265be0c/verification.json",
+    "sha256": "e1371bf8948a9e35ea63d97f9f34639ff15100319e61e66c82b0f36f25a53a4f"
+  },
+  "native_signed_startup": {
+    "path": "output/shop_recovery_20261031/native_smoke.json",
+    "sha256": "8e1d7ff0f8217188940b5d47ea8f87856027f76eddcb94dd9bbddd721284a209"
+  },
+  "derived_sdk_report": {
+    "path": "output/shop_recovery_20261031/sdk_upload_report.json",
+    "sha256": "52a6d5a61ce3a30013a436439a576075b23b78c5e61d8a04bc53d90c7b5b9c2f"
+  },
+  "original_four_account_gate_preserved": true,
+  "official_callbacks": {
+    "subscribe1313": 1,
+    "download3406": 1
+  },
+  "backend": {
+    "status": "WS4_REDEMPTION_VERIFIED",
+    "scope": "WS4_ONLY_15432",
+    "release": "20261031-redemption-ws4-23e3ab768478",
+    "bundle": "d573588b64d2ea6d1431c856d52e0515b5ed471cfdf6af4456ff618d0f568488",
+    "tables_added": 3,
+    "rpcs_added": 2,
+    "existing_code_definitions": 128,
+    "new_codes_generated": 0,
+    "original_business_tables_unchanged": 31,
+    "existing_functions_and_acls_unchanged": true,
+    "payment_services_unchanged": true,
+    "backup": {
+      "server_full_dump": true,
+      "bytes": 697146,
+      "local_dpapi_only": true,
+      "encrypted_roundtrip_verified": true
+    },
+    "production_player_data_copied_to_test": false,
+    "real_code_definitions_copied_to_test": false,
+    "synthetic_actual_postgres_and_lua_checks": [
+      "all_prizes_atomic_and_once_without_vip",
+      "concurrent_same_account_single_grant",
+      "concurrent_global_quota",
+      "expiry_bad_codes_and_database_rate_limit",
+      "lost_commit_reply_recovery",
+      "monthly_renewal_and_permanent_pass_preservation"
+    ],
+    "plan": {
+      "path": "output/shop_recovery_20261031/ws4/plan.json",
+      "sha256": "9cb40121a6ffdb0fba3d2ccaa39e321fd13d47680f55f4d13bfb56087c8d87ec"
+    },
+    "clone": {
+      "path": "output/shop_recovery_20261031/ws4/clone.json",
+      "sha256": "2dbcb0e648c3a59fe6b91bfe59e71708b7c0572ec7101d4c0941c481266db55a"
+    },
+    "activation": {
+      "path": "output/shop_recovery_20261031/ws4/activate.json",
+      "sha256": "9a70a3af305018052892c7e55fa32f66b54330aa872a7b8116db25328ee71f07"
+    },
+    "verification": {
+      "path": "output/shop_recovery_20261031/ws4/verify.json",
+      "sha256": "d92507eddb5052846db674c8299f2a42c806ff52da52f78a2538788c35114ea0"
+    }
+  },
+  "validation_limits": {
+    "signed_native_startup": "PASS; cheats=false; normal HTTP cvar=1; no cloud account actions",
+    "real_player_login": "NOT_RUN",
+    "real_player_reward_claim": "NOT_RUN",
+    "real_player_redemption": "NOT_RUN",
+    "online_multiplayer": "NOT_RUN",
+    "online_FPS": "NOT_MEASURED",
+    "downloaded_copy_native_launch": "NOT_RUN"
+  },
+  "canonical_journal_sha256_after_download": "e650032673e4380a571f90ef1b035f9a5d2732e4ac9234481f41dd70625900c1",
+  "canonical_journal_unchanged_by_download": true,
+  "pending_cleared": false,
+  "upload_retries": 0,
+  "public_release": false
+}
