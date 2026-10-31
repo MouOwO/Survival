@@ -8,10 +8,17 @@
 
 ```powershell
 python tools/shop_recovery_20261031/build_release.py --source-revision <commit> --report output/shop_recovery_20261031/plan.json
+python tools/shop_recovery_20261031/build_release.py --source-revision <same-commit> --prepare --report output/shop_recovery_20261031/unsigned_review.json
 python tools/shop_recovery_20261031/build_release.py --source-revision <same-commit> --build --reviewed-plan output/shop_recovery_20261031/plan.json --key <existing-external-key> --report output/shop_recovery_20261031/package.json
 ```
 
 全部输出必须为新的外部目录。父3101的签名/正式上传及官方下载证明、canonical journal、16项准入审阅、五份既有卷、固定替换集和签名均强制核对；不改冻结发行工具或父文件。正常产物依然 `ready_for_upload=false`，须新包原生启动与兑换码后端验收，不能直接调用旧3101发布工具伪造验收。
+
+父信任目录的既有svt_m3101原生安装另生成三份交付回执；它们不属于审阅源。仅复制父报告固定的16项并逐字节比对，额外文件只允许该明确命名的三份回执，不修改父目录、不把回执当审阅输入。
+
+`--prepare`只写六份替换、完整清单及明确的UNSIGNED_DO_NOT_INSTALL_OR_UPLOAD标记，不读私钥、不复制签名，不可运行/上传。2026-10-31首次签名请求被自动审批以本轮尚未明确授权私钥签名为由拒绝，未执行；完成未签名审阅后须取得用户明确签名授权，不能绕过签名校验进行实机或发布。
+
+`backend_plan.py --report <NEW-path>`仅在内存中对WS4现役公开源码验证两处兑换补丁并给出前后hash，查询三表/两RPC是否存在；本机现有码配置只记数量/hash，未上传或登记。它不写云端文件、不建库、迁移、部署、发奖或重启服务。正式执行仍需本次授权、服务器完整备份/本机仅DPAPI密文、仅结构及合成账号的隔离验证、原玩家/订单行摘要保护；不直接复用面向另一套5432后台的旧部署命令。
 
 验证包括真实Lua模块链路：验收模式3类请求=0次HTTP、正常模式=3次HTTP；保留同局锁定与离线隔离。此为模拟原生边界，真实网络/发奖次数为0，不冒称线上到账。3101原样输入在相同测试中命中 `SHIPPED_READ_ONLY_ACCEPTANCE_CAUSES_EMPTY_SHOP_AND_BLOCKED_BENEFITS`。原有 `test_mode_unlock_zero.lua:378` 与 `test_archive_service.lua:155` 在未改HEAD同样失败，单独记录，不为了过测删除断言。
 

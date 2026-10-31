@@ -32,6 +32,7 @@ OVERLAY = Path("D:/Survival_发布候选") / (PREFIX + "_overlay")
 VIEW = Path("D:/Survival_发布候选") / (PREFIX + "_view")
 TRUSTED = Path("D:/Survival_发布候选") / (PREFIX + "_trusted_source")
 OUTPUT = Path("D:/Survival_工坊输出") / PREFIX
+UNSIGNED = Path("D:/Survival_发布候选") / (PREFIX + "_unsigned_review")
 REPORT = ROOT / "output/shop_recovery_20261031"
 MODE = "scripts/vscripts/config/mode_release_config.lua"
 PAYLOADS = (MODE, "scripts/vscripts/systems/commerce_service.lua",
@@ -82,7 +83,13 @@ def plan(revision):
     selected = {row["path"] for row in parent.previous.base.protection.selected_files(
         [row["path"] for row in after["files"]], policy)}
     need(len(selected) == 184 and not selected.intersection(changed), "Protected modules must remain exact")
-    review = {name: checks((BASE_TRUSTED / name).read_bytes()) for name in sorted(inc.all_files(BASE_TRUSTED))}
+    expected_review = base_report["trusted_review_pins"]
+    extra = inc.all_files(BASE_TRUSTED) - set(expected_review)
+    handoff = {"output/release_test_handoff/svt_m3101/" + name for name in
+               ("_release_manifest.json", "_release_signature.json", "handoff.json")}
+    need(extra <= handoff, "Unknown files in parent trusted source")
+    review = {name: checks((BASE_TRUSTED / name).read_bytes()) for name in sorted(expected_review)}
+    need(review == expected_review, "Parent admission review bytes changed")
     need(len(review) == 16 and not set(review).intersection(changed), "Admission review sources must remain exact")
     tree, groups, rewritten, moves = parent.previous.base.parent.rotation_plan(
         inc.read_entries(BASE_VPK), old, after, set(changed))
@@ -145,17 +152,36 @@ def build(reviewed, revision, key):
     return actual
 
 
+def prepare_unsigned(revision):
+    actual, _, after, values, _, _ = plan(revision)
+    inc.external(UNSIGNED, exists=False)
+    need(not UNSIGNED.exists(), "NEW unsigned review directory required")
+    UNSIGNED.mkdir(parents=True, exist_ok=False)
+    for name, raw in values.items(): inc.write_new(UNSIGNED / name, raw)
+    inc.write_new(UNSIGNED / pack.handoff.MANIFEST, pack.runtime.canonical_bytes(after) + b"\n")
+    marker = {"status": "UNSIGNED_DO_NOT_INSTALL_OR_UPLOAD", "content_sha256": actual["content_sha256"],
+              "signing_key_read": False, "authorization_required": True}
+    inc.write_new(UNSIGNED / "_UNSIGNED_DO_NOT_INSTALL_OR_UPLOAD.json", (json.dumps(marker) + "\n").encode())
+    need(not (UNSIGNED / pack.handoff.SIGNATURE).exists(), "Unsigned preparation must not copy any signature")
+    actual.update(status="UNSIGNED_REVIEW_READY_SIGNING_AUTHORIZATION_REQUIRED", unsigned_review=str(UNSIGNED),
+                  signing_key_read=False)
+    return actual
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-revision", required=True)
     parser.add_argument("--report", type=Path, required=True)
-    parser.add_argument("--build", action="store_true")
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument("--build", action="store_true")
+    modes.add_argument("--prepare", action="store_true", help="Write only an unsigned review overlay; never read a key")
     parser.add_argument("--reviewed-plan", type=Path)
     parser.add_argument("--key", type=Path)
     args = parser.parse_args(); need(not args.report.exists(), "NEW report required")
     if args.build:
         need(args.reviewed_plan is not None, "Explicit reviewed plan required")
         result = build(args.reviewed_plan, args.source_revision, args.key)
+    elif args.prepare: result = prepare_unsigned(args.source_revision)
     else: result, *_ = plan(args.source_revision)
     args.report.parent.mkdir(parents=True, exist_ok=True)
     inc.write_new(args.report, (json.dumps(result, ensure_ascii=False, indent=2) + "\n").encode("utf8"))
