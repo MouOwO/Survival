@@ -3,7 +3,7 @@
 Base: verified Workshop item `3824360109`, sequence `2026103004`, content `5cdb3ad487e7f70ad22ba37658a4a10c14d56ad96ed566a223b787d058f87913`.
 New identity: `2026103101 / WS4-WALL-ATTACK-PERF-01`. The original item remains Unlisted with the original four-account admission, payments and d573 backend bytes. These tools never deploy a server.
 
-The current state is **pending_wall_fix**. No signed3101 candidate, VPK output, native acceptance, upload or download exists yet. The external `*_pending_wall_fix` directory contains eleven approved runtime replacements plus an explicit blocker marker. It has no release manifest/signature and cannot pass the publisher.
+Final state: **uploaded and officially downloaded/fully verified**. Original item3824360109 now serves3101, content `b99f3ac128c6433012f419fba87b6b7b59ca2aab8c2c98339f50f24c788b3263`, actual Steam manifest `4767827996113746006`,6915 resources/184 protected modules,3,788,076,180bytes. See [delivery record](../../publishing/workshop/wall_attack_perf_20261031_v01.json). The unsigned `*_pending_wall_fix` directory remains an explicitly blocked historical draft. The following commands document the frozen flow; final paths already exist and must not be rebuilt or overwritten.
 
 ## Frozen scope
 
@@ -12,7 +12,7 @@ The current state is **pending_wall_fix**. No signed3101 candidate, VPK output, 
 | Blademaster scene | `deadad5a3` | One new map and `monster_portrait_scenes.vjs_c`; the old already-shipped map remains unused |
 | Query portrait, performance, daily availability | `753de9888` (includes `fb44509f4`) | Four UI scripts, one stylesheet, performance clock and two grid Lua modules |
 | Protected asset catalog | Historic production plaintext, single `hero_permanent_hero_blademaster.model_skin: 1→0` | Exactly one protected generated table rebuilt with the pinned private-RNG pipeline; all other values/aliases exact |
-| Wall repair | Not yet supplied | Requires a nonempty explicit committed-path approval and an actual difference from3004 |
+| Wall repair | `2669cf30c` | Verified distant route, native idle-acquire with radius0, and cached rear vacancy routing; two committed source paths |
 
 The known scope adds two files (one map and `core/performance_clock.lua`):6915 total runtime files,189 packaged portrait maps,188 active scene identities after deduplication. Exactly183 protected modules remain byte-identical and one catalog module is rebuilt. The current Git catalog has historical name/notes differences, so it is deliberately not copied wholesale.
 
@@ -95,3 +95,9 @@ The publisher defaults to preflight. Apply delegates to the unchanged SDK publis
 ## Cost and isolation
 
 This is an explicit offline operator, not a game timer. Immutable Git blobs and the197-entry scene inventory are indexed once per invocation. A plan processes6915 manifest rows inO(N log N) canonical sort plusO(K) small replacement data. Protection processes exactly one table with full deep-value/alias/RNG checks. Explicit authentication/packing phases each stream the necessary signed inventory/3.78GB archives; those are intentional one-shot integrity passes, not polling or scene hot-path scans. The pending overlay copies onlyK replacements; the final complete view and unchanged volumes reuse hard links that are never opened for writing. Shared base files, developer runtime, backend, payment state, visibility, account list and canonical journal remain unchanged during preparation/build.
+
+Final evidence is deliberately limited: signed production startup with real native `sv_cheats=false`, prior four-mode offline natural attacks, final83-function loaded-source proof,108-file scoped equivalence and dedicated logical queue regressions. The final natural15-wave observation did not exercise a controlled front-death/backfill; no such native pass or online multiplayer/FPS pass is claimed.
+
+The first signed build was interrupted after VIEW creation. Recovery preserved it and staging, and repeated all checks. A postcheck in the frozen builder omitted its own approved portrait allowlist context;188 maps were policy-only exclusions with zero missing/modified/unexpected bytes. Revalidation used the same existing `scene_maps(False)` as the authenticated baseline. No frozen operator or signature bytes were edited.
+
+First3101 submission failed3404/result2 while uploading106222 manifest bytes. It remains preserved. Fresh official3004 full verification preceded locked CAS recovery; switching the existing ikuu TUN from rule to global made the endpoint reachable, then one controlled same-candidate retry succeeded. Full3101 official verification followed; ikuu was restored to rule mode. Detailed evidence/hashes are in the delivery record and knowledge-base wall hotfix note.

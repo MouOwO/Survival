@@ -1,66 +1,26 @@
 {
   "schema_version": 2,
-  "snapshot_date": "2026-10-28",
+  "snapshot_date": "2026-10-31",
   "timezone": "Asia/Shanghai",
   "project": "孤城逐晓 / Survival",
   "read_first": "00_START_HERE.md",
   "latest_release": {
-    "schema": 1,
-    "status": "UPLOADED_OFFICIAL_DOWNLOAD_VERIFIED_NATIVE_ENTRY_VISUAL_PENDING",
+    "status": "UPLOADED_AND_OFFICIAL_DOWNLOAD_FULLY_VERIFIED",
     "workshop_id": "3824360109",
+    "release_sequence": 2026103101,
+    "revision": "WS4-WALL-ATTACK-PERF-01",
     "visibility": "unlisted",
-    "release_sequence": 2026102805,
-    "revision": "WS4-TEN-SIN-STARTUP-02",
-    "content_sha256": "549afe0f4125a5f880884f1f5a42d1a6ae307b7b7ea97ddacc400e34dcfd0776",
-    "vpk_sha256": "d6d2f75f530539abe58f69457c41b31f01a362546b573034c860440c9afe8fcc",
-    "package_bytes": 3767366244,
-    "package_files": [
-      {
-        "name": "3824360109.vpk",
-        "bytes": 274380,
-        "sha256": "d6d2f75f530539abe58f69457c41b31f01a362546b573034c860440c9afe8fcc"
-      },
-      {
-        "name": "3824360109_000.vpk",
-        "bytes": 1073608953,
-        "sha256": "77deb683b91a45250aa6f9a6dac61c97049cd33eeb1226b0b2307f5d98ab2fa8"
-      },
-      {
-        "name": "3824360109_001.vpk",
-        "bytes": 1068730788,
-        "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
-      },
-      {
-        "name": "3824360109_002.vpk",
-        "bytes": 1072379183,
-        "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
-      },
-      {
-        "name": "3824360109_003.vpk",
-        "bytes": 552372940,
-        "sha256": "7383f8f065b0adde28a9a0ad0560419add35d150fcf92f7d6776268b8d3cc1e4"
-      }
-    ],
-    "file_count": 6658,
-    "changed_runtime_paths": [
-      "scripts/vscripts/systems/challenge_session_service.lua"
-    ],
+    "content_sha256": "b99f3ac128c6433012f419fba87b6b7b59ca2aab8c2c98339f50f24c788b3263",
+    "steam_manifest": "4767827996113746006",
+    "package_bytes": 3788076180,
+    "runtime_files": 6915,
+    "public_release": false,
     "uploaded": true,
     "download_verified": true,
-    "download_manifest": "3734424561061643436",
-    "download_receipt_sha256": "b0f41a3c7f6f81fcf2c20f7d13d4811e8e298623780334b45b167b7c1e0926bb",
-    "native_test": "NOT_RUN_ENTRY_VISUAL_PENDING",
-    "ready_for_public_release": false,
-    "source_record": "publishing/workshop/ten_sin_startup_20261028_v02.json",
-    "source_record_sha256": "54de37a59524147d5b918c1ff66127da6a4f5dff2811805ee7a59dcfcc4fd97f",
-    "inherited_map_provenance": {
-      "release_sequence": 2026102802,
-      "source_sha256": "4e62350c1bf08e663f5217885f26652918c2e09296a829f29a987ba8a14dccdc",
-      "compiled_map_sha256": "f868f295a01b78f63dbeb9fe9edfc6a7591b3889ace84f0892f595ac46f22186",
-      "source_crc32": 3557144492,
-      "map_crc_entries_verified": 307,
-      "native_map_acceptance": "PASS_HOST_ORDINARY_ARCADE_MAP_LOADED"
-    }
+    "source_record": "publishing/workshop/wall_attack_perf_20261031_v01.json",
+    "source_record_sha256": "1088fc9a7f12b6102df086fe932a9c9ab36fdf913b4304bf4610db3a1796b6af",
+    "native_test": "PASS_NATIVE_SIGNED_PRODUCTION_STARTUP_ONLY",
+    "evidence": "evidence/wall_attack_release_20261031.public.json"
   },
   "evidence_boundaries": {
     "native_two_player_auth_profile": "PASS_IN_2708",
@@ -168,9 +128,9 @@
     "backend_deployed": false
   },
   "wall_attack_hotfix_20261031": {
-    "status": "FIXED_DEVELOPMENT_NATIVE_FOUR_MODES_PASS_FINAL_REPLAY_AND_RELEASE_PENDING",
+    "status": "UPLOADED_AND_OFFICIAL_DOWNLOAD_FULLY_VERIFIED",
     "evidence": "evidence/wall_attack_hotfix_20261031.md",
-    "current_workshop_sequence": 2026103004,
+    "current_workshop_sequence": 2026103101,
     "target_sequence": 2026103101,
     "native_open_modes": [
       "standard",
@@ -180,6 +140,11 @@
     ],
     "wall_only_restriction_preserved": true,
     "backend_deployed_by_this_task": false,
-    "workshop_uploaded": false
+    "workshop_uploaded": true,
+    "official_download_verified": true,
+    "steam_manifest": "4767827996113746006",
+    "native_controlled_front_death_backfill": "NOT_EXERCISED",
+    "native_far_rear_over512": "LOGICAL_REGRESSION_ONLY",
+    "online_multiplayer": "NOT_RUN"
   }
 }

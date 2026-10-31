@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 11762,
-      "sha256": "66f9fe3349c324468e8f70d42bc0a2c93bdecde808bae880acfc52124525e07a"
+      "bytes": 11782,
+      "sha256": "36183f0ded2219e401c5f399ce6970f1703b7e4602d6493663d1d3296a2ac435"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -35,13 +35,13 @@
     },
     {
       "path": "06_build_release_ops.md",
-      "bytes": 18988,
-      "sha256": "a569b8166b472cacd54b07c85ac655890a38b0be71a7114ec2690cfac5b99e50"
+      "bytes": 19732,
+      "sha256": "3e0a45ae4ddcc9504a4e59b13d5f8db76af4d4fbdb294e6caf0bae9f2713ee1e"
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 24233,
-      "sha256": "6601da9e5e035eeffb6787e397a451933b331ffd149ce13c682076c8a24b5693"
+      "bytes": 24214,
+      "sha256": "15d2944dc8cff351c0bfe06b106ac1e46c909d66d50f0f83c6ee1a2e5c85847f"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 4188,
-      "sha256": "741a3e5c40741090bc8657e19f77a41e1593542cc6dd0ad5bd2008856f6d3906"
+      "bytes": 4183,
+      "sha256": "15172feb3e8b545590812d66986deff609282a5e5a549a5929fdcde1457e72b9"
     },
     {
       "path": "data/completed_work_index.json",
@@ -90,8 +90,8 @@
     },
     {
       "path": "data/context.json",
-      "bytes": 6967,
-      "sha256": "c7adfefd241c97ba45c8020c4711b3302713c590b0e63aa6c9747222b9aba979"
+      "bytes": 5660,
+      "sha256": "1e8fc13f2e2e6f431d79853986c2339c214745423524b2e32998493e756c6817"
     },
     {
       "path": "data/repository_files.json",
@@ -310,8 +310,13 @@
     },
     {
       "path": "evidence/wall_attack_hotfix_20261031.md",
-      "bytes": 5181,
-      "sha256": "6d08fea341bb8d3b7293a6a6864c3ebfb50adb9bb79b0cfcf4020f618cf72de2"
+      "bytes": 9704,
+      "sha256": "4f8b1015d3c25abf0f3a05999595247e1db1a4db42a26c165fad808538ae09c7"
+    },
+    {
+      "path": "evidence/wall_attack_release_20261031.public.json",
+      "bytes": 6290,
+      "sha256": "1088fc9a7f12b6102df086fe932a9c9ab36fdf913b4304bf4610db3a1796b6af"
     },
     {
       "path": "evidence/wave_overflow_grace_20261030.md",

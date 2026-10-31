@@ -1,0 +1,140 @@
+{
+  "schema": 1,
+  "status": "UPLOADED_AND_OFFICIAL_DOWNLOAD_FULLY_VERIFIED",
+  "observed_utc": "2026-10-31T11:04:35.738085+00:00",
+  "workshop_id": "3824360109",
+  "release_sequence": 2026103101,
+  "revision": "WS4-WALL-ATTACK-PERF-01",
+  "visibility": "unlisted",
+  "content_sha256": "b99f3ac128c6433012f419fba87b6b7b59ca2aab8c2c98339f50f24c788b3263",
+  "steam_manifest": "4767827996113746006",
+  "runtime_files": 6915,
+  "protected_modules": 184,
+  "protected_modules_byte_identical_to3004": 183,
+  "protected_catalog_change": "Only hero_permanent_hero_blademaster.model_skin 1->0; historic production names/values/aliases retained.",
+  "package_bytes": 3788076180,
+  "package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 286548,
+      "sha256": "4ce86549d2ba169fca16a8571edbaf99335116ba7c1d5a2c06b1b24a41571f9b"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1071717612,
+      "sha256": "80a257ff57f9ccbc67c65ec46d62133a9ddab3692cea810da26aa6bee4ab27d5"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1071529200,
+      "sha256": "3046a3ae720dd0e80950e14562bf8c8c556f095a4ab068773d7f34dd78ca2b49"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379215,
+      "sha256": "e03f21542c7c283460e21c60c6350587a8b100b9ab5789d7cfa2ebe41fd1206a"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 572163605,
+      "sha256": "2f850882ab7096808c236d3cdb5e6d949bab66e3b7242196e4eba9fcb0eac39d"
+    }
+  ],
+  "changed_runtime_paths": [
+    "maps/portraits/monster_1bc348e8932e1cfc065b_v1.vpk",
+    "panorama/scripts/custom_game/combat_stats.vjs_c",
+    "panorama/scripts/custom_game/daily_remaining_5d5c1152eb.vjs_c",
+    "panorama/scripts/custom_game/monster_portrait_renderer.vjs_c",
+    "panorama/scripts/custom_game/monster_portrait_scenes.vjs_c",
+    "panorama/scripts/custom_game/topnav_remaining_5d5c1152eb.vjs_c",
+    "panorama/styles/custom_game/handoff_v1.vcss_c",
+    "scripts/vscripts/config/generated/asset_catalog.lua",
+    "scripts/vscripts/core/performance_clock.lua",
+    "scripts/vscripts/modifiers/modifier_enemy_wall_ai.lua",
+    "scripts/vscripts/systems/grid_placement_system.lua",
+    "scripts/vscripts/systems/wall_melee_contact.lua",
+    "scripts/vscripts/ui/grid_placement_router.lua"
+  ],
+  "source_revisions": {
+    "wall_fix": "2669cf30cc97d937caa27abe11d52efc68616109",
+    "release_guards": "71bff4b29a2ace26e6ae8439a725fa8c8db88a4b",
+    "portrait": "deadad5a3ea42ae6c05796e6444a741176a1abfc",
+    "performance_daily_query": "753de9888af9f41d472d8d0b2b0dafc530a74d9a"
+  },
+  "content_source_git_head": "54c7c6eac222f63f21cccc42fc961ad5ba0ce500",
+  "package_report": {
+    "path": "output/wall_attack_release_20261031/package.json",
+    "sha256": "66af15ec97586cd28c6314bd420085e55f52b2c4c6df5a6e7eca054e359fab22"
+  },
+  "download_receipt": {
+    "path": "output/wall_attack_release_20261031/download_evidence/20261031T110157Z_694bc9e946f6404b8ac299099b5fb82c/verification.json",
+    "sha256": "bd2710e9bc6bf7ab681250b00fc9dd7bbd6aa69b6e966d223dd1bdb03a7b8f48"
+  },
+  "native_signed_startup": {
+    "path": "output/wall_attack_release_20261031/native_smoke.json",
+    "sha256": "b0677d9639f85cfe1c73cc3916cf5c542aa4eba95862e3c7a879813d9943399b"
+  },
+  "wall_composite": {
+    "path": "output/wall_attack_release_20261031/wall_acceptance.json",
+    "sha256": "f66b834d9794ecef0d39f9371119447828076e8ab97359e80c7446802690979c"
+  },
+  "loaded_final_source": {
+    "path": "output/wall_attack_replay_20261031_v3/loaded_proof.json",
+    "sha256": "62b541420e0d23b1239e90f2ac65d601ff3942e19ee0cbc3890fc600c6b68862"
+  },
+  "scoped_combat_equivalence": {
+    "path": "output/wall_attack_ai_20261031/combat_equivalence_proof.json",
+    "sha256": "bd09acdc335cffb7250ab0cb5d22c75692afde65f69961c6b3645fc8e8631db5"
+  },
+  "official_callbacks": {
+    "subscribe1313": 1,
+    "download3406": 1
+  },
+  "signed_native_sv_cheats": false,
+  "original_four_account_gate_preserved": true,
+  "backend_bundle_preserved": "d573588b64d2ea6d1431c856d52e0515b5ed471cfdf6af4456ff618d0f568488",
+  "backend_deployment_performed": false,
+  "payments_changed": false,
+  "failure_recovery": {
+    "initial_3101_callback3404_result": 2,
+    "original_pending_sha256": "ee022ec875788ceacf80b2f5b6dd4cb52f997101a6f9a7107cd90eef6f3e5290",
+    "retention_proof": {
+      "path": "output/wall_attack_release_20261031/recovery_retention_proof.json",
+      "sha256": "c39372cbafb26afe7015ff9c1cafd392890a9610ab832b43f6a44799c037cec4"
+    },
+    "failed_attempt_preserved": true,
+    "controlled_same_candidate_retries": 1
+  },
+  "network_change": {
+    "client": "iKuuuVPN",
+    "tun_already_enabled": true,
+    "temporary_route_mode": "global",
+    "original_and_restored_route_mode": "rule",
+    "node_changed": false,
+    "credentials_or_subscription_read": false,
+    "route_probe": {
+      "path": "output/wall_attack_release_20261031/network_route_fix.json",
+      "sha256": "5161f90f22128d23b16ad6a6f696edbbc4471661986613a68a915012340f92e2"
+    },
+    "restored_ui": {
+      "path": "output/wall_attack_release_20261031/ikuu_restored_rule.png",
+      "sha256": "d4d70b3b70b6054d30a59883e0e456aad0b6b1af4e8daae169943cf2b8dc7f6e"
+    }
+  },
+  "validation_limits": {
+    "four_mode_offline_behavior": "PASS standard/pure/rich/cold N1 on initial two-cause fix; original run identity retained.",
+    "final_source_native_functions_verified": 83,
+    "combat_closure_rows": 108,
+    "final_native_single_case": "18 records/17 damage events; later interrupted crowd not passed.",
+    "final_native_natural15_observation": "Four native attacking/damaging units; controlled vacancy not exercised; later wall health change cause unestablished.",
+    "native_front_death_backfill": "NOT_EXERCISED",
+    "native_far_rear_over512": "NOT_EXERCISED; covered by committed logical real-module regression",
+    "crowd_native_record_lifecycle": "NOT_CLAIMED_CLEAN; observer attached after native records already existed",
+    "online_multiplayer": "NOT_RUN",
+    "online_FPS": "NOT_MEASURED",
+    "downloaded_copy_native_launch": "NOT_RUN"
+  },
+  "canonical_journal_sha256_after_download": "88c7be24030c4fba2b508052df59f633480fe78bd99661d0e1b8a57ffe2163ef",
+  "canonical_journal_unchanged_by_download": true,
+  "public_release": false
+}
