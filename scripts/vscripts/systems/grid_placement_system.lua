@@ -3,6 +3,7 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local config = require("config/grid_placement_config")
 local region_service = require("systems/forbidden_region_service")
+local performance_clock = require("core/performance_clock")
 
 local M = {}
 
@@ -515,7 +516,7 @@ function M.static_preview(payload)
     local width,height=math.ceil(b.max_x/size)-x0,math.ceil(b.max_y/size)-y0
     if width<1 or height<1 or width*height>65536 then return "" end
     local states={}
-    local clock=type(Time)=="function" and Time or os.clock
+    local clock=performance_clock.new()
     local started,count=clock(),0
     for x=x0,x0+width-1 do for y=y0,y0+height-1 do
         local center=cell_center(x,y,0)
@@ -550,7 +551,7 @@ function M.preview_area(payload)
     local display_height = math.floor(rich_mode() and ground_height(position)
         or number(config.build_ground_height, ground_height(position)))
     reconcile_occupied()
-    local clock = type(Time) == "function" and Time or os.clock
+    local clock = performance_clock.new()
     local now = GameRules and GameRules:GetGameTime() or 0
     -- Cache only advisory terrain results. Occupancy and units are refreshed
     -- every scan; GRID_CAN_PLACE / actual construction never use this cache.

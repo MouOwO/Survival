@@ -65,7 +65,9 @@ c.api.shutdown('test_done');
 // Sequential background warmup must not allocate worlds again on first selection.
 const w=fixture(),wr=w.cfg.SurvivalMonsterPortraitRenderer;
 wr.Prewarm(w.nativeHost());
-for(let step=0;step<500&&w.jobs.size;step++){
+// Background jobs now yield 500ms after each completed world. Advance a
+// virtual clock (no wall sleep) through the full, paced 188-world warmup.
+for(let step=0;step<2500&&w.jobs.size;step++){
  w.advance(60);w.run([...w.jobs.keys()][0]);
  for(const item of w.metrics.created.filter(x=>x.type==='DOTAScenePanel'))if(item.panel&&item.panel.alive)w.ready(item.panel);
  // CreatePanel metrics contain the real fixture handle under `panel`.

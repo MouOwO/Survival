@@ -5,13 +5,13 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 9667,
-      "sha256": "d5e9f6c21a9021f3f08267397976f31d1ccadef5f44d4bf980023304f55068bd"
+      "bytes": 10260,
+      "sha256": "f70a7c4a7cb331f12385f4f9282f4ed6ced488fb123d8aaa346dc18330cfa451"
     },
     {
       "path": "01_architecture_and_workflow.md",
-      "bytes": 3677,
-      "sha256": "40b4519cba98e40c9f3fd43cdee8d5000b3d75d6b548ef4cf86afa2e5bc38b97"
+      "bytes": 4167,
+      "sha256": "9b390fd771ef7dcb0594631527d83f350e11e734c15192849d3ed1cbe6d4bd95"
     },
     {
       "path": "02_core_gameplay.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 22102,
-      "sha256": "181d1592aa3883d68e5176d0d1428b6c070b60add08406b66494965f8d373fae"
+      "bytes": 22640,
+      "sha256": "c5582c830f19b5f4597e81136384b03b833d820ac532a4db3d1689644c147ea1"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 3640,
-      "sha256": "f5859c73e074efb376266b8b98c38d35f82ec2ac032355454ce5ba0a3d0b160f"
+      "bytes": 3775,
+      "sha256": "187445345d58021d0b7d4633e7ad9047a42fa36171cf11ef6651f4b52b8db61d"
     },
     {
       "path": "data/completed_work_index.json",
@@ -90,8 +90,8 @@
     },
     {
       "path": "data/context.json",
-      "bytes": 5879,
-      "sha256": "b87df0fc86487a8ca4151662f38379084aae3a5623e84e3fc8ec1b064a9db01c"
+      "bytes": 6484,
+      "sha256": "3f2492d79d7f6425c3bef969346fcde2b8bdf5265fd48f6104382b632d61d102"
     },
     {
       "path": "data/repository_files.json",
@@ -207,6 +207,11 @@
       "path": "evidence/monster_portraits_20261030.md",
       "bytes": 18467,
       "sha256": "a80515615edcddfb0229ab7357d22dcf47f879e6f1a884f6184423a33e210713"
+    },
+    {
+      "path": "evidence/movement_daily_hint_20261031.md",
+      "bytes": 6806,
+      "sha256": "15055e5d097ab7043afa230ed14a09376f8dba3c0dc4305f1e27fedc684f3e71"
     },
     {
       "path": "evidence/native_arcade_cloud_20261027.public.json",

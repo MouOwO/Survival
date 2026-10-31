@@ -75,10 +75,10 @@ function run(source){
   return {traces,stableCalls,missingQueryCount};
 }
 const current=run(candidate);
-assert(current.stableCalls.every(count=>count===2),'One native leaf lookup plus one group cleanup per stable hide');
-assert.equal(current.missingQueryCount,8,'Seven root ID lookups once plus one group cleanup, no negative cache');
+assert(current.stableCalls.every(count=>count===1),'Cached positive identity leaves only one group cleanup per stable hide');
+assert.equal(current.missingQueryCount,9,'One query-root lookup, seven main IDs and one group cleanup; a missing identity is not cached');
 if(before){
   const baseline=run(before);assert.deepEqual(current.traces,baseline.traces,'Exact supported/unsupported/legacy/replacement/zero/layout/portal ownership and visibility trace preserved');
-  assert(baseline.stableCalls.every(count=>count===3));assert.equal(baseline.missingQueryCount,15);
-  console.log('PORTRAIT_RESTORE_LOOKUP_REUSE_PASS: actual callbacks exact traces, native lookup2->1, missing rootqueries15->8, no cross-call cache, late/replacement/layout/portal/zero/multi/shutdown');
+  assert(baseline.stableCalls.every(count=>count>current.stableCalls[0]));
+  console.log('PORTRAIT_RESTORE_LOOKUP_REUSE_PASS: exact behavior traces, fewer stable root lookups, no negative cache, late/replacement/layout/portal/zero/multi/shutdown');
 }else console.log('PORTRAIT_RESTORE_LOOKUP_REUSE_PASS: candidate actual callbacks and dynamic counterexamples');

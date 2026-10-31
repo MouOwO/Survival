@@ -5,6 +5,7 @@ local building_definitions = require("config/generated/building_definitions")
 local grid_config = require("config/grid_placement_config")
 local grid_geometry = require("core/building_grid_geometry")
 local scheduler = require("core/scheduler")
+local performance_clock = require("core/performance_clock")
 local send
 
 local M = {}
@@ -72,7 +73,7 @@ local function preview_area(player_id, caster, position, profile, session_id)
     preview_areas[player_id] = state
     local team, caster_index = caster:GetTeamNumber(), caster:entindex()
     preview_terrain_caches[player_id] = preview_terrain_caches[player_id] or {}
-    local perf_clock = type(Time) == "function" and Time or os.clock
+    local perf_clock = performance_clock.new()
     local started, batches, max_batch_ms = perf_clock(), 0, 0
     state.job = coroutine.create(function()
         return require("systems/grid_placement_system").preview_area({

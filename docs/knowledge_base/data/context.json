@@ -152,5 +152,19 @@
     "other_196_appearances_preserved": true,
     "server_deployed": false,
     "workshop_uploaded": false
+  },
+  "movement_daily_hint_20261031": {
+    "status": "DEVELOPMENT_IMPLEMENTED_COMPILED_AND_REGRESSION_TESTED",
+    "evidence": "evidence/movement_daily_hint_20261031.md",
+    "user_report": "online stutter mainly first one or two minutes",
+    "mandatory_complexity_review": true,
+    "repeated_full_scene_scans_forbidden": true,
+    "indexed_portrait_hotpath": true,
+    "background_prewarm_pauses_for_motion": true,
+    "daily_entry_authoritative_glow": true,
+    "grid_budget_uses_elapsed_time": true,
+    "online_fps_acceptance": false,
+    "workshop_uploaded": false,
+    "backend_deployed": false
   }
 }
