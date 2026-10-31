@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 11782,
-      "sha256": "36183f0ded2219e401c5f399ce6970f1703b7e4602d6493663d1d3296a2ac435"
+      "bytes": 12221,
+      "sha256": "aadca058f03a23e891607dc06ec4e9086b6cd9b8fdd0a2a6e929c4bac9d6ef4a"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -25,8 +25,8 @@
     },
     {
       "path": "04_network_auth_official.md",
-      "bytes": 15031,
-      "sha256": "1311dd16e6c10d31a0cbb5aa1af175df84ee565d3277bffd8f2c42ea765f12ef"
+      "bytes": 15317,
+      "sha256": "3cc1e05ca4d07b6e4e8b2bc678cf32f657717b5d99722ec6aa451b48ccc72a57"
     },
     {
       "path": "05_payments_commerce_delivery.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 24214,
-      "sha256": "15d2944dc8cff351c0bfe06b106ac1e46c909d66d50f0f83c6ee1a2e5c85847f"
+      "bytes": 24596,
+      "sha256": "4ca1dbbf2e08c2ac00bdbc436c341d657150a5ad688629d541367782269dab93"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 4183,
-      "sha256": "15172feb3e8b545590812d66986deff609282a5e5a549a5929fdcde1457e72b9"
+      "bytes": 4330,
+      "sha256": "4ec85c764708dab6e7c91a6dbbc59a9fbd7017da3d32e354e3bf23e655587a35"
     },
     {
       "path": "data/completed_work_index.json",
@@ -287,6 +287,11 @@
       "path": "evidence/shop_daily_transport_20261031.md",
       "bytes": 4545,
       "sha256": "783d5376a19c5f5452b1224fe660c60e5fb39d598fedd36b3b62419ef5388aca"
+    },
+    {
+      "path": "evidence/steam_login_manual_repair_20261031.md",
+      "bytes": 3564,
+      "sha256": "9b973013ea00938eb79b9cddff1bd0edfcbef67e33a10c8b31edb08d217fec7e"
     },
     {
       "path": "evidence/teammate_builder_portrait_20261031.md",
