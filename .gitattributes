@@ -194,3 +194,14 @@ tools/ten_sin_startup_20261028_v02/*.json text eol=lf
 tools/ten_sin_startup_20261028_v02/*.patch text eol=lf whitespace=-blank-at-eol
 publishing/workshop/ten_sin_startup_20261028*.json text eol=lf
 tools/test_ten_sin_startup.lua text eol=lf
+
+# Keep reviewed feature sources and audit/operation receipts reproducible.
+panorama/src/scripts/custom_game/commerce_actions.js text eol=lf
+panorama/src/scripts/custom_game/monster_portrait_renderer.js text eol=crlf
+docs/reviews/** text eol=lf
+tools/commerce_feature_audit_20261031/* text eol=lf
+tools/portrait_recovery_20261031/*.py text eol=lf
+tools/arcade_portrait_release_20261031/*.py text eol=lf
+tools/arcade_portrait_release_20261031/README.md text eol=lf
+tools/arcade_portrait_perf_20261031/*.py text eol=lf
+tools/arcade_portrait_perf_20261031/*.ps1 text eol=lf

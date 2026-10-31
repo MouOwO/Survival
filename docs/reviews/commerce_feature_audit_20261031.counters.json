@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "kind": "BOUNDED_SYNTHETIC_ACTUAL_LUA_MODULE_COUNTS",
+  "baseline_release_sequence": 2026103102,
+  "content_sha256": "318491d5f839653d888c350dcaa7fb639189ec427779004879819d3ac9b45352",
+  "real_player_mutations": 0,
+  "native_fps_measured": false,
+  "source_sha256": {
+    "scripts/vscripts/systems/commerce_runtime.lua": "4b0b6905335594dabd922b812e4b19920f14327bdef889d3bf93bf9403fda90a",
+    "scripts/vscripts/systems/commerce_effects.lua": "e04bb357b16d8030f09f868e40f1c8f718f275c706efd6e663084c4a3540d1cb",
+    "scripts/vscripts/systems/permanent_reward_effect_service.lua": "9a837e6456f97306b2d2aa4499bafa0303dd29c005311f08c629b6c3c8d2d8b8",
+    "scripts/vscripts/systems/hero_progression_system.lua": "de1d972b3e4bf122730c181bde55fee8e06c1800c6a965574fe18aa4a5714ca5",
+    "scripts/vscripts/systems/training_room_service.lua": "b637b44415ffce8503d348a818b10e101f24f3b7a48ffbe4d67bafd068bd15d3",
+    "scripts/vscripts/systems/lottery_dynamic_effects.lua": "b127b2911211f44f3afc35aca302a2a5830b9aba839df7220fb4b8b44f05fc0c"
+  },
+  "stable_commerce_counts": [
+    {
+      "units_ready": 0,
+      "players": 1,
+      "ticks": 60,
+      "direct_ownership_queries": 660,
+      "worker_capacity_queries": 60,
+      "hero_bus_requests": 60,
+      "mocked_nettable_writes": 60,
+      "identical_writes": 59,
+      "actual_native_calls": 0,
+      "actual_network_calls": 0
+    },
+    {
+      "units_ready": 0,
+      "players": 4,
+      "ticks": 60,
+      "direct_ownership_queries": 2640,
+      "worker_capacity_queries": 240,
+      "hero_bus_requests": 240,
+      "mocked_nettable_writes": 240,
+      "identical_writes": 236,
+      "actual_native_calls": 0,
+      "actual_network_calls": 0
+    },
+    {
+      "units_ready": 1,
+      "players": 1,
+      "ticks": 60,
+      "direct_ownership_queries": 780,
+      "worker_capacity_queries": 60,
+      "hero_bus_requests": 60,
+      "mocked_nettable_writes": 60,
+      "identical_writes": 59,
+      "actual_native_calls": 0,
+      "actual_network_calls": 0
+    },
+    {
+      "units_ready": 1,
+      "players": 4,
+      "ticks": 60,
+      "direct_ownership_queries": 3120,
+      "worker_capacity_queries": 240,
+      "hero_bus_requests": 240,
+      "mocked_nettable_writes": 240,
+      "identical_writes": 236,
+      "actual_native_calls": 0,
+      "actual_network_calls": 0
+    }
+  ],
+  "identical_profile_projection": {
+    "events": 60,
+    "get_profile_calls": 60,
+    "commerce_full_projections": 60,
+    "inventory_scalar_lookups": 6420,
+    "lottery_definition_rows": 98,
+    "emitted_changed_outputs": 1,
+    "actual_native_calls": 0,
+    "actual_network_calls": 0
+  },
+  "traces": {
+    "reproduce_privilege_edges.lua": {
+      "script_sha256": "b24c44de3560ab51a12cfda18626372fbc462f84cb81fbf173594a23ca3b2bd5",
+      "stdout": "AUDIT_NIRVANA_LATE_OWNERSHIP: after_profile_refresh=0; after_later_progression_request=5\n[PermanentReward] projection_refreshed player_id=0 revision=0 hero_all_attributes_flat=0 map_level=0\nAUDIT_GROWTH_RING_COVERAGE: intrinsic_attack_growth=11_of_10; archive_attack_growth=100_of_100; combined=111; broad_description_expected=121\n[PermanentReward] projection_refreshed player_id=0 revision=0 hero_all_attributes_flat=0 map_level=10\n[PermanentReward] projection_refreshed player_id=0 revision=0 hero_all_attributes_flat=0 map_level=10\nAUDIT_LONGINUS_LAYER_ORDER: lottery_treasure_only=25_not_26_25; both_treasures=51_25_not_52_5\nAUDIT_GROWTH_RING_ENTRY: ring_owned=true; gold=75000; discounted_entry_plus_first_tick=75000; rejected_undiscounted_requirement=100000\nCOMMERCE_EDGE_AUDIT_PASS: four existing partial-implementation cases reproduced; real_network_calls=0; real_player_mutations=0\n"
+    },
+    "count_commerce_stable_calls.lua": {
+      "script_sha256": "451058ff930cd9a28a21302d0271701de8fdcb3f234387e2b27bce9124dd5042",
+      "stdout": "COMMERCE_STABLE_CALLS units_ready=0 players=1 ticks=60 direct_ownership_queries=660 worker_capacity_queries=60 hero_bus_requests=60 mocked_nettable_writes=60 identical_writes=59 actual_native_calls=0 actual_network_calls=0\nCOMMERCE_STABLE_CALLS units_ready=0 players=4 ticks=60 direct_ownership_queries=2640 worker_capacity_queries=240 hero_bus_requests=240 mocked_nettable_writes=240 identical_writes=236 actual_native_calls=0 actual_network_calls=0\nCOMMERCE_STABLE_CALLS units_ready=1 players=1 ticks=60 direct_ownership_queries=780 worker_capacity_queries=60 hero_bus_requests=60 mocked_nettable_writes=60 identical_writes=59 actual_native_calls=0 actual_network_calls=0\nCOMMERCE_STABLE_CALLS units_ready=1 players=4 ticks=60 direct_ownership_queries=3120 worker_capacity_queries=240 hero_bus_requests=240 mocked_nettable_writes=240 identical_writes=236 actual_native_calls=0 actual_network_calls=0\n"
+    },
+    "count_projection_refresh.lua": {
+      "script_sha256": "ae7dc5654f9a079898cfc3ad56444040c6c47c63b14ebe4e0ac3344c07d27a7f",
+      "stdout": "[PermanentReward] projection_refreshed player_id=0 revision=0 hero_all_attributes_flat=0 map_level=0\nIDENTICAL_PROFILE_PROJECTION events=60 get_profile_calls=60 commerce_full_projections=60 inventory_scalar_lookups=6420 lottery_definition_rows=98 emitted_changed_outputs=1 actual_native_calls=0 actual_network_calls=0\n"
+    }
+  }
+}

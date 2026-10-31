@@ -7,11 +7,13 @@ local exclusive_skills = require("config/generated/hero_exclusive_skills")
 local skills = require("config/generated/hero_skill_definitions")
 local passive_skills = require("config/hero_passive_skill_definitions")
 local tooltip_view_model = require("ui/hero_skill_tooltip_view_model")
+local hero_teleport_access = require("systems/hero_teleport_access")
 
 local M = {}
 
 local state_by_player = {}
 local pending_hero_by_player = {}
+local teleport_profile_subscription
 local RETURN_HOME_ABILITY = "ability_survival_return_home"
 local PICKUP_MATERIALS_ABILITY = "ability_survival_pickup_materials"
 local BALL_LIGHTNING_ABILITY = "ability_survival_hero_ball_lightning"
@@ -267,9 +269,7 @@ local function synchronize_unit_impl(state)
     if not ball_lightning then
         error("failed to add utility ability: " .. BALL_LIGHTNING_ABILITY)
     end
-    ball_lightning:SetLevel(1)
-    ball_lightning:SetHidden(false)
-    ball_lightning:SetActivated(true)
+    hero_teleport_access.synchronize(state.player_id, state.unit, ball_lightning)
     local return_ability = state.unit:FindAbilityByName(RETURN_HOME_ABILITY)
     if not return_ability then
         return_ability = state.unit:AddAbility(RETURN_HOME_ABILITY)
@@ -627,10 +627,20 @@ local function on_hero_removed(payload)
     publish(player_id, "hero_removed")
 end
 
+local function on_profile_changed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    local state = player_id and state_by_player[player_id]
+    if not state or not valid_entity(state.unit) then return end
+    -- A committed profile update changes one indexed hero's utility permission;
+    -- it must not rebuild unrelated skills or rescan every summoned hero.
+    hero_teleport_access.synchronize(player_id, state.unit)
+end
+
 function M.init()
     passive_skills.validate()
     state_by_player = {}
     pending_hero_by_player = {}
+    event_bus.unsubscribe(teleport_profile_subscription)
     event_bus.handle_request(
         events.HERO_SKILL_STATE_GET_REQUEST,
         state_request
@@ -654,6 +664,7 @@ function M.init()
     event_bus.subscribe(events.HERO_SKILL_REWARD_REQUEST, on_skill_reward)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
     event_bus.subscribe(events.HERO_REMOVED, on_hero_removed)
+    teleport_profile_subscription = event_bus.subscribe(events.PLAYER_PROFILE_CHANGED, on_profile_changed)
 end
 
 return M

@@ -1,4 +1,5 @@
 package.path='scripts/vscripts/?.lua;'..package.path
+package.loaded['config/test_access']={enabled=false,allowed_steamids={}}
 local bus=require('core/event_bus');local events=require('core/events')
 local clock=0;local tasks={};local owned={teleporter=true,saw=true,orbital=true,lumberyard=true}
 GameRules={GetGameTime=function() return clock end}
@@ -18,6 +19,7 @@ DOTA_UNIT_TARGET_TEAM_ENEMY=1;DOTA_UNIT_TARGET_HERO=1;DOTA_UNIT_TARGET_BASIC=2;D
 local function unit(id,boss)
     return {survival_player_id=id,survival_is_wave_monster=true,survival_is_boss=boss,
         IsNull=function()return false end,IsAlive=function()return true end,GetTeamNumber=function()return 2 end,
+        FindAbilityByName=function()return nil end,
         GetAbsOrigin=function()return Vector(0,0,0)end,GetStrength=function()return 2 end,GetAgility=function()return 3 end,GetIntellect=function()return 5 end,
         AddNewModifier=function(self)self.stripped=(self.stripped or 0)+1 end,Kill=function(self)self.killed=true end}
 end
@@ -25,6 +27,9 @@ local hero,wall=unit(0),unit(0)
 local mine,foreign,boss=unit(0),unit(1),unit(0,true)
 FindUnitsInRadius=function()return {mine,foreign,boss}end
 local damage={};ApplyDamage=function(p)damage[#damage+1]=p end
+package.loaded['combat/damage_service']={Deal=function(_,p)
+    ApplyDamage({attacker=p.attacker,victim=p.victim,damage=p.base_damage,damage_type=p.damage_type})
+end}
 bus.handle_request(events.HERO_SUMMON_GET_REQUEST,function()return {unit=hero}end)
 bus.handle_request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,function()return {totals={hero_attack_armor_reduction=10}}end)
 local research={};local grants=0

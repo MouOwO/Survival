@@ -1,6 +1,7 @@
 -- Run from the addon root. Uses production skill configuration, event bus,
 -- scheduler, hero skill system and UI request adapter with engine-only stubs.
 package.path = "scripts/vscripts/?.lua;" .. package.path
+package.loaded["config/test_access"] = { enabled = false, allowed_steamids = {} }
 
 local bus = require("core/event_bus")
 local events = require("core/events")
@@ -63,6 +64,8 @@ local function hero()
         function ability:GetAbilityName() return self.name end
         function ability:entindex() return self.index end
         function ability:GetCooldownTimeRemaining() return self.cooldown end
+        function ability:GetLevel() return self.level end
+        function ability:IsHidden() return self.hidden end
         function ability:StartCooldown(value) self.cooldown = value end
         function ability:SetLevel(value)
             unit.writes = unit.writes + 1

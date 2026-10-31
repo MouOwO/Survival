@@ -5,8 +5,13 @@ local MAX_DISTANCE = 800
 local destination_validation = require("systems/destination_validation_service")
 local blink_destination = require("systems/blink_destination")
 local scheduler = require("core/scheduler")
+local hero_teleport_access = require("systems/hero_teleport_access")
 local PARTICLE = "particles/units/heroes/hero_stormspirit/stormspirit_ball_lightning.vpcf"
 local SOUND = "Hero_StormSpirit.BallLightning"
+
+function ability_survival_hero_ball_lightning:GetCooldown()
+    return hero_teleport_access.COOLDOWN
+end
 
 local function flash(position, caster)
     local particle = ParticleManager:CreateParticle(PARTICLE, PATTACH_WORLDORIGIN, caster)
@@ -25,6 +30,11 @@ function ability_survival_hero_ball_lightning:CastFilterResultLocation(location)
     if not IsServer() then return UF_SUCCESS end
     local caster = self:GetCaster()
     if not caster or caster:IsNull() then return UF_FAIL_CUSTOM end
+    local allowed, reason = hero_teleport_access.check(hero_teleport_access.caster_player(caster))
+    if not allowed then
+        self.cast_error = reason
+        return UF_FAIL_CUSTOM
+    end
     local target = blink_destination.clamp(
         caster:GetAbsOrigin(), location, MAX_DISTANCE
     )
@@ -37,6 +47,7 @@ function ability_survival_hero_ball_lightning:CastFilterResultLocation(location)
         self.cast_error = "目标位置无法到达"
         return UF_FAIL_CUSTOM
     end
+    self.cast_error = nil
     return UF_SUCCESS
 end
 
@@ -48,6 +59,10 @@ function ability_survival_hero_ball_lightning:RefundTravelMana()
     if self.travel_mana_refunded then return end
     self.travel_mana_refunded = true
     self:RefundManaCost()
+    self:EndCooldown()
+    hero_teleport_access.restore_cooldown(
+        hero_teleport_access.caster_player(self:GetCaster()), self
+    )
 end
 
 function ability_survival_hero_ball_lightning:OnSpellStart()
@@ -55,6 +70,11 @@ function ability_survival_hero_ball_lightning:OnSpellStart()
     self.travel_mana_refunded = false
     local caster = self:GetCaster()
     if not caster or caster:IsNull() then return end
+    local player_id = hero_teleport_access.caster_player(caster)
+    if not hero_teleport_access.check(player_id) then
+        self:RefundTravelMana()
+        return
+    end
 
     local origin = caster:GetAbsOrigin()
     local target, distance = blink_destination.clamp(
@@ -78,9 +98,9 @@ function ability_survival_hero_ball_lightning:OnSpellStart()
     local moved = destination_validation.teleport(caster, target, true)
     if not moved then
         self:RefundTravelMana()
-        self:EndCooldown()
         return
     end
+    hero_teleport_access.commit(player_id, caster)
     flash(origin, caster)
     flash(caster:GetAbsOrigin(), caster)
     caster:EmitSound(SOUND)

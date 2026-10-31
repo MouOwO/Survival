@@ -4,10 +4,11 @@
 const assert=require("node:assert/strict"),fs=require("node:fs"),vm=require("node:vm");
 const source=fs.readFileSync("panorama/src/scripts/custom_game/commerce_actions.js","utf8");
 function harness({barrier=0,wall=null,tools=false,registerFail=false}={}){
- let now=0,game=0,nextTask=0,nextListener=0;const tasks=[],listeners=new Map(),calls=[],tables={
+ let now=0,game=0,nextTask=0,nextListener=0,portrait=100;const tasks=[],listeners=new Map(),calls=[],tables={
   survival_commerce_actions:{"player_0":{barrier}},
+  survival_hero_skills:{"player_0":{hero_ready:1,unit_entindex:100}},
   survival_commerce_wall:wall||{}},cfg={};
- const rootNodes=[],messages=[],commands=new Map(),commandAttempts=[],metrics={visible:0,text:0,refreshRuns:0,allReads:0};
+ const rootNodes=[],messages=[],commands=new Map(),commandAttempts=[],metrics={visible:0,text:0,refreshRuns:0,allReads:0,portraitReads:0};
  function makePanel(type,parent,id){
   const p={paneltype:type,id,parent,children:[],style:{},events:{},valid:true,_text:"",_visible:true,
    IsValid(){return this.valid;},SetPanelEvent(n,fn){this.events[n]=fn;},
@@ -24,6 +25,7 @@ function harness({barrier=0,wall=null,tools=false,registerFail=false}={}){
   AddCommand(name,fn){commandAttempts.push(name);if(registerFail)throw Error('registration rejected');commands.set(name,fn);}},
   GameUI:{CustomUIConfig:()=>cfg,GetCursorPosition:()=>[4,5],GetScreenWorldPosition:()=>[100,200,300]},
   Entities:{IsValidEntity:id=>id===100||id===101},
+  Players:{GetLocalPlayerPortraitUnit(){metrics.portraitReads++;return portrait;}},
   CustomNetTables:{GetTableValue:(table,key)=>tables[table]?.[key],
    GetAllTableValues(table){metrics.allReads++;return Object.entries(tables[table]||{}).map(([key,value])=>({key,value}));},
    SubscribeNetTableListener(table,fn){const token=++nextListener;listeners.set(token,{table,fn});return token;},
@@ -42,6 +44,7 @@ function harness({barrier=0,wall=null,tools=false,registerFail=false}={}){
  function change(table,key,value){if(value==null)delete tables[table][key];else tables[table][key]=value;
   for(const l of [...listeners.values()])if(l.table===table)l.fn(table,key,value);}
  return {cfg,tasks,listeners,calls,metrics,context,sentinel,reload,advance,change,messages,commands,commandAttempts,
+  select:value=>{portrait=value;},
   api:()=>cfg.SurvivalCommerceActions,
   root:()=>context.children.find(p=>p.id==="CommerceActions"&&p.valid),
   shield:()=>context.children.find(p=>p.id==="CommerceActions"&&p.valid).children[2],
@@ -91,7 +94,7 @@ function harness({barrier=0,wall=null,tools=false,registerFail=false}={}){
 {
  const h=harness({barrier:1,wall:{"100":{player_id:0,ready_at:30,expires:10,remaining:50}}});h.advance(0);
  const old=h.api(),oldTimer=h.tasks.find(t=>!t.cancelled),oldAim=h.cfg.SurvivalCommerceAim;
- h.reload();h.advance(0);assert.notEqual(h.api(),old);assert.equal(h.listeners.size,2,"reload leaves one owned pair of subscriptions");
+ h.reload();h.advance(0);assert.notEqual(h.api(),old);assert.equal(h.listeners.size,3,"reload leaves exactly one owned set of subscriptions");
  const metrics={...h.metrics};oldTimer.fn();assert.equal(h.metrics.text,metrics.text,"stale callback cannot change new context");
  assert.equal(oldAim("pressed",0),false,"retired input handler is inert");
  assert(h.sentinel.valid&&h.sentinel.visible,"Dispose deletes only this owned HUD");
@@ -105,6 +108,17 @@ function harness({barrier=0,wall=null,tools=false,registerFail=false}={}){
  assert.equal(h.cfg.SurvivalCommerceBlink(),true);assert.equal(h.calls.length,1);
  assert.equal(h.calls[0].name,"survival_commerce_action");assert.deepEqual({...h.calls[0].payload},{action:"blink",x:100,y:200});
  assert.equal(h.pending(),0,"other entitlement input does not need a shield timer");
+ h.select(101);assert.equal(h.cfg.SurvivalCommerceBlink(),false,"builder D must reach its independent ability handler");
+ assert.equal(h.calls.length,1,"selecting the builder must not teleport the hero");
+ h.change("survival_hero_skills","player_1",{hero_ready:1,unit_entindex:101});
+ assert.equal(h.cfg.SurvivalCommerceBlink(),false,"another player's hero receipt cannot replace the local index");
+ h.change("survival_hero_skills","player_0",{hero_ready:0,unit_entindex:-1});h.select(100);
+ assert.equal(h.cfg.SurvivalCommerceBlink(),false,"removed hero cannot consume the hotkey");
+ h.change("survival_hero_skills","player_0",{hero_ready:1,unit_entindex:101});h.select(101);
+ assert.equal(h.cfg.SurvivalCommerceBlink(),true,"new hero identity updates only from its committed local snapshot");
+ const reads=h.metrics.portraitReads,all=h.metrics.allReads;h.advance(300);
+ assert.equal(h.metrics.portraitReads,reads,"selection validation has no idle polling");
+ assert.equal(h.metrics.allReads,all,"hero indexing adds no collection scans");
 }
 {
  const h=harness();assert.equal(h.commandAttempts.length,0,"non-Tools entitlement HUD registers no diagnostic command");

@@ -2,6 +2,7 @@ local bus=require('core/event_bus')
 local events=require('core/events')
 local scheduler=require('core/scheduler')
 local effects=require('systems/commerce_effects')
+local hero_teleport_access=require('systems/hero_teleport_access')
 local M={}
 local players,trees,walls={}, {}, {}
 local initialized_world,subscriptions,action_listener,listener_manager,listener_registered
@@ -47,18 +48,25 @@ local function enemies(unit,radius)
     end
     return result
 end
-local function state(id) players[id]=players[id] or {research={},used={},cooldown=0,world=initialized_world};return players[id] end
+local function state(id) players[id]=players[id] or {research={},used={},world=initialized_world};return players[id] end
 local function publish(id)
     local s=state(id)
-    CustomNetTables:SetTableValue('survival_commerce_actions','player_'..id,{
-        blink=effects.owned(id,'teleporter') and 1 or 0,
+    local data={
+        blink=hero_teleport_access.owned(id) and 1 or 0,
         copper=effects.owned(id,'copper_axe') and not s.used.copper and 1 or 0,
         bomb=effects.owned(id,'saw') and not s.used.bomb and 1 or 0,
         ultimate=effects.owned(id,'tower_seal') and 1 or 0,
         immortal=effects.owned(id,'immortal') and 1 or 0,
         barrier=effects.owned(id,'barrier') and 1 or 0,
-        cooldown=s.cooldown,title=effects.owned(id,'sovereign') and '统御王印' or '',
-    })
+        cooldown=hero_teleport_access.ready_at(id),title=effects.owned(id,'sovereign') and '统御王印' or '',
+    }
+    local previous=s.published
+    if previous and previous.blink==data.blink and previous.copper==data.copper
+        and previous.bomb==data.bomb and previous.ultimate==data.ultimate
+        and previous.immortal==data.immortal and previous.barrier==data.barrier
+        and previous.cooldown==data.cooldown and previous.title==data.title then return end
+    s.published=data
+    CustomNetTables:SetTableValue('survival_commerce_actions','player_'..id,data)
 end
 function M.orbital(id,key)
     local s=state(id);local wall=walls[id];local unit=hero(id);local now=GameRules:GetGameTime()
@@ -98,13 +106,19 @@ function M.action(payload)
         return
     end
     local ok,reason=false,'商城权益不可用'
-    if action=='blink' and effects.owned(id,'teleporter') and GameRules:GetGameTime()>=s.cooldown then
+    if action=='blink' then
+        local permitted,denied=hero_teleport_access.check(id)
+        if not permitted then
+            publish(id)
+            bus.emit(events.UI_NOTIFICATION,{player_id=id,message=denied,level='error'})
+            return
+        end
         local x,y=tonumber(payload.x),tonumber(payload.y)
         if x and y and x==x and y==y and math.abs(x)<32768 and math.abs(y)<32768 then
             local target=Vector(x,y,unit:GetAbsOrigin().z)
             target.z=GetGroundHeight(target,unit)
             ok,reason=require('systems/destination_validation_service').teleport(unit,target,true)
-            if ok then s.cooldown=GameRules:GetGameTime()+10 end
+            if ok then hero_teleport_access.commit(id,unit) end
         end
     elseif action=='copper' and effects.owned(id,'copper_axe') and not s.used.copper and alive(trees[id]) then
         local target=require('systems/builder_work_position_service').find(unit,{footprint={x=2,y=2}},trees[id]:GetAbsOrigin())
@@ -205,7 +219,13 @@ function M.init()
             if epoch==subscribed_epoch and bus.get_generation()==subscribed_generation then callback(p) end
         end)
     end
-    subscribe(events.PLAYER_PROFILE_CHANGED,function(p) if tonumber(p.player_id) then effects.invalidate(p.player_id) end end)
+    subscribe(events.PLAYER_PROFILE_CHANGED,function(p)
+        local id=tonumber(p.player_id)
+        if id then effects.invalidate(id);publish(id) end
+    end)
+    subscribe(hero_teleport_access.CHANGED,function(p)
+        local id=tonumber(p.player_id);if id then publish(id) end
+    end)
     subscribe(events.TREE_CHANGED,function(p) if p.entindex then trees[tonumber(p.player_id)]=EntIndexToHScript(p.entindex) end end)
     subscribe(events.BUILDING_CREATED,function(p)
         if p.building_id=='wall' then walls[tonumber(p.player_id)]=p.unit or EntIndexToHScript(p.entindex) end
