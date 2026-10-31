@@ -107,10 +107,21 @@ def validate_loaded(loaded, origin, inputs, manifest, package):
     frozen, frozen_path = inputs.reference({"path": loaded.get("input_manifest"), "sha256": loaded.get("input_manifest_sha256")}, origin)
     build.need(frozen.get("candidate_content_sha256") == package["content_sha256"]
                and loaded.get("candidate_content_sha256") == package["content_sha256"], "Frozen inputs must bind the actual signed candidate")
-    build.need(datetime.fromisoformat(runtime["process_started_utc"]) > datetime.fromisoformat(frozen["created_utc"]), "VM must start after candidate source freeze")
     rows = {row["path"]: row for row in manifest["files"]}
     build.need(set(loaded.get("files", {})) == FIX2 and {r["source"] for r in frozen.get("inputs", [])} == FIX2,
                "Exactly the two confirmed plain combat files must be loaded")
+    started = datetime.fromisoformat(runtime["process_started_utc"])
+    if started <= datetime.fromisoformat(frozen["created_utc"]):
+        approved, approved_path = inputs.reference(frozen.get("approved_source_freeze"), frozen_path)
+        build.need(started > datetime.fromisoformat(approved["created_utc"])
+                   and approved.get("approved_commit") == package.get("wall_approval", {}).get("source_revision")
+                   and {r["source"] for r in approved.get("inputs", [])} == FIX2,
+                   "VM must start after candidate source freeze or the same approved immutable sources")
+        for item in approved["inputs"]:
+            name = item["source"]
+            actual, _ = inputs.reference({"path": item["frozen_input"], "sha256": item["sha256"]}, approved_path, decode=False)
+            build.need(item["sha256"] == rows[name]["sha256"] and actual == build.blob(approved["approved_commit"], name),
+                       "Prelaunch approved source differs from final signed candidate")
     transport, _ = inputs.reference({"path": loaded.get("transport_capture"), "sha256": loaded.get("transport_sha256")}, origin)
     answers = []
     for line in transport.get("rows", []):
@@ -152,6 +163,22 @@ def function_segments(source):
     starts = list(re.finditer(r"^(?:local )?function ([\w.:]+)\s*\(", source, re.M))
     return {m[1]: source[m.start(): starts[i+1].start() if i+1 < len(starts) else len(source)].strip()
             for i, m in enumerate(starts)}
+
+
+def validate_fix_source(row, candidate, native, manifest_row):
+    """Only committed LF versus development CRLF; preserve both raw hashes."""
+    binding = row.get("candidate_binding", {})
+    candidate_sha, native_sha = [hashlib.sha256(value).hexdigest() for value in (candidate, native)]
+    normalized = native.replace(b"\r\n", b"\n")
+    build.need(binding.get("normalization") == "CRLF_TO_LF_ONLY"
+               and re.fullmatch(r"[0-9a-f]{40}", binding.get("source_revision", "")) is not None
+               and b"\r" not in candidate and candidate == normalized
+               and binding.get("candidate_git_sha256") == candidate_sha == manifest_row["sha256"]
+               and binding.get("normalized_native_dev_sha256") == candidate_sha
+               and binding.get("native_dev_raw_sha256") == native_sha == row["native_dev_sha256"],
+               "Candidate fix must be the explicit committed LF form; only CRLF-to-LF is allowed")
+    build.need(build.blob(binding["source_revision"], row["path"]) == candidate,
+               "Candidate fix does not match the declared immutable Git source")
 
 
 def validate_equivalence(proof, origin, inputs, manifest):
@@ -206,8 +233,7 @@ def validate_equivalence(proof, origin, inputs, manifest):
     build.need(set(fixes) == FIX2, "Equivalence fix scope mismatch")
     for name, row in fixes.items():
         build.need(row["matches_frozen"] is True and row["patchfrozen_sha256"] == row["native_dev_sha256"] == closure[name]["native_dev"]["sha256"], "Frozen wall fix drift")
-        expected = (build.VIEW / name).read_bytes().replace(b"\r\n", b"\n")
-        build.need(expected == (dev / name).read_bytes().replace(b"\r\n", b"\n"), "Candidate plain fix differs beyond line endings")
+        validate_fix_source(row, (build.VIEW / name).read_bytes(), (dev / name).read_bytes(), rows[name])
     for item in proof.get("function_projection", []):
         name = item["module"]
         left, right = [function_segments((root / name).read_text("utf-8-sig"))[item["function"]] for root in (base, dev)]

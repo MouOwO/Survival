@@ -144,7 +144,30 @@ class CompositeProofGuards(unittest.TestCase):
             with self.subTest(changes=changes), self.assertRaisesRegex(ValueError, "Fresh VM"):
                 self.validate_loaded({**loaded, **changes}, manifest)
         loaded["native_runtime"]["process_started_utc"] = "2026-10-31T11:59:00+00:00"
-        with self.assertRaisesRegex(ValueError, "after candidate"):
+        with self.assertRaisesRegex(ValueError, "proof path/SHA256"):
+            self.validate_loaded(loaded, manifest)
+
+    def test_prelaunch_approved_git_freeze_can_precede_later_real_candidate_binding(self):
+        loaded, manifest, _ = self.loaded()
+        frozen_path = Path(loaded["input_manifest"])
+        frozen = json.loads(frozen_path.read_text())
+        approved = self.write("approved_freeze.json", {"created_utc": "2026-10-31T11:59:00+00:00",
+                            "approved_commit": "f" * 40, "inputs": frozen["inputs"]})
+        frozen.update(created_utc="2026-10-31T12:02:00+00:00", approved_source_freeze=approved)
+        ref = self.write("inputs.json", frozen)
+        loaded.update(input_manifest=ref["path"], input_manifest_sha256=ref["sha256"])
+        self.package["wall_approval"] = {"source_revision": "f" * 40}
+        with mock.patch.object(build, "blob", return_value=b"return {}\n"):
+            self.validate_loaded(loaded, manifest)
+        for commit, blob in (("0" * 40, b"return {}\n"), ("f" * 40, b"different\n")):
+            self.package["wall_approval"]["source_revision"] = commit
+            with self.subTest(commit=commit), mock.patch.object(build, "blob", return_value=blob), self.assertRaises(ValueError):
+                self.validate_loaded(loaded, manifest)
+        self.package["wall_approval"]["source_revision"] = "f" * 40
+        approved_raw = json.loads(Path(approved["path"]).read_text()); approved_raw["created_utc"] = "2026-10-31T12:02:00+00:00"
+        frozen["approved_source_freeze"] = self.write("approved_freeze.json", approved_raw)
+        ref = self.write("inputs.json", frozen); loaded["input_manifest_sha256"] = ref["sha256"]
+        with mock.patch.object(build, "blob", return_value=b"return {}\n"), self.assertRaisesRegex(ValueError, "after candidate"):
             self.validate_loaded(loaded, manifest)
 
     def test_candidate_input_source_count_and_function_bytes_cannot_drift(self):
@@ -175,6 +198,28 @@ class CompositeProofGuards(unittest.TestCase):
                         {"scope": "FULL_PACKAGE_EQUAL"}, {"online_multiplayer_acceptance": True}):
             with self.subTest(changes=changes), self.assertRaisesRegex(ValueError, "Complete scoped"):
                 publish.validate_equivalence({**base, **changes}, self.origin, publish.ProofInputs(), {"files": []})
+
+    def test_committed_lf_vs_development_crlf_only_is_explicit_and_hash_bound(self):
+        candidate, native = b"return {value=1}\n", b"return {value=1}\r\n"
+        sha = lambda value: hashlib.sha256(value).hexdigest()
+        row = {"path": sorted(publish.FIX2)[0], "native_dev_sha256": sha(native), "candidate_binding": {
+            "source_revision": "f" * 40, "normalization": "CRLF_TO_LF_ONLY",
+            "candidate_git_sha256": sha(candidate), "native_dev_raw_sha256": sha(native),
+            "normalized_native_dev_sha256": sha(candidate)}}
+        pin = {"sha256": sha(candidate)}
+        with mock.patch.object(build, "blob", return_value=candidate) as blob:
+            publish.validate_fix_source(row, candidate, native, pin)
+            blob.assert_called_once_with("f" * 40, row["path"])
+        cases = [(row, native, native, pin), (row, candidate, native.replace(b"=1", b"=2"), pin),
+                 (row, candidate, native.replace(b"\r\n", b"\r"), pin),
+                 ({**row, "candidate_binding": {**row["candidate_binding"], "normalization": "ANY_WHITESPACE"}}, candidate, native, pin),
+                 (row, candidate, native, {"sha256": "0" * 64})]
+        for item, signed, dev, manifest_pin in cases:
+            with self.subTest(signed=signed, dev=dev), mock.patch.object(build, "blob", return_value=candidate), \
+                 self.assertRaisesRegex(ValueError, "only CRLF-to-LF"):
+                publish.validate_fix_source(item, signed, dev, manifest_pin)
+        with mock.patch.object(build, "blob", return_value=b"other commit\n"), self.assertRaisesRegex(ValueError, "immutable Git"):
+            publish.validate_fix_source(row, candidate, native, pin)
 
 
 class PublicationGuards(unittest.TestCase):

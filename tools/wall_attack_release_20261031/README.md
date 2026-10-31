@@ -78,6 +78,10 @@ The separate loaded-source proof requires a newly started VM after the candidate
 
 An optional `fresh_replay` hash reference may accompany the composite. Its PID/world/session and loaded-proof ID must match the new VM. It never rewrites or rebinds the older four-mode evidence. Signing can finish before native evidence is available; publication cannot.
 
+Each equivalence `fix2` row also records `candidate_binding`: immutable `source_revision`, `normalization:"CRLF_TO_LF_ONLY"`, `candidate_git_sha256`, `native_dev_raw_sha256` and `normalized_native_dev_sha256`. The guard reads both raw files, requires the signed candidate to contain LF only and to equal the development file after replacing CRLF with LF, and checks the actual immutable Git blob. Raw development hashes remain raw; no other whitespace or source changes are accepted by this normalization.
+
+If the VM starts while the full bundle is still being signed, the eventual candidate input manifest keeps its real later creation time and adds an explicit `approved_source_freeze` path/SHA256 reference. That earlier manifest must predate the process, name the package's exact approved immutable commit, and contain exactly the two fix files whose frozen bytes equal both the real Git blobs and the final signed manifest hashes. This permits an honestly recorded source freeze before launch; it never backdates a candidate or relaxes exact live-source equality.
+
 After reviewing the actual completed `package.json` SHA:
 
 ```powershell
