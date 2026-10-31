@@ -173,6 +173,7 @@ docs/knowledge_base/** text eol=lf
 # The WS4 operator plan seals exact source bytes before remote execution.
 tools/ws4_catalog_sync_20261031/*.py text eol=lf
 tools/ws4_catalog_sync_20261031/README.md text eol=lf
+server/player_web_auth/game_diagnostics.py text eol=lf
 
 # Preserve the reviewed ten-sin startup patch and its pinned source bytes.
 scripts/vscripts/systems/challenge_session_service.lua text eol=crlf

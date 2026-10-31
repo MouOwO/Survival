@@ -1,5 +1,7 @@
 # 孤城逐晓／Survival 统一知识库
 
+最新未解问题：[2026-10-31 商城空白／每日领取等待与有界诊断](evidence/shop_daily_transport_20261031.md)。
+
 最新城墙攻击修复：[2026-10-31 两处原生根因、四开放模式自然攻击验收与3101发行](evidence/wall_attack_hotfix_20261031.md)。
 
 最新商城恢复：[2026-10-31 四人WS4合同版本对齐、备份与验收边界](evidence/shop_catalog_sync_20261031.md)。
