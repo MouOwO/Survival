@@ -116,8 +116,9 @@ for _, attacker in ipairs({hero, tower, challenge}) do
     assert(damage(attacker, wave, 1), "defenders must still damage wave enemies")
 end
 
--- Existing AI owns wall orders. Disable idle acquisition at spawn, then test
--- both its fallback event handler and the shared observer's handler entry.
+-- Existing AI owns wall orders. Native melee requires idle acquisition enabled
+-- even for explicit forced targets; zero radius plus all three wall-only gates
+-- still prevent attacks against nearby defenders.
 package.loaded["core/team_alignment"] = {}
 package.loaded["systems/wall_melee_contact"] = {release=noop}
 package.loaded["systems/wall_navigation_service"] = {}
@@ -128,7 +129,8 @@ local AI = require("modifiers/modifier_enemy_wall_ai")
 for _, attacker in ipairs(wave_units) do
     local ai=setmetatable({GetParent=function() return attacker end, StartIntervalThink=noop}, {__index=AI})
     ai:OnCreated({wall_entindex=wall:entindex()})
-    assert(attacker.idle == false and attacker.acquire == 0, "no automatic nearby targeting, including before a wall is available")
+    assert(attacker.idle == true and attacker.acquire == 0,
+        "native forced wall attacks need idle flag enabled with zero nearby search radius")
     ai.ai_state="chase"
     ai:IssueStateOrder(attacker, wall)
     assert(attacker.forced == wall and orders[#orders].TargetIndex == wall:entindex())
@@ -156,6 +158,6 @@ local idle_ai=setmetatable({GetParent=function() return waiting end, StartInterv
 local before=#orders
 idle_ai:OnCreated({wall_entindex=-1})
 idle_ai:OnIntervalThink()
-assert(#orders == before and not waiting.idle and waiting.acquire == 0,
+assert(#orders == before and waiting.idle and waiting.acquire == 0,
     "without a wall, wait instead of acquiring a tower or hero")
 print("WAVE_WALL_ONLY_PASS: normal/boss/ranged orders, damage, splash, transaction cleanup, AI recovery, defender/challenge isolation; damage checks="..consumed)

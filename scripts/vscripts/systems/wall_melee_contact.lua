@@ -559,6 +559,32 @@ end
 function M.rear_clear(wall,unit) return true end
 function M.extend_retreat(wall,unit,plan,goal) return nil,false end
 
+-- A real front vacancy can wake a rear owner beyond the local admission
+-- circle. Cache at most four faces per body geometry, never per waiting actor.
+-- A full partial terrain row (e.g. three valid keys) is not a vacancy.
+local function distant_front_vacancy(s,unit,side,stamp)
+    local face=s.faces[side]
+    if not face or face.count>=COUNT then return false end
+    local radius,padding=hull(unit),body_radius(unit)
+    local geometry=s.positions[radius] and s.positions[radius][padding]
+    local by_radius=s.distant_vacancies
+    if not by_radius then by_radius={};s.distant_vacancies=by_radius end
+    local by_padding=by_radius[radius]
+    if not by_padding then by_padding={};by_radius[radius]=by_padding end
+    local faces=by_padding[padding]
+    if not faces then faces={};by_padding[padding]=faces end
+    local cached=faces[side]
+    if cached and cached.revision==s.revision and cached.geometry==geometry then return cached.available end
+    -- Refresh candidates only after a real occupancy/geometry change. Stable
+    -- far waiters never expire/rebuild the shared terrain cache themselves.
+    local available=false
+    for _,candidate in ipairs(positions(s,unit,stamp)) do
+        if candidate.face==side and not face.slots[candidate.lane] then available=true;break end
+    end
+    faces[side]={revision=s.revision,geometry=s.positions[radius][padding],available=available}
+    return available
+end
+
 function M.resolve(wall,unit,preferred_face)
     if not alive(wall) or not alive(unit) then return nil end
     local p,origin=unit:GetAbsOrigin(),wall:GetAbsOrigin()
@@ -574,19 +600,27 @@ function M.resolve(wall,unit,preferred_face)
         -- Rear destinations extend into the real courtyard. Keep those
         -- reservations outside the small attack-admission area so they do
         -- not collapse back into the four verified front waypoints.
-        if point or (verified and distance(p,origin)<=1200) then
-            local front_edge=clean_face(s,side,origin,now())
-            point=rear_queue.reserve(s,wall,unit,side,front_edge,now()) or point
+        -- Only retain a real overflow reservation. A verified path is not a
+        -- reason to put a first arrival in the rear queue: on a stair its
+        -- first legal rear point can remain outside ENGAGE_DISTANCE forever.
+        if point then
+            local stamp=now()
+            local front_edge=clean_face(s,side,origin,stamp)
+            if verified and distant_front_vacancy(s,unit,side,stamp) then
+                -- Keep the original rear reservation while routing. Only a
+                -- successful local grant_claim releases it; simultaneous far
+                -- waiters must not churn/schedule the entire rear queue.
+                return {point=route.point,claimed=false,routing=true}
+            end
+            point=rear_queue.reserve(s,wall,unit,side,front_edge,stamp) or point
             return waiting_plan(wall,unit,p,side,front_edge,point)
         end
         M.release(wall:entindex(),id)
-        if route and route.wall==wall and route.point
-            and route.revision==(tonumber(wall.survival_wall_relocation_revision) or 0) then
+        if verified then
             -- Formal target selection has already checked this real contact's
             -- route. Keep ordinary collision while moving there; reservation
             -- and final entry still happen only inside the local contact area.
-            return {point=route.point,claimed=false,wait_face=preferred_face or face_for(p,origin),
-                wait_envelope=0,wait_radius=hull(unit),waiting_blocked=false,wait_retreat=false}
+            return {point=route.point,claimed=false,routing=true}
         end
         local layout=navigation.contact_layout and navigation.contact_layout(wall)
         -- A distant attack-target order may stop at a blocked square or plan
@@ -636,8 +670,7 @@ function M.resolve(wall,unit,preferred_face)
         -- Unknown/legacy callers may use native chase if every safe staging
         -- point is blocked. Never park them forever at a bad MOVE.
         if not stage.point then return nil end
-        return {point=stage.point,claimed=false,wait_face=side,wait_envelope=0,
-            wait_radius=radius,waiting_blocked=false,wait_retreat=false}
+        return {point=stage.point,claimed=false,routing=true}
     end
     local s=state_for(wall)
     local stamp=now()

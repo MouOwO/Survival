@@ -174,8 +174,10 @@ function M:OnCreated(params)
     if not IsServer() then return end
     local parent = self:GetParent()
     if parent.survival_is_wave_monster == true then
-        -- Explicit wall orders still work with native idle acquisition off.
-        if parent.SetIdleAcquire then parent:SetIdleAcquire(false) end
+        -- Native melee needs this flag even for a forced explicit wall order
+        -- (verified on a formal N1 spawn). Keep its search radius at zero;
+        -- order, retaliation and damage rules still reject non-wall targets.
+        if parent.SetIdleAcquire then parent:SetIdleAcquire(true) end
         if parent.SetAcquisitionRange then parent:SetAcquisitionRange(0) end
     end
     self:GetParent().survival_wall_contact_owner=self
@@ -527,7 +529,12 @@ function M:OnIntervalThink()
             if plan.claimed and not arrived and not self.contact_locked then
                 arrived=contact.settle(wall,parent,point)
             end
-            if not plan.claimed then
+            if plan.routing then
+                -- A proven distant MOVE is not a rear-queue hold or an
+                -- attack claim. Keep collision and bounded move recovery;
+                -- the contact allocator admits it only inside its own area.
+                desired="route"
+            elseif not plan.claimed then
                 desired="waiting"
                 local retained_retreat=self.ai_state=="retreat" and self.goal_wall==wall
                     and same_wait_geometry(self,plan)

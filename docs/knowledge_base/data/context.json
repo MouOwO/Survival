@@ -166,5 +166,20 @@
     "online_fps_acceptance": false,
     "workshop_uploaded": false,
     "backend_deployed": false
+  },
+  "wall_attack_hotfix_20261031": {
+    "status": "FIXED_DEVELOPMENT_NATIVE_FOUR_MODES_PASS_FINAL_REPLAY_AND_RELEASE_PENDING",
+    "evidence": "evidence/wall_attack_hotfix_20261031.md",
+    "current_workshop_sequence": 2026103004,
+    "target_sequence": 2026103101,
+    "native_open_modes": [
+      "standard",
+      "pure",
+      "rich",
+      "cold"
+    ],
+    "wall_only_restriction_preserved": true,
+    "backend_deployed_by_this_task": false,
+    "workshop_uploaded": false
   }
 }

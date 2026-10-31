@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 10803,
-      "sha256": "4b1363e193cf9e1648d739ff3fa419d3a62a2375f72a433a139e840b8ee1d099"
+      "bytes": 11264,
+      "sha256": "4376840641e53c661c2c82d296a4413b8679eb90b8c4fa4b437576f291d2de26"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -15,8 +15,8 @@
     },
     {
       "path": "02_core_gameplay.md",
-      "bytes": 32371,
-      "sha256": "3b74e16e290a8f29ea20858e2b8ae7cd994ff5f710bd9d6c1b17b7e3ca315eaa"
+      "bytes": 32415,
+      "sha256": "4e2b38c4059e86eaff2fee7e2ebbd6fc208ddac753c4454b0a875d7956691dc9"
     },
     {
       "path": "03_progression_save_contract.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 23225,
-      "sha256": "ea107571a93dc65b476453c8da4a11537c913200bc821b1ff37701e52c30e739"
+      "bytes": 23725,
+      "sha256": "f0b00381fa92ddda4d0ba47eb558a359e5dc3d79490c84ac8a9a99f42e887805"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 3905,
-      "sha256": "ad42148ae111e055b97a49ab1154d383d7d098f9860f550a527f2f4bfdea22c1"
+      "bytes": 4058,
+      "sha256": "827665c39e549d092313092d243bef97950089e7661ca0d0ce4317880cb8dcba"
     },
     {
       "path": "data/completed_work_index.json",
@@ -90,8 +90,8 @@
     },
     {
       "path": "data/context.json",
-      "bytes": 6484,
-      "sha256": "3f2492d79d7f6425c3bef969346fcde2b8bdf5265fd48f6104382b632d61d102"
+      "bytes": 6967,
+      "sha256": "c7adfefd241c97ba45c8020c4711b3302713c590b0e63aa6c9747222b9aba979"
     },
     {
       "path": "data/repository_files.json",
@@ -302,6 +302,11 @@
       "path": "evidence/ui_layout_20261028.public.json",
       "bytes": 1891,
       "sha256": "0aac529de67f55cfd7ea0fa6c05407b24e85fb62daa205bc4c6613d7d6380326"
+    },
+    {
+      "path": "evidence/wall_attack_hotfix_20261031.md",
+      "bytes": 5181,
+      "sha256": "6d08fea341bb8d3b7293a6a6864c3ebfb50adb9bb79b0cfcf4020f618cf72de2"
     },
     {
       "path": "evidence/wave_overflow_grace_20261030.md",
