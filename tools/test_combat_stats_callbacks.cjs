@@ -19,6 +19,7 @@ const instrumented=source.replace(seam,`    __test({applyAbilityRuntime:applyAbi
         portraitRect:portraitRect, portraitUpdate:updateCosmeticPortrait, updateSnapshot:update,
         resolveUnitDisplayName:resolveUnitDisplayName,
         portraitHide:hideCosmeticPortrait, portraitTransition:transitionCosmeticPortrait,
+        portraitAnchor:officialPortraitPanel,
         portraitState:function(){return {key:activePortraitKey,mode:activePortraitMode,unit:activePortraitUnit,
             entity:activePortraitEntity,scene:activePortraitScene,geometry:portraitGeometrySignature,
             snapshot:selectedUnitSnapshot,acceptedVersion:acceptedSnapshotVersion};},
@@ -106,7 +107,7 @@ function setup(options={}){
  $.Msg=(...s)=>messages.push(s.join(''));$.Warning=$.Msg;$.Localize=s=>s;
  const subscribe=(name,fn)=>{const id=++serial;subscriptions.set(id,{name,fn});return id};
  vm.runInNewContext(instrumented,{$,GameUI:Object.assign({CustomUIConfig:()=>cfg},options.gameUI||{}),Game:Object.assign({GetLocalPlayerID:()=>0,GetGameTime:()=>time},options.game||{}),
-  Players:{GetPlayerHeroEntityIndex:()=>selected},
+  Players:Object.assign({GetPlayerHeroEntityIndex:()=>selected},options.players||{}),
   Entities:Object.assign({GetUnitName:id=>unitNames.get(Number(id))||'npc_dota_hero_test',GetAbility:()=>-1,GetLevel:()=>1,IsHero:()=>true},options.entities||{}),
   Abilities:options.abilities||{},Date:options.date||Date,
   CustomNetTables:{GetTableValue:(name,key)=>runtime[key]||null,SubscribeNetTableListener:subscribe,UnsubscribeNetTableListener:id=>subscriptions.delete(id)},

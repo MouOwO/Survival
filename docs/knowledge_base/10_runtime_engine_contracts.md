@@ -1,6 +1,16 @@
 # 10 运行时、原生引擎与资源身份契约
 
-核对时间：2026-10-28（北京时间）。本次只读核对当前实现、20261024知识包与近期原生入口/地图发布记录；没有启动游戏、复测支付、加载地图或连接数据库。本文件保存长期代码边界和定位入口，具体版本、回执和待测状态以对应发布记录为准。
+2026-11-01头像契约补充：普通3102已实证188场景READY，选中Bane仍为`missing_anchor`、没有对应SCENE_SET/SHOW；本局问题不能继续归因于未打包或整图加载失败。实际HUD复用`portraitHUD(type DOTAPortrait)`，查询事件名不证明存在独立查询树。v04在独立查询叶优先的前提下，仅当主头像可见且原生展示单位等于当前目标时接受shared_main；API缺失/异常、单位不符、显式opacity=0、隐藏或collapse均拒绝。仅null/undefined/空白opacity视为未设置，不能把Number(null)=0当原生默认不可见；JSON中的null也可能来自NaN，不能单凭JSON断定原始类型。详见`docs/reviews/query_portrait_anchor_20261101.md`及[本轮证据边界](evidence/commerce_portrait_audit_20261101.md)。
+
+该v04修正已取得离线六场景、五个不同场景后冷回Bane的有限视觉证据；两段各8秒/239张屏幕采样的关键画面未见裸模。屏幕复制/PNG编码会扰动客户端，不能作为原生游戏帧或FPS；也未逐一计数全部饰品网格。4项是应用逻辑LRU上限，不是GPU即时释放证明。稳定路径仅检查固定容器与最多32层缓存父链，不扫描QueryContainer；真实容器变化/选择切换才重建索引。显式Tools全HUD诊断曾访问33249节点、耗时43ms，发生在暂停局，不能把这次诊断遍历混入正常热路径或性能验收。
+
+Valve资源核对仍保留：CreatePanel支持第四个properties参数；SceneLoaded和`DOTAScenePanelEnitiesLoaded`（原生拼写）可能代表不同阶段，READY/固定100ms均不是饰品像素证明。当前12份官方布局不要求addon属性；没有证据把缺addon判为故障。普通客户端已实际对`dota_dump_scene_panel_state`返回Unknown command，DLL字符串不是可用API证明；不绕过脚本/作弊限制。13文件v02尚待最终源码提交、unsigned及签名生产/新游廊验收，D原生fixture的run02已在Tools/offline内存provider中有限通过，实际原生指令覆盖成功/失败退款及双向10秒CD并恢复原库存/清理临时英雄；建造者仅状态/过滤，实际施放和生产包等价仍未验。原始Valve摘要保留在ignored `output/portrait_recovery_20261031/valve_contract/findings.json`。
+
+D原生验证必须保留安全前置拒绝：首次run01因HTTP标记1在prepare guard107被拒，未建立夹具状态或写库存；root确认严格offline内存provider后显式HTTP0并重开run02，夹具检查不变。最终phase12的`fixture_cloud_calls=0`限于夹具内存路径，不证明全进程零网络；`builder_native_order_tested=false`与`gameplay_package_equivalence=false`须随结果保存。见[脱敏指标及逐阶段原件摘要](evidence/hero_teleport_native_20261101.public.json)。
+
+首次档案网络契约也须区分代码计数与原生传输：冷开发局首次模式档案加载后出现9条CustomGameEvent序列化失败及SnapshotError，日志只给消息类，没有具体事件名/调用栈。当前与冻结3102的`archive_service`首次投影/发送核心区域相同；合成空档案均同步88包、约1.503MB JSON，公共daily_limits反复随页发送。它是既有突发风险，不是7621原生诊断值的单位/上限证明，更不能据此认定新头像锚点造成断线。后续需以受控事件名/时序/长度观测区分单包、整批、冷启动和后台积压；不得放宽联网权限或更改报文上限掩盖问题。
+
+以下基础契约初次核对时间为2026-10-28（北京时间）。该次只读整理核对实现、20261024知识包与原生入口/地图发布记录，没有启动游戏、复测支付、加载地图或连接数据库；页首2026-11-01补充另有对应实机证据。本文件保存长期代码边界和定位入口，具体版本、回执和待测状态以对应发布记录为准。
 
 路径以 game 仓库为根；`core/`、`systems/`、`config/`、`combat/`、`research/` 均为 `scripts/vscripts/` 下的缩写。提到 content 时指独立的地图/美术/Panorama源仓库。
 

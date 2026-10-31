@@ -1,0 +1,255 @@
+{
+  "schema": "survival.hero_teleport_native.public_receipt.v1",
+  "review_date": "2026-11-01",
+  "scope": {
+    "tools_development": true,
+    "offline_memory_provider": true,
+    "hero": "free Axe",
+    "map": "template_map",
+    "production_gameplay_verified": false,
+    "gameplay_package_equivalence": false,
+    "official_3102_contains_fix": false
+  },
+  "fixture_sha256": "db9a971695214079c85317b585e75965d163a7bacf9d35122a3961da9eff336f",
+  "run01": {
+    "status": "REJECTED_BEFORE_PREPARED_STATE",
+    "guard_code": 107,
+    "guard": "offline_logic_test=1 and archive_http_enabled=0",
+    "root_observed_archive_http_flag_before": 1,
+    "automatic_retry": false,
+    "inventory_writes": 0,
+    "temporary_hero_created": false,
+    "fixture_cloud_calls": 0,
+    "response_sha256": "e5a54079495ceb19dd4fcdd6efd8a5afe9d5791500770e887acd9c0c20d0acb0",
+    "note": "Root confirmed the live flag, explicitly disabled HTTP in the already verified offline-memory context, and started a new run; the fixture guard was unchanged. False restored/removed fields at stage 0 do not report a failed rollback."
+  },
+  "run02": {
+    "status": "SCOPED_NATIVE_FUNCTIONAL_PASS",
+    "successful_stage_count": 15,
+    "native_order_count": 3,
+    "native_observation_count": 3,
+    "automatic_stage_progression": false,
+    "automatic_retry": false,
+    "stages": [
+      {
+        "label": "run02_prepare",
+        "command": "prepare",
+        "response_sha256": "e1f0ad37a8b3390fef5063178ada34ca70e8d26754a722b8e182c5250547fc0e",
+        "checks": {
+          "fixture_cloud_calls": 0,
+          "hero_created_by_fixture": false,
+          "manual_summon_required": true,
+          "memory_provider": true,
+          "ok": true,
+          "stage": 1
+        }
+      },
+      {
+        "label": "run02_bind",
+        "command": "bind",
+        "response_sha256": "0b5714f22c65dbdd6f0c895d33837b314ad223ca8545e479b917293ba804fe9e",
+        "checks": {
+          "fixture_cloud_calls": 0,
+          "ok": true,
+          "root_owned_hero_bound": true,
+          "stage": 1
+        }
+      },
+      {
+        "label": "run02_unowned",
+        "command": "unowned",
+        "response_sha256": "6d33543ad07a07957e52b944b360cf82bfd54ecba35a264689f6820a0db68d03",
+        "checks": {
+          "builder_flags_unchanged": true,
+          "fixture_cloud_calls": 0,
+          "ok": true,
+          "stage": 2,
+          "unowned_hidden_and_rejected": true
+        }
+      },
+      {
+        "label": "run02_grant",
+        "command": "grant",
+        "response_sha256": "d57648587c3e43fbe3277e8dc215529999ffbfbefc5875f8c43901af1e6634f8",
+        "checks": {
+          "fixture_cloud_calls": 0,
+          "ok": true,
+          "owned_enabled": true,
+          "stage": 3
+        }
+      },
+      {
+        "label": "run02_refund_order",
+        "command": "refund_order",
+        "response_sha256": "764bbff054df5d02f5e97c4f29a7ddd395cef0ae66122158baecc0a2c1dc5bb5",
+        "checks": {
+          "fixture_cloud_calls": 0,
+          "kind": 1,
+          "ok": true,
+          "order_submitted": true,
+          "outcome_verified": false,
+          "stage": 4
+        }
+      },
+      {
+        "label": "run02_refund_observe",
+        "command": "observe",
+        "response_sha256": "8befd158d8b0b887a4453cab142eb51b6134430ce7cddde65c8fab80e2217363",
+        "checks": {
+          "fixture_cloud_calls": 0,
+          "kind": 1,
+          "native_cooldown": 0,
+          "ok": true,
+          "outcome_verified": true,
+          "shared_remaining": 0,
+          "stage": 5
+        }
+      },
+      {
+        "label": "run02_native_order",
+        "command": "native_order",
+        "response_sha256": "9157e62b605a17d5ab55e2e8d887b6ea96231732758875497520ab9814604e1a",
+        "checks": {
+          "fixture_cloud_calls": 0,
+          "kind": 2,
+          "ok": true,
+          "order_submitted": true,
+          "outcome_verified": false,
+          "stage": 4
+        }
+      },
+      {
+        "label": "run02_native_observe",
+        "command": "observe",
+        "response_sha256": "cccbe9d51e24a874b1c174a326d85f950f566375d3b19d750740c4e4254b0786",
+        "checks": {
+          "fixture_cloud_calls": 0,
+          "kind": 2,
+          "native_cooldown": 9.7999992370605,
+          "ok": true,
+          "outcome_verified": true,
+          "shared_remaining": 9.7662658691406,
+          "stage": 6
+        }
+      },
+      {
+        "label": "run02_custom_block",
+        "command": "custom_block",
+        "response_sha256": "5b01d1e26f85bb2120d3755b0c324db4a4ff392f0ca73e7d01c045377f02fa3e",
+        "checks": {
+          "fixture_cloud_calls": 0,
+          "native_to_custom_shared_cd": true,
+          "ok": true,
+          "stage": 7
+        }
+      },
+      {
+        "label": "run02_custom_order",
+        "command": "custom_order",
+        "response_sha256": "41d1fe048839a30b058fab3122924fff7e522881e9c1d692491c508b0a30d8f0",
+        "checks": {
+          "custom_success": true,
+          "fixture_cloud_calls": 0,
+          "ok": true,
+          "shared_remaining": 10,
+          "stage": 8
+        }
+      },
+      {
+        "label": "run02_native_block_order",
+        "command": "native_block_order",
+        "response_sha256": "427820a00c9dc51f869905c4d4c23a39550654bfd98ea0127ab48b8d8bf22a30",
+        "checks": {
+          "fixture_cloud_calls": 0,
+          "kind": 3,
+          "ok": true,
+          "order_submitted": true,
+          "outcome_verified": false,
+          "stage": 4
+        }
+      },
+      {
+        "label": "run02_blocked_observe",
+        "command": "observe",
+        "response_sha256": "c17453765e01abefeac1eeabda49efe596864719b09335c0b0744ec8c176cb1e",
+        "checks": {
+          "fixture_cloud_calls": 0,
+          "kind": 3,
+          "native_cooldown": 9.7999992370605,
+          "ok": true,
+          "outcome_verified": true,
+          "shared_remaining": 9.7000122070313,
+          "stage": 9
+        }
+      },
+      {
+        "label": "run02_revoke",
+        "command": "revoke",
+        "response_sha256": "994b9086cd42a77e70fd9e001af9c3d74ce4ed0270996b1167ba78751cf33450",
+        "checks": {
+          "builder_filter_allowed": true,
+          "builder_flags_unchanged": true,
+          "builder_native_order_tested": false,
+          "fixture_cloud_calls": 0,
+          "ok": true,
+          "revoked_hidden": true,
+          "stage": 10
+        }
+      },
+      {
+        "label": "run02_cleanup",
+        "command": "cleanup",
+        "response_sha256": "95d6f1cb5b2f72b1c1143119426b6ec38dc6860b2ac292a1d74c3688f9d90595",
+        "checks": {
+          "fixture_cloud_calls": 0,
+          "ok": true,
+          "original_inventory_restored": true,
+          "stage": 11,
+          "temporary_hero_removed": true
+        }
+      },
+      {
+        "label": "run02_finish",
+        "command": "finish",
+        "response_sha256": "3268051608a5c4a7170e5f4c0c74e0d6cd74a6fcf142f106edb090ea6c23f1b3",
+        "checks": {
+          "builder_d_unaffected": true,
+          "builder_native_order_tested": false,
+          "failed_cast_no_new_cd_and_refund": true,
+          "fixture_cloud_calls": 0,
+          "gameplay_package_equivalence": false,
+          "ok": true,
+          "original_inventory_restored": true,
+          "owned_cast_succeeds": true,
+          "scoped_native_functional_complete": true,
+          "shared_cooldown_10s": true,
+          "stage": 12,
+          "temporary_hero_removed": true,
+          "unowned_hidden_and_rejected": true
+        }
+      }
+    ],
+    "final_checks": {
+      "builder_d_unaffected": true,
+      "builder_native_order_tested": false,
+      "failed_cast_no_new_cd_and_refund": true,
+      "fixture_cloud_calls": 0,
+      "gameplay_package_equivalence": false,
+      "ok": true,
+      "original_inventory_restored": true,
+      "owned_cast_succeeds": true,
+      "scoped_native_functional_complete": true,
+      "shared_cooldown_10s": true,
+      "stage": 12,
+      "temporary_hero_removed": true,
+      "unowned_hidden_and_rejected": true
+    }
+  },
+  "evidence_limits": [
+    "Native orders used ExecuteOrderFromTable and observation after actual game-time advance; fixture did not call OnSpellStart directly.",
+    "Builder identity, ability flags/level and CastFilterResultLocation were checked; no native builder cast order was executed.",
+    "fixture_cloud_calls=0 describes the fixture memory-provider path, not an operating-system-wide network trace.",
+    "The root observed the selected free Axe complete portrait screenshot; this is separate visual evidence, not all-free-hero or signed-production coverage.",
+    "No account, session, raw output, authentication, inventory value or native entity index is copied into this receipt."
+  ]
+}

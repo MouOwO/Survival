@@ -1,0 +1,298 @@
+{
+  "schema": "survival.dev_bane5_etw.public_receipt.v1",
+  "review_date": "2026-11-01",
+  "label": "dev30020_v04_bane5_running_20261101_g01",
+  "status": "DEVELOPMENT_30S_NATIVE_SAMPLE_VALID_BUT_POST_SAMPLE_STABILITY_FAILED",
+  "scope": {
+    "tools": true,
+    "development": true,
+    "offline_memory_provider": true,
+    "client_pixels": [
+      1600,
+      900
+    ],
+    "normal_workshop_acceptance": false,
+    "signed_package_acceptance": false,
+    "production_gameplay_equivalence": false,
+    "equal_load_to_old_builder_baseline": false,
+    "candidate_stability_acceptance": false
+  },
+  "capture": {
+    "requested_seconds": 30,
+    "delay_seconds": 3,
+    "raw_rows": 1796,
+    "discarded_first_row": 1,
+    "first_interval_positive": true,
+    "accepted_frames": 1795,
+    "single_process": true,
+    "single_swapchain": true,
+    "interval_sum_seconds": 29.9165332,
+    "timestamp_span_seconds": 29.899884599999996,
+    "mean_fps": 60.00026767807441,
+    "frame_time": {
+      "count": 1795,
+      "mean_ms": 16.666592311977716,
+      "p95_ms": 16.816110000000002,
+      "p99_ms": 16.930878,
+      "max_ms": 17.0589
+    },
+    "slowest_one_percent": {
+      "whole_frame_count": 18,
+      "mean_frame_time_ms": 16.965588888888888,
+      "fps": 58.94284050787771,
+      "method": "ceil(0.01*N) largest native FrameTime values; 1000/mean, not 1/P99"
+    },
+    "over_ms": {
+      "16.7": 503,
+      "25": 0,
+      "33.3": 0,
+      "50": 0
+    },
+    "sync_interval_counts": {
+      "1": 1795
+    },
+    "present_mode_counts": {
+      "Composed: Copy with GPU GDI": 1795
+    }
+  },
+  "foreground": {
+    "once_per_second_samples": 30,
+    "all_target_window_foreground": true,
+    "coverage_seconds": 30.000090899993666,
+    "maximum_gap_seconds": 1.001169,
+    "continuous_visibility_proven": false
+  },
+  "cpu_gpu_etw": {
+    "CPUBusy": {
+      "count": 1795,
+      "mean_ms": 1.5490511420612814,
+      "p95_ms": 4.803729999999999,
+      "p99_ms": 8.025015999999997,
+      "max_ms": 14.1013
+    },
+    "CPUWait": {
+      "count": 1795,
+      "mean_ms": 15.117541169916434,
+      "p95_ms": 15.821330000000001,
+      "p99_ms": 15.908223999999999,
+      "max_ms": 16.0978
+    },
+    "GPUTime": {
+      "count": 1795,
+      "mean_ms": 16.055453760445683,
+      "p95_ms": 16.82599,
+      "p99_ms": 16.948629999999998,
+      "max_ms": 17.1716
+    },
+    "GPUBusy": {
+      "count": 1795,
+      "mean_ms": 6.424523788300836,
+      "p95_ms": 6.49206,
+      "p99_ms": 6.522454,
+      "max_ms": 6.5992
+    },
+    "GPUWait": {
+      "count": 1795,
+      "mean_ms": 9.630929972144846,
+      "p95_ms": 10.42873,
+      "p99_ms": 10.545114,
+      "max_ms": 10.7682
+    },
+    "GPULatency": {
+      "count": 1795,
+      "mean_ms": 1.1823847353760446,
+      "p95_ms": 4.38082,
+      "p99_ms": 7.617661999999991,
+      "max_ms": 13.7648
+    }
+  },
+  "per_five_seconds": [
+    {
+      "start_second": 0,
+      "end_second": 5,
+      "frames": 299,
+      "mean_fps": 59.999745151584136,
+      "max_frame_time_ms": 16.9647
+    },
+    {
+      "start_second": 5,
+      "end_second": 10,
+      "frames": 300,
+      "mean_fps": 59.998045263685306,
+      "max_frame_time_ms": 17.0363
+    },
+    {
+      "start_second": 10,
+      "end_second": 15,
+      "frames": 300,
+      "mean_fps": 60.00291614172449,
+      "max_frame_time_ms": 16.9062
+    },
+    {
+      "start_second": 15,
+      "end_second": 20,
+      "frames": 300,
+      "mean_fps": 60.00032280173667,
+      "max_frame_time_ms": 17.0589
+    },
+    {
+      "start_second": 20,
+      "end_second": 25,
+      "frames": 300,
+      "mean_fps": 60.00041640288984,
+      "max_frame_time_ms": 16.9701
+    },
+    {
+      "start_second": 25,
+      "end_second": 30,
+      "frames": 296,
+      "mean_fps": 60.00015729770968,
+      "max_frame_time_ms": 16.9413
+    }
+  ],
+  "scene_review": {
+    "before_utc": "2026-10-31T21:48:48.3473123Z",
+    "after_utc": "2026-10-31T21:49:22.9311262Z",
+    "before_countdown": "01:56",
+    "after_countdown": "01:21",
+    "before_after_selected_bane5_complete_appearance": true,
+    "before_after_bare_base_model_seen": false,
+    "before_after_victory_overlay_seen": false,
+    "before_after_pause_overlay_seen": false,
+    "attack_units_before_after": "0/90",
+    "all_game_frames_visual_reviewed": false,
+    "native_log_unpaused_local": "2026-11-01 05:48:47 +08:00",
+    "postgame_marker_found_in_capture_envelope": false,
+    "postgame_absence_proves_every_instant": false,
+    "background_asset_preloads_during_capture": 4,
+    "background_preload_local_time": "05:49:13..05:49:17",
+    "d_fixture_finish_and_cleanup_verified_separately": true
+  },
+  "runtime_bytes": {
+    "before_after_verified_files": 13,
+    "total_bytes": 778335,
+    "independent_current_disk_hash_recheck": true,
+    "all_loaded_vm_bytes_or_signature_equivalence_proven": false,
+    "pins": [
+      {
+        "path": "panorama/scripts/custom_game/monster_portrait_renderer.vjs_c",
+        "bytes": 18303,
+        "sha256": "d83c2d9165a1efc048bfe8a8426ac0e8ce747e12432d071a8aec86545062bade"
+      },
+      {
+        "path": "scripts/vscripts/systems/hero_teleport_access.lua",
+        "bytes": 3534,
+        "sha256": "c74b1deb0ca596a1c9f4691906c10cf444036af1a81910e2861110119ce45cd5"
+      },
+      {
+        "path": "scripts/vscripts/systems/hero_skill_system.lua",
+        "bytes": 25649,
+        "sha256": "7c24e294fbcb12db86e880956793cec2f5cb9bc198626c52457e37711704e88b"
+      },
+      {
+        "path": "scripts/vscripts/systems/commerce_runtime.lua",
+        "bytes": 15061,
+        "sha256": "e4248e1c3103ea40ccfad613eaadf199e565b5a098a57e29d8bd7bbeb40d8c34"
+      },
+      {
+        "path": "scripts/vscripts/abilities/ability_survival_hero_ball_lightning.lua",
+        "bytes": 4224,
+        "sha256": "99b82aeb954f6e0f4c01330292fb1546a1d8f574ea1c9b2be63ff96f35d8b335"
+      },
+      {
+        "path": "panorama/scripts/custom_game/commerce_actions.vjs_c",
+        "bytes": 13861,
+        "sha256": "8415bee0e577baa4df96212434647c7f9a430105f622ce633cfe107ad95cf85e"
+      },
+      {
+        "path": "resource/addon_schinese.txt",
+        "bytes": 90545,
+        "sha256": "abe21214bd6a0bbe471bc7078ff320be3c7f9d237448c3cbdac2be19e1e69334"
+      },
+      {
+        "path": "resource/addon_english.txt",
+        "bytes": 78319,
+        "sha256": "563c0ed515ea1dd654ddd2265413bbf5508a1c746d45c55d2692a49e2b0b9a19"
+      },
+      {
+        "path": "resource/localization/addon_schinese.txt",
+        "bytes": 80186,
+        "sha256": "5891e0acc676ae352960d94a6147558c31708911d961433c6ae1f8f4f3b770ae"
+      },
+      {
+        "path": "resource/localization/addon_english.txt",
+        "bytes": 79070,
+        "sha256": "fb31389b0176ff62c1bb7f9a599ce85baa9a7ab5e9394200027ea8f6a9f0808e"
+      },
+      {
+        "path": "panorama/localization/addon_schinese.txt",
+        "bytes": 71328,
+        "sha256": "8567ea7eb6708c8b2f65a3e0798f4f3c3db25ada27dac1c4453cdfe6dfbda310"
+      },
+      {
+        "path": "panorama/localization/addon_english.txt",
+        "bytes": 76437,
+        "sha256": "8c969399b7a714aaa3ab5d74cfb559d6d8b2146474819dbdf8376ce703478ff5"
+      },
+      {
+        "path": "panorama/scripts/custom_game/combat_stats.vjs_c",
+        "bytes": 221818,
+        "sha256": "1d0be37fe2e510e86179c64a6d904fc72bd6e59d777b3355a5f264e4dc2ba9fd"
+      }
+    ]
+  },
+  "inference": {
+    "curve_consistent_with_60hz_present_pacing": true,
+    "specific_cap_or_vsync_cvar_queried": false,
+    "maximum_uncapped_fps_proven": false,
+    "gpu_saturation_or_cpu_bottleneck_proven": false,
+    "fps_improvement_against_old_ordinary_baseline_proven": false
+  },
+  "artifacts_sha256": {
+    "frames.csv": "6570e897990b3a67be77429e8294c2767a7bc0a3806787c2a235cd68391e6af5",
+    "capture.json": "569cc8957c2a96d682e92d1008f4fc6de780c48dd9fefec68e07e9d7b2c26f33",
+    "analysis.json": "d47524ddea9b08a16da1c7574d34e5c0d0131241982bd5237134ac203b315c48",
+    "focus.json": "11fb6d579ae3824260a2cedc776dee8dd5bf9024fb012c5adaa92c61b866e78e",
+    "safe_summary.json": "4e85956e0601131423e616286a2d47712b66475be1e77a134b22617f75c71b6e",
+    "before.png": "b37c0c48d6974ac164876f8483233087e31b376f15cc0d229876b002d70d2211",
+    "after.png": "66175ba74cb130f1f70904d520c9300ac2f5f798ce923813d6ba91324741307d",
+    "before.json": "94198c7238f81fe2e6b1422ad9ff57fa93ce8dba17ef0c71e55f12fde7679463",
+    "after.json": "584bbc64676fd8706865a25975a9618bc7fa4ae7083b21ca2d5f7734998afece",
+    "native_log_at_review": "c2a16053f12b054639a1a325c866f5ca168f5a0129f3c9ac0ac2fec786b9df7d",
+    "post_etw_unresponsive_receipt": "4c0b34c7b4d98064343822ab42730ad7bddb7c722be77cf7ac485bd69d43b8fa"
+  },
+  "limitations": [
+    "Post-sample stability FAILED: two pause transports could not complete history replay; normal close was requested but the owned offline process remained unresponsive and was then ended by root. The earlier 30-second sample remains limited performance evidence, not stability acceptance.",
+    "Tools/offline Bane view differs from the old ordinary Workshop builder baseline; no before/after speedup comparison.",
+    "First native interval is discarded even though positive because it may predate the capture boundary.",
+    "Endpoints show complete Bane appearance; not every native game frame or mesh was independently inspected.",
+    "Thirty positive foreground samples and two endpoint screenshot checks do not prove uninterrupted foreground or game state between samples.",
+    "The game log records unpause before the screenshots and no postgame marker in the capture envelope; missing log markers alone cannot prove absence.",
+    "Native log shows four background AssetPreload tasks during capture; not an all-assets-warmed pure-idle benchmark.",
+    "All accepted frames report SyncInterval=1 and Composed: Copy with GPU GDI; timings are consistent with 60Hz pacing, but no native cap/vsync configuration was queried.",
+    "ETW Busy/Wait durations are not operating-system utilization; GPUTime includes GPUWait and does not prove GPU saturation.",
+    "Absolute ETW CPUStartTime to focus wall-clock alignment is not certified; raw CSV clocks remain unchanged.",
+    "Raw CSV, raw native log, process identities and accounts are excluded from this public receipt."
+  ],
+  "post_sample_stability": {
+    "status": "FAIL_UNRESPONSIVE_AFTER_MEASUREMENT",
+    "occurred_after_before_after_capture_envelope": true,
+    "console_pause_attempts": 2,
+    "both_console_history_replays_completed": false,
+    "console_failure": "Console history replay did not complete",
+    "normal_close_main_window_request_returned_true": true,
+    "process_exited_after_normal_close_request": false,
+    "strict_capture_window_valid_or_responsive": false,
+    "foreground_was_dota": false,
+    "os_responding": false,
+    "owned_process_identity_cim_argv_exe_hwnd_verified_by_root": true,
+    "temporary_inventory_and_hero_restored_before_sample": true,
+    "owned_hung_offline_process_ended_by_root": true,
+    "memory_dump_captured": false,
+    "credential_read_performed": false,
+    "cause_determined": false,
+    "earlier_30s_sample_invalidated": false,
+    "native_receipt_sha256": "4c0b34c7b4d98064343822ab42730ad7bddb7c722be77cf7ac485bd69d43b8fa",
+    "limit": "Smooth native frame intervals and normal before/after screenshots do not establish candidate stability. No causal attribution to VConsole, Tools, exit, native cache, ETW or the portrait change is established."
+  }
+}

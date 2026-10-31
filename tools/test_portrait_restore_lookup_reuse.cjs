@@ -76,7 +76,7 @@ function run(source){
 }
 const current=run(candidate);
 assert(current.stableCalls.every(count=>count===1),'Cached positive identity leaves only one group cleanup per stable hide');
-assert.equal(current.missingQueryCount,9,'One query-root lookup, seven main IDs and one group cleanup; a missing identity is not cached');
+assert.equal(current.missingQueryCount,10,'QueryContainer plus legacy query lookup, seven main IDs and one group cleanup; structural creation invalidates a missing identity');
 if(before){
   const baseline=run(before);assert.deepEqual(current.traces,baseline.traces,'Exact supported/unsupported/legacy/replacement/zero/layout/portal ownership and visibility trace preserved');
   assert(baseline.stableCalls.every(count=>count>current.stableCalls[0]));

@@ -17,10 +17,13 @@ class TestEntryBoundaryTest(unittest.TestCase):
     def test_regular_launch_arguments_keep_their_mode_and_port(self):
         args = entry.launch_arguments("offline", Path("normal.log"))
         self.assertEqual(args[args.index("+survival_offline_logic_test") + 1], "1")
+        self.assertEqual(args[args.index("+survival_archive_http_enabled") + 1], "0")
+        self.assertEqual(args.count("+survival_archive_http_enabled"), 1)
         self.assertEqual(args[args.index("-vconport") + 1], "29006")
         online = entry.launch_arguments("online", Path("online.log"))
         self.assertEqual(online[online.index("-vconport") + 1], "29005")
         self.assertNotIn("+survival_offline_logic_test", online)
+        self.assertNotIn("+survival_archive_http_enabled", online)
 
     def test_offline_launcher_preserves_live_game_and_never_contacts_cloud(self):
         with patch.object(entry, "check", return_value={"ok": True}), \
@@ -42,6 +45,8 @@ class TestEntryBoundaryTest(unittest.TestCase):
             args = launch.call_args.args[0]
             self.assertEqual(args[args.index("-addon") + 1], entry.ROOT.name)
             self.assertEqual(args[args.index("+survival_offline_logic_test") + 1], "1")
+            self.assertEqual(args[args.index("+survival_archive_http_enabled") + 1], "0")
+            self.assertEqual(args.count("+survival_archive_http_enabled"), 1)
             self.assertEqual(args[args.index("+sv_cheats") + 1], "1")
             self.assertNotIn(entry.ONLINE_ADDON, args)
 
@@ -74,6 +79,7 @@ class TestEntryBoundaryTest(unittest.TestCase):
             args = launch.call_args.args[0]
             self.assertEqual(args[args.index("-addon") + 1], entry.ONLINE_ADDON)
             self.assertNotIn("+survival_offline_logic_test", args)
+            self.assertNotIn("+survival_archive_http_enabled", args)
             self.assertEqual(args[args.index("+sv_cheats") + 1], "0")
             self.assertEqual(args.count("+sv_cheats"), 1)
 

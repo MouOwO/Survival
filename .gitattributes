@@ -198,6 +198,15 @@ tools/test_ten_sin_startup.lua text eol=lf
 # Keep reviewed feature sources and audit/operation receipts reproducible.
 panorama/src/scripts/custom_game/commerce_actions.js text eol=lf
 panorama/src/scripts/custom_game/monster_portrait_renderer.js text eol=crlf
+panorama/src/scripts/custom_game/combat_stats.js text eol=crlf
+tools/arcade_portrait_release_v02_20261101/*.py text eol=lf
+tools/arcade_portrait_release_v02_20261101/README.md text eol=lf
+tools/workshop_test/test_entry.py text eol=lf
+tools/workshop_test/test_test_entry.py text eol=lf
+tools/test_combat_stats_callbacks.cjs text eol=lf
+tools/test_portrait_restore_lookup_reuse.cjs text eol=lf
+tools/test_portrait_query_anchor.cjs text eol=lf
+tools/test_query_anchor_tree_probe.cjs text eol=lf
 docs/reviews/** text eol=lf
 tools/commerce_feature_audit_20261031/* text eol=lf
 tools/portrait_recovery_20261031/*.py text eol=lf

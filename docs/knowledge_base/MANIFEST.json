@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "snapshot_date": "2026-10-31",
+  "snapshot_date": "2026-11-01",
   "scope": "Curated project knowledge and historical snapshot; raw chat excluded",
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 12711,
-      "sha256": "3a7382c6639b89ff920a833d9b47a08350102a0073e3e4848e04e3546ce87b4c"
+      "bytes": 14122,
+      "sha256": "a36d04c6913360894f0971a36ca1481c60387cb4b28076ae1b8301f3e9d45a35"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,13 +40,13 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 25089,
-      "sha256": "8012ac5dc24d32605bf36871d08d5d190af99fcd7e29bac8d7b60e8b88bc45d5"
+      "bytes": 26923,
+      "sha256": "19df2bcb5d4d2c9eca0b5b16ac76b08582aea791a2c7943da6a4a4e318a192ab"
     },
     {
       "path": "08_new_project_reuse.md",
-      "bytes": 1556,
-      "sha256": "e38b7486d32caad3dfd7a692d8e39a371acb961aac769788be65f18e400b401a"
+      "bytes": 4646,
+      "sha256": "ccd7904a90037e977371f0ea53f54a772428627f8a4e244ccc072cf8d75908e6"
     },
     {
       "path": "09_session_digest.md",
@@ -55,8 +55,8 @@
     },
     {
       "path": "10_runtime_engine_contracts.md",
-      "bytes": 14093,
-      "sha256": "31dd4dbcf27f0d6e2ad2ee391932126c33b9c9ed294a389373855991e9df88e4"
+      "bytes": 17636,
+      "sha256": "bb9a63c7cc65d041ecfdf627310e76b7212796c468df5959e0d6de5d9414eab6"
     },
     {
       "path": "11_completed_work_catalog.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 4487,
-      "sha256": "f50af13f0d5412111a32c6b2da0071bea98ade28b97c8680b03d2ccf2b633c71"
+      "bytes": 5337,
+      "sha256": "fe3485b627c70fa6f0b2c53721177ec8ece85a67be595db8a5e2e0149af3d07f"
     },
     {
       "path": "data/completed_work_index.json",
@@ -164,9 +164,19 @@
       "sha256": "cb7ccb8be54c6dbbba6e2560075666976eaa593237dac0939a283323e98e35e0"
     },
     {
+      "path": "evidence/commerce_portrait_audit_20261101.md",
+      "bytes": 16139,
+      "sha256": "47e13e402acbb240923fdd0a54cf7066ffb7004a5d86f12c98dd4e389df3d09a"
+    },
+    {
       "path": "evidence/commerce_prices_20261028.md",
       "bytes": 2499,
       "sha256": "8bca6c86e27bfd5b6a3d626db48f73de8dee309f78309ae3061cdaa65e4b5bb5"
+    },
+    {
+      "path": "evidence/dev_bane5_etw_20261101.public.json",
+      "bytes": 11430,
+      "sha256": "047c2fe54c0514787cccc6e604b353311ab9469ab479fbc39aa7e9e7f2bbf9a1"
     },
     {
       "path": "evidence/directory_cleanup_20261028.public.json",
@@ -177,6 +187,11 @@
       "path": "evidence/endless_start_delay_20261029.md",
       "bytes": 3103,
       "sha256": "1dee0b152f3dd2dbc2af8527c81eb56946ff738af816a230f86a5b9f620ee6bb"
+    },
+    {
+      "path": "evidence/hero_teleport_native_20261101.public.json",
+      "bytes": 8740,
+      "sha256": "cc1b0370bd4e394dd1eccd7e43636df30474d044c1a77f6a925a469f875bf9c1"
     },
     {
       "path": "evidence/login_relay_recovery_20261028.public.json",

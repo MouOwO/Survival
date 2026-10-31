@@ -77,7 +77,8 @@ def launch_arguments(mode, log):
               "-condebug", "-con_logfile", str(log), "+sv_cheats", "1" if mode == "offline" else "0",
               "+host_timescale", "1"]
     if mode == "offline":
-        result.extend(("+survival_offline_logic_test", "1"))
+        # Keep HTTP explicitly disabled alongside the session-memory provider.
+        result.extend(("+survival_offline_logic_test", "1", "+survival_archive_http_enabled", "0"))
     result.extend(("+dota_launch_custom_game", addon, "template_map"))
     return result
 

@@ -139,7 +139,7 @@ try{
   try{[ArcadeInput]::EnsureForeground($inputWindow,[uint32]$GameProcessId);[ArcadeInput]::KeyEvent($inputCode,$false);try{Start-Sleep -Milliseconds 80}finally{[ArcadeInput]::KeyEvent($inputCode,$true)}}finally{if($Key -eq 'CtrlA'){[ArcadeInput]::KeyEvent(0x11,$true)}}
  }elseif($Action -eq 'Text'){
   # UI search or explicitly bounded native read/log commands; never arbitrary scripts or server mutations.
-  if($Text -notmatch '^(console|控制台|con_enable|sv_cheats|fps_max|fps_max_ui|r_vsync|mat_vsync|cl_showfps|dota_camera_get_lookatpos|hideconsole|condump|con_logfile(?: output/arcade_portrait_perf_20261031/[a-z0-9_]+\.log)?|echo ARCADE_[A-Z0-9_]+)$'){throw 'text_not_allowlisted'}
+  if($Text -notmatch '^(console|控制台|con_enable|sv_cheats|fps_max|fps_max_ui|r_vsync|mat_vsync|cl_showfps|dota_camera_get_lookatpos|help dota_camera_set_lookatpos|dota_camera_set_lookatpos -5716 6592 110|(?:help )?dota_dump_scene_panel_state|hideconsole|condump|con_logfile(?: output/arcade_portrait_perf_20261031/[a-z0-9_]+\.log)?|echo ARCADE_[A-Z0-9_]+)$'){throw 'text_not_allowlisted'}
   if($TextMode -eq 'AsciiKeys'){[ArcadeInput]::WriteAscii($Text,$inputWindow,[uint32]$GameProcessId)}
   else{[ArcadeInput]::Write($Text,$inputWindow,[uint32]$GameProcessId)}
  }elseif($Action -eq 'Focus'){

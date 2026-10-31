@@ -58,7 +58,7 @@
 
 专项`test_monster_portrait_prewarm_budget.cjs`已改为新驻留策略验证：197身份全映射、188不同地图、Bane4组件spec保持、LRU和两项保护、最新请求/旧选择取消、冷加载100ms遮罩、2/10/30秒重试、远端事件拒绝、预热先于选择的失败epoch、销毁/旧回调、197对1970目录稳定成本。`test_monster_portraits.cjs`保留全197身份、六英雄、未知/晚到身份、多选、场景重建及裸SetUnit调用为0的断言；与旧全目录预热相关的期望改为4世界与冷选择遮罩，没有删除这些行为保护。
 
-私有逻辑计数：output/portrait_recovery_20261031/bounded_pool/logical_report.json。原生对照、正式游廊饰品画面、帧率与冷首选耗时仍由主任务验收，候选尚未编译/签名/上传。
+私有逻辑计数：output/portrait_recovery_20261031/bounded_pool/logical_report.json。后续已通过官方单文件编译（18303字节，SHA d83c2d9165a1efc048bfe8a8426ac0e8ce747e12432d071a8aec86545062bade）并推送双仓；原生对照、正式游廊饰品画面、帧率与冷首选耗时仍由主任务验收，候选尚未签名/上传。
 
 ## 复杂度及复现
 
