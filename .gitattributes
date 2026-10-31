@@ -214,3 +214,5 @@ tools/arcade_portrait_release_20261031/*.py text eol=lf
 tools/arcade_portrait_release_20261031/README.md text eol=lf
 tools/arcade_portrait_perf_20261031/*.py text eol=lf
 tools/arcade_portrait_perf_20261031/*.ps1 text eol=lf
+
+tools/arcade_portrait_release_v02_20261101/REHEARSAL_V02.md text eol=lf

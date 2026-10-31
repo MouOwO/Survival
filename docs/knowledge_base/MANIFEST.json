@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 14122,
-      "sha256": "a36d04c6913360894f0971a36ca1481c60387cb4b28076ae1b8301f3e9d45a35"
+      "bytes": 14654,
+      "sha256": "cd5e0729f377caa8ec364a036444d9b85be98b8b676d832bcb864de65a469388"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,13 +40,13 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 26923,
-      "sha256": "19df2bcb5d4d2c9eca0b5b16ac76b08582aea791a2c7943da6a4a4e318a192ab"
+      "bytes": 27811,
+      "sha256": "2de4d44045f537824ad6584c489d3a9810defbba8b2e7d347e4647b171da5b79"
     },
     {
       "path": "08_new_project_reuse.md",
-      "bytes": 4646,
-      "sha256": "ccd7904a90037e977371f0ea53f54a772428627f8a4e244ccc072cf8d75908e6"
+      "bytes": 5083,
+      "sha256": "6275dbb95d032d5b04c9e1bc8830e55fef8d251dc381ec9893a1f0b99ca8a7a1"
     },
     {
       "path": "09_session_digest.md",
@@ -55,8 +55,8 @@
     },
     {
       "path": "10_runtime_engine_contracts.md",
-      "bytes": 17636,
-      "sha256": "bb9a63c7cc65d041ecfdf627310e76b7212796c468df5959e0d6de5d9414eab6"
+      "bytes": 18320,
+      "sha256": "d387883163fec7fb0a5fa0391f75580bdd74f03a7696ef1e14099e8e83b6daab"
     },
     {
       "path": "11_completed_work_catalog.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 5337,
-      "sha256": "fe3485b627c70fa6f0b2c53721177ec8ece85a67be595db8a5e2e0149af3d07f"
+      "bytes": 5669,
+      "sha256": "0a409de4aa6ecbf1a7a59571fb28c9fb0aa9736116dbf0d76c1974a05f23a139"
     },
     {
       "path": "data/completed_work_index.json",
@@ -165,8 +165,8 @@
     },
     {
       "path": "evidence/commerce_portrait_audit_20261101.md",
-      "bytes": 16139,
-      "sha256": "47e13e402acbb240923fdd0a54cf7066ffb7004a5d86f12c98dd4e389df3d09a"
+      "bytes": 18009,
+      "sha256": "357c63466228f1e3bd50e9c86c3a7773486cc7071a17c4bba25a83cacfdf3723"
     },
     {
       "path": "evidence/commerce_prices_20261028.md",
@@ -187,6 +187,11 @@
       "path": "evidence/endless_start_delay_20261029.md",
       "bytes": 3103,
       "sha256": "1dee0b152f3dd2dbc2af8527c81eb56946ff738af816a230f86a5b9f620ee6bb"
+    },
+    {
+      "path": "evidence/fresh_development_stability_20261101.public.json",
+      "bytes": 13653,
+      "sha256": "fa339e8d740b0529915c442f4cd75a32ed4fe9a98220e7f316e3199ee331ac7d"
     },
     {
       "path": "evidence/hero_teleport_native_20261101.public.json",

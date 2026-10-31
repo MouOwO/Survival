@@ -4,9 +4,9 @@
 
 ## 已完成与当前边界
 
-上一轮源码交付为game `11571b4313401d3d15073a0d14234754fb851316 / dev`、content `fb775f5ae9a36d863f048928a8fa0230a5cbb548 / master`，已按stash→pull→pop→commit→push同步。它包含D权益统一与renderer缓存改动，不包含随后v04的combat_stats查询锚点修正。该次同步时game原HUD编译字节、Python缓存、bundle运行指针及两份头像实验脚本保留，content干净；新改属性文件的换行归一已逐字节对照确切stash规范内容，其余原始SHA一致、旧stash保持。这是历史同步状态，不能当作当前13文件v02已提交。
+上一轮源码交付为game `11571b4313401d3d15073a0d14234754fb851316 / dev`、content `fb775f5ae9a36d863f048928a8fa0230a5cbb548 / master`，已按stash→pull→pop→commit→push同步。它包含D权益统一与renderer缓存改动，不包含随后v04的combat_stats查询锚点修正。该次同步时game原HUD编译字节、Python缓存、bundle运行指针及两份头像实验脚本保留，content干净；新改属性文件的换行归一已逐字节对照确切stash规范内容，其余原始SHA一致、旧stash保持。这是历史同步状态；当前13文件运行修复随后已纳入game `048a2d6b675325cd511abb01c5a122343052b2f7 / dev`及content `b1ac328e4467510c89fdfd8c6d9f79947d7c820a / master`，本轮操作工具另行提交，不改变冻结运行源码。
 
-当前正式游廊仍为3102。2026110101曾准备12文件未签名审阅包，6918项资源、184保护模块，content `7ed3e94bb586cfb88802a97ef98dadce4743c98dfbb5bd6d1f2b42bf95611d69`；它只作保留的旧候选，不安装/运行unsigned，也不能作为最终头像修复。当前范围改为2026110102的13文件v02，追加已有combat_stats.vjs_c；新增运行模块仍仅hero_teleport_access，资源总数仍6918/184保护模块。第二次源码commit及13文件最终unsigned尚未产生，签名生产玩法、正式新游廊及新版FPS均未验。原四账号、正常联网配置及`all_difficulties_unlocked=false`、d573和地图保持原范围；后续签名/发布须按最终范围审阅，不能沿用旧12文件计划冒充新候选。
+当前正式游廊仍为3102。2026110101曾准备12文件未签名审阅包，6918项资源、184保护模块，content `7ed3e94bb586cfb88802a97ef98dadce4743c98dfbb5bd6d1f2b42bf95611d69`；它只作保留的旧候选，不安装/运行unsigned，也不能作为最终头像修复。当前范围改为2026110102的13文件v02，追加已有combat_stats.vjs_c；新增运行模块仍仅hero_teleport_access，资源总数仍6918/184保护模块。13文件修复已有上述源码提交；签名生产玩法、正式新游廊及新版正式FPS均未验，当前不能沿用旧12文件候选状态代替新包审阅。原四账号、正常联网配置及`all_difficulties_unlocked=false`、d573和地图保持原范围；后续签名/发布须按最终范围审阅，不能沿用旧12文件计划冒充新候选。
 
 普通客户端8200已通过正常Steam授权，并在3102的template_map取得188场景READY；不再记录为“登录待用户”。普通局实证查询锚点缺失，离线v04的共享主头像/default-opacity修正及六场景视觉结果见下文。D原生fixture的run02现已完成15个串行阶段并finish，开发离线内存provider下的权益、真实施法/退款及共享CD有限通过；完整包等价、建造者实际施放和正式游廊仍未验，详见下方D验证补充。
 
@@ -39,7 +39,7 @@ Root用真实Tools开发局、template_map、offline内存provider与临时免�
 
 `docs/reviews/portrait_runtime_review_20261031.md`记录旧renderer的两个设计风险：全目录预建后保留188个DOTAScenePanel；超10秒永久failed回退裸模。开发renderer保留197身份/188地图目录，改为4项逻辑驻留LRU、当前/加载保护、仅响应明确请求，取消全目录后台预建；失败按真实选择epoch和2/10/30秒退避重试，不再永久黑名单，保留100ms防闪遮罩。失败超过10秒的原生退路仍存在，DeleteAsync也不证明GPU瞬时驻留绝不超过4。随后还必须修正combat_stats挂接，不能把renderer改动单独当完整修复。
 
-renderer的game/content源码同SHA `2bff46da002ffdef17b69eef6fa3dc28df374deee8ce4a878f3568634bd701c7`，官方编译物SHA `d83c2d9165a1efc048bfe8a8426ac0e8ce747e12432d071a8aec86545062bade`。combat_stats的v04源码/官方编译双摘要与实机证据记录在`docs/reviews/query_portrait_anchor_20261101.md`；它们尚待第二次源码提交纳入13文件v02，不能覆盖旧v01计划或将开发视觉记作已上线。
+renderer的game/content源码同SHA `2bff46da002ffdef17b69eef6fa3dc28df374deee8ce4a878f3568634bd701c7`，官方编译物SHA `d83c2d9165a1efc048bfe8a8426ac0e8ce747e12432d071a8aec86545062bade`。combat_stats的v04源码/官方编译双摘要与实机证据记录在`docs/reviews/query_portrait_anchor_20261101.md`；它们现已随048a2d6／b1ac328源码提交纳入13文件v02范围，不能覆盖旧v01计划或将开发视觉记作已上线。
 
 有效原游廊3102基线见`docs/reviews/arcade_opening_baseline_20261031.md`：本机一个普通Steam客户端1600×900、N1首波前、同视角建造者，2889完整帧间隔、约30秒，平均96.5384FPS，P95/P99为23.39448/28.196832ms，真正最慢29帧的1%low为32.6845FPS。>16.7/25/33.3/50ms为309/113/4/0帧。前后倒计时01:38→01:04；30个1Hz前台样本均通过，不冒称逐时刻无暂停/无切换。长帧更伴随CPU Busy时长，不能由此确定188世界为因果。
 
@@ -49,7 +49,7 @@ renderer的game/content源码同SHA `2bff46da002ffdef17b69eef6fa3dc28df374deee8c
 
 离线v04在同一开发世界已真实选中Bane5、转生1/2/3/4/6，再冷回Bane；六个不同场景均关联shared_main、实际SCENE_SET/SHOW和匹配头部/饰品/背景画面。Bane经过五个不同资产后再次READY并恢复像素，证明应用LRU淘汰后的场景重建/回切，不证明原生GPU已即时释放。具体画面和时间记录见`docs/reviews/query_portrait_anchor_20261101.md`。
 
-两段屏幕采样各约8秒、239张PNG：Bane→转生1实际是Undying/phalanx（旧路径含tide不代表Tidehunter）；独立检查13张关键样本，先遮罩/背景再完整模型，未见原生裸模。五场景后回Bane独立检查24张关键样本，也未见裸模，标题出现至完整模型的采样差约333.7ms。它们是受CopyFromScreen/编码扰动的约30Hz屏幕采样，未逐帧检查全部478张，也不能证明每个游戏渲染帧零闪帧、动画、全部饰品网格或FPS。反复热切、正式签名生产及新游廊行为仍待验。
+两段屏幕采样各约8秒、239张PNG：Bane→转生1实际是Undying/phalanx（旧路径含tide不代表Tidehunter）；独立检查13张关键样本，先遮罩/背景再完整模型，未见原生裸模。五场景后回Bane独立检查24张关键样本，也未见裸模，标题出现至完整模型的采样差约333.7ms。它们是受CopyFromScreen/编码扰动的约30Hz屏幕采样，未逐帧检查全部478张，也不能证明每个游戏渲染帧零闪帧、动画、全部饰品网格或FPS。后续新鲜实例的有限热切/跨容量冷重建另见下文，长期反复切换、正式签名生产及新游廊行为仍待验。
 
 旧局及该普通局在无主基地、首波开始后自然结算。第二段Bane视角ETW跨入POST_GAME（本地02:31:14，约采样19秒），因此整段排除于优化比较；98.09FPS只是混合场景原始统计，不是有效开局或Bane验收。后续需在稳定场景采样。截图/CSV/日志和账号资料只留ignored output，不入Git。
 
@@ -62,6 +62,12 @@ renderer的game/content源码同SHA `2bff46da002ffdef17b69eef6fa3dc28df374deee8c
 全部帧SyncInterval=1/Composed Copy GPU GDI；CPU Busy/Wait均值1.5491/15.1175ms，GPU Busy/Wait 6.4245/9.6309ms，与60Hz呈现节奏一致，具体限帧/垂直同步配置未查询，不能判定未限帧上限或单一CPU/GPU瓶颈。此为Tools开发离线Bane视角，与旧普通游廊建造者96.54FPS负载不等，不能称提速/退化对照；正式签名生产包、新普通游廊及多人长局性能仍待验。原始CSV、safe_summary和runner字节均保留未改。
 
 采样后另发生稳定性失败，不能被上述30秒指标覆盖：两次C6 pause均Console history replay did not complete；正常CloseMainWindow请求返回true但进程持续，严格截图拒绝window invalid or hung且前台已到非Dota。Root用OS确认Responding=false并核对精确CIM/argv/exe/hwnd，在合成库存/临时英雄已恢复的前提下结束该自有hung离线进程，无dump/凭据读取。诊断原件SHA `4c0b34c7b4d98064343822ab42730ad7bddb7c722be77cf7ac485bd69d43b8fa` 已纳入公共回执。30秒样本及正常前后图仍保留，但候选稳定性未通过；原因未定，不能归因VConsole、Tools、退出、原生缓存、ETW或本轮头像变更。
+
+## 新鲜开发实例的有限稳定性补充
+
+后续新鲜Tools/offline实例在一条持续连接中完成两段约45秒游戏时间自然运行并自动暂停，游戏时钟增量45.000000及44.999939秒；观察器于UTC23:02:50.211取得paused=true exit_status、23:02:50.216正常关闭。之后五次新连接均完成严格Tools/offline/session_memory、HTTP0/web=false证明、相机标记和连接关闭，全程保持游戏时间约808.566711且暂停。最初只有5种READY和一次容量淘汰，两轮Sven/LS/Bane为热回切；后续新增Undying1/Bloodseeker2并使3/4/5出现第二次READY。最终共10条READY、7种实际场景，支持跨容量冷重建，不证明GPU即时释放。五张新增选中像素及窗口元数据独立核对，饰品头像和背景完整；端点不代表每个原生游戏帧或逐网格证明。
+
+UTC23:15:59.9336605Z在窗口响应时请求WM_CLOSE，原回执exit_verified=false；root之后于23:16:10.0028381Z用CIM确认无Dota、未强杀。这是有限开发路径通过，不是普通生产/完整长局；本次也没有新ETW或与旧hang严格单变量A/B，旧30020无响应和冷SnapshotError失败继续保留，原因未定。新审查为`docs/reviews/fresh_development_stability_20261101.md`，见[安全公开阶段、加载计数及原件SHA](fresh_development_stability_20261101.public.json)。普通签名生产、新游廊同负载FPS、多人长战斗、反复跨容量资源生命周期仍待验；本次未改冻结运行源码、原发行README/plan或旧审查回执。
 
 ## 解耦评价及复用
 

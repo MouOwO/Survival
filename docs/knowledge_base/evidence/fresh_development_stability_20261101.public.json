@@ -1,0 +1,345 @@
+{
+  "schema": "survival.fresh_development_stability.public_receipt.v1",
+  "review_date": "2026-11-01",
+  "status": "LIMITED_FRESH_TOOLS_OFFLINE_RUN_RECONNECT_COLD_REBUILD_AND_NORMAL_EXIT_OBSERVED",
+  "scope": {
+    "tools": true,
+    "offline_memory_provider": true,
+    "client_pixels": [
+      1600,
+      900
+    ],
+    "runtime_game_source_revision": "048a2d6b675325cd511abb01c5a122343052b2f7",
+    "runtime_content_source_revision": "b1ac328e4467510c89fdfd8c6d9f79947d7c820a",
+    "normal_workshop_acceptance": false,
+    "signed_package_acceptance": false,
+    "production_gameplay_verified": false,
+    "long_game_stability_accepted": false,
+    "fresh_etw_or_fps_measured": false,
+    "older_hang_failure_erased": false,
+    "old_hang_cause_determined": false
+  },
+  "persistent_session": {
+    "connection_count": 1,
+    "automatic_reconnect": false,
+    "initial_transport_ready_utc": "2026-10-31T22:41:35.274Z",
+    "initial_runtime_gate_verified": false,
+    "later_lua_memory_gate_reply_count": 6,
+    "natural_windows": [
+      {
+        "armed_utc": "2026-10-31T22:46:39.696Z",
+        "auto_paused_utc": "2026-10-31T22:47:24.590Z",
+        "game_time_start": 718.56671142578,
+        "game_time_end": 763.56671142578,
+        "elapsed_game_seconds": 45.0
+      },
+      {
+        "armed_utc": "2026-10-31T22:54:25.014Z",
+        "auto_paused_utc": "2026-10-31T22:55:09.923Z",
+        "game_time_start": 763.56677246094,
+        "game_time_end": 808.56671142578,
+        "elapsed_game_seconds": 44.99993896484
+      }
+    ],
+    "exit_status_utc": "2026-10-31T23:02:50.211Z",
+    "exit_status_paused": true,
+    "transport_closed_utc": "2026-10-31T23:02:50.216Z",
+    "transcript_sha256": "c421665ea83774e180587b76bfd42fc8e9942e2c255f90b493d4deeb31715705",
+    "note": "Initial READY is transport-only. Later Lua operations each check the actual Tools/offline/memory-provider/web/HTTP gate; no signed-package or full loaded-byte proof is implied."
+  },
+  "later_fresh_connections": [
+    {
+      "view": "undying",
+      "helper_version": 1,
+      "connected_utc": "2026-10-31T23:07:42.088Z",
+      "ended_utc": "2026-10-31T23:07:54.170Z",
+      "single_fresh_connection_completed": true,
+      "strict_modeproof": {
+        "gameTime": 808.56671142578,
+        "http": false,
+        "offline": true,
+        "ok": true,
+        "paused": true,
+        "provider": "session_memory",
+        "web": false
+      },
+      "camera_marker_observed": true,
+      "camera_result_verified_in_operation_receipt": false,
+      "independent_selected_pixel_review_pass": true,
+      "automatic_reconnect": false,
+      "transport_closed": true,
+      "production_gameplay_verified": false,
+      "operation_stability_accepted": false,
+      "response_sha256": "61c0781fecda67e9f54d2906182360c2607cc90dfd55b477c11fb29a13773ae2"
+    },
+    {
+      "view": "bloodseeker",
+      "helper_version": 1,
+      "connected_utc": "2026-10-31T23:08:27.847Z",
+      "ended_utc": "2026-10-31T23:08:39.885Z",
+      "single_fresh_connection_completed": true,
+      "strict_modeproof": {
+        "gameTime": 808.56671142578,
+        "http": false,
+        "offline": true,
+        "ok": true,
+        "paused": true,
+        "provider": "session_memory",
+        "web": false
+      },
+      "camera_marker_observed": true,
+      "camera_result_verified_in_operation_receipt": false,
+      "independent_selected_pixel_review_pass": true,
+      "automatic_reconnect": false,
+      "transport_closed": true,
+      "production_gameplay_verified": false,
+      "operation_stability_accepted": false,
+      "response_sha256": "8e328107bf64d53f149b2bf115e41e0d51930fca11a21d10cd4128f75eb4cb07"
+    },
+    {
+      "view": "dragon_knight",
+      "helper_version": 2,
+      "connected_utc": "2026-10-31T23:12:47.361Z",
+      "ended_utc": "2026-10-31T23:12:59.406Z",
+      "single_fresh_connection_completed": true,
+      "strict_modeproof": {
+        "gameTime": 808.56671142578,
+        "http": false,
+        "offline": true,
+        "ok": true,
+        "paused": true,
+        "provider": "session_memory",
+        "web": false
+      },
+      "camera_marker_observed": true,
+      "camera_result_verified_in_operation_receipt": false,
+      "independent_selected_pixel_review_pass": true,
+      "automatic_reconnect": false,
+      "transport_closed": true,
+      "production_gameplay_verified": false,
+      "operation_stability_accepted": false,
+      "response_sha256": "a2d0678689d67d47bc6c74d393401d5e6b57be0481506b7d4c2dc99896dc86da"
+    },
+    {
+      "view": "sven",
+      "helper_version": 2,
+      "connected_utc": "2026-10-31T23:14:36.216Z",
+      "ended_utc": "2026-10-31T23:14:48.185Z",
+      "single_fresh_connection_completed": true,
+      "strict_modeproof": {
+        "gameTime": 808.56671142578,
+        "http": false,
+        "offline": true,
+        "ok": true,
+        "paused": true,
+        "provider": "session_memory",
+        "web": false
+      },
+      "camera_marker_observed": true,
+      "camera_result_verified_in_operation_receipt": false,
+      "independent_selected_pixel_review_pass": true,
+      "automatic_reconnect": false,
+      "transport_closed": true,
+      "production_gameplay_verified": false,
+      "operation_stability_accepted": false,
+      "response_sha256": "59ccbb516dffb9801870c5adf652410db01b2dc0fb2d245d94c451fcd68bb304"
+    },
+    {
+      "view": "bane",
+      "helper_version": 2,
+      "connected_utc": "2026-10-31T23:15:13.683Z",
+      "ended_utc": "2026-10-31T23:15:25.617Z",
+      "single_fresh_connection_completed": true,
+      "strict_modeproof": {
+        "gameTime": 808.56671142578,
+        "http": false,
+        "offline": true,
+        "ok": true,
+        "paused": true,
+        "provider": "session_memory",
+        "web": false
+      },
+      "camera_marker_observed": true,
+      "camera_result_verified_in_operation_receipt": false,
+      "independent_selected_pixel_review_pass": true,
+      "automatic_reconnect": false,
+      "transport_closed": true,
+      "production_gameplay_verified": false,
+      "operation_stability_accepted": false,
+      "response_sha256": "2a4ea6b89c582da06ff6281b8f88e3a349aebc62bb54af4db34db1f1c10706ed"
+    }
+  ],
+  "scene_loads": {
+    "distinct_ready_assets": 7,
+    "ready_events": 10,
+    "ready_occurrences_by_asset": {
+      "builder_io_benevolent_companion": 1,
+      "monster_boss_rebirth_05_lucid_torment": 2,
+      "monster_boss_rebirth_03_silverwurm": 2,
+      "monster_boss_rebirth_04_stormwrought": 2,
+      "monster_boss_rebirth_06_obsidian_atrocity": 1,
+      "monster_boss_rebirth_01_phalanx": 1,
+      "monster_boss_rebirth_02_bloodforge": 1
+    },
+    "events": [
+      {
+        "line": 2542,
+        "local_time": "11/01 06:45:10",
+        "asset": "builder_io_benevolent_companion",
+        "load_ms": 183,
+        "catalog_expected_components": 0
+      },
+      {
+        "line": 2605,
+        "local_time": "11/01 06:46:03",
+        "asset": "monster_boss_rebirth_05_lucid_torment",
+        "load_ms": 114,
+        "catalog_expected_components": 4
+      },
+      {
+        "line": 2703,
+        "local_time": "11/01 06:51:03",
+        "asset": "monster_boss_rebirth_03_silverwurm",
+        "load_ms": 144,
+        "catalog_expected_components": 6
+      },
+      {
+        "line": 2721,
+        "local_time": "11/01 06:51:05",
+        "asset": "monster_boss_rebirth_04_stormwrought",
+        "load_ms": 170,
+        "catalog_expected_components": 6
+      },
+      {
+        "line": 2738,
+        "local_time": "11/01 06:51:07",
+        "asset": "monster_boss_rebirth_06_obsidian_atrocity",
+        "load_ms": 155,
+        "catalog_expected_components": 4
+      },
+      {
+        "line": 3165,
+        "local_time": "11/01 07:08:12",
+        "asset": "monster_boss_rebirth_01_phalanx",
+        "load_ms": 127,
+        "catalog_expected_components": 3
+      },
+      {
+        "line": 3201,
+        "local_time": "11/01 07:08:50",
+        "asset": "monster_boss_rebirth_02_bloodforge",
+        "load_ms": 167,
+        "catalog_expected_components": 7
+      },
+      {
+        "line": 3316,
+        "local_time": "11/01 07:14:18",
+        "asset": "monster_boss_rebirth_03_silverwurm",
+        "load_ms": 145,
+        "catalog_expected_components": 6
+      },
+      {
+        "line": 3349,
+        "local_time": "11/01 07:14:51",
+        "asset": "monster_boss_rebirth_04_stormwrought",
+        "load_ms": 171,
+        "catalog_expected_components": 6
+      },
+      {
+        "line": 3384,
+        "local_time": "11/01 07:15:33",
+        "asset": "monster_boss_rebirth_05_lucid_torment",
+        "load_ms": 146,
+        "catalog_expected_components": 4
+      }
+    ],
+    "repeated_ready_assets": [
+      "monster_boss_rebirth_03_silverwurm",
+      "monster_boss_rebirth_04_stormwrought",
+      "monster_boss_rebirth_05_lucid_torment"
+    ],
+    "cross_capacity_cold_rebuild_observed": true,
+    "first_phase_was_only_five_assets_and_one_eviction_scope": true,
+    "immediate_native_gpu_release_proven": false,
+    "all_catalog_meshes_individually_verified": false,
+    "native_log_sha256": "7453111fecd9dc1e07f8ddd2d4022d470ac73a030c5ec7beec7a3fa11e815fbd"
+  },
+  "selected_endpoint_pixel_reviews": [
+    {
+      "label": "stability_fresh_bane_before_v01",
+      "started_utc": "2026-10-31T22:46:04.4073328Z",
+      "ended_utc": "2026-10-31T22:46:04.4958004Z",
+      "strict_window_endpoint_valid": true,
+      "png_sha256": "c9a62eca3fd3ed6abfbf0eea25e3d5e1af0af294a78d9366b958b43086dce1b4",
+      "metadata_sha256": "4ee888fca91f2e182f1cd5d57cbee62a76f45fce8ac8cd39f8e3a9ba10db8e0f"
+    },
+    {
+      "label": "stability_fresh_bane_after45_v01",
+      "started_utc": "2026-10-31T22:50:00.3814385Z",
+      "ended_utc": "2026-10-31T22:50:00.4813956Z",
+      "strict_window_endpoint_valid": true,
+      "png_sha256": "78c8d452fd324e296e1491a4c3b11229b5bb68aaba955e54a64ebc6ecc56ebbc",
+      "metadata_sha256": "2bbcf07347d641c44f88f41d5a9038341c62d0b8bf8a3b654c8bf7e28b13d695"
+    },
+    {
+      "label": "stability_reconnect_undying_selected_v01",
+      "started_utc": "2026-10-31T23:08:12.4538050Z",
+      "ended_utc": "2026-10-31T23:08:12.5400117Z",
+      "strict_window_endpoint_valid": true,
+      "png_sha256": "420c87f261c2bc3acd79bdd812b842af716af42ecc514beca2b48b383ef66904",
+      "metadata_sha256": "a2ed65452d08856bdce54f351155490e3ee153100f4eba06338804e22ca75d42"
+    },
+    {
+      "label": "stability_reconnect_02_selected_v01",
+      "started_utc": "2026-10-31T23:08:50.8003619Z",
+      "ended_utc": "2026-10-31T23:08:50.8919403Z",
+      "strict_window_endpoint_valid": true,
+      "png_sha256": "b00f301d509ff845c8ce1e2382e8bcdcda9d0a015796a0478bca90eec0725cea",
+      "metadata_sha256": "1e8ded0bb2c383cae60d8e90eafd0484dac25a7e34727a8d9f971ced2e163dec"
+    },
+    {
+      "label": "stability_reconnect_03_selected_v01",
+      "started_utc": "2026-10-31T23:14:19.1643719Z",
+      "ended_utc": "2026-10-31T23:14:19.2548999Z",
+      "strict_window_endpoint_valid": true,
+      "png_sha256": "b9c9c63ead39e6b6be84529ee1cb37c62a3daf788d524af158aab577f90f6487",
+      "metadata_sha256": "ffed4c7287d166f7ee25c6ccb88a09fe715d972f0b82e1ac2a7393f627674d59"
+    },
+    {
+      "label": "stability_reconnect_04_selected_v01",
+      "started_utc": "2026-10-31T23:14:52.3380480Z",
+      "ended_utc": "2026-10-31T23:14:52.4410008Z",
+      "strict_window_endpoint_valid": true,
+      "png_sha256": "aa9aa0bdc848ab034adba52a689d6667ea8de8c69aec562c0b56c8e8eada8cbc",
+      "metadata_sha256": "3ea7521f155310ffa23aa18b0512abfb9210b14803c04371f7a6083fb362a072"
+    },
+    {
+      "label": "stability_reconnect_bane_cold_return_v01",
+      "started_utc": "2026-10-31T23:15:34.1313492Z",
+      "ended_utc": "2026-10-31T23:15:34.2240958Z",
+      "strict_window_endpoint_valid": true,
+      "png_sha256": "1c20c525d854d9aca2960bd34715ca3d66e731d10f6317e95d44ad41a8fc74fa",
+      "metadata_sha256": "f2ec79abe39b849cf9b144c8767ff3af953da0a7be83d1f9723d02a624ae24fe"
+    }
+  ],
+  "normal_exit": {
+    "responding_before_request": true,
+    "wm_close_requested_utc": "2026-10-31T23:15:59.9336605Z",
+    "request_receipt_exit_verified": false,
+    "request_receipt_sha256": "1833b53af8f70efe4705bcc00434b4577ded12b54a23ac3f20137a0dfd7e1a85",
+    "force_terminated": false,
+    "later_no_dota_cim_verified": true,
+    "later_cim_utc": "2026-10-31T23:16:10.0028381Z",
+    "later_cim_evidence_source": "Root observed the later exact CIM result; distinct from the request receipt."
+  },
+  "limitations": [
+    "Seven distinct READY maps and repeat READY for DK/Sven/Bane support real cross-capacity cold rebuild, but not immediate GPU resource release.",
+    "Initial two Sven/LifeStealer/Bane loops were warm switches; later new connections/Undying/Bloodseeker selection extend the evidence.",
+    "READY component counts are catalog expectations, not native per-mesh visibility counts.",
+    "Camera helpers only confirm strict mode proof and command marker; the separate selected screenshots supply endpoint visual evidence.",
+    "Both approximately45-game-second windows pass their own bounded observation; pauses and manual interactions fill most wall-clock time.",
+    "No new ETW/FPS measurement, matched-load performance comparison, signed production, ordinary Workshop, multiplayer or long combat acceptance is claimed.",
+    "The earlier developer post-ETW hang and cold SnapshotError remain failures with undetermined causes; this fresh success does not erase them or isolate a causal variable.",
+    "Public evidence excludes raw session history, raw Lua, process handles/IDs, account, authentication, inventory values and full logs."
+  ]
+}
