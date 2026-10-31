@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "snapshot_date": "2026-10-30",
+  "snapshot_date": "2026-10-31",
   "scope": "Curated project knowledge and historical snapshot; raw chat excluded",
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 9263,
-      "sha256": "f40c04099c9507bb1a0887de86109509147a0027c0c44350046b3b25af6cad86"
+      "bytes": 9667,
+      "sha256": "d5e9f6c21a9021f3f08267397976f31d1ccadef5f44d4bf980023304f55068bd"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -25,8 +25,8 @@
     },
     {
       "path": "04_network_auth_official.md",
-      "bytes": 13797,
-      "sha256": "7f458102db46b02770249e5928b1ec9f20b02580668c8f22f1710455ffd2950a"
+      "bytes": 14391,
+      "sha256": "f4c2b2566a2101b572dbc0f3729374f5e303e21d88c20723281ebd65b92582f9"
     },
     {
       "path": "05_payments_commerce_delivery.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 21524,
-      "sha256": "df8237a7e1300263d11eb8151c0568901421d65217cd81cee3438c43b26054c0"
+      "bytes": 22102,
+      "sha256": "181d1592aa3883d68e5176d0d1428b6c070b60add08406b66494965f8d373fae"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 3526,
-      "sha256": "432f04940fd0a6d7e5d01a2a36277d00b0480116420049c11f5ce4793a6b95da"
+      "bytes": 3640,
+      "sha256": "f5859c73e074efb376266b8b98c38d35f82ec2ac032355454ce5ba0a3d0b160f"
     },
     {
       "path": "data/completed_work_index.json",
@@ -182,6 +182,11 @@
       "path": "evidence/login_relay_recovery_20261028.public.json",
       "bytes": 1810,
       "sha256": "30cfd2a0304da53e3a2fd95f72b1c269e97520a5ded629caea796b82c02e6d04"
+    },
+    {
+      "path": "evidence/login_relay_recovery_20261031.public.json",
+      "bytes": 1390,
+      "sha256": "09992013b028dc99dc21167cbc73c9d8b0a4ab45333883e5f2c27d27fcd03505"
     },
     {
       "path": "evidence/map_minimap_sync_20261030.md",

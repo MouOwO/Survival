@@ -1,5 +1,7 @@
 # 孤城逐晓／Survival 统一知识库
 
+最新登录恢复：[2026-10-31 Steam验签中转恢复](evidence/login_relay_recovery_20261031.public.json)。
+
 最新头像对照：[2026-10-30 锋刃宗师头饰、皮肤与镜头](evidence/blademaster_portrait_match_20261030.md)。
 
 最新决定：[2026-10-30 移除新手引导](evidence/onboarding_removed_20261030.md)。

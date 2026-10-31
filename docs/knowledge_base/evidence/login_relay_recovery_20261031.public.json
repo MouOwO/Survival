@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "observed_at": "2026-10-31T10:42:18+08:00",
+  "kind": "STEAM_LOGIN_RELAY_RECOVERY",
+  "reported_error": "steam_verification_unavailable",
+  "status": "OFFICIAL_TRANSPORT_RESTORED_USER_LOGIN_CONFIRMED",
+  "before": {
+    "login_switch_enabled": true,
+    "services_running": true,
+    "local_recorded_relay_missing": true,
+    "cloud_relay_listener_present": false,
+    "production_dummy_error": "steam_verification_unavailable"
+  },
+  "action": {
+    "existing_fixed_relay_restarted": true,
+    "cloud_configuration_changed": false,
+    "services_restarted": false,
+    "authentication_rules_changed": false,
+    "player_credentials_used": false,
+    "account_or_save_data_changed": false
+  },
+  "after": {
+    "cloud_relay_listener_present": true,
+    "official_steam_transport_ok": true,
+    "invalid_dummy_assertion_rejected": true,
+    "elapsed_seconds": 0.82,
+    "service_pids_unchanged": true,
+    "public_health_http": 200,
+    "real_player_login_confirmed": true,
+    "confirmation_source": "User confirmed successful login in this conversation"
+  },
+  "remaining": [
+    "Start a fresh Steam login from the authorization page; refreshing the failed callback retains its old failure.",
+    "The temporary relay depends on the author PC and its network staying online.",
+    "Stable cloud Steam egress and automatic relay recovery have not been installed."
+  ]
+}
