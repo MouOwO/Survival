@@ -170,6 +170,10 @@ panorama/src/scripts/custom_game/native_transport_probe.js text eol=crlf
 # Knowledge manifests hash UTF-8 LF bytes across Windows checkouts.
 docs/knowledge_base/** text eol=lf
 
+# The WS4 operator plan seals exact source bytes before remote execution.
+tools/ws4_catalog_sync_20261031/*.py text eol=lf
+tools/ws4_catalog_sync_20261031/README.md text eol=lf
+
 # Preserve the reviewed ten-sin startup patch and its pinned source bytes.
 scripts/vscripts/systems/challenge_session_service.lua text eol=crlf
 tools/ten_sin_startup_20261028/*.py text eol=lf

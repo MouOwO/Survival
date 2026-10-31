@@ -25,18 +25,18 @@
     },
     {
       "path": "04_network_auth_official.md",
-      "bytes": 14391,
-      "sha256": "f4c2b2566a2101b572dbc0f3729374f5e303e21d88c20723281ebd65b92582f9"
+      "bytes": 14763,
+      "sha256": "65c8a9daef6ed7465a2ea7d3720efa97a1130b4e6d289acf52915000b5a6426c"
     },
     {
       "path": "05_payments_commerce_delivery.md",
-      "bytes": 15327,
-      "sha256": "52132fc1a71c034ce55ef2c14ba6c7df10eb0339496fba3ca381e3bd6b62d72b"
+      "bytes": 15699,
+      "sha256": "ec9985757d9ab1df2d08059140063fe3366f06e4ddaa37e8230b61f987ef48ae"
     },
     {
       "path": "06_build_release_ops.md",
-      "bytes": 18348,
-      "sha256": "139bf8ab8664643a384d54bb7b4b83a8975175a985d81fe1ecbf797a7fa73c8c"
+      "bytes": 18720,
+      "sha256": "2ef04690cd7d7a11af26ce7f3d4f5ab5a15bb69611ced474dc406198500b13ed"
     },
     {
       "path": "07_decisions_incidents_pending.md",
@@ -277,6 +277,11 @@
       "path": "evidence/scourge_highland_20261029.md",
       "bytes": 4444,
       "sha256": "b9a922eae4934e4694953d470b269ca38811bb8ba224114f66bd6ee649cfe82a"
+    },
+    {
+      "path": "evidence/shop_catalog_sync_20261031.md",
+      "bytes": 4389,
+      "sha256": "189895ee228ad8f14d402962611466ec78b75c37b25b33c58d8e2b70672ad8f1"
     },
     {
       "path": "evidence/teammate_builder_portrait_20261031.md",
