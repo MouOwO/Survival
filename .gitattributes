@@ -230,3 +230,9 @@ scripts/vscripts/tests/test_archive_ui_wire_budget.lua text eol=lf
 tools/arcade_portrait_release_v05_20261101/*.py text eol=lf
 
 tools/arcade_portrait_release_v05_20261101/*.md text eol=lf
+
+tools/arcade_portrait_release_v06_20261101/*.py text eol=lf
+
+tools/arcade_portrait_release_v06_20261101/*.md text eol=lf
+
+tools/test_combat_hud_lookup_lifecycle.cjs text eol=lf
