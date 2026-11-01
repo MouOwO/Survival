@@ -5,7 +5,8 @@ is separately reviewed, retains all data, and restores owned code/config on
 failure. There is no OAuth approval, user provisioning, payment change or timer.
 """
 from pathlib import Path
-import base64, copy, hashlib, json, os, re, sqlite3, stat, subprocess, time
+from contextlib import closing
+import base64, copy, hashlib, json, os, re, socket, sqlite3, stat, subprocess, time
 
 OLD_IDS = ('76561198424163156', '76561198845461206', '76561198104787442', '76561198974301984')
 ADDED = '76561198296534615'
@@ -27,10 +28,19 @@ PROTECTED = ('goufayu-api.service','goufayu-payment.service','goufayu-db.service
 PINS = Path('/etc/goufayu-ws4/pins.json')
 SQLITE = Path('/var/lib/goufayu-ws4-web/auth.sqlite3')
 MAX_FILE = 16 * 1024 * 1024
+STARTUP_PORTS = (18765, 18767)
+
+
+class AdmissionGuardError(RuntimeError):
+ pass
 
 
 def need(value, code):
- if not value: raise RuntimeError(code)
+ if not value: raise AdmissionGuardError(code)
+
+
+def fixed_error_code(error):
+ return str(error) if isinstance(error,AdmissionGuardError) and re.fullmatch(r'[a-z][a-z0-9_]{1,127}',str(error)) else 'operation_failed'
 
 
 def sha(raw): return hashlib.sha256(raw).hexdigest()
@@ -168,7 +178,7 @@ def verify_before(plan):
 
 def sqlite_state(path=SQLITE):
  need(Path(path).is_file() and not Path(path).is_symlink(),'auth_database_missing')
- with sqlite3.connect('file:'+str(path)+'?mode=ro',uri=True) as conn:
+ with closing(sqlite3.connect('file:'+str(path)+'?mode=ro',uri=True)) as conn:
   schema=list(conn.execute("SELECT type,name,tbl_name,sql FROM sqlite_master WHERE name NOT LIKE 'sqlite_%' ORDER BY type,name"))
   tables={}
   for (name,) in conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name"):
@@ -180,8 +190,8 @@ def sqlite_state(path=SQLITE):
 
 def sqlite_backup(stage,name):
  path=stage/name;need(not path.exists(),'new_auth_backup_required')
- with sqlite3.connect('file:'+str(SQLITE)+'?mode=ro',uri=True) as source:
-  with sqlite3.connect(path) as destination:source.backup(destination)
+ with closing(sqlite3.connect('file:'+str(SQLITE)+'?mode=ro',uri=True)) as source:
+  with closing(sqlite3.connect(path)) as destination:source.backup(destination)
  os.chmod(path,0o600)
  return {'path':str(path),'sha256':sha(regular(path)),'state':sqlite_state(path),'host_private_only':True}
 
@@ -265,6 +275,19 @@ def wait_http(address, accepted):
   except urllib.error.HTTPError as error:
    if error.code in accepted:return
   except (urllib.error.URLError,OSError):pass
+  need(time.monotonic()<deadline,'startup_readiness_timeout');time.sleep(.25)
+
+
+def wait_socket(port):
+ # Listener creation follows Service/application initialization. A bare TCP
+ # connect/close sends no HTTP request and cannot mutate global-http limits.
+ need(port in STARTUP_PORTS,'startup_port_not_allowed')
+ deadline=time.monotonic()+12
+ while True:
+  remaining=deadline-time.monotonic();need(remaining>0,'startup_readiness_timeout')
+  try:
+   with socket.create_connection(('127.0.0.1',port),timeout=min(2,remaining)):return
+  except OSError:pass
   need(time.monotonic()<deadline,'startup_readiness_timeout');time.sleep(.25)
 
 
@@ -355,23 +378,24 @@ def activate(plan):
   need(backup['state']==before_sqlite,'auth_backup_snapshot_changed')
   for role,config in ROLES.items():
    for kind in ('env','unit'):owned_replace(config[kind],regular(stage/(role+'.'+kind+'.before')),regular(stage/(role+'.'+kind+'.after')))
-  command(['systemctl','daemon-reload']);control('start','api');wait_http('http://127.0.0.1:18765/health',{200,401,403})
+  command(['systemctl','daemon-reload']);control('start','api');wait_socket(18765)
   # No web proxy traffic during the PostgreSQL startup comparison.
   need(postgres_state()==before_pg,'postgres_data_or_schema_changed')
-  control('start','web');wait_http('http://127.0.0.1:18767/health',{200})
+  control('start','web');wait_socket(18767)
   need(sqlite_state()==before_sqlite,'auth_data_or_schema_changed_no_database_restore')
   processes=running(plan);policies=evaluate_policy(plan,processes);checked=health(processes)
   need({name:service(name) for name in PROTECTED}==plan['live']['protected'],'protected_service_changed')
   result={'ok':True,'status':'PASS_FIVE_ACCOUNT_ADMISSION_ACTIVE','added_steamid64':ADDED,'approved_steamids64':list(IDS),'max_players':4,
     'web_policy_active':True,'archive_policy_active':True,'original_accounts_preserved':True,'payments_unchanged':True,'bundle_preserved':True,
     'no_real_player_auth_claimed':True,'database_restored':False,'postgres_writes_by_operator':0,'postgres_before':before_pg,
+    'preservation_check_before_health':True,'health_rate_counters_expected':True,
     'sqlite_before':before_sqlite,'private_auth_backup':backup,'processes':processes,'policy_evaluation':policies,'health':checked,
     'plan_sha256':sha(encoded(plan)),'source_revision':plan['source_revision'],'prepared_receipt':{'path':str(stage/'prepared.json'),'sha256':sha(regular(stage/'prepared.json'))}}
   reference=receipt(stage,'activated',result);return {**result,'receipt':reference}
  except Exception as error:
   rollback=restore_owned(plan,stage) if touched else {'ok':True,'database_restored':False}
-  receipt(stage,'activation_failed',{'ok':False,'status':'FIVE_ACCOUNT_ACTIVATION_FAILED','error_type':type(error).__name__,'rollback':rollback,'database_restored':False})
-  raise RuntimeError('five_account_activation_failed_rollback_'+('ok' if rollback['ok'] else 'incomplete')) from None
+  receipt(stage,'activation_failed',{'ok':False,'status':'FIVE_ACCOUNT_ACTIVATION_FAILED','error_type':type(error).__name__,'error':fixed_error_code(error),'rollback':rollback,'database_restored':False})
+  raise AdmissionGuardError('five_account_activation_failed_rollback_'+('ok' if rollback['ok'] else 'incomplete')) from None
 
 
 def verify(plan):
@@ -400,4 +424,4 @@ if 'OP_ACTION' in globals():
  try:print(json.dumps(run(OP_ACTION,globals().get('OP_PLAN'),globals().get('OP_OVERLAYS')),sort_keys=True))
  except Exception as error:
   print(json.dumps({'ok':False,'status':'ADMISSION_OPERATION_REFUSED','error_type':type(error).__name__,
-                    'error':str(error) if isinstance(error,RuntimeError) and re.fullmatch('[a-z0-9_]+',str(error)) else 'operation_failed'}));raise SystemExit(1)
+                    'error':fixed_error_code(error)}));raise SystemExit(1)

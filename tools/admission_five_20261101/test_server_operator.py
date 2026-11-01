@@ -1,4 +1,4 @@
-"""Operator trust boundaries with local synthetic files; no SSH/service/DB I/O."""
+"""Local synthetic files/SQLite/HTTP; no SSH, deployed service or real-player I/O."""
 from pathlib import Path
 import copy,hashlib,importlib.util,json,os,tempfile,unittest
 from unittest.mock import patch
@@ -114,6 +114,91 @@ class ScopeTests(unittest.TestCase):
    restore.assert_called_once_with(plan,stage)
    self.assertEqual(saved.call_args.args[1],'activation_failed')
    self.assertFalse(saved.call_args.args[2]['database_restored'])
+
+ def test_bare_tcp_readiness_preserves_sqlite_where_http_health_changes_limits(self):
+  import sys,threading,urllib.request
+  from types import SimpleNamespace
+  sys.path.insert(0,str(HERE.parents[1]/'server'))
+  from player_web_auth.service import Service,Settings
+  from player_web_auth.http_api import BoundedServer,handler
+  with tempfile.TemporaryDirectory() as directory:
+   database=Path(directory)/'auth.sqlite3'
+   service=Service(Settings(database,'a'*64,'b'*64,op.OLD_IDS))
+   completed=threading.Event();base=handler(service)
+   class ObservedHandler(base):
+    def finish(self):
+     try:super().finish()
+     finally:completed.set()
+   server=BoundedServer(('127.0.0.1',0),ObservedHandler)
+   worker=threading.Thread(target=lambda:server.serve_forever(poll_interval=.01),daemon=True);worker.start()
+   port=server.server_address[1]
+   try:
+    before=op.sqlite_state(database)
+    with patch.object(op,'STARTUP_PORTS',(port,)):op.wait_socket(port)
+    self.assertTrue(completed.wait(2),'the empty TCP request must finish before the SQLite comparison')
+    self.assertEqual(op.sqlite_state(database),before)
+    with urllib.request.urlopen('http://127.0.0.1:'+str(port)+'/health',timeout=2) as response:
+     self.assertEqual(response.status,200);response.read()
+    after=op.sqlite_state(database)
+    self.assertNotEqual(after['tables']['limits'],before['tables']['limits'])
+    self.assertEqual({k:v for k,v in after['tables'].items() if k!='limits'},
+                     {k:v for k,v in before['tables'].items() if k!='limits'})
+   finally:server.shutdown();server.server_close();worker.join(2);service.close()
+
+ def test_tcp_readiness_rejects_other_ports_before_connecting(self):
+  with patch.object(op.socket,'create_connection') as connect:
+   with self.assertRaisesRegex(RuntimeError,'startup_port_not_allowed'):op.wait_socket(443)
+   connect.assert_not_called()
+
+ def test_full_sqlite_guard_precedes_any_http_health_probe(self):
+  result,events,saved=self.activation_order_case(False)
+  self.assertTrue(result['preservation_check_before_health'])
+  self.assertTrue(result['health_rate_counters_expected'])
+  self.assertLess(events.index('tcp:18767'),len(events)-1-events[::-1].index('sqlite'))
+  self.assertLess(len(events)-1-events[::-1].index('sqlite'),events.index('health'))
+
+ def test_unsolicited_limits_change_still_refuses_before_health(self):
+  result,events,saved=self.activation_order_case(True)
+  self.assertNotIn('health',events)
+  self.assertEqual(saved.call_args.args[1],'activation_failed')
+  self.assertEqual(saved.call_args.args[2]['error'],'auth_data_or_schema_changed_no_database_restore')
+  self.assertFalse(saved.call_args.args[2]['database_restored'])
+
+ def activation_order_case(self,changed):
+  plan=self.plan();plan['live']={'protected':{}};events=[]
+  before={'schema_sha256':'same','tables':{'limits':{'rows':1,'sha256':'before'}}}
+  after={**before,'tables':{'limits':{'rows':2,'sha256':'unsolicited'}}} if changed else before
+  counter=[0]
+  def auth_state():
+   events.append('sqlite');counter[0]+=1;return before if counter[0]==1 else after
+  def pg_state():events.append('postgres');return {'same':True}
+  with tempfile.TemporaryDirectory() as directory:
+   stage=Path(directory);prepared={'status':'PREPARED_FIVE_ACCOUNT_ADMISSION_NOT_ACTIVE','candidate_inventories':{'api':{},'web':{}}}
+   def fake_read(path):
+    if path.name=='plan.json':return op.encoded(plan)
+    if path.name=='prepared.json':return op.encoded(prepared)
+    return b'fixture'
+   with patch.object(op,'validate_plan',return_value=stage),patch.object(op,'regular',side_effect=fake_read), \
+       patch.object(op,'verify_before'),patch.object(op,'inventory',return_value={}),patch.object(op,'target',return_value=Path('/safe/new')), \
+       patch.object(op,'postgres_state',side_effect=pg_state),patch.object(op,'sqlite_state',side_effect=auth_state), \
+       patch.object(op,'sqlite_backup',return_value={'state':before}),patch.object(op,'owned_replace'),patch.object(op,'control'), \
+       patch.object(op,'command'),patch.object(op,'wait_socket',side_effect=lambda port:events.append('tcp:'+str(port))), \
+       patch.object(op,'wait_http',side_effect=AssertionError('HTTP readiness is forbidden before preservation')), \
+       patch.object(op,'running',return_value={}),patch.object(op,'evaluate_policy',return_value={}), \
+       patch.object(op,'health',side_effect=lambda processes:events.append('health')),patch.object(op,'PROTECTED',()), \
+       patch.object(op,'restore_owned',return_value={'ok':True,'database_restored':False}), \
+       patch.object(op,'receipt',return_value={'path':'fixture','sha256':'a'*64}) as saved:
+    if changed:
+     with self.assertRaisesRegex(RuntimeError,'rollback_ok'):op.activate(plan)
+     result=None
+    else:result=op.activate(plan)
+   return result,events,saved
+
+ def test_failure_code_does_not_return_untrusted_exception_text(self):
+  self.assertEqual(op.fixed_error_code(op.AdmissionGuardError('auth_data_or_schema_changed_no_database_restore')),
+                   'auth_data_or_schema_changed_no_database_restore')
+  for error in (RuntimeError('private_secret_value'),ValueError('https://user:secret@invalid/'),op.AdmissionGuardError('https://secret.invalid/')):
+   self.assertEqual(op.fixed_error_code(error),'operation_failed')
 
 
 class DriverTests(unittest.TestCase):
