@@ -3,10 +3,15 @@
 Preparation only: no SDK, signing, installation, native process or GUI action.
 Parent stays official0104 five-account/4-player, manifest7025356658517360342.
 Candidate sequence1106 and its new immutable source/package report are mandatory.
-RUNTIME_SOURCE_REVISION and download SOURCE_REVISION startNone and reject every
-real action before native/API access until root pins the new immutable source.
+RUNTIME_SOURCE_REVISION and download SOURCE_REVISION are pinned to immutable
+runtime commit1ae7839674e18bdeb9fbe255e558ee448fb1847b. Tests still verify that a
+missing source pin rejects every real action before native/API access.
 The new combat pins are frozen to Git-LF2b4d38b1...18af / compiler-CRLF
-d6dbbbe8...ea7a / artifacte9da3be3...e1f5,228763B. The source commit still awaits root.
+d6dbbbe8...ea7a / artifacte9da3be3...e1f5,228763B.
+
+At the time-limit closeout,1106 has an unsigned review only: no signed package,
+VPK build, installation, native gameplay, SDK or publication. The1105 process
+exited normally and its transaction restored all five official0104 files.
 
 New store: D:/Survival_本地排演/20261101_ws4_five_account_portrait_v06
 New port:29059

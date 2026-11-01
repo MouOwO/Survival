@@ -1,0 +1,15 @@
+# 最终阶段交接：1106已编译/unsigned审阅，目标未完成｜2026-11-01
+
+正式原游廊保持0104（manifest `7025356658517360342`、五个获准账号任选四人同局、6917资源/184保护模块），1105和1106均未发布。用户延长后的本阶段已收口，不再新开原生测试；不能标记整个任务完成。
+
+当前双仓源码已由Root同步：game `1ae7839674e18bdeb9fbe255e558ee448fb1847b / dev`、content `f8640121f8c196540fbb90e40416ac1d162144e3 / master`。1106仍以正式0104为父，范围14运行资源、6918总资源、184保护模块、19来源审阅、6项准入资源保持。新plan SHA `ff5e15aa0b8a76ffead72ac066da1cf74c05116f8889886625d5187db641cbca`，unsigned审阅报告SHA `fc0b13940af526cffa4f609f845f695c23ea2913d5890d15e4dfad440213a7d7`，unsigned content `3f56f5a286b1ad6bac87f18c330a88f2cd8ffa45cf2ef6d7b5a2f3841f02fb44`。状态为`UNSIGNED_REVIEW_READY_NOT_PUBLISHABLE`：尚未签名、未安装运行1106、未测其FPS、未上传，不能沿用1105实机记录冒充新候选验证。
+
+新增修复限于既有combat_stats产物路径。原100ms刷新中反复对缺失HUD控件做全根递归查找，真实函数的合成重放约31次根查询/次；现保留正/负结果、原生容器/祖先身份及结构变化检查，inventory只在初建或真实范围变化时索引骨架，到slot停止，不进入item artwork。稳定20次在0或10000个无关节点下均为0根查询、0递归访问、0目标属性重写；固定检查为53次GetParent、13次GetChildCount、61次IsValid/次。令A为首次请求的不同控件别名数、N为HUD节点数、D为祖先深度（上限48）、K为已观察原生路径节点数、I为inventory骨架节点数：初始化O((A+7)N+ADK+I)，稳定O(K+A+I)已观测路径/别名/小范围检查；7个固定原生容器也各需首次查找，真实原生结构变化才重建相应索引；没有新增计时器，保持100ms恢复及原五次选择重试。它消除已证重复全树查询，不证明所有UI热路径都已优化或FPS必然改善。
+
+独立审阅找到并复现“现有InventoryItems包装层内晚建slot”负缓存失效缺口，已用只在inventory范围重建的索引修复。最终又在真实选择事件开头和既有五次有界重试各验证一次原生容器变化，使late query能够失效旧负结果；普通稳定hotkey poll没有加全根扫描。独立重跑生命周期/late-query热键测试通过，shutdown旧任务不重启，普通选择无结构变化仍0根查询。game/content编译输入SHA `d6dbbbe8adc4d61f95ac97cc177079a080de6095af86192614657f789f70ea7a`，Git LF SHA `2b4d38b1671b0a8a6d883e66df4e90a8db97b70daf6e9a30ebf3b9ce451d18af`，官方编译SHA `e9da3be3168381b63c3a7fd14f20e5561458f16f366ca9cedfe504c9968ae1f5`。这些是源码/合成API计数与编译证明，不是新原生FPS。
+
+1105普通客户端已有限确认六种怪物的装备头像、背景和跨容量冷回Bane；21张暂停稳定画面不能证明完整切换瞬间无裸模。其真实30秒ETW平均100.3055FPS，但P95=19.9931ms超过16.7ms门槛，性能验收失败；第3波仅是unsupported原生Centaur头像，建造者回选该怪三张画面无QWER残留，不算带饰品波次或免费英雄切换通过。1105已正常WM_CLOSE、same-handle退出/keeper exit0，并有09:46:42.961121恢复0104五文件的原件；见[1105像素及正常收尾](candidate1105_portraits_20261101.md)和[FPS原始分位数](candidate1105_opening_fps_20261101.public.json)。此前30020挂起、0103 hold_failed及冷SnapshotError继续保留。
+
+下一次先核对正式仍0104、无并发发行/客户端及上述source/plan/unsigned摘要，审阅并按已批准范围准备精确1106签名产物；不要运行unsigned。随后以普通非Tools客户端和正常OAuth做真实冷选带饰品野外怪、超过四种场景后的冷回、实际带饰品波次怪、合法召唤的免费英雄/建造者切换与连续防闪采样，再在明确运行负载下测原生ETW。保持均值≥90FPS且P95≤16.7ms的原门槛，记录正常退出/恢复0104；全部发布门禁通过后才更新原条目并做官方完整下载和新游廊复验。不得用unsupported头像、开发fixture或新package的旧FPS代替缺失验收。
+
+[机器交接指标](candidate1106_handoff_20261101.public.json)保留完整摘要和待办。商品清单仍是`docs/reviews/commerce_feature_audit_20261031.md`（134 SKU审计），后续待安排5行/4SKU；D持有/共享CD为已开发未发布，距离/耗魔法差异保留，未扩大修改其余商品。

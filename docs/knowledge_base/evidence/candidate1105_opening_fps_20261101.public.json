@@ -1,0 +1,1146 @@
+{
+  "schema": 1,
+  "status": "VALID_SIGNED1105_ORDINARY_NATIVE_CAPTURE_P95_GATE_FAILED_NOT_PUBLISHED",
+  "capture_label": "local1105_candidate14_v05_31528_opening_20261101_g01",
+  "requested_seconds": 30.0,
+  "delay_seconds": 3.0,
+  "read_only": true,
+  "tools": false,
+  "real_account_operations": 0,
+  "script_injection": false,
+  "source_sha256": {
+    "frames.csv": "f879fbfe2aeaf289ff79498c81e3cea192e757929fada3c3a2b931d11d8a6c87",
+    "capture.json": "f0721aeaa99b2ed9ae88b7bb74b8864055420741d529b3437d43dbe570bd69e5",
+    "analysis.json": "cc4296d54a4b4c1314dc8419640fdec7132fc80b5543d6ae7e9d6ce963f2a78b",
+    "focus.json": "3c82376d68f7f2dce6ca32082fe5840df037a37312fc2349693083f7d0c96a0d",
+    "identity_signature.json": "04d224688e2c190a9c2fa0cfa5ebafb6ef32aeb0e63dbf417ac863871b97ee1e"
+  },
+  "scope": {
+    "clients_observed": 1,
+    "width": 1600,
+    "height": 900,
+    "single_pid": true,
+    "single_swapchain": true,
+    "scenario": "Local signed1105 ordinary original-item rehearsal, N1 next-wave3, builder selected, existing base/tower/research and early creeps; not initial first minute.",
+    "native_frame_metrics": true,
+    "os_cpu_gpu_utilization_measured": false,
+    "candidate_release_sequence": 2026110105,
+    "official_release_sequence_at_observation": 2026110104
+  },
+  "first_row_policy": {
+    "discarded_rows": 1,
+    "raw_first_interval_positive": true,
+    "reason": "Conservative existing capture protocol; positive first v2 interval is not claimed invalid"
+  },
+  "raw_frames": 3001,
+  "accepted_frames": 3000,
+  "frames": 3000,
+  "mean_fps": 100.30551857291086,
+  "interval_sum_seconds": 29.9086236,
+  "frame_time": {
+    "count": 3000,
+    "mean_ms": 9.9695412,
+    "p50_ms": 9.21575,
+    "p95_ms": 19.993124999999996,
+    "p99_ms": 25.14184599999998,
+    "max_ms": 44.0359
+  },
+  "over_ms": {
+    "16.7": 285,
+    "25.0": 32,
+    "33.3": 3,
+    "50.0": 0
+  },
+  "metrics": {
+    "FrameTime": {
+      "count": 3000,
+      "mean_ms": 9.9695412,
+      "p50_ms": 9.21575,
+      "p95_ms": 19.993124999999996,
+      "p99_ms": 25.14184599999998,
+      "max_ms": 44.0359
+    },
+    "CPUBusy": {
+      "count": 3000,
+      "mean_ms": 5.2329437,
+      "p50_ms": 3.1512000000000002,
+      "p95_ms": 19.936789999999995,
+      "p99_ms": 25.086030999999984,
+      "max_ms": 43.9722
+    },
+    "CPUWait": {
+      "count": 3000,
+      "mean_ms": 4.7365975,
+      "p50_ms": 5.46105,
+      "p95_ms": 8.257859999999999,
+      "p99_ms": 8.668648,
+      "max_ms": 9.4753
+    },
+    "GPUTime": {
+      "count": 3000,
+      "mean_ms": 8.6932545,
+      "p50_ms": 8.79165,
+      "p95_ms": 9.73955,
+      "p99_ms": 10.006105999999999,
+      "max_ms": 10.5933
+    },
+    "GPUBusy": {
+      "count": 3000,
+      "mean_ms": 8.160366266666667,
+      "p50_ms": 8.2424,
+      "p95_ms": 8.51721,
+      "p99_ms": 8.669514999999999,
+      "max_ms": 8.8308
+    },
+    "GPUWait": {
+      "count": 3000,
+      "mean_ms": 0.5328882333333333,
+      "p50_ms": 0.62595,
+      "p95_ms": 1.2327899999999994,
+      "p99_ms": 1.461302,
+      "max_ms": 1.9317
+    },
+    "GPULatency": {
+      "count": 3000,
+      "mean_ms": 9.838030666666667,
+      "p50_ms": 9.137,
+      "p95_ms": 19.603494999999995,
+      "p99_ms": 24.682537999999976,
+      "max_ms": 43.5653
+    }
+  },
+  "native_slowest_one_percent": {
+    "fraction": 0.01,
+    "frame_count": 30,
+    "mean_frame_time_ms": 28.46249,
+    "fps": 35.13396052137392,
+    "selection": "ceil(N*fraction) largest native frame intervals; whole frames, deterministic ties",
+    "formula": "1000 / arithmetic_mean(selected_FrameTime_ms)",
+    "not_inverse_percentile": true
+  },
+  "focus": {
+    "samples": 30,
+    "duration_seconds": 30.000396099989302,
+    "first_sample_second": 0.002148,
+    "last_sample_second": 29.001179,
+    "maximum_gap_seconds": 1.0008440000000007,
+    "all_observations_foreground": true,
+    "one_target_window": true,
+    "client_width": 1600,
+    "client_height": 900,
+    "sampling_interval_seconds": 1,
+    "continuous_foreground_proven": false,
+    "limitation": "Once-per-second positive observations do not rule out changes between samples."
+  },
+  "screenshots": {
+    "before": {
+      "png_sha256": "bcfe3004807825119c291fe78f9e1d7b6890e1e81a72300b5d67224ecc15cb42",
+      "metadata_sha256": "08048c398c316ae42b58acac61201856e201914368a9b24b1d52233d645138f1",
+      "started_utc": "2026-11-01T09:16:50.2898343Z",
+      "ended_utc": "2026-11-01T09:16:50.3684411Z",
+      "width": 1600,
+      "height": 900,
+      "foreground_nonminimized_verified": true
+    },
+    "after": {
+      "png_sha256": "81ced278a15b48cf903e9cc489bea619838a580bcfdd3a14aa1f03f2122c54d5",
+      "metadata_sha256": "af278489a42e03a6b1c890f0bf8c3f83e8b0cc1b06d43ce2b4927f70a9d93351",
+      "started_utc": "2026-11-01T09:17:24.3501972Z",
+      "ended_utc": "2026-11-01T09:17:24.4347928Z",
+      "width": 1600,
+      "height": 900,
+      "foreground_nonminimized_verified": true
+    }
+  },
+  "visual_review": {
+    "independently_read_both_actual_pngs": true,
+    "before_game_in_progress": true,
+    "after_game_in_progress": true,
+    "before_paused": false,
+    "after_paused": false,
+    "postgame": false,
+    "before_countdown": "01:20",
+    "after_countdown": "00:46",
+    "next_wave_before": 3,
+    "next_wave_after": 3,
+    "population_before": "8/31",
+    "population_after": "8/31",
+    "creeps_before": 6,
+    "creeps_after": 0,
+    "wood_before": 1150,
+    "wood_after": 349,
+    "research_completion_visible_after": true,
+    "gameplay_timer_advanced_seconds": 34,
+    "continuous_no_pause_or_window_change_proven": false
+  },
+  "timing": {
+    "capture_started_utc": "2026-11-01T09:16:50.546234+00:00",
+    "focus_started_utc": "2026-11-01T09:16:53.592522+00:00",
+    "focus_ended_utc": "2026-11-01T09:17:23.592917+00:00",
+    "screenshot_bracket_seconds": 33.981756,
+    "focus_after_capture_start_seconds": 3.046288,
+    "first_accepted_cpu_start_ms": 3038.8946,
+    "last_accepted_cpu_start_ms": 32939.3378,
+    "accepted_timestamp_span_seconds": 29.9004432,
+    "absolute_etw_wall_clock_alignment_certified": false
+  },
+  "consistency": {
+    "prior_independent_analysis_matches": true,
+    "frame_time_cpu_busy_plus_wait_max_error_ms": 3.3792413312028202e-15,
+    "cpu_start_next_interval_max_error_ms": 5.915268275202834e-12
+  },
+  "frame_time_correlations": {
+    "CPUBusy": 0.9260163635393314,
+    "CPUWait": -0.5527248535937621,
+    "GPUTime": -0.028706742543205977,
+    "GPUBusy": -0.015518668344440264,
+    "GPUWait": -0.03545212100919023,
+    "GPULatency": 0.9997552814788324
+  },
+  "frame_groups": {
+    "over_25ms": {
+      "frames": 32,
+      "means_ms": {
+        "FrameTime": 28.252612499999998,
+        "CPUBusy": 28.18385625,
+        "CPUWait": 0.06875625,
+        "GPUTime": 8.5626,
+        "GPUBusy": 8.12355625,
+        "GPUWait": 0.43904375,
+        "GPULatency": 27.817265625
+      }
+    },
+    "at_most_25ms": {
+      "frames": 2968,
+      "means_ms": {
+        "FrameTime": 9.772419137466308,
+        "CPUBusy": 4.985494508086253,
+        "CPUWait": 4.786924629380054,
+        "GPUTime": 8.694663173854448,
+        "GPUBusy": 8.160763140161725,
+        "GPUWait": 0.5339000336927223,
+        "GPULatency": 9.644184467654986
+      }
+    }
+  },
+  "present_modes": {
+    "Composed: Flip": 3000
+  },
+  "sync_intervals": {
+    "0": 3000
+  },
+  "per_second": [
+    {
+      "start_second": 0,
+      "end_second": 1,
+      "frames": 93,
+      "mean_fps": 96.16725906042933,
+      "interval_sum_seconds": 0.9670651,
+      "frame_time": {
+        "count": 93,
+        "mean_ms": 10.398549462365592,
+        "p50_ms": 9.3231,
+        "p95_ms": 19.590799999999998,
+        "p99_ms": 22.95961999999996,
+        "max_ms": 44.0359
+      },
+      "over_ms": {
+        "16.7": 10,
+        "25.0": 1,
+        "33.3": 1,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 1,
+      "end_second": 2,
+      "frames": 102,
+      "mean_fps": 101.68174630224858,
+      "interval_sum_seconds": 1.0031299,
+      "frame_time": {
+        "count": 102,
+        "mean_ms": 9.834606862745098,
+        "p50_ms": 9.29675,
+        "p95_ms": 18.85694499999999,
+        "p99_ms": 21.818139999999996,
+        "max_ms": 28.5388
+      },
+      "over_ms": {
+        "16.7": 8,
+        "25.0": 1,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 2,
+      "end_second": 3,
+      "frames": 99,
+      "mean_fps": 99.37253770660831,
+      "interval_sum_seconds": 0.9962511,
+      "frame_time": {
+        "count": 99,
+        "mean_ms": 10.063142424242423,
+        "p50_ms": 9.3037,
+        "p95_ms": 19.75234,
+        "p99_ms": 25.847005999999993,
+        "max_ms": 27.5476
+      },
+      "over_ms": {
+        "16.7": 10,
+        "25.0": 2,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 3,
+      "end_second": 4,
+      "frames": 102,
+      "mean_fps": 102.1665826129504,
+      "interval_sum_seconds": 0.9983695,
+      "frame_time": {
+        "count": 102,
+        "mean_ms": 9.787936274509804,
+        "p50_ms": 9.242750000000001,
+        "p95_ms": 18.766765,
+        "p99_ms": 22.19124999999999,
+        "max_ms": 27.977
+      },
+      "over_ms": {
+        "16.7": 8,
+        "25.0": 1,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 4,
+      "end_second": 5,
+      "frames": 101,
+      "mean_fps": 100.62481033219537,
+      "interval_sum_seconds": 1.0037286,
+      "frame_time": {
+        "count": 101,
+        "mean_ms": 9.93790693069307,
+        "p50_ms": 9.2259,
+        "p95_ms": 20.0496,
+        "p99_ms": 22.0649,
+        "max_ms": 24.2646
+      },
+      "over_ms": {
+        "16.7": 10,
+        "25.0": 0,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 5,
+      "end_second": 6,
+      "frames": 102,
+      "mean_fps": 101.85630113036528,
+      "interval_sum_seconds": 1.0014108,
+      "frame_time": {
+        "count": 102,
+        "mean_ms": 9.81775294117647,
+        "p50_ms": 9.24345,
+        "p95_ms": 19.02294,
+        "p99_ms": 21.288542,
+        "max_ms": 23.2395
+      },
+      "over_ms": {
+        "16.7": 8,
+        "25.0": 0,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 6,
+      "end_second": 7,
+      "frames": 99,
+      "mean_fps": 99.28431055169584,
+      "interval_sum_seconds": 0.9971364,
+      "frame_time": {
+        "count": 99,
+        "mean_ms": 10.072084848484849,
+        "p50_ms": 9.2275,
+        "p95_ms": 20.273279999999993,
+        "p99_ms": 22.27309599999996,
+        "max_ms": 32.0974
+      },
+      "over_ms": {
+        "16.7": 10,
+        "25.0": 1,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 7,
+      "end_second": 8,
+      "frames": 102,
+      "mean_fps": 100.4167096555195,
+      "interval_sum_seconds": 1.0157672,
+      "frame_time": {
+        "count": 102,
+        "mean_ms": 9.958501960784314,
+        "p50_ms": 9.234549999999999,
+        "p95_ms": 20.727545,
+        "p99_ms": 23.070221999999994,
+        "max_ms": 26.5731
+      },
+      "over_ms": {
+        "16.7": 10,
+        "25.0": 1,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 8,
+      "end_second": 9,
+      "frames": 100,
+      "mean_fps": 101.66836774790637,
+      "interval_sum_seconds": 0.9835901,
+      "frame_time": {
+        "count": 100,
+        "mean_ms": 9.835901,
+        "p50_ms": 9.2346,
+        "p95_ms": 18.82737,
+        "p99_ms": 22.433429000000004,
+        "max_ms": 23.6441
+      },
+      "over_ms": {
+        "16.7": 9,
+        "25.0": 0,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 9,
+      "end_second": 10,
+      "frames": 99,
+      "mean_fps": 99.25659815755691,
+      "interval_sum_seconds": 0.9974148,
+      "frame_time": {
+        "count": 99,
+        "mean_ms": 10.07489696969697,
+        "p50_ms": 9.1849,
+        "p95_ms": 21.358309999999996,
+        "p99_ms": 25.771871999999977,
+        "max_ms": 31.8612
+      },
+      "over_ms": {
+        "16.7": 10,
+        "25.0": 2,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 10,
+      "end_second": 11,
+      "frames": 102,
+      "mean_fps": 101.82915105036768,
+      "interval_sum_seconds": 1.0016778,
+      "frame_time": {
+        "count": 102,
+        "mean_ms": 9.820370588235294,
+        "p50_ms": 9.23245,
+        "p95_ms": 20.169974999999965,
+        "p99_ms": 24.416046999999992,
+        "max_ms": 25.5948
+      },
+      "over_ms": {
+        "16.7": 9,
+        "25.0": 1,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 11,
+      "end_second": 12,
+      "frames": 100,
+      "mean_fps": 100.16762049613824,
+      "interval_sum_seconds": 0.9983266,
+      "frame_time": {
+        "count": 100,
+        "mean_ms": 9.983266,
+        "p50_ms": 9.2102,
+        "p95_ms": 20.83914,
+        "p99_ms": 22.139403,
+        "max_ms": 22.3971
+      },
+      "over_ms": {
+        "16.7": 10,
+        "25.0": 0,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 12,
+      "end_second": 13,
+      "frames": 101,
+      "mean_fps": 100.27766986069247,
+      "interval_sum_seconds": 1.0072033,
+      "frame_time": {
+        "count": 101,
+        "mean_ms": 9.9723099009901,
+        "p50_ms": 9.2038,
+        "p95_ms": 19.8482,
+        "p99_ms": 23.4547,
+        "max_ms": 23.7141
+      },
+      "over_ms": {
+        "16.7": 10,
+        "25.0": 0,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 13,
+      "end_second": 14,
+      "frames": 100,
+      "mean_fps": 100.54553999088253,
+      "interval_sum_seconds": 0.9945742,
+      "frame_time": {
+        "count": 100,
+        "mean_ms": 9.945742000000001,
+        "p50_ms": 9.1456,
+        "p95_ms": 19.272934999999997,
+        "p99_ms": 25.294035000000015,
+        "max_ms": 28.1388
+      },
+      "over_ms": {
+        "16.7": 9,
+        "25.0": 2,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 14,
+      "end_second": 15,
+      "frames": 100,
+      "mean_fps": 99.69181273012609,
+      "interval_sum_seconds": 1.0030914,
+      "frame_time": {
+        "count": 100,
+        "mean_ms": 10.030914000000001,
+        "p50_ms": 9.19425,
+        "p95_ms": 20.026014999999997,
+        "p99_ms": 24.370771,
+        "max_ms": 24.5857
+      },
+      "over_ms": {
+        "16.7": 11,
+        "25.0": 0,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 15,
+      "end_second": 16,
+      "frames": 100,
+      "mean_fps": 100.1440271398325,
+      "interval_sum_seconds": 0.9985618,
+      "frame_time": {
+        "count": 100,
+        "mean_ms": 9.985618,
+        "p50_ms": 9.2286,
+        "p95_ms": 19.78538,
+        "p99_ms": 21.039618000000075,
+        "max_ms": 34.9905
+      },
+      "over_ms": {
+        "16.7": 9,
+        "25.0": 1,
+        "33.3": 1,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 16,
+      "end_second": 17,
+      "frames": 98,
+      "mean_fps": 97.84080322906598,
+      "interval_sum_seconds": 1.0016271,
+      "frame_time": {
+        "count": 98,
+        "mean_ms": 10.220684693877551,
+        "p50_ms": 9.2056,
+        "p95_ms": 20.08197499999999,
+        "p99_ms": 26.902276000000004,
+        "max_ms": 28.1528
+      },
+      "over_ms": {
+        "16.7": 12,
+        "25.0": 3,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 17,
+      "end_second": 18,
+      "frames": 102,
+      "mean_fps": 101.9743534501073,
+      "interval_sum_seconds": 1.0002515,
+      "frame_time": {
+        "count": 102,
+        "mean_ms": 9.80638725490196,
+        "p50_ms": 9.18695,
+        "p95_ms": 19.731779999999997,
+        "p99_ms": 23.04159599999999,
+        "max_ms": 23.1218
+      },
+      "over_ms": {
+        "16.7": 8,
+        "25.0": 0,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 18,
+      "end_second": 19,
+      "frames": 100,
+      "mean_fps": 100.23935152356798,
+      "interval_sum_seconds": 0.9976122000000001,
+      "frame_time": {
+        "count": 100,
+        "mean_ms": 9.976122,
+        "p50_ms": 9.19015,
+        "p95_ms": 20.52638,
+        "p99_ms": 24.960538000000014,
+        "max_ms": 27.7165
+      },
+      "over_ms": {
+        "16.7": 10,
+        "25.0": 1,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 19,
+      "end_second": 20,
+      "frames": 102,
+      "mean_fps": 101.84473769738034,
+      "interval_sum_seconds": 1.0015245,
+      "frame_time": {
+        "count": 102,
+        "mean_ms": 9.818867647058823,
+        "p50_ms": 9.1403,
+        "p95_ms": 19.98174,
+        "p99_ms": 23.233817999999992,
+        "max_ms": 25.2256
+      },
+      "over_ms": {
+        "16.7": 9,
+        "25.0": 1,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 20,
+      "end_second": 21,
+      "frames": 100,
+      "mean_fps": 100.07868185967808,
+      "interval_sum_seconds": 0.9992138,
+      "frame_time": {
+        "count": 100,
+        "mean_ms": 9.992138,
+        "p50_ms": 9.137450000000001,
+        "p95_ms": 20.447505,
+        "p99_ms": 25.153328000000005,
+        "max_ms": 26.3738
+      },
+      "over_ms": {
+        "16.7": 10,
+        "25.0": 2,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 21,
+      "end_second": 22,
+      "frames": 102,
+      "mean_fps": 102.19859230456623,
+      "interval_sum_seconds": 0.9980568,
+      "frame_time": {
+        "count": 102,
+        "mean_ms": 9.784870588235293,
+        "p50_ms": 9.169,
+        "p95_ms": 20.325214999999982,
+        "p99_ms": 24.208142,
+        "max_ms": 26.828
+      },
+      "over_ms": {
+        "16.7": 9,
+        "25.0": 1,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 22,
+      "end_second": 23,
+      "frames": 95,
+      "mean_fps": 94.62140085091531,
+      "interval_sum_seconds": 1.0040012,
+      "frame_time": {
+        "count": 95,
+        "mean_ms": 10.568433684210527,
+        "p50_ms": 9.2263,
+        "p95_ms": 20.83387,
+        "p99_ms": 30.186506000000012,
+        "max_ms": 35.1639
+      },
+      "over_ms": {
+        "16.7": 11,
+        "25.0": 4,
+        "33.3": 1,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 23,
+      "end_second": 24,
+      "frames": 101,
+      "mean_fps": 101.63500534992579,
+      "interval_sum_seconds": 0.9937521,
+      "frame_time": {
+        "count": 101,
+        "mean_ms": 9.839129702970297,
+        "p50_ms": 9.2173,
+        "p95_ms": 19.7109,
+        "p99_ms": 21.2389,
+        "max_ms": 26.2122
+      },
+      "over_ms": {
+        "16.7": 8,
+        "25.0": 1,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 24,
+      "end_second": 25,
+      "frames": 101,
+      "mean_fps": 101.2058222807724,
+      "interval_sum_seconds": 0.9979663000000001,
+      "frame_time": {
+        "count": 101,
+        "mean_ms": 9.880854455445546,
+        "p50_ms": 9.1737,
+        "p95_ms": 19.2141,
+        "p99_ms": 23.1815,
+        "max_ms": 27.2687
+      },
+      "over_ms": {
+        "16.7": 10,
+        "25.0": 1,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 25,
+      "end_second": 26,
+      "frames": 102,
+      "mean_fps": 100.76944385936696,
+      "interval_sum_seconds": 1.0122115999999999,
+      "frame_time": {
+        "count": 102,
+        "mean_ms": 9.923643137254901,
+        "p50_ms": 9.200099999999999,
+        "p95_ms": 19.547534999999996,
+        "p99_ms": 24.708018999999982,
+        "max_ms": 26.5209
+      },
+      "over_ms": {
+        "16.7": 10,
+        "25.0": 1,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 26,
+      "end_second": 27,
+      "frames": 100,
+      "mean_fps": 100.83155785765206,
+      "interval_sum_seconds": 0.991753,
+      "frame_time": {
+        "count": 100,
+        "mean_ms": 9.917530000000001,
+        "p50_ms": 9.2229,
+        "p95_ms": 20.191369999999996,
+        "p99_ms": 23.53655600000001,
+        "max_ms": 25.6607
+      },
+      "over_ms": {
+        "16.7": 8,
+        "25.0": 1,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 27,
+      "end_second": 28,
+      "frames": 100,
+      "mean_fps": 99.75563858771552,
+      "interval_sum_seconds": 1.0024496,
+      "frame_time": {
+        "count": 100,
+        "mean_ms": 10.024496000000001,
+        "p50_ms": 9.22865,
+        "p95_ms": 19.56243,
+        "p99_ms": 25.077393000000008,
+        "max_ms": 26.0172
+      },
+      "over_ms": {
+        "16.7": 11,
+        "25.0": 2,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 28,
+      "end_second": 29,
+      "frames": 100,
+      "mean_fps": 100.36014237089796,
+      "interval_sum_seconds": 0.9964115,
+      "frame_time": {
+        "count": 100,
+        "mean_ms": 9.964115,
+        "p50_ms": 9.2235,
+        "p95_ms": 19.007519999999996,
+        "p99_ms": 24.26338100000004,
+        "max_ms": 32.1914
+      },
+      "over_ms": {
+        "16.7": 9,
+        "25.0": 1,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 29,
+      "end_second": 30.0,
+      "frames": 95,
+      "mean_fps": 100.58297894597085,
+      "interval_sum_seconds": 0.9444937999999999,
+      "frame_time": {
+        "count": 95,
+        "mean_ms": 9.94204,
+        "p50_ms": 9.2553,
+        "p95_ms": 19.30746,
+        "p99_ms": 21.710828000000006,
+        "max_ms": 23.35
+      },
+      "over_ms": {
+        "16.7": 9,
+        "25.0": 0,
+        "33.3": 0,
+        "50.0": 0
+      }
+    }
+  ],
+  "per_five_seconds": [
+    {
+      "start_second": 0,
+      "end_second": 5,
+      "frames": 497,
+      "mean_fps": 100.02930033308347,
+      "interval_sum_seconds": 4.9685442,
+      "frame_time": {
+        "count": 497,
+        "mean_ms": 9.997070824949699,
+        "p50_ms": 9.2866,
+        "p95_ms": 19.776419999999998,
+        "p99_ms": 24.326508000000032,
+        "max_ms": 44.0359
+      },
+      "over_ms": {
+        "16.7": 46,
+        "25.0": 5,
+        "33.3": 1,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 5,
+      "end_second": 10,
+      "frames": 502,
+      "mean_fps": 100.49407652479792,
+      "interval_sum_seconds": 4.9953193,
+      "frame_time": {
+        "count": 502,
+        "mean_ms": 9.950835258964144,
+        "p50_ms": 9.2266,
+        "p95_ms": 19.932779999999994,
+        "p99_ms": 23.989808000000004,
+        "max_ms": 32.0974
+      },
+      "over_ms": {
+        "16.7": 47,
+        "25.0": 4,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 10,
+      "end_second": 15,
+      "frames": 503,
+      "mean_fps": 100.50204467713498,
+      "interval_sum_seconds": 5.0048733,
+      "frame_time": {
+        "count": 503,
+        "mean_ms": 9.950046322067594,
+        "p50_ms": 9.2012,
+        "p95_ms": 20.639099999999992,
+        "p99_ms": 24.434260000000002,
+        "max_ms": 28.1388
+      },
+      "over_ms": {
+        "16.7": 49,
+        "25.0": 3,
+        "33.3": 0,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 15,
+      "end_second": 20,
+      "frames": 502,
+      "mean_fps": 100.4084925502999,
+      "interval_sum_seconds": 4.999577100000001,
+      "frame_time": {
+        "count": 502,
+        "mean_ms": 9.959316932270918,
+        "p50_ms": 9.191500000000001,
+        "p95_ms": 19.988015,
+        "p99_ms": 25.222671000000002,
+        "max_ms": 34.9905
+      },
+      "over_ms": {
+        "16.7": 48,
+        "25.0": 6,
+        "33.3": 1,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 20,
+      "end_second": 25,
+      "frames": 499,
+      "mean_fps": 99.94011203947485,
+      "interval_sum_seconds": 4.9929902,
+      "frame_time": {
+        "count": 499,
+        "mean_ms": 10.00599238476954,
+        "p50_ms": 9.1785,
+        "p95_ms": 20.39731,
+        "p99_ms": 26.831107999999997,
+        "max_ms": 35.1639
+      },
+      "over_ms": {
+        "16.7": 48,
+        "25.0": 9,
+        "33.3": 1,
+        "50.0": 0
+      }
+    },
+    {
+      "start_second": 25,
+      "end_second": 30.0,
+      "frames": 497,
+      "mean_fps": 100.45844017149085,
+      "interval_sum_seconds": 4.9473195,
+      "frame_time": {
+        "count": 497,
+        "mean_ms": 9.95436519114688,
+        "p50_ms": 9.2201,
+        "p95_ms": 19.639899999999997,
+        "p99_ms": 24.757052000000005,
+        "max_ms": 32.1914
+      },
+      "over_ms": {
+        "16.7": 47,
+        "25.0": 5,
+        "33.3": 0,
+        "50.0": 0
+      }
+    }
+  ],
+  "per_minute": [
+    {
+      "start_second": 0,
+      "end_second": 30.0,
+      "frames": 3000,
+      "mean_fps": 100.30551857291086,
+      "interval_sum_seconds": 29.9086236,
+      "frame_time": {
+        "count": 3000,
+        "mean_ms": 9.9695412,
+        "p50_ms": 9.21575,
+        "p95_ms": 19.993124999999996,
+        "p99_ms": 25.14184599999998,
+        "max_ms": 44.0359
+      },
+      "over_ms": {
+        "16.7": 285,
+        "25.0": 32,
+        "33.3": 3,
+        "50.0": 0
+      }
+    }
+  ],
+  "slowest_ten_frames": [
+    {
+      "second": 0.9619238,
+      "FrameTime": 44.0359,
+      "CPUBusy": 43.9722,
+      "CPUWait": 0.0637,
+      "GPUTime": 8.6419,
+      "GPUBusy": 8.1593,
+      "GPUWait": 0.4826,
+      "GPULatency": 43.5653
+    },
+    {
+      "second": 22.643918799999998,
+      "FrameTime": 35.1639,
+      "CPUBusy": 35.0961,
+      "CPUWait": 0.0678,
+      "GPUTime": 8.8188,
+      "GPUBusy": 8.0599,
+      "GPUWait": 0.7589,
+      "GPULatency": 34.5144
+    },
+    {
+      "second": 15.621512599999999,
+      "FrameTime": 34.9905,
+      "CPUBusy": 34.9263,
+      "CPUWait": 0.0642,
+      "GPUTime": 8.4567,
+      "GPUBusy": 8.0786,
+      "GPUWait": 0.3781,
+      "GPULatency": 34.5908
+    },
+    {
+      "second": 28.970833,
+      "FrameTime": 32.1914,
+      "CPUBusy": 32.1392,
+      "CPUWait": 0.0522,
+      "GPUTime": 8.5202,
+      "GPUBusy": 8.1132,
+      "GPUWait": 0.407,
+      "GPULatency": 31.6714
+    },
+    {
+      "second": 6.0166008,
+      "FrameTime": 32.0974,
+      "CPUBusy": 32.0399,
+      "CPUWait": 0.0575,
+      "GPUTime": 8.5044,
+      "GPUBusy": 8.1432,
+      "GPUWait": 0.3612,
+      "GPULatency": 31.6978
+    },
+    {
+      "second": 9.039841000000001,
+      "FrameTime": 31.8612,
+      "CPUBusy": 31.8063,
+      "CPUWait": 0.0549,
+      "GPUTime": 8.432,
+      "GPUBusy": 8.1107,
+      "GPUWait": 0.3213,
+      "GPULatency": 31.4264
+    },
+    {
+      "second": 22.540703699999998,
+      "FrameTime": 29.8688,
+      "CPUBusy": 29.7997,
+      "CPUWait": 0.0691,
+      "GPUTime": 8.5985,
+      "GPUBusy": 8.0822,
+      "GPUWait": 0.5163,
+      "GPULatency": 29.3472
+    },
+    {
+      "second": 1.9068417,
+      "FrameTime": 28.5388,
+      "CPUBusy": 28.4877,
+      "CPUWait": 0.0511,
+      "GPUTime": 8.5862,
+      "GPUBusy": 8.199,
+      "GPUWait": 0.3872,
+      "GPULatency": 28.0817
+    },
+    {
+      "second": 16.671471,
+      "FrameTime": 28.1528,
+      "CPUBusy": 28.0958,
+      "CPUWait": 0.057,
+      "GPUTime": 8.5237,
+      "GPUBusy": 8.071,
+      "GPUWait": 0.4527,
+      "GPULatency": 27.7768
+    },
+    {
+      "second": 13.0971865,
+      "FrameTime": 28.1388,
+      "CPUBusy": 28.085,
+      "CPUWait": 0.0538,
+      "GPUTime": 8.4256,
+      "GPUBusy": 8.1013,
+      "GPUWait": 0.3243,
+      "GPULatency": 27.7664
+    }
+  ],
+  "limits": [
+    "One local1600x900 ordinary signed1105 candidate client and one30s early-game builder/base sample; not official downloaded1105, not initial first minute, not multiplayer or long-game acceptance.",
+    "Different camera, units, research and wave state from prior96.54 and86.11FPS ordinary3102 captures and the paused Bane portraits; no matched-load performance-improvement comparison.",
+    "1%low is inverse mean duration of ceil(N*.01) slowest whole native frame intervals, not inverseP99.",
+    "FrameTime=CPUBusy+CPUWait creates definitional correlation. ETW durations are not OS utilization or thread/function attribution; they do not identify Lua, Panorama,188worlds, shaders or background loading as cause.",
+    "Focus is sampled1Hz; before/after native pixels show normal countdown progression, not continuous proof of no intervening pause or window changes.",
+    "No game command, new native capture, SDK, purchase, reward, redemption, account or GUI operation was performed for this independent analysis.",
+    "Process exit/restoration/stability and later screenshots are independent gates; valid30s metrics do not override them."
+  ],
+  "candidate": {
+    "source_revision": "79d7d10529435b399eb9b5f6bc6216cd823946e1",
+    "content_sha256": "007f87da33cb62e7ea073f076cd586d7b9bcf00970fb292dc26d058c745ba645",
+    "package_report_sha256": "dac080fcd67be76a5d239bc23c06fb020c81a2321d5bd145b4278a449af2725f",
+    "scope_runtime_paths": 14,
+    "resources": 6918,
+    "protected_modules": 184,
+    "approved_accounts": 5,
+    "max_players": 4
+  },
+  "engineering_gate": {
+    "mean_fps_minimum": 90,
+    "mean_fps_pass": true,
+    "p95_ms_maximum": 16.7,
+    "p95_pass": false,
+    "overall_pass": false,
+    "publication_performed": false,
+    "official_download_1105": false,
+    "reason": "Mean FPS passes but P95 exceeds reviewed engineering threshold; valid measurement is retained as a failed candidate-performance gate."
+  }
+}

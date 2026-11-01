@@ -1,16 +1,18 @@
 # 商品功能、头像驻留及解耦审查｜2026-11-01
 
+**当前1106仅编译/unsigned审阅，未完成目标**：正式原条目仍0104五账号/四人容量。game1ae78396／content f8640121已同步，1106为同14路径/6918资源/184保护模块/19审阅；HUD稳定根递归查询的合成计数31→0，尚未签名、未新实机/FPS/发布。1105有限头像通过，但实测100.31FPS/P95=19.99ms未过16.7ms门槛；第3波仅原生退路、非饰品或免费英雄验收，已正常退出并完整恢复0104。下一步需新1106带饰品冷选/淘汰回切、免费英雄切换、真实带饰品波次、FPS及发布/官方下载，不能标完成。见[精确交接与待办](candidate1106_handoff_20261101.md)。
+
 任务从UTC2026-10-31 14:31开始，用户限制12小时，截止UTC2026-11-01 02:31。优先级：实际游廊饰品头像与开局帧率，随后侏儒传送器门禁、全商品清单、解耦及新项目知识交接。用户确认3102商城已有商品信息，并自行完成兑换；这不等于每件商品及真人奖励到账都已逐项验收。
 
 ## 已完成与当前边界
 
-截止前阶段更新：[14文件候选收口](candidate14_stage_closeout_20261101.md)记录用户明确批准后已签seq2026110103/content c28c43f6…030a（report0df36ca4…090e），运行source ceede161d3、ops9559…、content b1ac328。原五VPK完整备份后本地stage并普通启动，用户自行OAuth进入N3波次5；root观察运行建造者画面，但前台持续干扰、engine.log未生成，生产饰品头像/QWER/FPS/稳定性没有验收，ETW仅准备未执行。没有日志不能记0错误，不能发布；原条目未更新，远端仍3102，旧13签名保留。WM_CLOSE已排队，root CIM于02:18:46.8802933确认无Dota；keeper exit1于02:17:11.157306写hold_failed/evidence_complete=false，连续hold和正常keeper收尾未通过、原因未定。实际official restore已exit0，restored.json确认ORIGINAL3102_FIVE_FILES_FULLY_RESTORED、publication_performed=false，原五文件已完整恢复、备份保留；keeper hold_failed与生产验收未通过仍保留。
+原12小时截止阶段（历史）：[14文件候选收口](candidate14_stage_closeout_20261101.md)记录用户明确批准后已签seq2026110103/content c28c43f6…030a（report0df36ca4…090e），运行source ceede161d3、ops9559…、content b1ac328。原五VPK完整备份后本地stage并普通启动，用户自行OAuth进入N3波次5；root观察运行建造者画面，但前台持续干扰、engine.log未生成，生产饰品头像/QWER/FPS/稳定性没有验收，ETW仅准备未执行。没有日志不能记0错误，不能发布；原条目未更新，远端仍3102，旧13签名保留。WM_CLOSE已排队，root CIM于02:18:46.8802933确认无Dota；keeper exit1于02:17:11.157306写hold_failed/evidence_complete=false，连续hold和正常keeper收尾未通过、原因未定。实际official restore已exit0，restored.json确认ORIGINAL3102_FIVE_FILES_FULLY_RESTORED、publication_performed=false，原五文件已完整恢复、备份保留；keeper hold_failed与生产验收未通过仍保留。
 
-最新范围变更：archive_service的UI wire预算修复已在开发源码冻结并完成专项Lua/Node及新冷Tools日志复核，用户确认查看结果正常，详见[安全指标与原件SHA](archive_ui_wire_budget_20261101.public.json)及`docs/reviews/archive_ui_wire_budget_20261101.md`。该修复现已纳入14文件v03源码ceede161d3并完成新计划/签名，普通生产验收未完成；截止前状态以上方收口为准。已签13文件v02/2026110102保持原样、未发布，不含新wire修复；签名包content `9535cee3defd7e2a9a4cb1ed5861e229481a4465ea44afdab958c04b33cf08aa`、reportSHA `a589489bd56caaa2ce183c578859d6a2a8663b3e1fc74577ab0d649ba12b58f8`。正式游廊仍3102，不能拿旧13签名或旧12计划发布新14源。
+最新范围变更：archive_service的UI wire预算修复已在开发源码冻结并完成专项Lua/Node及新冷Tools日志复核，用户确认查看结果正常，详见[安全指标与原件SHA](archive_ui_wire_budget_20261101.public.json)及`docs/reviews/archive_ui_wire_budget_20261101.md`。该修复现已纳入14文件v03源码ceede161d3并完成新计划/签名，普通生产验收未完成；截止前状态以上方收口为准。已签13文件v02/2026110102保持原样、未发布，不含新wire修复；签名包content `9535cee3defd7e2a9a4cb1ed5861e229481a4465ea44afdab958c04b33cf08aa`、reportSHA `a589489bd56caaa2ce183c578859d6a2a8663b3e1fc74577ab0d649ba12b58f8`。当时正式游廊仍3102；此后0104已正式发布，当前1105必须保留其五账号准入，不能拿旧13签名或旧12计划发布新14源。
 
 上一轮源码交付为game `11571b4313401d3d15073a0d14234754fb851316 / dev`、content `fb775f5ae9a36d863f048928a8fa0230a5cbb548 / master`，已按stash→pull→pop→commit→push同步。它包含D权益统一与renderer缓存改动，不包含随后v04的combat_stats查询锚点修正。该次同步时game原HUD编译字节、Python缓存、bundle运行指针及两份头像实验脚本保留，content干净；新改属性文件的换行归一已逐字节对照确切stash规范内容，其余原始SHA一致、旧stash保持。这是历史同步状态；当前13文件运行修复随后已纳入game `048a2d6b675325cd511abb01c5a122343052b2f7 / dev`及content `b1ac328e4467510c89fdfd8c6d9f79947d7c820a / master`，本轮操作工具另行提交，不改变冻结运行源码。
 
-当前正式游廊仍为3102。2026110101曾准备12文件未签名审阅包，6918项资源、184保护模块，content `7ed3e94bb586cfb88802a97ef98dadce4743c98dfbb5bd6d1f2b42bf95611d69`；它只作保留的旧候选，不安装/运行unsigned，也不能作为最终头像修复。此前范围改为2026110102的13文件v02（现已签名保留、未发布），追加已有combat_stats.vjs_c；新增运行模块仍仅hero_teleport_access，资源总数仍6918/184保护模块。13文件修复已有上述源码提交；签名生产玩法、正式新游廊及新版正式FPS均未验，当前不能沿用旧12文件候选状态代替新包审阅。原四账号、正常联网配置及`all_difficulties_unlocked=false`、d573和地图保持原范围；后续签名/发布须按最终范围审阅，不能沿用旧12文件计划冒充新候选。
+早期基线为3102（当前正式版已为0104）。2026110101曾准备12文件未签名审阅包，6918项资源、184保护模块，content `7ed3e94bb586cfb88802a97ef98dadce4743c98dfbb5bd6d1f2b42bf95611d69`；它只作保留的旧候选，不安装/运行unsigned，也不能作为最终头像修复。此前范围改为2026110102的13文件v02（现已签名保留、未发布），追加已有combat_stats.vjs_c；新增运行模块仍仅hero_teleport_access，资源总数仍6918/184保护模块。13文件修复已有上述源码提交；签名生产玩法、正式新游廊及新版正式FPS均未验，当前不能沿用旧12文件候选状态代替新包审阅。原四账号、正常联网配置及`all_difficulties_unlocked=false`、d573和地图保持原范围；后续签名/发布须按最终范围审阅，不能沿用旧12文件计划冒充新候选。
 
 普通客户端8200已通过正常Steam授权，并在3102的template_map取得188场景READY；不再记录为“登录待用户”。普通局实证查询锚点缺失，离线v04的共享主头像/default-opacity修正及六场景视觉结果见下文。D原生fixture的run02现已完成15个串行阶段并finish，开发离线内存provider下的权益、真实施法/退款及共享CD有限通过；完整包等价、建造者实际施放和正式游廊仍未验，详见下方D验证补充。
 

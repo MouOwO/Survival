@@ -1,0 +1,457 @@
+{
+  "schema_version": 1,
+  "status": "SIGNED1105_ORDINARY_PORTRAIT_SAMPLED_VISUAL_PASS_NOT_PUBLISHED",
+  "observed_utc": "2026-11-01T09:17:59.751222+00:00",
+  "official_release": {
+    "sequence": 2026110104,
+    "steam_manifest": "7025356658517360342",
+    "files": 6917,
+    "protected_modules": 184,
+    "approved_account_count": 5,
+    "max_players": 4
+  },
+  "candidate": {
+    "sequence": 2026110105,
+    "content_sha256": "007f87da33cb62e7ea073f076cd586d7b9bcf00970fb292dc26d058c745ba645",
+    "source_revision": "79d7d10529435b399eb9b5f6bc6216cd823946e1",
+    "package_report_sha256": "dac080fcd67be76a5d239bc23c06fb020c81a2321d5bd145b4278a449af2725f",
+    "files": 6918,
+    "protected_modules": 184,
+    "runtime_path_count": 14,
+    "trusted_review_count": 19,
+    "preserved_admission_row_count": 6,
+    "approved_account_count": 5,
+    "max_players": 4
+  },
+  "evidence": {
+    "transaction_sha256": "0d48b8f71f6688c38b6d19ba9bfe70b6288a3966dbff4424c6291d208c04f83e",
+    "process_receipt_sha256": "d8e681c3e5f82404f296e64b71e0637a3a697230a95d2406adce429cfb661e58",
+    "same_process_generation": true,
+    "ordinary_client": true,
+    "tools": false,
+    "offline_logic_test": false,
+    "resolution": [
+      1600,
+      900
+    ],
+    "capture_count": 21,
+    "distinct_monster_scenes": 6,
+    "all_metadata_validated": true,
+    "all_samples_paused": true,
+    "displayed_next_wave": 2,
+    "displayed_countdown": "01:04",
+    "cases": [
+      {
+        "case": "bane5",
+        "label": "挑战5转 / Bane",
+        "asset": "monster_boss_rebirth_05_lucid_torment",
+        "captures": [
+          {
+            "name": "candidate1105_bane5_a",
+            "png_sha256": "e23ae284f3dfe1a233b668453fc6689c9a96a9fe3dd3e73458ce3e44cbafcd74",
+            "metadata_sha256": "238277e4fbd01554a7e7740e3934b485263f9509cd354d7f25614bdadd97b6be",
+            "started_utc": "2026-11-01T08:54:17.9883277Z",
+            "ended_utc": "2026-11-01T08:54:18.0813963Z"
+          },
+          {
+            "name": "candidate1105_bane5_b",
+            "png_sha256": "a4d4623cae8cd57752fbd3fd9795e90c806274f071226b4910ce644ee4155aa4",
+            "metadata_sha256": "a10ffa01ee04706bbfda2d68109f0a1e91cb925ac2f9224dec0eb2965bc268bb",
+            "started_utc": "2026-11-01T08:54:18.2857440Z",
+            "ended_utc": "2026-11-01T08:54:18.3537790Z"
+          },
+          {
+            "name": "candidate1105_bane5_c",
+            "png_sha256": "d272d07de083383488279bcf4155ffb1b5d48c87d3b25b589a8ae54fdb2d5741",
+            "metadata_sha256": "05b980c715b03fba61c2601f4885be6288b82a6575cfc8daff75d5bf8eb93130",
+            "started_utc": "2026-11-01T08:54:18.5488001Z",
+            "ended_utc": "2026-11-01T08:54:18.6218916Z"
+          }
+        ],
+        "independent_pixels_reviewed": true,
+        "equipped_portrait_and_background_visible_in_samples": true,
+        "no_base_model_or_stale_qwer_observed_in_samples": true
+      },
+      {
+        "case": "other01",
+        "label": "挑战1转 / Undying",
+        "asset": "monster_boss_rebirth_01_phalanx",
+        "captures": [
+          {
+            "name": "candidate1105_other01_a",
+            "png_sha256": "309d8fd6b069c87d38233d43439f909dc25322aa67db2027368e5f0818c7aff5",
+            "metadata_sha256": "989b693908a1d2960f38f2c48fb3fe888abf819eebd0e92fb9208b792b01999f",
+            "started_utc": "2026-11-01T09:01:51.5305150Z",
+            "ended_utc": "2026-11-01T09:01:51.6237931Z"
+          },
+          {
+            "name": "candidate1105_other01_b",
+            "png_sha256": "cab129b3a698611c0f98ee815c72557abbfd23e542170b575658fa2e7a21bc24",
+            "metadata_sha256": "488e3014e83a1d5632305b79cfb6c9399357c2456399affa86d08919a7f75f0c",
+            "started_utc": "2026-11-01T09:01:51.8367604Z",
+            "ended_utc": "2026-11-01T09:01:51.9042609Z"
+          },
+          {
+            "name": "candidate1105_other01_c",
+            "png_sha256": "a42b86c85060482325fb835912064db2c5e80cdc29e44f2439c25227e8b084ad",
+            "metadata_sha256": "df4e5df82848fd2e9eaf26a06855d833ea548c47d5227fd68ebbadc54ae3d6f6",
+            "started_utc": "2026-11-01T09:01:52.0976938Z",
+            "ended_utc": "2026-11-01T09:01:52.1663379Z"
+          }
+        ],
+        "independent_pixels_reviewed": true,
+        "equipped_portrait_and_background_visible_in_samples": true,
+        "no_base_model_or_stale_qwer_observed_in_samples": true
+      },
+      {
+        "case": "other02",
+        "label": "挑战2转 / Bloodseeker",
+        "asset": "monster_boss_rebirth_02_bloodforge",
+        "captures": [
+          {
+            "name": "candidate1105_other02_a",
+            "png_sha256": "0e421eb3645a053333b2b118dc37ca31dac931ead4fd2b6d02be2ae3866d01ad",
+            "metadata_sha256": "4b9fabae293756403ad7ac7b13061aa1dd65142a1043c026a8ace900b5ee93b8",
+            "started_utc": "2026-11-01T09:01:54.4850295Z",
+            "ended_utc": "2026-11-01T09:01:54.5527801Z"
+          },
+          {
+            "name": "candidate1105_other02_b",
+            "png_sha256": "be55959d6e82ca841ba29a53d1eacabe29a73f6624d1f0ec64c8bb90268bc8cf",
+            "metadata_sha256": "cf9283107c144659949a1d23d5784d2c8891f8afb661ad3e0f843926eecfc1d9",
+            "started_utc": "2026-11-01T09:01:54.7521682Z",
+            "ended_utc": "2026-11-01T09:01:54.8168541Z"
+          },
+          {
+            "name": "candidate1105_other02_c",
+            "png_sha256": "c56f79f70d50d2345c29848cdf670ed8b3090c8ff78c4193757ae42467745911",
+            "metadata_sha256": "cf2bc19f9699f7166f96f1e0ee5c01162b7dd530870e1fd9de55a628215b9681",
+            "started_utc": "2026-11-01T09:01:55.0000582Z",
+            "ended_utc": "2026-11-01T09:01:55.0664956Z"
+          }
+        ],
+        "independent_pixels_reviewed": true,
+        "equipped_portrait_and_background_visible_in_samples": true,
+        "no_base_model_or_stale_qwer_observed_in_samples": true
+      },
+      {
+        "case": "other03",
+        "label": "挑战3转 / Dragon Knight",
+        "asset": "monster_boss_rebirth_03_silverwurm",
+        "captures": [
+          {
+            "name": "candidate1105_other03_a",
+            "png_sha256": "e976f69af3dd6db43a543f6b640d8d798235f5c2590e790b4222117a018e7af1",
+            "metadata_sha256": "57f6eb792d80095380c3311d395193416214fda5f2da5a58fa3fa8fd966ebe1c",
+            "started_utc": "2026-11-01T09:01:57.3585363Z",
+            "ended_utc": "2026-11-01T09:01:57.4163387Z"
+          },
+          {
+            "name": "candidate1105_other03_b",
+            "png_sha256": "8544498cb512943efbc8410bfc97fbcb9a0c509a1bd28d5a556ae969c77a468a",
+            "metadata_sha256": "7d06b4ace5140d59dfffa78711d23d555b1816c06adf6aadd4ba637f4c38a302",
+            "started_utc": "2026-11-01T09:01:57.6119034Z",
+            "ended_utc": "2026-11-01T09:01:57.6846516Z"
+          },
+          {
+            "name": "candidate1105_other03_c",
+            "png_sha256": "8756131856b21046801a7c7b62a5b105a2a6bdd9ed9838f7ac4fb7a804adb17d",
+            "metadata_sha256": "bde45c001bb4bbd8898b87c4459b76edaba5b73f3165db504692a88d547afe0d",
+            "started_utc": "2026-11-01T09:01:57.8786904Z",
+            "ended_utc": "2026-11-01T09:01:57.9618674Z"
+          }
+        ],
+        "independent_pixels_reviewed": true,
+        "equipped_portrait_and_background_visible_in_samples": true,
+        "no_base_model_or_stale_qwer_observed_in_samples": true
+      },
+      {
+        "case": "other04",
+        "label": "挑战4转 / Sven",
+        "asset": "monster_boss_rebirth_04_stormwrought",
+        "captures": [
+          {
+            "name": "candidate1105_other04_a",
+            "png_sha256": "ac7518be5373e3e1d4a55aa7cdd75bf9dc7121e255e32d4ec9dde4c9f450feb6",
+            "metadata_sha256": "5252d5e4c9036047c0e403cf2ad3b6400963d8f980cb91954378d0cebec392da",
+            "started_utc": "2026-11-01T09:02:00.2692531Z",
+            "ended_utc": "2026-11-01T09:02:00.3329570Z"
+          },
+          {
+            "name": "candidate1105_other04_b",
+            "png_sha256": "86a1a66cc2674dbfa86f070a9de9311dfae296b6de6d216c9799675db87a2313",
+            "metadata_sha256": "a4c668f8eda166a84154534bdfe8e2d4b1d5d1899630241b42a1d68c14309e5e",
+            "started_utc": "2026-11-01T09:02:00.5149810Z",
+            "ended_utc": "2026-11-01T09:02:00.5840330Z"
+          },
+          {
+            "name": "candidate1105_other04_c",
+            "png_sha256": "0d8534b71986b20c805cfb421582bbb7fb657951fe4c409fa76df195897400b1",
+            "metadata_sha256": "abd0e6e9278dcb3f4d5e5e9930e92cd97f57e6c8d7345597de6c2fe2135ee1e5",
+            "started_utc": "2026-11-01T09:02:00.7667507Z",
+            "ended_utc": "2026-11-01T09:02:00.8341966Z"
+          }
+        ],
+        "independent_pixels_reviewed": true,
+        "equipped_portrait_and_background_visible_in_samples": true,
+        "no_base_model_or_stale_qwer_observed_in_samples": true
+      },
+      {
+        "case": "other06",
+        "label": "挑战6转 / Lifestealer",
+        "asset": "monster_boss_rebirth_06_obsidian_atrocity",
+        "captures": [
+          {
+            "name": "candidate1105_other06_a",
+            "png_sha256": "c73433b86916a11c21c01a81314abd19f8f94a8420e4dc0b2eb540a96640ba4f",
+            "metadata_sha256": "68c276f838885df4fc3f53743d8763816f48191d5418b469349edd91235d82c6",
+            "started_utc": "2026-11-01T09:02:03.1238250Z",
+            "ended_utc": "2026-11-01T09:02:03.1824417Z"
+          },
+          {
+            "name": "candidate1105_other06_b",
+            "png_sha256": "316c0f7c94ade5aca5bb3b1a0e137b790dc739d0c6a8763f5fc1b5f89e9195d4",
+            "metadata_sha256": "63503cc0f42cb19ff3d1f457d019b058d58f7a0e9abab4e4266c81e0a872e9dd",
+            "started_utc": "2026-11-01T09:02:03.3699681Z",
+            "ended_utc": "2026-11-01T09:02:03.4309244Z"
+          },
+          {
+            "name": "candidate1105_other06_c",
+            "png_sha256": "749543ac202dca5c726e58ac111f8f1e2767629445ccb9f7e99ac651786a5ac4",
+            "metadata_sha256": "520260882c62975ffe6da869922249499f52bee24e1f98b5ac18912448edb9c1",
+            "started_utc": "2026-11-01T09:02:03.6260474Z",
+            "ended_utc": "2026-11-01T09:02:03.7046282Z"
+          }
+        ],
+        "independent_pixels_reviewed": true,
+        "equipped_portrait_and_background_visible_in_samples": true,
+        "no_base_model_or_stale_qwer_observed_in_samples": true
+      },
+      {
+        "case": "bane5_return",
+        "label": "五种不同场景后回到挑战5转",
+        "asset": "monster_boss_rebirth_05_lucid_torment",
+        "captures": [
+          {
+            "name": "candidate1105_bane5_return_a",
+            "png_sha256": "c70a99102ef92ececad6b3291659ad967a2b3ba2e9fdaaa748a4c4477ece43f2",
+            "metadata_sha256": "84ec2e62f552847d7a1396559fe9aebc1e43667ef9d5b60721eec9a07dc86355",
+            "started_utc": "2026-11-01T09:02:06.0188135Z",
+            "ended_utc": "2026-11-01T09:02:06.0908810Z"
+          },
+          {
+            "name": "candidate1105_bane5_return_b",
+            "png_sha256": "ade043f316e0f3cffdc91718334029ef5c726c7750acc22b442e8fe18c3abafc",
+            "metadata_sha256": "d087da4f7b035683d2ac427777979ffb62e4b63fc8cdebe8228765e4479ee682",
+            "started_utc": "2026-11-01T09:02:06.2781447Z",
+            "ended_utc": "2026-11-01T09:02:06.3500787Z"
+          },
+          {
+            "name": "candidate1105_bane5_return_c",
+            "png_sha256": "8e2a866a67b58b1d573a2536f5fd73411524edce936cc02b55e98430426c6b4d",
+            "metadata_sha256": "d62ff00189a7b990f0b5f005b2eeca49651957f95b242caf030e787d98974f12",
+            "started_utc": "2026-11-01T09:02:06.5331910Z",
+            "ended_utc": "2026-11-01T09:02:06.6005147Z"
+          }
+        ],
+        "independent_pixels_reviewed": true,
+        "equipped_portrait_and_background_visible_in_samples": true,
+        "no_base_model_or_stale_qwer_observed_in_samples": true
+      }
+    ]
+  },
+  "diagnostic_prefix": {
+    "observed_utc": "2026-11-01T09:17:59.751222+00:00",
+    "bytes": 449561,
+    "sha256": "7fcca86b50c24383ff4758faa917f53fd253e05ca47a34f571f458d22d5290d5",
+    "finalized": false,
+    "raw_log_exported": false,
+    "ready": [
+      {
+        "asset": "monster_boss_rebirth_05_lucid_torment",
+        "map": "portraits/monster_326b73b164e21d7f1a07_v1",
+        "ms": 97,
+        "catalogue_components": 4
+      },
+      {
+        "asset": "monster_boss_rebirth_01_phalanx",
+        "map": "portraits/monster_f7ff354925db46ed5866_v1",
+        "ms": 123,
+        "catalogue_components": 3
+      },
+      {
+        "asset": "monster_boss_rebirth_02_bloodforge",
+        "map": "portraits/monster_46060a6c5f0712e13469_v1",
+        "ms": 142,
+        "catalogue_components": 7
+      },
+      {
+        "asset": "monster_boss_rebirth_03_silverwurm",
+        "map": "portraits/monster_3c910c9c46bfb3b9d614_v1",
+        "ms": 91,
+        "catalogue_components": 6
+      },
+      {
+        "asset": "monster_boss_rebirth_04_stormwrought",
+        "map": "portraits/monster_a24347f9aea9405cec13_v1",
+        "ms": 97,
+        "catalogue_components": 6
+      },
+      {
+        "asset": "monster_boss_rebirth_06_obsidian_atrocity",
+        "map": "portraits/monster_ccf9c15fda42e7d7e384_v1",
+        "ms": 100,
+        "catalogue_components": 4
+      },
+      {
+        "asset": "monster_boss_rebirth_05_lucid_torment",
+        "map": "portraits/monster_326b73b164e21d7f1a07_v1",
+        "ms": 83,
+        "catalogue_components": 4
+      }
+    ],
+    "scope": "MUTABLE_LOG_PREFIX_OBSERVATION_ONLY_NOT_FINAL_EXIT_OR_WHOLE_SESSION_ACCEPTANCE"
+  },
+  "boundaries": {
+    "discrete_settled_screens_not_all_native_frames": true,
+    "no_complete_selection_flash_timing_proof": true,
+    "catalogue_component_count_not_visible_mesh_count": true,
+    "application_cold_return_ready_again": true,
+    "gpu_immediate_eviction_verified": false,
+    "frame_rate_acceptance": "SEPARATE_NATIVE_ETW_VALID_BUT_P95_GATE_FAILED_NOT_PUBLISHED",
+    "wave_portrait_acceptance": "NATIVE_UNSUPPORTED_FALLBACK_SAMPLES_ONLY_NOT_EQUIPPED_SCENE_PASS",
+    "free_hero_builder_switch_acceptance": "NOT_RUN_NO_FREE_HERO_SUMMONED",
+    "process_exit_acceptance": "OWNED_NORMAL_EXIT_SAME_RETAINED_HANDLE",
+    "restoration_acceptance": "ORIGINAL0104_FIVE_FILES_FULLY_RESTORED",
+    "stability_acceptance": "FINITE_SESSION_NORMAL_EXIT_ONLY_NOT_LONG_GAME",
+    "publication_performed": false,
+    "official_download_1105_verified": false,
+    "all_gameplay_paths_verified": false,
+    "builder_to_native_wave_switch": "THREE_RETURN_SAMPLES_NO_STALE_QWER"
+  },
+  "fps_evidence": {
+    "path": "candidate1105_opening_fps_20261101.public.json",
+    "sha256": "ed27ee788d8315fe8af66d4ef98660aafe40c19618f4320500395945bb558918"
+  },
+  "supplementary_wave_builder_samples": [
+    {
+      "case": "wave3",
+      "captures": [
+        {
+          "name": "candidate1105_wave3_a",
+          "png_sha256": "8b5b8be2d810f331326a40717ed57e26d986ae1af1929aa959a81fda2b44f6c1",
+          "metadata_sha256": "21d02136d84e819bb55a8019b23a58a9b9b4edfdccc47bcfbee6691ef29af12a",
+          "started_utc": "2026-11-01T09:27:57.3381190Z",
+          "ended_utc": "2026-11-01T09:27:57.4236309Z"
+        },
+        {
+          "name": "candidate1105_wave3_b",
+          "png_sha256": "c8bd67822c89ccb32aa3bd292513db098998a006b6d6a7e59d7824e21a4edeb8",
+          "metadata_sha256": "04b735921b0523e41c4d12da5d59eb2ebf073e6f8a5f05ea937eb94438552714",
+          "started_utc": "2026-11-01T09:27:57.5658652Z",
+          "ended_utc": "2026-11-01T09:27:57.6286883Z"
+        },
+        {
+          "name": "candidate1105_wave3_c",
+          "png_sha256": "fc21d3a7f063589363163d35aa63724b9a5213f82e95d53bfd86d49cb68842e1",
+          "metadata_sha256": "655ed51a05619a637959cfec36750758984f6436a62da6f13ef569c387d2b1a5",
+          "started_utc": "2026-11-01T09:27:57.7542483Z",
+          "ended_utc": "2026-11-01T09:27:57.8290211Z"
+        }
+      ],
+      "independent_pixels_reviewed": true,
+      "paused": true,
+      "next_wave": 4,
+      "countdown": "01:25",
+      "scope": "NATIVE_UNSUPPORTED_PORTRAIT_FALLBACK_NOT_EQUIPPED_SCENE_OR_FREE_HERO_PASS",
+      "no_stale_qwer_observed": true
+    },
+    {
+      "case": "builder_switch",
+      "captures": [
+        {
+          "name": "candidate1105_builder_switch_a",
+          "png_sha256": "c58b2e5794076a30069846e987a114bda3df9df8acd17f52ccb06f65e42181fb",
+          "metadata_sha256": "56456c43ca435832a05c31a5a79e0193fa858d6f9ee40b07606676fe57843c37",
+          "started_utc": "2026-11-01T09:30:36.2624306Z",
+          "ended_utc": "2026-11-01T09:30:36.3530751Z"
+        },
+        {
+          "name": "candidate1105_builder_switch_b",
+          "png_sha256": "bde425b63f5b24c0908aded645da9bc02cfdea0a6e0dce71ce06bb461bf8c281",
+          "metadata_sha256": "2ba383fd597fb3c92e0c108d8fb1bfc47d4631aa672b88e43959d834eadd438c",
+          "started_utc": "2026-11-01T09:30:36.5047572Z",
+          "ended_utc": "2026-11-01T09:30:36.5755296Z"
+        },
+        {
+          "name": "candidate1105_builder_switch_c",
+          "png_sha256": "a934ad48c2555a93cd18260a998461166aa2999223490a21486956ef31a6cb82",
+          "metadata_sha256": "2cf5b846d34bb25608a55540750e965e92ddcd62e8d7ea8f3d4cf480c124e34a",
+          "started_utc": "2026-11-01T09:30:36.7146342Z",
+          "ended_utc": "2026-11-01T09:30:36.7960409Z"
+        }
+      ],
+      "independent_pixels_reviewed": true,
+      "paused": true,
+      "next_wave": 4,
+      "countdown": "01:25",
+      "scope": "NATIVE_UNSUPPORTED_PORTRAIT_FALLBACK_NOT_EQUIPPED_SCENE_OR_FREE_HERO_PASS",
+      "no_stale_qwer_observed": false
+    },
+    {
+      "case": "wave3_after_builder",
+      "captures": [
+        {
+          "name": "candidate1105_wave3_after_builder_a",
+          "png_sha256": "352f4b96bc62911489d2494b0fdcbe6aedb5dd94c2b561d4aa8afc2c97b7f3a3",
+          "metadata_sha256": "28c536ff87c52ddb761abe74532e758d9a0bf53a099e3a48473be3309ef33095",
+          "started_utc": "2026-11-01T09:30:37.3787500Z",
+          "ended_utc": "2026-11-01T09:30:37.4600489Z"
+        },
+        {
+          "name": "candidate1105_wave3_after_builder_b",
+          "png_sha256": "0d99b1f0e7a1137ac59526a9da249dc3a0b58acf1270afe23ceb534950fe40fc",
+          "metadata_sha256": "5aae88c9ec0a26c1e383db226a02180b69e6d3a0fa3a8afa027d2cfac3081c22",
+          "started_utc": "2026-11-01T09:30:37.5832864Z",
+          "ended_utc": "2026-11-01T09:30:37.6610422Z"
+        },
+        {
+          "name": "candidate1105_wave3_after_builder_c",
+          "png_sha256": "d9856df7f6cd7f6027d498a37f1bcdc6246ae6d2b9f7bbc9b1d9671fac8d5256",
+          "metadata_sha256": "53cb19e4fd9fbc751a4aba26d9e04d7764efad7db51a0ed551d66eb64bc2e942",
+          "started_utc": "2026-11-01T09:30:37.7833138Z",
+          "ended_utc": "2026-11-01T09:30:37.8623578Z"
+        }
+      ],
+      "independent_pixels_reviewed": true,
+      "paused": true,
+      "next_wave": 4,
+      "countdown": "01:25",
+      "scope": "NATIVE_UNSUPPORTED_PORTRAIT_FALLBACK_NOT_EQUIPPED_SCENE_OR_FREE_HERO_PASS",
+      "no_stale_qwer_observed": true
+    }
+  ],
+  "normal_exit_and_restore": {
+    "close_requested_utc": "2026-11-01T09:41:49.240736+00:00",
+    "force_stop": false,
+    "hold_end_utc": "2026-11-01T09:41:51.123025+00:00",
+    "hold_end_status": "OWNED_DOTA_EXITED_HOLDS_COMPLETED",
+    "exit_identity_method": "SAME_RETAINED_HANDLE_GETPROCESSTIMES",
+    "root_observed_keeper_exit_code": 0,
+    "held_file_count": 5,
+    "restored_utc": "2026-11-01T09:46:42.961121+00:00",
+    "restoration_status": "ORIGINAL0104_FIVE_FILES_FULLY_RESTORED",
+    "restored_release_sequence": 2026110104,
+    "restored_manifest": "7025356658517360342",
+    "original_file_count": 5,
+    "backups_preserved": true,
+    "acf_written": false,
+    "canonical_journal_written": false,
+    "publication_performed": false,
+    "receipt_sha256": {
+      "close_requested.json": "86241952ab743d931bf98b3758490025acea68d65c3bb63c7fbf71aaef9afa59",
+      "hold_end.json": "fdb9c72bbd56020882b14b15055697af23266f27dda07d286b10d2ad67cf16b3",
+      "restored.json": "14b41c1e958b41a1d14822fad879f257a477559cbb608f2f84effca8c13b2f54"
+    }
+  }
+}

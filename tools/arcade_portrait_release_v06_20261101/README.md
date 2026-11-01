@@ -1,7 +1,9 @@
 # Candidate1106: same fourteen runtime paths, targeted HUD-cache performance fix
 
-Preparation only. No signature, package build, installation, SDK, native action
-or Git operation has been performed by this new tool preparation.
+Runtime source is committed and pushed as1ae7839674e18bdeb9fbe255e558ee448fb1847b,
+with the content mirror atf8640121f8c196540fbb90e40416ac1d162144e3. Official
+compilation, a concrete plan and unsigned review are complete. Candidate1106
+has no signature, VPK build, installation, native gameplay or SDK/publication.
 
 ## Exact change relative to candidate1105
 

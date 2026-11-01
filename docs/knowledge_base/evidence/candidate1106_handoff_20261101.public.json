@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "status": "INCOMPLETE_1106_COMPILED_AND_UNSIGNED_REVIEW_READY_NOT_SIGNED_NOT_NATIVE_NOT_PUBLISHED",
+  "official_release_sequence": 2026110104,
+  "official_manifest": "7025356658517360342",
+  "approved_account_count": 5,
+  "max_players": 4,
+  "source_game_commit": "1ae7839674e18bdeb9fbe255e558ee448fb1847b",
+  "source_content_commit": "f8640121f8c196540fbb90e40416ac1d162144e3",
+  "source_sync_reported_by_root": true,
+  "candidate_release_sequence": 2026110106,
+  "unsigned_content_sha256": "3f56f5a286b1ad6bac87f18c330a88f2cd8ffa45cf2ef6d7b5a2f3841f02fb44",
+  "plan_sha256": "ff5e15aa0b8a76ffead72ac066da1cf74c05116f8889886625d5187db641cbca",
+  "unsigned_report_sha256": "fc0b13940af526cffa4f609f845f695c23ea2913d5890d15e4dfad440213a7d7",
+  "runtime_paths": 14,
+  "resources": 6918,
+  "protected_modules": 184,
+  "trusted_reviews": 19,
+  "preserved_admission_rows": 6,
+  "combat_source_artifact_pin": {
+    "git_blob": {
+      "bytes": 223585,
+      "md5": "a8959d566661836b7a4a6ed2b44bd1fb",
+      "sha256": "2b4d38b1671b0a8a6d883e66df4e90a8db97b70daf6e9a30ebf3b9ce451d18af"
+    },
+    "compiler_input": {
+      "bytes": 227915,
+      "md5": "2185dc5f1a05f3d2cc68c43527d00b29",
+      "sha256": "d6dbbbe8adc4d61f95ac97cc177079a080de6095af86192614657f789f70ea7a"
+    },
+    "normalization": "GIT_LF_TO_COMPILER_CRLF_ONLY",
+    "compiled_artifact_sha256": "e9da3be3168381b63c3a7fd14f20e5561458f16f366ca9cedfe504c9968ae1f5"
+  },
+  "cache_validation": {
+    "kind": "SYNTHETIC_REAL_PRODUCTION_FUNCTION_CALL_COUNTS_NOT_NATIVE_FPS",
+    "previous_root_miss_traversals_per_tick": 31,
+    "current_stable_root_traversals_per_tick": 0,
+    "current_stable_recursive_visits_per_tick": 0,
+    "current_target_property_writes_per_tick": 0,
+    "unrelated_nodes_compared": [
+      0,
+      10000
+    ],
+    "ticks_per_case": 20,
+    "current_fixed_bridge_calls_per_tick": {
+      "GetParent": 53,
+      "GetChildCount": 13,
+      "IsValid": 61
+    },
+    "independent_final_lifecycle_and_hotkey_slot_index_tests_passed": true,
+    "nested_inventory_late_slot_counterexample_fixed": true
+  },
+  "previous1105": {
+    "mean_fps": 100.30551857291086,
+    "p95_ms": 19.993124999999996,
+    "p99_ms": 25.14184599999998,
+    "native_slowest_one_percent_fps": 35.13396052137392,
+    "performance_gate_pass": false,
+    "normal_exit_verified": true,
+    "restored0104_verified": true,
+    "published": false
+  },
+  "pending": [
+    "Root-reviewed signing of exact1106 candidate",
+    "normal-client cold equipped monster / eviction return on1106",
+    "normal free-hero to builder switching",
+    "actual equipped wave portrait, not unsupported native fallback",
+    "fresh ordinary running ETW and P95 threshold on1106",
+    "normal lifecycle/restore proof for new rehearsal",
+    "original-item publication and official1313/3406 download then actual new Workshop verification"
+  ],
+  "signed": false,
+  "native_test": "NOT_RUN",
+  "online_fps": "NOT_MEASURED_FOR_THIS_PACKAGE",
+  "ready_for_upload": false,
+  "publication_performed": false,
+  "objective_complete": false
+}

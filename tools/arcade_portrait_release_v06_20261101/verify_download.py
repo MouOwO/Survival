@@ -38,7 +38,7 @@ need(hashlib.sha256(PROTOCOL.read_bytes().replace(b'\r\n', b'\n')).hexdigest() =
      'Frozen official1313/3406 download protocol changed')
 protocol = module('portrait1106_download_private_protocol', PROTOCOL)
 api = protocol.api
-SOURCE_REVISION = None  # Root must pin the final immutable source before any action.
+SOURCE_REVISION = '1ae7839674e18bdeb9fbe255e558ee448fb1847b'
 SUCCESS_STATUS = 'SUBMITTED_UNLISTED_PENDING_DOWNLOAD_AND_NATIVE_TEST'
 REPORT_SHA = None
 
