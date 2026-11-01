@@ -41,7 +41,7 @@ class RehearsalTests(unittest.TestCase):
         value=json.loads(out.getvalue())
         self.assertEqual((value['release_sequence'],value['original_release_sequence'],value['approved_accounts']),(2026110105,2026110104,5))
         self.assertEqual((value['files_written'],value['os_queries'],value['clients_started']),(0,0,0))
-        self.assertIsNone(value['expected_runtime_source_revision']);self.assertFalse(value['ready_for_upload'])
+        self.assertEqual(value['expected_runtime_source_revision'],r.RUNTIME_SOURCE_REVISION);self.assertFalse(value['ready_for_upload'])
         self.assertEqual(value['restoration_status'],'ORIGINAL0104_FIVE_FILES_FULLY_RESTORED')
 
     def test_unset_source_rejects_all_actions_before_package_or_native(self):

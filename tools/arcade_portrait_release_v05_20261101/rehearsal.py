@@ -22,7 +22,7 @@ _spec=importlib.util.spec_from_file_location('ordinary1105_own_checks',HERE/'rel
 c=importlib.util.module_from_spec(_spec);_spec.loader.exec_module(c)
 p=v4.p;p.c=c;p.b=c.b;p.need=c.b.need
 b,need=p.b,p.need
-RUNTIME_SOURCE_REVISION=None
+RUNTIME_SOURCE_REVISION='79d7d10529435b399eb9b5f6bc6216cd823946e1'
 STORE=Path('D:/Survival_本地排演/20261101_ws4_five_account_portrait_v05')
 LOG_ROOT=b.ROOT/'output/arcade_portrait_rehearsal_v05_20261101'
 BASE_MANIFEST='7025356658517360342'

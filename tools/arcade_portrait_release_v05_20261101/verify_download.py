@@ -38,7 +38,7 @@ need(hashlib.sha256(PROTOCOL.read_bytes().replace(b'\r\n', b'\n')).hexdigest() =
      'Frozen official1313/3406 download protocol changed')
 protocol = module('portrait1105_download_private_protocol', PROTOCOL)
 api = protocol.api
-SOURCE_REVISION = None  # Root must pin the final immutable merge commit before any action.
+SOURCE_REVISION = '79d7d10529435b399eb9b5f6bc6216cd823946e1'  # Root must pin the final immutable merge commit before any action.
 SUCCESS_STATUS = 'SUBMITTED_UNLISTED_PENDING_DOWNLOAD_AND_NATIVE_TEST'
 REPORT_SHA = None
 
