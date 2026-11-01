@@ -1,5 +1,7 @@
 # 孤城逐晓／Survival 统一知识库
 
+最新账号任务：[新增第五个获准账号，保持四人同局](evidence/account_admission_20261101.md)。
+
 当前收口：[14文件已签候选的有限排演与待确认恢复](evidence/candidate14_stage_closeout_20261101.md)。签名完成不等于生产验收：用户自行OAuth到N3/波次5，前台受干扰、原生日志未生成，头像/FPS/稳定性未通过、ETW未执行，原条目未更新；WM_CLOSE已排队且root CIM确认无Dota，但keeper exit1/hold_failed，连续hold未通过；实际official restore已exit0，restored.json确认ORIGINAL3102_FIVE_FILES_FULLY_RESTORED、publication_performed=false，原五文件已完整恢复、备份保留；keeper hold_failed与生产验收未通过仍保留。
 
 最新wire修复与14路径发行范围：[首次存档分包预算/缓存基线/冷局与用户验收边界](evidence/archive_ui_wire_budget_20261101.public.json)，对应审查`docs/reviews/archive_ui_wire_budget_20261101.md`。20分类945行完整，合成最大JSON5928/6144；新冷Tools独立日志20 full+40 delta页无对应错误，用户确认结果正常。已签13包2026110102未发布且不含此修复，14文件v03现已完成源码/计划和签名，但普通生产验收未完成；正式3102及普通生产/长局待验，旧hang失败不覆盖。

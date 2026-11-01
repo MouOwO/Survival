@@ -1,5 +1,7 @@
 # 新会话先读｜孤城逐晓项目知识库
 
+**新增获准玩家准备中（2026-11-01）**：用户要求加入`76561198296534615`，客户端/服务器固定四账号校验已配套调整并通过专项检查；每局仍最多4人。服务器部署和独立准入签名包尚待完成，不能只改后台就称已生效。旧14路径候选保持未发布。见[新增账号范围与状态](evidence/account_admission_20261101.md)。
+
 **14文件v03已签，生产排演未通过/未发布**：运行源码ceede161d3／操作9559…／content b1ac328；新候选seq2026110103、content c28c43f6…030a已获用户明确批准签名并本地stage，原五VPK完整备份保留。开发Snapshot修复已过有限冷局及用户查看；普通客户端由用户自行OAuth进入N3波次5，root仅观察运行建造者画面。前台干扰、engine.log未生成，生产头像/FPS/稳定性没有验收，ETW仅准备未执行，不能把无日志当0错误。原条目未更新、远端仍3102、旧13签名保留未发；WM_CLOSE已排队，root CIM确认无Dota；keeper exit1写hold_failed/evidence_complete=false，连续hold与正常keeperfinish未通过，实际official restore已exit0，restored.json确认ORIGINAL3102_FIVE_FILES_FULLY_RESTORED、publication_performed=false，原五文件已完整恢复、备份保留；keeper hold_failed与生产验收未通过仍保留。见[当前阶段与恢复状态](evidence/candidate14_stage_closeout_20261101.md)。
 
 **2026-11-01 商品/头像/解耦审查（开发视觉通过，正式新版待验）**：用户确认3102商城正常且已完成兑换；134个在售SKU均有接入证据，另列4个部分接入边界（涉及3个商品），按要求未顺带修复。普通3102已正常授权并实证Bane查询头像`missing_anchor`；离线v04以真实单位身份绑定共享主头像，并兼容原生默认opacity，已核对六个场景及淘汰后冷回Bane。两段各8秒/239张屏幕采样的关键画面未见裸模，不能替代逐游戏帧或FPS验收。此前改为13文件v02（现为保留的已签未发布旧候选）；运行修复已纳入game `048a2d6b675325cd511abb01c5a122343052b2f7`／content `b1ac328e4467510c89fdfd8c6d9f79947d7c820a`，签名生产、新游廊仍待验，旧12文件候选不能作为最终包。D源码回归及run02离线原生有限验证通过，已核未持有/持有/撤销、失败退款、双入口10秒CD和库存/临时英雄恢复；建造者仅状态/过滤，实际施放未测，正式3102尚不含D修复。有效旧版开局96.54FPS保留；跨结算的98.09FPS样本剔除，冷开发局SnapshotError另列稳定性失败。后续Bane5开发ETW30秒约60FPS可保留，但采样后同进程无响应、正常关闭未退出，候选稳定性未通过，原因未定；不能用平滑帧时间替代稳定性验收。见[当前任务、证据与边界](evidence/commerce_portrait_audit_20261101.md)。

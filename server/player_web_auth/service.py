@@ -128,8 +128,8 @@ class Settings:
                 or not re.fullmatch(r"[A-Za-z0-9_+/=-]{32,256}", self.upstream_bearer)
                 or self.secret == self.upstream_bearer):
             raise ValueError("server_secret_invalid")
-        if len(self.steam_ids) != 4 or len(set(self.steam_ids)) != 4:
-            raise ValueError("four_test_accounts_required")
+        if len(self.steam_ids) not in (4, 5) or len(set(self.steam_ids)) != len(self.steam_ids):
+            raise ValueError("four_or_five_unique_test_accounts_required")
         for steam in self.steam_ids:
             if (not re.fullmatch(r"7656119\d{10}", steam)
                     or not 0 < int(steam) - STEAM_BASE <= 0xFFFFFFFF):

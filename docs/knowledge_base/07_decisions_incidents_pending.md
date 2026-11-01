@@ -1,5 +1,7 @@
 # 07｜关键决策、事故与未完成事项
 
+**新增获准玩家准备中（2026-11-01）**：用户要求加入`76561198296534615`，客户端/服务器固定四账号校验已配套调整并通过专项检查；每局仍最多4人。服务器部署和独立准入签名包尚待完成，不能只改后台就称已生效。旧14路径候选保持未发布。见[新增账号范围与状态](evidence/account_admission_20261101.md)。
+
 **截止前最新阶段**：14文件v03/2026110103已签并按用户明确批准stage原条目本地排演；source ceede161d3、ops9559…、content b1ac328，签名包c28c43f6…030a。用户自行OAuth进入N3波次5，但root只看到运行建造者画面，前台干扰且engine.log未生成；未完成生产头像/FPS/稳定性，ETW仅准备，不能发布。原条目未更新、旧13已签候选保留；WM_CLOSE已排队且root CIM确认无Dota，keeper exit1写hold_failed/evidence_complete=false，不能记连续hold/正常keeperfinish；实际official restore已exit0，restored.json确认ORIGINAL3102_FIVE_FILES_FULLY_RESTORED、publication_performed=false，原五文件已完整恢复、备份保留；keeper hold_failed与生产验收未通过仍保留。后续须取真实恢复回执，再安排普通候选受控日志、画面、ETW及稳定性。见[阶段收口](evidence/candidate14_stage_closeout_20261101.md)。
 
 **2026-11-01 当前最高优先级**：普通3102已完成正常授权，Bane头像资源READY后仍出现`missing_anchor`、未进入SCENE_SET/SHOW；故障已定位到该HUD的查询头像挂接。离线v04修正共享主头像身份绑定与默认opacity，已核对六个场景、1/2/3/4/6后冷回Bane，两段各8秒/239张屏幕采样的关键画面未见裸模；这不是正式新版或FPS通过。此前13文件v02运行源码已纳入game048a2d6／content b1ac328且已签未发布；当前加入archive wire修复后的14文件v03已完成源码/plan审阅和签名，普通生产验收仍未完成；上一轮11571/fb775仍是历史提交，不能代替当前候选及普通生产验收。D源码回归及run02离线原生有限验证通过，覆盖权益翻转、失败退款、双入口10秒CD和库存/临时英雄恢复；建造者仅状态/过滤，实际施放未测，正式3102未包含该修复。全134商品清单完成，另外4项部分接入（3个SKU）等用户安排。任务12小时截止UTC2026-11-01 02:31。见[完整边界与现有报告入口](evidence/commerce_portrait_audit_20261101.md)。

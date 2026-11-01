@@ -1,4 +1,4 @@
-"""Optional four-account test gate; this is not Steam/server authentication.
+"""Optional bounded test-account gate; this is not Steam/server authentication.
 
 The HTTP API already expects a trusted game server's Bearer credential. This
 additional gate restricts which existing Steam account IDs that server may use.
@@ -30,8 +30,8 @@ class TestAccountPolicy:
         if not value.strip():
             return None  # Explicit opt-in: existing production access is unchanged.
         identities = [part.strip() for part in value.split(",")]
-        if len(identities) != 4 or len(set(identities)) != 4:
-            raise ValueError("test_access_requires_four_unique_steam_ids")
+        if len(identities) not in (4, 5) or len(set(identities)) != len(identities):
+            raise ValueError("test_access_requires_four_or_five_unique_steam_ids")
         accounts = set()
         for identity in identities:
             if not re.fullmatch(r"[0-9]{17}", identity):

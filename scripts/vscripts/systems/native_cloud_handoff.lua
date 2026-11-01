@@ -5,8 +5,8 @@ local REVISION = "WS4-NATIVE-HANDOFF-01"
 local LATCH = "__survival_native_cloud_handoff_01"
 local COMMAND = "changelevel template_map gamemode=15 customgamemode=3824360109 nomapvalidation=1"
 local MAP, CAPACITY, INTERVAL, STABLE_SECONDS, MAX_SECONDS = "ws4_entry", 4, 0.1, 1, 120
-local ROSTER = {"76561198424163156", "76561198845461206", "76561198104787442", "76561198974301984"}
-local ACCOUNTS = {['463897428'] = true, ['885195478'] = true, ['144521714'] = true, ['1014036256'] = true}
+local ROSTER = {"76561198424163156", "76561198845461206", "76561198104787442", "76561198974301984", "76561198296534615"}
+local ACCOUNTS = {['463897428'] = true, ['885195478'] = true, ['144521714'] = true, ['1014036256'] = true, ['336268887'] = true}
 local RESOURCE_APIS = {"GetPlayerCount", "IsValidPlayerID", "IsFakeClient", "GetTeam", "GetPlayer", "GetConnectionState", "GetSteamAccountID"}
 
 local function method(object, name)
@@ -56,12 +56,14 @@ local function environment()
         if type(release) ~= "table" or release.channel ~= "production" or type(config) ~= "table" or config.enabled ~= true
             or type(config.allowed_steamids) ~= "table" or type(rules) ~= "table" or type(rules.by_id) ~= "table"
             or type(rules.by_id.default_multiplayer) ~= "table" or rules.by_id.default_multiplayer.max_players ~= CAPACITY then return nil end
-        local count = 0
+        local count, highest_index = 0, 0
         for index, steam in pairs(config.allowed_steamids) do
-            if not integer(index, 1, CAPACITY) or steam ~= ROSTER[index] then return nil end
+            if not integer(index, 1, #ROSTER) or steam ~= ROSTER[index] then return nil end
             count = count + 1
+            highest_index = math.max(highest_index, index)
         end
-        if count ~= CAPACITY or type(policy) ~= "table" or type(policy.enabled) ~= "function"
+        if (count ~= 4 and count ~= #ROSTER) or highest_index ~= count
+            or type(policy) ~= "table" or type(policy.enabled) ~= "function"
             or type(policy.init) ~= "function" or type(policy.allowed) ~= "function"
             or policy.enabled() ~= true or policy.init() ~= true then return nil end
         return policy

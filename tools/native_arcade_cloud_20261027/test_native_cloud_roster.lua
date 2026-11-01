@@ -222,4 +222,30 @@ group("same-world options cannot shrink and a genuinely new world reads its own 
     check(not p.requirement_present() and #p.expected_accounts() == 0, "new helper world does not inherit a prior party")
 end)
 
+group("five approved accounts support each four-player target roster", function()
+    local identities = {463897428, 885195478, 144521714, 1014036256, 336268887}
+    for omitted = 1, 5 do
+        local _, s, p = fixture(); s.config.allowed_steamids[5] = "76561198296534615"
+        s.valid, s.players, s.accounts, s.connections, s.teams = {}, {}, {}, {}, {}
+        local chosen = {}
+        for index, account in ipairs(identities) do
+            if index ~= omitted then chosen[#chosen + 1] = account; s.add((#chosen - 1) * 5, account) end
+        end
+        table.sort(chosen)
+        for index, account in ipairs(chosen) do chosen[index] = string.format("%.0f", account) end
+        s.option = table.concat(chosen, "_")
+        local row = p.snapshot()
+        check(row.valid and row.complete and #row.player_ids == 4 and #row.expected_accounts == 4,
+            "target waits for precisely the four selected approved players, not all five")
+    end
+    local _, s, p = fixture(); s.config.allowed_steamids[5] = "76561198296534615"
+    s.option = "144521714_336268887_463897428_885195478_1014036256"
+    check(not p.complete_roster() and p.snapshot().status == "native_roster_option_invalid",
+        "five-player map option remains invalid")
+    local _, denied, q = fixture(); denied.config.allowed_steamids[5] = "76561198296534615"
+    denied.option = "336268888"; check(not q.complete_roster(), "unknown sixth cannot enter through map option")
+    local _, sparse, r = fixture(); sparse.config.allowed_steamids[5] = "76561198296534615"; sparse.config.allowed_steamids[4] = nil
+    check(not r.complete_roster(), "sparse approved roster is refused")
+end)
+
 print(string.format("PASS native cloud roster: %d groups, %d checks (actual modules; no live game)", groups, checks))

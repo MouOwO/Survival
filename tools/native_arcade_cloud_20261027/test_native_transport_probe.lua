@@ -443,4 +443,15 @@ group("invalid status never turns a callback into successful transport", functio
     end
 end)
 
+group("fifth tester has the same authenticated private diagnostic boundary", function()
+    local _, s, p = fixture(); s.roster.allowed_steamids[5] = "76561198296534615"; s.accounts[0] = 336268887
+    check(p.init()); s.listener(10, {nonce=nonce(1),echo_b64="Zg"})
+    check(#s.sent == 1 and s.sent[1].reply.account_id == "336268887" and #s.requests == 0,
+        "fifth tester receives only its bound private echo, with no authentication or HTTP grant")
+    s.allowed = false; s.listener(10, {nonce=nonce(2),echo_b64="Zg"})
+    check(#s.sent == 1, "roster presence cannot override failed admission")
+    s.allowed = true; s.accounts[0] = 336268888; s.listener(10, {nonce=nonce(3),echo_b64="Zg"})
+    check(#s.sent == 1, "unknown sixth account cannot use diagnostic transport")
+end)
+
 print(string.format("PASS native transport probe: %d groups, %d checks (no live network/game)", groups, checks))

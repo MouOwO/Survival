@@ -369,4 +369,34 @@ group("timeouts, stopped clocks and old-world callbacks do not force open", func
         "old mode thinker cannot operate new native world")
 end)
 
+group("five approved accounts choose any four without increasing session capacity", function()
+    local identities = {463897428, 885195478, 144521714, 1014036256, 336268887}
+    for omitted = 1, 5 do
+        local _, s, p = fixture()
+        s.roster.allowed_steamids[5] = "76561198296534615"
+        s.valid, s.players, s.accounts, s.connections, s.teams = {}, {}, {}, {}, {}
+        local chosen = {}
+        for index, account in ipairs(identities) do
+            if index ~= omitted then chosen[#chosen + 1] = account; s.add((#chosen - 1) * 5, account) end
+        end
+        table.sort(chosen)
+        for index, account in ipairs(chosen) do chosen[index] = string.format("%.0f", account) end
+        s.expected, s.expected_roster = 4, table.concat(chosen, "_")
+        check(p.activate()); s.advance(1.3)
+        check(#s.commands == 1 and p.snapshot().players == 4 and p.snapshot().capacity == 4,
+            "every subset of four approved accounts hands off with original four-player capacity")
+    end
+    local _, s, p = fixture(); s.roster.allowed_steamids[5] = "76561198296534615"
+    s.accounts[5] = 336268888
+    check(p.activate()); s.advance(1.3)
+    check(#s.commands == 0 and p.snapshot().status == "account_not_allowed", "unknown sixth is rejected")
+    local _, full, q = fixture(); full.roster.allowed_steamids[5] = "76561198296534615"
+    full.expected = 5
+    check(q.activate()); full.advance(0.2)
+    check(#full.commands == 0 and q.snapshot().status == "registered_roster_count_invalid",
+        "five approved identities do not permit five simultaneous players")
+    local _, sparse, r = fixture(); sparse.roster.allowed_steamids[5] = "76561198296534615"; sparse.roster.allowed_steamids[4] = nil
+    check(not r.activate() and sparse.schedules == 0, "four-member sparse roster cannot omit an original tester")
+end)
+
 print(string.format("PASS native cloud handoff: %d groups, %d checks (actual module/policy; no live game)", groups, checks))

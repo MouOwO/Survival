@@ -34,14 +34,15 @@ function M.online_allowed()
         local access = require("core/test_access_policy")
         local roster = require("config/test_access")
         if type(roster) ~= "table" or roster.enabled ~= true or type(roster.allowed_steamids) ~= "table" then return false end
-        local count,seen,ids=0,{},{}
+        local count,seen,ids,highest_index=0,{},{},0
         for index,steam in pairs(roster.allowed_steamids) do
-            if type(index)~="number" or index~=math.floor(index) or index<1 or index>4
+            if type(index)~="number" or index~=math.floor(index) or index<1 or index>5
                 or type(steam)~="string" or #steam~=17 or not steam:match("^%d+$")
                 or steam<="76561197960265728" or steam>"76561202255233023" or seen[steam] then return false end
             count,seen[steam],ids[index]=count+1,true,steam
+            highest_index=math.max(highest_index,index)
         end
-        if count~=4 then return false end
+        if (count~=4 and count~=5) or highest_index~=count then return false end
         local fingerprint=table.concat(ids,":")
         if roster_fingerprint and roster_fingerprint~=fingerprint then return false end
         if access.enabled()~=true or access.init()~=true then return false end

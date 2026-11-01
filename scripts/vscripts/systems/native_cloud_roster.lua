@@ -3,8 +3,8 @@
 -- first target-VM player. Every consumer must retain its own normal gates.
 local M = {}
 local OPTION = "ws4_native_roster"
-local WHITELIST = {['463897428'] = true, ['885195478'] = true, ['144521714'] = true, ['1014036256'] = true}
-local STEAMIDS = {"76561198424163156", "76561198845461206", "76561198104787442", "76561198974301984"}
+local WHITELIST = {['463897428'] = true, ['885195478'] = true, ['144521714'] = true, ['1014036256'] = true, ['336268887'] = true}
+local STEAMIDS = {"76561198424163156", "76561198845461206", "76561198104787442", "76561198974301984", "76561198296534615"}
 local world, initial_option, initial_required, option_latched
 
 local function method(object, name)
@@ -51,12 +51,14 @@ local function trusted_environment()
         local policy = require("core/test_access_policy")
         if type(release) ~= "table" or release.channel ~= "production" or type(config) ~= "table"
             or config.enabled ~= true or type(config.allowed_steamids) ~= "table" then return nil end
-        local count = 0
+        local count, highest_index = 0, 0
         for index, steam in pairs(config.allowed_steamids) do
-            if not integer(index, 1, 4) or steam ~= STEAMIDS[index] then return nil end
+            if not integer(index, 1, #STEAMIDS) or steam ~= STEAMIDS[index] then return nil end
             count = count + 1
+            highest_index = math.max(highest_index, index)
         end
-        if count ~= 4 or type(policy) ~= "table" or type(policy.enabled) ~= "function" or type(policy.init) ~= "function"
+        if (count ~= 4 and count ~= #STEAMIDS) or highest_index ~= count
+            or type(policy) ~= "table" or type(policy.enabled) ~= "function" or type(policy.init) ~= "function"
             or type(policy.allowed) ~= "function" or policy.enabled() ~= true or policy.init() ~= true then return nil end
         return policy
     end)

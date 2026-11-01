@@ -146,5 +146,18 @@
     "native_controlled_front_death_backfill": "NOT_EXERCISED",
     "native_far_rear_over512": "LOGICAL_REGRESSION_ONLY",
     "online_multiplayer": "NOT_RUN"
+  },
+  "fifth_player_admission_20261101": {
+    "status": "CODE_TESTED_SERVER_AND_SIGNED_CLIENT_RELEASE_PENDING",
+    "steamid64": "76561198296534615",
+    "account32": "336268887",
+    "approved_accounts": 5,
+    "max_players_per_match": 4,
+    "server_deployed": false,
+    "workshop_published": false,
+    "planned_sequence": 2026110104,
+    "unpublished_14_path_candidate_preserved": true,
+    "old_0103_requires_rebuild_before_later_publication": true,
+    "evidence": "evidence/account_admission_20261101.md"
   }
 }

@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import sys
 import threading
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -70,6 +71,27 @@ class FourPlayerAccessTests(unittest.TestCase):
                          ("test_account_not_allowed", 403))
         self.assertEqual(self.rpc.calls, [])
 
+    def test_fifth_account_requires_explicit_configuration_and_sixth_stays_denied(self):
+        added = str(76561198296534615 - STEAM_INDIVIDUAL_BASE)
+        self.assertEqual(added, "336268887")
+        install(self.app, setting(100, 101, 102, 103))
+        with self.assertRaises(ApiError):
+            self.app.profile({"account_id": added})
+        self.assertEqual(self.rpc.calls, [])
+
+        extended = FishingApplication("fixture-token", "fixture-account-pepper", None, self.rpc)
+        install(extended, setting(100, 101, 102, 103, int(added)))
+        for account in ("100", "101", "102", "103", added):
+            self.assertEqual(extended.profile({"account_id": account})["account_id"], account)
+        expected = hmac.new(b"fixture-account-pepper", added.encode(), hashlib.sha256).hexdigest()
+        self.assertEqual(self.rpc.calls[-1][1]["p_account_id"], expected)
+        before = len(self.rpc.calls)
+        with self.assertRaises(ApiError) as rejected:
+            extended.profile({"account_id": "336268888"})
+        self.assertEqual((rejected.exception.code, rejected.exception.status),
+                         ("test_account_not_allowed", 403))
+        self.assertEqual(len(self.rpc.calls), before)
+
     def test_outsider_reward_and_online_checkpoint_rejected_before_rpc(self):
         install(self.app, setting(100, 101, 102, 103))
         reward = dict(account_id="104", grant_id="00000000-0000-0000-0000-000000000001",
@@ -85,7 +107,8 @@ class FourPlayerAccessTests(unittest.TestCase):
         self.assertEqual(self.rpc.calls, [])
 
     def test_invalid_opt_in_fails_without_changing_application(self):
-        for env in (setting(1, 2, 3), setting(1, 2, 3, 4, 5), setting(1, 2, 3, 3),
+        for env in (setting(1, 2, 3), setting(1, 2, 3, 4, 5, 6), setting(1, 2, 3, 3),
+                    setting(1, 2, 3, 4, 4), setting(1, 2, 3, 4, 0),
                     setting(0, 2, 3, 4), setting(4294967296, 2, 3, 4),
                     {ENVIRONMENT_NAME: "1,2,3,4"}, {ENVIRONMENT_NAME: "invalid"}):
             with self.subTest(env=env):
@@ -94,6 +117,31 @@ class FourPlayerAccessTests(unittest.TestCase):
                     install(self.app, env)
                 self.assertEqual(self.app._database_account_id, original)
                 self.assertFalse(hasattr(self.app, "_survival_test_access_policy"))
+
+    def test_startup_accepts_configured_four_or_five_and_rejects_six_before_database_builder(self):
+        from workshop_test import run_api
+        settings = SimpleNamespace(database_backend="postgres", host="127.0.0.1", port=18765,
+            postgres_dsn="postgresql://fixture@127.0.0.1:15432/goufayu_ws4", payment_mode="test",
+            http_client_timeout_seconds=5, http_request_deadline_seconds=10, http_max_concurrency=4)
+        for members in ((100, 101, 102, 103), (100, 101, 102, 103, 336268887),
+                        (100, 101, 102, 103, 336268887, 336268888)):
+            app = FishingApplication("fixture-token", "fixture-account-pepper", None, self.rpc)
+            with self.subTest(count=len(members)), patch.dict(os.environ, setting(*members), clear=True), \
+                    patch.object(run_api.Settings, "from_env", return_value=settings), \
+                    patch.object(run_api, "build_application", return_value=app) as builder, \
+                    patch.object(run_api, "Policy"), patch.object(run_api, "make_handler"), \
+                    patch.object(run_api, "handler"), patch.object(run_api, "BoundedThreadingHTTPServer") as server:
+                result = run_api.main()
+                if len(members) == 6:
+                    self.assertEqual(result, 2)
+                    builder.assert_not_called()
+                    server.assert_not_called()
+                else:
+                    self.assertEqual(result, 0)
+                    builder.assert_called_once_with(settings)
+                    server.return_value.serve_forever.assert_called_once_with()
+                    server.return_value.server_close.assert_called_once_with()
+                    self.assertEqual(app._survival_test_access_policy.permits("336268887"), len(members) == 5)
 
     def test_no_steam64_alias_or_noncanonical_account_can_create_other_archive(self):
         policy = install(self.app, setting(100, 101, 102, 103))

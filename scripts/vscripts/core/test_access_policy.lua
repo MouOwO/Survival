@@ -7,6 +7,7 @@ local allowed_accounts, disconnect_requested = {}, {}
 local BASE = "76561197960265728"
 local MAXIMUM = "76561202255233023"
 local MAX_ACCOUNT = 4294967295
+local MAX_ALLOWED_ACCOUNTS = 5 -- Approved roster size, not simultaneous player capacity.
 
 local function account_from_steamid64(value)
     if type(value) ~= "string" or #value ~= 17 or not value:match("^%d+$")
@@ -48,17 +49,20 @@ function M.init()
     if type(config) ~= "table" or config.enabled ~= true or type(config.allowed_steamids) ~= "table" then
         return fail("test_access_configuration_invalid")
     end
-    local count = 0
+    local count, highest_index = 0, 0
     for key, steam in pairs(config.allowed_steamids) do
-        if type(key) ~= "number" or key < 1 or key > 4 or key ~= math.floor(key) then
-            return fail("test_access_requires_four_accounts")
+        if type(key) ~= "number" or key < 1 or key > MAX_ALLOWED_ACCOUNTS or key ~= math.floor(key) then
+            return fail("test_access_requires_four_or_five_accounts")
         end
         local account = account_from_steamid64(steam)
         if not account or allowed_accounts[account] then return fail("test_access_account_invalid_or_duplicate") end
         allowed_accounts[account] = true
         count = count + 1
+        highest_index = math.max(highest_index, key)
     end
-    if count ~= 4 then return fail("test_access_requires_four_accounts") end
+    if (count ~= 4 and count ~= MAX_ALLOWED_ACCOUNTS) or highest_index ~= count then
+        return fail("test_access_requires_four_or_five_accounts")
+    end
     if type(IsServer) ~= "function" then return fail("test_access_server_api_missing") end
     local server_ok, server = pcall(IsServer)
     if not server_ok or server ~= true then return fail("test_access_server_required") end

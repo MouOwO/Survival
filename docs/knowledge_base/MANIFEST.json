@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 15731,
-      "sha256": "84a12160a6360625b6062f5af0883602672c7fb0ffe9b7715cc6ddf593d3f146"
+      "bytes": 16124,
+      "sha256": "adb620b57d4ccf38a67743a132dd3b0172fa5da7c949d4c30dd3c8a2fd595b54"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 29703,
-      "sha256": "bdfa8eaf1b83800b02e9f20525253703b2fe4572352aa58b1b8c7f0e22358a4a"
+      "bytes": 30096,
+      "sha256": "308c91568ff58ccfb91dd899ef3f8061deda9393c01899555536be1becce0f2a"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 6858,
-      "sha256": "1f6e801b97f73604d799a353ff55a742792f83a9d3fc312858086a68b04f33fa"
+      "bytes": 6974,
+      "sha256": "d5f94a73dac85c53d674952ef5342d991ac8d701da21cdbaaea8082612a8c5b4"
     },
     {
       "path": "data/completed_work_index.json",
@@ -90,8 +90,8 @@
     },
     {
       "path": "data/context.json",
-      "bytes": 5660,
-      "sha256": "1e8fc13f2e2e6f431d79853986c2339c214745423524b2e32998493e756c6817"
+      "bytes": 6175,
+      "sha256": "c0707a347df016c12465c6b91324516c81d453c53d85717e05e57429054914c2"
     },
     {
       "path": "data/repository_files.json",
@@ -117,6 +117,11 @@
       "path": "data/source_manifest.json",
       "bytes": 31769,
       "sha256": "dd22616e57ab56e16490fd3fe910bc57f394da64ef3b2545965850c53ea1b02e"
+    },
+    {
+      "path": "evidence/account_admission_20261101.md",
+      "bytes": 3822,
+      "sha256": "f78f96db104459add21e2353a9019059bf07634cf425ffbfbb62b9acc823c8fc"
     },
     {
       "path": "evidence/approved_content_names_beta_gift_20261030.md",

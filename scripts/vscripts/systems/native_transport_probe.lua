@@ -3,8 +3,8 @@
 local M = {}
 local REVISION = "WS4-NATIVE-PROBE-01"
 local REQUEST, REPLY = "survival_native_transport_probe_request", "survival_native_transport_probe_reply"
-local ROSTER = {"76561198424163156", "76561198845461206", "76561198104787442", "76561198974301984"}
-local ACCOUNTS = {['463897428'] = true, ['885195478'] = true, ['144521714'] = true, ['1014036256'] = true}
+local ROSTER = {"76561198424163156", "76561198845461206", "76561198104787442", "76561198974301984", "76561198296534615"}
+local ACCOUNTS = {['463897428'] = true, ['885195478'] = true, ['144521714'] = true, ['1014036256'] = true, ['336268887'] = true}
 local initialized, active_session, last_clock = false, nil, nil
 local accounts = {}
 
@@ -46,12 +46,14 @@ local function actor(source)
     local permitted, allowed = pcall(function()
         local config, access = require("config/test_access"), require("core/test_access_policy")
         if type(config) ~= "table" or config.enabled ~= true or type(config.allowed_steamids) ~= "table" then return false end
-        local count = 0
+        local count, highest_index = 0, 0
         for key, value in pairs(config.allowed_steamids) do
-            if type(key) ~= "number" or key ~= math.floor(key) or key < 1 or key > 4 or value ~= ROSTER[key] then return false end
+            if type(key) ~= "number" or key ~= math.floor(key) or key < 1 or key > #ROSTER or value ~= ROSTER[key] then return false end
             count = count + 1
+            highest_index = math.max(highest_index, key)
         end
-        return count == 4 and access.enabled() == true and access.init() == true and access.allowed(id) == true
+        return (count == 4 or count == #ROSTER) and highest_index == count
+            and access.enabled() == true and access.init() == true and access.allowed(id) == true
     end)
     if permitted and allowed then return entity, id, account end
 end

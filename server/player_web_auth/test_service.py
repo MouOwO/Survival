@@ -472,6 +472,35 @@ class ServiceTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             settings_from_environment({"ISOLATED_LOCAL_PROGRESS": "true"})
 
+    def test_fifth_configured_account_still_requires_normal_login_and_sixth_is_rejected(self):
+        added_steam = "76561198296534615"
+        identity = {"account_id": "336268887", "match_session_id": "fifth-account-fixture-session"}
+        self.fail_code("test_account_not_allowed", lambda: self.start(identity))
+        self.service.close()
+        self.settings = replace(self.settings, steam_ids=STEAMS + (added_steam,))
+        self.service = self.build()
+        self.assertEqual(self.settings.accounts[identity["account_id"]], added_steam)
+        started = self.start(identity)
+        polled = self.service.poll(dict(identity, device_code=started["device_code"]), "peer")
+        self.assertEqual(polled["status"], "pending")
+        self.assertNotIn("access_token", polled)
+        row = self.service.db.execute("SELECT approved_steam,token_hash FROM challenges").fetchone()
+        self.assertEqual(tuple(row), (None, None))
+        count = self.service.db.execute("SELECT count(*) FROM challenges").fetchone()[0]
+        self.fail_code("test_account_not_allowed", lambda: self.start(dict(identity, account_id="336268888")))
+        self.assertEqual(self.service.db.execute("SELECT count(*) FROM challenges").fetchone()[0], count)
+        self.assertEqual(self.forward_calls, [])
+        self.assertEqual(self.verifications, [])
+
+    def test_extended_roster_remains_bounded_unique_and_valid_steam64(self):
+        added = "76561198296534615"
+        for values in (STEAMS + (STEAMS[0],), STEAMS + ("invalid",),
+                       STEAMS + ("76561197960265728",), STEAMS + (added, "76561198296534616")):
+            with self.subTest(values=values), self.assertRaises(ValueError):
+                replace(self.settings, steam_ids=values).validate()
+        self.settings.validate()
+        replace(self.settings, steam_ids=STEAMS + (added,)).validate()
+
     def test_relay_setting_defaults_off_and_accepts_only_boolean_env_values(self):
         env = {"PLAYER_WEB_AUTH_DATABASE": str(self.settings.database), "PLAYER_WEB_AUTH_SECRET": self.settings.secret,
                "PLAYER_WEB_AUTH_UPSTREAM_BEARER": self.settings.upstream_bearer,

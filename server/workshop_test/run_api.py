@@ -1,4 +1,4 @@
-"""Run only against the independent ws4 PostgreSQL instance and four accounts."""
+"""Run only against the independent ws4 PostgreSQL instance and limited roster."""
 from pathlib import Path
 import json
 import os
@@ -20,8 +20,8 @@ def main():
                 or dsn.path != "/goufayu_ws4" or settings.payment_mode != "test"):
             raise ValueError("isolated_database_required")
         policy = TestAccountPolicy.from_environment(os.environ)
-        if policy is None or len(policy.account_ids) != 4:
-            raise ValueError("four_test_accounts_required")
+        if policy is None:
+            raise ValueError("explicit_test_account_roster_required")
         # Check all isolation and account constraints before the builder's
         # initial definition/config synchronization can write to PostgreSQL.
         app = build_application(settings)
