@@ -89,7 +89,7 @@ def replace_env(raw, key, *, old_root=None, new_root=None):
 
 def patch_unit(raw, old_root, new_root, suffix):
  expected=old_root+('/'+suffix if suffix else '')
- working=re.findall(rb'(?m)^WorkingDirectory=([^\r\n]+)',raw)
+ working=re.findall(rb'(?m)^[ \t]*WorkingDirectory=([^\r\n]+)',raw)
  need(working==[expected.encode()],'unit_working_directory_changed')
  need(1<=raw.count(old_root.encode())<=4,'unit_root_anchor_changed')
  changed=raw.replace(old_root.encode(),new_root.encode())

@@ -34,11 +34,15 @@ class ScopeTests(unittest.TestCase):
 
  def test_unit_requires_actual_old_working_directory_and_preserves_other_lines(self):
   raw=b'[Service]\nWorkingDirectory=/old/backend\nExecStart=/old/.venv/bin/python -B -m workshop_test.run_api\nEnvironmentFile=/etc/fixed.env\n'
-  changed=op.patch_unit(raw,'/old','/new','backend')
-  self.assertIn(b'WorkingDirectory=/new/backend',changed)
-  self.assertIn(b'ExecStart=/new/.venv/bin/python',changed)
-  self.assertIn(b'EnvironmentFile=/etc/fixed.env\n',changed)
-  for bad in (raw.replace(b'/old/backend',b'/another/backend'),raw+b'WorkingDirectory=/old/backend\n'):
+  for prefix in (b'',b' ',b'\t'):
+   variant=raw.replace(b'WorkingDirectory=',prefix+b'WorkingDirectory=')
+   changed=op.patch_unit(variant,'/old','/new','backend')
+   self.assertIn(prefix+b'WorkingDirectory=/new/backend',changed)
+   self.assertIn(b'ExecStart=/new/.venv/bin/python',changed)
+   self.assertIn(b'EnvironmentFile=/etc/fixed.env\n',changed)
+   self.assertEqual(changed.replace(b'/new',b'/old'),variant)
+  for bad in (raw.replace(b'/old/backend',b'/another/backend'),raw+b'WorkingDirectory=/old/backend\n',
+              raw+b' WorkingDirectory=/old/backend\n',raw+b'\tWorkingDirectory=/old/backend\n'):
    with self.assertRaises(RuntimeError):op.patch_unit(bad,'/old','/new','backend')
 
  def test_plan_rejects_general_roster_widening_escape_or_room_limit_change(self):
