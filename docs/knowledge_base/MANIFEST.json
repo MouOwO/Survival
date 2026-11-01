@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 16900,
-      "sha256": "5e816d750838ecb2f1690223e939054378a00298d3324574c31dca008a2eef60"
+      "bytes": 17482,
+      "sha256": "2e4a2523503ca82221a5128f6a03a740408c61387fa1600206f07ce616f43939"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -25,8 +25,8 @@
     },
     {
       "path": "04_network_auth_official.md",
-      "bytes": 16048,
-      "sha256": "57b3a21dde8c57d4f2066e9a3f057d8ee8d7bdc2b71f952dec87ae10ec5f0a56"
+      "bytes": 16630,
+      "sha256": "b8d87aeeac603e0b77d952252833e2d7c1c9907c2c3a41d5ec670c9b29dae9e0"
     },
     {
       "path": "05_payments_commerce_delivery.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 30903,
-      "sha256": "360aed8a54eb48d62993de896a314fa8dd48318eca1085f383b2b2deb2e2b9e3"
+      "bytes": 31484,
+      "sha256": "61d177ae723739c9cea6f7caa207b474a3e23dbc80a37573ca10bb24f992c776"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 7678,
-      "sha256": "7e7261850c803f22590d3333f98eb69840b8c62bf5111c2d5b1705de16de2c74"
+      "bytes": 8260,
+      "sha256": "c0cfc3f8be25faf184b1f88671234508b48983b86fd09fa05e5399ebc1dd13e3"
     },
     {
       "path": "data/completed_work_index.json",
@@ -377,6 +377,16 @@
       "path": "evidence/steam_login_manual_repair_20261031.md",
       "bytes": 3564,
       "sha256": "9b973013ea00938eb79b9cddff1bd0edfcbef67e33a10c8b31edb08d217fec7e"
+    },
+    {
+      "path": "evidence/steam_login_relay_recovery_20261101.md",
+      "bytes": 3023,
+      "sha256": "a978ed93fb76d4bd023d780b80eb2d4cc20c5e0baa8802dc4392900fb58cb054"
+    },
+    {
+      "path": "evidence/steam_login_relay_recovery_20261101.public.json",
+      "bytes": 4081,
+      "sha256": "c9b67c8c2de8c8491678e4c25599ce8f79e826d34a9a5cde131dcc47776e8a27"
     },
     {
       "path": "evidence/teammate_builder_portrait_20261031.md",
