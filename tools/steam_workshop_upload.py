@@ -23,6 +23,7 @@ import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import stream_workshop_vpk as pack
+import release_sdk_lineage_hook as release_lineage
 
 APP = 570
 OWNER = '76561198845461206'
@@ -61,15 +62,17 @@ def emit(value):
 
 def journal(path: Path, value: dict):
     """Persist recovery state before an irreversible call; never discard an ID."""
+    value['updated_at_utc'] = datetime.now(timezone.utc).isoformat()
+    lineage_guarded = release_lineage.before_journal_write(path, value)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(path.name + '.part')
-    value['updated_at_utc'] = datetime.now(timezone.utc).isoformat()
     with temporary.open('w', encoding='utf8', newline='\n') as stream:
         json.dump(value, stream, ensure_ascii=False, indent=2)
         stream.write('\n')
         stream.flush()
         os.fsync(stream.fileno())
     os.replace(temporary, path)
+    release_lineage.after_journal_write(path, lineage_guarded)
 
 
 def load(path):
@@ -142,7 +145,7 @@ class Steam:
     def fn(self, name, result, args):
         function = getattr(self.dll, name)
         function.restype, function.argtypes = result, args
-        return function
+        return release_lineage.wrap_sdk_function(name, function)
 
     def ug(self, suffix, result, types, *args):
         return self.fn('SteamAPI_ISteamUGC_' + suffix, result, [C.c_void_p, *types])(self.ugc, *args)

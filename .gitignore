@@ -588,3 +588,6 @@ __pycache__/
 !/scripts/vscripts/tests/test_player_web_auth.lua
 
 !/scripts/vscripts/tests/test_archive_ui_wire_budget.lua
+
+# Shared world Boss lifecycle and per-player reward regression.
+!/scripts/vscripts/tests/test_shared_challenge_bosses.lua

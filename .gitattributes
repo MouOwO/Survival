@@ -236,3 +236,15 @@ tools/arcade_portrait_release_v06_20261101/*.py text eol=lf
 tools/arcade_portrait_release_v06_20261101/*.md text eol=lf
 
 tools/test_combat_hud_lookup_lifecycle.cjs text eol=lf
+
+tools/release_lineage_20261101/*.py text eol=lf
+tools/release_lineage_20261101/*.md text eol=lf
+tools/shared_boss_portrait_release_20261101/*.py text eol=lf
+tools/shared_boss_portrait_release_20261101/*.md text eol=lf
+tools/shared_boss_portrait_release_20261101/*.json text eol=lf
+tools/release_sdk_lineage_hook.py text eol=lf
+tools/test_release_sdk_lineage_hook.py text eol=lf
+publishing/workshop/release_authority_20261101.json text eol=lf
+publishing/workshop/release_listing_template_20261101.json text eol=lf
+tools/release_pipeline.py text eol=lf
+tools/test_release_pipeline.py text eol=lf

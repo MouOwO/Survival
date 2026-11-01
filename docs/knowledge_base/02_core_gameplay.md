@@ -1,5 +1,8 @@
 # 02 核心玩法与数值维护契约
 
+**2026-11-01 共享Boss开发规则，尚未发布**：05/08/09单Boss与11十戒10槽共13个共享世界槽位；只有实际成功进入且当前阶段有效的个人session获得原个人击杀/材料结果，未进入者不广播发奖。四玩家旧理论52→新13不是实测数量或FPS；十转不改，maintain_count练功房四玩家fixture仍296。真实双PC单body/重生/个人结果须新普通候选验收，正式0104仍沿旧实体逻辑。见[机制与证据边界](evidence/shared_boss_release_pipeline_20261101.md)。
+
+
 核对时间：2026-10-28（北京时间）。本次只读核对桌面 20261024 知识包、本仓库 CSV/Lua 和近期验证文档，没有启动游戏、运行交易或检查云数据库。本文的“当前源码”指开发工作区；某个冻结工坊版本是否包含同样配置，须另查其签名清单与发布记录。
 
 路径以 game 仓库为根；`core/`、`systems/`、`config/`、`combat/`、`research/` 均为 `scripts/vscripts/` 下的缩写。可编辑地图单独位于 content 仓库。
@@ -16,7 +19,7 @@
 
 源码入口：`scripts/vscripts/addon_game_mode.lua`、`systems/startup_loading_service.lua`、`systems/match_setup_service.lua`、`systems/team_difficulty_service.lua`、`systems/player_profile_service.lua`（后文省略路径均位于 `scripts/vscripts/`）。
 
-十戒预览在身份/资源屏障后的 `HERO_READY` 即创建于各玩家十个对应标记，不再等购买战斗英雄。预备实体仍保持无敌、禁攻击及奖励隔离；重复就绪复用实体，模式/难度变化刷新属性，每一段出战时重新绑定当前英雄。真实service的模拟引擎回归与四玩家checkout通过；原生新版开局画面/多人完整挑战尚未验收。冻结发布只含对应四段补丁，不能据此认定同期开发数值也已发布，见[十戒开局展示证据](evidence/ten_sin_startup_20261028.md)。
+正式0104及此前的个人十戒预览在身份/资源屏障后的 `HERO_READY` 即创建于各玩家十个对应标记，不再等购买战斗英雄。预备实体仍保持无敌、禁攻击及奖励隔离；重复就绪复用实体，模式/难度变化刷新属性，每一段出战时重新绑定当前英雄。真实service的模拟引擎回归与四玩家checkout通过；原生新版开局画面/多人完整挑战尚未验收。冻结发布只含对应四段补丁，不能据此认定同期开发数值也已发布，见[十戒开局展示证据](evidence/ten_sin_startup_20261028.md)。
 
 ## 2. 模式、难度与验收局隔离
 

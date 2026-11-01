@@ -1,0 +1,22 @@
+{
+  "title": "孤城逐晓 · 封闭测试",
+  "description": "四人协作塔防与生存。建造城防、培养英雄，应对不断增强的怪物波次，并挑战无尽模式。本条目仅供获准账号验证开局前 Steam 网页登录、独立测试存档和游戏内扫码购买。",
+  "visibility_requested": "unlisted",
+  "workshop_id": "3824360109",
+  "tester_steamids64": [
+    "76561198104787442",
+    "76561198296534615",
+    "76561198424163156",
+    "76561198845461206",
+    "76561198974301984"
+  ],
+  "map": "ws4_entry",
+  "max_players": 4,
+  "real_money_payments": true,
+  "cover_sha256": "00714bb69b9c400231f88112673b2fd881d50680a0a76ab63a1792256b679aa1",
+  "schema": 1,
+  "cover": "gou_fayu_workshop.jpg",
+  "approved_parent_release_sequence": 2026110104,
+  "approved_parent_content_sha256": "6ffc0816d040ffe4a4d7a3db472c74dc18b96fad36f5f204cba5b0879ab5489f",
+  "copied_from_approved_listing_sha256": "993f33e2724002ea7372d62d5ae981123b673a070274a430e0ad237a964f7aa9"
+}

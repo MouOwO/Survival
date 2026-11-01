@@ -5,18 +5,18 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 17482,
-      "sha256": "2e4a2523503ca82221a5128f6a03a740408c61387fa1600206f07ce616f43939"
+      "bytes": 18051,
+      "sha256": "975ad7e1575a1c3e36ac1b238701e3db02b384cd01539f73b83c01514eb8e6ba"
     },
     {
       "path": "01_architecture_and_workflow.md",
-      "bytes": 4167,
-      "sha256": "9b390fd771ef7dcb0594631527d83f350e11e734c15192849d3ed1cbe6d4bd95"
+      "bytes": 4750,
+      "sha256": "e7a4dff4baf3fa3e57d5adfa8519870627d19da60951b119fc91b4645d2c828b"
     },
     {
       "path": "02_core_gameplay.md",
-      "bytes": 32432,
-      "sha256": "713749ffbbfb07610a524ccd52990881ec2aa792d5010549cff26ac47061d40e"
+      "bytes": 33003,
+      "sha256": "c4b8565265b534c79280a726a45c9d53dfd37afce0a6d5be5c5b2d570e65b630"
     },
     {
       "path": "03_progression_save_contract.md",
@@ -35,13 +35,13 @@
     },
     {
       "path": "06_build_release_ops.md",
-      "bytes": 21669,
-      "sha256": "4c05a1ca5a2f291c3071a206df2ae0c5bbc32de51396cf3f75bb63b2d962f8e4"
+      "bytes": 22328,
+      "sha256": "36985de33e3073468171011f01d4802170ef08b88bcebb2508eaf03717bf5b34"
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 31484,
-      "sha256": "61d177ae723739c9cea6f7caa207b474a3e23dbc80a37573ca10bb24f992c776"
+      "bytes": 32067,
+      "sha256": "287d4c8c6b859ea1a46a11f6cfdf5c9cfd6877170adc1b39c583d09e163e7f4a"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 8260,
-      "sha256": "c0cfc3f8be25faf184b1f88671234508b48983b86fd09fa05e5399ebc1dd13e3"
+      "bytes": 8739,
+      "sha256": "e4f4bfd08cf5ef2bdd4620f2bacb6cd5735e313da348287416d98f3be1d00948"
     },
     {
       "path": "data/completed_work_index.json",
@@ -347,6 +347,16 @@
       "path": "evidence/scourge_highland_20261029.md",
       "bytes": 4444,
       "sha256": "b9a922eae4934e4694953d470b269ca38811bb8ba224114f66bd6ee649cfe82a"
+    },
+    {
+      "path": "evidence/shared_boss_release_pipeline_20261101.md",
+      "bytes": 3181,
+      "sha256": "026ad7ca6d6eaf4e08d964085f37651e2a92a93ddc56482112297c6f2d333fb6"
+    },
+    {
+      "path": "evidence/shared_boss_release_pipeline_20261101.public.json",
+      "bytes": 4505,
+      "sha256": "478d9df7925ce453f5492423e788008868e8c79922322d275303944ed4f1a485"
     },
     {
       "path": "evidence/shop_catalog_sync_20261031.md",

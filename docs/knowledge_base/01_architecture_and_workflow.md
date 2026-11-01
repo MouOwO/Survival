@@ -1,5 +1,8 @@
 # 01｜架构与协作
 
+**2026-11-01 限域解耦/发行权威（开发未发布）**：共享世界槽位registry、个人challenge session与AI分工，按key/entindex/session/player索引；只在真实状态变化处理参与者，保留个人奖励。统一入口`tools/release_pipeline.py`以不可变game/content源码、独立operator工具提交和签名父资源绑定，禁止把整HEAD或测试PASS当发布。当前17项候选尚无新plan/unsigned/签名/实机，正式0104保持；这不是整个工程重构。见[范围和复杂度](evidence/shared_boss_release_pipeline_20261101.md)。
+
+
 ## 三个权威层
 
 | 层 | 权威与职责 | 不能替代的边界 |

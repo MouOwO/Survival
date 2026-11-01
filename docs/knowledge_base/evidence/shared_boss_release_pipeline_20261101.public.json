@@ -1,0 +1,129 @@
+{
+  "schema": 1,
+  "kind": "SHARED_BOSS_AND_PORTRAIT_PIPELINE_CODE_REVIEW_NOT_NATIVE_RELEASE",
+  "snapshot_date": "2026-11-01",
+  "status": "CODE_REVIEWED_PENDING_IMMUTABLE_GIT_PLAN_UNSIGNED_AND_AUTHORIZATION",
+  "official_parent": {
+    "release_sequence": 2026110104,
+    "resources": 6917,
+    "protected_modules": 184,
+    "approved_accounts": 5,
+    "max_players": 4,
+    "steam_manifest": "7025356658517360342",
+    "content_sha256": "6ffc0816d040ffe4a4d7a3db472c74dc18b96fad36f5f204cba5b0879ab5489f"
+  },
+  "proposed_candidate": {
+    "release_sequence": 2026110107,
+    "changed_runtime_paths": 17,
+    "resources": 6919,
+    "protected_modules": 184,
+    "trusted_reviews": 22,
+    "game_source_revision": null,
+    "content_source_revision": null,
+    "operator_revision": null,
+    "plan_created": false,
+    "unsigned_prepared": false,
+    "signed": false,
+    "native_gameplay_verified": false,
+    "fps_measured": false,
+    "published": false,
+    "official_download_verified": false
+  },
+  "lineage": {
+    "baseline_sha256": "3a60ddab9a93b58fa936e789f1a9d2008d39ed7eca9545487e1f40bf32219ee3",
+    "parent_resource_origins": 6917,
+    "source_anchors": {
+      "game": "20420efc36c2bc1007e316898d5b972956ada3bd",
+      "content": "f8640121f8c196540fbb90e40416ac1d162144e3"
+    },
+    "source_anchor_is_full_published_tree": false,
+    "historical_deferred": 220,
+    "deferred_status": "DEFERRED_UNRELEASED_OUTSIDE_THIS_TASK",
+    "deferred_production_equivalence_claimed": false,
+    "required_scope_deferred_overlap": 0,
+    "new_runtime_or_deferred_drift_rejected": true,
+    "operator_revision_is_independent": true,
+    "all_auxiliary_inputs_bound_to_immutable_operator_commit": true
+  },
+  "authority": {
+    "path": "publishing/workshop/release_authority_20261101.json",
+    "sha256": "06df3c0d9154b2866463a5e525c85997590a0b8d6f71013b98279c36405eaacb",
+    "validator_sha256": "e710ef28dcb914f4237f0c78433953b5fc05d9aae8a281faa8a24b3014fa2121",
+    "recipe_sha256": "3019bff7b53f22f4301a399b4a78a3ab24fb18da3fe739d779016298215a7dfa",
+    "rehearsal_sha256": "72c6a012ddf54766ac33bc17ac4d45b898f6bbd5a3a684f0ad75e1d8b8d2a7ac",
+    "entry": "tools/release_pipeline.py",
+    "default_sdk_initializations": 0,
+    "sdk_lock_and_live_lease_same_owner": true,
+    "pending_failure_records_preserved": true,
+    "steam_delivery": "COMPLETE_VERIFIED_VPK_SET"
+  },
+  "shared_bosses": {
+    "authored_slots": 13,
+    "old_four_player_theoretical_bound": 52,
+    "native_entity_count_measured": false,
+    "encounters": [
+      "05",
+      "08",
+      "09",
+      "11"
+    ],
+    "rebirth_unchanged": true,
+    "maintain_count_unchanged": true,
+    "private_room_fixture_four_players": 296,
+    "rewards": "ONLY_CURRENT_ELIGIBLE_JOINED_PERSONAL_SESSIONS",
+    "real_db_delivery_verified": false,
+    "stable_target_complexity": "O(1)",
+    "invalid_target_lookup": "O(participants<=4)",
+    "stable_ai_seconds": 0.5,
+    "fixture_interval_calls": 20,
+    "fixture_world_or_entity_queries_delta": 0,
+    "fixture_target_writes_delta": 1,
+    "fixture_native_fps_claimed": false,
+    "partial_project_decoupling_only": true
+  },
+  "isolated_checks": {
+    "observed_candidate_directory_tests": 43,
+    "breakdown": {
+      "build": 24,
+      "rehearsal": 12,
+      "native_evidence_groups": 7
+    },
+    "root_reported_sdk_hook": 9,
+    "root_reported_legacy_sdk_groups": [
+      21,
+      18
+    ],
+    "root_reported_guard": 18,
+    "root_reported_cli": 11,
+    "results_are_native_acceptance": false,
+    "root_lifecycle_aggregate": "SEPARATELY_RECORDED_BY_FINAL_ROOT_INTEGRATION"
+  },
+  "mandatory_native_gates": {
+    "qop_commandment_09": true,
+    "bane5_cold_eviction_return": true,
+    "equipped_wave": true,
+    "free_hero_builder_switch": true,
+    "distinct_other_scenes_at_least": 5,
+    "two_pc_shared_boss_user_confirmation": true,
+    "etw_seconds_at_least": 30,
+    "mean_fps_at_least": 90,
+    "p95_ms_at_most": 16.7,
+    "normal_same_handle_exit": true,
+    "official0104_full_restore": true,
+    "raw_index_false_must_remain_unchanged": true
+  },
+  "old1105_sample": {
+    "mean_fps": 100.3055,
+    "p95_ms": 19.9931,
+    "p95_gate_passed": false,
+    "is_new1107_evidence": false
+  },
+  "authorization": {
+    "new17_signing_authorized": false,
+    "publish_authorized_by_this_document": false,
+    "ask_after_concrete_unsigned_review": true
+  },
+  "raw_code_or_credentials_included": false,
+  "backend_or_payment_changed": false,
+  "login_relay_evidence_preserved": true
+}

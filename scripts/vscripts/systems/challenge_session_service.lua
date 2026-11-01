@@ -24,6 +24,7 @@ local monster_hero_visual_service = require("systems/monster_hero_visual_service
 local monster_hull_scale = require("systems/monster_hull_scale")
 local monster_navigation = require("systems/monster_navigation_policy")
 local wave_monster_collision = require("systems/wave_monster_collision")
+local shared_boss = require("systems/shared_challenge_boss_registry")
 local challenge_11_staging = "modifier_challenge_11_staging"
 
 local M = {}
@@ -32,7 +33,7 @@ local foreground_encounter_by_player = {}
 local monster_meta = {}
 local auto_test_started = {}
 local abyss_cleared_stage_by_player = {}
-local challenge_11_prepared_by_player = {}
+local challenge_11_prepared = nil
 -- Set true only when validating the seven-sins / ten-sins map markers.
 -- Normal challenge purchases must not create unrelated boss encounters.
 local AUTO_START_CHALLENGE_TESTS = false
@@ -200,6 +201,7 @@ local function remove_dead(session)
 end
 
 local function destroy_session_monsters(session)
+    shared_boss.detach(session)
     -- Prepared abyss groups share this cleanup but do not own a respawn timer.
     if session.player_id ~= nil and session.encounter_id ~= nil then
         scheduler.cancel("challenge_respawn:" .. session.player_id .. ":" .. session.encounter_id)
@@ -215,15 +217,18 @@ local function destroy_session_monsters(session)
         all_monsters[entindex] = unit
     end
     for entindex, unit in pairs(all_monsters) do
-        monster_meta[entindex] = nil
-        if valid(unit) then
+        -- Personal cancellation never tears down the arena's shared occupant.
+        local shared = shared_boss.slot_for(unit)
+        local meta = monster_meta[entindex]
+        if not shared and meta and meta.unit == unit then monster_meta[entindex] = nil end
+        if not shared and valid(unit) then
             -- Native modifier destruction can run while UTIL_Remove still
             -- reports an alive parent. Never resume a staged-bar experiment.
             unit.survival_challenge_teardown = true
             monster_visual.clear(unit)
             monster_hero_visual_service.clear(unit)
         end
-        if alive(unit) then UTIL_Remove(unit) end
+        if not shared and alive(unit) then UTIL_Remove(unit) end
     end
     session.monsters = {}
     session.prepared_monsters = {}
@@ -281,7 +286,8 @@ local function spawn_point_for(session, member, location)
     -- Practice rooms may intentionally expose only one marker. Units are
     -- spread by FindClearSpaceForUnit after creation, so occupancy must not
     -- make the marker unavailable for the remaining configured count.
-    local point = spawn_marker(location, member.spawn_mode == "maintain_count")
+    local point = spawn_marker(location, member.spawn_mode == "maintain_count"
+        or session.shared_world == true)
     if not point and WOOD_STRENGTH_ENCOUNTERS[session.encounter_id] then
         point = marker(location.entry_target_name)
     end
@@ -313,8 +319,9 @@ local function maintain_count_spawn_position(session, member, location, point)
     return origin
 end
 
-local function spawn_member(session, member)
-    if require("systems/player_context_service").is_defeated(session.player_id) then
+local function create_member(session, member)
+    if not session.shared_world
+        and require("systems/player_context_service").is_defeated(session.player_id) then
         return nil, "player_defeated"
     end
     local location = room_locations.resolve(member.location_id, session.player_id)
@@ -378,7 +385,9 @@ local function spawn_member(session, member)
             .. " unit=" .. tostring(archetype.unit_name) .. " detail=" .. tostring(unit))
         return nil, "challenge_unit_create_failed:" .. tostring(archetype.unit_name)
     end
+    if session.shared_boss_slot then session.shared_boss_slot.pending_unit = unit end
     monster_navigation.apply(unit)
+    unit.survival_shared_challenge_boss = session.shared_world == true or nil
     if session.challenge.challenge_id == "challenge_11" then
         unit.survival_challenge_11_staged = true
         unit.survival_challenge_11_staged_owner = session.player_id
@@ -458,6 +467,8 @@ local function spawn_member(session, member)
     session.monsters[unit:entindex()] = unit
     session.monster_count = session.monster_count + 1
     monster_meta[unit:entindex()] = {
+        unit = unit,
+        shared_slot = session.shared_boss_slot,
         player_id = session.player_id,
         team = session.team,
         encounter_id = session.encounter_id,
@@ -475,8 +486,35 @@ local function spawn_member(session, member)
     return unit
 end
 
+local function spawn_member(session, member)
+    local key = shared_boss.key(session.encounter_id, member)
+    if not key then return create_member(session, member) end
+    local world = {
+        player_id=session.player_id, team=session.team, challenge=session.challenge,
+        encounter=session.encounter, encounter_id=session.encounter_id,
+        difficulty_id=session.difficulty_id, game_mode=session.game_mode,
+        shared_world=true, monsters={}, monster_count=0,
+    }
+    local unit, slot, reason = shared_boss.acquire(key, world, member)
+    if not unit then return nil, reason end
+    if not session.shared_preview then
+        if not shared_boss.attach(slot, session, hero_for(session.player_id)) then
+            return nil, "shared_boss_attach_failed"
+        end
+        local entindex = unit:entindex()
+        if not session.monsters[entindex] then
+            session.monsters[entindex] = unit
+            session.monster_count = session.monster_count + 1
+        end
+        if unit.survival_challenge_11_staged == true then
+            unit.survival_challenge_11_staged_owner = session.player_id
+        end
+    end
+    return unit
+end
+
 local function release_challenge_11_unit(unit)
-    if not valid(unit) then return end
+    if not valid(unit) or unit.survival_challenge_11_staged ~= true then return end
     unit.survival_challenge_11_staged = nil
     unit:RemoveModifierByName(challenge_11_staging)
     local ai = unit.FindModifierByName and unit:FindModifierByName("modifier_practice_monster_ai")
@@ -493,8 +531,10 @@ end
 local function refresh_prepared_challenge_11(session, difficulty_id, mode_id)
     if session.difficulty_id == difficulty_id and session.game_mode == mode_id then return true end
     local updates = {}
-    for entindex, unit in pairs(session.prepared_monsters or {}) do
-        local meta = monster_meta[entindex]
+    for _, member in ipairs(session.members) do
+        local slot = shared_boss.get(shared_boss.key(session.encounter_id, member))
+        local unit = slot and slot.unit
+        local meta = valid(unit) and monster_meta[unit:entindex()]
         if valid(unit) and meta and unit.survival_challenge_11_staged == true then
             local member = meta.member
             local profile, reason = combat_profiles.resolve(member.member_id, difficulty_id, mode_id)
@@ -502,6 +542,12 @@ local function refresh_prepared_challenge_11(session, difficulty_id, mode_id)
             local archetype = archetypes.by_id[tostring(member.combat_archetype_id or "")]
                 or archetypes.by_id[member.archetype_id]
             updates[#updates + 1] = {unit=unit, archetype=archetype, profile=profile}
+        end
+    end
+    for _, member in ipairs(session.members) do
+        local slot = shared_boss.get(shared_boss.key(session.encounter_id, member))
+        if slot then
+            slot.context.difficulty_id, slot.context.game_mode = difficulty_id, mode_id
         end
     end
     for _, update in ipairs(updates) do
@@ -520,8 +566,8 @@ local function refresh_prepared_challenge_11(session, difficulty_id, mode_id)
 end
 
 local function prepare_challenge_11(player_id, team, difficulty_id, mode_id)
-    if challenge_11_prepared_by_player[player_id] then
-        return refresh_prepared_challenge_11(challenge_11_prepared_by_player[player_id], difficulty_id, mode_id)
+    if challenge_11_prepared then
+        return refresh_prepared_challenge_11(challenge_11_prepared, difficulty_id, mode_id)
     end
     local encounter = encounters.by_id.encounter_challenge_11
     local challenge = challenge_for_encounter("encounter_challenge_11")
@@ -538,7 +584,7 @@ local function prepare_challenge_11(player_id, team, difficulty_id, mode_id)
         members = list,
         monsters = {},
         monster_count = 0,
-        prepared_monsters = {},
+        shared_preview = true,
         spawn_mode = "simultaneous",
         status = "staging",
         generation = DoUniqueString("challenge_11_staging"),
@@ -550,60 +596,28 @@ local function prepare_challenge_11(player_id, team, difficulty_id, mode_id)
             print("[Challenge11] staging failed: " .. tostring(error_message))
             return false
         end
-        session.prepared_monsters[unit:entindex()] = unit
     end
     session.monsters = {}
     session.monster_count = 0
-    challenge_11_prepared_by_player[player_id] = session
+    challenge_11_prepared = session
     return true
 end
 
 local function activate_prepared_challenge_11(session)
-    local staged = session.prepared_monsters
-        and next(session.prepared_monsters) and session
-        or challenge_11_prepared_by_player[session.player_id]
-    if not staged then return false end
-    -- Entry previews can predate difficulty selection. Reuse their bodies,
-    -- refreshing the selected combat profile before any stage is released.
-    local refreshed = refresh_prepared_challenge_11(staged, session.difficulty_id, session.game_mode)
-    if not refreshed then return false end
-    local target_member = session.members[1]
-    local selected_entindex = nil
-    for entindex, unit in pairs(staged.prepared_monsters or {}) do
-        local meta = monster_meta[entindex]
-        if meta and meta.member
-            and meta.member.member_id == target_member.member_id then
-            selected_entindex = entindex
-            session.monsters[entindex] = unit
-            session.monster_count = session.monster_count + 1
-            monster_meta[entindex] = {
-                player_id = session.player_id,
-                team = session.team,
-                encounter_id = session.encounter_id,
-                member = target_member,
-            }
-            release_challenge_11_unit(unit)
-            break
-        end
-    end
-    if not selected_entindex then return false end
-    session.prepared_monsters = staged.prepared_monsters
-    challenge_11_prepared_by_player[session.player_id] = nil
+    local prepared, reason = prepare_challenge_11(session.player_id, session.team,
+        session.difficulty_id, session.game_mode)
+    if not prepared then return false, reason end
+    local unit, error_message = spawn_member(session, session.members[1])
+    if not unit then return false, error_message end
+    release_challenge_11_unit(unit)
     return true
 end
 
 local function activate_prepared_member(session, member)
-    for entindex, unit in pairs(session.prepared_monsters or {}) do
-        local meta = monster_meta[entindex]
-        if meta and meta.member
-            and meta.member.member_id == member.member_id then
-            session.monsters[entindex] = unit
-            session.monster_count = session.monster_count + 1
-            release_challenge_11_unit(unit)
-            return true
-        end
-    end
-    return false
+    local unit, reason = spawn_member(session, member)
+    if not unit then return false, reason end
+    release_challenge_11_unit(unit)
+    return true
 end
 
 local function current_member(session)
@@ -1256,17 +1270,9 @@ local function schedule_maintain_respawn(session, member)
     return arm()
 end
 
-local function on_killed(payload)
+local function killed_for_session(payload, meta, session)
     local victim = payload.victim
-    if not valid(victim) then return end
     local entindex = victim:entindex()
-    local meta = monster_meta[entindex]
-    if not meta then return end
-    monster_meta[entindex] = nil
-    monster_visual.on_death(victim)
-    monster_hero_visual_service.on_death(victim)
-    local session = get_session(meta.player_id, meta.encounter_id)
-    if not session then return end
     if session.monsters[entindex] then
         session.monsters[entindex] = nil
         session.monster_count = math.max(0, session.monster_count - 1)
@@ -1401,6 +1407,34 @@ local function on_killed(payload)
     end, "challenge_next:" .. meta.player_id .. ":" .. meta.encounter_id)
 end
 
+local function on_killed(payload)
+    local victim = payload.victim
+    if not valid(victim) then return end
+    local entindex = victim:entindex()
+    local meta = monster_meta[entindex]
+    -- Entity indices can be reused. An old death cannot retire a new body.
+    if not meta or meta.unit ~= victim then return end
+    monster_meta[entindex] = nil
+    monster_visual.on_death(victim)
+    monster_hero_visual_service.on_death(victim)
+    if meta.shared_slot then
+        local participants = shared_boss.on_death(victim,
+            tonumber(meta.shared_slot.context.challenge.respawn_seconds) or 1)
+        for _, session in ipairs(participants or {}) do
+            if get_session(session.player_id, session.encounter_id) == session
+                and session.status == "active" and session.monsters[entindex] == victim then
+                killed_for_session(payload, {
+                    player_id=session.player_id, team=session.team,
+                    encounter_id=session.encounter_id, member=meta.member,
+                }, session)
+            end
+        end
+        return
+    end
+    local session = get_session(meta.player_id, meta.encounter_id)
+    if session then killed_for_session(payload, meta, session) end
+end
+
 local function on_seven_sins_completed(payload)
     local player_id = tonumber(payload.player_id)
     local session = player_id and get_session(
@@ -1479,6 +1513,7 @@ end
 local function prepare_after_hero_summoned(payload)
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil or player_id < 0 then return end
+    shared_boss.bind_player_hero(player_id, hero_for(player_id))
     local wave_state = event_bus.request(events.WAVE_STATE_GET_REQUEST, {})
     local difficulty_id = wave_state and wave_state.ok
         and tostring(wave_state.difficulty_id or "") or difficulty_config.default_id
@@ -1506,13 +1541,29 @@ local function on_player_disconnected(payload)
         destroy_session_monsters(session)
         publish(session, "cancelled", { reason = "player_defeated" })
     end
-    local prepared = challenge_11_prepared_by_player[player_id]
-    challenge_11_prepared_by_player[player_id] = nil
-    if prepared then destroy_session_monsters(prepared) end
     scheduler.cancel("challenge_auto_test:" .. player_id)
 end
 
 function M.init()
+    shared_boss.configure({
+        now = function() return GameRules:GetGameTime() end,
+        after = scheduler.after,
+        cancel = scheduler.cancel,
+        create = function(slot)
+            local world = slot.context
+            world.shared_boss_slot = slot
+            world.monsters, world.monster_count = {}, 0
+            return create_member(world, slot.member)
+        end,
+        destroy = function(unit)
+            local meta = monster_meta[unit:entindex()]
+            if meta and meta.unit == unit then monster_meta[unit:entindex()] = nil end
+            unit.survival_challenge_teardown = true
+            monster_visual.clear(unit)
+            monster_hero_visual_service.clear(unit)
+            if alive(unit) then UTIL_Remove(unit) end
+        end,
+    })
     for player_id, owned in pairs(sessions) do
         for encounter_id in pairs(owned) do
             scheduler.cancel("challenge_respawn:" .. player_id .. ":" .. encounter_id)
@@ -1523,7 +1574,7 @@ function M.init()
     monster_meta = {}
     auto_test_started = {}
     abyss_cleared_stage_by_player = {}
-    challenge_11_prepared_by_player = {}
+    challenge_11_prepared = nil
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_killed)
     event_bus.subscribe(events.PLAYER_DISCONNECTED, on_player_disconnected)
     event_bus.subscribe(
@@ -1544,8 +1595,9 @@ function M.init()
     event_bus.subscribe(events.HERO_SUMMONED, prepare_after_hero_summoned)
     event_bus.subscribe(events.WAVE_CHANGED, function()
         event_bus.after_dispatch("challenge_11_preview_stats", function()
-            for player_id, prepared in pairs(challenge_11_prepared_by_player) do
-                prepare_after_hero_summoned({player_id=player_id, team=prepared.team})
+            if challenge_11_prepared then
+                prepare_after_hero_summoned({player_id=challenge_11_prepared.player_id,
+                    team=challenge_11_prepared.team})
             end
         end)
     end)

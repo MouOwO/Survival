@@ -1,5 +1,6 @@
 modifier_practice_monster_ai = class({})
 _G.modifier_practice_monster_ai = modifier_practice_monster_ai
+local shared_boss = require("systems/shared_challenge_boss_registry")
 
 local function valid(unit)
     return unit and not unit:IsNull() and unit:IsAlive()
@@ -21,6 +22,7 @@ function modifier_practice_monster_ai:OnCreated(params)
         self.aggro_radius, tonumber(params and params.leash_radius) or 1200
     )
     self.has_target = false
+    self.target_entindex = nil
     self.returning_home = false
     local unit = self:GetParent()
     self.staging = unit and unit.HasModifier
@@ -35,6 +37,7 @@ function modifier_practice_monster_ai:Resume()
         and unit:HasModifier("modifier_challenge_11_staging")) then return false end
     unit:SetForceAttackTarget(nil)
     self.has_target = false
+    self.target_entindex = nil
     self.returning_home = false
     self.staging = false
     self:StartIntervalThink(0.5)
@@ -46,8 +49,12 @@ function modifier_practice_monster_ai:OnIntervalThink()
     local unit = self:GetParent()
     if not valid(unit) then return end
 
-    local hero = self.hero_entindex > 0
-        and EntIndexToHScript(self.hero_entindex) or nil
+    local hero
+    if unit.survival_shared_challenge_boss then
+        hero = shared_boss.target_for(unit, unit:GetAbsOrigin(), self.leash_radius)
+    else
+        hero = self.hero_entindex > 0 and EntIndexToHScript(self.hero_entindex) or nil
+    end
     local from_home = (unit:GetAbsOrigin() - self.home):Length2D()
     local hero_distance = valid(hero)
         and (hero:GetAbsOrigin() - unit:GetAbsOrigin()):Length2D() or 999999
@@ -71,9 +78,10 @@ function modifier_practice_monster_ai:OnIntervalThink()
 
     if hero_distance <= self.aggro_radius then
         self.returning_home = false
-        if not self.has_target then
+        if not self.has_target or self.target_entindex ~= hero:entindex() then
             unit:SetForceAttackTarget(hero)
             self.has_target = true
+            self.target_entindex = hero:entindex()
         end
     elseif self.has_target then
         unit:SetForceAttackTarget(nil)

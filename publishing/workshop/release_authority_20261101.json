@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "app_id": 570,
+  "workshop_id": "3824360109",
+  "owner": "76561198845461206",
+  "canonical_journal": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\four_accounts_20261022\\steam_upload_state.json",
+  "lineage_state": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\release_lineage_20261101\\state.json",
+  "publication_lock": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\four_accounts_20261022\\steam_upload_state.json.lock",
+  "validator_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\tools\\shared_boss_portrait_release_20261101\\validator.py",
+  "validator_sha256": "e710ef28dcb914f4237f0c78433953b5fc05d9aae8a281faa8a24b3014fa2121",
+  "repositories": {
+    "game": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival",
+    "content": "D:/SteamLibrary/steamapps/common/dota 2 beta/content/dota_addons/Survival"
+  },
+  "required_feature_ancestors": {
+    "game": [
+      "1ae7839674e18bdeb9fbe255e558ee448fb1847b",
+      "acc557388643528e901c2e18d73d7ab561b52f20"
+    ],
+    "content": [
+      "f8640121f8c196540fbb90e40416ac1d162144e3"
+    ]
+  },
+  "recipe_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\tools\\shared_boss_portrait_release_20261101\\build_release.py",
+  "recipe_sha256": "3019bff7b53f22f4301a399b4a78a3ab24fb18da3fe739d779016298215a7dfa",
+  "rehearsal_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\tools\\shared_boss_portrait_release_20261101\\rehearsal.py",
+  "rehearsal_sha256": "72c6a012ddf54766ac33bc17ac4d45b898f6bbd5a3a684f0ad75e1d8b8d2a7ac",
+  "listing_template_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\publishing\\workshop\\release_listing_template_20261101.json",
+  "listing_template_sha256": "3f0031eb39e84f5db0195793d7b1abed00a1d428f25a7c1a138ecca9d63f9ef0",
+  "reviewed_source_baseline_sha256": "3a60ddab9a93b58fa936e789f1a9d2008d39ed7eca9545487e1f40bf32219ee3",
+  "scope": "SHARED_BOSSES_AND_PENDING_PORTRAIT_TELEPORT_ARCHIVE_HUD_FIXES_17_RESOURCES",
+  "historical_deferred_changes": 220,
+  "source_anchor_is_full_published_tree": false
+}
