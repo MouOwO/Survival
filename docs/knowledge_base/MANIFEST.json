@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 16124,
-      "sha256": "adb620b57d4ccf38a67743a132dd3b0172fa5da7c949d4c30dd3c8a2fd595b54"
+      "bytes": 16235,
+      "sha256": "a1246da93693a07d2e3870fb731a7bdbea203beefea6bb1c66cdc4833dbc8fd4"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -25,8 +25,8 @@
     },
     {
       "path": "04_network_auth_official.md",
-      "bytes": 15544,
-      "sha256": "cee8f3cd609ea591f04c53648d93a08b695da3a2b0bd315f47f9b8bb391277a6"
+      "bytes": 16048,
+      "sha256": "57b3a21dde8c57d4f2066e9a3f057d8ee8d7bdc2b71f952dec87ae10ec5f0a56"
     },
     {
       "path": "05_payments_commerce_delivery.md",
@@ -35,13 +35,13 @@
     },
     {
       "path": "06_build_release_ops.md",
-      "bytes": 20483,
-      "sha256": "9f2e24966421236baa78a9fa287622e6814fac778aaf3f1d793fdf055d9ae2e7"
+      "bytes": 20987,
+      "sha256": "c70b19e374c36bb3a5e837f11e019f8b3fbc34d4e24496f968f0b8b8f49fea92"
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 30096,
-      "sha256": "308c91568ff58ccfb91dd899ef3f8061deda9393c01899555536be1becce0f2a"
+      "bytes": 30207,
+      "sha256": "78174c2fd2932bd0aa56bb79927302611409a2368a0667874d10896be2ae59d4"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 6974,
-      "sha256": "d5f94a73dac85c53d674952ef5342d991ac8d701da21cdbaaea8082612a8c5b4"
+      "bytes": 6987,
+      "sha256": "2c556be4d81cc70df5d3d92d64b3842e951ab5d3037ffe51d5a37111c3753276"
     },
     {
       "path": "data/completed_work_index.json",
@@ -90,8 +90,8 @@
     },
     {
       "path": "data/context.json",
-      "bytes": 6175,
-      "sha256": "c0707a347df016c12465c6b91324516c81d453c53d85717e05e57429054914c2"
+      "bytes": 8043,
+      "sha256": "f42dd9e806590cd84f969ba43899a9f85b51dc86b6a980a3e8992f1c75d5dd71"
     },
     {
       "path": "data/repository_files.json",
@@ -120,8 +120,13 @@
     },
     {
       "path": "evidence/account_admission_20261101.md",
-      "bytes": 3822,
-      "sha256": "f78f96db104459add21e2353a9019059bf07634cf425ffbfbb62b9acc823c8fc"
+      "bytes": 6519,
+      "sha256": "2fedae2c02457787b6296c863f149454241965f5db877cbe772bd6448bf419d1"
+    },
+    {
+      "path": "evidence/account_admission_20261101.public.json",
+      "bytes": 9060,
+      "sha256": "a077d336f715428bb6c8b94947801d901d27906087599d14ac91cb459b1405fc"
     },
     {
       "path": "evidence/approved_content_names_beta_gift_20261030.md",

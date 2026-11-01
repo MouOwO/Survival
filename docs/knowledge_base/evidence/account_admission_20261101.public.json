@@ -1,0 +1,208 @@
+{
+  "schema": 1,
+  "status": "UPLOADED_AND_OFFICIAL_DOWNLOAD_FULLY_VERIFIED",
+  "observed_utc": "2026-11-01T07:20:31.178139+00:00",
+  "workshop_id": "3824360109",
+  "release_sequence": 2026110104,
+  "revision": "WS4-FIVE-ACCOUNT-ADMISSION-01",
+  "visibility": "unlisted",
+  "added_steamid64": "76561198296534615",
+  "added_account32": "336268887",
+  "approved_steamids64": [
+    "76561198424163156",
+    "76561198845461206",
+    "76561198104787442",
+    "76561198974301984",
+    "76561198296534615"
+  ],
+  "approved_accounts": 5,
+  "max_players": 4,
+  "content_sha256": "6ffc0816d040ffe4a4d7a3db472c74dc18b96fad36f5f204cba5b0879ab5489f",
+  "steam_manifest": "7025356658517360342",
+  "runtime_files": 6917,
+  "protected_modules": 184,
+  "protected_modules_preserved": 184,
+  "all_other_resources_byte_identical_to3102": 6911,
+  "baseline_release_sequence": 2026103102,
+  "baseline_content_sha256": "318491d5f839653d888c350dcaa7fb639189ec427779004879819d3ac9b45352",
+  "baseline_content_source_git_head": "54c7c6eac222f63f21cccc42fc961ad5ba0ce500",
+  "content_source_scope": "Runtime assets inherit verified3102. A repository HEAD at delivery does not claim its unpublished content assets are included.",
+  "source_revision": "f7a870371caf602b52088a06bc991888e66782ad",
+  "server_source_revision": "e96a49b80e7d582bf955cf027fc4f0a863e60f7d",
+  "changed_runtime_paths": [
+    "scripts/vscripts/config/test_access.lua",
+    "scripts/vscripts/core/commerce_release_policy.lua",
+    "scripts/vscripts/core/test_access_policy.lua",
+    "scripts/vscripts/systems/native_cloud_handoff.lua",
+    "scripts/vscripts/systems/native_cloud_roster.lua",
+    "scripts/vscripts/systems/native_transport_probe.lua"
+  ],
+  "package_bytes": 3788093063,
+  "package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 286616,
+      "sha256": "84b5645f1b1e7c8892630555b17f8deecf5d6abe13fe5144a55ef500a09f8cdb"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1071723575,
+      "sha256": "1bdaa9b69d980bd172f6d466479a549a438b4875f8cf939f9fbf7fb9100270c8"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1071529200,
+      "sha256": "3046a3ae720dd0e80950e14562bf8c8c556f095a4ab068773d7f34dd78ca2b49"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379215,
+      "sha256": "e03f21542c7c283460e21c60c6350587a8b100b9ab5789d7cfa2ebe41fd1206a"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 572174457,
+      "sha256": "0553d3fd3dad2b30e3f2778d6c25e5f63e1f263ee1d052259cff77c7b0cfe577"
+    }
+  ],
+  "vpk_sha256": "84b5645f1b1e7c8892630555b17f8deecf5d6abe13fe5144a55ef500a09f8cdb",
+  "package_report": {
+    "path": "output/admission_five_20261101/package.json",
+    "sha256": "70306be7a42962172fddce88bc8c4ac12dc5e73db1119d97839b871115aa01b6"
+  },
+  "native_signed_startup": {
+    "path": "output/admission_five_20261101/native_smoke.json",
+    "sha256": "2274d2bd04c8b369dd3527d21aa0b72a1dfa3519377d92c27d71498d206481a2"
+  },
+  "backend_proof": {
+    "path": "output/admission_five_20261101/server_proof.json",
+    "sha256": "048ee7b6604be25f9670d13935062fb8121275c0d78e4669641a136f4b08d4fb"
+  },
+  "download_receipt": {
+    "path": "output/admission_five_20261101/download_evidence/20261101T072031Z_468953cd585844389c7418c92b6d5e5e/verification.json",
+    "sha256": "2c95a80263ea246258bce3e98054dd11d947ac6434d3dbf30a7fd11d0e34db5f"
+  },
+  "private_backup_verification": {
+    "path": "output/admission_five_20261101/server_prepared_backups_verified_v3.json",
+    "sha256": "98aface51ce367db5d009e737341766ab25038c4d6d6817d3055e7b98dc6b265"
+  },
+  "supplementary_records": {
+    "guarded_preflight": {
+      "path": "output/admission_five_20261101/publish_preflight_01.guard.json",
+      "sha256": "37342d65eb00a06fc0ec89a6db3a7ed8c3e9993924dfce7640a8fa3f13e58190"
+    },
+    "guarded_preflight_log": {
+      "path": "output/admission_five_20261101/publish_preflight_01.log",
+      "sha256": "cbb9acb0b85d1e7f196020b01d56017f0ca935dc40af0e3053ce20299ab1fd74",
+      "format": "raw"
+    },
+    "guarded_apply": {
+      "path": "output/admission_five_20261101/publish_apply_01.guard.json",
+      "sha256": "9f74c7bae4f3631e0b1718f5bf3f53c1d795c1e1fbf0311e99092ade6bd9fa44"
+    },
+    "guarded_apply_log": {
+      "path": "output/admission_five_20261101/publish_apply_01.log",
+      "sha256": "149e79ecceb0e0753b669786c86d0f3408a0056239c72a7ffefc41d443d90546",
+      "format": "raw"
+    },
+    "external_candidate_restore": {
+      "path": "output/admission_five_20261101/external_candidate14_restore.json",
+      "sha256": "f5fc82524f9feeace3ec9bc5986d6bd8b7589fb8751096ed66c9dfeb5268626d"
+    },
+    "preserved_cover_record": {
+      "path": "publishing/workshop/gou_fayu_cover_20261101.json",
+      "sha256": "ef2fa89c6abd28c29337c20736dbbef9308ac81b94115c4339a7d84fe2b96ade"
+    },
+    "content_repository_sync": {
+      "path": "output/admission_five_20261101/content_delivery_sync.json",
+      "sha256": "3d29300f63d3e85c29530badfefeeae9ff14554dfb2e6a728e7d460ce965f342"
+    },
+    "official_download_log": {
+      "path": "output/admission_five_20261101/official_download_01.log",
+      "sha256": "620310befcfec772c90abae57c064dc42b5e331c577dc12a2423dcd82124f5ab",
+      "format": "raw"
+    },
+    "guard_source_sync": {
+      "path": "output/admission_five_20261101/guard_source_sync.json",
+      "sha256": "a92aea61fd7c32d551336240631ff03cb97d8586e5621ae143659e22086c4a5a",
+      "format": "json"
+    },
+    "post_download_server_verify": {
+      "path": "output/admission_five_20261101/server_verified_after_download.json",
+      "sha256": "9ac471361855143ed03c009eb525e91b701fbfddbd2f421b4c3487204e7f51a6"
+    },
+    "vpn_rule_route_verification": {
+      "path": "output/admission_five_20261101/vpn_rule_restored.json",
+      "sha256": "79d37dab3a736b824649ed2c14bfc77cc55203a2275d8db1087df98ee502af5d"
+    },
+    "server_activation_sequencing": {
+      "path": "output/admission_five_20261101/server_activation_sequencing_incident_v3.json",
+      "sha256": "ca75171c94750dc0493cff464dea960cd4894ea2f2d9bf000e370082b5ea6feb"
+    },
+    "server_operator_ordering_tests": {
+      "path": "output/admission_five_20261101/server_operator_ordering_tests.json",
+      "sha256": "31cbfc02b52f76530774c36409e2b4be1bab63df74725ad4b15174d0be12bf67"
+    },
+    "server_previous_failure_diagnosis": {
+      "path": "output/admission_five_20261101/server_activation_failure_diagnosis.json",
+      "sha256": "c8c277804131e362c1b86b29ab4b99fa3087a84e86dc1e3a2a03fb72d866e702"
+    }
+  },
+  "backend": {
+    "status": "PASS_FIVE_ACCOUNT_ADMISSION_ACTIVE",
+    "approved_accounts": 5,
+    "max_players": 4,
+    "bundle": "d573588b64d2ea6d1431c856d52e0515b5ed471cfdf6af4456ff618d0f568488",
+    "web_policy_active": true,
+    "archive_policy_active": true,
+    "original_accounts_preserved": true,
+    "payments_unchanged": true,
+    "no_real_player_auth_claimed": true,
+    "database_restored": false,
+    "preservation_check_before_health": true,
+    "normal_http_rate_counters_expected": true,
+    "backup": {
+      "path": "server_prepared_v3.json",
+      "sha256": "615f5fb0805966103054903628920b190c9350d446f90ea040df1ed55fc4d873"
+    },
+    "backup_verification": {
+      "path": "output/admission_five_20261101/server_prepared_backups_verified_v3.json",
+      "sha256": "98aface51ce367db5d009e737341766ab25038c4d6d6817d3055e7b98dc6b265"
+    },
+    "activate": {
+      "path": "server_activated_v3.json",
+      "sha256": "67af2c57b0b2eb937262f46c50829b69e8aa13d6759bd3c72b93f124d9bd6e51"
+    },
+    "verify": {
+      "path": "server_verified_v3.json",
+      "sha256": "26fae83fb5248bccf31baf3cff5058fd978fabf8d96f48d58d8bf47bc5fcb6ea"
+    }
+  },
+  "official_callbacks": {
+    "subscribe1313": 1,
+    "download3406": 1
+  },
+  "original_unlisted_item_preserved": true,
+  "unpublished_14_path_candidate_preserved": true,
+  "old_0103_requires_rebuild_before_later_publication": true,
+  "operational_incidents": [
+    {
+      "server_activation_no_dota_gate_satisfied": false,
+      "status": "SERVER_ACTIVATION_DISPATCHED_AFTER_FAILED_ENVIRONMENT_EXCLUSION",
+      "scope": "Parallel dispatch sent v3 activation despite failed Dota exclusion check; PG/SQLite preservation before health passed. Earlier owned0104 startup/closure is separate evidence; no environment-exclusivity pass is claimed."
+    }
+  ],
+  "validation_limits": {
+    "signed_native_startup": "PASS_STARTUP_ONLY; real cheats0/normalHTTP1",
+    "new_player_oauth": "NOT_PERFORMED; player must authorize normally",
+    "new_player_actual_gameplay": "NOT_RUN",
+    "online_multiplayer": "NOT_RUN",
+    "online_FPS": "NOT_MEASURED",
+    "downloaded_copy_native_launch": "NOT_RUN",
+    "server_activation_environment_exclusion": "NOT_PASSED; parallel dispatch incident retained"
+  },
+  "canonical_journal_sha256_at_download": "6e6f5f6b09995bf715d68900d2c86f871aab83ccf2998da5a8c9e7412386628e",
+  "canonical_journal_unchanged_by_download": true,
+  "public_release": false,
+  "content_repository_head_at_delivery": "ef501fd450d762d084aa9f8a063f6c8f2bfc179a"
+}

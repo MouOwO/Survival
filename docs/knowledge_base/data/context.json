@@ -1,26 +1,66 @@
 {
   "schema_version": 2,
-  "snapshot_date": "2026-10-31",
+  "snapshot_date": "2026-11-01",
   "timezone": "Asia/Shanghai",
   "project": "孤城逐晓 / Survival",
   "read_first": "00_START_HERE.md",
   "latest_release": {
     "status": "UPLOADED_AND_OFFICIAL_DOWNLOAD_FULLY_VERIFIED",
     "workshop_id": "3824360109",
-    "release_sequence": 2026103101,
-    "revision": "WS4-WALL-ATTACK-PERF-01",
+    "release_sequence": 2026110104,
+    "revision": "WS4-FIVE-ACCOUNT-ADMISSION-01",
     "visibility": "unlisted",
-    "content_sha256": "b99f3ac128c6433012f419fba87b6b7b59ca2aab8c2c98339f50f24c788b3263",
-    "steam_manifest": "4767827996113746006",
-    "package_bytes": 3788076180,
-    "runtime_files": 6915,
+    "content_sha256": "6ffc0816d040ffe4a4d7a3db472c74dc18b96fad36f5f204cba5b0879ab5489f",
+    "steam_manifest": "7025356658517360342",
+    "package_bytes": 3788093063,
+    "runtime_files": 6917,
     "public_release": false,
     "uploaded": true,
     "download_verified": true,
-    "source_record": "publishing/workshop/wall_attack_perf_20261031_v01.json",
-    "source_record_sha256": "1088fc9a7f12b6102df086fe932a9c9ab36fdf913b4304bf4610db3a1796b6af",
+    "source_record": "publishing/workshop/account_admission_20261101_v01.json",
+    "source_record_sha256": "a077d336f715428bb6c8b94947801d901d27906087599d14ac91cb459b1405fc",
     "native_test": "PASS_NATIVE_SIGNED_PRODUCTION_STARTUP_ONLY",
-    "evidence": "evidence/wall_attack_release_20261031.public.json"
+    "evidence": "evidence/account_admission_20261101.public.json",
+    "package_files": [
+      {
+        "name": "3824360109.vpk",
+        "bytes": 286616,
+        "sha256": "84b5645f1b1e7c8892630555b17f8deecf5d6abe13fe5144a55ef500a09f8cdb"
+      },
+      {
+        "name": "3824360109_000.vpk",
+        "bytes": 1071723575,
+        "sha256": "1bdaa9b69d980bd172f6d466479a549a438b4875f8cf939f9fbf7fb9100270c8"
+      },
+      {
+        "name": "3824360109_001.vpk",
+        "bytes": 1071529200,
+        "sha256": "3046a3ae720dd0e80950e14562bf8c8c556f095a4ab068773d7f34dd78ca2b49"
+      },
+      {
+        "name": "3824360109_002.vpk",
+        "bytes": 1072379215,
+        "sha256": "e03f21542c7c283460e21c60c6350587a8b100b9ab5789d7cfa2ebe41fd1206a"
+      },
+      {
+        "name": "3824360109_003.vpk",
+        "bytes": 572174457,
+        "sha256": "0553d3fd3dad2b30e3f2778d6c25e5f63e1f263ee1d052259cff77c7b0cfe577"
+      }
+    ],
+    "vpk_sha256": "84b5645f1b1e7c8892630555b17f8deecf5d6abe13fe5144a55ef500a09f8cdb",
+    "baseline_content_source_git_head": "54c7c6eac222f63f21cccc42fc961ad5ba0ce500",
+    "content_repository_head_at_delivery": "ef501fd450d762d084aa9f8a063f6c8f2bfc179a",
+    "approved_accounts": 5,
+    "max_players": 4,
+    "changed_runtime_paths": [
+      "scripts/vscripts/config/test_access.lua",
+      "scripts/vscripts/core/commerce_release_policy.lua",
+      "scripts/vscripts/core/test_access_policy.lua",
+      "scripts/vscripts/systems/native_cloud_handoff.lua",
+      "scripts/vscripts/systems/native_cloud_roster.lua",
+      "scripts/vscripts/systems/native_transport_probe.lua"
+    ]
   },
   "evidence_boundaries": {
     "native_two_player_auth_profile": "PASS_IN_2708",
@@ -148,16 +188,23 @@
     "online_multiplayer": "NOT_RUN"
   },
   "fifth_player_admission_20261101": {
-    "status": "CODE_TESTED_SERVER_AND_SIGNED_CLIENT_RELEASE_PENDING",
+    "status": "UPLOADED_AND_OFFICIAL_DOWNLOAD_FULLY_VERIFIED",
     "steamid64": "76561198296534615",
     "account32": "336268887",
     "approved_accounts": 5,
     "max_players_per_match": 4,
-    "server_deployed": false,
-    "workshop_published": false,
+    "server_deployed": true,
+    "workshop_published": true,
     "planned_sequence": 2026110104,
     "unpublished_14_path_candidate_preserved": true,
     "old_0103_requires_rebuild_before_later_publication": true,
-    "evidence": "evidence/account_admission_20261101.md"
+    "evidence": "evidence/account_admission_20261101.md",
+    "official_download_verified": true,
+    "current_sequence": 2026110104,
+    "steam_manifest": "7025356658517360342",
+    "new_player_oauth": "NOT_PERFORMED_NORMAL_LOGIN_REQUIRED",
+    "new_player_multiplayer": "NOT_RUN",
+    "server_activation_no_dota_gate_satisfied": false,
+    "operational_incident_retained": true
   }
 }
