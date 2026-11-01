@@ -35,8 +35,8 @@
     },
     {
       "path": "06_build_release_ops.md",
-      "bytes": 20017,
-      "sha256": "74ee60de336c33a443e0ba024ecb5e9f56d3197f0f2d17cc7cc0797983a6da05"
+      "bytes": 20483,
+      "sha256": "9f2e24966421236baa78a9fa287622e6814fac778aaf3f1d793fdf055d9ae2e7"
     },
     {
       "path": "07_decisions_incidents_pending.md",
@@ -384,6 +384,11 @@
       "sha256": "5c7e6344347122ab9bff108c46a2acec7cd0dba693efc453ff4c40e5f87d02a3"
     },
     {
+      "path": "evidence/workshop_cover_20261101.md",
+      "bytes": 3672,
+      "sha256": "8fcbe11c9abe4bb4639649666735fb3671b66fc575f311e244c1a64f5aeaf0de"
+    },
+    {
       "path": "history/20261024/00_START_HERE.md",
       "bytes": 2945,
       "sha256": "9518ec86a675a8cb29de5ef631c151be6eef4546a55ceb73f699bdbbbbc64b28"
@@ -547,6 +552,11 @@
       "path": "validation/20261031/teammate_builder_portrait.json",
       "bytes": 2718,
       "sha256": "5e0b748604de932edb2a5a7a61720a7cdfe6b634c41c491a700843695553e114"
+    },
+    {
+      "path": "validation/20261101/workshop_cover.json",
+      "bytes": 1393,
+      "sha256": "d64d4ee5cba3fbddc7f0e4b1d692dd50a14e5cbbe3a54c5e4dea1d7bdd3ca376"
     }
   ]
 }

@@ -4,7 +4,7 @@ e6a078bff4924e5cf910cb6db92101ce  02_core_gameplay.md
 4220fce140538e36f5e8f6c042dd2d87  03_progression_save_contract.md
 46e79db8901a5994b56cf199c88ed364  04_network_auth_official.md
 792258693078ad1d400df53a21714521  05_payments_commerce_delivery.md
-5e3d3c9d6c99785410a2cb4d87a7d1d8  06_build_release_ops.md
+9bbeed1251368f8c8b1300f5c790bbc6  06_build_release_ops.md
 3773b513d05f9fb791302f8423d40dda  07_decisions_incidents_pending.md
 2a173f3d2da8a24af5a6e46c67764bd1  08_new_project_reuse.md
 e86cb49a9028b56768551c0ce2d2e156  09_session_digest.md
@@ -12,7 +12,7 @@ e86cb49a9028b56768551c0ce2d2e156  09_session_digest.md
 02e917d898f284488194760afea37626  11_completed_work_catalog.md
 c5d539495e5a99a38be32acd29d3b90b  12_sessions_archive_and_recovery.md
 9a5bc6486324d7e2430e664b14bf2d7d  13_art_ui_qa.md
-d87e6cca794c6561dc04d64e677f0815  MANIFEST.json
+2ed6944390a775d770db74ca2ddb9c65  MANIFEST.json
 7f371090900ed781564a860494ae934d  NEW_CHAT_PROMPT.txt
 82b2874a5aa2f61e20b2ec084a2df7e2  README.md
 33fbd1cc38438efb46442edfabdebbc6  data/completed_work_index.json
@@ -75,6 +75,7 @@ fe736a70e5066f94b0f4630e83e2ed7d  evidence/tooltip_follow_20261028.md
 d6b58d31b83f0853f59092630bf9b7da  evidence/wall_attack_hotfix_20261031.md
 26a1f78c3f29c57a10636cfd07bb8d91  evidence/wall_attack_release_20261031.public.json
 aeec7ceaea906940b7b74ef3465c1f3d  evidence/wave_overflow_grace_20261030.md
+21b447313c0f8348e05ab8ad382b6c60  evidence/workshop_cover_20261101.md
 15a808f422b557cb3db1b800dd108783  history/20261024/00_START_HERE.md
 a0da9a4ca306b95dea8b69097c114301  history/20261024/01_architecture_and_workflow.md
 55ae98f80d10ef7c61fdcc83023353a8  history/20261024/02_core_gameplay.md
@@ -108,3 +109,4 @@ c63b69a82b9cc69a993fdf55e239cf50  validation/20261029/archive_all_release.json
 b8d0ef048f61d6d12979fbaa6bc15f78  validation/20261030/map_minimap_sync.json
 f0e1770669607ef31c7a5a3b57b1601e  validation/20261030/wave_overflow_grace.json
 8ec25fcdfe882a1a5a6c86b7bd3bfc78  validation/20261031/teammate_builder_portrait.json
+ee1a2efe2cf6fa6b646ce581b6edbed1  validation/20261101/workshop_cover.json
