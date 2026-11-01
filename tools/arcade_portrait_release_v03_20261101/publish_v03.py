@@ -97,7 +97,7 @@ def bind_review(review,package,package_sha):
 def reject_fatal_network_diagnostics(text):
     # These exact diagnostic families accompanied the real cold-start snapshot
     # disconnect. A root no-crash boolean cannot override the actual log.
-    need(re.search(r'NETWORK_DISCONNECT_SNAPSHOTERROR|Failed\s+to\s+serialize\s+CustomGameEvent|SendData[^\r\n]*reliable\s+data\s+too\s+big',
+    need(re.search(r'NETWORK_DISCONNECT_SNAPSHOTERROR|Failed\s+to\s+serialize\s+(?:CUserMsg_)?CustomGameEvent|SendData[^\r\n]*reliable\s+data\s+too\s+big',
         text,re.I) is None,'Fatal network snapshot or reliable CustomGameEvent serialization diagnostic; candidate must not publish')
 
 

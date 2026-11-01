@@ -17,7 +17,7 @@ sys.dont_write_bytecode=True
 HERE=Path(__file__).resolve().parent
 PARENT=HERE.parent/'arcade_portrait_release_v02_20261101/rehearsal.py'
 PARENT_SHA='b15122de3441a12d283e5d3c7f0998558b2b4fbd90058fb9beb5df928f181cd7'
-RUNTIME_SOURCE_REVISION=None
+RUNTIME_SOURCE_REVISION='ceede161d3a009ef5034a5965a1a6c5393930bc2'
 
 
 def require_source_revision():

@@ -218,6 +218,7 @@ class PublishTests(unittest.TestCase):
 
     def test_actual_snapshot_and_custom_event_fatal_logs_refuse_whole_preflight(self):
         diagnostics=(b'NETWORK_DISCONNECT_SNAPSHOTERROR',b'Failed to serialize CustomGameEvent',
+            b'Failed to serialize CUserMsg_CustomGameEvent [148]',
             b'SendData reliable data too big (7628 bytes)',b'SendData: reliable data too big')
         for diagnostic in diagnostics:
             with self.subTest(diagnostic=diagnostic),tempfile.TemporaryDirectory() as temporary,ExitStack() as stack:
