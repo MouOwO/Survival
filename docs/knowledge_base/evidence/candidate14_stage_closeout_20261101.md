@@ -1,0 +1,15 @@
+# 14文件候选阶段收口｜2026-11-01
+
+14文件v03已按用户明确批准完成签名，并进入原条目的本地普通客户端排演；生产头像、FPS与稳定性验收没有完成，原游廊条目没有更新。正式远端仍3102；旧13文件签名包保留且未发布。当前恢复状态为 **ORIGINAL3102_FIVE_FILES_FULLY_RESTORED**：WM_CLOSE已排队，root于UTC02:18:46.8802933确认无Dota；keeper却以exit1写hold_failed/evidence_complete=false，不能记连续hold或正常keeper收尾通过。实际official restore已exit0，restored.json确认ORIGINAL3102_FIVE_FILES_FULLY_RESTORED、publication_performed=false，原五文件已完整恢复、备份保留；keeper hold_failed与生产验收未通过仍保留。公开安全字段见[阶段回执](candidate14_stage_closeout_20261101.public.json)。
+
+候选：sequence `2026110103`，content `c28c43f6983a1a2f5c086b4c025edfa58ea4b6419186d91edda1c830df2c030a`，package report SHA `0df36ca48ef617220268bf15d80b2e726a036721112d33226d2379eb45ce090e`；6918资源、184保护模块、14声明路径。运行源码game `ceede161d3a009ef5034a5965a1a6c5393930bc2`，操作工具提交由root报告为`9559…`，content源码`b1ac328e4467510c89fdfd8c6d9f79947d7c820a`。旧13签名及旧计划不替代这一候选。
+
+14路径包含首次档案UI wire修复：开发冷局日志与用户查看已通过有限观察，945行/quota保留；具体源测试、JSON预算及native/JSON区别见[wire修复证据](archive_ui_wire_budget_20261101.public.json)。这不代表正常生产中的所有功能已测。
+
+root报告已保存原五VPK完整备份并stage同一签名14候选，启动普通非Tools客户端。用户自行完成OAuth并进入N3波次5；root观察到运行中的建造者画面。前台持续受其他应用干扰，控制测量条件未建立，ETW runner只是准备、没有执行。没有完成怪物饰品/背景、英雄建造者切换QWER、FPS或生产稳定性验收。
+
+原生engine.log未生成，不能把不存在的日志写成“0错误”或完整原生日志已通过。当前证据不足以放行发布；未调用更新原条目或官方下载来代替实机验收。截止前official WM_CLOSE已成功排队，root提升CIM于UTC02:18:46.8802933确认无Dota。keeper以exit1结束并于02:17:11.157306写hold_failed.json，status=HOLD_OR_OWNERSHIP_FAILED_NO_FORCE_STOP、evidence_complete=false；元数据没有异常原因，不能推断具体failure，也不能声称连续hold验收或正常keeperfinish。实际official restore已exit0，restored.json确认ORIGINAL3102_FIVE_FILES_FULLY_RESTORED、publication_performed=false，原五文件已完整恢复、备份保留；keeper hold_failed与生产验收未通过仍保留。；原五备份与签名候选均保留。
+
+旧30020的ETW后挂起仍未定因，旧冷SnapshotError记录保留；本次开发wire路径成功不抹去旧失败。恢复现已真实收口；仍须另行完成普通候选的受控画面、原生日志与真实ETW/退出稳定性，才可按授权更新原条目。本记录不保存raw OAuth/认证、账号、session、完整日志或带认证信息的截图。
+
+恢复真实回执：`658474b65063f730bebd5c5f976c84ea3ac5019eaec7c842b837c5347c819158`（1200字节）；实际official restore已exit0，restored.json确认ORIGINAL3102_FIVE_FILES_FULLY_RESTORED、publication_performed=false，原五文件已完整恢复、备份保留；keeper hold_failed与生产验收未通过仍保留。

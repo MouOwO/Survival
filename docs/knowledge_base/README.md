@@ -1,6 +1,8 @@
 # 孤城逐晓／Survival 统一知识库
 
-最新wire修复与14路径发行范围：[首次存档分包预算/缓存基线/冷局与用户验收边界](evidence/archive_ui_wire_budget_20261101.public.json)，对应审查`docs/reviews/archive_ui_wire_budget_20261101.md`。20分类945行完整，合成最大JSON5928/6144；新冷Tools独立日志20 full+40 delta页无对应错误，用户确认结果正常。已签13包2026110102未发布且不含此修复，14文件v03尚待新源码、计划/unsigned与重签；正式3102及普通生产/长局待验，旧hang失败不覆盖。
+当前收口：[14文件已签候选的有限排演与待确认恢复](evidence/candidate14_stage_closeout_20261101.md)。签名完成不等于生产验收：用户自行OAuth到N3/波次5，前台受干扰、原生日志未生成，头像/FPS/稳定性未通过、ETW未执行，原条目未更新；WM_CLOSE已排队且root CIM确认无Dota，但keeper exit1/hold_failed，连续hold未通过；实际official restore已exit0，restored.json确认ORIGINAL3102_FIVE_FILES_FULLY_RESTORED、publication_performed=false，原五文件已完整恢复、备份保留；keeper hold_failed与生产验收未通过仍保留。
+
+最新wire修复与14路径发行范围：[首次存档分包预算/缓存基线/冷局与用户验收边界](evidence/archive_ui_wire_budget_20261101.public.json)，对应审查`docs/reviews/archive_ui_wire_budget_20261101.md`。20分类945行完整，合成最大JSON5928/6144；新冷Tools独立日志20 full+40 delta页无对应错误，用户确认结果正常。已签13包2026110102未发布且不含此修复，14文件v03现已完成源码/计划和签名，但普通生产验收未完成；正式3102及普通生产/长局待验，旧hang失败不覆盖。
 
 最新综合审查：[2026-11-01 全商品矩阵、查询头像锚点、D门禁及性能边界](evidence/commerce_portrait_audit_20261101.md)。普通3102已授权并定位`missing_anchor`；离线v04完成六场景及淘汰后冷回Bane的有限视觉核对，两段各239张屏幕采样的关键画面未见裸模。13文件v02运行修复已纳入game048a2d6／content b1ac328，签名生产、新游廊与正式FPS待验；D已完成run02离线原生有限验证及库存/临时英雄恢复，建造者实际施放和签名生产包仍未验，正式3102不含该修复。保留有效96.54FPS基线、剔除跨结算98.09FPS样本，并记录一次冷开发局SnapshotError，不能以热重载成功覆盖。新增Bane5开发ETW30秒约60FPS有效，但采样后同进程无响应且正常关闭未退出，候选稳定性未通过、原因未定。
 

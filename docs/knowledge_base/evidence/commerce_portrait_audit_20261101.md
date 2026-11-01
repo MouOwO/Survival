@@ -4,7 +4,9 @@
 
 ## 已完成与当前边界
 
-最新范围变更：archive_service的UI wire预算修复已在开发源码冻结并完成专项Lua/Node及新冷Tools日志复核，用户确认查看结果正常，详见[安全指标与原件SHA](archive_ui_wire_budget_20261101.public.json)及`docs/reviews/archive_ui_wire_budget_20261101.md`。当前须改为14文件v03：新源码commit、plan/unsigned审阅及重签尚待完成。已签13文件v02/2026110102保持原样、未发布，不含新wire修复；签名包content `9535cee3defd7e2a9a4cb1ed5861e229481a4465ea44afdab958c04b33cf08aa`、reportSHA `a589489bd56caaa2ce183c578859d6a2a8663b3e1fc74577ab0d649ba12b58f8`。正式游廊仍3102，不能拿旧13签名或旧12计划发布新14源。
+截止前阶段更新：[14文件候选收口](candidate14_stage_closeout_20261101.md)记录用户明确批准后已签seq2026110103/content c28c43f6…030a（report0df36ca4…090e），运行source ceede161d3、ops9559…、content b1ac328。原五VPK完整备份后本地stage并普通启动，用户自行OAuth进入N3波次5；root观察运行建造者画面，但前台持续干扰、engine.log未生成，生产饰品头像/QWER/FPS/稳定性没有验收，ETW仅准备未执行。没有日志不能记0错误，不能发布；原条目未更新，远端仍3102，旧13签名保留。WM_CLOSE已排队，root CIM于02:18:46.8802933确认无Dota；keeper exit1于02:17:11.157306写hold_failed/evidence_complete=false，连续hold和正常keeper收尾未通过、原因未定。实际official restore已exit0，restored.json确认ORIGINAL3102_FIVE_FILES_FULLY_RESTORED、publication_performed=false，原五文件已完整恢复、备份保留；keeper hold_failed与生产验收未通过仍保留。
+
+最新范围变更：archive_service的UI wire预算修复已在开发源码冻结并完成专项Lua/Node及新冷Tools日志复核，用户确认查看结果正常，详见[安全指标与原件SHA](archive_ui_wire_budget_20261101.public.json)及`docs/reviews/archive_ui_wire_budget_20261101.md`。该修复现已纳入14文件v03源码ceede161d3并完成新计划/签名，普通生产验收未完成；截止前状态以上方收口为准。已签13文件v02/2026110102保持原样、未发布，不含新wire修复；签名包content `9535cee3defd7e2a9a4cb1ed5861e229481a4465ea44afdab958c04b33cf08aa`、reportSHA `a589489bd56caaa2ce183c578859d6a2a8663b3e1fc74577ab0d649ba12b58f8`。正式游廊仍3102，不能拿旧13签名或旧12计划发布新14源。
 
 上一轮源码交付为game `11571b4313401d3d15073a0d14234754fb851316 / dev`、content `fb775f5ae9a36d863f048928a8fa0230a5cbb548 / master`，已按stash→pull→pop→commit→push同步。它包含D权益统一与renderer缓存改动，不包含随后v04的combat_stats查询锚点修正。该次同步时game原HUD编译字节、Python缓存、bundle运行指针及两份头像实验脚本保留，content干净；新改属性文件的换行归一已逐字节对照确切stash规范内容，其余原始SHA一致、旧stash保持。这是历史同步状态；当前13文件运行修复随后已纳入game `048a2d6b675325cd511abb01c5a122343052b2f7 / dev`及content `b1ac328e4467510c89fdfd8c6d9f79947d7c820a / master`，本轮操作工具另行提交，不改变冻结运行源码。
 

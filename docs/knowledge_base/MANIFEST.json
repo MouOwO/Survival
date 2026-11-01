@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 15489,
-      "sha256": "076972a35192eda40d1580ba989b3f422786e1bd3e5ad74b1d29bff6633ee68d"
+      "bytes": 15731,
+      "sha256": "84a12160a6360625b6062f5af0883602672c7fb0ffe9b7715cc6ddf593d3f146"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 28750,
-      "sha256": "a1169a5d104b261c8d2d80fb994e6f7bfc1a7793378b99a0621c3c5193874209"
+      "bytes": 29703,
+      "sha256": "bdfa8eaf1b83800b02e9f20525253703b2fe4572352aa58b1b8c7f0e22358a4a"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 6212,
-      "sha256": "dce12eb9c1ffa8fa48ea02a1f01555288ce38d5e18c68eaf11e70a351bfdc7f2"
+      "bytes": 6858,
+      "sha256": "1f6e801b97f73604d799a353ff55a742792f83a9d3fc312858086a68b04f33fa"
     },
     {
       "path": "data/completed_work_index.json",
@@ -164,14 +164,24 @@
       "sha256": "e0e617d922b258eba820418d23ad3811d85da220e9f1f6d23acf5aca4aaa88d3"
     },
     {
+      "path": "evidence/candidate14_stage_closeout_20261101.md",
+      "bytes": 3494,
+      "sha256": "ff787ca7d595eaae60468e0dd44c24575ad150a473ec9615f88e7fbabbf9bfa6"
+    },
+    {
+      "path": "evidence/candidate14_stage_closeout_20261101.public.json",
+      "bytes": 4189,
+      "sha256": "8c424480f15f51455daf6e217d028a87d7f4a12e7bbf5db7a16ad6de5a8dc7c0"
+    },
+    {
       "path": "evidence/challenge_projectiles_20261029.md",
       "bytes": 3433,
       "sha256": "cb7ccb8be54c6dbbba6e2560075666976eaa593237dac0939a283323e98e35e0"
     },
     {
       "path": "evidence/commerce_portrait_audit_20261101.md",
-      "bytes": 20429,
-      "sha256": "8829a99eb7af3805e5da5d3a2bc4c60146f512a939c900e0f76c4ba0343207bd"
+      "bytes": 21490,
+      "sha256": "53d4fb37bd13eb0a8410375270f905a591defac4ead73414fbd591051d62ccbb"
     },
     {
       "path": "evidence/commerce_prices_20261028.md",
