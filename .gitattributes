@@ -216,3 +216,13 @@ tools/arcade_portrait_perf_20261031/*.py text eol=lf
 tools/arcade_portrait_perf_20261031/*.ps1 text eol=lf
 
 tools/arcade_portrait_release_v02_20261101/REHEARSAL_V02.md text eol=lf
+
+tools/arcade_portrait_release_v03_20261101/*.py text eol=lf
+
+tools/arcade_portrait_release_v03_20261101/*.md text eol=lf
+
+scripts/vscripts/systems/archive_service.lua text eol=crlf
+
+tools/test_archive_ui_wire_budget.* text eol=lf
+
+scripts/vscripts/tests/test_archive_ui_wire_budget.lua text eol=lf

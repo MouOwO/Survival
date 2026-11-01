@@ -1,0 +1,735 @@
+{
+  "schema": "survival.archive_ui_wire_budget.public_receipt.v1",
+  "review_date": "2026-11-01",
+  "status": "SOURCE_AND_SYNTHETIC_CHECKS_PASS_WITH_ONE_COLD_TOOLS_LOG_AND_USER_ACCEPTANCE",
+  "scope": {
+    "runtime_file": "scripts/vscripts/systems/archive_service.lua",
+    "source_raw_sha256": "51b554d203485c1ccad6fa9d91cd197cf91ff6400e572e3cdf8c7455f617cd4b",
+    "source_git_lf_sha256": "6a50c80d15ba98374d8a7df31aa664112070a8ffb4e8b71867a0fd1ae2cddec4",
+    "production_signed_new14_package_verified": false,
+    "new14_published": false,
+    "normal_arcade_validation": false,
+    "all_gameplay_acceptance": false,
+    "scheduler_queue_added": false,
+    "source_frozen_for_native_review": true
+  },
+  "change": {
+    "ui_wire_daily_limits_omitted": true,
+    "server_snapshot_and_quota_preserved": true,
+    "page_metadata_projected_once": true,
+    "whole_page_rows_not_copied_per_chunk": true,
+    "max_rows_per_packet": 12,
+    "conservative_json_budget_bytes": 6144,
+    "fixed_envelope_reserve_bytes": 256,
+    "all_rows_checked_before_page_sends": true,
+    "oversized_indivisible_header_or_row_explicitly_rejected": true,
+    "baseline_committed_only_after_all_synchronous_sends_return": true,
+    "native_wire_size_claimed_same_as_json": false
+  },
+  "synthetic_real_projectors": {
+    "categories": 20,
+    "complete_rows": 945,
+    "before_packets": 88,
+    "after_packets": 108,
+    "before_total_json_bytes": 1503242,
+    "after_total_json_bytes": 552791,
+    "before_max_json_packet_bytes": 23490,
+    "after_max_json_packet_bytes": 5928,
+    "initial_json_encode_calls": 1093,
+    "unchanged_json_encode_calls": 0,
+    "unchanged_send_calls": 0,
+    "inventory_revision_change_json_encode_calls": 84,
+    "inventory_revision_change_delta_packets": 20,
+    "added_timers": 0,
+    "http_calls": 0,
+    "persistence_calls": 0,
+    "native_calls": 0,
+    "transport_row_record_deepcopies_before_derived": 9346,
+    "transport_row_record_deepcopies_after_derived": 1890,
+    "derived_copy_counts_are_not_native_measurements": true
+  },
+  "regression_checks": {
+    "lua_budget_all_catalogue_rows": true,
+    "actual_compact_receiver_full_and_delta_forward_reverse": true,
+    "actual_delta_cache_used": true,
+    "missing_baseline_requires_resync": true,
+    "server_quota_cap_preserved": true,
+    "oversized_header_row_not_silently_dropped": true,
+    "rejected_page_never_becomes_baseline": true,
+    "partial_native_send_exception_retries_full_baseline": true,
+    "custom_projector_argument_private": true,
+    "lua_test_path": "scripts/vscripts/tests/test_archive_ui_wire_budget.lua",
+    "node_test_path": "tools/test_archive_ui_wire_budget.cjs"
+  },
+  "cold_native_log": {
+    "shared_read_succeeded": true,
+    "source_log_sha256_at_read": "5cdc91aa7a3d5193ffd66f153cc95a83aebe1152d504bc93e02cb73247493435",
+    "bytes_read": 214709,
+    "lines_read": 1999,
+    "safe_receipt_sha256": "2169abb8c5b41b924d4f0dfd3480b57153792560a9839b7bf03f4a9f4de95ae5",
+    "page_summaries": 60,
+    "full_page_summaries": 20,
+    "full_rows": 945,
+    "full_chunk_send_calls_inferred": 108,
+    "delta_page_summaries": 40,
+    "all_page_json_maximum": 5928,
+    "all_page_json_budget": 6144,
+    "errors_in_read_snapshot": [],
+    "per_page": [
+      {
+        "category": "clear",
+        "mode": "full",
+        "rows": 176,
+        "chunks": 15,
+        "max_json_bytes": 5430,
+        "budget": 6144,
+        "line": 1400,
+        "local_time": "11/01 08:40:46"
+      },
+      {
+        "category": "shadow",
+        "mode": "full",
+        "rows": 0,
+        "chunks": 1,
+        "max_json_bytes": 1642,
+        "budget": 6144,
+        "line": 1401,
+        "local_time": "11/01 08:40:46"
+      },
+      {
+        "category": "points",
+        "mode": "full",
+        "rows": 112,
+        "chunks": 14,
+        "max_json_bytes": 5924,
+        "budget": 6144,
+        "line": 1402,
+        "local_time": "11/01 08:40:46"
+      },
+      {
+        "category": "starjoy_points",
+        "mode": "full",
+        "rows": 24,
+        "chunks": 3,
+        "max_json_bytes": 5734,
+        "budget": 6144,
+        "line": 1403,
+        "local_time": "11/01 08:40:46"
+      },
+      {
+        "category": "gift",
+        "mode": "full",
+        "rows": 36,
+        "chunks": 3,
+        "max_json_bytes": 5170,
+        "budget": 6144,
+        "line": 1404,
+        "local_time": "11/01 08:40:46"
+      },
+      {
+        "category": "titles",
+        "mode": "full",
+        "rows": 9,
+        "chunks": 1,
+        "max_json_bytes": 4757,
+        "budget": 6144,
+        "line": 1405,
+        "local_time": "11/01 08:40:46"
+      },
+      {
+        "category": "fragment",
+        "mode": "full",
+        "rows": 16,
+        "chunks": 3,
+        "max_json_bytes": 5563,
+        "budget": 6144,
+        "line": 1406,
+        "local_time": "11/01 08:40:46"
+      },
+      {
+        "category": "map_level",
+        "mode": "full",
+        "rows": 34,
+        "chunks": 3,
+        "max_json_bytes": 5066,
+        "budget": 6144,
+        "line": 1407,
+        "local_time": "11/01 08:40:46"
+      },
+      {
+        "category": "pet",
+        "mode": "full",
+        "rows": 0,
+        "chunks": 1,
+        "max_json_bytes": 1639,
+        "budget": 6144,
+        "line": 1408,
+        "local_time": "11/01 08:40:46"
+      },
+      {
+        "category": "work",
+        "mode": "full",
+        "rows": 34,
+        "chunks": 3,
+        "max_json_bytes": 4965,
+        "budget": 6144,
+        "line": 1409,
+        "local_time": "11/01 08:40:46"
+      },
+      {
+        "category": "endless",
+        "mode": "full",
+        "rows": 92,
+        "chunks": 8,
+        "max_json_bytes": 5210,
+        "budget": 6144,
+        "line": 1410,
+        "local_time": "11/01 08:40:46"
+      },
+      {
+        "category": "friend",
+        "mode": "full",
+        "rows": 40,
+        "chunks": 4,
+        "max_json_bytes": 5913,
+        "budget": 6144,
+        "line": 1411,
+        "local_time": "11/01 08:40:46"
+      },
+      {
+        "category": "ex",
+        "mode": "full",
+        "rows": 40,
+        "chunks": 4,
+        "max_json_bytes": 5920,
+        "budget": 6144,
+        "line": 1412,
+        "local_time": "11/01 08:40:46"
+      },
+      {
+        "category": "beast",
+        "mode": "full",
+        "rows": 40,
+        "chunks": 4,
+        "max_json_bytes": 5857,
+        "budget": 6144,
+        "line": 1413,
+        "local_time": "11/01 08:40:46"
+      },
+      {
+        "category": "fishing",
+        "mode": "full",
+        "rows": 26,
+        "chunks": 3,
+        "max_json_bytes": 3670,
+        "budget": 6144,
+        "line": 1414,
+        "local_time": "11/01 08:40:46"
+      },
+      {
+        "category": "building",
+        "mode": "full",
+        "rows": 9,
+        "chunks": 1,
+        "max_json_bytes": 4247,
+        "budget": 6144,
+        "line": 1415,
+        "local_time": "11/01 08:40:46"
+      },
+      {
+        "category": "wife",
+        "mode": "full",
+        "rows": 40,
+        "chunks": 4,
+        "max_json_bytes": 5914,
+        "budget": 6144,
+        "line": 1416,
+        "local_time": "11/01 08:40:46"
+      },
+      {
+        "category": "concubine",
+        "mode": "full",
+        "rows": 5,
+        "chunks": 1,
+        "max_json_bytes": 3564,
+        "budget": 6144,
+        "line": 1417,
+        "local_time": "11/01 08:40:46"
+      },
+      {
+        "category": "boss",
+        "mode": "full",
+        "rows": 34,
+        "chunks": 3,
+        "max_json_bytes": 3729,
+        "budget": 6144,
+        "line": 1419,
+        "local_time": "11/01 08:40:46"
+      },
+      {
+        "category": "commerce_goods",
+        "mode": "full",
+        "rows": 178,
+        "chunks": 29,
+        "max_json_bytes": 5928,
+        "budget": 6144,
+        "line": 1420,
+        "local_time": "11/01 08:40:46"
+      },
+      {
+        "category": "clear",
+        "mode": "delta",
+        "rows": 2,
+        "chunks": 1,
+        "max_json_bytes": 168,
+        "budget": 6144,
+        "line": 1540,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "shadow",
+        "mode": "delta",
+        "rows": 2,
+        "chunks": 1,
+        "max_json_bytes": 169,
+        "budget": 6144,
+        "line": 1541,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "points",
+        "mode": "delta",
+        "rows": 2,
+        "chunks": 1,
+        "max_json_bytes": 169,
+        "budget": 6144,
+        "line": 1542,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "starjoy_points",
+        "mode": "delta",
+        "rows": 2,
+        "chunks": 1,
+        "max_json_bytes": 177,
+        "budget": 6144,
+        "line": 1543,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "gift",
+        "mode": "delta",
+        "rows": 2,
+        "chunks": 1,
+        "max_json_bytes": 167,
+        "budget": 6144,
+        "line": 1544,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "titles",
+        "mode": "delta",
+        "rows": 2,
+        "chunks": 1,
+        "max_json_bytes": 169,
+        "budget": 6144,
+        "line": 1545,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "fragment",
+        "mode": "delta",
+        "rows": 2,
+        "chunks": 1,
+        "max_json_bytes": 171,
+        "budget": 6144,
+        "line": 1546,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "map_level",
+        "mode": "delta",
+        "rows": 2,
+        "chunks": 1,
+        "max_json_bytes": 172,
+        "budget": 6144,
+        "line": 1547,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "pet",
+        "mode": "delta",
+        "rows": 2,
+        "chunks": 1,
+        "max_json_bytes": 166,
+        "budget": 6144,
+        "line": 1548,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "work",
+        "mode": "delta",
+        "rows": 2,
+        "chunks": 1,
+        "max_json_bytes": 168,
+        "budget": 6144,
+        "line": 1549,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "endless",
+        "mode": "delta",
+        "rows": 2,
+        "chunks": 1,
+        "max_json_bytes": 171,
+        "budget": 6144,
+        "line": 1550,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "friend",
+        "mode": "delta",
+        "rows": 2,
+        "chunks": 1,
+        "max_json_bytes": 170,
+        "budget": 6144,
+        "line": 1551,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "ex",
+        "mode": "delta",
+        "rows": 2,
+        "chunks": 1,
+        "max_json_bytes": 166,
+        "budget": 6144,
+        "line": 1552,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "beast",
+        "mode": "delta",
+        "rows": 2,
+        "chunks": 1,
+        "max_json_bytes": 169,
+        "budget": 6144,
+        "line": 1553,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "fishing",
+        "mode": "delta",
+        "rows": 2,
+        "chunks": 1,
+        "max_json_bytes": 171,
+        "budget": 6144,
+        "line": 1554,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "building",
+        "mode": "delta",
+        "rows": 2,
+        "chunks": 1,
+        "max_json_bytes": 172,
+        "budget": 6144,
+        "line": 1555,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "wife",
+        "mode": "delta",
+        "rows": 2,
+        "chunks": 1,
+        "max_json_bytes": 168,
+        "budget": 6144,
+        "line": 1556,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "concubine",
+        "mode": "delta",
+        "rows": 2,
+        "chunks": 1,
+        "max_json_bytes": 173,
+        "budget": 6144,
+        "line": 1557,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "boss",
+        "mode": "delta",
+        "rows": 2,
+        "chunks": 1,
+        "max_json_bytes": 168,
+        "budget": 6144,
+        "line": 1558,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "commerce_goods",
+        "mode": "delta",
+        "rows": 2,
+        "chunks": 1,
+        "max_json_bytes": 178,
+        "budget": 6144,
+        "line": 1559,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "clear",
+        "mode": "delta",
+        "rows": 1,
+        "chunks": 1,
+        "max_json_bytes": 137,
+        "budget": 6144,
+        "line": 1560,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "shadow",
+        "mode": "delta",
+        "rows": 1,
+        "chunks": 1,
+        "max_json_bytes": 138,
+        "budget": 6144,
+        "line": 1561,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "points",
+        "mode": "delta",
+        "rows": 1,
+        "chunks": 1,
+        "max_json_bytes": 138,
+        "budget": 6144,
+        "line": 1562,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "starjoy_points",
+        "mode": "delta",
+        "rows": 1,
+        "chunks": 1,
+        "max_json_bytes": 146,
+        "budget": 6144,
+        "line": 1563,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "gift",
+        "mode": "delta",
+        "rows": 1,
+        "chunks": 1,
+        "max_json_bytes": 136,
+        "budget": 6144,
+        "line": 1564,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "titles",
+        "mode": "delta",
+        "rows": 1,
+        "chunks": 1,
+        "max_json_bytes": 138,
+        "budget": 6144,
+        "line": 1565,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "fragment",
+        "mode": "delta",
+        "rows": 1,
+        "chunks": 1,
+        "max_json_bytes": 140,
+        "budget": 6144,
+        "line": 1566,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "map_level",
+        "mode": "delta",
+        "rows": 1,
+        "chunks": 1,
+        "max_json_bytes": 141,
+        "budget": 6144,
+        "line": 1567,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "pet",
+        "mode": "delta",
+        "rows": 1,
+        "chunks": 1,
+        "max_json_bytes": 135,
+        "budget": 6144,
+        "line": 1568,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "work",
+        "mode": "delta",
+        "rows": 1,
+        "chunks": 1,
+        "max_json_bytes": 136,
+        "budget": 6144,
+        "line": 1569,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "endless",
+        "mode": "delta",
+        "rows": 1,
+        "chunks": 1,
+        "max_json_bytes": 139,
+        "budget": 6144,
+        "line": 1570,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "friend",
+        "mode": "delta",
+        "rows": 1,
+        "chunks": 1,
+        "max_json_bytes": 138,
+        "budget": 6144,
+        "line": 1571,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "ex",
+        "mode": "delta",
+        "rows": 1,
+        "chunks": 1,
+        "max_json_bytes": 134,
+        "budget": 6144,
+        "line": 1572,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "beast",
+        "mode": "delta",
+        "rows": 1,
+        "chunks": 1,
+        "max_json_bytes": 137,
+        "budget": 6144,
+        "line": 1573,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "fishing",
+        "mode": "delta",
+        "rows": 1,
+        "chunks": 1,
+        "max_json_bytes": 139,
+        "budget": 6144,
+        "line": 1574,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "building",
+        "mode": "delta",
+        "rows": 1,
+        "chunks": 1,
+        "max_json_bytes": 140,
+        "budget": 6144,
+        "line": 1575,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "wife",
+        "mode": "delta",
+        "rows": 1,
+        "chunks": 1,
+        "max_json_bytes": 136,
+        "budget": 6144,
+        "line": 1576,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "concubine",
+        "mode": "delta",
+        "rows": 1,
+        "chunks": 1,
+        "max_json_bytes": 141,
+        "budget": 6144,
+        "line": 1577,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "boss",
+        "mode": "delta",
+        "rows": 1,
+        "chunks": 1,
+        "max_json_bytes": 136,
+        "budget": 6144,
+        "line": 1578,
+        "local_time": "11/01 08:40:48"
+      },
+      {
+        "category": "commerce_goods",
+        "mode": "delta",
+        "rows": 1,
+        "chunks": 1,
+        "max_json_bytes": 146,
+        "budget": 6144,
+        "line": 1579,
+        "local_time": "11/01 08:40:48"
+      }
+    ],
+    "not_certification_of_future_log_suffix": true,
+    "root_dotnet_failed_read_zero_counts_used": false
+  },
+  "user_acceptance": {
+    "reported_by_root": true,
+    "user_said_viewed_result_ok_and_continue": true,
+    "not_root_all_gameplay_test": true,
+    "not_ordinary_production_test": true
+  },
+  "old_failure_retention": {
+    "old_cold_snapshot_error_record_retained": true,
+    "old_post_etw_hang_retained_and_cause_undetermined": true,
+    "nine_failed_native_messages_mapped_to_exact_json_packets": false,
+    "native_7628_integer_unit_proven": false
+  },
+  "old_signed13": {
+    "status": "BUILT_SIGNED_PENDING_NATIVE_PERF_ACCEPTANCE",
+    "release_sequence": 2026110102,
+    "source_revision": "048a2d6b675325cd511abb01c5a122343052b2f7",
+    "content_sha256": "9535cee3defd7e2a9a4cb1ed5861e229481a4465ea44afdab958c04b33cf08aa",
+    "package_report_sha256": "a589489bd56caaa2ce183c578859d6a2a8663b3e1fc74577ab0d649ba12b58f8",
+    "signature_valid": true,
+    "resources": 6918,
+    "protected_modules": 184,
+    "workshop_upload_performed": false,
+    "contains_new_archive_wire_fix": false,
+    "immutable_old_package_preserved": true
+  },
+  "legacy_test_limitations": [
+    {
+      "test": "scripts/vscripts/tests/test_archive_service.lua",
+      "failure_line": 155,
+      "before_and_after_same_failure": true,
+      "reason": "Old hard-coded point-catalogue count fixture."
+    },
+    {
+      "test": "tools/test_archive_retry_snapshot.lua",
+      "failure_line": 111,
+      "before_and_after_same_failure": true,
+      "reason": "Old fixture expects zero points rows in a catalogue that now exposes locked cards."
+    }
+  ],
+  "source_test_sha256": {
+    "scripts/vscripts/tests/test_archive_ui_wire_budget.lua": "a9ba78b9e0c279aa394385ab0d3bd6885a4d2f899c8b7232c67a84a76192ba8a",
+    "tools/test_archive_ui_wire_budget.cjs": "57107b3534d3bfb77a5b89002dbc88e243f9f1d9a22dd9c2f8b5f6381b4ea4b8"
+  },
+  "limits": [
+    "6KiB is a conservative core/json_encoder estimate, not a measured native protobuf size or an engine maximum.",
+    "One cold Tools/offline log and user acceptance do not prove all gameplay, full long-run stability or normal signed Arcade behavior.",
+    "The108 initial sends still occur synchronously; no scheduler queue or aggregate-per-frame native budget is claimed.",
+    "Existing all-category projection/diff cost on profile events remains; unchanged state produces zero new JSON encodes or native sends.",
+    "The previous13 signed package does not contain this fix;14-path release needs a new source commit, reviewed plan, build/signature and native production verification.",
+    "Old native SnapshotError and post-ETW hang records remain; new success does not prove a single root cause or equate7628 with JSON byte counts.",
+    "No raw log, account, process identity, session, credential or inventory value is exported."
+  ]
+}

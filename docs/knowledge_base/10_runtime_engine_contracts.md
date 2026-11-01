@@ -10,7 +10,9 @@ D原生验证必须保留安全前置拒绝：首次run01因HTTP标记1在prepar
 
 后续新鲜Tools/offline实例的原生生命周期补充：两段各约45秒游戏时间自然运行自动暂停，五次新连接完成严格内存provider/HTTP0证明；最终7种READY、3/4/5二次READY与像素核对支持实际跨容量冷重建。应用淘汰不证明原生GPU即时释放，目录components也不代表逐网格可见计数。观察器exit_status/TRANSPORT_CLOSED不是游戏退出；WM_CLOSE请求回执exit_verified=false，需另有后续CIM确认无Dota，本次未强杀。旧实例ETW后挂起仍未定因，不因新实例有限成功而覆盖。见[脱敏阶段证据](evidence/fresh_development_stability_20261101.public.json)。
 
-首次档案网络契约也须区分代码计数与原生传输：冷开发局首次模式档案加载后出现9条CustomGameEvent序列化失败及SnapshotError，日志只给消息类，没有具体事件名/调用栈。当前与冻结3102的`archive_service`首次投影/发送核心区域相同；合成空档案均同步88包、约1.503MB JSON，公共daily_limits反复随页发送。它是既有突发风险，不是7621原生诊断值的单位/上限证明，更不能据此认定新头像锚点造成断线。后续需以受控事件名/时序/长度观测区分单包、整批、冷启动和后台积压；不得放宽联网权限或更改报文上限掩盖问题。
+最新archive wire契约：6KiB为core/json_encoder保守估算、256字节envelope余量、每包最多12行，不是原生字节或引擎上限。仅wire排除未消费daily_limits，M.snapshot/quota仍完整；metadata逐页投影，单row/header先验超限拒绝，完整同步Send返回后才提交baseline。真实projector20类945行，108包/max5928；同状态0encode/0send，未新加scheduler或帧预算。实际compact与真实delta Apply重放全值一致，缺baseline需重同步。新冷Tools日志/用户确认有有限通过证据，旧hang原因仍未定；已签13包不含此改动且未发布，新14路径候选必须新计划/构建重签。见[安全回执](evidence/archive_ui_wire_budget_20261101.public.json)。
+
+首次档案网络契约也须区分代码计数与原生传输：冷开发局首次模式档案加载后出现9条CustomGameEvent序列化失败及SnapshotError，日志只给消息类，没有具体事件名/调用栈。此次wire修复前，开发与冻结3102的`archive_service`首次投影/发送核心区域相同；合成空档案均同步88包、约1.503MB JSON，公共daily_limits反复随页发送。它是既有突发风险，不是7621原生诊断值的单位/上限证明，更不能据此认定新头像锚点造成断线。后续需以受控事件名/时序/长度观测区分单包、整批、冷启动和后台积压；不得放宽联网权限或更改报文上限掩盖问题。
 
 以下基础契约初次核对时间为2026-10-28（北京时间）。该次只读整理核对实现、20261024知识包与原生入口/地图发布记录，没有启动游戏、复测支付、加载地图或连接数据库；页首2026-11-01补充另有对应实机证据。本文件保存长期代码边界和定位入口，具体版本、回执和待测状态以对应发布记录为准。
 

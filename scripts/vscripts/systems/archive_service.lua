@@ -26,6 +26,8 @@ local daily_viewers, purchase_provider = {}, nil
 local vip_viewers = {}
 local archive_players = {}
 local sent_pages = {}
+local ui_json = require("core/json_encoder")
+local UI_PACKET_JSON_BUDGET, UI_PACKET_ROW_LIMIT, UI_PACKET_ENVELOPE_RESERVE = 6 * 1024, 12, 256
 local public_beta_viewers, public_beta_sequences, public_beta_claims = {}, {}, {}
 local PUBLIC_BETA_TIER = "public_beta_login"
 local ENDLESS_FLUSH_INTERVAL, ENDLESS_BATCH_LIMIT = 5, 32
@@ -270,6 +272,63 @@ function M.snapshot(player_id, category_id)
     return snapshot_profile(player_id, category_id, account_profile(player_id))
 end
 
+local function ui_json_bytes(value)
+    local ok, encoded = pcall(ui_json.encode, value)
+    if ok then return #encoded end
+end
+
+local function reject_ui_page(category_id, reason, row_index, bytes)
+    -- Fixed diagnostics only: never serialize profile, row, account or payload.
+    print(string.format("[ARCHIVE_UI_WIRE] REJECT category=%s reason=%s row=%s json_bytes=%s budget=%s",
+        tostring(category_id), reason, tostring(row_index or 0), tostring(bytes or -1),
+        tostring(UI_PACKET_JSON_BUDGET)))
+    return nil
+end
+
+local function ui_page_chunks(category_id, header, rows, sequence)
+    local header_bytes = ui_json_bytes(header)
+    local fixed = header_bytes and header_bytes + UI_PACKET_ENVELOPE_RESERVE
+    if not fixed or fixed > UI_PACKET_JSON_BUDGET then
+        return reject_ui_page(category_id, "header_budget", 0, fixed)
+    end
+    -- Verify the fixed reserve covers the largest sequence/chunk envelope for
+    -- this page before sending anything; JSON lengths are not native lengths.
+    local envelope = {}
+    for key, value in pairs(header) do envelope[key] = value end
+    envelope.rows, envelope.sequence = {}, sequence
+    envelope.chunk, envelope.chunks = math.max(1, #rows), math.max(1, #rows)
+    local envelope_bytes = ui_json_bytes(envelope)
+    if not envelope_bytes or envelope_bytes > fixed then
+        return reject_ui_page(category_id, "envelope_reserve", 0, envelope_bytes)
+    end
+    local ranges = { { first = 1, last = 0, bytes = fixed } }
+    for index, row in ipairs(rows) do
+        local bytes = ui_json_bytes(row)
+        -- One byte per row also conservatively covers array separators.
+        if not bytes or fixed + bytes + 1 > UI_PACKET_JSON_BUDGET then
+            return reject_ui_page(category_id, "row_budget", index, bytes and fixed + bytes + 1)
+        end
+        local range = ranges[#ranges]
+        if range.last >= range.first and (range.last - range.first + 1 >= UI_PACKET_ROW_LIMIT
+                or range.bytes + bytes + 1 > UI_PACKET_JSON_BUDGET) then
+            range = { first = index, last = index - 1, bytes = fixed }
+            ranges[#ranges + 1] = range
+        end
+        range.last, range.bytes = index, range.bytes + bytes + 1
+    end
+    return ranges
+end
+
+local function log_ui_page(category_id, delta, rows, chunks, max_bytes)
+    if type(IsInToolsMode) ~= "function" or not IsInToolsMode() then return end
+    local offline = package.loaded["debug/offline_logic_test"]
+    if not offline or type(offline.is_provider) ~= "function"
+            or not offline.is_provider(profiles.get_provider()) then return end
+    print(string.format("[ARCHIVE_UI_WIRE] category=%s mode=%s rows=%s chunks=%s max_json_bytes=%s budget=%s",
+        tostring(category_id), delta and "delta" or "full", tostring(rows), tostring(chunks),
+        tostring(max_bytes), tostring(UI_PACKET_JSON_BUDGET)))
+end
+
 local function send_page(player_id, category_id, profile)
     if not CustomGameEventManager or not PlayerResource then return end
     local player = PlayerResource:GetPlayer(player_id)
@@ -280,23 +339,44 @@ local function send_page(player_id, category_id, profile)
         custom_renderers[category_id] and copy(profile) or profile)
         or M.snapshot(player_id, category_id)
     if not result.ok then return end
+    -- One shallow UI projection per page. Server snapshots/quotas retain their
+    -- complete daily_limits; no UI consumes that large duplicated dictionary.
+    -- Rows remain read-only references until only the selected chunk is copied.
+    local metadata, wire = {}, { rows = result.rows or {} }
+    for key, value in pairs(result) do
+        if key ~= "rows" and key ~= "daily_limits" then
+            metadata[key], wire[key] = value, value
+        end
+    end
     sent_pages[player_id] = sent_pages[player_id] or {}
     local previous = sent_pages[player_id][category_id]
-    local changes = previous and require("core/ui_snapshot_delta").diff(previous.data,result)
+    local changes = previous and require("core/ui_snapshot_delta").diff(previous.data, wire)
     if changes and #changes==0 then return end
-    serial = (serial or 0) + 1
-    local rows = changes or result.rows or {}
-    local chunks = math.max(1, math.ceil(#rows / 12))
-    for chunk = 1, chunks do
-        local packet = changes and {ok=true,category_id=category_id,delta=1,base_sequence=previous.sequence} or copy(result)
+    local sequence = (serial or 0) + 1
+    local rows = changes or wire.rows
+    local header = changes and {ok=true,category_id=category_id,delta=1,base_sequence=previous.sequence} or metadata
+    local ranges = ui_page_chunks(category_id, header, rows, sequence)
+    if not ranges then return end -- No partial page or new baseline on refusal.
+    serial = sequence
+    local max_bytes = 0
+    for chunk, range in ipairs(ranges) do
+        local packet = copy(header)
         packet.rows = {}
-        for index = (chunk - 1) * 12 + 1, math.min(chunk * 12, #rows) do
-            packet.rows[#packet.rows + 1] = rows[index]
+        for index = range.first, range.last do
+            packet.rows[#packet.rows + 1] = copy(rows[index])
         end
-        packet.sequence, packet.chunk, packet.chunks = serial, chunk, chunks
+        packet.sequence, packet.chunk, packet.chunks = sequence, chunk, #ranges
+        local bytes = ui_json_bytes(packet)
+        if not bytes or bytes > UI_PACKET_JSON_BUDGET then
+            return reject_ui_page(category_id, "packet_budget", range.first, bytes)
+        end
+        max_bytes = math.max(max_bytes, bytes)
         CustomGameEventManager:Send_ServerToPlayer(player, "survival_archive_snapshot", packet)
     end
-    sent_pages[player_id][category_id]={sequence=serial,data=copy(result)}
+    -- Commit only after every synchronous send returned. A failure must leave
+    -- the previous baseline, so retries never delta against an unsent page.
+    sent_pages[player_id][category_id] = { sequence = sequence, data = copy(wire) }
+    log_ui_page(category_id, changes, #rows, #ranges, max_bytes)
 end
 local function send(player_id)
     if not CustomGameEventManager or not PlayerResource

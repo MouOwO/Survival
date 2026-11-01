@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 14654,
-      "sha256": "cd5e0729f377caa8ec364a036444d9b85be98b8b676d832bcb864de65a469388"
+      "bytes": 15489,
+      "sha256": "076972a35192eda40d1580ba989b3f422786e1bd3e5ad74b1d29bff6633ee68d"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,13 +40,13 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 27811,
-      "sha256": "2de4d44045f537824ad6584c489d3a9810defbba8b2e7d347e4647b171da5b79"
+      "bytes": 28750,
+      "sha256": "a1169a5d104b261c8d2d80fb994e6f7bfc1a7793378b99a0621c3c5193874209"
     },
     {
       "path": "08_new_project_reuse.md",
-      "bytes": 5083,
-      "sha256": "6275dbb95d032d5b04c9e1bc8830e55fef8d251dc381ec9893a1f0b99ca8a7a1"
+      "bytes": 5629,
+      "sha256": "95500829eb20e68b314bab73033311fc5fb61e23e2b6bd241885984831004b79"
     },
     {
       "path": "09_session_digest.md",
@@ -55,8 +55,8 @@
     },
     {
       "path": "10_runtime_engine_contracts.md",
-      "bytes": 18320,
-      "sha256": "d387883163fec7fb0a5fa0391f75580bdd74f03a7696ef1e14099e8e83b6daab"
+      "bytes": 19085,
+      "sha256": "81b77bae3377e2c28a090b708ea203ca80d19789cc5c8bf2a14685763f931b84"
     },
     {
       "path": "11_completed_work_catalog.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 5669,
-      "sha256": "0a409de4aa6ecbf1a7a59571fb28c9fb0aa9736116dbf0d76c1974a05f23a139"
+      "bytes": 6212,
+      "sha256": "dce12eb9c1ffa8fa48ea02a1f01555288ce38d5e18c68eaf11e70a351bfdc7f2"
     },
     {
       "path": "data/completed_work_index.json",
@@ -149,6 +149,11 @@
       "sha256": "3e6f036646f56e14d1049caa8a09c09f22c43eb835f3589b9a7aa98f6c4f1950"
     },
     {
+      "path": "evidence/archive_ui_wire_budget_20261101.public.json",
+      "bytes": 19872,
+      "sha256": "4b5fd0f26508104d03833b5a075aa2b67516735fb2685176c493cefed2d48394"
+    },
+    {
       "path": "evidence/archive_video_challenges_20261029.md",
       "bytes": 9362,
       "sha256": "7d6f8d6d46f4e6d2512f64c29c73d8aa6e5c4b6be3bb4c7376487bef227e0c00"
@@ -165,8 +170,8 @@
     },
     {
       "path": "evidence/commerce_portrait_audit_20261101.md",
-      "bytes": 18009,
-      "sha256": "357c63466228f1e3bd50e9c86c3a7773486cc7071a17c4bba25a83cacfdf3723"
+      "bytes": 20429,
+      "sha256": "8829a99eb7af3805e5da5d3a2bc4c60146f512a939c900e0f76c4ba0343207bd"
     },
     {
       "path": "evidence/commerce_prices_20261028.md",

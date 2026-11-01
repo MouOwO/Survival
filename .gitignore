@@ -586,3 +586,5 @@ __pycache__/
 
 # Browser authorization must retain its credential/identity regression checks.
 !/scripts/vscripts/tests/test_player_web_auth.lua
+
+!/scripts/vscripts/tests/test_archive_ui_wire_budget.lua

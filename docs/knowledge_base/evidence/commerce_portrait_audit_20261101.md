@@ -4,9 +4,11 @@
 
 ## 已完成与当前边界
 
+最新范围变更：archive_service的UI wire预算修复已在开发源码冻结并完成专项Lua/Node及新冷Tools日志复核，用户确认查看结果正常，详见[安全指标与原件SHA](archive_ui_wire_budget_20261101.public.json)及`docs/reviews/archive_ui_wire_budget_20261101.md`。当前须改为14文件v03：新源码commit、plan/unsigned审阅及重签尚待完成。已签13文件v02/2026110102保持原样、未发布，不含新wire修复；签名包content `9535cee3defd7e2a9a4cb1ed5861e229481a4465ea44afdab958c04b33cf08aa`、reportSHA `a589489bd56caaa2ce183c578859d6a2a8663b3e1fc74577ab0d649ba12b58f8`。正式游廊仍3102，不能拿旧13签名或旧12计划发布新14源。
+
 上一轮源码交付为game `11571b4313401d3d15073a0d14234754fb851316 / dev`、content `fb775f5ae9a36d863f048928a8fa0230a5cbb548 / master`，已按stash→pull→pop→commit→push同步。它包含D权益统一与renderer缓存改动，不包含随后v04的combat_stats查询锚点修正。该次同步时game原HUD编译字节、Python缓存、bundle运行指针及两份头像实验脚本保留，content干净；新改属性文件的换行归一已逐字节对照确切stash规范内容，其余原始SHA一致、旧stash保持。这是历史同步状态；当前13文件运行修复随后已纳入game `048a2d6b675325cd511abb01c5a122343052b2f7 / dev`及content `b1ac328e4467510c89fdfd8c6d9f79947d7c820a / master`，本轮操作工具另行提交，不改变冻结运行源码。
 
-当前正式游廊仍为3102。2026110101曾准备12文件未签名审阅包，6918项资源、184保护模块，content `7ed3e94bb586cfb88802a97ef98dadce4743c98dfbb5bd6d1f2b42bf95611d69`；它只作保留的旧候选，不安装/运行unsigned，也不能作为最终头像修复。当前范围改为2026110102的13文件v02，追加已有combat_stats.vjs_c；新增运行模块仍仅hero_teleport_access，资源总数仍6918/184保护模块。13文件修复已有上述源码提交；签名生产玩法、正式新游廊及新版正式FPS均未验，当前不能沿用旧12文件候选状态代替新包审阅。原四账号、正常联网配置及`all_difficulties_unlocked=false`、d573和地图保持原范围；后续签名/发布须按最终范围审阅，不能沿用旧12文件计划冒充新候选。
+当前正式游廊仍为3102。2026110101曾准备12文件未签名审阅包，6918项资源、184保护模块，content `7ed3e94bb586cfb88802a97ef98dadce4743c98dfbb5bd6d1f2b42bf95611d69`；它只作保留的旧候选，不安装/运行unsigned，也不能作为最终头像修复。此前范围改为2026110102的13文件v02（现已签名保留、未发布），追加已有combat_stats.vjs_c；新增运行模块仍仅hero_teleport_access，资源总数仍6918/184保护模块。13文件修复已有上述源码提交；签名生产玩法、正式新游廊及新版正式FPS均未验，当前不能沿用旧12文件候选状态代替新包审阅。原四账号、正常联网配置及`all_difficulties_unlocked=false`、d573和地图保持原范围；后续签名/发布须按最终范围审阅，不能沿用旧12文件计划冒充新候选。
 
 普通客户端8200已通过正常Steam授权，并在3102的template_map取得188场景READY；不再记录为“登录待用户”。普通局实证查询锚点缺失，离线v04的共享主头像/default-opacity修正及六场景视觉结果见下文。D原生fixture的run02现已完成15个串行阶段并finish，开发离线内存provider下的权益、真实施法/退款及共享CD有限通过；完整包等价、建造者实际施放和正式游廊仍未验，详见下方D验证补充。
 
@@ -69,13 +71,21 @@ renderer的game/content源码同SHA `2bff46da002ffdef17b69eef6fa3dc28df374deee8c
 
 UTC23:15:59.9336605Z在窗口响应时请求WM_CLOSE，原回执exit_verified=false；root之后于23:16:10.0028381Z用CIM确认无Dota、未强杀。这是有限开发路径通过，不是普通生产/完整长局；本次也没有新ETW或与旧hang严格单变量A/B，旧30020无响应和冷SnapshotError失败继续保留，原因未定。新审查为`docs/reviews/fresh_development_stability_20261101.md`，见[安全公开阶段、加载计数及原件SHA](fresh_development_stability_20261101.public.json)。普通签名生产、新游廊同负载FPS、多人长战斗、反复跨容量资源生命周期仍待验；本次未改冻结运行源码、原发行README/plan或旧审查回执。
 
+## 首档案UI wire最小修复（新14路径范围）
+
+实际offline内存默认profile仅3466B/103个默认标量、库存/archive/entitlements/achievements均空；不能删道具或稀疏造档规避首发尖峰。只在archive_service UI wire副本去未消费daily_limits，metadata每页一次投影，按6KiB估算/256余量/max12rows分包，超单row/header明确整页拒绝；所有同步Send返回后才提交baseline。M.snapshot和服务器quota完整，108包仍同步发送，未加新scheduler/真正每帧总预算。
+
+真实projector945行合成对照：88→108包，总JSON1503242→552791、最大23490→5928；初始化1093encode，同状态0encode/0send，合成库存/版本变化84encode/20delta。实际client接收函数和delta cache在正逆序下full/delta全部等价，缺baseline必须resync；超限拒绝与部分发送异常不得建立baseline。旧test_archive_service155/old retry111以未改HEAD模块同位置失败，保留旧目录fixture限制，不删断言。
+
+新冷Tools日志独立Python共享读取214709B/1999行，60条安全摘要：20full页945rows/108chunks，40delta页，max5928；已读范围无CustomEvent serializefail/reliable too big/SnapshotError/REJECT/script runtime，root.NET读取失败的0计数无效且未纳证。用户说查看结果正常并要求继续，单列用户验收，不冒称root全玩法或普通生产。source raw51b554d2…cd4b、GitLF6a50c80d…dec4冻结；旧7628单位/九失败包名仍无证明，旧ETW挂起保留未定因。上述安全JSON与新审查记录完整证据、成本和限制；新14包与普通生产/新游廊仍待审阅/重签/实机。
+
 ## 解耦评价及复用
 
 `docs/reviews/architecture_coupling_review_20261031.md`和头像领域审查分别记录职责边界。已有事件代际、账号/局内投影、窄库存读、after_dispatch合并等有效设计；“解耦不够”不自动等于FPS原因。已修D的平行入口和同值商业快照重复提交；未大范围重构其他商品。
 
 仍需安排：1Hz塔/墙成长按玩家重复筛全局buildings（O(P×B)）、相同profile事件仍在去重前复制全档并重算所有来源、永久来源乘区手工顺序、combat_stats同栈拥有战斗数值/技能/原生头像几何。对应建议是owner/type索引、按变化域发布带版本的小投影、统一来源层、独立头像挂载适配器；都需以实际热点和兼容回归决定范围。
 
-新增可复现的首次快照风险：当前与实际冻结3102的snapshot_profile/send_page/send区域LF字节相同；相同合成空档案、真实投影函数和mock传输下，均同步发送20分类/88包，JSON合计约1.503MB，最大约23KB，第二次同状态0包。空shadow页也重复daily_limits约11,160字节和categories约1,474字节；分包仅按12行，没有单包字节或每批发送预算。43个相关generated表已对冻结保护模块返回值比较并核manifest字节，26完全相同、17存在差异（主要名称/描述，另benefit追加1条、endless起始延迟）；分类及各主要目录行数保持。此路径在3102已存在、且不在13文件替换范围，不能当作新候选回归证明。JSON体积和模拟88次调用不等于原生报文大小、7621的单位/上限或本次断线唯一原因；后续应按事件时序定位，并拆共享元数据/页面数据、建立真实字节和发送预算。
+新增可复现的首次快照风险：本次wire修改前，开发与实际冻结3102的snapshot_profile/send_page/send区域LF字节相同；相同合成空档案、真实投影函数和mock传输下，均同步发送20分类/88包，JSON合计约1.503MB，最大约23KB，第二次同状态0包。空shadow页也重复daily_limits约11,160字节和categories约1,474字节；分包仅按12行，没有单包字节或每批发送预算。43个相关generated表已对冻结保护模块返回值比较并核manifest字节，26完全相同、17存在差异（主要名称/描述，另benefit追加1条、endless起始延迟）；分类及各主要目录行数保持。此路径在3102已存在、且不在13文件替换范围，不能当作新候选回归证明。JSON体积和模拟88次调用不等于原生报文大小、7621的单位/上限或本次断线唯一原因；后续应按事件时序定位，并拆共享元数据/页面数据、建立真实字节和发送预算。
 
 本轮启动目录索引O(N)，取消全目录3D预建，按需创建、逻辑缓存最多4项；原生实际释放峰值未测。稳定准备/显隐O(1)。197与1970目录的300次调用均0枚举/0样式写、相同1800模拟GetParent。D权限O(1)标量读，1000次检查在1和10001库存下各1000标量读/0完整档；同状态事件0原生setter，10个稳定tick0NetTable提交。这些是模拟调用数，实际FPS仅上述有效原游廊ETW。
 
