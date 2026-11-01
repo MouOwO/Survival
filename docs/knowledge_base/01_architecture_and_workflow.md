@@ -1,6 +1,6 @@
 # 01｜架构与协作
 
-**2026-11-01 限域解耦/发行权威（开发未发布）**：共享世界槽位registry、个人challenge session与AI分工，按key/entindex/session/player索引；只在真实状态变化处理参与者，保留个人奖励。统一入口`tools/release_pipeline.py`以不可变game/content源码、独立operator工具提交和签名父资源绑定，禁止把整HEAD或测试PASS当发布。当前17项候选尚无新plan/unsigned/签名/实机，正式0104保持；这不是整个工程重构。见[范围和复杂度](evidence/shared_boss_release_pipeline_20261101.md)。
+**2026-11-02 限域解耦与发行边界**：共享registry/个人session/AI分离及game/content/operator不可变来源保留；1107因双PC1000p头像门禁问题阻断，不发布。新combat只按原生UI scale归一并以单叶/最多32层祖先身份使负缓存失效，稳定不扫描全HUD/197目录；两源及编译/回归已完成，原生新尺寸/FPS待验。手动attach仅观察窗口，不能借2 humans、一次QOP body或旧900p样本补成owned启动/全共享奖励通过。0104已完整恢复；0201开发中。220历史差异仍延期，不是全工程重构或全HEAD发布。见[成本与最新边界](evidence/portrait_resolution_guard_20261102.md)。
 
 
 ## 三个权威层

@@ -1,6 +1,6 @@
 # 新会话先读｜孤城逐晓项目知识库
 
-**2026-11-01 最新开发候选为1107（未签/未实机/未发布）**：共享Boss3项与待发布头像/HUD/D/archive14项合并为17项，计划6919资源/184保护/22审阅；正式仍五账号0104。13共享单体槽、个人奖励隔离及统一发行入口已做源码/隔离审阅，220项历史源码差异明确延期，不是全HEAD发布。当前未生成新plan/unsigned；根任务Git后先出具体审阅稿，再申请17项签名与普通双PC/FPS验证。见[本次范围、成本和硬门禁](evidence/shared_boss_release_pipeline_20261101.md)。
+**2026-11-02 最新：1107因双PC分辨率故障明确不发布；正式0104已恢复。** 玩家同局1600×1000头像残缺、改900p并重选后恢复。新combat两源raw2947af1／Git-LF1af651／compiled5f3d0f已官方编译，72布局+cost+3回归通过；新尺寸实机/FPS仍待。旧1107两段900p样本113.20/P9511.17、双PC111.08/P9510.96分别保留，不是新修复验收。手动attach不证明启动前连续hold；Root正常关闭后collector释放holds，restore04真实完整恢复0104，无SDK发布。0201 recipe/主菜单GC route开发中，尚无plan/unsigned/签/native。见[最新事实与下一步](evidence/portrait_resolution_guard_20261102.md)。
 
 
 

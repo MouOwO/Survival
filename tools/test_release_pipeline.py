@@ -119,6 +119,30 @@ class PipelineTests(unittest.TestCase):
         loader.assert_called_once_with(self.f.authority,'rehearsal')
         self.assertEqual(ops.main.call_args.args[0],['inspect','--transaction','synthetic','--report-sha256','f'*64,'--label','sample'])
 
+    def test_controlled_launch_route_is_explicitly_forwarded_and_unknown_route_refused(self):
+        ops=SimpleNamespace(main=Mock(return_value=0))
+        for route in ('direct','lobby'):
+            with patch.object(p,'authority',return_value=self.f.authority),patch.object(p,'pinned_module',return_value=ops):
+                self.assertEqual(p.main(['rehearsal','launch','--transaction','synthetic','--report-sha256','f'*64,'--route',route]),0)
+            self.assertEqual(ops.main.call_args.args[0],['launch','--transaction','synthetic','--report-sha256','f'*64,'--route',route])
+        with patch.object(p,'authority',side_effect=AssertionError('Unknown route reached authority')),redirect_stderr(io.StringIO()),self.assertRaises(SystemExit):
+            p.main(['rehearsal','launch','--route','manual_gc'])
+
+    def test_download_delegates_only_pinned_module_and_never_grants_sdk_mutation_lease(self):
+        download=SimpleNamespace(main=Mock(return_value=0))
+        with patch.object(p,'authority',return_value=self.f.authority),patch.object(p,'pinned_module',return_value=download) as loader,patch.object(p,'_sdk',side_effect=AssertionError('SDK imported')),patch.object(g,'release_lease',side_effect=AssertionError('Download granted mutation lease')):
+            for args,expected in [(['download'],[]),(['download','--preflight','--report-sha256','e'*64],['--preflight','--report-sha256','e'*64]),(['download','--apply','--report-sha256','e'*64],['--download','--report-sha256','e'*64])]:
+                self.assertEqual(p.main(args),0)
+                self.assertEqual(download.main.call_args.args[0],expected)
+                self.assertEqual(loader.call_args.args,(self.f.authority,'download'))
+
+    def test_download_missing_or_malformed_report_and_ambiguous_action_refused(self):
+        for args in (['download','--apply'],['download','--preflight'],['download','--report-sha256','e'*64],['download','--apply','--report-sha256','HEAD']):
+            with patch.object(p,'authority',return_value=self.f.authority),patch.object(p,'pinned_module',side_effect=AssertionError('Invalid input reached pinned module')),self.subTest(args=args),self.assertRaises(g.Refused):
+                p.main(args)
+        with redirect_stderr(io.StringIO()),self.assertRaises(SystemExit):
+            p.main(['download','--apply','--preflight','--report-sha256','e'*64])
+
     def test_cli_preflight_has_no_sdk_no_generated_listing_and_no_state_write(self):
         self.f.seed();path,pin=self.request_path();before=self.f.state.read_bytes()
         with patch.object(p,'authority',return_value=self.f.authority),patch.object(p,'recipe',return_value=self.builder),patch.object(p,'_sdk',side_effect=AssertionError('SDK touched')),patch.object(g,'atomic_json',side_effect=AssertionError('JSON write')),redirect_stdout(io.StringIO()) as out:

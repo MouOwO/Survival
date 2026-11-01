@@ -1,6 +1,6 @@
 # 孤城逐晓／Survival 统一知识库
 
-**最新待办：1107共享Boss与头像统一发行**。本轮17项/6919/184/22，仅源码与工具审阅，正式0104保持；源码game/content游标与operator提交独立，220项延期不自动发布。新plan/unsigned、签名、QOP09/带饰品波次/免费英雄、双PC共享Boss及90FPS/P95≤16.7ms仍待真实验收。见[新交接](evidence/shared_boss_release_pipeline_20261101.md)与[机器边界](evidence/shared_boss_release_pipeline_20261101.public.json)。
+**最新：1107已因双PC高分辨率故障阻断，未发布；本机已完整恢复0104。** 同局1600×1000→900p重选后头像恢复；新2947/1af651/5f3d0f源码与官方编译、72+cost+3回归通过，新尺寸普通实机/FPS仍pending。旧1107的113.20/P9511.17及双PC111.08/P9510.96只作900p有限样本。手动attach与真实2 humans不能当owned启动或全部共享Boss奖励通过。0201 recipe/受控主菜单GC route开发中，无新plan/unsigned/签/native/发布。见[最新交接](evidence/portrait_resolution_guard_20261102.md)及[脱敏机器事实](evidence/portrait_resolution_guard_20261102.public.json)。
 
 
 

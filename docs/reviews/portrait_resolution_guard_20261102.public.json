@@ -1,0 +1,242 @@
+{
+  "status": "SOURCE_MIRROR_OFFICIAL_COMPILE_DOMAIN_TESTS_PASS_NATIVE_PENDING",
+  "field_observation": {
+    "source": "user_confirmation_relayed_by_root",
+    "same_two_player_session": true,
+    "before_resolution": [
+      1600,
+      1000
+    ],
+    "after_resolution": [
+      1600,
+      900
+    ],
+    "selection_sequence": "different_boss_then_rest_alchemist",
+    "user_result": "Changed to 1600x900 and the portrait recovered",
+    "native_leaf_dimensions_on_peer_measured": false,
+    "peer_screenshot_sha256": "5b579d78b890a70f340ed895a21a35c1d2b9fb285c1096da64eefa431ade26f0"
+  },
+  "signed_1107": {
+    "release_sequence": 2026110107,
+    "report_sha256": "86c10bed12d60403d31b1951cbd608a86523835bca39ef563b1f36b3fd3878e3",
+    "source_game": "eaef4398383be211880423eb142eb0a1d723c69f",
+    "source_content": "eb281a1398466876575a5885e60a8dd207e5f556",
+    "compiler_input_sha256": "d6dbbbe8adc4d61f95ac97cc177079a080de6095af86192614657f789f70ea7a",
+    "compiled_sha256": "e9da3be3168381b63c3a7fd14f20e5561458f16f366ca9cedfe504c9968ae1f5",
+    "publish_allowed": false
+  },
+  "cause": {
+    "native_logical_size": 264,
+    "old_physical_height_max": 240,
+    "old_physical_width_max": 280,
+    "scale900": 0.8333333333333334,
+    "scale1000": 0.9259259259259259,
+    "expected_native_height900": 220.0,
+    "expected_native_height1000": 244.44444444444446,
+    "player_specific_branch_required_to_reproduce": false,
+    "rollback_proved": false,
+    "field_resolution_fault_confirmed": true,
+    "guard_mechanism_reproduced_with_production_function": true,
+    "native_peer_guard_rejection_directly_measured": false
+  },
+  "draft": {
+    "raw_sha256": "2947af1a6143f8c6df18f98b6fdc35dbf95c40c8309cb8c45a5ad1101b8884f1",
+    "git_lf_sha256": "1af65125378603ff72040c5b27651d308c1d73a603c62e2974032bcd6e10bfca",
+    "tracked_runtime_applied": true,
+    "compiled": true,
+    "signed": false,
+    "installed": false,
+    "published": false,
+    "independent_review": "passed_synthetic_scope_only",
+    "source_raw_bytes": 232772,
+    "source_crlf_lines": 4415,
+    "source_git_lf_bytes": 228357,
+    "content_mirror_identical": true,
+    "compiled_sha256": "5f3d0fc3ba8639d438cd973af7bdea5369004e5d65e202dd22830624a3c09b93",
+    "compiled_bytes": 233620,
+    "official_compiler_exit": 0,
+    "official_compiler_summary": "1 compiled, 0 failed, 0 skipped",
+    "domain_tests_default_production_source_passed": true
+  },
+  "production_function_replay": {
+    "cases": 72,
+    "viewports_height": [
+      900,
+      1000,
+      1080,
+      1440,
+      2160
+    ],
+    "dpi": [
+      1,
+      1.25,
+      1.5,
+      2
+    ],
+    "players": [
+      0,
+      1
+    ],
+    "negative_cache_alive_leaf_and_ancestor_reparenting": true,
+    "root_replacement": true,
+    "steady_300_and_10000_root_find": 0,
+    "steady_300_and_10000_style_writes": 0
+  },
+  "synthetic_costs": [
+    {
+      "variant": "signed1107_source",
+      "unrelated_nodes": 0,
+      "initial_selection": {
+        "rootFind": 9,
+        "recursiveVisits": 84,
+        "writes": 11,
+        "parent": 49,
+        "valid": 75,
+        "childCount": 10,
+        "position": 10,
+        "layoutReads": 15
+      },
+      "stable_one": {
+        "rootFind": 0,
+        "recursiveVisits": 12,
+        "writes": 0,
+        "parent": 34,
+        "valid": 58,
+        "childCount": 4,
+        "position": 8,
+        "layoutReads": 10
+      },
+      "stable300": {
+        "rootFind": 0,
+        "recursiveVisits": 3600,
+        "writes": 0,
+        "parent": 10200,
+        "valid": 17400,
+        "childCount": 1200,
+        "position": 2400,
+        "layoutReads": 3000
+      }
+    },
+    {
+      "variant": "signed1107_source",
+      "unrelated_nodes": 10000,
+      "initial_selection": {
+        "rootFind": 9,
+        "recursiveVisits": 50084,
+        "writes": 11,
+        "parent": 49,
+        "valid": 75,
+        "childCount": 10,
+        "position": 10,
+        "layoutReads": 15
+      },
+      "stable_one": {
+        "rootFind": 0,
+        "recursiveVisits": 12,
+        "writes": 0,
+        "parent": 34,
+        "valid": 58,
+        "childCount": 4,
+        "position": 8,
+        "layoutReads": 10
+      },
+      "stable300": {
+        "rootFind": 0,
+        "recursiveVisits": 3600,
+        "writes": 0,
+        "parent": 10200,
+        "valid": 17400,
+        "childCount": 1200,
+        "position": 2400,
+        "layoutReads": 3000
+      }
+    },
+    {
+      "variant": "draft",
+      "unrelated_nodes": 0,
+      "initial_selection": {
+        "rootFind": 9,
+        "recursiveVisits": 84,
+        "writes": 11,
+        "parent": 52,
+        "valid": 79,
+        "childCount": 10,
+        "position": 10,
+        "layoutReads": 37
+      },
+      "stable_one": {
+        "rootFind": 0,
+        "recursiveVisits": 12,
+        "writes": 0,
+        "parent": 34,
+        "valid": 60,
+        "childCount": 4,
+        "position": 8,
+        "layoutReads": 30
+      },
+      "stable300": {
+        "rootFind": 0,
+        "recursiveVisits": 3600,
+        "writes": 0,
+        "parent": 10200,
+        "valid": 18000,
+        "childCount": 1200,
+        "position": 2400,
+        "layoutReads": 9000
+      }
+    },
+    {
+      "variant": "draft",
+      "unrelated_nodes": 10000,
+      "initial_selection": {
+        "rootFind": 9,
+        "recursiveVisits": 50084,
+        "writes": 11,
+        "parent": 52,
+        "valid": 79,
+        "childCount": 10,
+        "position": 10,
+        "layoutReads": 37
+      },
+      "stable_one": {
+        "rootFind": 0,
+        "recursiveVisits": 12,
+        "writes": 0,
+        "parent": 34,
+        "valid": 60,
+        "childCount": 4,
+        "position": 8,
+        "layoutReads": 30
+      },
+      "stable300": {
+        "rootFind": 0,
+        "recursiveVisits": 3600,
+        "writes": 0,
+        "parent": 10200,
+        "valid": 18000,
+        "childCount": 1200,
+        "position": 2400,
+        "layoutReads": 9000
+      }
+    }
+  ],
+  "acceptance_limits": {
+    "new_candidate_native_pixels_verified": false,
+    "new_candidate_fps_verified": false,
+    "new_candidate_official_compile_verified": true,
+    "ordinary_two_pc_retest_required": true,
+    "native_fps_and_hold_restore_gates_still_required": true
+  },
+  "committable_tests": [
+    "tools/test_portrait_resolution_layout.cjs",
+    "tools/test_portrait_resolution_costs.cjs"
+  ],
+  "operations": {
+    "runtime_source_written_with_expected_old_hash_guard": true,
+    "git": false,
+    "recipe_or_aux_modified": false,
+    "sign": false,
+    "install_or_launch": false,
+    "sdk": false
+  }
+}

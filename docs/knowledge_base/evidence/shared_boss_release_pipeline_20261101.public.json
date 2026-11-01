@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "kind": "SHARED_BOSS_AND_PORTRAIT_PIPELINE_CODE_REVIEW_NOT_NATIVE_RELEASE",
-  "snapshot_date": "2026-11-01",
-  "status": "CODE_REVIEWED_PENDING_IMMUTABLE_GIT_PLAN_UNSIGNED_AND_AUTHORIZATION",
+  "kind": "SHARED_BOSS_PORTRAIT_PIPELINE_SIGNED_PARTIAL_NATIVE_NOT_RELEASED",
+  "snapshot_date": "2026-11-02",
+  "status": "SIGNED1107_REAL_PARTIAL_VISUAL_AND_FPS_PASS_FULL_NATIVE_AND_RELEASE_PENDING",
   "official_parent": {
     "release_sequence": 2026110104,
     "resources": 6917,
@@ -18,16 +18,20 @@
     "resources": 6919,
     "protected_modules": 184,
     "trusted_reviews": 22,
-    "game_source_revision": null,
-    "content_source_revision": null,
-    "operator_revision": null,
-    "plan_created": false,
-    "unsigned_prepared": false,
-    "signed": false,
+    "game_source_revision": "eaef4398383be211880423eb142eb0a1d723c69f",
+    "content_source_revision": "eb281a1398466876575a5885e60a8dd207e5f556",
+    "operator_revision": "eaef4398383be211880423eb142eb0a1d723c69f",
+    "plan_created": true,
+    "unsigned_prepared": true,
+    "signed": true,
     "native_gameplay_verified": false,
-    "fps_measured": false,
+    "fps_measured": true,
     "published": false,
-    "official_download_verified": false
+    "official_download_verified": false,
+    "package_report_sha256": "86c10bed12d60403d31b1951cbd608a86523835bca39ef563b1f36b3fd3878e3",
+    "content_sha256": "7a4c5af2bb1f25cc4adacb46228cf9f129d58571afc30367f649250b165221ce",
+    "signature_valid": true,
+    "partial_native_cases_observed": true
   },
   "lineage": {
     "baseline_sha256": "3a60ddab9a93b58fa936e789f1a9d2008d39ed7eca9545487e1f40bf32219ee3",
@@ -119,11 +123,151 @@
     "is_new1107_evidence": false
   },
   "authorization": {
-    "new17_signing_authorized": false,
+    "new17_signing_authorized": true,
     "publish_authorized_by_this_document": false,
-    "ask_after_concrete_unsigned_review": true
+    "ask_after_concrete_unsigned_review": false,
+    "new17_rehearsal_authorized": true,
+    "publish_only_after_all_required_gates": true,
+    "all_required_gates_passed": false,
+    "concrete_unsigned_review_preceded_authorization": true,
+    "current_authorization_stage": "USER_APPROVED_SIGNED17_AND_REHEARSAL_PUBLISH_ONLY_AFTER_ALL_GATES"
   },
   "raw_code_or_credentials_included": false,
   "backend_or_payment_changed": false,
-  "login_relay_evidence_preserved": true
+  "login_relay_evidence_preserved": true,
+  "actual_run03": {
+    "kind": "ORDINARY_SAME_SIGNED_CANDIDATE_FINITE_CASES_AND_ONE_EARLY_N4_ETW_SAMPLE",
+    "pid": 30424,
+    "created_utc": "2026-11-01T15:16:58.4949550Z",
+    "native_created_filetime": 134380198184949550,
+    "qop09": {
+      "root_and_independent_settled_frames": 3,
+      "close_framing_and_visible_wardrobe_background": true,
+      "no_qwer_or_silence_in_samples": true,
+      "ready_ms": 137,
+      "components": 5
+    },
+    "bane5": {
+      "first_ready_ms": 98,
+      "cold_return_ready_ms": 96,
+      "components": 4,
+      "other_distinct_scenes": [
+        1,
+        2,
+        3,
+        4,
+        6
+      ],
+      "root_settled_frames": 6,
+      "independent_review": "FIRST_AND_LAST_OF_FIRST_AND_RETURN_SERIES",
+      "sampled_wardrobe_background_correct": true
+    },
+    "all_transition_frames_captured": false,
+    "all197_portraits_verified": false,
+    "native_gpu_release_completion_verified": false,
+    "etw": {
+      "raw_rows": 3390,
+      "accepted_intervals": 3389,
+      "seconds": 30,
+      "delay_seconds": 3,
+      "focus_samples": 30,
+      "all_sampled_focus_target": true,
+      "mean_fps": 113.20089252006146,
+      "p95_ms": 11.16886,
+      "p99_ms": 14.25142,
+      "true_one_percent_low_fps": 60.98200761737018,
+      "slowest_tail_frames": 34,
+      "max_frame_ms": 23.7336,
+      "over25ms": 0,
+      "engineering_mean90_p95_16_7_pass": true,
+      "bracketing_game_unpaused": true,
+      "bracketing_countdown": [
+        "01:03",
+        "00:29"
+      ],
+      "postgame_visible": false,
+      "scene": "N4_NEXT_WAVE2_BASE_15_MEEPO_VISIBLE_AND_COSTUMED_BANE_SELECTED",
+      "equal_load_old_vs_new_comparison": false,
+      "performance_causal_attribution_proven": false
+    },
+    "before_inspection": {
+      "status": "INCOMPLETE_NATIVE_FILE_USE_EVIDENCE",
+      "index_owned_dota_use_observed": false,
+      "all_five_open_verified": false,
+      "data_volume_dota_observations": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "keeper_all_five": true,
+      "raw_receipts_rewritten": false
+    },
+    "after_inspection_obtained": false,
+    "user_manual_exit_confirmed": null,
+    "keeper_exit_code": 0,
+    "hold_end_status": "OWNED_DOTA_EXITED_HOLDS_COMPLETED",
+    "same_handle_exit_observed": true,
+    "hold_end_utc": "2026-11-01T15:59:21.987019+00:00",
+    "wm_close_intent_exists": false,
+    "wm_close_requested_exists": false,
+    "original0104_restore_completed": false,
+    "full_native_admission_passed": false,
+    "exit_reason_separately_confirmed": false,
+    "exit_reason": "ORIGINAL_PROCESS_ENDED_THEN_NEW_PROCESS_OBSERVED_REASON_NOT_SEPARATELY_CONFIRMED",
+    "root_wm_close_or_kill_sent": false,
+    "crash_evidence_obtained": false
+  },
+  "other_runs": {
+    "run01_user_confirmed_manual_quit": true,
+    "run02_user_confirmed_manual_quit": true,
+    "run01_run02_crash_claimed": false,
+    "subsequent_process_observed": {
+      "pid": 33900,
+      "created_utc_root_reported": "2026-11-01T15:59:41.588834Z",
+      "owned_by_original_keeper": false,
+      "inherits_old_evidence": false
+    }
+  },
+  "pending": [
+    "FREE_HERO_BUILDER_SWITCH",
+    "ACTUAL_EQUIPPED_WAVE7_AXE",
+    "TWO_PC_SHARED_BOSS_OBSERVATION_AND_CONFIRMATION",
+    "AFTER_INSPECTION",
+    "COMPLETE_NORMAL_CLOSE_EVIDENCE_CHAIN",
+    "ORIGINAL0104_FULL_RESTORE",
+    "PUBLISH_AND_OFFICIAL_DOWNLOAD"
+  ],
+  "normal_ui_lookup": {
+    "source": "ACTUAL_SIGNED1107_VIEW",
+    "earliest_n4_equipped_wave": 7,
+    "asset": "monster_wave_humanoid_red_axe",
+    "components": 6,
+    "wave6_not_equipped": true,
+    "hero_altar_requires_city_level": 4,
+    "axe_altar_native_button_order": 3,
+    "hero_or_equipped_wave_test_completed": false
+  },
+  "installed_rehearsal_state": {
+    "candidate_five_files_not_restored_yet": true,
+    "official_journal_release_sequence": 2026110104,
+    "official_journal_history_entries": 20,
+    "sdk_upload_performed": false,
+    "peer_remote0104_local1107_version_mismatch": true,
+    "peer_same_signed_package_test_pending": true,
+    "peer_installer_v01_real_small_file_test_failed_and_blocked": true,
+    "peer_installer_v02_under_repair": false,
+    "peer_full_package_install_pass_claimed": false,
+    "peer_installer_final_hash": "fdd669c000dcfa89d24fc7d2aafdf3fea23dc759e7dbf055d20edadd916398dd",
+    "peer_installer_v02_real_tiny_helper_tests_passed": 10,
+    "peer_installer_v02_full_install_restore_verified": false,
+    "peer_installer_exact_tiny_receipt_sha256": "bc396cba2a58ecd69d01f15b818fcf9c76952912ff6a15ec320a408acd87833f",
+    "peer_real_vpk_bytes_read_in_tiny_test": 0,
+    "new_unowned_dota_process_currently_occupies_installation": true
+  },
+  "partial_evidence_refs": {
+    "qop_partial_v01_sha256": "90c4ca37bcf1be06d1e217828d98099ec3cea3a447374598528cf81874257edd",
+    "bane_and_etw_partial_v02_sha256": "b3ced7e58ff648d5b03da7d702ae64958214cd7085f8f58ae8bc049d036444f0",
+    "signed_runtime_wave_ui_lookup_sha256": "b3204cc3d0d0265f8cecce7501b5bdda2cde29832b681c5802d77276900286f5"
+  }
 }

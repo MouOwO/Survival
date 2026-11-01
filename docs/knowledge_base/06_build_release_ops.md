@@ -1,6 +1,6 @@
 # 06｜构建、签名、工坊分发与恢复
 
-**2026-11-01 当前发行准备：1107，未签/未发布**。唯一入口`tools/release_pipeline.py`，固定authority/recipe/validator/rehearsal；本次17项/6919资源/184保护/22审阅，以官方五账号0104为父。Git源码增量准入，Steam仍交完整校验VPK；220项历史差异明确延期，operator与game/content提交分开。当前无新plan/unsigned，根任务Git后先审具体候选，再向用户申请新17签名及普通实机协作；旧14签名授权不自动扩展。实机/90FPS且P95≤16.7ms/同handle正常退出/0104全恢复未过不能publish。见[完整门禁](evidence/shared_boss_release_pipeline_20261101.md)。
+**2026-11-02 当前发行：1107不得发，已完整恢复官方0104。** 同局peer1600×1000残缺→900p重选恢复，旧物理240门禁在生产函数复现；新combat raw2947af1／GitLF1af651／vjs5f3d0f已两仓一致、官方1 compiled/0 failed与72+cost+3回归通过，尚无新尺寸原生验收。手动双PC111.08FPS/P9510.96只属旧1107/900p观察；不补owned launch。Root正常WM_CLOSE、collector同handle退出/holds释放后，restore04真实exit0、ORIGINAL0104_FIVE_FILES_FULLY_RESTORED；五卷/backup保留，无SDKupload。0201 recipe与受控主菜单GC route开发中，无plan/unsigned/签/native/publish。peer v01禁止执行，v02需显式Bundle且保留全部backup。见[发布/恢复与操作教训](evidence/portrait_resolution_guard_20261102.md)。
 
 
 **历史1106仅编译/unsigned审阅，未完成目标**：正式原条目仍0104五账号/四人容量。game1ae78396／content f8640121已同步，1106为同14路径/6918资源/184保护模块/19审阅；HUD稳定根递归查询的合成计数31→0，尚未签名、未新实机/FPS/发布。1105有限头像通过，但实测100.31FPS/P95=19.99ms未过16.7ms门槛；第3波仅原生退路、非饰品或免费英雄验收，已正常退出并完整恢复0104。下一步需新1106带饰品冷选/淘汰回切、免费英雄切换、真实带饰品波次、FPS及发布/官方下载，不能标完成。见[精确交接与待办](evidence/candidate1106_handoff_20261101.md)。

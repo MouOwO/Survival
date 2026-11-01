@@ -2,9 +2,31 @@
 
 根集成复核：122项Python隔离检查通过（含两项纯包/发布后生命周期检查），三份Lua解析、共享Boss真实服务夹具、既有重生节奏及房间位置检查通过。这些不是实机FPS。另三项旧回归已与20420完整旧Lua根做真实双跑：失败行及失败前加载源码摘要完全一致，未加载本轮三个Boss模块；基线收据位于忽略目录 `output/shared_boss_baseline_regression_20261101/run01/comparison.json`，SHA `37c9c8dd4bf58423937d230980394ea9d5a6bb0fbac55bb9602dfd710499a759`。未顺带改动这些旧夹具。
 
-本记录截止于源码、工具和隔离测试阶段。正式父包仍为五账号0104（四人容量），
-本轮没有生成或签名1107，没有新plan/unsigned、普通实机或发布结果。
-之后的提交、构包和实机结果必须另附实际SHA与回执，不能由本记录推导完成。
+2026-11-02更新：1107已按本次用户授权完成plan/unsigned及签名，原正式游廊仍0104，未上传。
+report SHA`86c10bed12d60403d31b1951cbd608a86523835bca39ef563b1f36b3fd3878e3`，
+content`7a4c5af2bb1f25cc4adacb46228cf9f129d58571afc30367f649250b165221ce`。
+game/operator为`eaef4398383be211880423eb142eb0a1d723c69f`，content仓库为
+`eb281a1398466876575a5885e60a8dd207e5f556`。下面代码/隔离结论与后续实际证据分开。
+
+run03普通PID30424取得QOP09三张正确近景（137ms/5组件），Bane98ms初载及1/2/3/4/6后96ms冷回
+（4组件/六张settled画面完整）；不宣称197全量或完整转场逐帧通过。
+30秒ETW独立复算3389间隔mean113.2008925FPS/P9511.16886ms/P9914.25142ms，
+真1%low60.982FPS（最慢34帧），max23.7336ms、0>25ms、30焦点样本全部有效。
+前后N4计时01:03→00:29且未暂停/结算，完整Bane与15只Meepo可见，本样本90/16.7阈值通过；
+不等于旧新同负载因果对比或全模式长局通过。
+
+before inspection四data均Dota+keeper、indexfalse/all5false原样保留，status仍INCOMPLETE；after缺失。
+用户只明确确认run01/02退出为手动操作。run03原进程已结束、随后检测到新进程，退出原因本轮未另确认；
+Root未发送WM_CLOSE/kill，不据此判crash或已确认manual。UTC15:59:21.987019获同retained
+handle退出及keeper exit0，但无WM_CLOSE intent/close_requested链，尚未完整restore0104。
+随后检测到新PID33900，不属于原keeper；本机候选五卷仍未恢复，新进程占用不能继承旧验收。
+正式0104/20条history不变，没有SDK上传；远端0104和本机1107版本不同阻止同局，手动同签客机包
+仍在准备。peer installer v01真实小文件失败已阻止；v02 SHA`fdd669c0…16398dd`的实际同helper
+小文件10项通过，receipt`bc396cba…87833f`确认0真实VPK字节、完整Install/Restore未执行，不能写客机分发通过。
+剩余门槛为免费英雄/建造者、实际带饰品wave7 Axe、双PC共享Boss、after inspection、完整正常
+退出/恢复及发布/下载。实际已签VIEW确认最早N4 costumed wave为7(Axe/6组件)，正常英雄入口
+是Lv4后建祭坛第三原生Axe按钮；这两项还只是定位，不是操作通过。
+
 
 ## 本次范围与来源
 
@@ -21,7 +43,7 @@
 17项与延期清单零重叠；锚点后延期项改字节/身份、删除或新增未审运行路径均拒绝。
 工具代码的`operator_revision`与运行源码game/content提交独立，全部AUX实际字节必须
 匹配其不可变工具提交；只允许显式Git LF→CRLF变换并记录双摘要，脏工具不准入。
-最终源码/工具提交待根任务Git同步，本文不预填提交号。
+本次不可变源码与工具提交见开头，后续文档提交不改变此签名包来源。
 
 ## 共享实体与个人结果
 
@@ -47,7 +69,7 @@ world epoch、slot life与timer身份共同使旧回调失效。测试验证这�
 | 难度/模式变化 | 同状态直接返回；实际变化仅刷新十戒10成员，O(10)，不按tick遍历全场 | 模拟计数，原生耗时待验 |
 | HUD缓存 | 稳定100ms对已知路径/库存骨架增量校验，0根递归；真实容器重建才重索引 | 既有生产callback fixture：31→0根查询；不是已测FPS提升 |
 | 头像 | 197身份/188场景目录与renderer逻辑LRU4解耦；只选中/有限近期请求，组件不删 | 原生DeleteAsync释放时刻与完整197像素未证明 |
-| 排演keeper | 稳定期每2秒一次只读kernel wait，0CIM/哈希/VConsole；控制点才查身份/完整性 | 复用已原生验证same-handle退出；新1107尚未跑 |
+| 排演keeper | 稳定期每2秒一次只读kernel wait，0CIM/哈希/VConsole；控制点才查身份/完整性 | 新1107 run03同handle退出已有，完整close/restore链未闭合 |
 
 本轮解决了特定所有权和热点边界，不是整个工程已完成解耦。模块数量本身不等于FPS因果；
 1105旧样本mean100.3055FPS/P95=19.9931ms，P95门槛失败，不能借新单测覆盖。
@@ -84,5 +106,5 @@ FileID及持有证明，原始indexfalse/all5false/INCOMPLETE不得改成true。
 共享Boss真实service/registry/AI+假引擎专项已通过。发行目录独立复跑24构建+12排演+7组完整
 证据测试，共43项（其中拒绝变体另有多例）；根集成新增生命周期检查另记，不把不同suite简单
 相加为实机结果。根任务已报告SDK hook9、legacy SDK21+18、guard18、CLI11项隔离结果。
-全部都是代码/模拟边界；新1107签名、plan、unsigned、像素、多人和FPS均无本次通过记录。
-下一步先等根任务完成Git后生成具体plan/unsigned，再向用户申请新17范围签名及客户端协作。
+这些隔离计数不冒充实机。后续实际签名/有限像素/一次FPS结果见开头，整体原生/多人/恢复未通过。
+下一步补齐剩余真实门槛并安全恢复；门槛未齐不得发布，当前正式0104保持。

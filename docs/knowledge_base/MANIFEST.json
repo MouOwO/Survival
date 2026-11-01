@@ -1,22 +1,22 @@
 {
   "schema": 1,
-  "snapshot_date": "2026-11-01",
+  "snapshot_date": "2026-11-02",
   "scope": "Curated project knowledge and historical snapshot; raw chat excluded",
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 18051,
-      "sha256": "975ad7e1575a1c3e36ac1b238701e3db02b384cd01539f73b83c01514eb8e6ba"
+      "bytes": 18163,
+      "sha256": "04ee1d7ef38251cd0bc9891d88c76f575369253fa6f73d39f3192939f4713cac"
     },
     {
       "path": "01_architecture_and_workflow.md",
-      "bytes": 4750,
-      "sha256": "e7a4dff4baf3fa3e57d5adfa8519870627d19da60951b119fc91b4645d2c828b"
+      "bytes": 4848,
+      "sha256": "a15cdfd755cbe06c017365f084c25e0e94798f597db4090f7cc17ff83608dffe"
     },
     {
       "path": "02_core_gameplay.md",
-      "bytes": 33003,
-      "sha256": "c4b8565265b534c79280a726a45c9d53dfd37afce0a6d5be5c5b2d570e65b630"
+      "bytes": 33120,
+      "sha256": "6564126c9125dc6c6f45729f70e7d00cfdaaa6c40930616e321bac415e8251c5"
     },
     {
       "path": "03_progression_save_contract.md",
@@ -35,13 +35,13 @@
     },
     {
       "path": "06_build_release_ops.md",
-      "bytes": 22328,
-      "sha256": "36985de33e3073468171011f01d4802170ef08b88bcebb2508eaf03717bf5b34"
+      "bytes": 22460,
+      "sha256": "2281f02819ca2af8e519e6ed01ce5b0c193784e95a66ce0e25694ac46e9702c9"
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 32067,
-      "sha256": "287d4c8c6b859ea1a46a11f6cfdf5c9cfd6877170adc1b39c583d09e163e7f4a"
+      "bytes": 32225,
+      "sha256": "7f89c9e2528ae6fb56423d5afca94667033c103aece7c629f9d17252ef3a86d7"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -70,8 +70,8 @@
     },
     {
       "path": "13_art_ui_qa.md",
-      "bytes": 10893,
-      "sha256": "4321ac25f7a18c885a18d6177bbe8a4d4a6321b1031e8738a48067ea8eb3a5dd"
+      "bytes": 11513,
+      "sha256": "33d9bced2b007d3af967cd73baacb12e67bab5b0aa09362e1c79a69d4cf4d48e"
     },
     {
       "path": "NEW_CHAT_PROMPT.txt",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 8739,
-      "sha256": "e4f4bfd08cf5ef2bdd4620f2bacb6cd5735e313da348287416d98f3be1d00948"
+      "bytes": 8904,
+      "sha256": "df1877de4d222d845c751197dc349eb9afcb9a9fa3b5bb760406873294f37922"
     },
     {
       "path": "data/completed_work_index.json",
@@ -299,6 +299,16 @@
       "sha256": "abbe3e6910e7cebc3322bcdcc7db0a44018e9cf1901cd3d43b8d16425dd8d97f"
     },
     {
+      "path": "evidence/portrait_resolution_guard_20261102.md",
+      "bytes": 6059,
+      "sha256": "0364bc46c9e36e7d02f4d575ddfd31c2ac5a4dd89007391222037b9cfb95d4eb"
+    },
+    {
+      "path": "evidence/portrait_resolution_guard_20261102.public.json",
+      "bytes": 9230,
+      "sha256": "5b87df040f175e65c58b21251868da135b62397b51bd0a5f863f67b75dc8194f"
+    },
+    {
       "path": "evidence/portrait_rollback_official_20261029.md",
       "bytes": 3195,
       "sha256": "7aae316ec173f0b1a976ca5f31011a55f935cfebe4a82290b7b046e2a2b0545d"
@@ -350,13 +360,13 @@
     },
     {
       "path": "evidence/shared_boss_release_pipeline_20261101.md",
-      "bytes": 3181,
-      "sha256": "026ad7ca6d6eaf4e08d964085f37651e2a92a93ddc56482112297c6f2d333fb6"
+      "bytes": 5745,
+      "sha256": "6da83003152e42a5c450728579c9a0d0d066f4358a45432ae49542227a49665d"
     },
     {
       "path": "evidence/shared_boss_release_pipeline_20261101.public.json",
-      "bytes": 4505,
-      "sha256": "478d9df7925ce453f5492423e788008868e8c79922322d275303944ed4f1a485"
+      "bytes": 10208,
+      "sha256": "7751f5b6352f2654ceab442696a585c7db83ae35c3311cab2ef6850b7f51404f"
     },
     {
       "path": "evidence/shop_catalog_sync_20261031.md",

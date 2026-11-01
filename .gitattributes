@@ -248,3 +248,8 @@ publishing/workshop/release_authority_20261101.json text eol=lf
 publishing/workshop/release_listing_template_20261101.json text eol=lf
 tools/release_pipeline.py text eol=lf
 tools/test_release_pipeline.py text eol=lf
+
+tools/portrait_resolution_release_20261102/*.py text eol=lf
+tools/portrait_resolution_release_20261102/*.md text eol=lf
+publishing/workshop/release_authority_20261102.json text eol=lf
+tools/test_release_authority_20261102.py text eol=lf

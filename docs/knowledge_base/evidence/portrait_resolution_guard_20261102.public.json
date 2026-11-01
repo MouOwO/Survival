@@ -1,0 +1,209 @@
+{
+  "schema": 1,
+  "status": "SOURCE_FIX_COMPILED_NATIVE_RESOLUTION_RETEST_PENDING_OFFICIAL0104_RESTORED",
+  "official": {
+    "release_sequence": 2026110104,
+    "steam_manifest": "7025356658517360342",
+    "approved_accounts": 5,
+    "maximum_players": 4,
+    "canonical_history_count": 20,
+    "sdk_publish_performed": false
+  },
+  "rejected_1107": {
+    "release_sequence": 2026110107,
+    "signed_report_sha256": "86c10bed12d60403d31b1951cbd608a86523835bca39ef563b1f36b3fd3878e3",
+    "content_sha256": "7a4c5af2bb1f25cc4adacb46228cf9f129d58571afc30367f649250b165221ce",
+    "runtime_changes": 17,
+    "signed_resources": 6919,
+    "protected_modules": 184,
+    "trusted_reviews": 22,
+    "publish_allowed": false,
+    "reason": "Peer1600x1000 Boss native fallback; same-session1600x900 and reselect restored portrait",
+    "user_ab_confirmed": true,
+    "peer_native_leaf_size_measured": false,
+    "native_guard_rejection_on_peer_directly_measured": false,
+    "production_function_guard_mechanism_reproduced": true,
+    "original_peer_image": {
+      "path": "output/shared_boss_portrait_release_20261101/peer_boss_portrait_report_20261102.jpg",
+      "sha256": "5b579d78b890a70f340ed895a21a35c1d2b9fb285c1096da64eefa431ade26f0"
+    },
+    "no_rollback_proved": true
+  },
+  "source_fix": {
+    "state": "APPLIED_MIRRORED_OFFICIAL_COMPILE_DOMAIN_TESTS_PASS",
+    "source_commit": "PENDING_GIT_SYNC",
+    "source_git_lf_sha256": "1af65125378603ff72040c5b27651d308c1d73a603c62e2974032bcd6e10bfca",
+    "source_git_lf_bytes": 228357,
+    "compiler_input_raw_crlf_sha256": "2947af1a6143f8c6df18f98b6fdc35dbf95c40c8309cb8c45a5ad1101b8884f1",
+    "source_raw_bytes": 232772,
+    "source_crlf_lines": 4415,
+    "game_content_identical": true,
+    "compiled_sha256": "5f3d0fc3ba8639d438cd973af7bdea5369004e5d65e202dd22830624a3c09b93",
+    "compiled_bytes": 233620,
+    "official_compiler_exit": 0,
+    "official_compiler_summary": "1 compiled, 0 failed, 0 skipped",
+    "layout_cases": 72,
+    "cost_regression_pass": true,
+    "existing_callback_anchor_hud_suites_pass": true,
+    "native_new_size_visual_verified": false,
+    "native_new_fix_fps_verified": false,
+    "signed": false,
+    "published": false
+  },
+  "geometry": {
+    "formal_leaf_logical_pixels": 264,
+    "old_physical_height_max": 240,
+    "native_height900_observed_previously": 220,
+    "peer_height1000_derived": 244.44444444444446,
+    "peer_derived_height_not_measurement": true,
+    "new_scale_order": [
+      "leaf_actualuiscale",
+      "root_actualuiscale",
+      "viewport_height_over1080_only_if_missing"
+    ],
+    "explicit_invalid_scale_rejected": true,
+    "missing_probe_max_ancestor_depth": 32,
+    "stable_root_discovery_calls": 0,
+    "stable_style_writes": 0,
+    "full_update_extra_validity_checks_synthetic": 2,
+    "full_update_extra_layout_reads_synthetic": 20,
+    "full_update_existing_local_overlay_visits_synthetic": 12,
+    "synthetic_counts_are_not_fps": true
+  },
+  "manual_two_pc": {
+    "native_local_host_status_reviewed_by_root": true,
+    "native_status_humans": 2,
+    "connection_kind": "loopback_host",
+    "source_kind": "manual_start_not_owned_launch",
+    "owned_launch": false,
+    "pre_attach_continuity": "UNPROVEN",
+    "attach_utc": "2026-11-01T18:27:02.983357Z",
+    "before_observed_utc": "2026-11-01T18:27:03.715184Z",
+    "after_observed_utc": "2026-11-01T19:23:56.477112Z",
+    "before_and_after_four_data_owned_dota": true,
+    "keeper_all_five_before_after": true,
+    "index_owned_dota_before": false,
+    "index_owned_dota_after": false,
+    "all_five_open_before": false,
+    "all_five_open_after": false,
+    "release_admission": false,
+    "one_qop_world_body_visual_observation_only": true,
+    "all_13_slots_or_multiplayer_kill_rewards_passed": false,
+    "status_image": {
+      "path": "output/arcade_portrait_perf_20261031/screens/candidate1107_manual_two_pc_native_status_v01.png",
+      "sha256": "de9efa8c40a547f824ab22d715aa1267cf33527f779d849b2f8fe4c576cf0600"
+    }
+  },
+  "fps_observations": [
+    {
+      "candidate": 2026110107,
+      "origin": "owned_run03_single_client_partial",
+      "mean_fps": 113.20089252006146,
+      "p95_ms": 11.16886,
+      "claim": "retained old900p sample only"
+    },
+    {
+      "candidate": 2026110107,
+      "origin": "manual_two_pc_old900p",
+      "mean_fps": 111.07945788148163,
+      "p95_ms": 10.958275,
+      "p99_ms": 15.00295,
+      "true_one_percent_low_fps": 56.0549668410141,
+      "accepted_intervals": 3326,
+      "focus_samples": 30,
+      "max_ms": 47.6518,
+      "over_50ms": 0,
+      "scenario": "N1 next1/00:19 to next2/01:14 naturally crossed first wave; QOP costume visible in two settled screenshots",
+      "source_kind": "manual_start_not_owned_launch",
+      "new_resolution_fix_measurement": false,
+      "equal_load_comparison": false,
+      "full_admission": false
+    }
+  ],
+  "close_and_restore": {
+    "root_normal_wm_close_requested": true,
+    "root_wm_close_utc": "2026-11-01T19:32:53Z",
+    "collector_ended_utc": "2026-11-01T19:32:53.812030Z",
+    "collector_status": "MANUAL_PROCESS_EXITED_OBSERVATION_HOLDS_RELEASED",
+    "same_retained_handle_exit_observed": true,
+    "file_holds_released": true,
+    "collector_did_not_request_stop": true,
+    "restore_status": "ORIGINAL0104_FIVE_FILES_FULLY_RESTORED",
+    "restore_observed_utc": "2026-11-01T19:40:16.033811+00:00",
+    "restore_cli_exit_reported_by_root": 0,
+    "restored_source_receipt_sha256": "f794aa396357521aba3a2e3b0046276c2dcac32417e63753616b2c84a3ef49d9",
+    "backups_preserved": true,
+    "canonical_journal_written": false,
+    "acf_written": false,
+    "publication_performed": false,
+    "root_confirmed_no_dota": true,
+    "force_kill_used": false
+  },
+  "peer_portable_lessons": {
+    "v01_sha256": "feef68471299bb006007e54dc7875f74506ab71c8cf96b8647d7e2ec740e7a68",
+    "v01_nul_bug_failed_and_must_not_execute": true,
+    "v02_sha256": "fdd669c000dcfa89d24fc7d2aafdf3fea23dc759e7dbf055d20edadd916398dd",
+    "v02_actual_full_lab_install_restore_passed": true,
+    "v02_default_bundle_parameter_bug_requires_explicit_bundle": true,
+    "peer_staged_interruption_preserved": true,
+    "exact_interrupted_path_isolated_before_new_run02": true,
+    "peer_new_run02_install_user_confirmed": true,
+    "all_backups_preserved": true,
+    "final_peer_restore_pending_new_candidate": true,
+    "no_sdk_publication": true
+  },
+  "next_0201": {
+    "intended_sequence": 2026110201,
+    "recipe_and_controlled_native_main_menu_gc_route_in_development": true,
+    "route_requires_normal_original_item_local_host_ui": true,
+    "plan_created": false,
+    "unsigned_created": false,
+    "signed": false,
+    "native_acceptance": false,
+    "published": false,
+    "official_parent_remains_0104": true
+  },
+  "pending": [
+    "New0201 source/operator Git synchronization and concrete plan/unsigned review",
+    "Fresh signing approval for changed0201 package before any signing or native installation",
+    "Owned ordinary LocalHost two-PC launch before game start,900/1000 peer resolution matrix and user confirmation",
+    "All original portrait cases including free hero, real equipped wave and five-scene eviction/cold return",
+    "Actual sharedBoss eligibility/kill/reward behavior beyond one world-body visual observation",
+    "Valid new-fix30s FPS/focus, native inspections/normal exit/holds release/full0104 restore, then release/download verification"
+  ],
+  "references": [
+    {
+      "path": "docs/reviews/portrait_resolution_guard_20261102.public.json",
+      "sha256": "b0eda55d34ebf897113517e288abae4a0ba694dfe3c6d1fd9644246b294e75f0"
+    },
+    {
+      "path": "output/portrait_resolution_compile_20261102_v01/compile.json",
+      "sha256": "7f815c606a378f444eebfdb615dcb0205925777e850af45bd39ebc8f2b88dd29"
+    },
+    {
+      "path": "output/shared_boss_portrait_release_20261101/manual_two_pc_run01/etw_partial_evidence_20261102_v01.json",
+      "sha256": "9cac2465c3a768154d3379dab7b740e07b622f9e0be528d94824afb703f263f8"
+    },
+    {
+      "path": "output/shared_boss_portrait_release_20261101/manual_two_pc_run01/evidence/end.json",
+      "sha256": "f4db3a02793d2e7739f6c0bc404ca8d69cba85cd277d60d1a83c9ad3921aeb10"
+    },
+    {
+      "path": "output/shared_boss_portrait_release_20261101/manual_two_pc_run01/evidence/inspections/before01.json",
+      "sha256": "05b32a79a944a95b13a2a5f65759d977937308d5e8a5f38cbb9eb042ec7cf190"
+    },
+    {
+      "path": "output/shared_boss_portrait_release_20261101/manual_two_pc_run01/evidence/inspections/after01.json",
+      "sha256": "feaa9a1a4c1ab70303772512ef1cde7f499d1297f0a6a3d6d253a8e511b2ab7a"
+    },
+    {
+      "path": "output/shared_boss_portrait_release_20261101/peer_full_roundtrip_20261102/run01/backup/installed.json",
+      "sha256": "533c199458dd5c81bf465ed9535e70991322327a536eb96cefac5f2bfc709603"
+    },
+    {
+      "path": "output/shared_boss_portrait_release_20261101/peer_full_roundtrip_20261102/run01/backup/restored.json",
+      "sha256": "c12366d6195d04bbd3fcd7c8d9104d20ce64f2a72486a987605d4c3a9bc041d2"
+    }
+  ],
+  "privacy": "No player names, raw authentication, account assertions, original argv/session parameters or image bytes copied into this knowledge bundle."
+}

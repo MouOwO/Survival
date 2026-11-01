@@ -62,7 +62,7 @@ def request_json(builder, path, expected_sha256):
 
 def static_status():
     return dict(status='STATIC_RELEASE_PIPELINE_NO_EFFECTS',
-        commands=['status', 'plan', 'prepare', 'build', 'rehearsal', 'bootstrap', 'preflight', 'publish'],
+        commands=['status', 'plan', 'prepare', 'build', 'rehearsal', 'download', 'bootstrap', 'preflight', 'publish'],
         authority_override_supported=False, sdk_initialized=False,
         files_written=0, publication_performed=False,
         incremental_projection='AUTHENTICATED_RESOURCE_BASE_PLUS_COMPLETE_IMMUTABLE_GIT_BINDINGS',
@@ -169,6 +169,12 @@ def main(argv=None):
     action = actions.add_parser('rehearsal')
     action.add_argument('action', nargs='?', default='plan', choices=['plan','stage','launch','inspect','close','restore'])
     action.add_argument('--transaction'); action.add_argument('--report-sha256'); action.add_argument('--label')
+    action.add_argument('--route', choices=['direct', 'lobby'])
+    action = actions.add_parser('download')
+    download_mode = action.add_mutually_exclusive_group()
+    download_mode.add_argument('--preflight', action='store_true')
+    download_mode.add_argument('--apply', action='store_true', help='Request and fully verify the official download; never uploads')
+    action.add_argument('--report-sha256')
     for command in ('bootstrap', 'preflight', 'publish'):
         action = actions.add_parser(command)
         action.add_argument('--request', type=Path, required=True)
@@ -181,9 +187,17 @@ def main(argv=None):
     if args.command == 'rehearsal':
         ops = pinned_module(auth, 'rehearsal')
         delegated = [args.action]
-        for name in ('transaction', 'report_sha256', 'label'):
+        for name in ('transaction', 'report_sha256', 'label', 'route'):
             if getattr(args, name) is not None: delegated += ['--' + name.replace('_', '-'), getattr(args, name)]
         return ops.main(delegated)
+    if args.command == 'download':
+        guard.need((args.preflight or args.apply) == (args.report_sha256 is not None),
+                   'download_action_needs_explicit_signed_report_sha')
+        delegated = ['--download'] if args.apply else (['--preflight'] if args.preflight else [])
+        if args.report_sha256 is not None:
+            guard.checked_sha(args.report_sha256)
+            delegated += ['--report-sha256', args.report_sha256]
+        return pinned_module(auth, 'download').main(delegated)
     builder = recipe(auth)
     if args.command in ('plan', 'prepare', 'build'):
         delegated = [] if args.command == 'plan' else ['--' + args.command]
