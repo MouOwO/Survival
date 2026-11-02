@@ -45,6 +45,15 @@ class Fixture:
         self.package=dict(source_revision=self.sources['game'],source_revisions=self.sources,
             content_sha256=self.content,files=6917,protected_modules_preserved=184,
             changed_runtime_paths=sorted(payloads),package_files=candidate,release_sequence=x.SEQUENCE)
+        parent_reviews={'scripts/vscripts/synthetic_review_%02d.lua'%i:{'sha256':sha(str(i).encode())}for i in range(17)}
+        parent_reviews[payloads[3]]={'sha256':'1'*64}
+        target_pins={name:{'sha256':sha(('candidate '+name).encode())}for name in payloads}
+        reviews=copy.deepcopy(parent_reviews)
+        reviews.update({name:target_pins[name]for name in payloads[2:]})
+        compiled={payloads[0]:{'source':'panorama/src/scripts/custom_game/lottery_cinematic_v1.js'},
+            payloads[1]:{'source':'panorama/src/styles/custom_game/lottery_cinematic_v1.css'}}
+        self.package.update(target_pins=target_pins,trusted_review_pins=reviews,
+            source_artifact_pins={pin['source']:{'sha256':sha(pin['source'].encode())}for pin in compiled.values()})
         self.manifest={'content_sha256':self.content};self.signed={'signature_valid':True,'release_sequence':x.SEQUENCE}
         self.process=dict(schema=1,kind='SYNTHETIC_REHEARSAL_PROTOCOL',pid=1234,created_utc=utc(1),
             native_created_filetime=ticks(utc(1))+7,started_utc=utc(0),
@@ -65,9 +74,12 @@ class Fixture:
             [self.process['executable'],*self.process['argv']]).encode())
         runtime=SimpleNamespace(within=lambda path,root:path.resolve().is_relative_to(Path(root).resolve()),
             digest=lambda path:sha(Path(path).read_bytes()))
-        self.b=SimpleNamespace(ROOT=self.root,ITEM='3824360109',SEQUENCE=x.SEQUENCE,PAYLOADS=payloads,
+        self.b=SimpleNamespace(ROOT=self.root,ITEM='3824360109',SEQUENCE=x.SEQUENCE,PAYLOADS=payloads,COMPILED=compiled,
             BASE_CONTENT='f'*64,pack=SimpleNamespace(handoff=SimpleNamespace(regular_path=lambda path:Path(path).resolve()),runtime=runtime),
-            baseline=Mock(return_value=({'package_files':self.original},'SYNTHETIC_OLD_MANIFEST')))
+            baseline=Mock(return_value=({'package_files':self.original},'SYNTHETIC_OLD_MANIFEST')),
+            BASE_REPORT=self.root/'authenticated_parent_report.json',
+            load=Mock(return_value={'trusted_review_pins':parent_reviews}),
+            base_trusted_review=lambda report:report['trusted_review_pins'])
         self.ops=SimpleNamespace(p=SimpleNamespace(STORE=self.store,INSTALLED=self.install,NAMES=tuple(names),
             EXE=Path(self.process['executable']),PORT=29061,KIND=self.process['kind'],utc_ticks=ticks,
             require_rows=Mock(),full_vpk=Mock()),LAUNCH_ROUTES=('direct','lobby'),arguments=arguments,
@@ -164,6 +176,8 @@ class NativeTests(unittest.TestCase):
             self.assertEqual(result['lottery_previews']['observed_ticket_pools'],{pool:'map'for pool in x.POOLS})
             self.assertFalse(result['native_fps_measured']);self.assertFalse(result['real_player_transaction_performed'])
             self.assertFalse(result['training_tips_native_tested']);self.assertEqual(result['updates_submitted'],0)
+            self.assertEqual(result['trusted_review_lineage']['final_count'],19)
+            self.assertEqual(result['trusted_review_lineage']['unchanged_parent_count'],17)
             f.ops.p.require_rows.assert_called_once_with(f.install,f.original)
             f.ops.p.full_vpk.assert_called_once();f.checks.validated_package.assert_called_once_with('a'*64,full=True)
 
@@ -171,6 +185,11 @@ class NativeTests(unittest.TestCase):
         changes={
             'old_sequence':lambda f:f.signed.update(release_sequence=2026110201),
             'old_resource_scope':lambda f:f.package.update(files=6919),
+            'extra_twentieth_review':lambda f:f.package['trusted_review_pins'].update({'unknown.lua':{'sha256':'9'*64}}),
+            'changed_old_review':lambda f:f.package['trusted_review_pins'].update({'scripts/vscripts/synthetic_review_00.lua':{'sha256':'9'*64}}),
+            'missing_router_review':lambda f:f.package['trusted_review_pins'].pop(f.b.PAYLOADS[3]),
+            'old_router_not_replaced':lambda f:f.package['trusted_review_pins'].update({f.b.PAYLOADS[3]:{'sha256':'1'*64}}),
+            'unknown_compile_binding':lambda f:f.package['source_artifact_pins'].update({'third_compiled':{}}),
             'wrong_sources':lambda f:f.review.update(source_revisions={'game':'1'*40,'content':'d'*40}),
             'ready_only':lambda f:f.review.clear(),
             'tools':lambda f:f.review.update(tools=True),

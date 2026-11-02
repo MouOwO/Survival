@@ -20,7 +20,7 @@ PAYLOADS = frozenset((
     "scripts/vscripts/ui/ui_request_router.lua",
 ))
 NATIVE_ADMISSION_MODULE = HERE / "native_admission.py"
-NATIVE_ADMISSION_SHA256 = "3174b75fb554532c2e0da44d077d5a7e332d01841f1415db54b5fc4df78541a0"
+NATIVE_ADMISSION_SHA256 = "935f0958a188dce736baa08282b3b4cd2cd30794767ddb9e8060527600c7a8ab"
 b = c = None
 
 
@@ -104,14 +104,16 @@ def validate_release(request):
          "Reviewed native lottery UI admission policy changed")
     builder, checks = context()
     report, manifest, signed = checks.validated_package(digest(request.get("report_sha256")), full=True)
+    # Parent18 already contains ui_request_router: replace that review and add
+    # production_ui_service, preserving the other17. Two updates yield19 keys.
     need(report.get("status") == "BUILT_SIGNED_PENDING_NATIVE_LOTTERY_ACCEPTANCE"
          and report.get("release_sequence") == RELEASE_SEQUENCE
          and report.get("files") == 6917 and report.get("protected_modules_preserved") == 184
          and set(report.get("changed_runtime_paths", [])) == PAYLOADS
          and report.get("added_runtime_paths") == [] and report.get("removed_runtime_paths") == []
-         and len(report.get("trusted_review_pins", {})) == 20
+         and len(report.get("trusted_review_pins", {})) == 19
          and len(report.get("source_artifact_pins", {})) == 2,
-         "Exact four-resource, two-compiled, twenty-review signed hotfix required")
+         "Exact four-resource, two-compiled, nineteen-review signed hotfix required")
     need(request.get("source_revisions") == report["source_revisions"]
          and request.get("signed_manifest_sha256") == builder.pack.runtime.digest(builder.VIEW / builder.pack.handoff.MANIFEST)
          and request.get("content_sha256", report["content_sha256"]) == report["content_sha256"],

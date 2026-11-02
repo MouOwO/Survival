@@ -71,7 +71,7 @@ def validated_package(expected_sha, *, full=False):
          and package.get('release_sequence') == b.SEQUENCE
          and package.get('files') == manifest.get('file_count') == 6917
          and package.get('protected_modules_preserved') == 184
-         and len(package.get('trusted_review_pins', {})) == 20
+         and len(package.get('trusted_review_pins', {})) == 19
          and package.get('approved_steamids64') == list(b.APPROVED)
          and len(b.APPROVED) == 5 and package.get('max_players') == 4
          and set(package.get('preserved_admission_rows', {})) == set(b.ADMISSION_PATHS)
@@ -179,7 +179,7 @@ def static_plan():
     return dict(status='STATIC_V09_OFFICIAL_DOWNLOAD_PLAN_NO_EFFECTS',
         workshop_id=b.ITEM, release_sequence=2026110202, runtime_source_revisions='FROM_AUTHENTICATED_COMPLETED_REPORT',
         runtime_files=6917, protected_modules=184, scoped_runtime_paths=4,
-        approved_account_count=5, max_players=4, trusted_reviews=20,
+        approved_account_count=5, max_players=4, trusted_reviews=19,
         parent_release_sequence=2026110104, immutable_source_revisions_required=True,
         explicit_signed_report_sha_required=True, exact_successful_current_journal_required_for_download=True,
         frozen_protocol_sha256=PROTOCOL_SHA, historical_terminal_protected_summary=180,

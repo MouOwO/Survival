@@ -3,6 +3,7 @@ from pathlib import Path
 from types import SimpleNamespace
 import copy
 import importlib.util
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -68,14 +69,52 @@ class BuildTests(unittest.TestCase):
         new['files'][0]['sha256']='b'*64
         with self.assertRaises(ValueError):b.preserved_admission(old,new)
 
-    def test_training_reviews_add_only_two_and_reject_drift(self):
+    def test_training_reviews_replace_existing_router_add_production_and_reject_drift(self):
+        values={n:('source-'+n).encode() for n in b.ADDITIONAL_SOURCE_REVIEWS}
+        pins={n:b.sha(v) for n,v in values.items()}
+        parent={f'parent{i}':b.checks(b'original') for i in range(17)}
+        router=next(iter(b.REPLACED_PARENT_REVIEWS));parent[router]=b.checks(b'original router')
+        with patch.object(b,'base_trusted_review',return_value=parent),patch.object(b,'TRAINING_SOURCE_PINS',pins):
+            projected=b.trusted_review({},values)
+            self.assertEqual(len(projected),19)
+            self.assertEqual(projected[router],b.checks(values[router]))
+            self.assertTrue(all(projected[n]==pin for n,pin in parent.items() if n!=router))
+            self.assertEqual(set(projected)-set(parent),set(b.NEW_SOURCE_REVIEWS))
+            values[next(iter(values))]=b'changed'
+            with self.assertRaises(ValueError):b.trusted_review({},values)
+
+    def test_missing_existing_router_or_extra_parent_overlap_refused(self):
         values={n:('source-'+n).encode() for n in b.ADDITIONAL_SOURCE_REVIEWS}
         pins={n:b.sha(v) for n,v in values.items()}
         parent={f'parent{i}':b.checks(b'original') for i in range(18)}
         with patch.object(b,'base_trusted_review',return_value=parent),patch.object(b,'TRAINING_SOURCE_PINS',pins):
-            self.assertEqual(len(b.trusted_review({},values)),20)
-            values[next(iter(values))]=b'changed'
-            with self.assertRaises(ValueError):b.trusted_review({},values)
+            with self.assertRaisesRegex(ValueError,'review role'):b.trusted_review({},values)
+
+    def test_real_parent_review_verifies_all18_before_allowing_exact_router_overlap(self):
+        with tempfile.TemporaryDirectory(prefix='synthetic-lottery-parent-review-') as directory:
+            root=Path(directory)
+            names=[*[f'parent{i}' for i in range(17)],next(iter(b.REPLACED_PARENT_REVIEWS))]
+            expected={}
+            for name in names:
+                path=root/name;path.parent.mkdir(parents=True,exist_ok=True)
+                path.write_bytes(('original '+name).encode());expected[name]=b.checks(path.read_bytes())
+            with patch.object(b,'BASE_TRUSTED',root),patch.object(b.inc,'all_files',return_value=set(names)):
+                self.assertEqual(b.base_trusted_review({'trusted_review_pins':expected}),expected)
+                (root/names[0]).write_bytes(b'changed original')
+                with self.assertRaisesRegex(ValueError,'Original18'):
+                    b.base_trusted_review({'trusted_review_pins':expected})
+
+    def test_real_parent_review_rejects_any_second_payload_overlap(self):
+        with tempfile.TemporaryDirectory(prefix='synthetic-lottery-overlap-') as directory:
+            root=Path(directory)
+            names=[*[f'parent{i}' for i in range(16)],*b.ADDITIONAL_SOURCE_REVIEWS]
+            expected={}
+            for name in names:
+                path=root/name;path.parent.mkdir(parents=True,exist_ok=True)
+                path.write_bytes(b'original');expected[name]=b.checks(b'original')
+            with patch.object(b,'BASE_TRUSTED',root),patch.object(b.inc,'all_files',return_value=set(names)):
+                with self.assertRaisesRegex(ValueError,'Only the existing router'):
+                    b.base_trusted_review({'trusted_review_pins':expected})
 
     def test_operator_aux_and_external_paths_preserve_frozen0201(self):
         self.assertIn('tools/lottery_hotfix_release_20261102/ledger.py',b.AUXILIARY_INPUTS)

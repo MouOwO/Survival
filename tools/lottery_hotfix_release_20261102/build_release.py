@@ -107,6 +107,8 @@ ADDED_RUNTIME_PATHS=()
 COMPILED={'panorama/scripts/custom_game/lottery_cinematic_v1.vjs_c': {'source': 'panorama/src/scripts/custom_game/lottery_cinematic_v1.js', 'content_source': 'panorama/scripts/custom_game/lottery_cinematic_v1.js', 'source_git_sha256': 'f817d8b1e66c1c73b0b55dcdd8252ed567b64de886a812aecb3d9bc3f64a0816', 'source_sha256': 'a20d60e165e7e8e3f2f61031e3a99e390ba70cee0483094181e2120a88bdf8ea', 'source_normalization': 'GIT_LF_TO_COMPILER_CRLF_ONLY', 'compiled_sha256': 'f0b89bcb3c8abb82b962c5e1e2e6b944e5ea7d85749397429f95d117a3d20d23'}, 'panorama/styles/custom_game/lottery_cinematic_v1.vcss_c': {'source': 'panorama/src/styles/custom_game/lottery_cinematic_v1.css', 'content_source': 'panorama/styles/custom_game/lottery_cinematic_v1.css', 'source_git_sha256': '75f0597e8cd6a97f356633a06b3e71e46d8ac5ea858000564c5afe8fa9f48c57', 'source_sha256': 'b9cb926cf5a9f951e27cdf98a0485745aafc459e78d6e374c9e9ee69ebac8a35', 'source_normalization': 'GIT_LF_TO_COMPILER_CRLF_ONLY', 'compiled_sha256': '691c18f7f061ea6c04d56a1984d6ebe39043c1cf05e01402a826ce8611b50024'}}
 TRAINING_SOURCE_PINS={'scripts/vscripts/ui/production_ui_service.lua': '7ee4ac210eae16108ed19995b83498f34a42ac43dd82805c859689f2f123f1d4', 'scripts/vscripts/ui/ui_request_router.lua': 'e5e30c37537db9b8512ccc142170fc7f6691adadaf291b62fc6647fbf1cf3529'}
 ADDITIONAL_SOURCE_REVIEWS=PAYLOADS[2:]
+REPLACED_PARENT_REVIEWS=frozenset({'scripts/vscripts/ui/ui_request_router.lua'})
+NEW_SOURCE_REVIEWS=frozenset({'scripts/vscripts/ui/production_ui_service.lua'})
 AUXILIARY_INPUTS = (
     'tools/lottery_hotfix_release_20261102/build_release.py',
     'tools/lottery_hotfix_release_20261102/release_checks.py',
@@ -300,21 +302,36 @@ def base_trusted_review(report):
         ('_release_manifest.json','_release_signature.json','handoff.json')}
     need(inc.all_files(BASE_TRUSTED)-set(expected) <= allowed_handoff, 'Unknown parent trusted-source extras')
     result = {name:checks((BASE_TRUSTED/name).read_bytes()) for name in sorted(expected)}
-    need(len(result) == 18 and result == expected and not set(result).intersection(PAYLOADS), 'Original18 five-account admission reviews changed')
+    need(len(result) == 18 and result == expected,
+        'Original18 five-account admission reviews changed')
+    need(set(result).intersection(PAYLOADS)==REPLACED_PARENT_REVIEWS
+        and not set(result).intersection(NEW_SOURCE_REVIEWS),
+        'Only the existing router review may overlap this hotfix')
     return result
 
 
 def trusted_review(report,values):
-    result=base_trusted_review(report)
+    original=base_trusted_review(report)
+    result=dict(original)
+    need(set(ADDITIONAL_SOURCE_REVIEWS)==REPLACED_PARENT_REVIEWS|NEW_SOURCE_REVIEWS,
+        'Exact replacement router and new production presentation reviews required')
     for name in ADDITIONAL_SOURCE_REVIEWS:
-        need(name not in result and sha(values[name])==TRAINING_SOURCE_PINS[name],'New immutable training review required')
+        need((name in original)==(name in REPLACED_PARENT_REVIEWS)
+            and sha(values[name])==TRAINING_SOURCE_PINS[name],
+            'Explicit immutable training review role or bytes differ')
         result[name]=checks(values[name])
-    need(len(result)==20 and set(result).intersection(PAYLOADS)==set(ADDITIONAL_SOURCE_REVIEWS),'Original18 plus two training reviews required')
+    need(len(result)==19 and set(result)==set(original)|NEW_SOURCE_REVIEWS
+        and set(result).intersection(PAYLOADS)==set(ADDITIONAL_SOURCE_REVIEWS)
+        and all(result[name]==pin for name,pin in original.items() if name not in REPLACED_PARENT_REVIEWS),
+        'Preserve17 original reviews, replace router and add production review only')
     return result
 
 
 def training_review(revision,values):
-    return {n:dict(source_revision=revision,source_sha256=sha(values[n]),status='ROOT_REVIEWED_PRESENTATION_ONLY') for n in ADDITIONAL_SOURCE_REVIEWS}
+    return {n:dict(source_revision=revision,source_sha256=sha(values[n]),
+        status='ROOT_REVIEWED_PRESENTATION_ONLY',
+        review_role='REPLACE_EXISTING_PARENT_REVIEW' if n in REPLACED_PARENT_REVIEWS else 'ADD_NEW_SOURCE_REVIEW')
+        for n in ADDITIONAL_SOURCE_REVIEWS}
 
 
 def source_lineage(revision,content_revision,old,values,source_bindings):

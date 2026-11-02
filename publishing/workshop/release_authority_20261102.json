@@ -7,7 +7,7 @@
   "lineage_state": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\release_lineage_20261101\\state.json",
   "publication_lock": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\four_accounts_20261022\\steam_upload_state.json.lock",
   "validator_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\tools\\lottery_hotfix_release_20261102\\validator.py",
-  "validator_sha256": "997b319fecdcc7af1e166f5295897f963d0dfe2529ba6ba1f7d09c525cb43a44",
+  "validator_sha256": "70fb19bc302967dd527e28e80eca58a00d63254a11d6766a2e23d909835b716b",
   "repositories": {
     "game": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival",
     "content": "D:/SteamLibrary/steamapps/common/dota 2 beta/content/dota_addons/Survival"
@@ -24,7 +24,7 @@
     ]
   },
   "recipe_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\tools\\lottery_hotfix_release_20261102\\build_release.py",
-  "recipe_sha256": "49aa99a6a149aba573c62ac438abe6fb3b77e6837f9729d54d505cd9608ae79e",
+  "recipe_sha256": "a90154ce9ca13fb16f05273b5a50343ec08547a853f38978de3c74b3509c2af5",
   "rehearsal_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\tools\\lottery_hotfix_release_20261102\\rehearsal.py",
   "rehearsal_sha256": "dda926955aae3ea7cb591130a9b5df2392a4184acf38591691aecd384c049d57",
   "listing_template_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\publishing\\workshop\\release_listing_template_20261101.json",
@@ -34,7 +34,7 @@
   "historical_deferred_changes": 220,
   "source_anchor_is_full_published_tree": false,
   "download_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\tools\\lottery_hotfix_release_20261102\\verify_download.py",
-  "download_sha256": "b79bc8ff35b41cc34a5d5424e23665426c31c35e8eb71b747a4a4126a445a554",
+  "download_sha256": "cc10665eade3591c6355bf8b1e6429c1b8e9ede8d6b65dbe515cb7e023ed7004",
   "release_sequence": 2026110202,
   "native_launch_profiles": [
     "direct",
@@ -42,9 +42,20 @@
   ],
   "manual_attach_adopt_allowed": false,
   "native_admission_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\tools\\lottery_hotfix_release_20261102\\native_admission.py",
-  "native_admission_sha256": "3174b75fb554532c2e0da44d077d5a7e332d01841f1415db54b5fc4df78541a0",
+  "native_admission_sha256": "935f0958a188dce736baa08282b3b4cd2cd30794767ddb9e8060527600c7a8ab",
   "unpublished0201_deferred_source_entries": {
     "game": 20,
     "content": 3
+  },
+  "trusted_review_count": 19,
+  "review_projection": {
+    "parent_reviews": 18,
+    "preserved_parent_reviews": 17,
+    "replaced_parent_reviews": [
+      "scripts/vscripts/ui/ui_request_router.lua"
+    ],
+    "added_new_reviews": [
+      "scripts/vscripts/ui/production_ui_service.lua"
+    ]
   }
 }

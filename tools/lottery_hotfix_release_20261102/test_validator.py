@@ -43,7 +43,7 @@ class ValidatorTests(unittest.TestCase):
         self.report = dict(self.plan, status="BUILT_SIGNED_PENDING_NATIVE_LOTTERY_ACCEPTANCE", dry_run=False,
                            signing_key_read=True, signature_valid=True, files=6917, protected_modules_preserved=184,
                            changed_runtime_paths=sorted(v.PAYLOADS), added_runtime_paths=[], removed_runtime_paths=[],
-                           trusted_review_pins={str(n): {} for n in range(20)}, source_artifact_pins={"js": {}, "css": {}},
+                           trusted_review_pins={str(n): {} for n in range(19)}, source_artifact_pins={"js": {}, "css": {}},
                            content_sha256="b" * 64, authenticated_parent_manifest_sha256="c" * 64,
                            parent_resource_origins_sha256="d" * 64, resource_origins_sha256="e" * 64)
         self.manifest = {"file_count": 6917, "content_sha256": self.report["content_sha256"]}
@@ -109,11 +109,13 @@ class ValidatorTests(unittest.TestCase):
 
     def test_signed_scope_and_immutable_plan_drift_rejected(self):
         for field, value in (("files", 6919), ("protected_modules_preserved", 183),
-                             ("trusted_review_pins", {}), ("source_artifact_pins", {"one": {}}),
+                             ("trusted_review_pins", {}),
+                             ("trusted_review_pins", {str(n): {} for n in range(20)}),
+                             ("source_artifact_pins", {"one": {}}),
                              ("changed_runtime_paths", list(v.PAYLOADS)[:3])):
             old = self.report[field]
             self.report[field] = value
-            with self.subTest(field=field), self.assertRaisesRegex(ValueError, "twenty-review signed hotfix"):
+            with self.subTest(field=field), self.assertRaisesRegex(ValueError, "nineteen-review signed hotfix"):
                 v.validate_release(self.request)
             self.report[field] = old
         self.report["target_pins"] = {}
@@ -138,6 +140,30 @@ class ValidatorTests(unittest.TestCase):
         request["source_revisions"] = {"game": "9" * 40, "content": "2" * 40}
         with self.assertRaisesRegex(ValueError, "Bootstrap must bind"):
             v.validate_bootstrap(request)
+
+
+class ActualParentReviewProjectionTests(unittest.TestCase):
+    def test_real_parent_replaces_router_and_only_adds_production_review(self):
+        builder = load("actual_hotfix_parent_review_projection", HERE / "build_release.py")
+        raw = builder.BASE_REPORT.read_bytes()
+        self.assertEqual(hashlib.sha256(raw).hexdigest(),
+                         "70306be7a42962172fddce88bc8c4ac12dc5e73db1119d97839b871115aa01b6")
+        parent = json.loads(raw)
+        previous = parent["trusted_review_pins"]
+        router = "scripts/vscripts/ui/ui_request_router.lua"
+        production = "scripts/vscripts/ui/production_ui_service.lua"
+        self.assertEqual(len(previous), 18)
+        self.assertEqual(set(previous).intersection(builder.ADDITIONAL_SOURCE_REVIEWS), {router})
+        self.assertNotIn(production, previous)
+        values = {name: (builder.ROOT / name).read_bytes().replace(b"\r\n", b"\n")
+                  for name in builder.ADDITIONAL_SOURCE_REVIEWS}
+        projected = builder.trusted_review(parent, values)
+        self.assertEqual(len(projected), 19)
+        self.assertEqual(set(projected) - set(previous), {production})
+        self.assertEqual(projected[router], builder.checks(values[router]))
+        self.assertNotEqual(projected[router], previous[router])
+        for name in set(previous) - {router}:
+            self.assertEqual(projected[name], previous[name])
 
 
 class AuthorityRegistrationTests(unittest.TestCase):

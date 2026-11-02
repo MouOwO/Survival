@@ -51,7 +51,7 @@ def validated_package(expected_report_sha256,*,full=False):
     b.need(len(source_bindings)==2 and report.get('source_artifact_pins')==source_bindings,
         'Both JS/CSS Git/compiler/artifact source bindings must match')
     b.need(report['trusted_review_pins']==b.trusted_review(base_report,values),
-        'Exact18 parent reviews plus two training presentation source reviews required')
+        'Exact17 unchanged parent reviews, replacement router and new production review required')
     b.need(report.get('training_ui_source_review')==b.training_review(report['source_revision'],values),
         'Both immutable training presentation source reviews required')
     expected,changed=b.projected(old,values)
@@ -76,7 +76,7 @@ def validated_package(expected_report_sha256,*,full=False):
     for name,pin in report['trusted_review_pins'].items():
         reviewed=values[name] if name in b.ADDITIONAL_SOURCE_REVIEWS else (b.BASE_TRUSTED/name).read_bytes()
         b.need(b.checks((b.TRUSTED/name).read_bytes())==pin==b.checks(reviewed),
-            'Original18 parent reviews or two additional source reviews changed')
+            'Preserved17 parent reviews or either reviewed training source changed')
     b.need({row['path'] for row in b.parent.parent.previous.base.protection.selected_files(
         [row['path'] for row in manifest['files']],b.load(b.ROOT/'tools/lua_protection_policy.json'))}.isdisjoint(b.PAYLOADS),
         'No protected module may be replaced by scoped raw Lua')

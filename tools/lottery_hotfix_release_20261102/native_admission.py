@@ -278,6 +278,28 @@ def lottery_cases(review,origin,process,bounds,text,reader):
         'ticket_balances_unchanged':True,'real_draw_ack_required':False,'consumer_ack_test_is_native':False}
 
 
+def trusted_review_lineage(report,b):
+    # The authenticated original18 already review ui_request_router. Replacing
+    # that reviewed source does not add a twentieth review; only the production
+    # presentation service is new. Authenticate the old18 before deriving19.
+    router='scripts/vscripts/ui/ui_request_router.lua'
+    added='scripts/vscripts/ui/production_ui_service.lua'
+    parent=b.base_trusted_review(b.load(b.BASE_REPORT))
+    reviewed=report.get('trusted_review_pins',{})
+    need(len(parent)==18 and router in parent and added not in parent,
+        'Authenticated original18 router review required')
+    need(len(reviewed)==19 and set(reviewed)==set(parent)|{added}
+        and set(reviewed).intersection(b.PAYLOADS)=={router,added}
+        and all(reviewed[name]==pin for name,pin in parent.items()if name!=router)
+        and all(reviewed[name]==report['target_pins'][name]for name in (router,added)),
+        'Original17 unchanged, one controlled router replacement and one new service review required')
+    need(set(b.COMPILED)==set(b.PAYLOADS[:2]) and len(b.COMPILED)==2
+        and set(report.get('source_artifact_pins',{}))=={pin['source']for pin in b.COMPILED.values()},
+        'Exactly the two compiled JS/CSS bindings required')
+    return dict(parent_count=18,unchanged_parent_count=17,final_count=19,
+        replaced_parent_paths=[router],added_paths=[added])
+
+
 def validate_native_release(request,report,manifest,signed):
     checks,b,ops=environment();expected=request.get('report_sha256')
     actual,actual_manifest,actual_signed=checks.validated_package(expected,full=True)
@@ -286,6 +308,7 @@ def validate_native_release(request,report,manifest,signed):
         and report.get('files')==6917 and report.get('protected_modules_preserved')==184
         and len(b.PAYLOADS)==4 and report.get('changed_runtime_paths')==sorted(b.PAYLOADS),
         'Exact signed0202 four-resource candidate required')
+    trusted=trusted_review_lineage(report,b)
     ops.source_binding(report,expected)
     need(request.get('source_revisions')==report['source_revisions'],'Request source pair differs')
     ref={'path':request.get('production_evidence_path'),'sha256':request.get('production_evidence_sha256')}
@@ -310,7 +333,8 @@ def validate_native_release(request,report,manifest,signed):
     return dict(ordinary_production_acceptance=True,scope=SCOPE,release_sequence=SEQUENCE,
         content_sha256=manifest['content_sha256'],source_revisions=report['source_revisions'],
         production_evidence_sha256=ref['sha256'],native_process_generation=request['native_process_generation'],
-        lottery_previews=visual,original0104_fully_restored=True,native_file_use_policy=POLICY,
+        lottery_previews=visual,trusted_review_lineage=trusted,
+        original0104_fully_restored=True,native_file_use_policy=POLICY,
         all_gameplay_paths_verified=False,training_tips_native_tested=False,real_player_transaction_performed=False,
         native_fps_measured=False,official_download=False,post_upload_arcade_verified=False,
         sdk_initialized=False,updates_submitted=0)

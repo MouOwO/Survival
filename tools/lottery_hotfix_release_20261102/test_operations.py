@@ -53,7 +53,7 @@ class OperationsTests(unittest.TestCase):
     def test_download_static_and_family_counts_have_no_old0201_scope(self):
         value=download.static_plan();download.require_family_identity()
         self.assertEqual((value['release_sequence'],value['runtime_files'],value['scoped_runtime_paths'],value['trusted_reviews']),
-                         (2026110202,6917,4,20))
+                         (2026110202,6917,4,19))
         self.assertFalse(value['steam_initialized'])
         self.assertEqual(value['downloads_requested'],0)
 
