@@ -40,4 +40,4 @@
 
 ## 后台边界
 
-只读审计已取得当前API发行`20261029-redemption-2f918e4c0edd`，bundle仍d573588b…，支付/DB健康，审计时无待结算及在线活动。真实线上service.py与本地HEAD还有其他未部署差异，因此新部署器只在认证线上父源码中精确替换结算后的3行并增加helper，不能把本地整个service.py直接上传夹带其他业务变动。不改配置bundle、SQL、支付、凭据或玩家记录；保存完整旧发行供回退。
+此前审计/窄补丁针对旧测试API发行`20261029-redemption-2f918e4c0edd`，并非当前游廊WS4。该旧测试API一度切换d2c7c2e85920，本轮已撤回自己的指针变更并恢复父版，完整准备发行保留；不修改SQL或玩家数据。WS4只读确认实际仍为`20261101-admission-five-ffd96ff80622`、bundle d573588b…，未安装helper，支付未改。不可据旧测试API的激活或合成Lua投影声称实际游廊请求已加速；后续须重新核对WS4父manifest/source后执行窄补丁，不可直接覆盖本地整份service.py。
