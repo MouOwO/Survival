@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 23056,
-      "sha256": "16f71208afe03a3ae4eac571f0bbeb1cdb6a223c3f80f45958ad6ee5d4150567"
+      "bytes": 23736,
+      "sha256": "86184efcb9f5d4c8c8dc0bb2dfcfa2e772600e84676ec1eea5fccdf3625175e1"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 37022,
-      "sha256": "6a4daf1d4c57449333c469e2c0f06db0fe96d16cebc6f96b6fcd5d88e5e54f64"
+      "bytes": 37736,
+      "sha256": "6db616e4a5d7896198640a2aaef3fbcfdb928ddfbd847ae4cd0aafd1d1e65b7a"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 12253,
-      "sha256": "b6558557ea56bb6086b2fea8febd7dd9ce993a8d11abc44d1c6aa7809b200b29"
+      "bytes": 12648,
+      "sha256": "ea666fe44b673398d3c26e852bb10161e584927de909ac03ac03ed52393169dd"
     },
     {
       "path": "data/completed_work_index.json",
@@ -270,8 +270,8 @@
     },
     {
       "path": "evidence/lottery0301_native_run01_20261103.md",
-      "bytes": 2014,
-      "sha256": "14f8d76978888ecf344c1da7837e374ce939a883ecbaa79f0e024c2f8172fd60"
+      "bytes": 3423,
+      "sha256": "5cb442b29748aa51491e5356d034de2ec06ca09ea7144e6aa542e22b1e0c08da"
     },
     {
       "path": "evidence/lottery_arcade_delivery_20261102.md",
@@ -450,8 +450,8 @@
     },
     {
       "path": "evidence/storage_cleanup_20261103.md",
-      "bytes": 2991,
-      "sha256": "1bd9388fd842486188a0dbe3bceef7f280b909f917eb0f38fac620b1984eebe1"
+      "bytes": 3689,
+      "sha256": "a87ce88d07edb26ababa77fe2f29764d1e2758648a91301e3304bf5463238b7a"
     },
     {
       "path": "evidence/teammate_builder_portrait_20261031.md",

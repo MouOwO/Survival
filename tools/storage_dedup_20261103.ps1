@@ -1,11 +1,13 @@
-param([switch]$Apply)
+param([switch]$Apply,[ValidateSet('round1','round2')][string]$Round='round1')
 $ErrorActionPreference = 'Stop'
 $root = [IO.Path]::GetFullPath('D:\Survival_发布候选')
 $names = @('20261021_noncommercial_preflight_01','20261021_secure_release_01','20261022_four_accounts_v01','20261022_four_accounts_v02','20261023_ws4_auth_v01')
+if ($Round -eq 'round2') { $names = @('20261021_noncommercial_preflight_01','20261023_ws4_auth_v02','20261023_ws4_auth_v03','20261024_ws4_web_auth_v01') }
 $reportRoot = Join-Path $PSScriptRoot '..\output\storage_dedup_20261103'
 [void](New-Item -ItemType Directory -Path $reportRoot -Force)
 $planPath = Join-Path $reportRoot 'expanded_plan.json'
 $receiptPath = Join-Path $reportRoot 'expanded_receipt.json'
+if ($Round -eq 'round2') { $planPath=Join-Path $reportRoot 'expanded_plan_round2.json'; $receiptPath=Join-Path $reportRoot 'expanded_receipt_round2.json' }
 function Check-File([string]$path) {
  $absolute = [IO.Path]::GetFullPath($path)
  if (-not $absolute.StartsWith($root + '\', [StringComparison]::OrdinalIgnoreCase)) { throw 'outside_explicit_candidate_root' }
@@ -30,12 +32,13 @@ if (-not $Apply) {
   $dir = Join-Path $root $name
   if ((Get-Item -LiteralPath $dir).Attributes -band [IO.FileAttributes]::ReparsePoint) { throw 'candidate_reparse_point' }
   foreach ($file in (Get-ChildItem -LiteralPath $dir -File -Recurse)) {
-   if ($file.Length -lt 1048576 -or $file.LinkType -eq 'HardLink') { continue }
+   if ($file.Length -lt 1048576) { continue }
    $relative = $file.FullName.Substring($dir.Length+1)
    if ($relative.StartsWith('maps\') -or $relative -notmatch '\.(vtex_c|vmdl_c|otf|webm|vpcf_c|vsnd_c|vmat_c)$') { continue }
    [void](Check-File $file.FullName)
    $key = $relative+'|'+$file.Length
    if (-not $canonical.ContainsKey($key)) { $canonical[$key] = @{path=$file.FullName; hash=$null}; continue }
+   if ($file.LinkType -eq 'HardLink') { continue }
    $source = $canonical[$key]
    if (-not $source.hash) { $source.hash = Digest $source.path; $hashed++ }
    $hash = Digest $file.FullName; $hashed++

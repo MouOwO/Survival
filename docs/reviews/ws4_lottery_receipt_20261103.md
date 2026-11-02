@@ -9,3 +9,11 @@
 复杂度：部署初始化一次O(R字节)805项文件验证与完整复制；空闲0任务；每个成功draw沿用同一真实快照worker的O(C×I)与排序、最多4池，新增数据库/HTTP 0。正常快照回退保留；不改CPU复杂度、不承诺真实总耗时<1秒。probe固定3次，每个worker原有10秒上限，实际服务沿用4槽并发限制；不预热真实玩家或增加周期扫描。真实前样本ACK约981/1031ms，总快照ready约2717/2046ms，来自本机普通局观察，不能等同本补丁后的改善。上线后仍需真实样本比较。
 
 本审阅时audit已通过，prepare/probe/激活/独立verify尚未执行；只有后续真实回执才能改变该状态。
+
+## 后续实际执行
+
+operator固定为game `f32ab80b6b8780d30d7deb0fda3edbbe8a9f5312`，已推送dev。prepare健康校验使用既有WS4 web进程的内部上游pin并请求只读config，不公开token、不绕过认证。prepare实际完成；真实冻结Lua对合成profile投影三轮通过，四池、券37保持，RPC=0，耗时695.15/686.49/692.05ms。随后实际WS4 DB身份及待结算0校验通过，原子切换unit的WorkingDirectory，仅重启WS4 API；独立verify通过。
+
+新API PID592495，manifest SHA256 `75c7fd8fc1e95fc1a5a73e521e1d5f9cd411c271ba99028ccfef779b46e48a11`，新unit SHA256 `970c1195edd9359d745942e981269fa61e9951b4621ef81f5e87b3d187e9af9d`。两运行文件SHA分别56e32e2e30e2e46257ae002652b6800bc6b5b864fa6097a8fbd079b4af8df03f、9192fc746010acd798a06fd551f65d5729e2727f5ed19667d8fbbff17a1c8e38。原完整发行/unit、env/bundle保留；7个无关服务PID保持。部署器只有只读SQL，未执行迁移、交易或改写玩家记录；API既有启动同步行为保持，不把工具database_writes=0包装成全服务器所有后台进程从未写库。
+
+这证明后端已激活，不证明新客户端演出/真实响应耗时已通过。0301本机run01已正常完整恢复0104，尚未原生准入或发布；Root自动真实券仍0/30，界面普通券1张，等待用户后续独立交易轮次准备足额或先做预览的选择。完整本地脱敏回执位于output/ws4_lottery_receipt_20261103。

@@ -15,3 +15,7 @@ operator `e26c11f651b02f4987a60aebd6a37d444bc8d9ca` 已推送game/dev。实际�
 canonical stage run01已返回LOCAL_SIGNED_CANDIDATE_STAGED_NOT_OFFICIAL_DOWNLOAD，5个原包完整备份、候选副本及逐次替换回执在D:/Survival_本地排演/20261103_ws4_lottery_redemption_v12/run01，未改ACF。stage后空闲约7.66GB；这是正常备份/候选占用，不是清理失败。owned direct launch已返回运行回执，PID31796、created_utc原串2026-11-02T16:38:22.3229890Z、keeper工具会话11420保持存活。不能另开客户端、冒认进程或强杀。用户已被请求正常Steam授权并进standard N1，再回复“已进入N1”，尚未收到该确认。
 
 当前只是本机测试安装，正式远端仍0104。仍欠实际四池/三次连续预览、完整引擎日志、正常退出与恢复；30普通券真实交易另行记录（自动仍0/30）、WS4窄补丁/真实耗时及lease发布/官方下载仍待。旧API实验不作为WS4加速证据。后续任何结束/换包必须canonical close、same-handle exit、keeper释放后restore，不能把签名或暂装当发布。
+
+## 更新：该进程已经退出，不能继续按上段启动中状态操作
+
+用户确认N1/Steam授权后，本轮未取得完整原生准入；已经canonical WM_CLOSE、keeper11420正常exit0、restore实际exit0完整恢复0104，PID31796不再运行。实际WS4随后以独立operator完成补丁激活/独立复核；新一轮纯预览、独立足额30券交易及正式发布仍待，不重复启动旧run01或重放交易。另已完成第二轮3027份/8.92GB旧副本去重并独立复核，两轮共20.81GB，D盘约16.55GB可用，包路径/字节/地图/签名/恢复备份均保留。最新事实见[run01观察、退出恢复及WS4后续](lottery0301_native_run01_20261103.md)。
