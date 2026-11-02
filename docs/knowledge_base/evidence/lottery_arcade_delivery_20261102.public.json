@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "date_local": "2026-11-02",
-  "recorded_utc": "2026-11-02T09:01:14.123217+00:00",
-  "status": "SIGNED0203_RUN03_STAGED_OWNED_BEFORE_INSPECT_AWAITING_NORMAL_LOGIN_NOT_ADMITTED",
+  "recorded_utc": "2026-11-02T11:39:43.164993+00:00",
+  "status": "LOCAL_OFFICIAL0104_RESTORED_PEER0201_RESTORE_PENDING_0203_NOT_ADMITTED_NOT_PUBLISHED",
   "paired_note": "docs/knowledge_base/evidence/lottery_arcade_delivery_20261102.md",
   "privacy": {
     "raw_auth_session_or_native_logs_included": false,
@@ -144,14 +144,11 @@
   },
   "handoff_owner": "Root",
   "pending": [
-    "user completes normal web login for current owned run03",
-    "ordinary standard N1 and valid cold archive/four-pool current captures",
-    "same-process after inspection and full final native log review",
-    "normal retained-handle exit",
-    "complete0104 restoration",
-    "new native admission and preflight if all evidence passes",
-    "SDK publication only after actual admission",
-    "full official download verification"
+    "peer0201 dedicated Restore success feedback ORIGINAL0104_RESTORED",
+    "actual same-version multiplayer verification after both restores",
+    "0203 future native acceptance remains incomplete; ended run03 evidence must not be backfilled",
+    "no SDK publication unless a later candidate passes all actual admission gates",
+    "full official download verification only after a later authorized publication"
   ],
   "close_and_restore": {
     "normal_wm_close_requested_utc": "2026-11-02T04:57:13.362637+00:00",
@@ -223,7 +220,7 @@
     "plan_generated": true,
     "unsigned_generated": true,
     "signed": true,
-    "native_tested": "LIMITED_REJECTED_RUN01_RUN02_CURRENT_RUN03_PENDING",
+    "native_tested": "LIMITED_REJECTED_RUN01_RUN02_RUN03_CLOSED_AND_RESTORED_NO_OVERALL_ADMISSION",
     "published": false,
     "output_prefix": "20261102_ws4_lottery_snapshot_v10",
     "port": 29064,
@@ -485,20 +482,20 @@
   "current_rehearsal": {
     "release_sequence": 2026110203,
     "transaction_id": "run03_snapshot_preview",
-    "status": "STAGED_OWNED_LAUNCH_BEFORE01_INSPECT_AWAITING_NORMAL_WEB_LOGIN",
-    "active_at_root_observation": true,
+    "status": "OWNED_PROCESS_EXITED_ORIGINAL0104_FIVE_FILES_FULLY_RESTORED_NOT_ADMITTED",
+    "active_at_root_observation": false,
     "pid": 27636,
     "created_utc": "2026-11-02T08:02:07.6220040Z",
     "port": 29064,
     "owned_launch": true,
     "launch_route": "direct",
     "package_report_sha256": "8ae7d8a921eff12beac1376671a4f5b9713b37a8c2dfa1f75e33a87f7496ec10",
-    "normal_web_login_complete": "AWAITING_USER_CONFIRMATION",
+    "normal_web_login_complete": "NOT_ACCEPTED_AS_NATIVE_EVIDENCE",
     "ordinary_standard_n1": "NOT_YET_OBSERVED",
     "four_pool_native_captures": "NOT_YET_OBSERVED",
-    "after_inspection": "NOT_RUN",
-    "normal_exit": "NOT_RUN",
-    "restore": "NOT_RUN",
+    "after_inspection": "NOT_RUN_NOT_BACKFILLED_AFTER_EXIT",
+    "normal_exit": "SAME_RETAINED_HANDLE_EXIT_OBSERVED",
+    "restore": "ORIGINAL0104_FIVE_FILES_FULLY_RESTORED",
     "publication": "NOT_RUN",
     "official_download": "NOT_RUN",
     "root_admitted": false,
@@ -517,6 +514,16 @@
         "path": "D:/Survival_本地排演/20261102_ws4_lottery_snapshot_v10/run03_snapshot_preview/inspections/before01.json",
         "sha256": "30ff9964bca5cdc2fcd5c8a251fcfb557df763bc0d6340160036d6bdf5c14eea",
         "bytes": 4778
+      },
+      "hold_end": {
+        "path": "D:/Survival_本地排演/20261102_ws4_lottery_snapshot_v10/run03_snapshot_preview/hold_end.json",
+        "sha256": "ce12be7a115af796b940be81750926cd7ad59e9badb6a387ca2c44e9a7c14b4a",
+        "bytes": 2000
+      },
+      "restored": {
+        "path": "D:/Survival_本地排演/20261102_ws4_lottery_snapshot_v10/run03_snapshot_preview/restored.json",
+        "sha256": "060460980755fa35e6ffed92996c70f4fc1270d95d036bf7092e5b714b9fa03e",
+        "bytes": 1295
       }
     },
     "before01_raw_observation": {
@@ -533,7 +540,10 @@
         "3824360109_003.vpk": true
       },
       "raw_incomplete_or_index_false_reclassified": false
-    }
+    },
+    "restore_exit_code": 0,
+    "ended_utc": "2026-11-02T10:28:50.890773+00:00",
+    "restored_utc": "2026-11-02T11:33:35.924786+00:00"
   },
   "local_tool_boundaries": {
     "ps7_json_auto_date_conversion": {
@@ -554,5 +564,53 @@
     "both_repositories_pushed": true,
     "original_user_dirty_files_preserved": 5,
     "knowledge_commit_is_not_new_runtime_publication": true
+  },
+  "version_recovery": {
+    "status": "LOCAL_OFFICIAL0104_RESTORED_PEER_RESTORE_PENDING",
+    "local_restore": {
+      "path": "D:/Survival_本地排演/20261102_ws4_lottery_snapshot_v10/run03_snapshot_preview/restored.json",
+      "sha256": "060460980755fa35e6ffed92996c70f4fc1270d95d036bf7092e5b714b9fa03e",
+      "status": "ORIGINAL0104_FIVE_FILES_FULLY_RESTORED"
+    },
+    "local_restore_exit_code": 0,
+    "safe_receipt": {
+      "path": "output/workshop_version_recovery_20261102/local_restored_v01.safe.json",
+      "sha256": "a004e40548b413fef58f523ceb255e15c62e6371379c7d59f815603ecc6b0cac",
+      "bytes": 904
+    },
+    "fresh_official_query": {
+      "result": 1,
+      "time_updated": 1793536475,
+      "total_files_bytes": 3788093063,
+      "cached": false,
+      "max_cache_age_seconds": 0
+    },
+    "steam_manifest": "7025356658517360342",
+    "acf_changed": false,
+    "publication_performed": false,
+    "official_download_performed": false,
+    "peer": {
+      "both_clients_exited_user_confirmed": true,
+      "0201_paths_unchanged_user_confirmed": true,
+      "restore_command_provided": true,
+      "restore_success_user_report": "PENDING",
+      "tool": "peer0201.ps1",
+      "action": "Restore",
+      "backup": "D:/steam/SurvivalPeerBackup_0201_run01",
+      "previous_backup_preserved": "D:/steam/SurvivalPeerBackup_1107_run02",
+      "subscription_folder_deleted": false,
+      "acf_edited": false
+    },
+    "actual_multiplayer_after_recovery_verified": false
+  },
+  "asset_isolation_boundary": {
+    "rule": "Raw VPK and LAB must reside outside game/content addon trees",
+    "historical_non_maps_raw_vpk_count_root_reported": 205,
+    "locations": "output/tmp including stash byte backups",
+    "new_raw_vpk_created_by_this_recovery": 0,
+    "ownership_fully_reviewed": false,
+    "automatic_moves_or_deletions_performed": false,
+    "established_as_version_mismatch_root_cause": false,
+    "player_backups_preserved": true
   }
 }

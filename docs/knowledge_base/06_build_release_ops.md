@@ -1,6 +1,8 @@
 # 06｜构建、签名、工坊分发与恢复
 
-**2026-11-02 当前：0203签包已就绪，run03未准入；正式远端仍0104。** signed8ae7…ec10／content9cfd…21d54，source d611＋ef、OPS11f25，五项／6917／184／20审查／2compiled。run01及run02已正常退出并恢复0104，后者日志0序列化但视觉受结算遮罩拒绝；当前owned27636已stage／before01，等用户网页登录，后续N1／四池／after／退出恢复／Submit／官方下载未完成。归档保留与原始INCOMPLETE/indexfalse不改。见[产物和接手](evidence/lottery_arcade_delivery_20261102.md)及[机器摘要](evidence/lottery_arcade_delivery_20261102.public.json)。
+**2026-11-02 当前：本机run03已完整恢复0104，客机恢复待反馈；0203不准入、不发布。** Root实际restore exit0／`ORIGINAL0104_FIVE_FILES_FULLY_RESTORED`，fresh-only官方result1／cachefalse／maxcache0／time_updated1793536475／3788093063字节与0104一致，ACF manifest `7025356658517360342`未改。客机须用0201专用Restore和原`SurvivalPeerBackup_0201_run01`，保留旧1107及0201备份，不删订阅目录、不改ACF；待真实成功反馈与联机核验。signed8ae7…ec10五项候选保留，未Submit／未官方下载；原始INCOMPLETE/indexfalse和所有失败轮次不改。另有205项历史非maps裸VPK在output／tmp待归属审阅隔离，本轮没有新造裸VPK，不自动移动用户字节备份，不据此断言版本失配根因。见[产物和接手](evidence/lottery_arcade_delivery_20261102.md)及[机器摘要](evidence/lottery_arcade_delivery_20261102.public.json)。
+
+人工候选覆盖期间，不能仅凭ACF或更新记录宣称联机版本一致；正式联机前须按真实五文件和已签manifest核对身份。owned测试结束、正常退出或明确不继续后，应立即通过canonical restore恢复正式包并留存回执；交接时若仍暂存，必须显式标记“本机测试包不可与正式游廊混联”。Git push、签名和stage均不等于已发布；此项流程修正不新增守护进程，也不改变冻结ops。
 
 **2026-11-02 本轮无发行上传**：用户选择沿用现有苟发育宣传图，fresh官方SDK／CDN字节核验一致，0封面上传、0游戏上传，正式0104未变。四档10／50／100／200普通map券已生产新增并独立核验，132总数、旧128不变；API／支付未重启，私有Excel已交付，不需新游戏包。见[本轮确认与登记证据](evidence/cover_ticket_codes_20261102.md)及[机器证据](evidence/cover_ticket_codes_20261102.public.json)。
 

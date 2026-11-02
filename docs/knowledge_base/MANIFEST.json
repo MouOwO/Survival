@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 19952,
-      "sha256": "12ab7d4f2a412fe16abd3dca2331d47a00f73f038a6e7478160e0a3f7b305145"
+      "bytes": 19990,
+      "sha256": "5583aaed8ec80c0a4e8dd15d1d72f8a1a76894522775995a26bd5293a28e461c"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -30,18 +30,18 @@
     },
     {
       "path": "05_payments_commerce_delivery.md",
-      "bytes": 17669,
-      "sha256": "719dd429f053a7409f6f6de2f4c0f00ca89fe92779798de7c4edb8ad175e4849"
+      "bytes": 17720,
+      "sha256": "1c8ed72528570fbd9f8632fae6fd64666e1a321e035ac7bd5a8fdb541945b8ea"
     },
     {
       "path": "06_build_release_ops.md",
-      "bytes": 23577,
-      "sha256": "f590a55981044c4ae4b13ced882ee5709d52d4ecd67eb41af1359ba756399437"
+      "bytes": 24363,
+      "sha256": "1850bbcb386df508c7deecc91a90a070dca8a7a62085b969fe37561dfea335e1"
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 34007,
-      "sha256": "a463f9e42895dbda331d5f3b8ed8f074b701ed125ebc23e60bd7dc26e3c99e65"
+      "bytes": 34050,
+      "sha256": "ef154cf62c9762604b0820cbe20f73e7d3651a82fb87b2f812c0bb61db682f7d"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 10200,
-      "sha256": "c1d54fd0c0d776742593b0fb43e804ab5fe4b028791a73cc028c9e46accedda0"
+      "bytes": 10252,
+      "sha256": "1bc8fbc8f08ef6b6ce6a2b63d1a1113b25ebf3e35edf95f454924a6a3f46cb70"
     },
     {
       "path": "data/completed_work_index.json",
@@ -270,13 +270,13 @@
     },
     {
       "path": "evidence/lottery_arcade_delivery_20261102.md",
-      "bytes": 6926,
-      "sha256": "20603bc48d7932dd1f93476ec346fc40cbc80629783f3413e0345b0b40bf2b75"
+      "bytes": 7623,
+      "sha256": "9e43958354510720974ded56c175ba07fc471003eaab3a2ff55e5a839c2be7e5"
     },
     {
       "path": "evidence/lottery_arcade_delivery_20261102.public.json",
-      "bytes": 23445,
-      "sha256": "c8bcce84f376e90f9c5aa82e467b689e7d17cc78c12ea70f0c68bf894dbdc304"
+      "bytes": 26156,
+      "sha256": "5a77a04b5038752c8056be8af47318786d8d884c254487a09e88a435d83bff29"
     },
     {
       "path": "evidence/lottery_training_feedback_20261102.md",
