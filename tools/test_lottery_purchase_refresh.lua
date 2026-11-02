@@ -488,4 +488,13 @@ test('stale profile or wrong config receipt still waits for authoritative endpoi
     end
 end)
 
+test('explicit redemption resync retires a pre-redemption HTTP read', function()
+    local h=harness();h.seed(0,20,0);h.changed(0);equal(#h.reads,2)
+    h.request(events.LOTTERY_CACHE_RESYNC_REQUEST,{player_id=0,pool_id='map'})
+    h.reply(2,{fixture(20,0)});equal(#h.reads,3,'Old request must not satisfy redemption invalidation')
+    equal(#h.packets,1,'No stale packet published')
+    h.reply(3,{fixture(70,0)});equal(h.get(0).snapshot.tickets,70)
+    equal(#h.commands,0,'Resync never replays redemption or grants rewards')
+end)
+
 print('LOTTERY_PURCHASE_REFRESH_PASS: ' .. passed .. ' regression cases; real event bus/delta; deferred authority; no network')

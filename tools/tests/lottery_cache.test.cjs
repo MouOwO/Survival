@@ -225,3 +225,34 @@ test("the generated local seed has a verified digest and is loaded before the ca
     const controller=fs.readFileSync("panorama/src/scripts/custom_game/lottery_ui_remaining_5d5c1152eb.js","utf8");
     assert(!controller.includes("ui_lottery_snapshot_request"));assert(!controller.includes("正在切换奖池"));assert(!controller.includes("正在读取"));
 });
+
+test("redeem success invalidates four pools and requests one authoritative refresh, never adds tickets",()=>{
+    const h=fixture();for(const id of ids)h.api.Ingest(h.dynamic(id,20));
+    const before=h.requests.length;
+    h.emit('survival_commerce_result',{action:'redeem',request_id:'redeem_fixture_1',ok:true,granted:999});
+    assert.equal(h.requests.length,before+1);assert.equal(h.requests.at(-1).name,'ui_lottery_cache_resync');
+    for(const id of ids){assert.equal(h.api.IsAuthoritative(id),false);assert.equal(h.api.Snapshot(id).selected_pool.tickets,20);}
+    for(const id of ids)h.api.Ingest(h.dynamic(id,id==='map'?70:20));
+    assert.equal(h.api.Snapshot('map').selected_pool.tickets,70);
+    for(const id of ids)assert(h.api.IsAuthoritative(id));
+});
+
+test("failed unrelated malformed duplicate and disposed redemption replies cannot issue refreshes",()=>{
+    const h=fixture(),packet={action:'redeem',request_id:'redeem_fixture_2',ok:true};
+    const before=h.requests.length;
+    for(const value of [{...packet,ok:false},{...packet,ok:'false'},{...packet,action:'purchase'},{...packet,request_id:''}])h.emit('survival_commerce_result',value);
+    assert.equal(h.requests.length,before);
+    h.emit('survival_commerce_result',packet);h.emit('survival_commerce_result',packet);
+    assert.equal(h.requests.length,before+1);h.api.Dispose();h.emit('survival_commerce_result',{...packet,request_id:'new_fixture'});
+    assert.equal(h.requests.length,before+1);
+});
+
+test("redemption supersedes a pending resync once and old timeout cannot duplicate its request",()=>{
+    const h=fixture(),refreshes=()=>h.requests.filter(r=>r.name==='ui_lottery_cache_resync').length;
+    h.emit('ui_lottery_catalog',{ok:1,unchanged:1,catalog_md5:h.api.Catalog().md5,config_hash:hash,catalog_sequence:1,session_id:'session1'});
+    h.api.Resync('map');const before=refreshes();
+    h.emit('survival_commerce_result',{action:'redeem',request_id:'redeem_fixture_3',ok:1});
+    assert.equal(refreshes(),before+1);
+    for(const id of ids)h.api.Ingest(h.dynamic(id,50));
+    h.advance(5);assert.equal(refreshes(),before+1);
+});

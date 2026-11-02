@@ -360,7 +360,9 @@ function M.init()
     end)
     bus.handle_request(events.LOTTERY_CACHE_RESYNC_REQUEST,function(p)
         full_required[p.player_id]=true
-        fetch(p.player_id,nil,false)
+        -- Explicit invalidation (including a completed redemption) must retire
+        -- an older in-flight read, not reuse its pre-redemption inventory.
+        fetch(p.player_id,nil,true)
         return {pending=true}
     end)
     bus.subscribe(events.PLAYER_PROFILE_CHANGED,function(p)
