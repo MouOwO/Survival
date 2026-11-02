@@ -1411,8 +1411,8 @@ local function register_return_home_request()
     end)
 end
 
--- Resource transactions keep stable error codes; every notification consumer
--- receives the readable cost failure, including native and batch upgrade paths.
+-- Resource/training services keep stable error codes; every notification
+-- consumer receives readable cost/capacity failures, including native paths.
 local resource_failure_messages = {
     wood_not_enough = "木材不足",
     gold_not_enough = "金币不足",
@@ -1422,6 +1422,24 @@ local resource_failure_messages = {
     not_enough_population = "人口不足",
     insufficient_wood = "木材不足",
     insufficient_gold = "金币不足",
+    insufficient_population = "人口不足",
+    population_limit = "人口不足",
+    population_limit_reached = "人口不足",
+    training_queue_full = "训练队列已满",
+    training_max_count_reached = "本级训练名额已满",
+    training_limit_reached = "训练名额已满",
+    training_reserved_limit = "剩余训练名额已在队列中",
+    training_not_available = "后续训练尚未开放",
+    training_owner_mismatch = "只能在自己的主城训练",
+    training_city_level_required = "主城等级不足，无法训练",
+    training_building_missing = "主城不可用，无法继续训练",
+    training_definition_invalid = "训练配置无效，请稍后重试",
+    training_type_invalid = "当前训练类型不可用",
+    training_cancelled = "训练已取消",
+    training_completion_failed = "训练未能完成，请稍后重试",
+    lumberjack_training_missing = "伐木工训练配置尚未就绪",
+    repairer_training_missing = "修理工训练配置尚未就绪",
+    worker_create_failed = "工人生成失败，请稍后重试",
 }
 
 local function on_notification(payload)

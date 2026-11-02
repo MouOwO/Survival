@@ -9,12 +9,29 @@ local runtime_builder = require("ui/ability_runtime_builder")
 -- The worker/shop systems own jobs, prices, limits and completion timers.
 local M = {}
 local research_cache, research_generation = {}, {}
-local function operation_error(code, fallback)
-    local messages = {wood_not_enough = "木材不足", insufficient_wood = "木材不足",
+local operation_error_messages = {wood_not_enough = "木材不足", insufficient_wood = "木材不足",
         gold_not_enough = "金币不足", insufficient_gold = "金币不足",
         population_not_enough = "人口不足", insufficient_population = "人口不足",
+        not_enough_population = "人口不足", population_limit = "人口不足",
+        population_limit_reached = "人口不足",
+        training_queue_full = "训练队列已满",
+        training_max_count_reached = "本级训练名额已满",
+        training_limit_reached = "训练名额已满",
+        training_reserved_limit = "剩余训练名额已在队列中",
+        training_not_available = "后续训练尚未开放",
+        training_owner_mismatch = "只能在自己的主城训练",
+        training_city_level_required = "主城等级不足，无法训练",
+        training_building_missing = "主城不可用，无法继续训练",
+        training_definition_invalid = "训练配置无效，请稍后重试",
+        training_type_invalid = "当前训练类型不可用",
+        training_cancelled = "训练已取消",
+        training_completion_failed = "训练未能完成，请稍后重试",
+        lumberjack_training_missing = "伐木工训练配置尚未就绪",
+        repairer_training_missing = "修理工训练配置尚未就绪",
+        worker_create_failed = "工人生成失败，请稍后重试",
         insufficient_resources = "资源不足", resource_error = "资源信息尚未就绪"}
-    return messages[code] or code or fallback
+local function operation_error(code, fallback)
+    return operation_error_messages[code] or code or fallback
 end
 local function invalidate_research(payload)
     local player=tonumber(payload and payload.player_id)

@@ -1,6 +1,12 @@
 package.path = "scripts/vscripts/?.lua;" .. package.path
 local listeners, sent, pushes = {}, {}, {}
 local admitted, defeated = { [0] = true, [1] = true }, {}
+-- Presentation fixtures supply two admitted actors; production Steam admission
+-- is tested independently and must not be changed to exercise error messages.
+package.loaded["core/test_access_policy"] = {
+    enabled = function() return true end,
+    enforce = function(id) return admitted[id] == true end,
+}
 local handles = { [0] = {}, [1] = {} }
 PlayerResource = {
     IsValidPlayerID = function(_, id) return handles[id] ~= nil end,
@@ -266,6 +272,39 @@ assert(#diagnostic_lines==2 and diagnostic_lines[1]:find("request_id=tools%-view
     "tools diagnostics correlate the incoming research intent with its result")
 IsInToolsMode,print=original_tools_mode,original_print
 print("RESEARCH_RESPONSE_IDENTITY_PASS: trusted player/source, independent request correlation and stable error codes")
+-- Native ability/internal-service notifications bypass the production click
+-- response, but must share its Chinese capacity feedback without new training.
+local before_capacity_requests=#requests
+local training_failure_cases={{"wood_not_enough","木材不足"},{"gold_not_enough","金币不足"},
+    {"population_not_enough","人口不足"},{"not_enough_population","人口不足"},
+    {"training_queue_full","训练队列已满"},
+    {"training_max_count_reached","本级训练名额已满"},
+    {"training_limit_reached","训练名额已满"},
+    {"training_reserved_limit","剩余训练名额已在队列中"},
+    {"population_limit","人口不足"},{"population_limit_reached","人口不足"},
+    {"insufficient_population","人口不足"},
+    {"training_not_available","后续训练尚未开放"},
+    {"training_owner_mismatch","只能在自己的主城训练"},
+    {"training_city_level_required","主城等级不足，无法训练"},
+    {"training_building_missing","主城不可用，无法继续训练"},
+    {"training_definition_invalid","训练配置无效，请稍后重试"},
+    {"training_type_invalid","当前训练类型不可用"},
+    {"training_cancelled","训练已取消"},
+    {"training_completion_failed","训练未能完成，请稍后重试"},
+    {"lumberjack_training_missing","伐木工训练配置尚未就绪"},
+    {"repairer_training_missing","修理工训练配置尚未就绪"},
+    {"worker_create_failed","工人生成失败，请稍后重试"},
+    {"主城周围没有可通行的空地，无法训练工人，请先腾出空间","主城周围没有可通行的空地，无法训练工人，请先腾出空间"},
+    {"unrelated_error_code","unrelated_error_code"}}
+for _,case in ipairs(training_failure_cases) do
+    bus.emit(events.UI_NOTIFICATION,{player_id=1,message=case[1],level="error"})
+    local notice=sent[#sent]
+    assert(notice.name=="ui_notification" and notice.player==handles[1]
+        and notice.payload.message==case[2] and notice.payload.level=="error",
+        "native/internal training capacity notifications must remain private and Chinese")
+end
+assert(#requests==before_capacity_requests,"localizing a tip must not enqueue or charge a training request")
+print("TRAINING_CAPACITY_NOTIFICATION_PASS: Chinese queue/quota/population/spawn failure display, original domain codes and recipient preserved")
 -- Refresh only the affected player's currently selected building. The timing
 -- fields are stable server timestamps, so the UI animates without polling.
 bus.reset()
@@ -327,8 +366,7 @@ bus.handle_request(events.TECHNOLOGY_PURCHASE_NEXT_REQUEST, function()
     return {ok=false,error=forced_research_error,error_code=forced_research_code}
 end)
 bus.subscribe(events.UI_NOTIFICATION, function(payload) resource_notices[#resource_notices + 1] = payload end)
-for _, case in ipairs({{"wood_not_enough", "木材不足"}, {"gold_not_enough", "金币不足"},
-    {"population_not_enough", "人口不足"}}) do
+for _, case in ipairs(training_failure_cases) do
     forced_worker_error=case[1]
     train(0,200)
     local response=sent[#sent]
@@ -339,6 +377,7 @@ for _, case in ipairs({{"wood_not_enough", "木材不足"}, {"gold_not_enough", 
     assert(response.payload.error==case[2] and resource_notices[#resource_notices].message==case[2],
         "rejected training must expose a specific Chinese resource error: "
             .. tostring(response.payload.error) .. "/" .. tostring(resource_notices[#resource_notices].message))
+    assert(forced_worker_error==case[1],"presentation must not alter the worker service's stable failure code")
 end
 for _, case in ipairs({{"insufficient_wood", "木材不足"}, {"insufficient_gold", "金币不足"}}) do
     forced_research_error=case[1]

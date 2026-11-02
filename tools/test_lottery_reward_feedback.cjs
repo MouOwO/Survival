@@ -18,7 +18,7 @@ config.SurvivalUI.RewardFX={Create(host,options){
  const instance={cleared:0,disposed:false,Play(event){assert(!this.disposed);effects.push(event);},Clear(){this.cleared++;},Dispose(){this.disposed=true;}};
  owners.push(instance);return instance;
 }};
-['reference_windows','ui_snapshot_cache','lottery_scene_transition','lottery_handoff_bb9968eef7','remaining_5d5c1152eb','lottery_cinematic_v1','lottery_ui_remaining_5d5c1152eb'].forEach(function(file){vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+file+'.js','utf8'),env);});
+['reference_windows','ui_snapshot_cache','common/lottery_cache','lottery_scene_transition','lottery_handoff_bb9968eef7','remaining_5d5c1152eb','lottery_cinematic_v1','lottery_ui_remaining_5d5c1152eb'].forEach(function(file){vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+file+'.js','utf8'),env);});
 `);
 suite += `
 root.actuallayoutwidth=1920;root.actuallayoutheight=1080;root.actualuiscale_x=1;root.actualuiscale_y=1;
@@ -57,7 +57,17 @@ ui.Open();const reset=begin();answer(reset);ui.CloseResult();advance(10);assert.
 const mismatch=begin();answer({...mismatch,request_id:'unrelated'});assert.equal(effects.length,5);answer(mismatch);ui.SkipReveal();assert.equal(effects.length,6,'An unrelated result cannot consume the matching request receipt');
 
 const draws=requests.filter(row=>row.n==='ui_lottery_draw_request');
-assert(draws.every(row=>Object.keys(row.p).sort().join(',')==='count,pool_id,request_id'),'Feedback never changes purchase payloads');
+assert(draws.every(row=>Object.keys(row.p).sort().join(',')==='count,expected_config_hash,pool_id,request_id'),'Feedback preserves the current catalogue-bound purchase payload');
+const beforeFallback=effects.length,drawsBeforeFallback=draws.length;
+const asyncFailure=begin();answer(asyncFailure);
+nodes.LotteryCinematicMovie.AddClass('MovieError');advance(.2);
+assert(nodes.LotteryCinematicFallback.BHasClass('LCFallbackActive'),'Native error must enter the themed CSS presentation');
+assert.equal(effects.length,beforeFallback,'Error fallback must animate before feedback');
+advance(3.7);advance(2);
+assert.equal(effects.length,beforeFallback+1,'Already-ACKed results celebrate exactly once after fallback');
+answer(asyncFailure);ui.SkipCinematic();advance(10);
+assert.equal(effects.length,beforeFallback+1,'Duplicate ACK or late skip cannot celebrate twice');
+assert.equal(requests.filter(row=>row.n==='ui_lottery_draw_request').length,drawsBeforeFallback+1,'Fallback cannot issue another draw');
 const beforeDispose=effects.length;ui.Dispose();advance(10);ui.SkipReveal();ui.Open();assert.equal(effects.length,beforeDispose);assert(owners.at(-1).disposed);
 console.log('LOTTERY_REWARD_FEEDBACK_PASS: real film and flips, normal/single/ten/skip paths, failed/duplicate/unrelated/hidden responses, reset, cleanup and unchanged purchase payloads');
 `;

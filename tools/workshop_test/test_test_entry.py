@@ -1,8 +1,11 @@
 """Entry boundaries: never start a cloud helper offline or replace a live game."""
 import importlib.util
 import hashlib
+import io
 import json
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
+import stat
 import tempfile
 from types import SimpleNamespace
 import unittest
@@ -14,6 +17,70 @@ spec.loader.exec_module(entry)
 
 
 class TestEntryBoundaryTest(unittest.TestCase):
+    def test_absent_labs_use_only_bounded_metadata_without_scanning(self):
+        with tempfile.TemporaryDirectory() as directory, patch.object(entry, "ROOT", Path(directory)), \
+                patch.object(entry.os, "scandir", side_effect=AssertionError("No absent-root traversal")), \
+                patch.object(Path, "lstat", autospec=True, side_effect=FileNotFoundError) as metadata:
+            entry.guard_addon_vpk_labs()
+        self.assertLessEqual(metadata.call_count, 9)
+
+    def test_receipts_only_lab_passes_without_reading_files(self):
+        with tempfile.TemporaryDirectory() as directory, patch.object(entry, "ROOT", Path(directory)):
+            lab = entry.ROOT / entry.ADDON_VPK_LAB_ROOTS[0]
+            (lab / "run01").mkdir(parents=True)
+            (lab / "run01/receipt.json").write_text("not a VPK", encoding="utf8")
+            with patch.object(Path, "read_bytes", side_effect=AssertionError("No file-content read")), \
+                    patch.object(Path, "read_text", side_effect=AssertionError("No file-content read")):
+                entry.guard_addon_vpk_labs()
+
+    def test_each_known_lab_rejects_bare_data_volume_before_any_launch(self):
+        for relative in entry.ADDON_VPK_LAB_ROOTS:
+            with self.subTest(relative=relative), tempfile.TemporaryDirectory() as directory, \
+                    patch.object(entry, "ROOT", Path(directory)), \
+                    patch.object(entry, "process_inventory", side_effect=AssertionError("No native query")), \
+                    patch.object(entry.subprocess, "Popen", side_effect=AssertionError("No client launch")), \
+                    patch.object(entry, "ensure_relay", side_effect=AssertionError("No cloud")):
+                lab = entry.ROOT / relative / "run01/570/3824360109"
+                lab.mkdir(parents=True)
+                (lab / "3824360109_000.vpk").write_bytes(b"synthetic data volume, not a directory index")
+                for check_only in (True, False):
+                    with self.subTest(check_only=check_only), self.assertRaisesRegex(RuntimeError, "addon_lab_vpk_detected"):
+                        entry.run("offline", check_only=check_only)
+                self.assertTrue((lab / "3824360109_000.vpk").exists(), "Guard must never remove or move a VPK")
+
+    def test_actual_map_package_and_unrelated_backup_are_never_scanned(self):
+        with tempfile.TemporaryDirectory() as directory, patch.object(entry, "ROOT", Path(directory)):
+            for relative in ("maps/template_map.vpk", "real_backup/original/3824360109_000.vpk"):
+                path = entry.ROOT / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(b"must not inspect or modify this real-path fixture")
+            with patch.object(entry.os, "scandir", side_effect=AssertionError("Do not traverse real map/backup")):
+                entry.guard_addon_vpk_labs()
+
+    def test_reparse_lab_parent_refuses_without_following_into_real_packages(self):
+        fake = SimpleNamespace(st_mode=stat.S_IFDIR, st_file_attributes=0x400)
+        with patch.object(Path, "lstat", return_value=fake), \
+                patch.object(entry.os, "scandir", side_effect=AssertionError("Never follow junction")):
+            with self.assertRaisesRegex(RuntimeError, "addon_lab_path_unsafe"):
+                entry.guard_addon_vpk_labs()
+
+    def test_guard_errors_have_stable_code_and_chinese_explanation(self):
+        with patch.object(entry.sys, "argv", ["test_entry.py", "offline", "--check"]), \
+                patch.object(entry, "run", side_effect=RuntimeError("addon_lab_vpk_detected")), \
+                redirect_stdout(io.StringIO()) as output, redirect_stderr(io.StringIO()) as errors:
+            self.assertEqual(entry.main(), 1)
+        result = json.loads(output.getvalue())
+        self.assertEqual(result["error"], "addon_lab_vpk_detected")
+        self.assertIn("插件目录之外", result["message"])
+        self.assertIn("本工具不会自动移动或删除文件", errors.getvalue())
+
+    def test_online_check_does_not_traverse_offline_lab_namespace(self):
+        with patch.object(entry, "guard_addon_vpk_labs", side_effect=AssertionError("Offline guard only")), \
+                patch.object(Path, "is_file", return_value=True), \
+                patch.object(Path, "read_bytes", return_value=b"enabled = true"), \
+                patch.object(entry, "check_online_policy"):
+            self.assertEqual(entry.check("online")["status"], "ENTRY_CHECKED")
+
     def test_regular_launch_arguments_keep_their_mode_and_port(self):
         args = entry.launch_arguments("offline", Path("normal.log"))
         self.assertEqual(args[args.index("+survival_offline_logic_test") + 1], "1")

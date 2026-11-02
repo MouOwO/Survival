@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 18163,
-      "sha256": "04ee1d7ef38251cd0bc9891d88c76f575369253fa6f73d39f3192939f4713cac"
+      "bytes": 18819,
+      "sha256": "dec1d7b54ddf3df5e011139adf1495838acc44abc7843d3e96bbb0a9898689b1"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 32225,
-      "sha256": "7f89c9e2528ae6fb56423d5afca94667033c103aece7c629f9d17252ef3a86d7"
+      "bytes": 32801,
+      "sha256": "3dad307f0eb92d985df59efe6eb87503794569d4c6d8e481c303833a4be7934c"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -70,18 +70,8 @@
     },
     {
       "path": "13_art_ui_qa.md",
-      "bytes": 11513,
-      "sha256": "33d9bced2b007d3af967cd73baacb12e67bab5b0aa09362e1c79a69d4cf4d48e"
-    },
-    {
-      "path": "NEW_CHAT_PROMPT.txt",
-      "bytes": 829,
-      "sha256": "59e6930906e62202d56d95ce3dd7390a7a90a6133c6ac204da10fd62f4fee10d"
-    },
-    {
-      "path": "README.md",
-      "bytes": 8904,
-      "sha256": "df1877de4d222d845c751197dc349eb9afcb9a9fa3b5bb760406873294f37922"
+      "bytes": 11865,
+      "sha256": "613a00e1a83302042f3f1d23f8b4653b59937cee9616a214485db2ecfebab896"
     },
     {
       "path": "data/completed_work_index.json",
@@ -257,6 +247,16 @@
       "path": "evidence/login_relay_recovery_20261031.public.json",
       "bytes": 1390,
       "sha256": "09992013b028dc99dc21167cbc73c9d8b0a4ab45333883e5f2c27d27fcd03505"
+    },
+    {
+      "path": "evidence/lottery_training_feedback_20261102.md",
+      "bytes": 8203,
+      "sha256": "ac0147b1bbef8f788570d8bcfd2a7da5bbfe61ee460f2c62475872a253acc0a5"
+    },
+    {
+      "path": "evidence/lottery_training_feedback_20261102.public.json",
+      "bytes": 26365,
+      "sha256": "e24f1f64710576f8ac6f769d98d67ebcd4df86d5a830216a5629c65675c1a41f"
     },
     {
       "path": "evidence/map_minimap_sync_20261030.md",
@@ -504,11 +504,6 @@
       "sha256": "3e9d78ecd41b1e4aaa4335fc0c33fdca621d5e94a98a4d082af5d299d00a2380"
     },
     {
-      "path": "history/20261024/README.md",
-      "bytes": 3523,
-      "sha256": "8fb412555efbff16e4191ae220fb68c521283ef11131c5d4a5c8ad6f8820868b"
-    },
-    {
       "path": "history/20261024/data/commerce_facts.json",
       "bytes": 10585,
       "sha256": "6105f8496427aab2540ee0572bd1e084247114c6b36dc50cec305269c0bf864e"
@@ -549,9 +544,24 @@
       "sha256": "40bd838081c9322b471aa29977d19958932c9cbb87c14d7b54728f9883a86817"
     },
     {
+      "path": "history/20261024/README.md",
+      "bytes": 3523,
+      "sha256": "8fb412555efbff16e4191ae220fb68c521283ef11131c5d4a5c8ad6f8820868b"
+    },
+    {
       "path": "history/README.md",
       "bytes": 449,
       "sha256": "5ebf48f3b52e07d03945ecfb8e7c2883c1905c48a7ed6fb544604525da474bec"
+    },
+    {
+      "path": "NEW_CHAT_PROMPT.txt",
+      "bytes": 829,
+      "sha256": "59e6930906e62202d56d95ce3dd7390a7a90a6133c6ac204da10fd62f4fee10d"
+    },
+    {
+      "path": "README.md",
+      "bytes": 9306,
+      "sha256": "3406a8d31b883064f936e4595f5e763dfe244cf39f71e5bd464caf09aea1d1f7"
     },
     {
       "path": "tools/verify_knowledge.py",

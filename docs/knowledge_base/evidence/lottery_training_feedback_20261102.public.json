@@ -1,0 +1,588 @@
+{
+  "schema": 1,
+  "status": "DEVELOPMENT_FIXES_COMPILED_NATIVE_FOUR_POOLS_VIDEO_FALLBACK_SKIP_CLOSE_VERIFIED_NEW_RELEASE_PENDING",
+  "date_local": "2026-11-02",
+  "paired_note": "docs/knowledge_base/evidence/lottery_training_feedback_20261102.md",
+  "privacy": {
+    "credentials_or_account_records_included": false,
+    "raw_auth_or_session_logs_included": false
+  },
+  "release_boundary": {
+    "official_release_sequence": 2026110104,
+    "official_steam_manifest": "7025356658517360342",
+    "candidate0201": {
+      "release_sequence": 2026110201,
+      "game_source_revision": "037a4df3d97ffcd106c7ac116849e92ff4d7fc34",
+      "content_source_revision": "faea2c11c1425b7c80320476e551d7ea4a9a7cff",
+      "signed_report_sha256": "a56042e7c4706e6e7b49e29fc696c16998f6956a4d0c910e4d22106a7a1a0736",
+      "runtime_paths": 17,
+      "signed_resources": 6919,
+      "protected_modules": 184,
+      "signed": true,
+      "published": false,
+      "user_confirmed_other_resolution_portraits_correct": true,
+      "specific_resolutions_enumerated_by_user": false,
+      "manual_two_pc_shared_boss_kill_respawn_rewards": "PENDING_USER_RESULT",
+      "user_confirmation_is_full_native_gate_pass": false
+    },
+    "new_training_and_lottery_ui": {
+      "part_of_frozen0201_payload": false,
+      "signed": false,
+      "published": false,
+      "new_normal_arcade_playback_verified": false,
+      "new_normal_arcade_fps_measured": false,
+      "new_fps_claimed": false
+    },
+    "restore": {
+      "status": "ORIGINAL0104_FIVE_FILES_FULLY_RESTORED",
+      "root_observed_command_exit_code": 0,
+      "observed_utc": "2026-11-01T23:42:52.123765+00:00",
+      "original_content_sha256": "6ffc0816d040ffe4a4d7a3db472c74dc18b96fad36f5f204cba5b0879ab5489f",
+      "publication_performed": false,
+      "acf_written": false,
+      "canonical_journal_written": false,
+      "official_download_performed": false,
+      "backups_preserved": true,
+      "earlier_no_client_precondition_refusal_counted_as_restore_success": false,
+      "receipt": {
+        "path": "D:/Survival_本地排演/20261102_ws4_shared_boss_portrait_v08/run01_resolution_two_pc/restored.json",
+        "sha256": "45a45533400838f1a13dcc40a3ac6af3ee75892a180d9025083479ba2821e0b1"
+      }
+    }
+  },
+  "lottery_presentation": {
+    "reported_pool": "summer",
+    "reported_visible_error": "播放时发生错误",
+    "original_native_video_failure_root_cause": "NOT_PROVEN",
+    "root_package_readonly_review": {
+      "four_webm_and_js_css_match_signed0201_manifest": true,
+      "four_videos_equal_official0104_resources": true,
+      "valid_webm_vp9_vorbis_header_is_decoder_success_proof": false,
+      "missing_video_packaging_proven": false,
+      "provenance": "Root package review recorded in paired note; no raw authentication logs included"
+    },
+    "fix": {
+      "normal_path": "Play the existing pool video first",
+      "async_error_signal": "Valve native MovieError class on the retained current Movie panel",
+      "fallback": "Same-pool existing texture with native CSS transform/opacity presentation",
+      "uses_already_confirmed_draw_results": true,
+      "additional_draw_reward_or_balance_requests": 0,
+      "generation_fences_for_close_skip_replace_old_callbacks": true,
+      "completion_at_most_once": true,
+      "new_art_or_video_reencoding": false,
+      "original_video_playback_fixed_claimed": false
+    },
+    "official_compile": {
+      "receipt": {
+        "path": "output/lottery_movie_diagnostic_20261102/failfast_compile_v01/compile.json",
+        "sha256": "6556930c12b25327dc13b3b49ae53701a2ddda5ef4bb3bcdb0bab9c7d37fe59e"
+      },
+      "game_content_sources_mirrored": true,
+      "js": {
+        "source": "panorama/src/scripts/custom_game/lottery_cinematic_v1.js",
+        "git_lf_sha256": "c02cc5c57f2783845ff3617e87e9084ea6ec4e4fcb6fe29149cbd493b3af89bc",
+        "compiler_input_raw_crlf_sha256": "d1da774dc7ecc417e0baf8dc15472d2c9fb16b0d0710d46feb6784f6fbf0f527",
+        "compiled": "panorama/scripts/custom_game/lottery_cinematic_v1.vjs_c",
+        "compiled_sha256": "33beed45dfebf9c052842cd99822e4b48874fa16ca8c2cd29b5fe3f1e06e80b7",
+        "compiled_bytes": 10296,
+        "compiler_exit_code": 0
+      },
+      "css": {
+        "source": "panorama/src/styles/custom_game/lottery_cinematic_v1.css",
+        "git_lf_sha256": "75f0597e8cd6a97f356633a06b3e71e46d8ac5ea858000564c5afe8fa9f48c57",
+        "compiler_input_raw_crlf_sha256": "b9cb926cf5a9f951e27cdf98a0485745aafc459e78d6e374c9e9ee69ebac8a35",
+        "compiled": "panorama/styles/custom_game/lottery_cinematic_v1.vcss_c",
+        "compiled_sha256": "691c18f7f061ea6c04d56a1984d6ebe39043c1cf05e01402a826ce8611b50024",
+        "compiled_bytes": 7823,
+        "compiler_exit_code": 0
+      }
+    },
+    "cost_and_domain_tests": {
+      "scope": "Production functions, native-CSS declarations and mock call counts; not native duration or FPS",
+      "video_class_reads_max_per_presentation": 70,
+      "class_read_interval_seconds": 0.1,
+      "peak_active_timers": 2,
+      "fallback_nodes_first_use": 5,
+      "retained_current_theme_textures": 1,
+      "same_theme_texture_rewrite": false,
+      "fallback_css_mode_js_frame_pumps": 0,
+      "outside_presentation_polling": false,
+      "hud_or_scene_collection_traversal": false,
+      "initialization": "O(1) fixed panels; fallback five nodes created lazily once",
+      "stable": "O(1) retained Movie class check, at most70 checks; CSS animation needs no JS frame loop",
+      "state_change": "O(1) fixed node/timer cleanup and generation invalidation; no reward/network request",
+      "new_module_cases_passed": 7,
+      "existing_reward_feedback_ten_layout_updates_passed": true,
+      "test_receipt": {
+        "path": "output/lottery_movie_diagnostic_20261102/failfast_compile_v01/test_results_v02.json",
+        "sha256": "772d661e471de9ed30e34a9c1ce1494c53f64be89f53f50c43439895d7c02083"
+      },
+      "video_poll_validity_reads_max": 70,
+      "video_poll_class_and_validity_reads_max": 140,
+      "video_poll_schedules_max": 70,
+      "watchdog_schedules": 1,
+      "video_poll_native_api_calls_per_healthy_tick": "1 IsValid +1 BHasClass, plus1 Schedule except final tick; fixed setup and cleanup separately bounded",
+      "new_reward_or_network_requests": 0
+    },
+    "native_observation": {
+      "status": "TOOLS_OFFLINE_LOOSE_RESOURCES_NATIVE_VISUAL_CASES_PASSED",
+      "process": {
+        "pid": 14292,
+        "created_utc": "2026-11-02T00:01:20.1914110Z",
+        "tools": true,
+        "survival_offline_logic_test": 1,
+        "survival_archive_http_enabled": 0,
+        "viewport_width": 1600,
+        "viewport_height": 900,
+        "paused_session": true
+      },
+      "scope": "Actual native Tools offline previews using loose development resources; not a signed new UI package or normal Arcade validation",
+      "evidence_frames": [
+        {
+          "relative_path": "design_refs/menus_v10/work/native/lottery_fix_map_native_early_20261102_v02.png",
+          "sha256": "aea0db1f382e5f306c5c33643ac7520cf0fbf29ebad92bb1b2e02ed82aded434",
+          "bytes": 3676075,
+          "png_width": 1600,
+          "png_height": 900,
+          "scenario": "native_theme",
+          "pool": "map",
+          "phase": "early"
+        },
+        {
+          "relative_path": "design_refs/menus_v10/work/native/lottery_fix_map_native_late_20261102_v02.png",
+          "sha256": "6fe709ce70a1383d2c0579179722f4bf55460c7e8f473bc1a04c15bbe72cf81b",
+          "bytes": 4096863,
+          "png_width": 1600,
+          "png_height": 900,
+          "scenario": "native_theme",
+          "pool": "map",
+          "phase": "late"
+        },
+        {
+          "relative_path": "design_refs/menus_v10/work/native/lottery_fix_map_native_end_20261102_v02.png",
+          "sha256": "9047766abb3ed2c98a7987ed11d7f8eda56a2cfbc13c081bb76b0ca40fbf028b",
+          "bytes": 2658989,
+          "png_width": 1600,
+          "png_height": 900,
+          "scenario": "native_theme",
+          "pool": "map",
+          "phase": "end"
+        },
+        {
+          "relative_path": "design_refs/menus_v10/work/native/lottery_fix_cultivation_native_early_20261102_v02.png",
+          "sha256": "4781a0b8d61d0898dcb3bfb80bf80cccc0835f8b90ddc9813e42f3450958c452",
+          "bytes": 2903860,
+          "png_width": 1600,
+          "png_height": 900,
+          "scenario": "native_theme",
+          "pool": "cultivation",
+          "phase": "early"
+        },
+        {
+          "relative_path": "design_refs/menus_v10/work/native/lottery_fix_cultivation_native_late_20261102_v02.png",
+          "sha256": "45a5a6923cf549de1b33bb04e749d7f228eebdabc344606e93625251c6002c3f",
+          "bytes": 3562138,
+          "png_width": 1600,
+          "png_height": 900,
+          "scenario": "native_theme",
+          "pool": "cultivation",
+          "phase": "late"
+        },
+        {
+          "relative_path": "design_refs/menus_v10/work/native/lottery_fix_cultivation_native_end_20261102_v02.png",
+          "sha256": "673db0bb570aee54bd75998659f7c45c8ded666f52e3460b0384b42089dfc1bc",
+          "bytes": 2659668,
+          "png_width": 1600,
+          "png_height": 900,
+          "scenario": "native_theme",
+          "pool": "cultivation",
+          "phase": "end"
+        },
+        {
+          "relative_path": "design_refs/menus_v10/work/native/lottery_fix_dragon_knight_native_early_20261102_v02.png",
+          "sha256": "fbd034c65dacaa01616f7be6a851e7452f012b8de94f89df314ce04b44b70337",
+          "bytes": 2599527,
+          "png_width": 1600,
+          "png_height": 900,
+          "scenario": "native_theme",
+          "pool": "dragon_knight",
+          "phase": "early"
+        },
+        {
+          "relative_path": "design_refs/menus_v10/work/native/lottery_fix_dragon_knight_native_late_20261102_v02.png",
+          "sha256": "c20194770805ddb343017f1a62a897a45591fd7148231e1f655aac2440dcb571",
+          "bytes": 3468656,
+          "png_width": 1600,
+          "png_height": 900,
+          "scenario": "native_theme",
+          "pool": "dragon_knight",
+          "phase": "late"
+        },
+        {
+          "relative_path": "design_refs/menus_v10/work/native/lottery_fix_dragon_knight_native_end_20261102_v02.png",
+          "sha256": "acdaa493b4c014f604b1b0c6b32bd2c759335ff3f78a2974c47815d10383d0e9",
+          "bytes": 2658085,
+          "png_width": 1600,
+          "png_height": 900,
+          "scenario": "native_theme",
+          "pool": "dragon_knight",
+          "phase": "end"
+        },
+        {
+          "relative_path": "design_refs/menus_v10/work/native/lottery_fix_summer_native_early_20261102_v02.png",
+          "sha256": "ea00ebfe2f8143a193c6eac2fa9f2eb4cff481d13a0e14c06bfcdd078090b2fb",
+          "bytes": 2613915,
+          "png_width": 1600,
+          "png_height": 900,
+          "scenario": "native_theme",
+          "pool": "summer",
+          "phase": "early"
+        },
+        {
+          "relative_path": "design_refs/menus_v10/work/native/lottery_fix_summer_native_late_20261102_v02.png",
+          "sha256": "d59c9e56fd9caf923bfd3896ccfdfe2b75d454c314e3ddbf4f5257fa9373484b",
+          "bytes": 3668532,
+          "png_width": 1600,
+          "png_height": 900,
+          "scenario": "native_theme",
+          "pool": "summer",
+          "phase": "late"
+        },
+        {
+          "relative_path": "design_refs/menus_v10/work/native/lottery_fix_summer_native_end_20261102_v02.png",
+          "sha256": "0d1181ff7db27451681fd6747644934cbbd536ddcba4bb3187018b973acbb2ae",
+          "bytes": 2659736,
+          "png_width": 1600,
+          "png_height": 900,
+          "scenario": "native_theme",
+          "pool": "summer",
+          "phase": "end"
+        },
+        {
+          "relative_path": "design_refs/menus_v10/work/native/lottery_fix_summer_video_early_20261102_v02.png",
+          "sha256": "78dea7980b5f0128c3e8f86c212d1598156a2298e82fee7bbf33cb0f6ca81e0a",
+          "bytes": 3554336,
+          "png_width": 1600,
+          "png_height": 900,
+          "scenario": "summer_video",
+          "pool": "summer",
+          "phase": "early"
+        },
+        {
+          "relative_path": "design_refs/menus_v10/work/native/lottery_fix_summer_video_late_20261102_v02.png",
+          "sha256": "8bd01b8681fee6917afab25359bf5823f26aa7b6b50d96e636c3973934856789",
+          "bytes": 3599571,
+          "png_width": 1600,
+          "png_height": 900,
+          "scenario": "summer_video",
+          "pool": "summer",
+          "phase": "late"
+        },
+        {
+          "relative_path": "design_refs/menus_v10/work/native/lottery_fix_summer_video_end_20261102_v02.png",
+          "sha256": "f9cae0844417a01ee868aa6320a2021c859ecf09760cb05d645372d2c703e2f8",
+          "bytes": 2659040,
+          "png_width": 1600,
+          "png_height": 900,
+          "scenario": "summer_video",
+          "pool": "summer",
+          "phase": "end"
+        },
+        {
+          "relative_path": "design_refs/menus_v10/work/native/lottery_fix_missing_map_early_20261102_v02.png",
+          "sha256": "8ff7288a715b9f98a750c9d060102d812fc8bb581f9adb15c65cca07c440fbe0",
+          "bytes": 2438240,
+          "png_width": 1600,
+          "png_height": 900,
+          "scenario": "missing_map",
+          "pool": "map",
+          "phase": "early"
+        },
+        {
+          "relative_path": "design_refs/menus_v10/work/native/lottery_fix_missing_map_late_20261102_v02.png",
+          "sha256": "edef559e95d237d9ad11f1adc9456551bd62b85e3d11a20c6cfdb16ec300d431",
+          "bytes": 3584377,
+          "png_width": 1600,
+          "png_height": 900,
+          "scenario": "missing_map",
+          "pool": "map",
+          "phase": "late"
+        },
+        {
+          "relative_path": "design_refs/menus_v10/work/native/lottery_fix_missing_map_end_20261102_v02.png",
+          "sha256": "9d8d361a61ef68d26ce94cafd8db228c8bc6796fe3f776addd8a63788c9a03db",
+          "bytes": 2661884,
+          "png_width": 1600,
+          "png_height": 900,
+          "scenario": "missing_map",
+          "pool": "map",
+          "phase": "end"
+        },
+        {
+          "relative_path": "design_refs/menus_v10/work/native/lottery_fix_skip_20261102_v02.png",
+          "sha256": "c57206dbdaadebe646d7f02818f68874c28a075539aa5b0c70f95fb97a463230",
+          "bytes": 2624427,
+          "png_width": 1600,
+          "png_height": 900,
+          "scenario": "skip",
+          "pool": null,
+          "phase": "after_skip"
+        },
+        {
+          "relative_path": "design_refs/menus_v10/work/native/lottery_fix_closed_20261102_v02.png",
+          "sha256": "cdfaf5657b8e520b2f4f57ca810b8a8aaac3d246aa4fbd3c8c5a427784ae14cc",
+          "bytes": 2761169,
+          "png_width": 1600,
+          "png_height": 900,
+          "scenario": "close",
+          "pool": null,
+          "phase": "after_close"
+        }
+      ],
+      "evidence_frame_count": 20,
+      "first_pid32636_postgame_frames_included": false,
+      "four_pool_native_themes": {
+        "pools": [
+          "map",
+          "cultivation",
+          "dragon_knight",
+          "summer"
+        ],
+        "phases_per_pool": [
+          "early",
+          "late",
+          "end"
+        ],
+        "frame_count": 12,
+        "actual_theme_animation_and_return_to_lottery_window_verified": true,
+        "ticket_count_visible_after_end": 0,
+        "visual_review": "Root reviewed summer; portrait agent reviewed remaining9 frames"
+      },
+      "ordinary_summer_video": {
+        "status": "ACTUAL_NATIVE_VIDEO_MOTION_AND_CLEAN_END_VERIFIED_IN_LOOSE_TOOLS",
+        "frame_count": 3,
+        "root_visual_reviewed": true,
+        "observation": "Golden-gate film changed between early and late frames, ended back at lottery without visible video error",
+        "normal_arcade_video_decode_verified": false
+      },
+      "forced_missing_map_fallback": {
+        "status": "ACTUAL_NATIVE_MOVIEERROR_TO_THEME_BRANCH_VERIFIED",
+        "method": "Root temporarily renamed both game/content map.webm after cache-free setup, then invoked normal map Preview; finally restored both original files",
+        "frame_count": 3,
+        "root_visual_reviewed": true,
+        "actual_theme_animation_and_return_verified": true,
+        "native_log": {
+          "path": "output/test_entry_runtime/offline_20261102_000120_191104.log",
+          "safe_exact_marker": "[LOTTERY_CINEMATIC] native playback failed; using themed presentation",
+          "matching_line_numbers": [
+            1886
+          ],
+          "times_present_in_matching_lines": [
+            "08:19:49"
+          ],
+          "root_observed_local_time": "08:19:49",
+          "raw_log_copied_to_public_evidence": false
+        },
+        "restore_receipt": {
+          "path": "output/lottery_arcade_fix_20261102/missing_video_probe_restored_v01.safe.json",
+          "sha256": "2f579e221171a29385bcbd462e5175d01909ae29754c48f2a9288e1c7669d64a",
+          "status": "PAIRED_VIDEO_PROBE_ASSETS_RESTORED_IDENTICALLY",
+          "observed_utc": "2026-11-02T00:19:54.1868794Z",
+          "both_asset_sha256": "454d7aa49fbc041bc34245cbac8c564de940c65fa397f1dd5da584de19cd7962",
+          "both_paths_restored_identically": true,
+          "cloud": false,
+          "reward_operations": 0,
+          "script_injection": false
+        },
+        "original_user_reported_video_failure_root_cause_proven": false
+      },
+      "skip": {
+        "status": "ROOT_VISUAL_REVIEW_PASSED",
+        "frame_count": 1,
+        "click_completed_ms": 661,
+        "native_theme_duration_ms": 3650,
+        "returned_to_lottery_window": true,
+        "skip_earlier_than_full_duration": true,
+        "ticket_count_visible": 0
+      },
+      "close": {
+        "status": "ROOT_VISUAL_REVIEW_PASSED",
+        "frame_count": 1,
+        "overlay_cleaned": true,
+        "paused_world_visible": true,
+        "ticket_count_visible": 0
+      },
+      "shutdown": {
+        "close_method": "Normal CloseMainWindow",
+        "root_close_request_returned": true,
+        "process_exit_confirmed": true,
+        "status": "NORMAL_CLOSE_FOLLOWED_BY_NO_PROCESS_OBSERVATION",
+        "force_termination": false,
+        "observation_scope": "Get-Process exact pid14292 absent after normal close; no retained-handle continuous-hold assertion"
+      },
+      "fps": "NOT_MEASURED_THIS_ROUND_PAUSED_SESSION",
+      "ordinary_arcade_validation": "NOT_RUN_THIS_ROUND",
+      "new_ui_signed": false,
+      "new_ui_published": false
+    }
+  },
+  "training_chinese_errors": {
+    "scope": "Two existing display resolvers only; worker training business and production admission unchanged",
+    "modified_modules": [
+      {
+        "path": "scripts/vscripts/ui/production_ui_service.lua",
+        "raw_sha256": "7c4160a8f76ec13c5e4a7bfcec3266fa1942db6c1e19a28658bfe8a74e6355ad"
+      },
+      {
+        "path": "scripts/vscripts/ui/ui_request_router.lua",
+        "raw_sha256": "f2119ec5160869db35ddceb3ef6a33d444da41d1b7874b348432b162d9413e32"
+      }
+    ],
+    "known_return_codes_covered": [
+      "training_queue_full",
+      "training_max_count_reached",
+      "training_not_available",
+      "training_owner_mismatch",
+      "training_city_level_required",
+      "training_building_missing",
+      "training_definition_invalid",
+      "training_type_invalid",
+      "training_cancelled",
+      "training_completion_failed"
+    ],
+    "capacity_population_and_worker_creation_aliases_localized": true,
+    "internal_error_codes_preserved": true,
+    "private_recipient_preserved": true,
+    "unknown_non_training_error_behavior_preserved": true,
+    "original_walkable_spawn_space_message_already_chinese": true,
+    "exact_user_original_english_tip_captured": false,
+    "cost": {
+      "initialization": "O(C) module-level fixed mapping once",
+      "on_actual_error": "O(1) lookup",
+      "stable_refresh_work_added": 0,
+      "new_native_calls": 0,
+      "new_network_calls": 0
+    },
+    "regressions": {
+      "router_test": "scripts/vscripts/tests/test_production_ui_router.lua",
+      "router_test_raw_sha256": "66aa70b0edf9a8e8ed298bee7fa1746451851b8fb78ec41795598facc032ae0d",
+      "router_dual_response_notification_parameterized": "PASS",
+      "worker_training_queue": "PASS",
+      "worker_system_training_test_only_admitted_actors": "PASS",
+      "lumberjack_training_integration_test_only_admitted_actors": "PASS",
+      "admitted_fixture_scope": "Synthetic actors0/1 in isolated tests only; no production account/permission change",
+      "old_display_negative_control": {
+        "status": "OLD_MODULES_REPRODUCE_RAW_training_queue_full",
+        "path": "output/training_error_localization_20261102/baseline_negative_v01/receipt.json",
+        "sha256": "083e750ef381c6d5bd945f7bca77e71696d22195858191bd209fff4785ba5b46"
+      },
+      "stock_fixture_baseline_comparison": {
+        "status": "CURRENT_AND_BASELINE_SAME_LINE161_FAILURE",
+        "baseline_revision": "037a4df3d97ffcd106c7ac116849e92ff4d7fc34",
+        "worker_module_git_lf_sha256": "90be8585c235abf6a5775c833554a4b3d791a081bb536a4c42cdc8799f83e6d7",
+        "worker_module_current_lf_equal_baseline": true,
+        "failure_file": "scripts/vscripts/tests/test_worker_system_training.lua",
+        "failure_line": 161,
+        "both_exit_codes": [
+          1,
+          1
+        ],
+        "actual_probe": "Existing stock fixture lacks admitted context for resource.try_spend.request and worker.train.request",
+        "production_business_modified_to_make_test_green": false,
+        "path": "output/training_error_localization_20261102/stock_fixture_037a4df_comparison_v01/comparison.safe.json",
+        "sha256": "91b9b8ea557b7a1db46292ae0f4ca9ad33415858d29de916bc3407ed6ce83cd7"
+      }
+    }
+  },
+  "vpk_lab_isolation": {
+    "observed_failure": "Tools AssetSystem scanned an addon-contained LAB bare data volume and reported VPK directory corrupt",
+    "formal_package_corruption_inferred": false,
+    "git_ignore_is_resource_scan_isolation": false,
+    "relocation": {
+      "status": "LAB_VPK_TREES_RELOCATED_OUTSIDE_ADDON",
+      "observed_utc": "2026-11-01T23:49:56.3777798Z",
+      "same_volume_whole_directory_rename": true,
+      "total_files": 147,
+      "vpk_files": 60,
+      "files_deleted": 0,
+      "payload_full_hash_performed": false,
+      "official_workshop_modified": false,
+      "real_player_backups_modified": false,
+      "archive_root": "D:/Survival_排演实验归档/20261102",
+      "trees": [
+        {
+          "old_addon_relative_root": "output/portrait_resolution_release_20261102/peer_full_roundtrip_20261102",
+          "archive_directory": "portrait_resolution_peer_full_roundtrip_20261102",
+          "files": 90,
+          "vpk_files": 34
+        },
+        {
+          "old_addon_relative_root": "output/shared_boss_portrait_release_20261101/peer_full_roundtrip_20261102",
+          "archive_directory": "shared_boss_peer_full_roundtrip_20261102",
+          "files": 38,
+          "vpk_files": 16
+        },
+        {
+          "old_addon_relative_root": "output/shared_boss_portrait_release_20261101/ql01",
+          "archive_directory": "shared_boss_ql01",
+          "files": 19,
+          "vpk_files": 10
+        }
+      ],
+      "receipt": {
+        "path": "output/lottery_arcade_fix_20261102/vpk_lab_relocation_v01.safe.json",
+        "sha256": "851fd57094c5bc3c49823106a6cef347ede93073e9071c8419f25d40a1e6a287"
+      }
+    },
+    "remaining_output_header_inventory": {
+      "vpk_files": 123,
+      "invalid_directory_headers": 0,
+      "payload_crypto_verification_claimed": false,
+      "path": "output/lottery_arcade_fix_20261102/output_vpk_headers_after_v01.safe.json",
+      "sha256": "de26c7b8ba8df08d5ddb71d450fd832f3d2906675bc8bfda9322ecff1f63cfd2"
+    },
+    "permanent_guard": {
+      "entry": "tools/workshop_test/test_entry.py",
+      "entry_raw_sha256": "42908018d07fe8e345f7ab3fb24e323fca577c76c2bcd634f11da8de960cd579",
+      "entry_is_in_frozen0201_auxiliary_inputs": false,
+      "mode": "Offline check and launch preflight only; online unchanged",
+      "known_lab_roots": 3,
+      "normal_absent_roots_metadata_reads_upper_bound": 9,
+      "normal_absent_roots_directory_enumerations": 0,
+      "existing_lab_entry_limit_total": 4096,
+      "existing_lab_cooperative_deadline_seconds": 2,
+      "vpk_content_reads": 0,
+      "real_map_or_unrelated_backup_traversals": 0,
+      "follows_reparse_points": false,
+      "automatic_move_or_delete": false,
+      "stable_error_code": "addon_lab_vpk_detected",
+      "chinese_actionable_explanation": true,
+      "stable_game_loop_work_added": 0,
+      "complexity": "Once per offline preflight O(K*D) metadata for fixed K3,D3; only present known LABs traverse O(min(N,4096)) entries within cooperative2s budget; no per-frame work",
+      "covers_all_future_arbitrary_addon_lab_locations": false,
+      "tests": {
+        "file": "tools/workshop_test/test_test_entry.py",
+        "raw_sha256": "8cc4e8744a6f68745d287105e43feeac980c325e7f8586f7c351988748d0cebc",
+        "isolated_cases_passed": 16,
+        "native_dota_or_sdk_calls": 0,
+        "independent_review_and_rerun": "PASS",
+        "scope": "Absent/receipt-only roots, each bare volume, no map/backup scan, reparse refusal, Chinese error, offline-only, pre-launch/no-client/relay boundaries"
+      },
+      "both_repository_agents_rules_updated": true,
+      "rule": "Keep every bare VPK, data volume and synthetic package LAB outside both addon trees; retain real backups"
+    }
+  },
+  "pending": [
+    "Normal Arcade video playback and asynchronous-error fallback with the new UI; Tools-only cases do not satisfy this",
+    "Any new normal-Arcade FPS or full release acceptance",
+    "User manual two-PC shared Boss kill, respawn and personal reward results",
+    "New scoped source/operator release preparation, reviewed signing and publication beyond frozen0201"
+  ],
+  "development_git_workflow": {
+    "sequence": "stash -> pull -> pop -> validation -> commit -> push",
+    "game_sync_receipt": "output/lottery_arcade_fix_20261102/git_sync_game_v01.json",
+    "content_sync_receipt": "output/lottery_arcade_fix_20261102/git_sync_content_v01.json",
+    "pull_and_exact_task_stash_pop_completed_both": true,
+    "delivery_commit_identity": "Read the containing Git commit; no mutable source tag is substituted for the frozen signed0201 cursors"
+  }
+}

@@ -8,8 +8,10 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import stat
 import subprocess
 import sys
+import time
 
 ROOT = Path(__file__).resolve().parents[2]
 GAME = ROOT.parents[1]
@@ -23,11 +25,68 @@ PAYMENT_HELPER_PINS = frozenset((
     "scripts/vscripts/config/commerce_payment_access.lua", "scripts/vscripts/core/commerce_release_policy.lua",
     "scripts/vscripts/systems/payment_service.lua", "scripts/vscripts/systems/player_web_auth.lua",
 ))
+ADDON_VPK_LAB_ROOTS = (
+    "output/portrait_resolution_release_20261102/peer_full_roundtrip_20261102",
+    "output/shared_boss_portrait_release_20261101/peer_full_roundtrip_20261102",
+    "output/shared_boss_portrait_release_20261101/ql01",
+)
+LAB_ERROR_MESSAGES = {
+    "addon_lab_vpk_detected": "插件目录内存在 VPK 测试包或裸分卷，已阻止离线启动。请将整个实验目录迁移到插件目录之外并保留备份；本工具不会自动移动或删除文件。",
+    "addon_lab_path_unsafe": "VPK 实验目录包含目录连接或异常路径，已停止检查；请保留现场并手动核实，避免扫描真实安装或备份。",
+    "addon_lab_scan_failed": "无法安全检查 VPK 实验目录，已阻止离线启动；请检查目录权限并保留全部备份。",
+    "addon_lab_scan_limit": "VPK 实验目录超过检查预算，已阻止离线启动；请将整个实验目录迁移到插件目录之外并保留备份。",
+}
 
 
 def need(value, code):
     if not value:
         raise RuntimeError(code)
+
+
+def guard_addon_vpk_labs():
+    """Once per offline check/launch, never a frame task or workspace scan.
+
+    K=3 fixed roots, D=3 fixed components: <=K*D cached metadata reads when
+    absent. Existing LABs alone get one no-reparse traversal, <=4096 entries
+    and2 seconds total. No VPK contents, actual packages, or backups are read.
+    """
+    checked = {}
+    reparse = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+    deadline, visited = time.monotonic() + 2, 0
+    try:
+        for relative in ADDON_VPK_LAB_ROOTS:
+            lab = ROOT
+            for part in Path(relative).parts:
+                lab = lab / part
+                if lab not in checked:
+                    try:
+                        info = lab.lstat()
+                    except FileNotFoundError:
+                        checked[lab] = False
+                    else:
+                        need(stat.S_ISDIR(info.st_mode) and not getattr(info, "st_file_attributes", 0) & reparse,
+                             "addon_lab_path_unsafe")
+                        checked[lab] = True
+                if not checked[lab]:
+                    break
+            else:
+                pending = [lab]
+                while pending:
+                    need(time.monotonic() <= deadline, "addon_lab_scan_limit")
+                    directory = pending.pop()
+                    with os.scandir(directory) as entries:
+                        for item in entries:
+                            visited += 1
+                            need(visited <= 4096 and time.monotonic() <= deadline, "addon_lab_scan_limit")
+                            need(not item.name.lower().endswith(".vpk"), "addon_lab_vpk_detected")
+                            info = item.stat(follow_symlinks=False)
+                            need(not stat.S_ISLNK(info.st_mode)
+                                 and not getattr(info, "st_file_attributes", 0) & reparse,
+                                 "addon_lab_path_unsafe")
+                            if stat.S_ISDIR(info.st_mode):
+                                pending.append(Path(item.path))
+    except OSError:
+        raise RuntimeError("addon_lab_scan_failed") from None
 
 
 def load_relay():
@@ -119,6 +178,8 @@ def check_online_policy(addon):
 
 def check(mode):
     need(mode in ("offline", "online"), "test_mode_invalid")
+    if mode == "offline":
+        guard_addon_vpk_labs()
     need((GAME / "bin/win64/dota2.exe").is_file(), "dota_executable_missing")
     addon = ROOT if mode == "offline" else ROOT.parent / ONLINE_ADDON
     need((addon / "maps/template_map.vpk").is_file(), "test_map_missing")
@@ -172,6 +233,9 @@ def main():
         if not code.replace("_", "").isalnum() or len(code) > 80:
             code = "test_entry_failed"
         result = {"ok": False, "error": code, "mode": args.mode}
+        if code in LAB_ERROR_MESSAGES:
+            result["message"] = LAB_ERROR_MESSAGES[code]
+            print(result["message"], file=sys.stderr)
     print(json.dumps(result, ensure_ascii=True))
     return 0 if result["ok"] else 1
 

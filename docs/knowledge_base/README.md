@@ -1,5 +1,7 @@
 # 孤城逐晓／Survival 统一知识库
 
+**2026-11-02 最新补充**：[抽卡演出、中文训练提示与0201移交](evidence/lottery_training_feedback_20261102.md)。0201已签，用户确认客机安装及其他分辨率头像正常，双人共享结果待回传；没有发布。新演出/训练修复属于后续开发范围，不能覆盖0201冻结五包或复用旧验收。下方“0201尚未签名”按上一阶段历史保留。
+
 **最新：1107已因双PC高分辨率故障阻断，未发布；本机已完整恢复0104。** 同局1600×1000→900p重选后头像恢复；新2947/1af651/5f3d0f源码与官方编译、72+cost+3回归通过，新尺寸普通实机/FPS仍pending。旧1107的113.20/P9511.17及双PC111.08/P9510.96只作900p有限样本。手动attach与真实2 humans不能当owned启动或全部共享Boss奖励通过。0201 recipe/受控主菜单GC route开发中，无新plan/unsigned/签/native/发布。见[最新交接](evidence/portrait_resolution_guard_20261102.md)及[脱敏机器事实](evidence/portrait_resolution_guard_20261102.public.json)。
 
 
