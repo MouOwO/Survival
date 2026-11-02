@@ -1,5 +1,7 @@
 # 孤城逐晓／Survival 统一知识库
 
+**2026-11-02 抽奖0204进行中**：[连续抽奖、后台回执及暂装交接](evidence/lottery_replay_receipt_20261102.md)。后台两文件补丁已激活且支付不变；签名0204已暂装并owned direct启动PID9820，等待用户OAuth/N1，未原生准入/上传。用户允许最多30普通券，尚未自动消费；本机不可与正式0104混联，测试结束须恢复。
+
 **2026-11-02 最新：0203仍未上传，本机已再次恢复正式0104，等待连续客户端验证窗口。** run04出现非Root发送的实际抽奖结果，不能作无消耗准入；run05正常退出后又出现Steam新客户端，恢复一度被占用，现已正常关闭菜单客户端并取得run05完整restore回执，实际0个Dota进程。操作者及原进程退出原因尚待确认，不归咎用户或认定崩溃。下一轮辅助脚本已备好；未调用SDK Submit，正式远端仍0104。详见[真实阶段](evidence/lottery_arcade_delivery_20261102.md)。
 
 **2026-11-02 最新阶段**：[本机恢复官方0104、客机报告恢复0104成功，0203仍未准入／未发布](evidence/lottery_arcade_delivery_20261102.md)／[机器摘要](evidence/lottery_arcade_delivery_20261102.public.json)。Root实际run03 restore exit0，fresh-only官方元数据与0104一致，ACF manifest未改；两端退出后用户已确认客机显示`ORIGINAL0104_RESTORED`。没有SDK Submit或实际联机通过结论；0202 fatal及0203无效视觉证据全部保留。
