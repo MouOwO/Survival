@@ -19,6 +19,9 @@ def same_balances(before, after):
 def make_app(client, actors, defaults):
     class App:
         rpc_client = client
+        # Disposable clone only: settlement needs a deterministic HMAC seed.
+        # Never load or copy the production application pepper/ENV here.
+        account_id_pepper = 'ticket-clone-synthetic-pepper-v1'
         def _database_account_id(self, public): return actors[public]
         def _ensure_gameplay_stats(self, account):
             return self.rpc_client.rpc('ensure_player_gameplay_stats', {'p_account_id': account, 'p_gameplay_stats': defaults})

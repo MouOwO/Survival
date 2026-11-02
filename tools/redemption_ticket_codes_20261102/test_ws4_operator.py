@@ -1,9 +1,12 @@
 """Isolated boundaries. No SSH, PostgreSQL, credentials, SDK or native clients."""
 from pathlib import Path, PurePosixPath, PureWindowsPath
+import ast
 import contextlib
 import copy
 import hashlib
+import hmac
 import importlib.util
+import inspect
 import io
 import json
 import sys
@@ -198,6 +201,40 @@ class OperatorTests(unittest.TestCase):
         self.assertFalse(clone_checks.same_balances({}, {'u_coin':1}))
         self.assertFalse(clone_checks.same_balances({'u_coin':88,'shop_points':99}, {'u_coin':87,'shop_points':99}))
         self.assertFalse(clone_checks.same_balances({}, {'other_currency':1}))
+
+    def test_clone_app_covers_full_real_service_protocol_and_settlement(self):
+        from archive_backend.service import ArchiveService
+        app=clone_checks.make_app(object(),{}, {})
+        # Derive the protocol from the real service, rather than checking only
+        # the profile fixture path that missed settlement's pepper dependency.
+        tree=ast.parse(inspect.getsource(ArchiveService))
+        required={node.attr for node in ast.walk(tree) if isinstance(node,ast.Attribute)
+            and isinstance(node.value,ast.Attribute) and node.value.attr=='app'
+            and isinstance(node.value.value,ast.Name) and node.value.value.id=='self'}
+        self.assertEqual(required,{'rpc_client','account_id_pepper','profile',
+            '_database_account_id','_ensure_gameplay_stats','_public_response'})
+        self.assertTrue(all(hasattr(app,name)for name in required))
+        self.assertEqual(app.account_id_pepper,'ticket-clone-synthetic-pepper-v1')
+        bundle=SimpleNamespace(configs={'synthetic':True},tables={},directory=HERE)
+        service=ArchiveService(app,bundle,'synthetic-worker-not-executed')
+        captured=[]
+        def worker(argv,**kwargs):
+            self.assertEqual(argv,['synthetic-worker-not-executed','worker.lua'])
+            self.assertEqual(kwargs['cwd'],HERE)
+            captured.append(json.loads(kwargs['input']))
+            return SimpleNamespace(stdout=b'{"ok":true,"synthetic_settlement":true}')
+        service_module=sys.modules[ArchiveService.__module__]
+        profile={'account_id':'synthetic_clone_actor','save':{}}
+        command={'id':'lottery_snapshot','kind':'lottery_snapshot'}
+        with patch.object(service_module.subprocess,'run',side_effect=worker)as execute:
+            result=service.settle(profile,command,False)
+        self.assertEqual(result,{'ok':True,'synthetic_settlement':True})
+        self.assertEqual(execute.call_count,1)
+        expected=int.from_bytes(hmac.new(b'ticket-clone-synthetic-pepper-v1',
+            b'synthetic_clone_actor:lottery_snapshot',hashlib.sha256).digest()[:4],'big')%2147483646+1
+        self.assertEqual(captured[0]['seed'],expected)
+        self.assertEqual(captured[0]['command'],command)
+        self.assertEqual(captured[0]['profile'],profile)
 
     def test_verify_uses_same_rr_digest_count_and_start_validity(self):
         plan={'inventory':{'definitions':BASE,'payment_services':{'payment':1}}}
