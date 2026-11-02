@@ -1,6 +1,6 @@
 # 孤城逐晓／Survival 统一知识库
 
-**2026-11-02 最新阶段**：[本机恢复官方0104、客机待恢复，0203仍未准入／未发布](evidence/lottery_arcade_delivery_20261102.md)／[机器摘要](evidence/lottery_arcade_delivery_20261102.public.json)。Root实际run03 restore exit0，fresh-only官方元数据与0104一致，ACF manifest未改；两端退出后已给客机0201专用Restore命令，等待成功反馈。没有SDK Submit或实际联机通过结论；0202 fatal及0203无效视觉证据全部保留。
+**2026-11-02 最新阶段**：[本机恢复官方0104、客机报告恢复0104成功，0203仍未准入／未发布](evidence/lottery_arcade_delivery_20261102.md)／[机器摘要](evidence/lottery_arcade_delivery_20261102.public.json)。Root实际run03 restore exit0，fresh-only官方元数据与0104一致，ACF manifest未改；两端退出后用户已确认客机显示`ORIGINAL0104_RESTORED`。没有SDK Submit或实际联机通过结论；0202 fatal及0203无效视觉证据全部保留。
 
 **2026-11-02 最新完成**：[现有宣传封面确认与四档普通券启用](evidence/cover_ticket_codes_20261102.md)／[机器证据](evidence/cover_ticket_codes_20261102.public.json)。fresh SDK／CDN确认沿用当前封面，本轮0封面／游戏上传，正式0104不变。新增10／50／100／200普通map券已独立核验，132总数、旧128不变，每账号每码一次累计360；API／支付未重启，已启用Excel已私有交付。
 

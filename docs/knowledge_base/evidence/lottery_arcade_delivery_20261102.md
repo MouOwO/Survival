@@ -1,6 +1,6 @@
-# 2026-11-02 抽卡交付移交：本机恢复0104，客机待恢复，0203未发布
+# 2026-11-02 抽卡交付移交：本机恢复0104，客机报告恢复0104成功，0203未发布
 
-**当前不是最终完成状态。** 0203 run03原owned进程27636已同handle结束；Root实际恢复官方0104五文件，restore exit0，状态`ORIGINAL0104_FIVE_FILES_FULLY_RESTORED`。fresh-only官方SDK查询result1、cachefalse、maxcache0，time_updated1793536475及3788093063字节与0104一致，ACF manifest `7025356658517360342`未改。用户确认双端退出且客机0201路径未变，Root已给专用Restore命令，仍待客机`ORIGINAL0104_RESTORED`反馈；尚未实际联机验收。0203没有准入、没有SDK Submit；不能写“游廊已修好”。
+**当前不是最终完成状态。** 0203 run03原owned进程27636已同handle结束；Root实际恢复官方0104五文件，restore exit0，状态`ORIGINAL0104_FIVE_FILES_FULLY_RESTORED`。fresh-only官方SDK查询result1、cachefalse、maxcache0，time_updated1793536475及3788093063字节与0104一致，ACF manifest `7025356658517360342`未改。用户确认双端退出且客机0201路径未变，Root已给专用Restore命令，用户现已报告客机显示`ORIGINAL0104_RESTORED`；尚未实际联机验收。0203没有准入、没有SDK Submit；不能写“游廊已修好”。
 
 ## 实际原因与修复范围
 
@@ -40,7 +40,7 @@ run03 before01原始状态为`INCOMPLETE_NATIVE_FILE_USE_EVIDENCE`：四data卷�
 
 ## 接手与安全保留
 
-当前先等另一台电脑用原0201专用恢复器及`D:/steam/SurvivalPeerBackup_0201_run01`恢复0104；旧`SurvivalPeerBackup_1107_run02`和当前备份都保留，不重跑安装wrapper、不删订阅目录、不手改ACF。路径已由用户确认未改，但执行成功仍待反馈；恢复结果与实际联机验收分开记录。若后续继续0203，须另有有效普通N1／冷开档、四池无消耗预览、全日志零fatal、after与退出恢复证据，不能补作已结束run03的通过。本轮不要求消费或发奖；后台／支付未因此部署或重启，没有新FPS结论。
+另一台电脑已按用户反馈用原0201专用恢复器及`D:/steam/SurvivalPeerBackup_0201_run01`恢复0104；旧`SurvivalPeerBackup_1107_run02`和当前备份都保留，不重跑安装wrapper、不删订阅目录、不手改ACF。路径已由用户确认未改，且用户已报告`ORIGINAL0104_RESTORED`；Root没有独立访问客机或代替用户验证入房；恢复结果与实际联机验收分开记录。若后续继续0203，须另有有效普通N1／冷开档、四池无消耗预览、全日志零fatal、after与退出恢复证据，不能补作已结束run03的通过。本轮不要求消费或发奖；后台／支付未因此部署或重启，没有新FPS结论。
 
 lineage bootstrap已完成但仍head0104／generation0／pendingNone，没有Submit或canonical journal写入；CAS用于防过期包覆盖，不是发布完成。四pool失败索引固定4键，稳定演出外0新计时器／状态查询，同池首错后0新Movie／错误轮询；最多5复用节点、1当前主题图、2活动计时器，没有反复全场扫描。
 

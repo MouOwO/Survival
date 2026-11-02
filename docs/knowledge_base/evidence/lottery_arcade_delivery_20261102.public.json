@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "date_local": "2026-11-02",
-  "recorded_utc": "2026-11-02T11:39:43.164993+00:00",
-  "status": "LOCAL_OFFICIAL0104_RESTORED_PEER0201_RESTORE_PENDING_0203_NOT_ADMITTED_NOT_PUBLISHED",
+  "recorded_utc": "2026-11-02T12:15:14.739921+00:00",
+  "status": "OFFICIAL0104_LOCAL_RESTORED_PEER_SUCCESS_USER_REPORTED_MULTIPLAYER_PENDING",
   "paired_note": "docs/knowledge_base/evidence/lottery_arcade_delivery_20261102.md",
   "privacy": {
     "raw_auth_session_or_native_logs_included": false,
@@ -144,7 +144,6 @@
   },
   "handoff_owner": "Root",
   "pending": [
-    "peer0201 dedicated Restore success feedback ORIGINAL0104_RESTORED",
     "actual same-version multiplayer verification after both restores",
     "0203 future native acceptance remains incomplete; ended run03 evidence must not be backfilled",
     "no SDK publication unless a later candidate passes all actual admission gates",
@@ -566,7 +565,7 @@
     "knowledge_commit_is_not_new_runtime_publication": true
   },
   "version_recovery": {
-    "status": "LOCAL_OFFICIAL0104_RESTORED_PEER_RESTORE_PENDING",
+    "status": "LOCAL_RESTORED_PEER_ORIGINAL0104_RESTORED_USER_REPORTED",
     "local_restore": {
       "path": "D:/Survival_本地排演/20261102_ws4_lottery_snapshot_v10/run03_snapshot_preview/restored.json",
       "sha256": "060460980755fa35e6ffed92996c70f4fc1270d95d036bf7092e5b714b9fa03e",
@@ -593,13 +592,14 @@
       "both_clients_exited_user_confirmed": true,
       "0201_paths_unchanged_user_confirmed": true,
       "restore_command_provided": true,
-      "restore_success_user_report": "PENDING",
+      "restore_success_user_report": "ORIGINAL0104_RESTORED",
       "tool": "peer0201.ps1",
       "action": "Restore",
       "backup": "D:/steam/SurvivalPeerBackup_0201_run01",
       "previous_backup_preserved": "D:/steam/SurvivalPeerBackup_1107_run02",
       "subscription_folder_deleted": false,
-      "acf_edited": false
+      "acf_edited": false,
+      "remote_restore_independently_observed_by_root": false
     },
     "actual_multiplayer_after_recovery_verified": false
   },
