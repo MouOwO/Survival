@@ -1,5 +1,7 @@
 # 07｜关键决策、事故与未完成事项
 
+**2026-11-02 最新：0203仍未上传，本机已再次恢复正式0104，等待连续客户端验证窗口。** run04出现非Root发送的实际抽奖结果，不能作无消耗准入；run05正常退出后又出现Steam新客户端，恢复一度被占用，现已正常关闭菜单客户端并取得run05完整restore回执，实际0个Dota进程。操作者及原进程退出原因尚待确认，不归咎用户或认定崩溃。下一轮辅助脚本已备好；未调用SDK Submit，正式远端仍0104。详见[真实阶段](evidence/lottery_arcade_delivery_20261102.md)。
+
 **2026-11-02 当前待办：客机已报告恢复0104成功，下一步为重开后的实际联机核验。** 本机run03已真实restore exit0，fresh-only官方元数据与0104一致；0203从未准入或发布。用户确认双端退出及客机0201路径未改，Root已给保留备份的专用Restore命令，用户已报告`ORIGINAL0104_RESTORED`。不能把本机恢复或查询成功写成双端联机通过。0202十次fatal、0203 run01未完成与run02结算遮罩拒绝均保留；本地日期／F9采集问题不算产品回归。见[精确阶段及剩余项](evidence/lottery_arcade_delivery_20261102.md)及[机器摘要](evidence/lottery_arcade_delivery_20261102.public.json)。
 
 **2026-11-02 本轮任务已收口**：用户决定沿用当前苟发育宣传封面，fresh SDK／CDN一致；四档10／50／100／200普通map券已登记并独立核验`FOUR_ROWS_MATCH_VERIFIED`，每账号每码一次累计360，共132项、旧128不变，已启用Excel已私有交付。API／支付未重启，本轮0封面／游戏上传、正式0104不变；不要为此重新签包或上传，也不据此声称真人兑换到账。见[最终结果与限制](evidence/cover_ticket_codes_20261102.md)及[机器证据](evidence/cover_ticket_codes_20261102.public.json)。

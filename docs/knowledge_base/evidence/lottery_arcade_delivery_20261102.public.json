@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "date_local": "2026-11-02",
-  "recorded_utc": "2026-11-02T12:15:14.739921+00:00",
-  "status": "OFFICIAL0104_LOCAL_RESTORED_PEER_SUCCESS_USER_REPORTED_MULTIPLAYER_PENDING",
+  "recorded_utc": "2026-11-02T13:56:17.941517+00:00",
+  "status": "OFFICIAL0104_RESTORED_AFTER_INTERRUPTED_RUN05_AWAITING_CONTINUOUS_TEST_WINDOW",
   "paired_note": "docs/knowledge_base/evidence/lottery_arcade_delivery_20261102.md",
   "privacy": {
     "raw_auth_session_or_native_logs_included": false,
@@ -612,5 +612,87 @@
     "automatic_moves_or_deletions_performed": false,
     "established_as_version_mismatch_root_cause": false,
     "player_backups_preserved": true
+  },
+  "publication_attempt_20261102": {
+    "release_sequence": 2026110203,
+    "actual_sdk_submit_performed": false,
+    "run04": {
+      "process_pid": 12604,
+      "stage_global_acf_changed": true,
+      "target_item_unchanged_on_reconciliation": true,
+      "reconciliation_receipt": {
+        "path": "output/lottery_arcade_delivery_20261102/run04_acf_reconciliation_v01.safe.json",
+        "sha256": "05c490b10a7af59b5f3f2b428247e1e7425296537f69d75195fa075d758afd39"
+      },
+      "canonical_full_launch_revalidation_succeeded": true,
+      "real_draw_result_chains_in_log": 2,
+      "draw_operator_independently_confirmed": false,
+      "root_draw_commands_sent": 0,
+      "no_consumption_admission_passed": false,
+      "restore": {
+        "path": "D:/Survival_本地排演/20261102_ws4_lottery_snapshot_v10/run04_snapshot_preview/restored.json",
+        "sha256": "7813d81dc8db322588389553dd24ddbb86546831a75924e3ba9e59c88f54a3fc"
+      }
+    },
+    "run05": {
+      "process_pid": 15432,
+      "native_created_filetime": 134380988461874103,
+      "before_inspection": {
+        "path": "D:/Survival_本地排演/20261102_ws4_lottery_snapshot_v10/run05_snapshot_preview/inspections/before01.json",
+        "sha256": "47cd33deab327db35bf457eb39e43e1a0a505c6a5210b0ea41b7663ec3ef108c"
+      },
+      "usable_preview_screens_observed": 0,
+      "retained_native_handle_exit": {
+        "path": "D:/Survival_本地排演/20261102_ws4_lottery_snapshot_v10/run05_snapshot_preview/hold_end.json",
+        "sha256": "20fb1e864c3668512c901f1c5980184a0edc2eb22d157b70081853dee2665c80"
+      },
+      "exit_cause_user_confirmation_pending": true,
+      "snapshot_errors_in_closed_log": 0,
+      "custom_event_serialization_errors_in_closed_log": 0,
+      "script_runtime_errors_in_closed_log": 0,
+      "later_steam_client_pid": 32920,
+      "later_client_observed_at_workshop_menu": true,
+      "later_client_normal_wm_close_requested": true,
+      "restore": {
+        "path": "D:/Survival_本地排演/20261102_ws4_lottery_snapshot_v10/run05_snapshot_preview/restored.json",
+        "sha256": "d0ac1e8a9b140d1629aa3961b38dc9c3234268fa1c36a7ae09e170b60ba1ce3f"
+      }
+    },
+    "current_local_sequence": 2026110104,
+    "current_dota_process_count_observed": 0,
+    "next_transaction": "run06_snapshot_preview",
+    "next_collector_generator": "output/lottery_arcade_delivery_20261102/prepare_preview_collector_0203_v09.py",
+    "next_pause_helper": "output/lottery_arcade_delivery_20261102/send_dota_pause_0203_run06_v01.ps1",
+    "continuous_client_window_user_confirmation_pending": true,
+    "storage_only_compression": {
+      "external_lab_files_retained": 147,
+      "external_lab_logical_bytes": 43958104009,
+      "files_deleted": 0,
+      "files_moved": 0,
+      "ntfs_lossless_storage_only": true,
+      "file_lengths_and_last_write_times_checked": true,
+      "all_lab_contents_rehashed_after_compression": false,
+      "additional_completed_runs_storage_compressed": [
+        "run02_snapshot_preview",
+        "run03_snapshot_preview",
+        "run04_snapshot_preview"
+      ]
+    }
+  },
+  "concurrent_workspace_changes_observed": {
+    "runtime_paths": [
+      "panorama/src/scripts/custom_game/lottery_cinematic_v1.js",
+      "panorama/scripts/custom_game/lottery_cinematic_v1.vjs_c",
+      "scripts/vscripts/systems/archive_http_adapter.lua",
+      "scripts/vscripts/systems/lottery_http_service.lua",
+      "server/archive_backend/service.py"
+    ],
+    "other_untracked_release_family": "tools/lottery_replay_release_20261102",
+    "signed_candidate_compiled_js_bytes": 11246,
+    "observed_workspace_compiled_js_bytes": 10835,
+    "observed_workspace_compiled_js_sha256": "29f9dd98e211f9798a591808300c7d1be624a138709ca6dc6249d9eaccff3703",
+    "other_task_pause_user_confirmation_pending": true,
+    "root_changes_in_this_turn_are_knowledge_only": true,
+    "other_task_changes_preserved": true
   }
 }

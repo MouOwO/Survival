@@ -1,5 +1,7 @@
 # 新会话先读｜孤城逐晓项目知识库
 
+**2026-11-02 最新：0203仍未上传，本机已再次恢复正式0104，等待连续客户端验证窗口。** run04出现非Root发送的实际抽奖结果，不能作无消耗准入；run05正常退出后又出现Steam新客户端，恢复一度被占用，现已正常关闭菜单客户端并取得run05完整restore回执，实际0个Dota进程。操作者及原进程退出原因尚待确认，不归咎用户或认定崩溃。下一轮辅助脚本已备好；未调用SDK Submit，正式远端仍0104。详见[真实阶段](evidence/lottery_arcade_delivery_20261102.md)。
+
 **2026-11-02 当前：本机已恢复正式0104，用户已确认客机恢复0104；0203未准入、未发布。** run03原进程已结束，Root实际恢复五文件并取得exit0；fresh-only官方查询与0104一致，ACF manifest `7025356658517360342`未改。用户确认双端退出，用户已报告客机专用Restore显示`ORIGINAL0104_RESTORED`；当前不能声称联机恢复通过。0202十次fatal及0203前两轮视觉拒绝边界保留。见[逐轮事实与接手](evidence/lottery_arcade_delivery_20261102.md)及[机器摘要](evidence/lottery_arcade_delivery_20261102.public.json)。
 
 **2026-11-02 本轮已完成：沿用宣传封面，四档普通券已启用。** fresh官方SDK／CDN确认当前“我在刀塔2苟发育”封面字节一致，本轮0封面上传、0游戏上传，正式0104未变。10／50／100／200张普通map券已生产登记并独立核验`FOUR_ROWS_MATCH_VERIFIED`，共132项、旧128项不变；每账号每码一次，累计360张。API／支付未重启，已启用Excel已私有交付。见[本轮结果](evidence/cover_ticket_codes_20261102.md)及[脱敏机器证据](evidence/cover_ticket_codes_20261102.public.json)。

@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 19996,
-      "sha256": "252b6e6d5a1b289bad5bd32e74c1feb62c9693a79e1b69327d8542256a13935b"
+      "bytes": 20579,
+      "sha256": "4b70613d167823caf6f98e7dc45f651ec7100f0e585ec5560066b9c5665449ba"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -30,18 +30,18 @@
     },
     {
       "path": "05_payments_commerce_delivery.md",
-      "bytes": 17734,
-      "sha256": "8b596a67ddfb7c9227efde2ac8526c0a075dd5cd4cafdd45d80c012739fb7bab"
+      "bytes": 18317,
+      "sha256": "0a0e12a73d20235ca35fcca2174315feb0312e72c528299abd7c283034f594f7"
     },
     {
       "path": "06_build_release_ops.md",
-      "bytes": 24411,
-      "sha256": "b982e350df15f4f886ad78c79bb953d3a001b8da239cfdad0394972f1583a73a"
+      "bytes": 24994,
+      "sha256": "f89718f47ef02b2b9455ac4341c7a3cccf38ff99161dda62b24b0a8cd1e068fd"
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 34077,
-      "sha256": "44762b1be00a5b00a7572d6c036a075102d246ffbdb11f1aec63dd6aa0e6da6a"
+      "bytes": 34660,
+      "sha256": "6873f547dd25ed728330dd2ecc18f2af4c96856fefa5e80619a1ce86ac567a4c"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -260,13 +260,13 @@
     },
     {
       "path": "evidence/lottery_arcade_delivery_20261102.md",
-      "bytes": 7726,
-      "sha256": "84573853c58673e53f3ce98417ed750910e0482793b54474a3066c4b2d6e3412"
+      "bytes": 9484,
+      "sha256": "36d290b92d2bf3422eb80b6ad444e4e9ee17ce28606b18119c6b15a7d7aff45e"
     },
     {
       "path": "evidence/lottery_arcade_delivery_20261102.public.json",
-      "bytes": 26156,
-      "sha256": "bfd108229750ccdc10ef3c036094b8524c535ac2d8f3914c2450e26b849eed96"
+      "bytes": 30079,
+      "sha256": "7b9065a8a9e57c6f45d6e6bd2770592c03e60523d548254a942a7ca17bda50e0"
     },
     {
       "path": "evidence/lottery_training_feedback_20261102.md",
@@ -580,8 +580,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 10259,
-      "sha256": "46cfc176c02a760084d407fd740217462078be203b4ac0193a401ac0cf7d3f64"
+      "bytes": 10842,
+      "sha256": "9a57bb179b09d6528c9f3daa332263bf70a80952937e526412a08240c3fefb66"
     },
     {
       "path": "tools/verify_knowledge.py",

@@ -1,5 +1,13 @@
 # 2026-11-02 抽卡交付移交：本机恢复0104，客机报告恢复0104成功，0203未发布
 
+**并发编辑已实证。** 同一工作区另有抽奖JS／编译资源、Lua适配与后台修改，以及未跟踪的`tools/lottery_replay_release_20261102/`；当前编译JS已从签候选11246字节变为10835字节。Root保留全部外部改动，等待用户协调其他任务与客户端；不能把当前工作区当成旧0203已审源，也不能让旧候选覆盖另一任务的新修复。本轮没有运行SDK Submit。
+
+**后续发布尝试仍未完成。** run04安装末尾检测全局ACF变动，目标条目清单及候选索引只读复核未变，保留失败事件后由canonical launch完整重验启动；该局随后出现两条非Root发送的实际抽奖结果链，不能作无消耗验收，已正常退出并完整恢复。run05已stage／owned15432启动／before01，但没有取得可用预览画面，原进程21:21正常退出，原因待确认；完整关闭日志Snapshot／CustomGameEvent序列化／脚本runtime诊断均0，不是画面通过。之后Steam启动32920占用恢复，Root观察其停在游廊菜单，正常WM_CLOSE后经canonical restore完整恢复run05，当前0个Dota进程、正式0104。未Submit，不宣称11月2日更新已发布。
+
+下一步等待用户确认连续客户端验证窗口；run06的v09 collector生成器与专用dota_pause辅助脚本已准备，尚未stage／启动。不要使用已退出run04／05补作通过，也不要在用户实际抽奖或客户端被重开的情况下继续标记无消耗准入。
+
+为保留空间，对addon树外147个旧LAB及已完成恢复的run02／03／04副本仅执行可逆NTFS存储压缩，文件全部保留；核对路径／长度／last-write未变，不声称全量内容重哈希，也没有新增帧循环或原生FPS结论。
+
 **当前不是最终完成状态。** 0203 run03原owned进程27636已同handle结束；Root实际恢复官方0104五文件，restore exit0，状态`ORIGINAL0104_FIVE_FILES_FULLY_RESTORED`。fresh-only官方SDK查询result1、cachefalse、maxcache0，time_updated1793536475及3788093063字节与0104一致，ACF manifest `7025356658517360342`未改。用户确认双端退出且客机0201路径未变，Root已给专用Restore命令，用户现已报告客机显示`ORIGINAL0104_RESTORED`；尚未实际联机验收。0203没有准入、没有SDK Submit；不能写“游廊已修好”。
 
 ## 实际原因与修复范围
