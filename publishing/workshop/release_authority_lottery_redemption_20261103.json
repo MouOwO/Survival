@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "app_id": 570,
+  "workshop_id": "3824360109",
+  "owner": "76561198845461206",
+  "canonical_journal": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/output/four_accounts_20261022/steam_upload_state.json",
+  "lineage_state": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/output/release_lineage_20261101/state.json",
+  "publication_lock": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/output/four_accounts_20261022/steam_upload_state.json.lock",
+  "validator_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/lottery_redemption_release_20261103/validator.py",
+  "validator_sha256": "9c966c49efbc94943ad46b32d6ce0fc951c2ac2931d1159e8551f127781bd901",
+  "repositories": {
+    "game": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival",
+    "content": "D:/SteamLibrary/steamapps/common/dota 2 beta/content/dota_addons/Survival"
+  },
+  "required_feature_ancestors": {
+    "game": [
+      "14812ec239d3dd24634b9b860b81e35a9a9fd721"
+    ],
+    "content": [
+      "a9590039044285dd96ca056a720747973f16cf2c"
+    ]
+  },
+  "recipe_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/lottery_redemption_release_20261103/build_release.py",
+  "recipe_sha256": "726acd0fbc1bdb4519d6dc6ee2886770959e104d09f83cb50c4270e57bdd5f24",
+  "rehearsal_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/lottery_redemption_release_20261103/rehearsal.py",
+  "rehearsal_sha256": "72abf29c6b1eb661d4586ddef434a9d6c845fa2536b425397cdb981ae47517a1",
+  "listing_template_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/publishing/workshop/release_listing_template_20261101.json",
+  "listing_template_sha256": "3f0031eb39e84f5db0195793d7b1abed00a1d428f25a7c1a138ecca9d63f9ef0",
+  "reviewed_source_baseline_sha256": "3a60ddab9a93b58fa936e789f1a9d2008d39ed7eca9545487e1f40bf32219ee3",
+  "scope": "LOTTERY_REDEMPTION_REFRESH_EIGHT_RESOURCES",
+  "historical_deferred_changes": 220,
+  "source_anchor_is_full_published_tree": false,
+  "download_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/lottery_redemption_release_20261103/verify_download.py",
+  "download_sha256": "2133f95b48c6c9ce764b3fe02a558595e79fe0fc428fae049af438090c893736",
+  "release_sequence": 2026110301,
+  "native_launch_profiles": [
+    "direct",
+    "lobby"
+  ],
+  "manual_attach_adopt_allowed": false,
+  "native_admission_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/lottery_redemption_release_20261103/native_admission.py",
+  "native_admission_sha256": "5d962745d0dcaa891bfd7c13a77af459715067c549bb5a8d1eddd9aac32d360a",
+  "unpublished0201_deferred_source_entries": {
+    "game": 19,
+    "content": 3
+  },
+  "trusted_review_count": 22,
+  "review_projection": {
+    "parent_reviews": 18,
+    "preserved_parent_reviews": 17,
+    "replaced_parent_reviews": [
+      "scripts/vscripts/ui/ui_request_router.lua"
+    ],
+    "added_new_reviews": [
+      "scripts/vscripts/systems/archive_service.lua",
+      "scripts/vscripts/ui/production_ui_service.lua",
+      "scripts/vscripts/systems/archive_http_adapter.lua",
+      "scripts/vscripts/systems/lottery_http_service.lua"
+    ]
+  }
+}

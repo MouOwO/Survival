@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "snapshot_date": "2026-11-02",
+  "snapshot_date": "2026-11-03",
   "scope": "Curated project knowledge and historical snapshot; raw chat excluded",
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 21242,
-      "sha256": "7b1b7a1b2ac43ce1bf52b0dc21527619eac3d83a65c7788460343f98df2d026f"
+      "bytes": 21754,
+      "sha256": "ef37f31582a5e463ca39c1bb8ef362dcda3ad17c9b4b7a8502c593948f79da3f"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 35418,
-      "sha256": "48cecdaba3ac4c08903a54fe2260ad904d0d016499ad9f3aee51bcfe69371ec5"
+      "bytes": 35948,
+      "sha256": "a01e609f003382d839624b5b26ca34d8caaff100ead3fad46610030e81aa3721"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 11287,
-      "sha256": "5c3c3d216125cf3d2d1855e24f171fe27e9e8a04dff08c57e28d01cc684c4eaa"
+      "bytes": 11597,
+      "sha256": "83362f5bf0f07873b8648467afc8459c3a60c229ddec43cadc46a22bb2c723ff"
     },
     {
       "path": "data/completed_work_index.json",
@@ -442,6 +442,11 @@
       "path": "evidence/steam_login_relay_recovery_20261101.public.json",
       "bytes": 4081,
       "sha256": "c9b67c8c2de8c8491678e4c25599ce8f79e826d34a9a5cde131dcc47776e8a27"
+    },
+    {
+      "path": "evidence/storage_cleanup_20261103.md",
+      "bytes": 1329,
+      "sha256": "b9cf70a9fb48d922a40b432ed2fd6a2fb02e5c87e5756d9b954946ff4f378864"
     },
     {
       "path": "evidence/teammate_builder_portrait_20261031.md",
