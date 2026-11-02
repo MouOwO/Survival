@@ -253,3 +253,9 @@ tools/portrait_resolution_release_20261102/*.py text eol=lf
 tools/portrait_resolution_release_20261102/*.md text eol=lf
 publishing/workshop/release_authority_20261102.json text eol=lf
 tools/test_release_authority_20261102.py text eol=lf
+
+# Operator plans pin exact reviewed bytes across Windows checkouts.
+tools/redemption_ticket_codes_20261102/*.py text eol=lf
+tools/redemption_ticket_codes_20261102/*.json text eol=lf
+tools/redemption_ticket_codes_20261102/*.md text eol=lf
+publishing/workshop/gou_fayu_cover_20261102.json text eol=lf

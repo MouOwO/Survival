@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "ticket_content_id": "lottery_ticket",
+  "base_sku": "lottery_ticket_single",
+  "pool_id": "map",
+  "per_account_per_code": 1,
+  "tiers": [
+    {"quantity": 10, "label": "普通抽奖券×10"},
+    {"quantity": 50, "label": "普通抽奖券×50"},
+    {"quantity": 100, "label": "普通抽奖券×100"},
+    {"quantity": 200, "label": "普通抽奖券×200"}
+  ]
+}
