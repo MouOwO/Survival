@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 21754,
-      "sha256": "ef37f31582a5e463ca39c1bb8ef362dcda3ad17c9b4b7a8502c593948f79da3f"
+      "bytes": 22306,
+      "sha256": "2c4d3d826bddb5a3db1533ab827d5eb8062b3e42ce184f2a650e1a2bd94627b8"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 35948,
-      "sha256": "a01e609f003382d839624b5b26ca34d8caaff100ead3fad46610030e81aa3721"
+      "bytes": 36374,
+      "sha256": "7075d2fd7f340a4b3eb9ab2199c2fe90ce4abd16114ce82fd75d04c1617cb5e0"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 11597,
-      "sha256": "83362f5bf0f07873b8648467afc8459c3a60c229ddec43cadc46a22bb2c723ff"
+      "bytes": 11885,
+      "sha256": "6f673ae5779eb9cad8e15dd0782b7b49c9196777f900715a8a1cb49ddd56ee1f"
     },
     {
       "path": "data/completed_work_index.json",
@@ -445,8 +445,8 @@
     },
     {
       "path": "evidence/storage_cleanup_20261103.md",
-      "bytes": 1329,
-      "sha256": "b9cf70a9fb48d922a40b432ed2fd6a2fb02e5c87e5756d9b954946ff4f378864"
+      "bytes": 2991,
+      "sha256": "1bd9388fd842486188a0dbe3bceef7f280b909f917eb0f38fac620b1984eebe1"
     },
     {
       "path": "evidence/teammate_builder_portrait_20261031.md",
