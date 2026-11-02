@@ -265,3 +265,9 @@ tools/lottery_hotfix_release_20261102/*.py text eol=lf
 tools/lottery_hotfix_release_20261102/*.md text eol=lf
 tools/lottery_hotfix_release_20261102/*.json text eol=lf
 tools/lottery_hotfix_release_20261102/*.ps1 text eol=lf
+
+# Independent lottery snapshot operator sources.
+tools/lottery_snapshot_release_20261102/*.py text eol=lf
+tools/lottery_snapshot_release_20261102/*.md text eol=lf
+tools/lottery_snapshot_release_20261102/*.json text eol=lf
+tools/lottery_snapshot_release_20261102/*.ps1 text eol=lf

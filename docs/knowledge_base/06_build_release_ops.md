@@ -1,5 +1,7 @@
 # 06｜构建、签名、工坊分发与恢复
 
+**2026-11-02 当前发行：0202拒发并真实恢复0104；NEW0203尚未构包。** 0202四池画面通过但完整日志10次序列化fatal，owned正常关闭／同handle退出／keeper exit0，restore真实exit0；0 Submit，lineage仍0104/gen0/pendingNone。0203薄适配只加Archive6a50：五替换／6917／184／20可信审查／2compiled，剩22域延期、旧220不动；26＋common28共54项隔离通过，待新Git／plan／签名／原生。旧0202源码签包／16图／日志／备份全保留。见[SHA、恢复和下一步](evidence/lottery_arcade_delivery_20261102.md)及[机器摘要](evidence/lottery_arcade_delivery_20261102.public.json)。
+
 **2026-11-02 本轮无发行上传**：用户选择沿用现有苟发育宣传图，fresh官方SDK／CDN字节核验一致，0封面上传、0游戏上传，正式0104未变。四档10／50／100／200普通map券已生产新增并独立核验，132总数、旧128不变；API／支付未重启，私有Excel已交付，不需新游戏包。见[本轮确认与登记证据](evidence/cover_ticket_codes_20261102.md)及[机器证据](evidence/cover_ticket_codes_20261102.public.json)。
 
 **2026-11-02 当前发行：1107不得发，已完整恢复官方0104。** 同局peer1600×1000残缺→900p重选恢复，旧物理240门禁在生产函数复现；新combat raw2947af1／GitLF1af651／vjs5f3d0f已两仓一致、官方1 compiled/0 failed与72+cost+3回归通过，尚无新尺寸原生验收。手动双PC111.08FPS/P9510.96只属旧1107/900p观察；不补owned launch。Root正常WM_CLOSE、collector同handle退出/holds释放后，restore04真实exit0、ORIGINAL0104_FIVE_FILES_FULLY_RESTORED；五卷/backup保留，无SDKupload。0201 recipe与受控主菜单GC route开发中，无plan/unsigned/签/native/publish。peer v01禁止执行，v02需显式Bundle且保留全部backup。见[发布/恢复与操作教训](evidence/portrait_resolution_guard_20261102.md)。

@@ -1,5 +1,7 @@
 # 05｜商城、扫码支付与权威交付
 
+**2026-11-02 抽卡演出仅有限视觉通过，0202不得发布。** 四pool16图实际回退并回窗、39券保持，未真人抽卡／交易；但10次CustomGameEvent序列化失败仍在，已正常退出并完整恢复0104。0203源码准备加入已审archive分包，尚未新计划／签包／原生。库存、概率、购买／发奖及已启用四码不改，正式远端仍0104。见[结果及交易边界](evidence/lottery_arcade_delivery_20261102.md)及[机器摘要](evidence/lottery_arcade_delivery_20261102.public.json)。
+
 **2026-11-02 四档普通券已启用**：10／50／100／200张`lottery_ticket`，仅普通地图奖池`map`，每账号每码一次，四码累计360张。生产新增4行后，`verify_af0475ac`确认`FOUR_ROWS_MATCH_VERIFIED`：共132项、旧128项不变，API／支付未重启。原始同批明文仅私有Excel，桌面`普通抽奖券四档兑换码_已启用_20261102.xlsx`已交付；登记和交付完成不等于真人兑换到账实测。无需游戏包或后台代码部署，本轮0封面／游戏上传、正式0104未变。见[结果与边界](evidence/cover_ticket_codes_20261102.md)及[机器证据](evidence/cover_ticket_codes_20261102.public.json)。
 
 2026-10-31 商城/福利/兑换码：3102恢复正常联网写入，WS4三表两RPC及128项既有码已接入，真人领取待新版新局确认。见[本次发行](evidence/shop_recovery_release_20261031.md)。
