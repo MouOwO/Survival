@@ -1,5 +1,5 @@
 """Isolated boundaries. No SSH, PostgreSQL, credentials, SDK or native clients."""
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 import contextlib
 import copy
 import hashlib
@@ -246,6 +246,27 @@ class OperatorTests(unittest.TestCase):
             path=Path(temp)/'plan.json';path.write_bytes(driver.canonical({'local_operator_inputs':{}}))
             with self.assertRaisesRegex(ValueError,'complete_operator_input_set'):
                 driver.checked_plan(path,driver.sha(path.read_bytes()))
+
+    def test_windows_planner_emits_posix_stage_accepted_by_real_server_guard(self):
+        observed={'status':'READ_ONLY_WS4_TICKET_INVENTORY','database':'goufayu_ws4','connection_port':15432,
+            'definitions':BASE,'bundle_hash':'d573588b64d2ea6d1431c856d52e0515b5ed471cfdf6af4456ff618d0f568488'}
+        with tempfile.TemporaryDirectory()as temp,patch.object(driver,'OUT',Path(temp)):
+            folder=Path(temp);inventory=folder/'inventory.json';registry=folder/'registry.json';output=folder/'plan.json'
+            inventory.write_bytes(driver.canonical(observed));registry.write_bytes(driver.canonical(REGISTRY))
+            fake_operator=SimpleNamespace(STAGE_ROOT=PureWindowsPath('/root/goufayu_upload/ticket_codes_20261102'),validate_registry=op.validate_registry)
+            def module_for_plan(name,path):return definitions if Path(path).name=='definitions.py'else fake_operator
+            with patch.object(driver,'module',side_effect=module_for_plan),patch.object(driver.secrets,'token_hex',return_value='123456abcdef'):
+                result=driver.create_plan(inventory,driver.sha(inventory.read_bytes()),registry,driver.sha(registry.read_bytes()),output)
+            plan=json.loads(output.read_bytes());stage=plan['stage']
+            self.assertEqual(stage,'/root/goufayu_upload/ticket_codes_20261102/run_123456abcdef')
+            self.assertNotIn('\\',stage)
+            # Execute the actual server path guard with POSIX semantics and
+            # nonexistent-filesystem metadata, without Linux/SSH or source edits.
+            with patch.object(op,'Path',PurePosixPath),patch.object(op,'STAGE_ROOT',PurePosixPath('/root/goufayu_upload/ticket_codes_20261102')),\
+                 patch.object(PurePosixPath,'is_symlink',return_value=False,create=True):
+                self.assertEqual(str(op.stage_path(plan)),stage)
+                broken={'stage':str(PureWindowsPath(stage))}
+                with self.assertRaisesRegex(RuntimeError,'stage_scope_invalid'):op.stage_path(broken)
 
 
 if __name__=='__main__':unittest.main()

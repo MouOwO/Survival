@@ -4,7 +4,7 @@ Every input/phase is pinned; production apply is a separate explicit action.
 No real code generation, live-player redemption, service stop/restart or SQL
 migration is implemented. Backup plaintext stays on the server/in local RAM.
 """
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import argparse
 import base64
 import hashlib
@@ -81,7 +81,11 @@ def create_plan(inventory_path, inventory_sha, registry_path, registry_sha, outp
     run='run_'+secrets.token_hex(6)
     files={'operator.py':(HERE/'ws4_operator.py').read_bytes(),'clone_checks.py':(HERE/'clone_checks.py').read_bytes(),
            'registry.json':raw_registry}
-    value={'schema':1,'database':'goufayu_ws4','port':15432,'stage':str(op.STAGE_ROOT/run),
+    # The target is Linux even when this planner is running on Windows. Never
+    # serialize str(WindowsPath('/root/...')) into a remote stage identifier.
+    remote_stage=PurePosixPath(op.STAGE_ROOT.as_posix())/run
+    need(remote_stage.is_absolute()and '\\'not in str(remote_stage),'posix_remote_stage_required')
+    value={'schema':1,'database':'goufayu_ws4','port':15432,'stage':str(remote_stage),
            'inventory':observed,'inventory_sha256':sha(raw_inventory),'registry_path':str(Path(registry_path).resolve()),
            'registry_sha256':sha(raw_registry),'files':{k:sha(v)for k,v in files.items()},
            'local_operator_inputs':{name:sha((HERE/name).read_bytes())for name in
@@ -123,10 +127,10 @@ scope={};exec(compile(raw,'sealed_ticket_operator','exec'),scope)
 print(json.dumps(scope['dispatch'](ACTION,PLAN),sort_keys=True))
 '''
     # One request only. Unknown commit/SSH failures never automatically retry.
-    intent=OUT/(Path(plan['stage']).name+'_'+action+'_local_intent.json')
+    intent=OUT/(PurePosixPath(plan['stage']).name+'_'+action+'_local_intent.json')
     if action!='verify':new_json(intent,{'action':action,'plan_sha256':digest,'automatic_retry':False})
     result=remote(code,timeout=600 if action=='clone'else 180)
-    receipt=OUT/(Path(plan['stage']).name+'_'+action+'_'+secrets.token_hex(4)+'.json')
+    receipt=OUT/(PurePosixPath(plan['stage']).name+'_'+action+'_'+secrets.token_hex(4)+'.json')
     new_json(receipt,result)
     return {'status':result.get('status','PHASE_COMPLETED'),'receipt':str(receipt),'sha256':sha(receipt.read_bytes()),
             'automatic_retry':False,'player_redemption_performed':False}
@@ -143,7 +147,7 @@ print(json.dumps({'data':base64.b64encode(raw).decode(),'sha256':saved['sha256']
     value=remote(code,90);raw=base64.b64decode(value['data'],validate=True);need(sha(raw)==value['sha256'],'backup_transport_mismatch')
     crypto=module('ticket_existing_dpapi',ROOT/'tools/onboarding_release_20261025/deploy.py')
     encrypted=crypto.dpapi(raw);need(sha(crypto.dpapi(encrypted,decrypt=True))==value['sha256'],'dpapi_roundtrip_failed')
-    folder=OUT/'private/backups';folder.mkdir(parents=True,exist_ok=True);target=folder/(Path(plan['stage']).name+'.dump.dpapi')
+    folder=OUT/'private/backups';folder.mkdir(parents=True,exist_ok=True);target=folder/(PurePosixPath(plan['stage']).name+'.dump.dpapi')
     with target.open('xb')as stream:stream.write(encrypted)
     ack={'encrypted_roundtrip_verified':True,'sha256':value['sha256'],'ciphertext_sha256':sha(encrypted),'ciphertext_bytes':len(encrypted)}
     result=remote(operator_source()+'\nprint(json.dumps(acknowledge_backup('+repr(plan)+','+repr(ack)+'),sort_keys=True))\n')
