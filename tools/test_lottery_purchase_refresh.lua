@@ -1,6 +1,9 @@
 -- Standalone Lua 5.1 regression for purchase-triggered lottery refresh.
 -- Execute from the repository root. No HTTP, accounts, archive writes or game APIs.
 package.path = 'scripts/vscripts/?.lua;' .. package.path
+-- Isolated admitted-player fixture; production admission is not modified.
+package.loaded['core/test_access_policy']={enabled=function()return true end,
+    enforce=function(id)return id==0 or id==1 end}
 
 local bus = require('core/event_bus')
 local events = require('core/events')
@@ -447,6 +450,42 @@ test('refresh publishes every pool and owned count without guessing purchase rew
     equal(h.get(0, nil, nil, 'special').snapshot.items[1].owned_count, 5)
     equal(#h.reads, 2)
     equal(#h.commands, 0, 'profile change is read-only and grants no local inventory')
+end)
+
+test('committed applied receipt returns immediately without another snapshot HTTP', function()
+    local h=harness();h.seed(0,20,0)
+    local completed
+    h.request(events.LOTTERY_DRAW_REQUEST,{player_id=0,pool_id='map',count=10,
+        request_id='fast_receipt',complete=function(result)completed=result end})
+    h.commands[1].done({ok=true,lottery_profile_applied=true,snapshot_config_hash='regression_bundle',
+        lottery_snapshots={fixture(10,2)},response={ok=true,count=10,results={{id='reward'}}}})
+    assert(completed and completed.ok);equal(completed.snapshot.tickets,10)
+    equal(#h.reads,1,'Only initial seed, zero post-command HTTP');equal(#h.commands,1)
+end)
+
+test('receipt projection retires older read ownership and does not accept its late reply', function()
+    local h=harness();h.seed(0,20,0);h.changed(0)
+    local completed,waiting
+    h.get(0,function(result)waiting=result end)
+    h.request(events.LOTTERY_DRAW_REQUEST,{player_id=0,pool_id='map',count=10,
+        request_id='fast_overlap',complete=function(result)completed=result end})
+    h.commands[1].done({ok=true,lottery_profile_applied=true,snapshot_config_hash='regression_bundle',
+        lottery_snapshots={fixture(10,2)},response={ok=true}})
+    assert(completed and waiting);equal(h.get(0).snapshot.tickets,10)
+    h.reply(2,{fixture(99,99)});equal(h.get(0).snapshot.tickets,10)
+    equal(#h.reads,2,'No extra read after old response is discarded')
+end)
+
+test('stale profile or wrong config receipt still waits for authoritative endpoint', function()
+    for _,case in ipairs({{applied=false,hash='regression_bundle'},{applied=true,hash='wrong'}}) do
+        local h=harness();h.seed(0,20,0);local completed
+        h.request(events.LOTTERY_DRAW_REQUEST,{player_id=0,pool_id='map',count=10,
+            request_id='stale_fast',complete=function(result)completed=result end})
+        h.commands[1].done({ok=true,lottery_profile_applied=case.applied,snapshot_config_hash=case.hash,
+            lottery_snapshots={fixture(99,99)},response={ok=true}})
+        equal(completed,nil);equal(#h.reads,2)
+        h.reply(2,{fixture(10,2)});equal(completed.snapshot.tickets,10)
+    end
 end)
 
 print('LOTTERY_PURCHASE_REFRESH_PASS: ' .. passed .. ' regression cases; real event bus/delta; deferred authority; no network')

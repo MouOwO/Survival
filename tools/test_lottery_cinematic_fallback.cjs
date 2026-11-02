@@ -56,17 +56,19 @@ const rows=[];
  oldCallbacks.forEach(fn=>fn());assert.equal(done,1);assert.equal(f.jobs.size,0);assert(f.metrics.peakJobs<=2);
  rows.push({case:'async_error_theme_animation_then_result',new_nodes:5,peak_timers:f.metrics.peakJobs});
 }
-// Sync decoder failure also animates; same theme reuses texture and five nodes.
+// Sync decoder failure is local to this draw; next draw retries and restarts its layer.
 {
  const f=fixture(),api=f.load();f.setFailure(true);let done=0;
  assert(api.Play('map',[],()=>done++));f.advance(.02);assert(f.nodes.get('LotteryCinematicFallback').classes.has('LCFallbackActive'));
  f.advance(3.7);assert.equal(done,1);const created=f.metrics.created,images=f.metrics.images.length;
  const reads=f.metrics.classReads;
- api.Play('map',[],()=>done++);f.advance(3.7);assert.equal(done,2);assert.equal(f.metrics.created-created,0,'Known failed pool must not create another native Movie');
- assert.equal(f.metrics.classReads,reads,'Known failed pool needs no decoder polling');
- assert.equal(f.metrics.images.length,images,'Same current texture must not be rewritten');
- api.Play('dragon_knight',[],()=>done++);assert.equal(f.metrics.images.length,images+1);api.Cancel();assert.equal(done,2);
- rows.push({case:'sync_error_reuse_one_current_theme'});
+ const oldLayer=f.nodes.get('LotteryCinematicFallback');
+ api.Play('map',[],()=>done++);f.advance(3.7);assert.equal(done,2);assert.equal(f.metrics.created-created,6,'One fresh Movie and fixed five-node fallback per failed draw');
+ assert.equal(oldLayer.alive,false);assert.notEqual(f.nodes.get('LotteryCinematicFallback'),oldLayer);
+ assert.equal(f.metrics.classReads,reads,'Synchronous failures require no poll');
+ assert.equal(f.metrics.images.length,images+1);
+ f.setFailure(false);api.Play('map',[],()=>done++);assert(f.nodes.get('LotteryCinematicMovie').played);f.advance(7.1);assert.equal(done,3,'A recovered decoder plays again in the same game');
+ rows.push({case:'sync_failure_next_draw_recovers_and_fallback_timeline_rebuilt'});
 }
 // Skip dispatches the existing consumer action once; close cancels without grant.
 {
@@ -92,24 +94,24 @@ const rows=[];
  old.Play('map',[],()=>first++);failAsync(f);const stale=[...f.history.values()].map(j=>j.fn);
  old.Play('summer',[],()=>second++);stale.forEach(fn=>fn());assert.equal(first,0);assert.equal(second,0);
  failAsync(f);f.advance(3.8);assert.equal(second,1);
- old.Play('map',[],()=>first++);assert(!f.nodes.has('LotteryCinematicMovie'),'Cached failed map uses theme directly');const oldPending=[...f.jobs.values()].map(j=>j.fn),fresh=f.load();
+ old.Play('map',[],()=>first++);assert(f.nodes.has('LotteryCinematicMovie'),'Every draw retries media');const oldPending=[...f.jobs.values()].map(j=>j.fn),fresh=f.load();
  fresh.Play('summer',[],()=>second++);oldPending.forEach(fn=>fn());assert.equal(first,0);f.advance(7.1);assert.equal(second,2);assert.equal(f.jobs.size,0);
  rows.push({case:'replacement_dispose_stale_callbacks'});
 }
-// Only the failed pool is bypassed, and module replacement retries fresh media.
+// Every pool gets fresh media on each successive draw; failures never poison the session.
 {
  const f=fixture(),api=f.load();let done=0;
  for(const pool of ['map','cultivation','dragon_knight','summer']){
   api.Play(pool,[],()=>done++);assert(f.nodes.has('LotteryCinematicMovie'),'Another pool keeps its original video');
   failAsync(f);f.advance(3.8);
   const created=f.metrics.created,reads=f.metrics.classReads;
-  api.Play(pool,[],()=>done++);f.advance(3.8);
-  assert.equal(f.metrics.created,created);assert.equal(f.metrics.classReads,reads);assert.equal(f.jobs.size,0);
+  api.Play(pool,[],()=>done++);assert(f.nodes.has('LotteryCinematicMovie'));failAsync(f);f.advance(3.8);
+  assert.equal(f.metrics.created,created+6);assert.equal(f.metrics.classReads,reads+1);assert.equal(f.jobs.size,0);
  }
  assert.equal(done,8);const fresh=f.load();fresh.Play('map',[],()=>done++);
  assert(f.nodes.has('LotteryCinematicMovie'),'New module must not retain a previous game decoder failure');
  f.advance(7.1);assert.equal(done,9);
- rows.push({case:'four_pool_failure_index_repeat_zero_movie_and_poll_module_reset',cached_movie_creations:0,cached_native_class_reads:0});
+ rows.push({case:'four_pools_repeat_after_failure_fresh_movie_each_draw',nodes_per_failed_draw:6,native_error_checks:1});
 }
 // New direct preview is Tools-only at both registration and invocation.
 {
@@ -131,8 +133,8 @@ const rows=[];
  assert(f.messages.includes('[LOTTERY_CINEMATIC] stage=complete pool=map preview=true'));
  const reads=f.metrics.classReads,created=f.metrics.created;
  api.Preview('map');f.advance(3.8);
- assert(f.messages.includes('[LOTTERY_CINEMATIC] stage=fallback pool=map reason=circuit_open preview=true'));
- assert.equal(f.metrics.classReads,reads);assert.equal(f.metrics.created,created);
+ assert.equal(f.messages.filter(m=>m==='[LOTTERY_CINEMATIC] stage=fallback pool=map reason=sync_error preview=true').length,2);
+ assert.equal(f.metrics.classReads,reads);assert.equal(f.metrics.created,created+6);
  assert.equal(f.messages.filter(m=>m==='[LOTTERY_CINEMATIC] stage=complete pool=map preview=true').length,2);
  rows.push({case:'ordinary_zero_transaction_preview_phase_logs_and_cached_theme'});
 }
@@ -141,4 +143,13 @@ for(const name of ['LCThemeReveal','LCHaloReveal','LCRingConverge','LCFlareRevea
  assert(css.includes("@keyframes '"+name+"'"));assert(css.includes('animation-name:'+name));
 }
 assert(css.includes('transform:scale3d(')&&css.includes('animation-duration:3.6s'));
+{
+ const f=fixture(),api=f.load();let done=0,last=null;
+ for(let round=0;round<3;round++){
+  assert(api.Play('map',Array.from({length:10},()=>({quality:'sr'})),()=>done++));
+  const current=f.nodes.get('LotteryCinematicMovie');assert(current.played);assert.notEqual(current,last);
+  f.advance(7.1);assert.equal(done,round+1);assert.equal(f.jobs.size,0);last=current;
+ }
+ rows.push({case:'three_consecutive_ten_result_presentations',completed:done,peak_timers:f.metrics.peakJobs});
+}
 console.log(JSON.stringify({status:'LOTTERY_CINEMATIC_FALLBACK_PASS',scope:'production functions and CSS timeline declarations; not native rendered animation or video playback',cases:rows,native_calls:0,reward_requests:0}));

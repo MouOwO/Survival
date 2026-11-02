@@ -16,6 +16,7 @@ local seed_ok,seed=pcall(require,'config/generated/lottery_catalog_manifest')
 local seed_md5=seed_ok and type(seed)=='table' and seed.config_hash==bundle.hash and type(seed.catalog_md5)=='string'
     and #seed.catalog_md5==32 and not seed.catalog_md5:find('[^0-9a-f]') and seed.catalog_md5 or nil
 local session=tostring(DoUniqueString and DoUniqueString('lottery_http') or os.time()):gsub('[^%w_.-]','_')
+local pool_ids={map=true,cultivation=true,dragon_knight=true,summer=true}
 local function catalog_scope()
     local current_session=tostring(require('systems/match_setup_service').get_session_id() or '')
     if current_session~=catalog_session then
@@ -220,10 +221,17 @@ local function submit(payload,kind)
     if kind=='lottery_draw' then command.count=payload.count
     elseif kind=='lottery_exchange' then command.item_id=payload.item_id
     else command.read_action=payload.read_action;command.revision=payload.revision end
+    local started=type(GetSystemTimeMS)=='function' and GetSystemTimeMS() or nil
     local job={owner=owner,kind=kind,hash=active_hash};busy[id]=job
+    local function timing(stage)
+        if started and kind=='lottery_draw' then
+            print('[LOTTERY_TIMING] stage='..stage..' elapsed_ms='..tostring(math.max(0,GetSystemTimeMS()-started)))
+        end
+    end
     local attempts=0
     local function finish(result)
         if busy[id]~=job or not current(id,owner) then return end
+        timing('settlement_ack')
         busy[id]=nil
         local response=type(result.response)=='table' and result.response or {ok=result.ok,error=result.error}
         response.request_id=payload.request_id;response.pool_id=payload.pool_id
@@ -261,7 +269,38 @@ local function submit(payload,kind)
             elseif payload.complete then payload.complete({ok=result.ok,snapshot=snapshot,error=result.error}) end
             return
         end
+        -- Fast path uses only this authenticated, successfully applied commit.
+        -- Fixed <=4 pool projections; no inventory/HUD scan and no extra HTTP.
+        local projected=result.lottery_snapshots
+        local valid_projection=result.ok and result.lottery_profile_applied==true
+            and job.hash==active_hash and result.snapshot_config_hash==job.hash
+            and type(projected)=='table' and #projected>=1 and #projected<=4
+        local selected,seen=nil,{}
+        if valid_projection then
+            for _,snapshot in ipairs(projected) do
+                local pool=type(snapshot)=='table' and snapshot.selected_pool_id
+                if not pool_ids[pool] or seen[pool] then
+                    valid_projection=false;break
+                end
+                seen[pool]=true
+                if pool==payload.pool_id then selected=snapshot end
+            end
+            valid_projection=valid_projection and selected~=nil
+        end
+        if valid_projection then
+            epochs[id]=(epochs[id] or 0)+1
+            loading[id]=nil -- Late older reads no longer own this generation.
+            for _,snapshot in ipairs(projected) do stamp(snapshot,owner,job.hash) end
+            publish(id,projected);published_epochs[id]=epochs[id]
+            response.snapshot=view(id,payload.pool_id)
+            local callbacks=waiters[id] or {};waiters[id]={}
+            for _,fn in ipairs(callbacks) do if current(id,owner) then fn({ok=true,snapshots=projected}) end end
+            if payload.complete then payload.complete(response) end
+            timing('receipt_snapshot_ready')
+            return
+        end
         fetch(id,function(refreshed)
+            timing('fallback_snapshot_ready')
             -- Do not report a stale cached balance as the post-command snapshot.
             response.snapshot=refreshed.ok and view(id,payload.pool_id) or nil
             if kind=='lottery_read' and not result.ok then response.snapshot=nil end

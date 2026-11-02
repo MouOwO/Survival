@@ -238,7 +238,9 @@ class ArchiveService:
         prepared=self.app.rpc_client.rpc("archive_prepare",{"p_account":database_id,"p_id":command["id"],
             "p_hash":requested_hash,"p_fingerprint":fingerprint,"p_command":command})
         result=self.finish_prepared(database_id,command["id"],prepared)
-        return self.app._public_response(result,database_id,account)
+        reply=self.app._public_response(result,database_id,account)
+        from .lottery_receipt_snapshot import attach
+        return attach(self,reply,command,requested_hash)
 
     def endless_batch(self, payload):
         """Bounded transport batch; durable per-wave receipts remain unchanged."""

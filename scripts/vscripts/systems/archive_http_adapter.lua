@@ -20,12 +20,15 @@ function M.submit(player_id,command,complete,lottery_hash)
         config_hash=lottery_hash
     end
     provider.archive_submit({account_id=account,config_hash=config_hash,command=command},function(result)
+        result.lottery_profile_applied=false
         if result.profile then
             if tostring(result.profile.account_id)~=tostring(account) then
                 complete({ok=false,terminal=true,error="account_id_mismatch"});return
             end
             local applied=profiles.apply_snapshot(player_id,result.profile,"archive_"..command.kind)
             if not applied.ok and applied.error~="snapshot_revision_stale" then complete(applied);return end
+            -- Local marker, never trusted from HTTP: stale receipts cannot become cache bases.
+            result.lottery_profile_applied=applied.ok==true
         end
         complete(result)
     end,function(error,status)
