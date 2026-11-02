@@ -32,7 +32,7 @@ function fixture(options={}){
  if(options.tools!==undefined)context.Game={IsInToolsMode:()=>options.tools,AddCommand:(name,fn)=>metrics.commands.push({name,fn})};
  function load(){vm.runInNewContext(source,context,{filename:'lottery_cinematic_v1.js'});return cfg.LotteryCinematic}
  function advance(seconds){const end=now+seconds;for(;;){const next=[...jobs.values()].filter(j=>j.due<=end).sort((a,b)=>a.due-b.due||a.id-b.id)[0];if(!next)break;now=next.due;jobs.delete(next.id);next.fn()}now=end}
- return {cfg,metrics,nodes,jobs,history,root,load,advance,setFailure:value=>syncFailure=value};
+ return {cfg,metrics,nodes,jobs,history,root,messages,load,advance,setFailure:value=>syncFailure=value};
 }
 function failAsync(f){const movie=f.nodes.get('LotteryCinematicMovie');movie.classes.add('MovieError');f.advance(.11);assert(!movie.alive,'Failed native Movie must be retired');return f.nodes.get('LotteryCinematicFallback')}
 const rows=[];
@@ -61,7 +61,9 @@ const rows=[];
  const f=fixture(),api=f.load();f.setFailure(true);let done=0;
  assert(api.Play('map',[],()=>done++));f.advance(.02);assert(f.nodes.get('LotteryCinematicFallback').classes.has('LCFallbackActive'));
  f.advance(3.7);assert.equal(done,1);const created=f.metrics.created,images=f.metrics.images.length;
- api.Play('map',[],()=>done++);f.advance(3.7);assert.equal(done,2);assert.equal(f.metrics.created-created,1,'Only fresh Movie is created after cached fallback');
+ const reads=f.metrics.classReads;
+ api.Play('map',[],()=>done++);f.advance(3.7);assert.equal(done,2);assert.equal(f.metrics.created-created,0,'Known failed pool must not create another native Movie');
+ assert.equal(f.metrics.classReads,reads,'Known failed pool needs no decoder polling');
  assert.equal(f.metrics.images.length,images,'Same current texture must not be rewritten');
  api.Play('dragon_knight',[],()=>done++);assert.equal(f.metrics.images.length,images+1);api.Cancel();assert.equal(done,2);
  rows.push({case:'sync_error_reuse_one_current_theme'});
@@ -90,9 +92,24 @@ const rows=[];
  old.Play('map',[],()=>first++);failAsync(f);const stale=[...f.history.values()].map(j=>j.fn);
  old.Play('summer',[],()=>second++);stale.forEach(fn=>fn());assert.equal(first,0);assert.equal(second,0);
  failAsync(f);f.advance(3.8);assert.equal(second,1);
- old.Play('map',[],()=>first++);failAsync(f);const oldPending=[...f.jobs.values()].map(j=>j.fn),fresh=f.load();
+ old.Play('map',[],()=>first++);assert(!f.nodes.has('LotteryCinematicMovie'),'Cached failed map uses theme directly');const oldPending=[...f.jobs.values()].map(j=>j.fn),fresh=f.load();
  fresh.Play('summer',[],()=>second++);oldPending.forEach(fn=>fn());assert.equal(first,0);f.advance(7.1);assert.equal(second,2);assert.equal(f.jobs.size,0);
  rows.push({case:'replacement_dispose_stale_callbacks'});
+}
+// Only the failed pool is bypassed, and module replacement retries fresh media.
+{
+ const f=fixture(),api=f.load();let done=0;
+ for(const pool of ['map','cultivation','dragon_knight','summer']){
+  api.Play(pool,[],()=>done++);assert(f.nodes.has('LotteryCinematicMovie'),'Another pool keeps its original video');
+  failAsync(f);f.advance(3.8);
+  const created=f.metrics.created,reads=f.metrics.classReads;
+  api.Play(pool,[],()=>done++);f.advance(3.8);
+  assert.equal(f.metrics.created,created);assert.equal(f.metrics.classReads,reads);assert.equal(f.jobs.size,0);
+ }
+ assert.equal(done,8);const fresh=f.load();fresh.Play('map',[],()=>done++);
+ assert(f.nodes.has('LotteryCinematicMovie'),'New module must not retain a previous game decoder failure');
+ f.advance(7.1);assert.equal(done,9);
+ rows.push({case:'four_pool_failure_index_repeat_zero_movie_and_poll_module_reset',cached_movie_creations:0,cached_native_class_reads:0});
 }
 // New direct preview is Tools-only at both registration and invocation.
 {
@@ -104,6 +121,20 @@ const rows=[];
  assert.equal(f.nodes.has('LotteryCinematicMovie'),false);f.advance(.02);assert(f.nodes.get('LotteryCinematicFallback').classes.has('LCFallbackActive'));
  f.advance(3.7);assert.equal(f.nodes.get('LotteryCinematicSurface').visible,false);assert.equal(f.jobs.size,0);
  rows.push({case:'tools_only_direct_native_preview_without_movie_or_rewards'});
+}
+// Ordinary-client visual-only previews expose bounded nonsecret phase evidence.
+{
+ const f=fixture({tools:false}),api=f.load();f.setFailure(true);
+ api.Preview('map');f.advance(3.8);
+ assert(f.messages.includes('[LOTTERY_CINEMATIC] stage=preview pool=map'));
+ assert(f.messages.includes('[LOTTERY_CINEMATIC] stage=fallback pool=map reason=sync_error preview=true'));
+ assert(f.messages.includes('[LOTTERY_CINEMATIC] stage=complete pool=map preview=true'));
+ const reads=f.metrics.classReads,created=f.metrics.created;
+ api.Preview('map');f.advance(3.8);
+ assert(f.messages.includes('[LOTTERY_CINEMATIC] stage=fallback pool=map reason=circuit_open preview=true'));
+ assert.equal(f.metrics.classReads,reads);assert.equal(f.metrics.created,created);
+ assert.equal(f.messages.filter(m=>m==='[LOTTERY_CINEMATIC] stage=complete pool=map preview=true').length,2);
+ rows.push({case:'ordinary_zero_transaction_preview_phase_logs_and_cached_theme'});
 }
 assert(css.includes('#LotteryCinematicMovie #ErrorMessage { visibility:collapse; }'));
 for(const name of ['LCThemeReveal','LCHaloReveal','LCRingConverge','LCFlareReveal']){

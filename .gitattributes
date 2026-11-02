@@ -259,3 +259,9 @@ tools/redemption_ticket_codes_20261102/*.py text eol=lf
 tools/redemption_ticket_codes_20261102/*.json text eol=lf
 tools/redemption_ticket_codes_20261102/*.md text eol=lf
 publishing/workshop/gou_fayu_cover_20261102.json text eol=lf
+
+# Independent lottery hotfix operator sources: immutable LF inputs.
+tools/lottery_hotfix_release_20261102/*.py text eol=lf
+tools/lottery_hotfix_release_20261102/*.md text eol=lf
+tools/lottery_hotfix_release_20261102/*.json text eol=lf
+tools/lottery_hotfix_release_20261102/*.ps1 text eol=lf

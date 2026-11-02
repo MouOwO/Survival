@@ -6,8 +6,8 @@
   "canonical_journal": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\four_accounts_20261022\\steam_upload_state.json",
   "lineage_state": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\release_lineage_20261101\\state.json",
   "publication_lock": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\four_accounts_20261022\\steam_upload_state.json.lock",
-  "validator_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\tools\\portrait_resolution_release_20261102\\validator.py",
-  "validator_sha256": "d081b93eabb8de92cec9e2e57e035dbf42237e435e39e687774141e98f1284ae",
+  "validator_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\tools\\lottery_hotfix_release_20261102\\validator.py",
+  "validator_sha256": "997b319fecdcc7af1e166f5295897f963d0dfe2529ba6ba1f7d09c525cb43a44",
   "repositories": {
     "game": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival",
     "content": "D:/SteamLibrary/steamapps/common/dota 2 beta/content/dota_addons/Survival"
@@ -23,22 +23,28 @@
       "eb281a1398466876575a5885e60a8dd207e5f556"
     ]
   },
-  "recipe_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\tools\\portrait_resolution_release_20261102\\build_release.py",
-  "recipe_sha256": "05f52c5b0fe18f8d219751b988e3d3100fb8368cf0019777f41f7693227aa859",
-  "rehearsal_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\tools\\portrait_resolution_release_20261102\\rehearsal.py",
-  "rehearsal_sha256": "24c18c681aaf649e3a0cc2c974ab2209f44f9344ccdec9d5ac81fddaa9a68948",
+  "recipe_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\tools\\lottery_hotfix_release_20261102\\build_release.py",
+  "recipe_sha256": "49aa99a6a149aba573c62ac438abe6fb3b77e6837f9729d54d505cd9608ae79e",
+  "rehearsal_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\tools\\lottery_hotfix_release_20261102\\rehearsal.py",
+  "rehearsal_sha256": "dda926955aae3ea7cb591130a9b5df2392a4184acf38591691aecd384c049d57",
   "listing_template_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\publishing\\workshop\\release_listing_template_20261101.json",
   "listing_template_sha256": "3f0031eb39e84f5db0195793d7b1abed00a1d428f25a7c1a138ecca9d63f9ef0",
   "reviewed_source_baseline_sha256": "3a60ddab9a93b58fa936e789f1a9d2008d39ed7eca9545487e1f40bf32219ee3",
-  "scope": "RESOLUTION_AWARE_SHARED_BOSSES_PORTRAIT_TELEPORT_ARCHIVE_HUD_17_RESOURCES",
+  "scope": "LOTTERY_MOVIEERROR_FALLBACK_TRAINING_CHINESE_FOUR_RESOURCES",
   "historical_deferred_changes": 220,
   "source_anchor_is_full_published_tree": false,
-  "download_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\tools\\portrait_resolution_release_20261102\\verify_download.py",
-  "download_sha256": "47b1ee96870f4832ff1169539f630e0bd3ba55e9338eb1e14c0477b4d4281fac",
-  "release_sequence": 2026110201,
+  "download_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\tools\\lottery_hotfix_release_20261102\\verify_download.py",
+  "download_sha256": "b79bc8ff35b41cc34a5d5424e23665426c31c35e8eb71b747a4a4126a445a554",
+  "release_sequence": 2026110202,
   "native_launch_profiles": [
     "direct",
     "lobby"
   ],
-  "manual_attach_adopt_allowed": false
+  "manual_attach_adopt_allowed": false,
+  "native_admission_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\tools\\lottery_hotfix_release_20261102\\native_admission.py",
+  "native_admission_sha256": "3174b75fb554532c2e0da44d077d5a7e332d01841f1415db54b5fc4df78541a0",
+  "unpublished0201_deferred_source_entries": {
+    "game": 20,
+    "content": 3
+  }
 }

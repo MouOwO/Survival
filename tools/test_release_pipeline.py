@@ -216,4 +216,28 @@ class PipelineTests(unittest.TestCase):
         self.assertIsNone(g.read_json(self.f.state)[0]['pending'])
 
 
+class ActiveHotfixRegistrationTests(unittest.TestCase):
+    def test_actual_registered_hotfix_paths_and_all_reviewed_pins(self):
+        auth=p.authority()
+        self.assertEqual(auth.policy['release_sequence'],2026110202)
+        self.assertEqual(auth.policy['scope'],'LOTTERY_MOVIEERROR_FALLBACK_TRAINING_CHINESE_FOUR_RESOURCES')
+        for prefix in ('validator','recipe','rehearsal','download','native_admission'):
+            path,raw=p.pinned_bytes(auth,prefix)
+            self.assertEqual(path.parent.name,'lottery_hotfix_release_20261102')
+        loaded=g._validator(auth)
+        self.assertEqual(loaded.RELEASE_SEQUENCE,2026110202)
+        self.assertIsNone(loaded.b)
+        self.assertIsNone(loaded.c)
+        with self.assertRaisesRegex(ValueError,'Only this exact four-resource'):
+            loaded.validate_release({'release_sequence':2026110201,'generation':1,'READY':True})
+
+    def test_actual_registered_hook_still_rejects_mutation_without_lease(self):
+        called=[]
+        native=lambda *args:called.append(args)
+        wrapped=p.hook.wrap_sdk_function('SteamAPI_ISteamUGC_StartItemUpdate',native)
+        with self.assertRaisesRegex(g.Refused,'reviewed_release_lease_required_before_sdk_mutation'):
+            wrapped(1,570,3824360109)
+        self.assertEqual(called,[])
+
+
 if __name__=='__main__':unittest.main()
