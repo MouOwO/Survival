@@ -1,0 +1,11 @@
+# 实际WS4回执优化｜2026-11-03
+
+本次目标只针对goufayu-ws4.service / goufayu_ws4:15432，不能使用旧goufayu-api.service的部署结果。父版20261101-admission-five-ffd96ff80622，manifest SHA256 970792238ee146c7dbb247e5fe1e7b320899c4f8273859223d591069a1a3d38e，805项manifest文件逐SHA校验通过。实际unit SHA256 e55585c23bba9be0bf7b75dc1a6de1563a1dfd0a6504220c1e0d5d8d784cd3f9；该服务直接使用WorkingDirectory，不使用legacy的current指针。ExecStart无父发行绝对路径，可仅精确替换WorkingDirectory一行。
+
+运行补丁只有两项：在已认证父service.py结算返回后插入只读attach，并添加lottery_receipt_snapshot.py，字节与已审阅14812ec23来源一致。新WS4发行20261103-ws4-lottery-receipt-d2c7c2e85920；完整旧发行、unit备份和逐操作回执保留。保持既有addon_root、bundle、环境、密钥、认证、SQL、抽奖规则/概率/奖励/真实记录；不上传本地整份service.py夹带其他差异。unit只允许在其原SHA匹配、probe通过且WS4待结算0时原子切换；只重启WS4 API。7个无关服务PID前后保持。原unit和完整旧目录可显式回滚。
+
+部署入口tools/ws4_lottery_receipt_20261103/deploy.py：默认静态；audit只读；prepare/probe/activate/verify/rollback必须指定不可变operator提交且工作字节与Git一致。保持同一admission锁与专用锁，拒绝并行操作和已存在回执重放。局部文件路径/父manifest/精确补丁锚点/源码SHA/数据库身份都有显式边界，不返回原始凭据或真实账号。probe仅使用合成profile、真实WS4冻结Lua/配置重复三次只读投影，RPC方法直接设为拒绝，不读取真实玩家，不提交抽奖/兑换。
+
+复杂度：部署初始化一次O(R字节)805项文件验证与完整复制；空闲0任务；每个成功draw沿用同一真实快照worker的O(C×I)与排序、最多4池，新增数据库/HTTP 0。正常快照回退保留；不改CPU复杂度、不承诺真实总耗时<1秒。probe固定3次，每个worker原有10秒上限，实际服务沿用4槽并发限制；不预热真实玩家或增加周期扫描。真实前样本ACK约981/1031ms，总快照ready约2717/2046ms，来自本机普通局观察，不能等同本补丁后的改善。上线后仍需真实样本比较。
+
+本审阅时audit已通过，prepare/probe/激活/独立verify尚未执行；只有后续真实回执才能改变该状态。

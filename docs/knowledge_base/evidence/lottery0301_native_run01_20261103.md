@@ -1,0 +1,13 @@
+# 0301 run01观察与正常恢复｜2026-11-03
+
+用户确认已进常规N1，另确认本局已完成Steam网页授权。owned PID31796/created_utc 2026-11-02T16:38:22.3229890Z，原keeper会话11420。初始截图lottery0301_n1_before01.png确见N1、建造者和第2波倒计时；不是登录截图。
+
+before01观察4个data卷都有同进程Dota使用，index已关闭；keeper持有完整5文件。原观察status=INCOMPLETE_NATIVE_FILE_USE_EVIDENCE保留，不能把其all_five/index=false改成true；现有policy接受4个data实际使用+外部完整签名绑定，但这本身不是整轮验收通过。
+
+存档正常点击的三张截图未得到存档窗口；后续截图有命运抉择modal遮挡，不能把点击返回ACTION_COMPLETED当界面打开/存档准入。VConsole预设29066连接拒绝，实际枚举出的54638不是VConsole协议，未取得原生命令回执；没有JS/Lua注入，没有擅自改端口或放宽准入。
+
+日志已出现两次真实抽奖结算，不由Root本轮自动指令发起；不能据此猜测操作者，不能将此局当无交易预览或三次十连证据。仅只读观察到ACK 980.8263ms / 1030.9265ms，总fallback snapshot ready 2716.9477ms / 2046.0668ms，定位额外串行快照等待。Root自动券预算仍0/30，用户被告知画面普通券1张不足三次十连，已请求之后独立交易轮次准备足额或先做预览。
+
+此前将券旁三角误称未同步警告已明确向用户纠正：源码LotteryGW2TicketHelp实际为普通券获取渠道说明，不是同步错误。不能以该图标推断缓存失效或否认用户授权。
+
+run01不准入、不上传。canonical close正常WM_CLOSE，keeper11420 exit0明确CLIENT_EXITED_RESTORE_REQUIRED；随后restore真实exit0，ORIGINAL0104_FIVE_FILES_FULLY_RESTORED，所有证据/备份/旧0301签包保留。正式游廊仍0104。实际WS4回执优化仅audit通过，后续部署不修改规则或真实数据，见tools/ws4_lottery_receipt_20261103及其开发审阅。
