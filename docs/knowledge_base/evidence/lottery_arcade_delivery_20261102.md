@@ -1,48 +1,49 @@
-# 2026-11-02 抽卡交付移交：0202因快照错误拒发，0203源码就绪
+# 2026-11-02 抽卡交付移交：0203已签，run03等待登录，尚未准入或发布
 
-**0202明确不得发布，不能把画面通过当作整体验收。** 普通owned客户端已完成四奖池16张真实图，39券保持，四池均实际走native_error→同主题动画→正常回窗；但完整原生日志在冷启动12:14:35／12:15:05累计10次`Failed to serialize CUserMsg_CustomGameEvent [148]`，触发保留的否决门槛。owned19776已正常关闭、keeper真实exit0并完整恢复0104（实际exit0）。正式远端仍0104，manifest `7025356658517360342`，没有Submit或新官方下载。
+**当前不是最终完成状态。** 0203已签并本地stage，owned普通run03（PID27636，UTC `2026-11-02T08:02:07.6220040Z`，端口29064）已启动并完成before01 inspection，正在等待用户正常网页登录；尚未观察本轮普通N1、四pool截图、after、退出或恢复。Root没有准入、没有SDK Submit；正式远端仍0104，manifest `7025356658517360342`。不能写“游廊已修好”或把此前画面移作本轮证据。
 
-当前新增0203薄适配仅源码就绪：0104父上原四项加已审`archive_service.lua`，尚未完成本轮新Git／plan／签名／原生验证。Root正在准备五项新候选；0202全部源码、签包、16图、日志与备份保留，旧视觉不能替代0203验收。
+## 实际原因与修复范围
 
-## 已确认的原因与交付范围
+实际0104四段WebM均在包内，与开发文件相同；安装旧JS/CSS没有新fallback，d71开发演出修复此前没有发布。原生MovieError是事实，底层读包／解码原因未证；官方intro松散文件、合法VP9/Vorbis头或Tools播放，都不能替代普通压包实测。
 
-实际0104内四段WebM均存在，且与开发片逐字节相同；安装的旧播放器JS/CSS没有新fallback。此前d71开发修复没有发布，已签未发0201也不包含它，因此不能把开发Tools演出成功当成用户当前游廊已修好。原生MovieError是已观察事实，底层读包或解码的具体原因尚未证明；官方intro为松散文件、同为VP9/Vorbis，只是待对照线索，不构成统一结论。
+0203 `WS4-LOTTERY-SNAPSHOT-03`以认证0104为父，精确五项：`lottery_cinematic_v1.vjs_c/.vcss_c`、`ui/production_ui_service.lua`、`ui/ui_request_router.lua`及`systems/archive_service.lua`。保留6917资源、184保护模块、五账号／四人容量及后台／支付配置；JS/CSS两组作者源、CRLF输入、官方产物及content镜像分别绑定。archive Git-LF为已审 `6a50c80d15ba98374d8a7df31aa664112070a8ffb4e8b71867a0fd1ae2cddec4`，只晋升UI-wire修复，不改奖励／RPC。
 
-独立热修复`2026110202 / WS4-LOTTERY-HOTFIX-02`以认证0104为父，仅替换四项既有运行文件：抽卡`lottery_cinematic_v1.vjs_c/.vcss_c`、`ui/production_ui_service.lua`、`ui/ui_request_router.lua`。JS/CSS作者源及content镜像另作两组官方编译绑定；视频与主题图继承父包。维持6917资源、184保护模块、原五账号／四人容量及后台配置。
+原18可信审查先完整认证，原17保持、router替换、production及archive新增，最终20；Training2与UIWire1分列。实际父Lua归一CRLF比较，仅中文训练映射／常量表提升，没有夹带认证、交易或发奖变更。0201其余16运行资源＋3game作者源＋3content镜像共22域延期，旧220延期不动；所有旧0201／0202产物保留，不宣称完整HEAD已发布。
 
-0202没有搭车0201未发布的17项，23个源域精确延期。0203仅晋升其中已审archive UI-wire一项（Git-LF SHA `6a50c80d15ba98374d8a7df31aa664112070a8ffb4e8b71867a0fd1ae2cddec4`），其余16运行资源＋3game作者源＋3content镜像共22域继续延期，旧220项历史延期不动。0201的头像／共享Boss等产物和原门槛保持；不宣称完整HEAD已发布，未来合并不能用旧播放器覆盖本轮修复。
+## 0202失败与0203逐轮边界
 
-先完整认证0104原18份可信审查，再仅替换其中已有router并新增production UI，最终19份、原17份逐字保持；两个训练源分别审查。直接对实际父源归一CRLF比较，production UI仅提升错误表为模块常量并增加训练中文映射，router仅修改注释及中文映射，未夹带认证、交易或发奖改动。第一次计划因错误的“父审阅与payload必须完全不交”假设在签名／换包前拒绝；修复不是放宽原18份保护。
+| 轮次 | 已观察事实 | 结论与恢复 |
+| --- | --- | --- |
+| 0202 owned19776 | 四池16张真实图、39券不变，各池native_error→fallback→return | 全日志冷启动12:14:35／12:15:05累计10次`Failed to serialize CUserMsg_CustomGameEvent [148]`，明确拒发；正常退出、keeper exit0及恢复0104实际exit0。旧证据全部保留。 |
+| 0203 run01 owned30076 | 普通standard N1和已填充通关存档两图的有限视觉 | 空场结束后未完成四池采集；不能验收。06:41:51同handle正常结束、06:49:26实际恢复0104，事务已完整归档C盘并留D指针。 |
+| 0203 run02 owned2172 | 四池日志链完成，计数39券保持 | Root实际看图发现结算遮罩覆盖，视觉明确拒绝；07:32:58同handle正常结束、07:41:32实际恢复0104。不能把日志完成当可见动画通过。 |
+| 0203 run03 owned27636 | 已stage、owned direct启动、before01真实执行 | 正在等待用户网页登录；本轮N1、四池、after、退出／恢复与准入均pending。 |
 
-## 不可变源码与实际产物
+run02关闭后的完整engine.log已独立只读筛查：295954字节／2886行，SHA `26f3f58d851fb01e159772b3b2443c68f4049d3efef88f6b038f27c82e8cd7db`，读取前后size／mtime稳定；CustomGameEvent序列化、SnapshotError、reliable-data-too-big及脚本runtime-error均0。只支持该有限关闭日志没有这些诊断，不消除视觉拒绝，不证明run03或长局稳定；没有复制原始日志或认证内容。
 
-运行源game `d611d7c7e27d2d0f0722bad9cce04fb8c3d862eb`、content `ef3f6ad1343ceb327a9932cd8317eafd7dd54874`；operator `0a82ff5e13bf63cbe58c98b3f5056d50482e5e11`，均已推送。
+run03 before01原始状态为`INCOMPLETE_NATIVE_FILE_USE_EVIDENCE`：四data卷真实Dota使用为true，index使用／all_five_open为false，6917／184外部签包绑定保持。原始false与INCOMPLETE不改写为完整PASS；后续还需同一进程的新实际画面和after证据。
 
-| 产物 | SHA256 |
+本地辅助脚本PS7自动日期反序列化丢失原ISO文本，以及F9暂停／镜头操作路径不符合预期，污染了采集时机；它们不是运行源码回归或游戏崩溃证明。采集应保留ISO原串（`ConvertFrom-Json -DateKind String`）；旧无效截图和被遮挡画面不能反复算通过。
+
+## 不可变源码和真实签包
+
+运行game `d611d7c7e27d2d0f0722bad9cce04fb8c3d862eb`、content `ef3f6ad1343ceb327a9932cd8317eafd7dd54874`，operator `11f25d8456356032ac01f80f6ef2b84fb6708f7b`均已推送；用户原5个dirty文件保留。后续知识提交不改变这三份冻结身份。
+
+| 0203产物 | SHA256 |
 | --- | --- |
-| `plan_v02.json` | `d24f0440a98a21c1e8e3868c5325d5ac12dbafca594db5c9be4b0954b6709a62` |
-| `unsigned_v02.json` | `201cae68824581108919f9c8ec8434c35d1b7ed025ba051c3237e30c9d39e806` |
-| 已签`package.json` | `3a59fd1528b99554d989685293ae29a2116b401db94ae7c3c354ad32cdc111a4` |
-| content身份 | `852e07b74d3bf289dc22ddf8691929a6e698a474606164d82681d34a59d4d307` |
+| plan_v01 | `16da85205b4b01e1814853e766c06fc0023efcd8f8c6afd4bc5d4b374bc08009` |
+| unsigned_v01 | `8796413039b4cf744677a820e38d2adcdb399e1a2694a36ac1918e8744413cd1` |
+| signed package | `8ae7d8a921eff12beac1376671a4f5b9713b37a8c2dfa1f75e33a87f7496ec10` |
+| content身份 | `9cfd6a09a1bda6b35f649cb2240b6de757f1d53aa91037416bd8657f55a21d54` |
 
-报告位于`output/lottery_hotfix_release_20261102/`。独立unsigned审阅实核四个物理payload与计划一致，manifest严格等父包四行投影：6913未变行、184保护行均保持；unsigned仅六个文件且没有签名。随后Root实际签包成功；这些证据仍不替代普通原生验收。
+独立unsigned审阅核五payload匹配plan，archive等已审6a50，其余四项逐字等0202；6912未变父行、184保护行、20审查和2compiled均符合，无签名。随后Root实际签名并分轮排演。新family26＋common28共54项隔离回归、9个生产演出模块模拟场景及两条consumer回归通过；这些不等于原生、FPS、真人花券或发奖通过。0202签包SHA `3a59fd1528b99554d989685293ae29a2116b401db94ae7c3c354ad32cdc111a4`继续保留为失败候选，不覆盖其记录。
 
-0202的64项发行隔离测试、9个生产模块模拟场景及两条consumer流程回归通过，JS/CSS官方编译两项成功；这没有阻止上述真实网络失败。0203新family26项＋common28项共54项隔离回归通过，仍不是原生验收。没有新增FPS结论。失败索引仅四个固定pool：初始化O(1)，稳定演出外0新计时器／原生状态查询；首错后该pool后续0新Movie、0错误轮询，至多五个复用节点／一张当前主题图、两个活动计时器。真实抽奖仍使用原ACK结果，不增加抽卡、购买、领取或兑换请求。
+## 接手与安全保留
 
-## 0202实机结果、退出与实际恢复
+Root负责run03正常登录／N1、四池无消耗预览和冷开档真实数据、完整最终日志零fatal、after、正常同handle退出及恢复0104；新证据全部符合后才准入／preflight／原条目更新／官方下载。本轮不要求真实抽卡结果或消费，票数不变的演出预览不能冒称玩家领奖。当前没有原生FPS改善结论，后台／支付未因此部署或重启。
 
-事务`run01_lottery_preview`位于`D:/Survival_本地排演/20261102_ws4_lottery_hotfix_v09/`，原owned普通PID19776、创建UTC`2026-11-02T03:58:42.2287750Z`、端口29062、direct路线，非Tools／离线逻辑测试。四池各早晚演出与窗前／返回共16张图，Root实际核对全部主题与回窗，39券不变；并非真人抽卡或结果卡片消费验证。
+lineage bootstrap已完成但仍head0104／generation0／pendingNone，没有Submit或canonical journal写入；CAS用于防过期包覆盖，不是发布完成。四pool失败索引固定4键，稳定演出外0新计时器／状态查询，同池首错后0新Movie／错误轮询；最多5复用节点、1当前主题图、2活动计时器，没有反复全场扫描。
 
-全日志10次序列化失败使0202拒发。Root于UTC04:57:13正常WM_CLOSE，04:57:15.265260的同retained handle证明`OWNED_DOTA_EXITED_HOLDS_COMPLETED`，keeper执行会话59744实际exit0；05:27:30.067788恢复回执为`ORIGINAL0104_FIVE_FILES_FULLY_RESTORED`，恢复命令真实exit0，保留备份，未写ACF或canonical journal。没有强杀、没有上传0202。
+空间归档只动completed＋restored事务：旧v03 33文件／7576239101字节、v04 31文件／7576239932字节，均在`C:/Survival_排演归档/20261102/completed_candidate14_v03`／`completed_candidate14_v04`；0202 run01为30文件／7576230438字节，位于`completed_lottery_hotfix0202_run01`；0203 run01为29文件／7576242209字节，位于`completed_lottery_snapshot0203_run01`。D原叶均留`ARCHIVED_TO_C_20261102.json`指针，未删除证据或触碰当前run03／正式包。后两份全SHA及有效Owner／Group／DACL核验，C目标保护继承，原SDDL／继承标志另存可恢复；不声称live继承位相同或独立验证SACL。旧恢复入口须先找回完整归档，不可直接对指针目录运行。
 
-## 0203源码与接手边界
-
-NEW `tools/lottery_snapshot_release_20261102`通过私有哈希钉死的薄适配复用0202构建／操作／下载，不改旧文件；独立v10输出与STORE、端口29064。五运行项、6917资源／184保护、20可信审查、两组compiled绑定；原18先完整认证，原17保持、router替换、production及archive新增，Training2和UIWire1分列。
-
-真实只读已推d611源码读取确认五项范围、archive等于已审6a50源码、剩19game＋3content域延期；这不是新plan或签包。当前尚未做0203新Git、plan、unsigned、签名、换包或原生测试。Root接续双仓同步、新具体候选及排演；普通冷N1开档与四pool新证据、完整日志零序列化／Snapshot错误、正常退出和0104恢复均须重新取得，之后才能preflight／原条目更新／官方下载。旧0202视觉、Tools或模拟回归都不能冒充新包通过。用户已准许重开，执行仍由Root负责；不在知识库保留授权页截图、nonce或原始认证日志。
-
-lineage bootstrap已真实完成：head为认证0104、generation0、pending为空，0 SDK调用、0 canonical journal写入。其CAS用于拒绝过期发布覆盖；bootstrap不等于候选已上传。
-
-为腾出完整备份空间，Root将已完成旧正式恢复的v03归档33文件、7576239101字节，迁至`C:/Survival_排演归档/20261102/completed_candidate14_v03`并逐项核SHA／保留ACL，D盘原位置仅留`ARCHIVED_TO_C_20261102.json`指针。正式包、认证0104父、0201待验及旧签包均保留，不改旧history；旧v03恢复入口不能在未找回归档时直接重跑。 另旧v04的31文件、7576239932字节已完整SHA／ACL核验后归档到`C:/Survival_排演归档/20261102/completed_candidate14_v04`，D盘原位置保留归档指针；同样不能在未找回归档时重跑其恢复入口。
-
-安全哈希、已发生与待发生字段见[配套机器摘要](lottery_arcade_delivery_20261102.public.json)。最终阶段由Root按后续实际回执更新，本记录不得被当作READY开关。
+安全回执与逐轮SHA见[配套机器摘要](lottery_arcade_delivery_20261102.public.json)。不保存授权截图、nonce、原始认证日志、账号身份或兑换码；当前记录不是READY开关，后续结果由Root按真实证据更新。

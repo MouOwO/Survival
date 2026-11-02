@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "date_local": "2026-11-02",
-  "recorded_utc": "2026-11-02T05:44:27.597388+00:00",
-  "status": "0202_NATIVE_VISUAL_PASS_REJECTED_SERIALIZATION_RESTORED0104_0203_SOURCE_READY_ONLY",
+  "recorded_utc": "2026-11-02T09:01:14.123217+00:00",
+  "status": "SIGNED0203_RUN03_STAGED_OWNED_BEFORE_INSPECT_AWAITING_NORMAL_LOGIN_NOT_ADMITTED",
   "paired_note": "docs/knowledge_base/evidence/lottery_arcade_delivery_20261102.md",
   "privacy": {
     "raw_auth_session_or_native_logs_included": false,
@@ -68,33 +68,6 @@
     "rejection_reason": "FULL_NATIVE_LOG_CUSTOM_GAME_EVENT_SERIALIZATION_FATAL",
     "published": false
   },
-  "artifacts": {
-    "plan": {
-      "path": "output/lottery_hotfix_release_20261102/plan_v02.json",
-      "sha256": "d24f0440a98a21c1e8e3868c5325d5ac12dbafca594db5c9be4b0954b6709a62",
-      "bytes": 3250801
-    },
-    "unsigned": {
-      "path": "output/lottery_hotfix_release_20261102/unsigned_v02.json",
-      "sha256": "201cae68824581108919f9c8ec8434c35d1b7ed025ba051c3237e30c9d39e806",
-      "bytes": 3250912
-    },
-    "signed_package_report": {
-      "path": "output/lottery_hotfix_release_20261102/package.json",
-      "sha256": "3a59fd1528b99554d989685293ae29a2116b401db94ae7c3c354ad32cdc111a4",
-      "bytes": 3252286
-    },
-    "transaction": {
-      "path": "D:/Survival_本地排演/20261102_ws4_lottery_hotfix_v09/run01_lottery_preview/transaction.json",
-      "sha256": "bcee1fabd59a5355a63b8cb1665e8a61b8005a04c60771fdde5f60f905da9fc2",
-      "bytes": 5502
-    },
-    "owned_process": {
-      "path": "D:/Survival_本地排演/20261102_ws4_lottery_hotfix_v09/run01_lottery_preview/process.json",
-      "sha256": "51c6a5b29fc795d9be771c349dde13e7ac5eac706c5d5600f8ece8aeefd36350",
-      "bytes": 6170
-    }
-  },
   "independent_unsigned_review": {
     "physical_payloads_match_plan": true,
     "exact_authenticated0104_manifest_projection": true,
@@ -107,7 +80,8 @@
     "unsigned_signature_present": false,
     "parent_and0201_paths_disjoint": true,
     "old_full_vpk_bytes_rehashed_by_reviewer": false,
-    "writes_or_native_actions": 0
+    "writes_or_native_actions": 0,
+    "release_sequence": 2026110202
   },
   "diagnosis": {
     "four_webms_present_in0104": true,
@@ -129,29 +103,6 @@
     "0203_promotes_only_archive_from_unpublished0201": true,
     "0203_remaining_explicitly_deferred_source_domains": 22
   },
-  "validation": {
-    "isolated_release_tests": 64,
-    "production_module_simulated_cases": 9,
-    "consumer_regression_flows": 2,
-    "official_compiled": 2,
-    "official_compile_failed": 0,
-    "normal_arcade_four_pool_native": "LIMITED_VISUAL_PASS_BUT_COMPLETE_NATIVE_GATE_REJECTED",
-    "native_fps_measured": false,
-    "fps_improvement_claimed": false,
-    "player_draw_purchase_claim_or_redemption_performed": false,
-    "native_fatal_serialization_count": 10,
-    "native_fatal_error": "Failed to serialize CUserMsg_CustomGameEvent [148]",
-    "native_fatal_log_clock_times": [
-      "12:14:35",
-      "12:15:05"
-    ],
-    "native_fatal_clock_not_converted_to_utc": true,
-    "normal_arcade_screens": 16,
-    "observed_visible_tickets_before": 39,
-    "observed_visible_tickets_after": 39,
-    "all_four_pools_actual_native_error_fallback_return": true,
-    "native_admission_overall": "REJECTED_FATAL_NETWORK_SERIALIZATION"
-  },
   "runtime_costs": {
     "failed_pool_index_max_keys": 4,
     "stable_outside_presentation_new_timers": 0,
@@ -162,33 +113,6 @@
     "active_timers_max": 2,
     "current_theme_textures": 1,
     "additional_draw_reward_or_network_requests": 0
-  },
-  "current_rehearsal": {
-    "status": "REJECTED0202_OWNED_PROCESS_NORMALLY_CLOSED_AND0104_RESTORED",
-    "transaction_id": "run01_lottery_preview",
-    "pid": 19776,
-    "created_utc": "2026-11-02T03:58:42.2287750Z",
-    "port": 29062,
-    "owned_launch": true,
-    "launch_route": "direct",
-    "tools": false,
-    "offline_logic_test": false,
-    "original0104_backed_up": true,
-    "signed0202_stage_completed": true,
-    "keeper_exec_session": 59744,
-    "keeper_must_be_retained": false,
-    "user_permitted_reopen": true,
-    "user_requested_action": "normal Steam login then ordinary N1",
-    "user_completion_reply_received": true,
-    "normal_login_verified": "ACTUAL_ORDINARY_GAMEPLAY_OBSERVED",
-    "four_pool_previews": "ACTUAL_16_SCREEN_VISUAL_PASS_NOT_OVERALL_ADMISSION",
-    "normal_close": "SAME_RETAINED_HANDLE_EXIT_PROVEN",
-    "restoration": "ORIGINAL0104_FIVE_FILES_FULLY_RESTORED",
-    "publication": "NOT_PERFORMED_REJECTED",
-    "official_download": "NOT_REQUESTED_FOR_REJECTED0202",
-    "active": false,
-    "root_observed_keeper_exit_code": 0,
-    "root_observed_restore_exit_code": 0
   },
   "bootstrap": {
     "status": "AUTHENTICATED0104_LINEAGE_BOOTSTRAP_COMPLETED",
@@ -215,17 +139,18 @@
     "per_file_sha256_and_acl_preserved": true,
     "formal0104_parent0201_and_old_signed_packages_untouched": true,
     "old_history_rewritten": false,
-    "old_restore_requires_archive_recovery": true
+    "old_restore_requires_archive_recovery": true,
+    "original_note": "Old v03 archive remains retained; other completed archives listed separately"
   },
   "handoff_owner": "Root",
   "pending": [
-    "Root completes new0203 dual-repository synchronization",
-    "new0203 source plan and unsigned review",
-    "new0203 signing and isolated ordinary rehearsal",
-    "fresh cold N1 archive and four-pool native evidence",
-    "zero serialization or snapshot fatal in whole new native log",
-    "new same-handle exit and complete0104 restore",
-    "preflight and original-item publication only if admitted",
+    "user completes normal web login for current owned run03",
+    "ordinary standard N1 and valid cold archive/four-pool current captures",
+    "same-process after inspection and full final native log review",
+    "normal retained-handle exit",
+    "complete0104 restoration",
+    "new native admission and preflight if all evidence passes",
+    "SDK publication only after actual admission",
     "full official download verification"
   ],
   "close_and_restore": {
@@ -241,29 +166,29 @@
     "backups_preserved": true,
     "artifacts": {
       "close_intent": {
-        "path": "D:/Survival_本地排演/20261102_ws4_lottery_hotfix_v09/run01_lottery_preview/close_intent.json",
+        "path": "C:/Survival_排演归档/20261102/completed_lottery_hotfix0202_run01/close_intent.json",
         "sha256": "e60e91a75310e12b4cc4e518e3ad38e43c30c21dde7ac591efa06d171a710e85",
         "bytes": 3221
       },
       "close_requested": {
-        "path": "D:/Survival_本地排演/20261102_ws4_lottery_hotfix_v09/run01_lottery_preview/close_requested.json",
+        "path": "C:/Survival_排演归档/20261102/completed_lottery_hotfix0202_run01/close_requested.json",
         "sha256": "d30bf7133b7c32d88a8a5cf43b922ca55e69ef2049b2e6497af9cecad2cff969",
         "bytes": 712
       },
       "hold_end": {
-        "path": "D:/Survival_本地排演/20261102_ws4_lottery_hotfix_v09/run01_lottery_preview/hold_end.json",
+        "path": "C:/Survival_排演归档/20261102/completed_lottery_hotfix0202_run01/hold_end.json",
         "sha256": "2c044b38eae8b1f41e3d27eb358e57ec3dbb0d33a5fca3e28217dc1f58371708",
         "bytes": 2000
       },
       "restored": {
-        "path": "D:/Survival_本地排演/20261102_ws4_lottery_hotfix_v09/run01_lottery_preview/restored.json",
+        "path": "C:/Survival_排演归档/20261102/completed_lottery_hotfix0202_run01/restored.json",
         "sha256": "cad767c7178519ed3361f3f73db1909c74d4f499b39912dd1f47f078838dbb67",
         "bytes": 1295
       }
     }
   },
   "next_candidate0203": {
-    "status": "SOURCE_READY_NOT_NEW_GIT_PLAN_SIGN_OR_NATIVE",
+    "status": "BUILT_SIGNED_PENDING_NATIVE_LOTTERY_SNAPSHOT_ACCEPTANCE",
     "tool_family": "tools/lottery_snapshot_release_20261102",
     "release_sequence": 2026110203,
     "revision": "WS4-LOTTERY-SNAPSHOT-03",
@@ -294,11 +219,11 @@
     "total_isolated_tests": 54,
     "thin_hash_pinned_reuse_of_frozen0202": true,
     "old0202_source_signed_package_screens_logs_backups_preserved": true,
-    "new_git_source_commit": null,
-    "plan_generated": false,
-    "unsigned_generated": false,
-    "signed": false,
-    "native_tested": false,
+    "new_git_source_commit": "d611d7c7e27d2d0f0722bad9cce04fb8c3d862eb",
+    "plan_generated": true,
+    "unsigned_generated": true,
+    "signed": true,
+    "native_tested": "LIMITED_REJECTED_RUN01_RUN02_CURRENT_RUN03_PENDING",
     "published": false,
     "output_prefix": "20261102_ws4_lottery_snapshot_v10",
     "port": 29064,
@@ -308,19 +233,326 @@
       "full native log has no serialization or snapshot fatal",
       "normal same-handle exit and complete0104 restoration"
     ],
-    "old0202_visual_is_new0203_acceptance": false
+    "old0202_visual_is_new0203_acceptance": false,
+    "content_sha256": "9cfd6a09a1bda6b35f649cb2240b6de757f1d53aa91037416bd8657f55a21d54",
+    "source_revisions": {
+      "game": "d611d7c7e27d2d0f0722bad9cce04fb8c3d862eb",
+      "content": "ef3f6ad1343ceb327a9932cd8317eafd7dd54874"
+    },
+    "operator_revision": "11f25d8456356032ac01f80f6ef2b84fb6708f7b",
+    "source_and_operator_commits_pushed": true,
+    "full_runtime_validator_passed": true,
+    "overall_native_admitted": false,
+    "artifacts": {
+      "plan": {
+        "path": "output/lottery_snapshot_release_20261102/plan_v01.json",
+        "sha256": "16da85205b4b01e1814853e766c06fc0023efcd8f8c6afd4bc5d4b374bc08009",
+        "bytes": 3257115
+      },
+      "unsigned": {
+        "path": "output/lottery_snapshot_release_20261102/unsigned_v01.json",
+        "sha256": "8796413039b4cf744677a820e38d2adcdb399e1a2694a36ac1918e8744413cd1",
+        "bytes": 3257226
+      },
+      "signed_package_report": {
+        "path": "output/lottery_snapshot_release_20261102/package.json",
+        "sha256": "8ae7d8a921eff12beac1376671a4f5b9713b37a8c2dfa1f75e33a87f7496ec10",
+        "bytes": 3258609
+      }
+    }
   },
   "additional_archives": [
     {
-      "root_reported_completed": true,
-      "completed_old_candidate": "v04/run01_candidate14",
+      "completed_candidate": "v04/run01_candidate14",
       "files": 31,
       "bytes": 7576239932,
       "destination": "C:/Survival_排演归档/20261102/completed_candidate14_v04",
-      "original_d_location_pointer_preserved": true,
-      "complete_sha256_and_acl_preserved": true,
-      "old_history_rewritten": false,
-      "old_restore_requires_archive_recovery": true
+      "original_d_pointer_preserved": true,
+      "complete_sha256_and_acl_preserved": true
+    },
+    {
+      "completed_candidate": "0202/run01_lottery_preview",
+      "files": 30,
+      "bytes": 7576230438,
+      "destination": "C:/Survival_排演归档/20261102/completed_lottery_hotfix0202_run01",
+      "original_d_pointer_preserved": true,
+      "all_sha256_verified": true,
+      "effective_owner_group_dacl_verified": true,
+      "target_inheritance_protected": true,
+      "original_sddl_and_inheritance_flags_preserved": true,
+      "sacl_independently_verified": false,
+      "receipt": {
+        "path": "output/lottery_arcade_delivery_20261102/completed_rehearsal_archive_v03.safe.json",
+        "sha256": "e60b702ff8c4283c83b3a96a56dce308c86d8405f754e59e5ae9c96128a4301d",
+        "bytes": 1188
+      }
+    },
+    {
+      "completed_candidate": "0203/run01_snapshot_preview",
+      "files": 29,
+      "bytes": 7576242209,
+      "destination": "C:/Survival_排演归档/20261102/completed_lottery_snapshot0203_run01",
+      "original_d_pointer_preserved": true,
+      "all_sha256_verified": true,
+      "effective_owner_group_dacl_verified": true,
+      "target_inheritance_protected": true,
+      "original_sddl_and_inheritance_flags_preserved": true,
+      "sacl_independently_verified": false,
+      "receipt": {
+        "path": "output/lottery_arcade_delivery_20261102/completed_rehearsal_archive_v04.safe.json",
+        "sha256": "34fc00b4f31ad73e5ad80a01abe85bd4f9666402f56867453d0200ea9d6af583",
+        "bytes": 1213
+      }
     }
-  ]
+  ],
+  "rehearsal0202": {
+    "status": "REJECTED0202_OWNED_PROCESS_NORMALLY_CLOSED_AND0104_RESTORED",
+    "transaction_id": "run01_lottery_preview",
+    "pid": 19776,
+    "created_utc": "2026-11-02T03:58:42.2287750Z",
+    "port": 29062,
+    "owned_launch": true,
+    "launch_route": "direct",
+    "tools": false,
+    "offline_logic_test": false,
+    "original0104_backed_up": true,
+    "signed0202_stage_completed": true,
+    "keeper_exec_session": 59744,
+    "keeper_must_be_retained": false,
+    "user_permitted_reopen": true,
+    "user_requested_action": "normal Steam login then ordinary N1",
+    "user_completion_reply_received": true,
+    "normal_login_verified": "ACTUAL_ORDINARY_GAMEPLAY_OBSERVED",
+    "four_pool_previews": "ACTUAL_16_SCREEN_VISUAL_PASS_NOT_OVERALL_ADMISSION",
+    "normal_close": "SAME_RETAINED_HANDLE_EXIT_PROVEN",
+    "restoration": "ORIGINAL0104_FIVE_FILES_FULLY_RESTORED",
+    "publication": "NOT_PERFORMED_REJECTED",
+    "official_download": "NOT_REQUESTED_FOR_REJECTED0202",
+    "active": false,
+    "root_observed_keeper_exit_code": 0,
+    "root_observed_restore_exit_code": 0
+  },
+  "validation0202": {
+    "isolated_release_tests": 64,
+    "production_module_simulated_cases": 9,
+    "consumer_regression_flows": 2,
+    "official_compiled": 2,
+    "official_compile_failed": 0,
+    "normal_arcade_four_pool_native": "LIMITED_VISUAL_PASS_BUT_COMPLETE_NATIVE_GATE_REJECTED",
+    "native_fps_measured": false,
+    "fps_improvement_claimed": false,
+    "player_draw_purchase_claim_or_redemption_performed": false,
+    "native_fatal_serialization_count": 10,
+    "native_fatal_error": "Failed to serialize CUserMsg_CustomGameEvent [148]",
+    "native_fatal_log_clock_times": [
+      "12:14:35",
+      "12:15:05"
+    ],
+    "native_fatal_clock_not_converted_to_utc": true,
+    "normal_arcade_screens": 16,
+    "observed_visible_tickets_before": 39,
+    "observed_visible_tickets_after": 39,
+    "all_four_pools_actual_native_error_fallback_return": true,
+    "native_admission_overall": "REJECTED_FATAL_NETWORK_SERIALIZATION"
+  },
+  "artifacts0202": {
+    "plan": {
+      "path": "output/lottery_hotfix_release_20261102/plan_v02.json",
+      "sha256": "d24f0440a98a21c1e8e3868c5325d5ac12dbafca594db5c9be4b0954b6709a62",
+      "bytes": 3250801
+    },
+    "unsigned": {
+      "path": "output/lottery_hotfix_release_20261102/unsigned_v02.json",
+      "sha256": "201cae68824581108919f9c8ec8434c35d1b7ed025ba051c3237e30c9d39e806",
+      "bytes": 3250912
+    },
+    "signed_package_report": {
+      "path": "output/lottery_hotfix_release_20261102/package.json",
+      "sha256": "3a59fd1528b99554d989685293ae29a2116b401db94ae7c3c354ad32cdc111a4",
+      "bytes": 3252286
+    },
+    "transaction": {
+      "path": "C:/Survival_排演归档/20261102/completed_lottery_hotfix0202_run01/transaction.json",
+      "sha256": "bcee1fabd59a5355a63b8cb1665e8a61b8005a04c60771fdde5f60f905da9fc2",
+      "bytes": 5502
+    },
+    "owned_process": {
+      "path": "C:/Survival_排演归档/20261102/completed_lottery_hotfix0202_run01/process.json",
+      "sha256": "51c6a5b29fc795d9be771c349dde13e7ac5eac706c5d5600f8ece8aeefd36350",
+      "bytes": 6170
+    }
+  },
+  "validation": {
+    "release_sequence": 2026110203,
+    "new_family_isolated_tests": 26,
+    "common_isolated_tests": 28,
+    "total_isolated_tests": 54,
+    "normal_native_admission": "NOT_ADMITTED",
+    "current_run03_n1_or_four_pool_captures": "NOT_YET_OBSERVED",
+    "fps_measured_or_improvement_claimed": false,
+    "sdk_submit_performed": false,
+    "official_download_performed": false,
+    "player_draw_purchase_claim_or_redemption_performed": false
+  },
+  "rehearsal0203_runs": {
+    "run01": {
+      "pid": 30076,
+      "created_utc": "2026-11-02T06:18:36.1402360Z",
+      "status": "LIMITED_COLD_N1_AND_POPULATED_ARCHIVE_VISUAL_ONLY_FOUR_POOLS_INCOMPLETE_RESTORED",
+      "ordinary_standard_n1_observed": true,
+      "populated_archive_limited_visual_observed": true,
+      "four_pool_native_completed": false,
+      "invalid_collection_reason": "empty arena ended; no completed four-pool capture; helper arrived late",
+      "root_acceptance": false,
+      "normal_owned_exit_status": "OWNED_DOTA_EXITED_HOLDS_COMPLETED",
+      "ended_utc": "2026-11-02T06:41:51.536367+00:00",
+      "restore_status": "ORIGINAL0104_FIVE_FILES_FULLY_RESTORED",
+      "restored_utc": "2026-11-02T06:49:26.077103+00:00",
+      "publication_performed": false,
+      "archived_to_c": true,
+      "artifacts": {
+        "process": {
+          "path": "C:/Survival_排演归档/20261102/completed_lottery_snapshot0203_run01/process.json",
+          "sha256": "fd602fefd947bb00462815979d937ffc4c19bb84d880b14f80cae859e395fa86",
+          "bytes": 7440
+        },
+        "hold_end": {
+          "path": "C:/Survival_排演归档/20261102/completed_lottery_snapshot0203_run01/hold_end.json",
+          "sha256": "9e554de572712381e42f89e714fdde075d8dec42c331f18a97e9d0185b5e1aa2",
+          "bytes": 2000
+        },
+        "restored": {
+          "path": "C:/Survival_排演归档/20261102/completed_lottery_snapshot0203_run01/restored.json",
+          "sha256": "57a8c37ee0b6c7046208737dce8bebc2d459e07fc458381cb1ad0cb967fedbfa",
+          "bytes": 1295
+        }
+      }
+    },
+    "run02": {
+      "pid": 2172,
+      "created_utc": "2026-11-02T07:11:46.9994700Z",
+      "status": "FOUR_POOL_LOGS_COMPLETE_VISUAL_REJECTED_POSTGAME_OVERLAY_RESTORED",
+      "four_pool_log_chains_observed": true,
+      "ticket_counter_before": 39,
+      "ticket_counter_after": 39,
+      "actual_screens_root_reviewed": true,
+      "actual_screens_obstructed_by_postgame_overlay": true,
+      "root_visual_acceptance": false,
+      "no_product_regression_inferred_from_input_or_capture_tool_failure": true,
+      "closed_native_log_scan": {
+        "scope": "COMPLETE_CLOSED_RUN02_NATIVE_LOG_ONLY",
+        "artifact": {
+          "path": "output/lottery_snapshot_rehearsal_20261102/run02_snapshot_preview/engine.log",
+          "bytes": 295954,
+          "sha256": "26f3f58d851fb01e159772b3b2443c68f4049d3efef88f6b038f27c82e8cd7db"
+        },
+        "lines_scanned": 2886,
+        "stable_during_read": true,
+        "diagnostic_counts": {
+          "custom_game_event_serialization": 0,
+          "snapshot_disconnect": 0,
+          "reliable_data_too_big": 0,
+          "script_runtime_error": 0
+        },
+        "raw_lines_or_auth_copied": false,
+        "observed_utc": "2026-11-02T09:01:14.123217+00:00",
+        "is_overall_visual_or_native_acceptance": false
+      },
+      "normal_owned_exit_status": "OWNED_DOTA_EXITED_HOLDS_COMPLETED",
+      "ended_utc": "2026-11-02T07:32:58.535833+00:00",
+      "restore_status": "ORIGINAL0104_FIVE_FILES_FULLY_RESTORED",
+      "restored_utc": "2026-11-02T07:41:32.234559+00:00",
+      "publication_performed": false,
+      "artifacts": {
+        "process": {
+          "path": "D:/Survival_本地排演/20261102_ws4_lottery_snapshot_v10/run02_snapshot_preview/process.json",
+          "sha256": "b285165099a32502e1617818425b412ce609f2c8bdf38aca557d8e9678272e98",
+          "bytes": 7439
+        },
+        "hold_end": {
+          "path": "D:/Survival_本地排演/20261102_ws4_lottery_snapshot_v10/run02_snapshot_preview/hold_end.json",
+          "sha256": "a9e9a5d797810dda9851abd4e475ccaa4a88fa2ef77f650e4cc7604f507d806b",
+          "bytes": 1998
+        },
+        "restored": {
+          "path": "D:/Survival_本地排演/20261102_ws4_lottery_snapshot_v10/run02_snapshot_preview/restored.json",
+          "sha256": "c01267110c470f2b9c40f1d7ce52b936a68dd854ec987267c004adc1f714a997",
+          "bytes": 1295
+        }
+      }
+    }
+  },
+  "current_rehearsal": {
+    "release_sequence": 2026110203,
+    "transaction_id": "run03_snapshot_preview",
+    "status": "STAGED_OWNED_LAUNCH_BEFORE01_INSPECT_AWAITING_NORMAL_WEB_LOGIN",
+    "active_at_root_observation": true,
+    "pid": 27636,
+    "created_utc": "2026-11-02T08:02:07.6220040Z",
+    "port": 29064,
+    "owned_launch": true,
+    "launch_route": "direct",
+    "package_report_sha256": "8ae7d8a921eff12beac1376671a4f5b9713b37a8c2dfa1f75e33a87f7496ec10",
+    "normal_web_login_complete": "AWAITING_USER_CONFIRMATION",
+    "ordinary_standard_n1": "NOT_YET_OBSERVED",
+    "four_pool_native_captures": "NOT_YET_OBSERVED",
+    "after_inspection": "NOT_RUN",
+    "normal_exit": "NOT_RUN",
+    "restore": "NOT_RUN",
+    "publication": "NOT_RUN",
+    "official_download": "NOT_RUN",
+    "root_admitted": false,
+    "artifacts": {
+      "transaction": {
+        "path": "D:/Survival_本地排演/20261102_ws4_lottery_snapshot_v10/run03_snapshot_preview/transaction.json",
+        "sha256": "e2d4270427e6aa0c93881b42c9488ed03bce63be92c7da5a38beea51e33e9de0",
+        "bytes": 6766
+      },
+      "process": {
+        "path": "D:/Survival_本地排演/20261102_ws4_lottery_snapshot_v10/run03_snapshot_preview/process.json",
+        "sha256": "f7b43993c7b6b5fe75d6da3a0887691af6a842cad858f5c53d7b4161493e18b3",
+        "bytes": 7440
+      },
+      "before01_inspection": {
+        "path": "D:/Survival_本地排演/20261102_ws4_lottery_snapshot_v10/run03_snapshot_preview/inspections/before01.json",
+        "sha256": "30ff9964bca5cdc2fcd5c8a251fcfb557df763bc0d6340160036d6bdf5c14eea",
+        "bytes": 4778
+      }
+    },
+    "before01_raw_observation": {
+      "status": "INCOMPLETE_NATIVE_FILE_USE_EVIDENCE",
+      "observed_utc": "2026-11-02T08:08:19.675701+00:00",
+      "external_signed_resources_verified": 6917,
+      "external_protected_modules_verified": 184,
+      "index_owned_dota_use_observed": false,
+      "all_five_open_verified": false,
+      "data_volume_owned_dota_uses_file": {
+        "3824360109_000.vpk": true,
+        "3824360109_001.vpk": true,
+        "3824360109_002.vpk": true,
+        "3824360109_003.vpk": true
+      },
+      "raw_incomplete_or_index_false_reclassified": false
+    }
+  },
+  "local_tool_boundaries": {
+    "ps7_json_auto_date_conversion": {
+      "effect": "lossy ISO created_utc text in ignored collector; guarded collection refused",
+      "product_regression_claimed": false,
+      "remedy": "preserve ISO string with ConvertFrom-Json -DateKind String"
+    },
+    "f9_camera_or_pause_path_not_as_expected": {
+      "effect": "game not paused in time; settlement overlay invalidated screenshots",
+      "product_regression_or_crash_claimed": false
+    },
+    "runtime_or_release_aux_modified_for_these_capture_errors": false
+  },
+  "source_control_boundary": {
+    "runtime_game_revision": "d611d7c7e27d2d0f0722bad9cce04fb8c3d862eb",
+    "runtime_content_revision": "ef3f6ad1343ceb327a9932cd8317eafd7dd54874",
+    "operator_revision": "11f25d8456356032ac01f80f6ef2b84fb6708f7b",
+    "both_repositories_pushed": true,
+    "original_user_dirty_files_preserved": 5,
+    "knowledge_commit_is_not_new_runtime_publication": true
+  }
 }

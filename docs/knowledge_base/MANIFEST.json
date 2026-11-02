@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 20074,
-      "sha256": "7c50c79722ee9bdf9e1abc0510bc527f4956aca86fcc80bc59099afe05a6a658"
+      "bytes": 19952,
+      "sha256": "12ab7d4f2a412fe16abd3dca2331d47a00f73f038a6e7478160e0a3f7b305145"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -30,18 +30,18 @@
     },
     {
       "path": "05_payments_commerce_delivery.md",
-      "bytes": 17683,
-      "sha256": "5d541c723fc9b4a0b63a42658008f6d99306d1d8b37c45480f35076f5b204460"
+      "bytes": 17669,
+      "sha256": "719dd429f053a7409f6f6de2f4c0f00ca89fe92779798de7c4edb8ad175e4849"
     },
     {
       "path": "06_build_release_ops.md",
-      "bytes": 23607,
-      "sha256": "822f2e0dd227e008a83eaff033d30e2ebe1d24769eed50f86c22df78233f8e9a"
+      "bytes": 23577,
+      "sha256": "f590a55981044c4ae4b13ced882ee5709d52d4ecd67eb41af1359ba756399437"
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 34070,
-      "sha256": "267a92f583c620d0535f3f32629c7e9aa3862f72d778de34ce39004db3b661be"
+      "bytes": 34007,
+      "sha256": "a463f9e42895dbda331d5f3b8ed8f074b701ed125ebc23e60bd7dc26e3c99e65"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -72,6 +72,16 @@
       "path": "13_art_ui_qa.md",
       "bytes": 11865,
       "sha256": "613a00e1a83302042f3f1d23f8b4653b59937cee9616a214485db2ecfebab896"
+    },
+    {
+      "path": "NEW_CHAT_PROMPT.txt",
+      "bytes": 829,
+      "sha256": "59e6930906e62202d56d95ce3dd7390a7a90a6133c6ac204da10fd62f4fee10d"
+    },
+    {
+      "path": "README.md",
+      "bytes": 10200,
+      "sha256": "c1d54fd0c0d776742593b0fb43e804ab5fe4b028791a73cc028c9e46accedda0"
     },
     {
       "path": "data/completed_work_index.json",
@@ -260,13 +270,13 @@
     },
     {
       "path": "evidence/lottery_arcade_delivery_20261102.md",
-      "bytes": 7144,
-      "sha256": "5682bb20483ee4a5abe216b8e414f00ecc33b90a5bcb686e2ed18769ab51e0e5"
+      "bytes": 6926,
+      "sha256": "20603bc48d7932dd1f93476ec346fc40cbc80629783f3413e0345b0b40bf2b75"
     },
     {
       "path": "evidence/lottery_arcade_delivery_20261102.public.json",
-      "bytes": 13215,
-      "sha256": "d418f17eef7e55bfdd9733b3a7daaa3aa4add68e61f7068e46588fc4b7ea5f7b"
+      "bytes": 23445,
+      "sha256": "c8bcce84f376e90f9c5aa82e467b689e7d17cc78c12ea70f0c68bf894dbdc304"
     },
     {
       "path": "evidence/lottery_training_feedback_20261102.md",
@@ -524,6 +534,11 @@
       "sha256": "3e9d78ecd41b1e4aaa4335fc0c33fdca621d5e94a98a4d082af5d299d00a2380"
     },
     {
+      "path": "history/20261024/README.md",
+      "bytes": 3523,
+      "sha256": "8fb412555efbff16e4191ae220fb68c521283ef11131c5d4a5c8ad6f8820868b"
+    },
+    {
       "path": "history/20261024/data/commerce_facts.json",
       "bytes": 10585,
       "sha256": "6105f8496427aab2540ee0572bd1e084247114c6b36dc50cec305269c0bf864e"
@@ -564,24 +579,9 @@
       "sha256": "40bd838081c9322b471aa29977d19958932c9cbb87c14d7b54728f9883a86817"
     },
     {
-      "path": "history/20261024/README.md",
-      "bytes": 3523,
-      "sha256": "8fb412555efbff16e4191ae220fb68c521283ef11131c5d4a5c8ad6f8820868b"
-    },
-    {
       "path": "history/README.md",
       "bytes": 449,
       "sha256": "5ebf48f3b52e07d03945ecfb8e7c2883c1905c48a7ed6fb544604525da474bec"
-    },
-    {
-      "path": "NEW_CHAT_PROMPT.txt",
-      "bytes": 829,
-      "sha256": "59e6930906e62202d56d95ce3dd7390a7a90a6133c6ac204da10fd62f4fee10d"
-    },
-    {
-      "path": "README.md",
-      "bytes": 10255,
-      "sha256": "b100d0902f2017721447bebf0a8d3fe30ed248686b41755bd0ee1c99cc593511"
     },
     {
       "path": "tools/verify_knowledge.py",

@@ -1,6 +1,6 @@
 # 新会话先读｜孤城逐晓项目知识库
 
-**2026-11-02 抽卡交付阻断与下一步：0202明确拒发，已恢复0104；0203仅源码就绪。** 0202普通四pool16图、39券不变及真实native_error→fallback→return通过，但全日志10次CustomGameEvent序列化失败使门槛拒绝；owned19776已正常退出、keeper和恢复命令均真实exit0。NEW0203仅加已审archive分包，五项／6917／184／20审查／2compiled，26＋common28共54项隔离通过，尚未新Git／plan／签名／原生。正式远端仍0104；旧画面不能当0203通过。见[实际结果与移交](evidence/lottery_arcade_delivery_20261102.md)及[机器摘要](evidence/lottery_arcade_delivery_20261102.public.json)。
+**2026-11-02 当前抽卡排演：0203已签，run03等待网页登录，尚未准入或发布。** 0202四池16图虽可用但10次序列化fatal拒发并恢复0104；0203 run01仅冷N1／开档有限视觉，run02四池日志和39券保持但图被结算遮罩覆盖，均正常退出恢复。当前owned27636已stage／before01，未观察本轮N1、四池、after、退出／恢复；正式远端仍0104。见[逐轮事实与接手](evidence/lottery_arcade_delivery_20261102.md)及[机器摘要](evidence/lottery_arcade_delivery_20261102.public.json)。
 
 **2026-11-02 本轮已完成：沿用宣传封面，四档普通券已启用。** fresh官方SDK／CDN确认当前“我在刀塔2苟发育”封面字节一致，本轮0封面上传、0游戏上传，正式0104未变。10／50／100／200张普通map券已生产登记并独立核验`FOUR_ROWS_MATCH_VERIFIED`，共132项、旧128项不变；每账号每码一次，累计360张。API／支付未重启，已启用Excel已私有交付。见[本轮结果](evidence/cover_ticket_codes_20261102.md)及[脱敏机器证据](evidence/cover_ticket_codes_20261102.public.json)。
 
