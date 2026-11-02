@@ -219,16 +219,16 @@ class PipelineTests(unittest.TestCase):
 class ActiveHotfixRegistrationTests(unittest.TestCase):
     def test_actual_registered_hotfix_paths_and_all_reviewed_pins(self):
         auth=p.authority()
-        self.assertEqual(auth.policy['release_sequence'],2026110203)
-        self.assertEqual(auth.policy['scope'],'LOTTERY_TRAINING_ARCHIVE_WIRE_FIVE_RESOURCES')
+        self.assertEqual(auth.policy['release_sequence'],2026110204)
+        self.assertEqual(auth.policy['scope'],'LOTTERY_REPLAY_COMMITTED_RECEIPT_SEVEN_RESOURCES')
         for prefix in ('validator','recipe','rehearsal','download','native_admission'):
             path,raw=p.pinned_bytes(auth,prefix)
-            self.assertEqual(path.parent.name,'lottery_snapshot_release_20261102')
+            self.assertEqual(path.parent.name,'lottery_replay_release_20261102')
         loaded=g._validator(auth)
-        self.assertEqual(loaded.RELEASE_SEQUENCE,2026110203)
+        self.assertEqual(loaded.RELEASE_SEQUENCE,2026110204)
         self.assertIsNone(loaded.b)
         self.assertIsNone(loaded.c)
-        with self.assertRaisesRegex(ValueError,'Only this exact five-resource'):
+        with self.assertRaisesRegex(ValueError,'Only this exact seven-resource'):
             loaded.validate_release({'release_sequence':2026110202,'generation':1,'READY':True})
 
     def test_actual_registered_hook_still_rejects_mutation_without_lease(self):
