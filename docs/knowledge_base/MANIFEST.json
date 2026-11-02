@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 18819,
-      "sha256": "dec1d7b54ddf3df5e011139adf1495838acc44abc7843d3e96bbb0a9898689b1"
+      "bytes": 19393,
+      "sha256": "2f98e44fc3492db9944237e96ddba60389f45e5b8f5741b9f57a69e6092b36f0"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -30,18 +30,18 @@
     },
     {
       "path": "05_payments_commerce_delivery.md",
-      "bytes": 16467,
-      "sha256": "ed0e2c3273ad68721614ac482a7ff72b73718af802eef5ddd7aab7f362e99428"
+      "bytes": 17140,
+      "sha256": "bcebee5c6ce63f9c548d49147b0e01d1448fb06e0c8b0387a88ee3f336508f60"
     },
     {
       "path": "06_build_release_ops.md",
-      "bytes": 22460,
-      "sha256": "2281f02819ca2af8e519e6ed01ce5b0c193784e95a66ce0e25694ac46e9702c9"
+      "bytes": 22943,
+      "sha256": "3617554e460f1a9649bf53d80b9cccfbce7dd0a83b40385aef724cb6c3a000fd"
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 32801,
-      "sha256": "3dad307f0eb92d985df59efe6eb87503794569d4c6d8e481c303833a4be7934c"
+      "bytes": 33382,
+      "sha256": "f9a2f503fbb2abde707f70bba55da783b48b4eeddf9c2f852c3939bd1bb5cbcf"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -212,6 +212,16 @@
       "path": "evidence/commerce_prices_20261028.md",
       "bytes": 2499,
       "sha256": "8bca6c86e27bfd5b6a3d626db48f73de8dee309f78309ae3061cdaa65e4b5bb5"
+    },
+    {
+      "path": "evidence/cover_ticket_codes_20261102.md",
+      "bytes": 5433,
+      "sha256": "270e3888e77affb375e06e17a0de724d34c75e1fae4b1e859e1b2d6166a0eded"
+    },
+    {
+      "path": "evidence/cover_ticket_codes_20261102.public.json",
+      "bytes": 15289,
+      "sha256": "1dddc071d6e369c1f314957898f8b72f96b4c05b8142c4a6db7e13117662bf90"
     },
     {
       "path": "evidence/dev_bane5_etw_20261101.public.json",
@@ -560,8 +570,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 9306,
-      "sha256": "3406a8d31b883064f936e4595f5e763dfe244cf39f71e5bd464caf09aea1d1f7"
+      "bytes": 9762,
+      "sha256": "8a98f4357027814f2d00961f09645f2a648ede1f9ff8a305692e5bc4a4f879dd"
     },
     {
       "path": "tools/verify_knowledge.py",

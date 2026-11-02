@@ -1,0 +1,396 @@
+{
+  "actual_operations": {
+    "apply": {
+      "artifact": {
+        "bytes": 766,
+        "path": "output/redemption_ticket_codes_20261102/run_1aa43048c1ca_apply_e6174a25.json",
+        "sha256": "63edad054c63f6e9697a653acc90e433d0ec9f49573d9105949ba2a5539e73d2"
+      },
+      "result": {
+        "api_restarted_by_operator": false,
+        "api_service": {
+          "pid": 489555,
+          "working_directory": "/opt/goufayu-ws4/releases/20261101-admission-five-ffd96ff80622/backend"
+        },
+        "api_service_unchanged": true,
+        "claims_at_transaction_snapshot": 9,
+        "existing_claims_preserved_in_same_rr_snapshot": true,
+        "inserted": 4,
+        "normal_concurrent_claims_allowed": true,
+        "old_definitions_preserved": {
+          "count": 128,
+          "sha256": "6448d304e714fdec9d6db3ef568bb9922d960f128e9eaa71ac91111956c9a1e0"
+        },
+        "payment_restarted_by_operator": false,
+        "payment_services": {
+          "goufayu-payment.service": 5427,
+          "goufayu-ws4-payment.service": 240881
+        },
+        "payment_services_unchanged": true,
+        "plan_sha256": "34fff94320205b133ca7759ada5bf065842cbc1664f4ae756ff803a9c1a31742",
+        "player_redemption_performed": false,
+        "status": "FOUR_WS4_TICKET_CODES_INSERTED"
+      }
+    },
+    "dpapi_decrypt_hash_roundtrip_verified": true,
+    "dpapi_roundtrip_basis": "actual protect-backup result SERVER_FULL_LOCAL_DPAPI_BACKUP_VERIFIED; apply requires matching offsite_ack and fresh full dump",
+    "independent_verify": {
+      "artifact": {
+        "bytes": 300,
+        "path": "output/redemption_ticket_codes_20261102/run_1aa43048c1ca_verify_af0475ac.json",
+        "sha256": "5e6ce7d58253f4c39d2052217c75d0a61ad6617dcde90091e293157c5dc5f89b"
+      },
+      "result": {
+        "api_restarted": false,
+        "automatic_retry": false,
+        "definition_count": 132,
+        "exact_total_132": true,
+        "matching_four": true,
+        "old128_definition_digest_preserved": true,
+        "payment_services_unchanged": true,
+        "player_redemption_performed": false,
+        "same_rr_verification_snapshot": true,
+        "status": "FOUR_ROWS_MATCH_VERIFIED"
+      }
+    },
+    "local_dpapi_ciphertext": {
+      "bytes": 794992,
+      "path": "output/redemption_ticket_codes_20261102/private/backups/run_1aa43048c1ca.dump.dpapi",
+      "sha256": "5e0389f8eabdeb9f04ee2117f895f6b593f8416baa5c8e490745302625016092"
+    },
+    "schema_only_clone": {
+      "artifact": {
+        "bytes": 948,
+        "path": "output/redemption_ticket_codes_20261102/run_1aa43048c1ca_clone_2579aed8.json",
+        "sha256": "9672624cea399d1c0f94a3d7b1c17832b4ff0b9973adc6c99b2934493283bc9a"
+      },
+      "result": {
+        "actual_app_rpc": true,
+        "checks": [
+          "production_insert_four_sql_with_four_synthetic_hashes",
+          "old_select_before_lock_stale_snapshot_reproduced",
+          "table_lock_before_select_blocks_writer",
+          "writer_succeeds_after_lock_release",
+          "four_exact_ticket_deltas_and_four_pool_projection",
+          "same_account_once_retry_and_peer_isolation",
+          "actual_postgres_concurrent_single_grant",
+          "actual_committed_reply_loss_idempotency"
+        ],
+        "clone_only": true,
+        "database": "goufayu_ws4_ticket_1aa43048c1ca",
+        "ok": true,
+        "plan_sha256": "34fff94320205b133ca7759ada5bf065842cbc1664f4ae756ff803a9c1a31742",
+        "production_player_data_copied": false,
+        "real_code_definitions_copied": false,
+        "real_code_hashes_copied": false,
+        "real_lua_reducer": true,
+        "real_player_redemption": false,
+        "schema_dump": {
+          "at": 1793585575.0139964,
+          "bytes": 309129,
+          "path": "/root/goufayu_upload/ticket_codes_20261102/run_1aa43048c1ca/schema.dump",
+          "schema_only": true,
+          "sha256": "96be61f8f7f69c95c7343b2811719b6411eca586bd634a0443123e0220484de1"
+        }
+      }
+    },
+    "server_full_backup": {
+      "artifact": {
+        "bytes": 223,
+        "path": "output/redemption_ticket_codes_20261102/run_1aa43048c1ca_backup_dfe96bd8.json",
+        "sha256": "54cdf7f1cfb5297398a5202f748f3c9be813cf5e8ff8e6ecd0f5b9dde5dc740c"
+      },
+      "result": {
+        "at": 1793585684.5433614,
+        "bytes": 794703,
+        "path": "/root/goufayu_upload/ticket_codes_20261102/run_1aa43048c1ca/full_backup.dump",
+        "schema_only": false,
+        "sha256": "a433258e3855379d0f2094b2e38452da124237c4871202a99885f5a61267e845"
+      }
+    }
+  },
+  "checks": {
+    "actual_pg_app_lua_checks": 8,
+    "final_tool_suite": {
+      "command": "LUA_EXECUTABLE=lua5.1.exe python -B -m unittest discover -s tools/redemption_ticket_codes_20261102 -p test_*.py",
+      "passed": true,
+      "seconds": 8.806,
+      "tests": 45
+    },
+    "first_rerun_without_lua_environment": "class setup failed; preserved; all 45 passed after specifying existing interpreter",
+    "game_candidate_published_this_task": false,
+    "in_game_ticket_receipt_tested_this_task": false,
+    "native_fps_measured_this_task": false,
+    "player_redemption_performed": false
+  },
+  "cost": {
+    "catalogue_compile_space": "O(P+4)",
+    "catalogue_compile_time": "O(P)+O(4), once",
+    "independent_verification_transactions": 1,
+    "maintenance_snapshot_time": "O(D log D + C log C), once; D=128, C=9 at apply snapshot",
+    "maintenance_space": "O(D+C)",
+    "new_stable_game_native_calls_per_second": 0,
+    "new_stable_game_network_calls_per_second": 0,
+    "production_insert_statements": 4,
+    "sql_lock_timeout_seconds": 5,
+    "sql_statement_timeout_seconds": 10
+  },
+  "cover": {
+    "artifact": {
+      "bytes": 3200,
+      "path": "output/cover_ticket_codes_20261102/cover_confirmation_v02.safe.json",
+      "sha256": "9636edccede58d75f76675668f50af7b51c22a1e00735348c64b67254cb87971"
+    },
+    "checked_utc": "2026-11-02T01:03:13.545249+00:00",
+    "dimensions": {
+      "height": 941,
+      "width": 1672
+    },
+    "fresh_official_query_and_cdn_match": true,
+    "game_uploads": 0,
+    "jpeg": {
+      "bytes": 936610,
+      "sha256": "00714bb69b9c400231f88112673b2fd881d50680a0a76ab63a1792256b679aa1"
+    },
+    "master": {
+      "bytes": 2722916,
+      "sha256": "7d4bbd0865782c8469b964b75a9c299b8f150d95ac59246511e3c49b65b8c351"
+    },
+    "protected_records_unchanged": true,
+    "publication_calls": 0,
+    "selected_art": "我在刀塔2苟发育：伐木建塔、抵御尸潮"
+  },
+  "plan": {
+    "file": {
+      "bytes": 3240,
+      "path": "output/redemption_ticket_codes_20261102/operation_plan_v03.json",
+      "sha256": "9cc0416b3418882b9c7d3ee43e27f97c50d2921d3f360e68e3ab63ee6cbe1bed"
+    },
+    "server_canonical_sha256": "34fff94320205b133ca7759ada5bf065842cbc1664f4ae756ff803a9c1a31742",
+    "source_binding": {
+      "artifact": {
+        "bytes": 663,
+        "path": "output/redemption_ticket_codes_20261102/operator_git_binding_v03.safe.json",
+        "sha256": "cfb3d2736a14413067a895bb9b5d991906aa76e13972cea5f8e23576f08456fa"
+      },
+      "result": {
+        "game_commit": "9c60b469f5fbaa803e96c2fba75588d23f24eae1",
+        "inputs": {
+          "clone_checks.py": "4d74be7e1ec5752f346e9d02596e31427ad1eb89e63ae103a8e15db2af76e10a",
+          "definitions.py": "2c5cf2eec078d55bfef429cc54bd876972edaa41aeefac12d1990789fb7a4a7e",
+          "tiers.json": "7e79090411eb4ef8af51aa1b189198c996f1ac05978800ca65c7345cc53f396a",
+          "ws4_operator.py": "6df4f353541867f5f5ba8f28f47243ea83e14ee6f5527cf4bc96072a47d70fd1",
+          "ws4_register.py": "de06677ae8c35d999afeea179d706593b41477ade1ce8040b57ae88415645124"
+        },
+        "stage": "/root/goufayu_upload/ticket_codes_20261102/run_1aa43048c1ca",
+        "status": "EXACT_COMMITTED_OPERATOR_BYTES"
+      }
+    }
+  },
+  "preserved_failures": [
+    {
+      "diagnostic": {
+        "artifact": {
+          "bytes": 1867,
+          "path": "output/redemption_ticket_codes_20261102/upload_diagnostic_v01.safe.json",
+          "sha256": "70a6630e1d3ff509657120e541510138003959f3726b3d8637e1564572e4940f"
+        },
+        "result": {
+          "baseline": {
+            "ok": true,
+            "value": "/opt/goufayu-ws4/releases/20261101-admission-five-ffd96ff80622"
+          },
+          "canonical_stage": {
+            "exists": false,
+            "path": "/root/goufayu_upload/ticket_codes_20261102/run_0d214704bc5f",
+            "symlink": false
+          },
+          "existing_lock_metadata": [
+            {
+              "bytes": 0,
+              "exists": true,
+              "path": "/var/lock/goufayu_admission_five.lock",
+              "symlink": false
+            },
+            {
+              "bytes": 0,
+              "exists": true,
+              "path": "/var/lock/goufayu_ws4_redemption.lock",
+              "symlink": false
+            }
+          ],
+          "inventory": {
+            "ok": true,
+            "value": {
+              "active_release": "/opt/goufayu-ws4/releases/20261101-admission-five-ffd96ff80622",
+              "api": {
+                "manifest_sha256": "970792238ee146c7dbb247e5fe1e7b320899c4f8273859223d591069a1a3d38e",
+                "pid": 489555,
+                "working_directory": "/opt/goufayu-ws4/releases/20261101-admission-five-ffd96ff80622/backend"
+              },
+              "attempts_count": 2,
+              "bundle_hash": "d573588b64d2ea6d1431c856d52e0515b5ed471cfdf6af4456ff618d0f568488",
+              "claims_count": 9,
+              "definitions": {
+                "count": 128,
+                "sha256": "6448d304e714fdec9d6db3ef568bb9922d960f128e9eaa71ac91111956c9a1e0"
+              },
+              "payment_services": {
+                "goufayu-payment.service": 5427,
+                "goufayu-ws4-payment.service": 240881
+              }
+            }
+          },
+          "registry_or_plaintext_codes_read": false,
+          "server_modified": false,
+          "stage_metadata": {
+            "clone_checks.py": {
+              "exists": false
+            },
+            "operator.py": {
+              "exists": false
+            },
+            "plan.json": {
+              "exists": false
+            },
+            "prepared.json": {
+              "exists": false
+            },
+            "registry.json": {
+              "exists": false
+            }
+          },
+          "stage_path_validation": {
+            "ok": false,
+            "reason": "stage_scope_invalid"
+          }
+        }
+      },
+      "outcome": "stage_scope_invalid before remote stage creation; zero production writes",
+      "plan": "v01"
+    },
+    {
+      "diagnostic": {
+        "artifact": {
+          "bytes": 1961,
+          "path": "output/redemption_ticket_codes_20261102/clone_diagnostic_v02.safe.json",
+          "sha256": "3dccf0d1dd39f6f6ed0a5c82c8bb37f789e12f763beaf0e268002e7728e03afc"
+        },
+        "result": {
+          "active_api": {
+            "manifest_sha256": "970792238ee146c7dbb247e5fe1e7b320899c4f8273859223d591069a1a3d38e",
+            "pid": 489555,
+            "working_directory": "/opt/goufayu-ws4/releases/20261101-admission-five-ffd96ff80622/backend"
+          },
+          "clone_cas_probe_table_exists": false,
+          "clone_counts": {
+            "archive_operations": 1,
+            "redemption_attempts": 1,
+            "redemption_claims": 1,
+            "redemption_codes": 4,
+            "survival_players": 1
+          },
+          "clone_database_exists": true,
+          "clone_reinvoked": false,
+          "clone_source_sha256": "ddaf95fb462c8699c0d35ad375118b96894601cd9a64fd9f3ddd70aa82f008e2",
+          "files": {
+            "applied.json": {
+              "exists": false
+            },
+            "apply_intent.json": {
+              "exists": false
+            },
+            "clone.json": {
+              "exists": false
+            },
+            "plan.json": {
+              "bytes": 3378,
+              "exists": true,
+              "sha256": "1f147d6797ac579a6b86c10b7014ce1f7a9b43d72cd5ca0c00f9a963bc586095"
+            },
+            "prepared.json": {
+              "bytes": 126,
+              "exists": true,
+              "sha256": "43be36e383feb5d4cb1cfd0be4ec612eeaebad4805bb7a1bc1bd9051aafe5313"
+            },
+            "schema.dump": {
+              "bytes": 309129,
+              "exists": true
+            }
+          },
+          "missing_app_attribute_names": [
+            "account_id_pepper"
+          ],
+          "production_definitions": {
+            "count": 128,
+            "sha256": "6448d304e714fdec9d6db3ef568bb9922d960f128e9eaa71ac91111956c9a1e0"
+          },
+          "registry_or_player_rows_read": false,
+          "required_app_attribute_names": [
+            "_database_account_id",
+            "_ensure_gameplay_stats",
+            "_public_response",
+            "account_id_pepper",
+            "profile",
+            "rpc_client"
+          ],
+          "server_modified": false,
+          "service_line177_safe": "seed=int.from_bytes(hmac.new(self.app.account_id_pepper.encode(),",
+          "service_source_sha256": "b75684f5052930b579d5dc3e0df6004e83328ff171c75c650f5564b813998165",
+          "stage": {
+            "exists": true,
+            "path": "/root/goufayu_upload/ticket_codes_20261102/run_921e5549ea50"
+          }
+        }
+      },
+      "outcome": "uploaded; synthetic clone App lacked account_id_pepper; clone interrupted; production 128 unchanged",
+      "plan": "v02"
+    }
+  ],
+  "private_delivery": {
+    "artifact": {
+      "bytes": 518,
+      "path": "output/redemption_ticket_codes_20261102/enabled_workbook_delivery_v01.safe.json",
+      "sha256": "d0c534237a687a7e479a060ead3731062dc80153bf470f9d32ec6f9d468ccf96"
+    },
+    "result": {
+      "bytes": 7139,
+      "original_private_workbook_unchanged": true,
+      "path": "C:\\Users\\Administrator\\Desktop\\普通抽奖券四档兑换码_已启用_20261102.xlsx",
+      "plaintext_codes_logged": false,
+      "player_redemption_performed": false,
+      "production_verify_sha256": "5e6ce7d58253f4c39d2052217c75d0a61ad6617dcde90091e293157c5dc5f89b",
+      "same_four_code_hashes_verified": true,
+      "sha256": "5015c0e17d991ad5da5247cb7c00547dc785d2749716fb87668f2d1b782304b7",
+      "status": "ENABLED_SAME_BATCH_WORKBOOK_DELIVERED"
+    }
+  },
+  "rewards": {
+    "all_four_total": 360,
+    "expiry": null,
+    "global_use_limit": 0,
+    "item_id": "lottery_ticket",
+    "per_account_per_code": 1,
+    "pool": "map",
+    "quantities": [
+      10,
+      50,
+      100,
+      200
+    ],
+    "special_tickets_or_wallet_modified": false
+  },
+  "schema": "COVER_AND_FOUR_TICKET_CODES_20261102_V1",
+  "scope_boundaries": [
+    "No real codes, per-code hashes, credentials or raw backup in Git/knowledge base",
+    "No API or payment restart; no schema/RPC migration; no old128 modification",
+    "No real-player redemption; no new UGC or game VPK publication; official0104 unchanged",
+    "Original private workbook, failed stages, clone databases, operation intents and backups retained"
+  ],
+  "source_commits": {
+    "content_cover": "b0ab48363648a76e336c66f6703267b3feac81ce",
+    "game_operation": "9c60b469f5fbaa803e96c2fba75588d23f24eae1"
+  },
+  "status": "EXISTING_ARTWORK_CONFIRMED_FOUR_CODES_REGISTERED_VERIFIED_AND_PRIVATELY_DELIVERED",
+  "workshop_item": "3824360109"
+}
