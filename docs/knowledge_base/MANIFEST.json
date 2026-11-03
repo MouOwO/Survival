@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 28837,
-      "sha256": "2454c7d4562ee19b14bf8dee37aefa63c6ce155433ef36ee861763f62c1d5419"
+      "bytes": 29422,
+      "sha256": "66f6c1b312a6a42d9a9fdd8e3c314d58c52e9abaf53765637e2380e70552850b"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 42758,
-      "sha256": "510fc5b6679d65c0d6372dcdb7fe8cf994c3925220273a9c65beebf233c4d7e5"
+      "bytes": 43343,
+      "sha256": "56cc0e5bb8e24c826d089ebc1437a739ebaa4b67dac6f8ec279619c26a16dfa9"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 16913,
-      "sha256": "07e2db1f8359587fa450a8422c893393eb3a10620c3f34fbf814ad9481d3821b"
+      "bytes": 17498,
+      "sha256": "a809433b75376e68a167f7ee364f5cb3f02e849762d3ffc630b3b542cec664d8"
     },
     {
       "path": "data/completed_work_index.json",
@@ -335,8 +335,8 @@
     },
     {
       "path": "evidence/network50_production_vip_phase3_20261103.md",
-      "bytes": 6156,
-      "sha256": "739704c04c0ad512de5da760b74ced39ed5f695f91a321f12ae72f7c972a89d0"
+      "bytes": 8488,
+      "sha256": "6f68ab44164ffa1edd89bcd1677bb91554d2188d2e05d4561b40303f0fbde5d8"
     },
     {
       "path": "evidence/network50_ui_local_handoff_20261103.md",

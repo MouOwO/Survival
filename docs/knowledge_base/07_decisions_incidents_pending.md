@@ -1,5 +1,7 @@
 # 07｜关键决策、事故与未完成事项
 
+**2026-11-03 严格Git gen3已生成，仍仅本地更新。** 输入game/operator8a48c567、content14c562b9、历史atlas0056；新schema26f90098…，11代／7932记录／186字段，旧7887ID／163字段完整保留。220game／4operator／6参考来源全入manifest；真runtime ID生产Lua／Node5、wire15／runtime16、VIP／worker重测通过。官方编译及最终产物提交由主操作者另记，新native／FPS与完整发行仍待，正式0104／本轮后台保持。见[gen3来源、精确摘要与未完项](evidence/network50_production_vip_phase3_20261103.md)。
+
 **2026-11-03 phase3仍仅本地更新，后台未改。** 生产view7恢复训练／研究／队列，VIP view8只传真实等级，英雄旧无消费者大包按订阅发送，Beta取消未就绪重复请求，工人容量真实变化触发刷新。24目录／12编译工具／5生产draft／22Beta及VIP边界通过；32官方编译由主操作者报告。当前实际目录仍fe1718，计划7932记录／186字段须新source冻结后严格Git生成；未新native／FPS，剩余legacy并未全部≤50 B，正式0104和完整发行待办保持。见[phase3真实范围、成本与待办](evidence/network50_production_vip_phase3_20261103.md)。
 
 **2026-11-03 当前接手：严格Git gen2输入已冻结，产物最终提交待补。** c8722ee2／5bdd9627只作为生成输入，新schema fe171856…；同源28官方编译完成但未冒称实际native／FPS／发布。production新工具保留3项运行逻辑，旧plan三项parent target已清空；真正186保护导出须等包含新lookup的第二game提交，不能拿c872旧lookup混新JS。完整recipe／ledger／authority、普通准入／SDK／官方下载仍阻断，正式0104保持。见[追加事实与全部SHA](evidence/network50_grid_selected_handoff_20261103.md)。

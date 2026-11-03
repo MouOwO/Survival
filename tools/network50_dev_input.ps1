@@ -1,5 +1,5 @@
 param(
- [Parameter(Mandatory=$true)][ValidateSet('Focus','Click','Screenshot')][string]$Action,
+ [Parameter(Mandatory=$true)][ValidateSet('Focus','Click','Screenshot','SelectBuilder','CancelTarget')][string]$Action,
  [ValidateSet('run02','run03','run04','run05','run06')][string]$Run='run02',
  [int]$X=-1,[int]$Y=-1,
  [ValidatePattern('^[a-z0-9_-]{1,60}$')][string]$Name='screen'
@@ -70,6 +70,14 @@ try{
   [ArcadeInput]::EnsureForeground($window,[uint32]$gameProcess)
   [ArcadeInput]::MouseEvent($false)
   try{Start-Sleep -Milliseconds 60}finally{[ArcadeInput]::MouseEvent($true)}
+ }elseif($Action -eq 'SelectBuilder' -or $Action -eq 'CancelTarget'){
+  Assert-DevProcess
+  [ArcadeInput]::EnsureForeground($window,[uint32]$gameProcess)
+  $fixedKey=if($Action -eq 'SelectBuilder'){0x71}else{0x1B}
+  try{
+   [ArcadeInput]::KeyEvent([uint16]$fixedKey,$false)
+   Start-Sleep -Milliseconds 60
+  }finally{[ArcadeInput]::KeyEvent([uint16]$fixedKey,$true)}
  }else{
   Assert-DevProcess
   [ArcadeInput]::EnsureForeground($window,[uint32]$gameProcess)

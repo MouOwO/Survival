@@ -44,3 +44,19 @@ Dev05的93帧／最大49 B及73批静态扫描是真实旧phase2范围，详见[
 历史manifest缺12个layout依赖、archive CSS缺9个图片依赖，以及shop JS物理mixed-EOL误挡，已在树外完整609输入闭包重编三项成功，未覆盖runtime或正式包。原临时工具未绑定operator commit的proof只作诊断，不冒充发行authority。
 
 通用`tools/release_compile_scope.py`已补XML src/layoutfile、CSS图片URL/import及VTEX像素闭包；仅从不可变Git导出CRLF，工作区物理EOL不再参与构建。plan必须指定operator commit，实际加载tool及inventory源码也核对该commit；编译结果验证v12块边界和JS DATA实际字节。12专项测试通过。新operator冻结后须标准CLI重新规划，必要时fresh stage重编；不能给旧proof改标签。完整历史pending、生产保护转换、recipe／ledger／authority、签名／普通准入／SDK及官方下载仍阻断，待发不清零。
+
+## 后续追加：S1严格Git gen3已生成，最终产物提交及新native待办
+
+本节追加发生在上方draft阶段之后；原draft测试及旧fe1718范围保留为历史。**仍仅本地更新，后台未改。** phase3 source／operator已冻结并push为game `8a48c567e5121ff946f1ce6f9ebbb6dc855fd4c8`，content `14c562b9139bba820decc885132f38095b8a4d93`；历史atlas显式绑定game `0056e2bf88106a2045b0575011196d15b7ee2383`。seed、运行schema、公开配置及历史全部从声明Git blob读取，无工作区回退。
+
+strict gen3 schema为 `26f900989a7546e089e0b0c28521723ee8e338ccd2e2a46d6d921ece7b54f75e`，registry为 `aac87becdf165a71c78938f52ee359d60c88f6ca45d8d0a9a7cebceb6e546863`。generation11、7932 records／186 fields；全部7887个旧ID和163个旧字段逐项不变，只尾部追加45条记录和23字段，十个祖先均校验通过。220个game、4个operator、6个atlas参考源的摘要完整列入生成manifest；content revision仅是配套编译来源，生成器没有读取content blob，不能当作编译／美术绑定证明。
+
+| gen3 game产物 | 规范LF SHA256 |
+| --- | --- |
+| `panorama/src/scripts/custom_game/common/ui_static_catalog.js`（4798146 B） | `a82e78dae5d92f967ad07f3b0fad7611eb36f960a3b59a78f230206154203606` |
+| `scripts/vscripts/config/generated/ui_static_catalog_lookup.lua`（3383461 B） | `5c9fa3e6ce9cd8c117da0302a22596a22fa0c0c083e43534562ec7c2a9974037` |
+| `data/ui/ui_static_catalog_manifest.json` | `1470bfb5171b741370ba4a06ec868102cc125a3b1aea5ca78fa532c4782daa1f` |
+
+输出均LF、无CR；content镜像及官方编译由主操作者单独处理。严格同参数`--check`已复现所有字节，JS语法通过。实际runtime registry的production Lua及Node5重新通过，Node明确输出`actual runtime registry`，不再augment draft metadata；wire15、runtime16、VIP Lua与实际controller、工人容量真实tracker也重跑通过。上述均为离线真实模块／调用计数，不是新native／FPS或普通客户端验收。
+
+S1/C1为生成输入冻结，不是包含新gen3输出的最终artifact提交。下一步由主操作者完成同源官方编译、两仓产物提交，再fresh独立Dev06验证生产／VIP与余下legacy及FPS；整个待发／保护／发行链仍按前文阻断，不据此标“已同步游廊”。
