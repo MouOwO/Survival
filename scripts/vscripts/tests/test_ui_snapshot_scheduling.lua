@@ -41,8 +41,8 @@ end
 local service = require("ui/ui_snapshot_service")
 register_projection()
 service.init()
-assert(calls == 1 and tasks.ui_snapshot_flush.at == 0.25 and #sent == 0)
-flush(0.25)
+assert(calls == 1 and tasks.ui_snapshot_flush.at == 0 and #sent == 0)
+flush(0)
 assert(#sent == 3 and next(tasks) == nil, "initial full snapshot is sent once, then idle")
 for i = 1, 3 do assert(sent[i].snapshot.sequence == i) end
 
@@ -55,7 +55,7 @@ for i = 1, 20 do
     now = 1 + i * 0.01
     bus.emit(events.UI_DIRTY, {team = 2})
 end
-assert(calls == previous_calls + 1 and tasks.ui_snapshot_flush == first and first.at == 1.25,
+assert(calls == previous_calls + 1 and tasks.ui_snapshot_flush == first and first.at == 1,
     "continuous dirty events keep the first deadline")
 flush(1.25)
 assert(#sent == 2 and sent[1].id ~= 2 and sent[2].id ~= 2 and next(tasks) == nil)
@@ -66,7 +66,7 @@ now = 2
 bus.emit(events.UI_DIRTY, {team = 2})
 during_build = function() bus.emit(events.UI_DIRTY, {team = 3}) end
 flush(2.25)
-assert(#sent == 2 and tasks.ui_snapshot_flush.at == 2.5)
+assert(#sent == 2 and tasks.ui_snapshot_flush.at == 2.25)
 flush(2.5)
 assert(#sent == 3 and sent[3].id == 2 and next(tasks) == nil)
 

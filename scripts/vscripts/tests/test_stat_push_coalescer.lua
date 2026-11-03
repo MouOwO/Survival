@@ -56,3 +56,24 @@ assert(scheduler.task_count()==2,"building and combat queues never replace each 
 advance(.11);assert(combat_sent==1 and scheduler.task_count()==1)
 advance(.05);assert(scheduler.task_count()==0)
 print("COMBAT_PUSH_PASS: 500 changes -> 1 latest snapshot; 100ms; independent building queue; armor invalidation preserved")
+
+-- Stable cached catalogues are reused by identity, independent of their size.
+-- Clock-only delivery metadata is not another displayed state change.
+local original_pairs=pairs
+for _,size in ipairs({10,100,1000}) do
+    local catalogue={};for i=1,size do catalogue[i]={name="research_"..i,cost=i}end
+    local visits,sends=0,0
+    local stable=factory.new({scheduler=scheduler,task_prefix="stable_"..size.."_",
+        is_selected=function()return true end,
+        build=function(p)return {entindex=291,level=p.level,server_time=clock,abilities=catalogue}end,
+        send=function()sends=sends+1 end})
+    stable.push({player_id=0,entindex=291,level=1});advance(.16)
+    pairs=function(value)if value==catalogue then visits=visits+1 end;return original_pairs(value)end
+    for i=1,20 do stable.push({player_id=0,entindex=291,level=1});advance(.16)end
+    pairs=original_pairs
+    assert(sends==1 and visits==0,"clock-only changes must not send or scan cached catalogue")
+    stable.push({player_id=0,entindex=291,level=2});advance(.16)
+    assert(sends==2,"a real displayed change must still be delivered")
+    stable.reset()
+end
+print("IMMUTABLE_PUSH_COST_PASS: N=10/100/1000, stable20 each => catalogue visits0, extra sends0; actual level change retained")

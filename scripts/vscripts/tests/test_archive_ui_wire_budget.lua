@@ -57,7 +57,20 @@ local function reset()
     archive=require("systems/archive_service");archive.init();archive.set_clock(function() return 1700000000 end)
     encodes, sends = 0, 0
 end
-local function publish() bus.emit(events.PLAYER_PROFILE_CHANGED,{player_id=0,reason="synthetic_wire_budget"}) end
+local queue_callbacks, max_callback_packets = 0, 0
+local function pump()
+    while timers.archive_ui_queue do
+        local fn=timers.archive_ui_queue;timers.archive_ui_queue=nil
+        local before=sends;fn();queue_callbacks=queue_callbacks+1
+        max_callback_packets=math.max(max_callback_packets,sends-before)
+        assert(sends-before<=2,"bounded archive queue callback exceeded two packets")
+        assert(queue_callbacks<10000,"archive queue did not settle")
+    end
+end
+local function publish()
+    bus.emit(events.PLAYER_PROFILE_CHANGED,{player_id=0,reason="synthetic_wire_budget"})
+    pump()
+end
 local function expected_pages()
     local result, count = {}, 0
     for _, category in ipairs(definitions.rows) do if category.enabled then
@@ -131,7 +144,7 @@ end end;assert(found)
 reset();profile.save.archive.social_last_draw={description=string.rep("大",2500)}
 publish();assert(#packets==0 and rejects("header_budget"))
 assert(archive.snapshot(0,"clear").last_draw.description==profile.save.archive.social_last_draw.description)
-profile.save.archive.social_last_draw=nil;packets={};publish()
+profile.save.archive.social_last_draw=nil;profile.revision=profile.revision+1;packets={};publish()
 assert(#packets>0);for _,packet in ipairs(packets) do assert(packet.delta==nil) end
 
 -- A synchronous native failure after chunk1 must not advance sent_pages.
@@ -148,7 +161,8 @@ local result={kind="REAL_ARCHIVE_UI_WIRE_BUDGET_SYNTHETIC_NOT_NATIVE",rows=initi
     initial_json_encode_calls=initial_encodes,unchanged_json_encode_calls=unchanged_encodes,
     change_json_encode_calls=change_encodes,change_packets=#delta_packets,per_packet_json_budget=6144,
     server_quota_preserved=true,rejected_header_and_row_preserved=true,partial_send_baseline_safe=true,
-    timers_added=0,http_calls=http,persistence_calls=writes,native_calls=0}
+    timers_added=0,queue_callbacks=queue_callbacks,max_packets_per_callback=max_callback_packets,
+    http_calls=http,persistence_calls=writes,native_calls=0}
 if arg and arg[1]=="emit" then result.initial_packets=initial_packets;result.delta_packets=delta_packets
     result.initial_expected=initial_expected;result.changed_expected=changed_expected end
 raw_print(encode(result))

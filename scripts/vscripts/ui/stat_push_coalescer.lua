@@ -1,7 +1,10 @@
 -- Presentation-only: bounded latest-value delivery, independent of gameplay ticks.
 local M = {}
-local transport = {reason=true, push_phase=true, refresh_sequence=true}
+local transport = {reason=true, push_phase=true, refresh_sequence=true, server_time=true}
 local function equal(a,b)
+    -- Projectors replace immutable cached research/catalogue subtrees only on
+    -- real generation changes. Never walk those same tables on every push.
+    if a == b then return true end
     if type(a) ~= type(b) then return false end
     if type(a) ~= "table" then return a == b end
     for k,v in pairs(a) do

@@ -1,5 +1,8 @@
 local profiles=require("systems/player_profile_service")
 local bundle=require("config/generated/archive_http_bundle")
+local ui_context=require("ui/compact_profile_context")
+local daily_projection=require("ui/compact_daily_projection")
+local lottery_projection=require("ui/compact_lottery_projection")
 local M={}
 function M.enabled()
     local p=profiles.get_provider()
@@ -25,7 +28,12 @@ function M.submit(player_id,command,complete,lottery_hash)
             if tostring(result.profile.account_id)~=tostring(account) then
                 complete({ok=false,terminal=true,error="account_id_mismatch"});return
             end
-            local applied=profiles.apply_snapshot(player_id,result.profile,"archive_"..command.kind)
+            local applied=ui_context.with(player_id,{source="archive_command",command=command,response=result.response,
+                profile=result.profile.account_profile or result.profile,
+                compact_daily_changes=daily_projection.command_changes(command,result),
+                compact_lottery_changes=lottery_projection.command_changes(command,result)},function()
+                return profiles.apply_snapshot(player_id,result.profile,"archive_"..command.kind)
+            end)
             if not applied.ok and applied.error~="snapshot_revision_stale" then complete(applied);return end
             -- Local marker, never trusted from HTTP: stale receipts cannot become cache bases.
             result.lottery_profile_applied=applied.ok==true
@@ -47,7 +55,11 @@ function M.submit_endless_batch(player_id,commands,complete)
             if tostring(result.profile.account_id)~=tostring(account) then
                 complete({ok=false,error="account_id_mismatch"});return
             end
-            local applied=profiles.apply_snapshot(player_id,result.profile,"archive_endless_batch")
+            local applied=ui_context.with(player_id,{source="archive_batch",commands=commands,
+                profile=result.profile.account_profile or result.profile,
+                compact_lottery_changes={headers=true},compact_daily_changes={unrelated=true}},function()
+                return profiles.apply_snapshot(player_id,result.profile,"archive_endless_batch")
+            end)
             if not applied.ok and applied.error~="snapshot_revision_stale" then complete(applied);return end
         end
         complete(result)

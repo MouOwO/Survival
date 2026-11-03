@@ -9,6 +9,7 @@ local M={}
 local caches,versions,loading,waiters,busy={},{},{},{},{}
 local owners,epochs,published_epochs,full_required={},{},{},{}
 local serial,operation,initialized=0,0,false
+local initialized_world
 local catalog,active_hash,catalog_loading,catalog_waiters=nil,bundle.hash,false,{}
 local catalog_serial=0
 local catalog_session,catalog_generation,require_expected_hash=nil,0,false
@@ -17,6 +18,12 @@ local seed_md5=seed_ok and type(seed)=='table' and seed.config_hash==bundle.hash
     and #seed.catalog_md5==32 and not seed.catalog_md5:find('[^0-9a-f]') and seed.catalog_md5 or nil
 local session=tostring(DoUniqueString and DoUniqueString('lottery_http') or os.time()):gsub('[^%w_.-]','_')
 local pool_ids={map=true,cultivation=true,dragon_knight=true,summer=true}
+local compact_transport,compact_factory,compact_lookup,compact_refresh
+local compact_states,compact_failures={},{}
+local function compact_bound(id)
+    if not compact_transport then local ok,t=pcall(require,'ui/compact_ui_transport');if ok then compact_transport=t end end
+    return compact_transport and compact_transport.is_bound and compact_transport.is_bound(id) or false
+end
 local function catalog_scope()
     local current_session=tostring(require('systems/match_setup_service').get_session_id() or '')
     if current_session~=catalog_session then
@@ -25,6 +32,7 @@ local function catalog_scope()
         catalog_serial,require_expected_hash=0,false
         caches,versions,loading,waiters,busy={},{},{},{},{}
         owners,epochs,published_epochs,full_required={},{},{},{}
+        compact_states,compact_failures={},{}
     end
     return current_session
 end
@@ -49,6 +57,8 @@ local function scope(id)
         caches[id],versions[id],loading[id],waiters[id],busy[id]=nil,nil,nil,nil,nil
         epochs[id],published_epochs[id],full_required[id]=0,nil,nil
         owners[id]=owner
+        compact_states[id]=nil
+        compact_failures[id]=nil
     end
     return owner
 end
@@ -62,6 +72,9 @@ local function stamp(snapshot,owner,hash)
     return snapshot
 end
 local function publish(id,snapshots)
+    -- The compact adapter reads authoritative profile keys. Do not construct
+    -- legacy diffs/catalogue events for a negotiated integer-only client.
+    if compact_bound(id) then return end
     caches[id]=caches[id] or {};versions[id]=versions[id] or {}
     for _,snapshot in ipairs(snapshots or {}) do
         stamp(snapshot,owners[id],snapshot.config_hash or active_hash)
@@ -181,8 +194,9 @@ local function check_catalog(complete,force_body)
                 -- Clients gate transactions until this same hash arrives.
                 local ids={};for id in pairs(owners) do ids[#ids+1]=id end
                 for _,id in ipairs(ids) do
-                    full_required[id]=true
-                    fetch(id,nil,true)
+                    if compact_bound(id)then
+                        if compact_refresh then compact_refresh(id,nil,{headers=true})end
+                    else full_required[id]=true;fetch(id,nil,true)end
                 end
             end
         else result={ok=false,error=result and result.error or 'lottery_catalog_invalid'} end
@@ -236,6 +250,16 @@ local function submit(payload,kind)
         local response=type(result.response)=='table' and result.response or {ok=result.ok,error=result.error}
         response.request_id=payload.request_id;response.pool_id=payload.pool_id
         if not result.ok then response.ok=false;response.error=result.error end
+        if payload.compact_token and compact_bound(id) then
+            if compact_refresh then
+                compact_refresh(id,result.profile and (result.profile.account_profile or result.profile),
+                    require('ui/compact_lottery_projection').command_changes(command,result),
+                    {token=payload.compact_token,response=response,applied=result.ok==true and result.lottery_profile_applied==true})
+            end
+            if payload.complete then payload.complete({ok=response.ok,pending=response.pending,terminal=response.terminal,error=response.error,compact_handled=true}) end
+            timing('compact_receipt_ready')
+            return
+        end
         if kind=='lottery_read' then
             -- A read receipt changes only unread metadata. It does not need
             -- another account/catalog HTTP read after the authoritative write.
@@ -321,8 +345,29 @@ local function submit(payload,kind)
     return {pending=true}
 end
 function M.init()
-    if initialized then return end;initialized=true
-    bus.handle_request(events.LOTTERY_SNAPSHOT_REQUEST,function(payload)
+    local own_world=bus.get_generation and bus.get_generation() or bus
+    if initialized and initialized_world==own_world then return end
+    if initialized then
+        local scheduler=require('core/scheduler')
+        if scheduler.cancel then scheduler.cancel('lottery_catalog_poll') end
+        -- Invalidate old asynchronous catalogue/profile work even if a Tools
+        -- reload retained the same textual match-session value.
+        catalog_session=nil;catalog_scope()
+    end
+    initialized,initialized_world=true,own_world
+    local function current_world()
+        return initialized_world==own_world and (not bus.get_generation or bus.get_generation()==own_world)
+    end
+    local function request(name,handler)
+        bus.handle_request(name,function(payload)
+            if not current_world() then return nil,'lottery_world_expired' end
+            return handler(payload)
+        end)
+    end
+    local function subscribe(name,handler)
+        bus.subscribe(name,function(payload)if current_world() then return handler(payload) end end)
+    end
+    request(events.LOTTERY_SNAPSHOT_REQUEST,function(payload)
         local id=payload.player_id
         local owner=scope(id)
         if not owner then return {ok=false,error='http_profile_required'} end
@@ -336,9 +381,9 @@ function M.init()
         end,payload.prefetch==1)
         return {pending=true}
     end)
-    bus.handle_request(events.LOTTERY_DRAW_REQUEST,function(p)return submit(p,'lottery_draw')end)
-    bus.handle_request(events.LOTTERY_EXCHANGE_REQUEST,function(p)return submit(p,'lottery_exchange')end)
-    bus.handle_request(events.LOTTERY_READ_ACK_REQUEST,function(p)
+    request(events.LOTTERY_DRAW_REQUEST,function(p)return submit(p,'lottery_draw')end)
+    request(events.LOTTERY_EXCHANGE_REQUEST,function(p)return submit(p,'lottery_exchange')end)
+    request(events.LOTTERY_READ_ACK_REQUEST,function(p)
         local owner=scope(p.player_id)
         local complete=p.complete
         local function header(result)
@@ -355,19 +400,35 @@ function M.init()
         if not (result and result.pending) then header(result) end
         return result
     end)
-    bus.handle_request(events.LOTTERY_CATALOG_REQUEST,function(p)
+    request(events.LOTTERY_CATALOG_REQUEST,function(p)
         catalog_for(tostring(p.md5 or ''),p.complete);return {pending=true}
     end)
-    bus.handle_request(events.LOTTERY_CACHE_RESYNC_REQUEST,function(p)
+    request(events.LOTTERY_CACHE_RESYNC_REQUEST,function(p)
         full_required[p.player_id]=true
         -- Explicit invalidation (including a completed redemption) must retire
         -- an older in-flight read, not reuse its pre-redemption inventory.
         fetch(p.player_id,nil,true)
         return {pending=true}
     end)
-    bus.subscribe(events.PLAYER_PROFILE_CHANGED,function(p)
+    subscribe(events.PLAYER_PROFILE_CHANGED,function(p)
         if p and p.player_id~=nil then
             local job=busy[p.player_id]
+            if compact_bound(p.player_id) then
+                local context=require('ui/compact_profile_context').current(p.player_id)
+                -- The submit completion owns its validated receipt and exact K
+                -- keys. The synchronous profile event must not send it twice.
+                if job and (job.kind=='lottery_draw' or job.kind=='lottery_read') then return end
+                local cached=compact_states[p.player_id]
+                if not context and cached and cached.projection.inspect().revision==p.revision then return end
+                local current_profile=context and context.profile
+                if not current_profile then
+                    current_profile=profiles.get_account_profile and profiles.get_account_profile(p.player_id)
+                        or profiles.get_profile and profiles.get_profile(p.player_id)
+                end
+                if compact_refresh then compact_refresh(p.player_id,current_profile,
+                    context and context.compact_lottery_changes or {initialize=true}) end
+                return
+            end
             if job and job.kind=='lottery_read' and p.reason=='archive_lottery_read' then return end
             fetch(p.player_id,nil,true)
         end
@@ -375,8 +436,110 @@ function M.init()
     local provider=profiles.get_provider()
     if provider and type(provider.lottery_catalog)=='function' then
         check_catalog()
-        require('core/scheduler').every(30,function()check_catalog()end,'lottery_catalog_poll')
+        require('core/scheduler').every(30,function()if current_world() then check_catalog() end end,'lottery_catalog_poll')
     end
 end
 function M.active_config_hash() catalog_scope();return active_hash end
+local function compact_setup()
+    if compact_factory then return true end
+    local ok,lookup=pcall(require,'config/generated/ui_static_catalog_lookup')
+    if not ok then return false end
+    local factory,why=require('ui/compact_lottery_projection').new(lookup)
+    if not factory then return false,why end
+    compact_factory,compact_lookup=factory,lookup;return true
+end
+local function compact_catalog_ready()
+    return seed_ok and type(seed)=='table'and type(seed.catalog_md5)=='string'
+        and catalog and catalog.session_id==catalog_session and catalog.catalog_md5==seed.catalog_md5
+end
+local function compact_unknown()
+    if not compact_setup()then return nil end
+    local r=compact_lookup.by_key['lottery:state'];local f=compact_lookup.field_by_name
+    local code=catalog and 6 or 2
+    return {{record=r,field=f.known,value=0},{record=r,field=f.enabled,value=0},{record=r,field=f.error_code,value=code}},code
+end
+local function compact_entry(id,profile,replace)
+    local owner=scope(id);if not owner or not compact_setup()then return nil end
+    local entry=compact_states[id]
+    if not entry or replace then
+        profile=profile or (profiles.get_account_profile and profiles.get_account_profile(id)or profiles.get_profile(id))
+        local projection,why=compact_factory.initialize(profile,{pending=busy[id]~=nil})
+        if not projection then return nil,why end
+        local intents=entry and entry.intents or{}
+        entry={projection=projection,owner=owner,profile=profile,intents=intents,used_tokens=entry and entry.used_tokens or{},
+            nonce_prefix=entry and entry.nonce_prefix or tostring(DoUniqueString and DoUniqueString('compact_lottery')or(session..'_'..tostring(operation+1))):gsub('[^%w_.-]','_')}
+        for token,intent in pairs(intents)do projection.bind_intent(token,intent.pool,intent.count)end -- <=1 active authoritative operation.
+        compact_states[id]=entry
+    end
+    return entry
+end
+local function compact_publish(id,entry,ops,full)
+    for index,pool in ipairs(require('config/lottery_config').pool_order)do local view=200+index
+        if compact_transport.is_open(id,view)then
+            local selected=full and entry.projection.full_ops(pool.id)or entry.projection.filter(pool.id,ops)
+            if #selected>0 then compact_transport.publish(id,view,selected,{full=full==true,priority=true})end
+        end
+    end
+end
+compact_refresh=function(id,profile,changes,receipt)
+    if not compact_catalog_ready()then
+        local ops,code=compact_unknown();if not ops then return nil end
+        if compact_failures[id]~=code then
+            compact_failures[id]=code;compact_states[id]=nil
+            for index in ipairs(require('config/lottery_config').pool_order)do local view=200+index
+                if compact_transport.is_open(id,view)then compact_transport.publish(id,view,ops,{full=true,priority=true})end
+            end
+        end
+        return nil,'lottery_config_refresh_required'
+    end
+    local cold=compact_states[id]==nil or compact_failures[id]~=nil;compact_failures[id]=nil
+    local entry=compact_entry(id,profile,false);if not entry then return nil end
+    local ops,full={},cold
+    if profile then
+        if changes and changes.initialize then entry=compact_entry(id,profile,true);if not entry then return nil end;full=true
+        else
+            local reason;ops,reason=entry.projection.update(profile,changes or{headers=true},{pending=busy[id]~=nil})
+            if not ops then return nil,reason end;entry.profile=profile
+        end
+    end
+    if receipt and receipt.token~=0 then
+        local intent=entry.intents[receipt.token]
+        if not intent then return nil,'lottery_intent_unknown'end
+        local result,why=entry.projection.receipt(receipt.token,receipt.response,receipt.applied)
+        if not result then return nil,why end
+        for _,op in ipairs(result)do ops[#ops+1]=op end
+        if receipt.response.pending~=true and (receipt.response.ok~=true or receipt.applied)then entry.intents[receipt.token]=nil end
+    end
+    compact_publish(id,entry,ops,full);return true
+end
+function M.compact_open(id,pool)
+    if not compact_bound(id) or not pool_ids[pool]then return nil end
+    scope(id)
+    if not compact_catalog_ready()then local ops,code=compact_unknown();compact_failures[id]=code;return ops end
+    local entry=compact_entry(id);return entry and entry.projection.full_ops(pool)or nil
+end
+function M.compact_pool(record)
+    if not compact_setup()then return nil end;return compact_factory.pool_id(record)
+end
+function M.compact_draw(id,pool,count,token,complete)
+    if not compact_bound(id)or not pool_ids[pool]or(count~=1 and count~=10)or type(token)~='number'or token~=math.floor(token)or token<1 or token>16383 then return{ok=false,error='lottery_intent_invalid'}end
+    if not compact_catalog_ready()then return{ok=false,error='lottery_config_refresh_required'}end
+    local entry=compact_entry(id);if not entry then return{ok=false,error='http_profile_required'}end
+    if entry.used_tokens[token]then return{ok=false,error='lottery_intent_token_reused'}end
+    if next(entry.intents)then return{ok=false,error='lottery_player_busy'}end
+    entry.projection.bind_intent(token,pool,count)
+    local intent={pool=pool,count=count};entry.intents[token]=intent
+    entry.used_tokens[token]=true
+    local result=submit({player_id=id,pool_id=pool,count=count,request_id=entry.nonce_prefix..'_'..token,
+        compact_token=token,expected_config_hash=active_hash,complete=complete},'lottery_draw')
+    if not result.pending then compact_refresh(id,nil,nil,{token=token,response=result,applied=false})end
+    return result
+end
+function M.compact_read(id,pool,action)
+    local config=require('config/lottery_config');local definition=config.pools[pool]
+    local actions={[1]='visit',[2]='details',[3]='notice'}
+    if not compact_bound(id)or not definition or not actions[action]or not compact_catalog_ready()then return nil end
+    return submit({player_id=id,pool_id=pool,read_action=actions[action],revision=definition.revision,
+        compact_token=0,complete=function()end},'lottery_read')
+end
 return M

@@ -75,7 +75,13 @@ local function player_wave_snapshot(player_id)
     -- All recipients share the assault count/deadline; buildings, resources and
     -- the individual eliminated/spectator status still belong to the recipient.
     local snapshot = {}
-    for key, value in pairs(wave) do snapshot[key] = value end
+    -- Difficulty definitions/unlock choices already belong to the authenticated
+    -- survival_loading/setup projection. They are a catalogue, not changing HUD
+    -- state: copying them into every resource/kill update repeatedly serialized
+    -- all N1..N10 descriptions. Retain every dynamic/personal wave field here.
+    for key, value in pairs(wave) do
+        if key ~= "difficulty_options" then snapshot[key] = value end
+    end
     local personal = event_bus.request(events.WAVE_STATE_GET_REQUEST, {
         player_id = player_id,
     })

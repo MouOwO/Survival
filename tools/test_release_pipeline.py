@@ -215,6 +215,57 @@ class PipelineTests(unittest.TestCase):
             p.publish(self.f.authority,self.builder,dict(self.f.request,parent_journal_sha256='0'*64))
         self.assertIsNone(g.read_json(self.f.state)[0]['pending'])
 
+    def test_diagnostic_commands_never_import_sdk_or_consult_mutation_authority(self):
+        import release_workflow_diagnostics as diagnostics
+        with patch.object(diagnostics,'main',return_value=2) as check,patch.object(p,'authority',side_effect=AssertionError('mutation authority touched')),patch.object(p,'_sdk',side_effect=AssertionError('SDK touched')):
+            self.assertEqual(p.main(['pending','--check']),2)
+        check.assert_called_once_with(['pending','--check'])
+
+    def test_complete_upload_success_download_failure_never_resubmits_or_claims_synced(self):
+        download=SimpleNamespace(main=Mock(return_value=1))
+        with patch.object(p,'publish',return_value=dict(uploaded=True,release_sequence=106)) as upload,patch.object(p,'pinned_module',return_value=download):
+            result=p.complete(self.f.authority,self.builder,self.f.request)
+        upload.assert_called_once();download.main.assert_called_once()
+        self.assertEqual(result['delivery_status'],'UPLOADED_PENDING_DOWNLOAD_VERIFICATION')
+        self.assertFalse(result['workshop_synchronized']);self.assertFalse(result['automatic_resubmit'])
+        self.assertTrue(result['canonical_history_and_backups_preserved'])
+
+    def test_complete_distinguishes_verified_task_from_unpublished_project_backlog(self):
+        import release_workflow_diagnostics as diagnostics
+        receipt=self.reports/'download_evidence'/'synthetic.json'
+        def finished(args):
+            print(json.dumps(dict(status='OFFICIAL_REFRESH_NATIVE_DOWNLOAD_FULLY_VERIFIED',evidence=str(receipt),release_sequence=106,steam_manifest='123456789')))
+            return 0
+        state=dict(upload_evidence_matches_target=True,official_download_evidence_matches_target=True,
+            task_package_status='WORKSHOP_SYNCED',project_status='LOCAL_ONLY',workshop_synchronized=False,
+            pending_counts=dict(pending=7))
+        with patch.object(p,'publish',return_value=dict(uploaded=True)) as upload,patch.object(p,'pinned_module',return_value=SimpleNamespace(main=finished)),patch.object(diagnostics,'delivery_status',return_value=state):
+            result=p.complete(self.f.authority,self.builder,self.f.request)
+        upload.assert_called_once()
+        self.assertTrue(result['workshop_synchronized']);self.assertFalse(result['project_workshop_synchronized'])
+        self.assertEqual(result['pending_counts']['pending'],7);self.assertFalse(result['cleanup_performed'])
+
+    def test_complete_requires_explicit_apply_and_never_accepts_sdk_only_success(self):
+        with redirect_stderr(io.StringIO()),patch.object(p,'authority',side_effect=AssertionError('authority reached')),self.assertRaises(SystemExit):
+            p.main(['complete','--request','request.json','--request-sha','e'*64])
+        download=SimpleNamespace(main=Mock(return_value=0))
+        with patch.object(p,'publish',return_value=dict(uploaded=True)) as upload,patch.object(p,'pinned_module',return_value=download):
+            result=p.complete(self.f.authority,self.builder,self.f.request)
+        upload.assert_called_once();self.assertFalse(result['workshop_synchronized'])
+
+    def test_download_output_is_bounded_without_aborting_transfer_or_resubmitting(self):
+        completed=[]
+        def noisy_download(args):
+            print('x'*32);completed.append(True);return 0
+        with patch.object(p._DownloadOutput,'limit',16),patch.object(p,'publish',return_value=dict(uploaded=True)) as upload,patch.object(p,'pinned_module',return_value=SimpleNamespace(main=noisy_download)):
+            result=p.complete(self.f.authority,self.builder,self.f.request)
+        self.assertEqual(completed,[True]);upload.assert_called_once()
+        self.assertFalse(result['workshop_synchronized']);self.assertFalse(result['automatic_resubmit'])
+        capture=p._DownloadOutput()
+        with patch.object(p._DownloadOutput,'limit',4):
+            self.assertEqual(capture.write('1234567'),7)
+            self.assertEqual(capture.getvalue(),'1234');self.assertTrue(capture.overflow)
+
 
 class ActiveHotfixRegistrationTests(unittest.TestCase):
     def test_actual_registered_hotfix_paths_and_all_reviewed_pins(self):

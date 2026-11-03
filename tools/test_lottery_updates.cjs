@@ -61,7 +61,9 @@ function timed(pool,stamp){const x=updated(pool,'time-'+stamp);x.selected_pool.u
 events.ui_lottery_snapshot(timed('map',1900));
 // Clear the earlier revision-only test's local record to model first use.
 Object.keys(config.SurvivalLotteryDetailReads).forEach(k=>delete config.SurvivalLotteryDetailReads[k]);
-events.ui_lottery_snapshot(timed('map',1900));assert(nodes.LotteryUpdateDot.visible);
+// The test changed local read state directly. A duplicate network delivery is
+// deliberately inert; use the real local refresh action for that invalidation.
+events.ui_lottery_snapshot(timed('map',1900));ui.Refresh();assert(nodes.LotteryUpdateDot.visible);
 ui.Feature('details');assert(!nodes.LotteryUpdateDot.visible,'opening details clears immediately, before HTTP acknowledgement');
 ui.CloseInfo();events.ui_lottery_snapshot(timed('map',1900));assert(!nodes.LotteryUpdateDot.visible,'stale unread flag cannot restore the dot');
 events.ui_lottery_snapshot(timed('map',2000));assert(!nodes.LotteryUpdateDot.visible,'equal timestamp is already read');

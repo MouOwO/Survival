@@ -50,11 +50,12 @@ local function owned_count(item, save)
     return nil
 end
 
-function M.project(profile)
+-- The compact view uses this same authoritative ownership adapter for one
+-- indexed changed item; it must not recreate a full 178-row page to find it.
+function M.project_one(profile, item_id)
+    local item = catalog.by_id[item_id]
+    if not item or item.enabled == false then return nil end
     local save = profile and table_or_nil(profile.save) or {}
-    local rows = {}
-    for _, item in ipairs(catalog.rows) do
-        if item.enabled ~= false then
             local count = owned_count(item, save)
             local resource = resources.lookup(item)
             local row = {
@@ -74,8 +75,13 @@ function M.project(profile)
             end
             local maximum = quantity(item.max_owned)
             if maximum and maximum > 0 then row.target = maximum end
-            rows[#rows + 1] = row
-        end
+    return row
+end
+
+function M.project(profile)
+    local rows = {}
+    for _, item in ipairs(catalog.rows) do
+        if item.enabled ~= false then rows[#rows + 1] = M.project_one(profile, item.id) end
     end
     return rows
 end

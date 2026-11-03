@@ -1,0 +1,118 @@
+{
+  "kind": "NATIVE_TOOLS_BIDIRECTIONAL_MESSAGE_CALIBRATION_NOT_ORDINARY_ACCEPTANCE",
+  "server_to_client": {
+    "method": "net_showmsg",
+    "layer": "CUserMsg_CustomGameEvent",
+    "event": "cw",
+    "key": "d",
+    "engine_build": "10938:11175759",
+    "networksystem_sha256": "7acebae03d1c558e819963d2e552c2d1aab0487c6688b6ece21b6b659f3506e2",
+    "source_log_sha256": "154bbd2c9500ad78dd8bc3c9bce25d3295829e5faca46a67bf27ef623dfe52e3",
+    "samples": [
+      {
+        "value_bytes": 0,
+        "native_bytes": 25,
+        "native_bits": 194
+      },
+      {
+        "value_bytes": 1,
+        "native_bytes": 26,
+        "native_bits": 202
+      },
+      {
+        "value_bytes": 8,
+        "native_bytes": 33,
+        "native_bits": 258
+      },
+      {
+        "value_bytes": 16,
+        "native_bytes": 41,
+        "native_bits": 322
+      },
+      {
+        "value_bytes": 24,
+        "native_bytes": 49,
+        "native_bits": 386
+      },
+      {
+        "value_bytes": 28,
+        "native_bytes": 53,
+        "native_bits": 418
+      },
+      {
+        "value_bytes": 32,
+        "native_bytes": 57,
+        "native_bits": 450
+      },
+      {
+        "value_bytes": 40,
+        "native_bytes": 65,
+        "native_bits": 514
+      }
+    ],
+    "fixed_native_ceil_bytes": 25,
+    "value_budget": 24,
+    "native_message_limit": 50,
+    "max_admitted_native_bytes": 49,
+    "native_probe": true,
+    "tools_only": true,
+    "ordinary_production_acceptance": false,
+    "layer_note": "net_showmsg incoming message bits rounded to bytes; excludes UDP/IP/Steam transport packet headers",
+    "workshop_install_written": false,
+    "transactions": 0
+  },
+  "client_to_server": {
+    "method": "net_showmsg",
+    "layer": "CClientMsg_CustomGameEvent",
+    "direction": "client_to_server",
+    "event": "cw",
+    "key": "d",
+    "engine_build": "10938:11175759",
+    "networksystem_sha256": "7acebae03d1c558e819963d2e552c2d1aab0487c6688b6ece21b6b659f3506e2",
+    "source_log_sha256": "f3825195ca31bdda272d04115481312b07d6b05245533c76227ab712a180d34e",
+    "samples": [
+      {
+        "value_bytes": 0,
+        "native_bits": 198,
+        "native_bytes": 25
+      },
+      {
+        "value_bytes": 1,
+        "native_bits": 206,
+        "native_bytes": 26
+      },
+      {
+        "value_bytes": 8,
+        "native_bits": 262,
+        "native_bytes": 33
+      },
+      {
+        "value_bytes": 16,
+        "native_bits": 326,
+        "native_bytes": 41
+      },
+      {
+        "value_bytes": 24,
+        "native_bits": 390,
+        "native_bytes": 49
+      },
+      {
+        "value_bytes": 32,
+        "native_bits": 454,
+        "native_bytes": 57
+      }
+    ],
+    "fixed_native_ceil_bytes": 25,
+    "value_budget": 24,
+    "max_admitted_native_bytes": 49,
+    "native_message_limit": 50,
+    "native_probe": true,
+    "tools_only": true,
+    "ordinary_production_acceptance": false,
+    "transactions": 0,
+    "workshop_install_written": false,
+    "layer_note": "net_showmsg incoming message bits rounded to bytes; excludes UDP/IP/Steam transport packet headers"
+  },
+  "s2c_receipt_sha256": "802a54733b151cfacd99409a7710891825ab78464eaaf4d9e736cd3a6e169a0c",
+  "c2s_receipt_sha256": "5c7d814e445dbe4a490674ffa25f39595cc48ecb6552f5ded64c6ad4448c3535"
+}

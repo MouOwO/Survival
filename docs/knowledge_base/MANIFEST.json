@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 25903,
-      "sha256": "182e030d3913355e0bb6d00a4d8800f454a05bef66ce2673c9197c9454c49fb0"
+      "bytes": 26745,
+      "sha256": "258202ea1bcec367edede0f3c17b6af77930a2c9439fd9a8457d6089f8c2724b"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 39903,
-      "sha256": "4ffa194052921cef78dc6df5e492035b2feaff5a320f89032ed0cb388bdb98c1"
+      "bytes": 40789,
+      "sha256": "c4b36c97eed444e50806ebc6ade67bbe3254016809658c90e540f700f6fe2aa0"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 14815,
-      "sha256": "4207437642a153028be7aae5d94703dcc5054abcf986b9e2645efa1c347c07d9"
+      "bytes": 15377,
+      "sha256": "c8f04abf1443006707309054e443ab90f05ea1d52faf57ff05b4d4096b76e579"
     },
     {
       "path": "data/completed_work_index.json",
@@ -327,6 +327,11 @@
       "path": "evidence/native_arcade_cloud_20261027.public.json",
       "bytes": 1694,
       "sha256": "3d57d439d339f2655e98d9b690735cf65de3945a15e7b52b77ac29e1bc7d657b"
+    },
+    {
+      "path": "evidence/network50_ui_local_handoff_20261103.md",
+      "bytes": 9367,
+      "sha256": "4211f01b1ad3e47f57a10de0f4a0bfe702a7bef339b985ea8ef4575dfa5cd344"
     },
     {
       "path": "evidence/offline_early_clear_scene_20261029.md",

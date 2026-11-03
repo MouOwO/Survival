@@ -9,6 +9,8 @@ import argparse
 import copy
 import importlib
 import json
+import io
+from contextlib import redirect_stdout
 from pathlib import Path
 import sys
 from types import ModuleType
@@ -19,6 +21,21 @@ import release_sdk_lineage_hook as hook
 from release_lineage_20261101 import guard
 
 MAX_REQUEST = 1024 * 1024
+
+
+class _DownloadOutput(io.StringIO):
+    """Bound diagnostic output without interrupting an in-flight download."""
+    limit = 4 * 1024 * 1024
+
+    def __init__(self):
+        super().__init__(); self.overflow = False
+
+    def write(self, value):
+        remaining = self.limit - self.tell()
+        if len(value) > remaining:
+            self.overflow = True
+        super().write(value[:max(0, remaining)])
+        return len(value)
 
 
 def authority():
@@ -62,11 +79,12 @@ def request_json(builder, path, expected_sha256):
 
 def static_status():
     return dict(status='STATIC_RELEASE_PIPELINE_NO_EFFECTS',
-        commands=['status', 'plan', 'prepare', 'build', 'rehearsal', 'download', 'bootstrap', 'preflight', 'publish'],
+        commands=['status', 'pending', 'delivery-status', 'retire-plan', 'plan', 'prepare', 'build', 'rehearsal', 'download', 'bootstrap', 'preflight', 'publish', 'complete'],
         authority_override_supported=False, sdk_initialized=False,
         files_written=0, publication_performed=False,
         incremental_projection='AUTHENTICATED_RESOURCE_BASE_PLUS_COMPLETE_IMMUTABLE_GIT_BINDINGS',
-        steam_delivery='COMPLETE_VERIFIED_VPK_SET_NOT_RUNTIME_HOT_PATCH')
+        steam_delivery='COMPLETE_VERIFIED_VPK_SET_NOT_RUNTIME_HOT_PATCH',
+        delivery_status='NOT_CHECKED_USE_DELIVERY_STATUS',workshop_synchronized=False)
 
 
 def _template(auth):
@@ -149,13 +167,58 @@ def publish(auth, builder, request):
             # This is the actual SDK return and canonical receipt, never a READY
             # constant. Unknown failures leave the lease intent for reconciliation.
             lease.mark_submitted(result)
-            return result
+            return {**result,'delivery_status':'UPLOADED_PENDING_DOWNLOAD_VERIFICATION',
+                    'workshop_synchronized':False,'official_download_required':True}
+
+
+def complete(auth,builder,request):
+    """One guarded upload, then one official full download, never auto-resubmit.
+
+    A transfer success is an intermediate state. Failed/unknown download keeps
+    actual upload history and returns uploaded-but-unverified; it never deletes
+    packages or rewrites the canonical journal to pretend a completed delivery.
+    """
+    submitted=publish(auth,builder,request)
+    capture=_DownloadOutput()
+    try:
+        with redirect_stdout(capture):
+            code=pinned_module(auth,'download').main(['--download','--report-sha256',request['report_sha256']])
+        guard.need(not capture.overflow,'official_download_output_budget_exceeded_receipt_not_asserted')
+        if code!=0:raise ValueError('official_download_not_verified')
+        records=[]
+        for line in capture.getvalue().splitlines():
+            try:value=json.loads(line)
+            except ValueError:continue
+            if isinstance(value,dict) and value.get('status')=='OFFICIAL_REFRESH_NATIVE_DOWNLOAD_FULLY_VERIFIED':records.append(value)
+        guard.need(len(records)==1 and records[0].get('evidence'),'exact_official_download_receipt_required')
+        import release_workflow_diagnostics as diagnostics
+        status=diagnostics.delivery_status(auth,download_receipt=Path(records[0]['evidence']))
+        guard.need(status['upload_evidence_matches_target'] and status['official_download_evidence_matches_target'],
+                   'downloaded_delivery_does_not_match_submitted_target')
+        return dict(status='TASK_PACKAGE_OFFICIAL_DOWNLOAD_VERIFIED',
+            delivery_status=status['task_package_status'],project_status=status['project_status'],
+            workshop_synchronized=status['task_package_status']=='WORKSHOP_SYNCED',
+            project_workshop_synchronized=status['workshop_synchronized'],
+            release_sequence=records[0]['release_sequence'],steam_manifest=records[0].get('steam_manifest'),
+            evidence=records[0]['evidence'],pending_counts=status['pending_counts'],
+            publication_performed=True,automatic_resubmit=False,cleanup_performed=False)
+    except Exception as error:
+        return dict(status='UPLOADED_PENDING_DOWNLOAD_VERIFICATION',
+            delivery_status='UPLOADED_PENDING_DOWNLOAD_VERIFICATION',workshop_synchronized=False,
+            release_sequence=submitted.get('release_sequence'),publication_performed=True,
+            error_type=type(error).__name__,automatic_resubmit=False,cleanup_performed=False,
+            canonical_history_and_backups_preserved=True)
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     actions = parser.add_subparsers(dest='command')
     actions.add_parser('status')
+    for name in ('pending','delivery-status','retire-plan'):
+        action=actions.add_parser(name)
+        action.add_argument('--full',action='store_true');action.add_argument('--check',action='store_true')
+        if name!='pending':action.add_argument('--download-receipt',type=Path)
+        if name=='retire-plan':action.add_argument('--inventory',type=Path,required=True)
     for command in ('plan', 'prepare', 'build'):
         action = actions.add_parser(command)
         action.add_argument('--source-revision', required=True)
@@ -175,14 +238,22 @@ def main(argv=None):
     download_mode.add_argument('--preflight', action='store_true')
     download_mode.add_argument('--apply', action='store_true', help='Request and fully verify the official download; never uploads')
     action.add_argument('--report-sha256')
-    for command in ('bootstrap', 'preflight', 'publish'):
+    for command in ('bootstrap', 'preflight', 'publish','complete'):
         action = actions.add_parser(command)
         action.add_argument('--request', type=Path, required=True)
         action.add_argument('--request-sha', required=True)
-        if command == 'publish': action.add_argument('--apply', action='store_true', required=True)
+        if command in ('publish','complete'): action.add_argument('--apply', action='store_true', required=True)
     args = parser.parse_args(argv)
     if args.command in (None, 'status'):
         print(json.dumps(static_status())); return 0
+    if args.command in ('pending','delivery-status','retire-plan'):
+        import release_workflow_diagnostics as diagnostics
+        delegated=[args.command]
+        for name in ('full','check'):
+            if getattr(args,name):delegated+=['--'+name]
+        for name in ('download_receipt','inventory'):
+            if getattr(args,name,None) is not None:delegated+=['--'+name.replace('_','-'),str(getattr(args,name))]
+        return diagnostics.main(delegated)
     auth = authority()
     if args.command == 'rehearsal':
         ops = pinned_module(auth, 'rehearsal')
@@ -216,6 +287,7 @@ def main(argv=None):
         result = dict(status='FULL_RELEASE_PREFLIGHT_PASS_NO_SDK_CAPABILITY',
             release_sequence=result['release_sequence'], content_sha256=result['content_sha256'],
             generation=request['generation'], publication_performed=False, files_written=0, sdk_initialized=False)
+    elif args.command=='complete':result=complete(auth,builder,request)
     else: result = publish(auth, builder, request)
     print(json.dumps(result, ensure_ascii=True)); return 0
 

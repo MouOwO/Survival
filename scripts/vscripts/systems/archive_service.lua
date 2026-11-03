@@ -23,9 +23,24 @@ local finalizing = false
 local session_id, serial, remote_provider
 local server_clock
 local daily_viewers, purchase_provider = {}, nil
+local daily_delivery, daily_sequences, pass_deadlines = {}, {}, {}
+local daily_generation = 0
+local compact_daily_transport, compact_daily_factory, compact_daily_lookup
+local compact_daily_states, compact_daily_users, compact_daily_tokens = {}, {}, {}
+local compact_daily_registered, compact_daily_send = false, nil
+local compact_daily_changed
+local compact_daily_handlers = {}
+local compact_archive_views
+local function compact_bound(id)
+    return compact_daily_transport and compact_daily_transport.is_bound
+        and compact_daily_transport.is_bound(id) or false
+end
 local vip_viewers = {}
 local archive_players = {}
 local sent_pages = {}
+local archive_delivery, archive_head, archive_tail = {}, nil, nil
+local archive_queue_scheduled, archive_queue_running, archive_queue_generation = false, false, 0
+local archive_renderer_generation = 0
 local ui_json = require("core/json_encoder")
 local UI_PACKET_JSON_BUDGET, UI_PACKET_ROW_LIMIT, UI_PACKET_ENVELOPE_RESERVE = 6 * 1024, 12, 256
 local public_beta_viewers, public_beta_sequences, public_beta_claims = {}, {}, {}
@@ -96,6 +111,12 @@ end
 -- Correlate UI intent with the existing transaction; this event never grants
 -- rewards. Transient provider failures retain the queue and the client lock.
 local function social_result(player_id, pool_id, request_id, result)
+    if compact_bound(player_id) then
+        if compact_archive_views and compact_archive_views.complete then
+            compact_archive_views.complete(player_id,pool_id,request_id,result)
+        end
+        return -- Numeric ACK is owned by the active compact archive view.
+    end
     if not PlayerResource or not CustomGameEventManager then return end
     local player = PlayerResource:GetPlayer(player_id)
     if not player then return end
@@ -230,6 +251,7 @@ function M.register_category(category_id, projector)
     assert(categories.by_id[category_id] and type(projector) == "function")
     renderers[category_id] = projector
     custom_renderers[category_id] = true
+    archive_renderer_generation=archive_renderer_generation+1
 end
 
 local function upgrade_pending(player_id, category_id)
@@ -239,6 +261,17 @@ local function upgrade_pending(player_id, category_id)
         if command.kind == kind then return 1 end
     end
     return 0
+end
+
+-- Header-only projection: no row projector, inventory scan, limits or catalogue.
+function M.compact_header(player_id,category_id,profile,header)
+    header=header or {}
+    header.revision=profile and profile.revision
+    header.has_pass=profile and has_pass(profile) and 1 or 0
+    header.pending=pending[player_id] and next(pending[player_id])~=nil and 1 or 0
+    header.upgrade_pending=upgrade_pending(player_id,category_id)
+    header.title_preview=category_id=="titles" and require("systems/title_presentation_service").preview_active(player_id) and 1 or 0
+    return header
 end
 
 local function snapshot_profile(player_id, category_id, profile)
@@ -329,10 +362,8 @@ local function log_ui_page(category_id, delta, rows, chunks, max_bytes)
         tostring(max_bytes), tostring(UI_PACKET_JSON_BUDGET)))
 end
 
-local function send_page(player_id, category_id, profile)
-    if not CustomGameEventManager or not PlayerResource then return end
-    local player = PlayerResource:GetPlayer(player_id)
-    if not player then return end
+local function build_ui_page(job)
+    local player_id,category_id,profile=job.player_id,job.category_id,job.owner.profile
     -- Built-in projectors only read this private per-send account snapshot.
     -- Extensions retain their own copy, as when each page fetched its profile.
     local result = profile and snapshot_profile(player_id, category_id,
@@ -349,7 +380,7 @@ local function send_page(player_id, category_id, profile)
         end
     end
     sent_pages[player_id] = sent_pages[player_id] or {}
-    local previous = sent_pages[player_id][category_id]
+    local previous = not job.force_full and sent_pages[player_id][category_id]
     local changes = previous and require("core/ui_snapshot_delta").diff(previous.data, wire)
     if changes and #changes==0 then return end
     local sequence = (serial or 0) + 1
@@ -358,36 +389,176 @@ local function send_page(player_id, category_id, profile)
     local ranges = ui_page_chunks(category_id, header, rows, sequence)
     if not ranges then return end -- No partial page or new baseline on refusal.
     serial = sequence
-    local max_bytes = 0
-    for chunk, range in ipairs(ranges) do
-        local packet = copy(header)
-        packet.rows = {}
-        for index = range.first, range.last do
-            packet.rows[#packet.rows + 1] = copy(rows[index])
-        end
-        packet.sequence, packet.chunk, packet.chunks = sequence, chunk, #ranges
-        local bytes = ui_json_bytes(packet)
-        if not bytes or bytes > UI_PACKET_JSON_BUDGET then
-            return reject_ui_page(category_id, "packet_budget", range.first, bytes)
-        end
-        max_bytes = math.max(max_bytes, bytes)
-        CustomGameEventManager:Send_ServerToPlayer(player, "survival_archive_snapshot", packet)
-    end
-    -- Commit only after every synchronous send returned. A failure must leave
-    -- the previous baseline, so retries never delta against an unsent page.
-    sent_pages[player_id][category_id] = { sequence = sequence, data = copy(wire) }
-    log_ui_page(category_id, changes, #rows, #ranges, max_bytes)
+    return {header=header,wire=wire,rows=rows,ranges=ranges,sequence=sequence,
+        changes=changes,next=1,max_bytes=0}
 end
-local function send(player_id)
-    if not CustomGameEventManager or not PlayerResource
-        or not PlayerResource:GetPlayer(player_id) then return end
-    -- A retry may have changed no data at all. Preserve every page's original
-    -- delta/checkpoint behavior while avoiding 17 full account-profile reads.
-    local profile = account_profile(player_id)
-    if not profile then return end
-    for _, category in ipairs(enabled_categories()) do
-        if categories.by_id[category.id] then send_page(player_id,category.id,profile) end
+-- Ready nodes and player/category jobs are indexed. There is no periodic scan
+-- of the twenty categories or the queued pages. Each dispatch does at most two
+-- page/chunk work units and checks the real engine clock between operations.
+local function unlink_archive_job(job)
+    if not job.queued then return end
+    if job.previous then job.previous.following=job.following else archive_head=job.following end
+    if job.following then job.following.previous=job.previous else archive_tail=job.previous end
+    job.previous,job.following,job.queued=nil,nil,false
+    if not archive_head and archive_queue_scheduled and not archive_queue_running then
+        scheduler.cancel("archive_ui_queue");archive_queue_scheduled=false
     end
+end
+local function finish_archive_job(job)
+    unlink_archive_job(job)
+    if job.owner.jobs[job.category_id]==job then job.owner.jobs[job.category_id]=nil end
+end
+local function link_archive_job(job,priority)
+    unlink_archive_job(job);job.queued=true
+    if priority then
+        job.following=archive_head
+        if archive_head then archive_head.previous=job else archive_tail=job end
+        archive_head=job
+    else
+        job.previous=archive_tail
+        if archive_tail then archive_tail.following=job else archive_head=job end
+        archive_tail=job
+    end
+end
+local function archive_job_current(job)
+    return job.generation==archive_queue_generation and archive_delivery[job.player_id]==job.owner
+        and job.owner.jobs[job.category_id]==job and job.epoch==job.owner.epoch
+        and PlayerResource and PlayerResource:GetPlayer(job.player_id)==job.owner.player
+end
+local kick_archive_queue
+local function flush_archive_queue()
+    archive_queue_scheduled=false;archive_queue_running=true
+    local clock=type(GetSystemTimeMS)=="function" and GetSystemTimeMS or nil
+    local started=clock and clock()
+    local units=0
+    while archive_head and units<2 do
+        if started and clock()-started>=2 then break end
+        local job=archive_head;units=units+1
+        if not archive_job_current(job) then finish_archive_job(job)
+        else
+            local ok=pcall(function()
+                if not job.page then
+                    job.page=build_ui_page(job)
+                    if not archive_job_current(job) then return end
+                    if not job.page then job.owner.seen[job.category_id]=job.epoch;finish_archive_job(job);return end
+                    if started and clock()-started>=2 then return end
+                end
+                local page=job.page
+                local range=page.ranges[page.next]
+                local packet=copy(page.header);packet.rows={}
+                for index=range.first,range.last do packet.rows[#packet.rows+1]=copy(page.rows[index]) end
+                packet.sequence,packet.chunk,packet.chunks=page.sequence,page.next,#page.ranges
+                local bytes=ui_json_bytes(packet)
+                if not bytes or bytes>UI_PACKET_JSON_BUDGET then
+                    reject_ui_page(job.category_id,"packet_budget",range.first,bytes)
+                    finish_archive_job(job);return
+                end
+                CustomGameEventManager:Send_ServerToPlayer(job.owner.player,"survival_archive_snapshot",packet)
+                if not archive_job_current(job) then return end
+                page.max_bytes=math.max(page.max_bytes,bytes);page.next=page.next+1
+                if page.next>#page.ranges then
+                    -- No partially delivered page is ever a delta base.
+                    sent_pages[job.player_id][job.category_id]={sequence=page.sequence,data=copy(page.wire)}
+                    job.owner.seen[job.category_id]=job.epoch
+                    job.owner.failed[job.category_id]=nil
+                    log_ui_page(job.category_id,page.changes,#page.rows,#page.ranges,page.max_bytes)
+                    finish_archive_job(job)
+                end
+            end)
+            if not ok then
+                job.owner.failed[job.category_id]=true
+                finish_archive_job(job)
+                print("[ARCHIVE_UI_QUEUE] page_send_failed category="..tostring(job.category_id))
+            end
+        end
+    end
+    archive_queue_running=false;kick_archive_queue(0.05)
+end
+kick_archive_queue=function(delay)
+    if not archive_head or archive_queue_scheduled or archive_queue_running then return end
+    archive_queue_scheduled=true
+    local generation=archive_queue_generation
+    scheduler.after(delay or 0,function()
+        if generation~=archive_queue_generation then return end
+        flush_archive_queue()
+    end,"archive_ui_queue")
+end
+local function enqueue_archive_page(state,category_id,priority,force_full)
+    local job=state.jobs[category_id]
+    if job and job.epoch==state.epoch then
+        if force_full and job.page and job.page.changes then finish_archive_job(job);job=nil
+        else
+            job.force_full=job.force_full or force_full
+            if priority then link_archive_job(job,true) end
+            return
+        end
+    end
+    if not force_full and state.seen[category_id]==state.epoch then return end
+    if job then finish_archive_job(job) end
+    job={player_id=state.player_id,category_id=category_id,owner=state,epoch=state.epoch,
+        generation=archive_queue_generation,force_full=force_full}
+    state.jobs[category_id]=job;link_archive_job(job,priority)
+end
+local function archive_source(player_id,profile,reuse_profile)
+    if not CustomGameEventManager or not PlayerResource then return end
+    local player=PlayerResource:GetPlayer(player_id)
+    if not player then return end
+    local state=archive_delivery[player_id]
+    if state and state.player~=player then
+        for _,job in pairs(state.jobs) do finish_archive_job(job) end
+        state=nil;archive_delivery[player_id]=nil;sent_pages[player_id]=nil
+    end
+    profile=profile or reuse_profile and state and state.profile or account_profile(player_id)
+    if not profile then return end
+    local day=require("systems/archive_calendar").day()
+    local pass=has_pass(profile)
+    local pending_state=pending[player_id] and next(pending[player_id])~=nil or false
+    local changed=not state or state.revision~=profile.revision or profile.revision==nil
+        or state.account~=profile.account_id or state.mode~=profile.mode or state.session~=profile.match_session_id
+        or state.day~=day or state.pass~=pass or state.pending~=pending_state
+        or state.renderer_generation~=archive_renderer_generation
+    if not state then
+        state={player_id=player_id,player=player,jobs={},seen={},failed={},epoch=0}
+        archive_delivery[player_id]=state
+    end
+    if changed then
+        for _,job in pairs(state.jobs) do finish_archive_job(job) end
+        if state.account~=profile.account_id or state.mode~=profile.mode or state.session~=profile.match_session_id then
+            sent_pages[player_id]=nil
+        end
+        state.profile,state.revision,state.account,state.mode,state.session=profile,profile.revision,profile.account_id,profile.mode,profile.match_session_id
+        state.failed={}
+        state.day,state.pass,state.pending=day,pass,pending_state
+        state.renderer_generation=archive_renderer_generation;state.epoch=state.epoch+1
+    end
+    return state,changed
+end
+local function send_page(player_id,category_id,profile)
+    if compact_bound(player_id) then return end
+    local state=archive_source(player_id,profile)
+    if state then enqueue_archive_page(state,category_id,true,false);kick_archive_queue() end
+end
+local function send(player_id,priority,profile,resync,reuse_profile)
+    if compact_bound(player_id) then
+        if compact_archive_views then
+            compact_archive_views.changed(player_id,profile or account_profile(player_id),{pending_changed=true})
+        end
+        return
+    end
+    local state,changed=archive_source(player_id,profile,reuse_profile)
+    if not state then return end
+    priority=priority or selected[player_id]
+    if changed then
+        for _,category in ipairs(enabled_categories()) do
+            if categories.by_id[category.id] then enqueue_archive_page(state,category.id,false,false) end
+        end
+    else
+        for category_id in pairs(state.failed) do
+            enqueue_archive_page(state,category_id,false,false)
+        end
+    end
+    if priority then enqueue_archive_page(state,priority,true,resync==true) end
+    kick_archive_queue()
 end
 
 local function local_settle(player_id, command)
@@ -432,7 +603,11 @@ local function local_settle(player_id, command)
     end
     local sections={archive=archive,gameplay_stats=stats}
     if result.content_inventory then sections.content_inventory=result.content_inventory end
-    local committed = profiles.update_save_sections(player_id,sections,"archive_"..command.kind)
+    local committed = require("ui/compact_profile_context").with(player_id,{
+        source="archive_command",command=command,response=result.response,
+        compact_daily_changes=require("ui/compact_daily_projection").command_changes(command,result)},function()
+        return profiles.update_save_sections(player_id,sections,"archive_"..command.kind)
+    end)
     if committed and committed.ok and result.response then committed.response = copy(result.response) end
     return committed
 end
@@ -542,7 +717,8 @@ flush = function(player_id)
                     end
                 end
             elseif result and (result.ok or result.terminal) then queue[id] = nil end
-            if terminal_error or result and result.terminal and not result.ok then
+            if (terminal_error or result and result.terminal and not result.ok)
+                and not (compact_daily_users[player_id] and (command.kind=="daily_claim" or command.kind=="benefit_claim")) then
                 bus.emit(events.UI_NOTIFICATION,{player_id=player_id,level="error",message=terminal_error or result.error or "存档请求被拒绝"})
             end
             if command.kind == "challenge" and result and result.ok == true and not result.pending
@@ -582,7 +758,7 @@ flush = function(player_id)
                 social_result(player_id, command.pool_id, command.id:match(":social_draw:([%w_-]+)$"), result)
             end
             if vip_viewers[player_id] then M.send_vip(player_id,result) end
-            if M.send_daily and daily_viewers[player_id] then
+            if M.send_daily and (daily_viewers[player_id] or daily_delivery[player_id] or compact_daily_users[player_id]) then
                 M.send_daily(player_id, command.kind=="daily_claim" and {
                     target_day=command.target_day,ok=result and result.ok==true,
                     error=result and result.error,terminal=result and result.terminal==true
@@ -694,28 +870,345 @@ function M.record_boss(player_id,kill_id)
     archive_players[player_id]=true
     return enqueue(player_id,{id=session_id..":boss:"..tostring(kill_id),kind="boss_kill"})
 end
-local daily_sequences={}
-function M.daily_snapshot(player_id)
-    local profile=account_profile(player_id)
+function M.daily_snapshot(player_id, profile)
+    profile=profile or account_profile(player_id)
     if not profile then return {ok=false,error="档案尚未载入"} end
     local result=require("systems/archive_daily_rewards").snapshot(profile,require("systems/archive_calendar").day(),has_pass(profile))
     result.benefits=require("systems/archive_benefit_rewards").snapshot(profile,has_pass(profile))
     result.ok=true
-    daily_sequences[player_id]=(daily_sequences[player_id] or 0)+1
-    result.sequence=daily_sequences[player_id]
     result.pending=M.has_pending(player_id) and 1 or 0
     result.purchase_enabled=result.purchase_enabled==1 and purchase_provider and 1 or 0
     return result
 end
-function M.send_daily(player_id,claim_result,benefit_claim_result)
+-- The catalogue is projected only for a changed account/date/pass/pending state,
+-- never by the one-second clock. A closed view is not a standing subscription.
+-- The wire v2 path transports bounded UTF-8 JSON fragments; JSON byte counts are
+-- not an assertion about the engine's native protobuf/KeyValues serialization.
+local DAILY_FRAGMENT_BYTES, DAILY_BATCH_PACKETS = 650, 2
+local function stop_daily_job(player_id, state)
+    if state then state.job=nil end
+    scheduler.cancel("archive_daily_wire:"..player_id)
+end
+local function daily_fragments(encoded)
+    local fragments, first = {}, 1
+    while first<=#encoded do
+        local last=math.min(#encoded,first+DAILY_FRAGMENT_BYTES-1)
+        -- Never split a multibyte UTF-8 codepoint between native strings.
+        if last<#encoded then
+            while last>=first and encoded:byte(last+1)>=128 and encoded:byte(last+1)<192 do last=last-1 end
+        end
+        assert(last>=first,"daily_wire_invalid_utf8")
+        fragments[#fragments+1]=encoded:sub(first,last);first=last+1
+    end
+    return fragments
+end
+local function queue_daily_wire(player_id, player, state, snapshot, force_full, changes)
+    local previous=not force_full and state.baseline
+    if changes and #changes==0 then return false end
+    local sequence=snapshot.sequence
+    local document=changes or snapshot
+    local encoded=ui_json.encode(document)
+    local fragments=daily_fragments(encoded)
+    local job={generation=daily_generation,player=player,sequence=sequence,
+        previous=previous,snapshot=snapshot,fragments=fragments,next=1}
+    stop_daily_job(player_id,state);state.job=job
+    local function flush_wire()
+        if daily_delivery[player_id]~=state or state.job~=job or job.generation~=daily_generation
+            or PlayerResource:GetPlayer(player_id)~=player then return end
+        for _=1,DAILY_BATCH_PACKETS do
+            if job.next>#fragments then break end
+            local packet={wire_v=2,view_id=state.view_id,session_id=session_id,
+                sequence=sequence,kind=changes and "delta" or "full",
+                base_sequence=previous and previous.sequence or nil,
+                chunk=job.next,chunks=#fragments,payload_json=fragments[job.next]}
+            CustomGameEventManager:Send_ServerToPlayer(player,"survival_daily_wire",packet)
+            -- A synchronous send may reenter a close/reopen or reset.
+            if daily_delivery[player_id]~=state or state.job~=job or job.generation~=daily_generation then return end
+            job.next=job.next+1
+        end
+        if job.next<=#fragments then
+            scheduler.after(0.05,flush_wire,"archive_daily_wire:"..player_id)
+        else
+            state.job=nil;state.baseline={sequence=sequence,data=snapshot}
+        end
+    end
+    scheduler.after(0,flush_wire,"archive_daily_wire:"..player_id)
+    return true
+end
+local function track_pass_deadline(player_id,profile)
+    local entitlement=profile and profile.entitlements and profile.entitlements.archive_pass
+    local expires=entitlement and entitlement.active==true and tonumber(entitlement.expires_at)
+    local now=require("systems/archive_calendar").now()
+    if not expires or expires<=now then expires=nil end
+    local previous=pass_deadlines[player_id]
+    local account=profile and profile.account_id
+    if previous and previous.expires==expires and previous.account==account then return end
+    scheduler.cancel("archive_pass_deadline:"..player_id)
+    local token={expires=expires,account=account,generation=daily_generation,
+        player=PlayerResource and PlayerResource:GetPlayer(player_id)}
+    pass_deadlines[player_id]=token
+    if not expires then return end
+    scheduler.after(math.max(0,expires-now),function()
+        if pass_deadlines[player_id]~=token or token.generation~=daily_generation then return end
+        pass_deadlines[player_id]=nil
+        if not PlayerResource or PlayerResource:GetPlayer(player_id)~=token.player then return end
+        local current=account_profile(player_id)
+        if not current or current.account_id~=token.account then return end
+        if require("systems/archive_calendar").now()<expires then
+            track_pass_deadline(player_id,current);return
+        end
+        bus.emit(events.PLAYER_PROFILE_CHANGED,{player_id=player_id,reason="archive_pass_expired"})
+    end,"archive_pass_deadline:"..player_id)
+end
+local function send_daily_hint(player,state,snapshot)
+    if state.wire_v~=2 or tonumber(snapshot.pending)==1 then return end
+    if snapshot.ok~=true then
+        if state.hint_known==false then return end
+        state.hint_known=false;state.hint_sequence=(state.hint_sequence or 0)+1
+        CustomGameEventManager:Send_ServerToPlayer(player,"survival_daily_hint",{
+            wire_v=2,view_id=state.view_id,session_id=session_id,
+            sequence=state.hint_sequence,known=0,claimable=0})
+        return
+    end
+    local claimable=snapshot.ordinary_status=="claimable"
+        or snapshot.premium and snapshot.premium.status=="claimable" or false
+    for _,track in ipairs({"daily_time","daily_wins","weekly_time"}) do
+        for _,row in ipairs(snapshot.benefits and snapshot.benefits[track] and snapshot.benefits[track].rows or {}) do
+            if (row.status=="claimable" or row.can_claim==true or tonumber(row.can_claim)==1)
+                and row.auto_claim~=true and tonumber(row.auto_claim)~=1 then claimable=true end
+        end
+    end
+    claimable=claimable and 1 or 0
+    if state.hint_known==true and state.hint==claimable then return end
+    state.hint_known=true;state.hint=claimable;state.hint_sequence=(state.hint_sequence or 0)+1
+    CustomGameEventManager:Send_ServerToPlayer(player,"survival_daily_hint",{
+        wire_v=2,view_id=state.view_id,session_id=session_id,
+        sequence=state.hint_sequence,known=1,claimable=claimable})
+end
+function M.send_daily(player_id,claim_result,benefit_claim_result,force_full,current_profile)
+    if compact_daily_users[player_id] and compact_daily_send then
+        return compact_daily_send(player_id,claim_result,benefit_claim_result,force_full,current_profile)
+    end
     if not PlayerResource or not CustomGameEventManager then return end
     local player=PlayerResource:GetPlayer(player_id)
     if player then
-        local snapshot=M.daily_snapshot(player_id)
+        local state=daily_delivery[player_id]
+        if state and state.player~=player then
+            stop_daily_job(player_id,state);daily_delivery[player_id]=nil;daily_viewers[player_id]=nil
+            return
+        end
+        local profile=current_profile or account_profile(player_id)
+        if state then
+            local account=profile and profile.account_id
+            local mode=profile and profile.mode
+            local match_session=profile and profile.match_session_id
+            if state.identity_known and (state.account~=account or state.mode~=mode or state.match_session~=match_session) then
+                stop_daily_job(player_id,state)
+                state.baseline,state.projected,state.hint,state.hint_known=nil,nil,nil,nil
+            end
+            state.identity_known=true
+            state.account,state.mode,state.match_session=account,mode,match_session
+        end
+        track_pass_deadline(player_id,profile)
+        local day=require("systems/archive_calendar").day()
+        local pass=has_pass(profile) and 1 or 0
+        local pending_state=M.has_pending(player_id) and 1 or 0
+        local revision=profile and profile.revision
+        local cached=state and state.projected
+        local unchanged=cached and revision~=nil and state.revision==revision and state.day==day
+            and state.pass==pass and state.pending==pending_state
+        if unchanged and not force_full and not claim_result and not benefit_claim_result then return end
+        local snapshot=unchanged and copy(cached) or M.daily_snapshot(player_id,profile)
+        snapshot.sequence=nil
+        if state then
+            state.projected=copy(snapshot)
+            state.revision,state.day,state.pass,state.pending=revision,day,pass,pending_state
+            send_daily_hint(player,state,snapshot)
+            if daily_delivery[player_id]~=state then return end
+            if not daily_viewers[player_id] and not force_full then return end
+        end
         snapshot.claim_result=claim_result
         snapshot.benefit_claim_result=benefit_claim_result
+        -- Compare business values without a transport counter. A profile
+        -- revision unrelated to this page must not cause another wire transfer.
+        local previous=state and state.baseline
+        local changes
+        if previous and not force_full then
+            local prior_sequence=previous.data.sequence;previous.data.sequence=nil
+            changes=require("core/ui_snapshot_delta").diff(previous.data,snapshot)
+            previous.data.sequence=prior_sequence
+            if #changes==0 then return end
+        end
+        daily_sequences[player_id]=(daily_sequences[player_id] or 0)+1
+        snapshot.sequence=daily_sequences[player_id]
+        if state and state.wire_v==2 then return queue_daily_wire(player_id,player,state,snapshot,force_full,changes) end
         CustomGameEventManager:Send_ServerToPlayer(player,"survival_daily_snapshot",snapshot)
+        if state then state.baseline={sequence=snapshot.sequence,data=snapshot} end
     end
+end
+local function compact_daily_context(id)
+    return {now=require("systems/archive_calendar").now(),pending=M.has_pending(id),
+        purchase_enabled=purchase_provider~=nil}
+end
+local function compact_daily_allowed(id)
+    if not integer(id) or not PlayerResource or not PlayerResource:IsValidPlayerID(id)
+        or not PlayerResource:GetPlayer(id) then return false end
+    if PlayerResource.IsFakeClient and PlayerResource:IsFakeClient(id) then return false end
+    local loading=package.loaded["systems/startup_loading_service"]
+    if not loading or type(loading.is_player_ready)~="function" or not loading.is_player_ready(id) then return false end
+    return require("core/test_access_policy").enforce(id)==true
+end
+local function compact_daily_hint(entry)
+    local hint=entry.projection.hint()
+    local rec=compact_daily_lookup.by_key["daily:state"];local fields=compact_daily_lookup.field_by_name
+    return {{record=rec,field=fields.known,value=hint.known and 1 or 0},
+        {record=rec,field=fields.can_claim,value=hint.can_claim and 1 or 0}},hint
+end
+local function compact_daily_entry(id,profile,changes)
+    profile=profile or account_profile(id)
+    local player=PlayerResource and PlayerResource:GetPlayer(id)
+    if not player or not compact_daily_factory then return nil end
+    local entry=compact_daily_states[id]
+    local ctx=compact_daily_context(id)
+    if not entry or entry.player~=player then
+        local projection,error_message=compact_daily_factory.initialize(profile,ctx)
+        if not projection then return nil,error_message end
+        entry={player=player,projection=projection};compact_daily_states[id]=entry
+        compact_daily_tokens[id]={};return entry,entry.projection.full_ops(),true
+    end
+    if not profile then
+        local projection=assert(compact_daily_factory.initialize(nil,ctx))
+        entry.projection=projection;compact_daily_tokens[id]={};return entry,projection.full_ops(),true
+    end
+    if changes==nil then
+        changes=entry.projection.inspect().revision==profile.revision and {} or {initialize=true}
+    end
+    local ops,error_message=entry.projection.update(profile,changes,ctx)
+    if not ops and error_message=="daily_identity_changed_reinitialize" then
+        local projection,why=compact_daily_factory.initialize(profile,ctx)
+        if not projection then return nil,why end
+        entry.projection=projection;compact_daily_tokens[id]={};return entry,projection.full_ops(),true
+    end
+    if not ops then return nil,error_message end
+    return entry,ops,changes and changes.initialize==true
+end
+local function compact_daily_publish(id,entry,ops,full)
+    if compact_daily_transport.is_open(id,3) then
+        if full then ops=entry.projection.full_ops() end
+        if #ops>0 or full then compact_daily_transport.publish(id,3,ops,{full=full==true,priority=true}) end
+    else
+        local hint_ops,hint=compact_daily_hint(entry)
+        if hint.pending then return end
+        local key=(hint.known and "1" or "0")..(hint.can_claim and "1" or "0")
+        if entry.hint~=key then entry.hint=key;compact_daily_transport.publish(id,3,hint_ops,{priority=true}) end
+    end
+end
+compact_daily_changed=function(id,payload,profile)
+    if not compact_daily_users[id] or not compact_daily_allowed(id) then return end
+    local metadata=require("ui/compact_profile_context").current(id)
+    local changes=payload and payload.compact_daily_changes or metadata and metadata.compact_daily_changes
+    if not changes then
+        local reason=payload and payload.reason
+        if reason=="archive_pass_expired" then changes={entitlement=true}
+        elseif reason=="archive_day_reset" then changes={calendar=true}
+        elseif compact_daily_states[id] and profile and compact_daily_states[id].projection.inspect().revision==profile.revision then changes={}
+        else changes={initialize=true} end -- Actual unclassified full account replacement.
+    end
+    local entry,ops,full=compact_daily_entry(id,profile,changes)
+    if entry then compact_daily_publish(id,entry,ops,full) end
+end
+compact_daily_send=function(id,claim_result,benefit_result,force_full,profile)
+    if not compact_daily_allowed(id) then return end
+    profile=profile or account_profile(id)
+    local entry,ops,full=compact_daily_entry(id,profile,nil)
+    if not entry then return end
+    if force_full then full=true end
+    local active=compact_daily_tokens[id] or {}
+    local function receipt(kind,result)
+        local pending_intent=active[kind]
+        if not result or not pending_intent then return end
+        if kind=="daily" and tonumber(result.target_day)~=pending_intent.target_day then return end
+        if kind=="benefit" and tostring(result.tier_id)~=pending_intent.tier_id then return end
+        local acknowledged=entry.projection.ack(pending_intent.token,result,profile,{pending=M.has_pending(id)})
+        for _,op in ipairs(acknowledged or {}) do ops[#ops+1]=op end
+    end
+    receipt("daily",claim_result);receipt("benefit",benefit_result)
+    compact_daily_publish(id,entry,ops,full)
+end
+local function setup_compact_daily()
+    local transport_ok,transport=pcall(require,"ui/compact_ui_transport")
+    local lookup_ok,lookup=pcall(require,"config/generated/ui_static_catalog_lookup")
+    if not transport_ok or not lookup_ok then return end -- Existing older installs retain their legacy reader.
+    local factory= require("ui/compact_daily_projection").new(lookup)
+    if not factory then return end
+    compact_daily_transport,compact_daily_lookup,compact_daily_factory=transport,lookup,factory
+    local own_world=type(bus.get_generation)=="function" and bus.get_generation()or bus
+    if compact_daily_registered==own_world then return end
+    local function current_world()
+        return (type(bus.get_generation)=="function" and bus.get_generation()or bus)==own_world
+    end
+    transport.register_view(3,{
+        open=function(id)
+            if not current_world() or not compact_daily_allowed(id) then return nil end
+            compact_daily_users[id]=true
+            daily_viewers[id]=nil;stop_daily_job(id,daily_delivery[id]);daily_delivery[id]=nil
+            local entry=compact_daily_entry(id,nil,nil)
+            return entry and entry.projection.full_ops()
+        end,
+        snapshot=function(id)
+            if not current_world() or not compact_daily_allowed(id) then return nil end
+            local entry=compact_daily_entry(id,nil,nil)
+            if not entry then return nil end
+            if transport.is_open(id,3) then return entry.projection.full_ops() end
+            return compact_daily_hint(entry)
+        end,
+        probe=function(id)
+            if not current_world() or not compact_daily_allowed(id) then return nil end
+            compact_daily_users[id]=true
+            daily_viewers[id]=nil;stop_daily_job(id,daily_delivery[id]);daily_delivery[id]=nil
+            local entry=compact_daily_entry(id,nil,nil)
+            if not entry then return nil end
+            local ops,hint=compact_daily_hint(entry)
+            entry.hint=(hint.known and "1" or "0")..(hint.can_claim and "1" or "0")
+            return transport.publish(id,3,ops,{full=true,priority=true})
+        end,
+        close=function(id)
+            if not current_world() then return nil end
+            local entry=compact_daily_states[id]
+            if entry then compact_daily_publish(id,entry,{},false) end
+            return true
+        end,
+        intent=function(id,action,args)
+            if not current_world() or not compact_daily_allowed(id) or not transport.is_open(id,3) then return nil end
+            if type(args)~="table" or not integer(args.request_token) or args.request_token<1 or args.request_token>16383
+                or args.arg_b~=nil and args.arg_b~=0 or args.arg_c~=nil and args.arg_c~=0 then return nil end
+            local entry=compact_daily_entry(id,nil,nil)
+            if not entry then return nil end
+            if action=="pass_purchase" then
+                return compact_daily_handlers.purchase and compact_daily_handlers.purchase(nil,{PlayerID=id})
+            end
+            local intent,payload,kind,handler
+            if action=="daily_claim" and integer(args.arg_a) then
+                kind="daily";intent={kind=kind,target_day=args.arg_a};payload={PlayerID=id,target_day=args.arg_a}
+                handler=compact_daily_handlers.daily
+            elseif action=="benefit_claim" and integer(args.arg_a) then
+                local row=lookup.records[args.arg_a]
+                local definition=row and row.domain=="daily" and row.kind=="benefit"
+                    and require("config/generated/archive_benefit_rewards").by_id[row.business_id]
+                if not definition or not definition.enabled or (definition.track~="daily_time" and definition.track~="daily_wins" and definition.track~="weekly_time") then return nil end
+                kind="benefit";intent={kind=kind,tier_id=definition.reward_id}
+                payload={PlayerID=id,track=definition.track,tier_id=definition.reward_id};handler=compact_daily_handlers.benefit
+            else return nil end
+            if not entry.projection.bind_intent(args.request_token,intent) then return nil end
+            compact_daily_tokens[id][kind]={token=args.request_token,target_day=intent.target_day,tier_id=intent.tier_id}
+            local result=handler and handler(nil,payload)
+            if not result then result={ok=false,terminal=true,error="操作过于频繁，请稍后重试"} end
+            if kind=="daily" then
+                compact_daily_send(id,{target_day=intent.target_day,ok=result.ok,pending=result.pending,terminal=result.terminal,error=result.error})
+            else compact_daily_send(id,nil,{tier_id=intent.tier_id,track=payload.track,ok=result.ok,pending=result.pending,terminal=result.terminal,error=result.error}) end
+            return result
+        end})
+    compact_daily_registered=own_world
 end
 function M.daily_claim(player_id,target)
     local today=require("systems/archive_calendar").day()
@@ -997,13 +1490,21 @@ function M.init()
     require("systems/title_presentation_service").init()
     finalizing = false
     sent_pages = {}
+    archive_queue_generation=archive_queue_generation+1
+    scheduler.cancel("archive_ui_queue")
+    archive_delivery,archive_head,archive_tail={},nil,nil
+    archive_queue_scheduled,archive_queue_running=false,false
     endless_generation = endless_generation + 1
     for id in pairs(pending) do scheduler.cancel("archive_endless_flush:" .. id) end
     endless_due, endless_force = {}, {}
     pending, busy, selected, throttles = {}, {}, {}, {}
     reward_notifications = {}
     public_beta_viewers, public_beta_sequences, public_beta_claims = {}, {}, {}
-    daily_viewers = {}
+    daily_generation=daily_generation+1
+    for id,state in pairs(daily_delivery) do stop_daily_job(id,state) end
+    for id in pairs(pass_deadlines) do scheduler.cancel("archive_pass_deadline:"..id) end
+    daily_viewers,daily_delivery,daily_sequences,pass_deadlines={},{},{},{}
+    compact_daily_states,compact_daily_users,compact_daily_tokens={},{},{}
     vip_viewers = {}
     archive_players = {}
     serial = 0
@@ -1016,10 +1517,11 @@ function M.init()
         local id = tonumber(payload.player_id)
         if id then
             archive_players[id]=true
-            online_clock.observe(id, account_profile(id))
+            local profile = account_profile(id)
+            online_clock.observe(id, profile)
+            track_pass_deadline(id,profile)
             -- The server's saved best floor can unlock newly added milestones.
             -- Never trust a floor/count supplied by the UI or award it on reads.
-            local profile = account_profile(id)
             if profile and require("systems/archive_starjoy_rewards").needs_reconcile(profile.save.gameplay_stats) then
                 enqueue(id, {id=session_id..":starjoy_reconcile", kind="starjoy_reconcile"})
             end
@@ -1030,8 +1532,12 @@ function M.init()
                 or require("systems/archive_titles").needs_reconcile(profile.save.archive)) then
                 enqueue(id, {id=session_id..":endless_reconcile", kind="endless_reconcile"})
             end
-            send(id)
-            if daily_viewers[id] then M.send_daily(id) end
+            if compact_bound(id) and compact_archive_views then
+                local metadata=require("ui/compact_profile_context").current(id)
+                compact_archive_views.changed(id,profile,metadata and metadata.compact_archive_changes or {replace=true})
+            else send(id,nil,profile) end
+            if compact_daily_users[id] then compact_daily_changed(id,payload,profile)
+            elseif daily_viewers[id] or daily_delivery[id] then M.send_daily(id,nil,nil,nil,profile) end
             if public_beta_viewers[id] then M.send_public_beta_gift(id) end
             if vip_viewers[id] then M.send_vip(id) end
             if not busy[id] then flush(id) end
@@ -1039,7 +1545,16 @@ function M.init()
     end)
     bus.subscribe(events.PLAYER_DISCONNECTED, function(payload)
         local id = tonumber(payload.player_id)
-        if id then online_clock.disconnect(id); M.flush_endless_rewards(id) end
+        if id then
+            local state=archive_delivery[id]
+            if state then for _,job in pairs(state.jobs) do finish_archive_job(job) end end
+            archive_delivery[id]=nil;sent_pages[id]=nil
+            daily_viewers[id]=nil
+            compact_daily_states[id],compact_daily_users[id],compact_daily_tokens[id]=nil,nil,nil
+            if compact_archive_views then compact_archive_views.disconnect(id) end
+            stop_daily_job(id,daily_delivery[id]);daily_delivery[id]=nil
+            online_clock.disconnect(id); M.flush_endless_rewards(id)
+        end
     end)
     scheduler.every(1, function()
         if finalizing or http_adapter.enabled() then return end -- Remote online credit consumes the existing DB checkpoint only.
@@ -1067,7 +1582,7 @@ function M.init()
             M.send_vip(id,result)
         else M.send_vip(id) end
     end)
-    local daily_times, pass_states = {}, {}
+    local daily_times = {}
     local public_beta_times={}
     CustomGameEventManager:RegisterListener("survival_public_beta_gift_request",function(_,payload)
         local id=tonumber(payload.PlayerID)
@@ -1086,39 +1601,64 @@ function M.init()
     CustomGameEventManager:RegisterListener("survival_daily_request",function(_,payload)
         local id=tonumber(payload.PlayerID)
         if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end
+        local state=daily_delivery[id]
+        local v2=tonumber(payload.wire_v)==2
+        local view_id=v2 and tostring(payload.view_id or "") or "legacy"
+        if v2 and (#view_id<1 or #view_id>96 or view_id:find("[^A-Za-z0-9_.:-]")) then return end
+        if payload.open==0 or payload.open==false then
+            if state and state.view_id==view_id then
+                daily_viewers[id]=nil;stop_daily_job(id,state)
+            end
+            return
+        end
+        local player=PlayerResource:GetPlayer(id)
+        if not player then return end
+        if not state or state.view_id~=view_id or state.player~=player or state.wire_v~=(v2 and 2 or 1) then
+            stop_daily_job(id,state)
+            state={view_id=view_id,wire_v=v2 and 2 or 1,player=player}
+            daily_delivery[id]=state
+        end
+        daily_viewers[id]=(not v2 or payload.subscribe==1 or payload.open==1) and true or nil
         local profile=account_profile(id)
-        if not profile then M.send_daily(id);return end
-        daily_viewers[id]=true
+        if not profile then M.send_daily(id,nil,nil,true);return end
         archive_players[id]=true
         if not (profile.save.archive and profile.save.archive.daily_rewards) then
             enqueue(id,{id=session_id..":daily_init",kind="daily_init",today=require("systems/archive_calendar").day()})
         end
-        M.send_daily(id)
+        M.send_daily(id,nil,nil,true,profile)
     end)
-    CustomGameEventManager:RegisterListener("survival_daily_claim",function(_,payload)
+    local function daily_claim_request(_,payload)
         local id=tonumber(payload.PlayerID)
         if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end
         local now=GameRules:GetGameTime()
         if daily_times[id] and now-daily_times[id]<0.3 then return end
         daily_times[id]=now
         local result=M.daily_claim(id,payload.target_day)
-        if not result.ok then bus.emit(events.UI_NOTIFICATION,{player_id=id,level="error",message=result.error}) end
+        if not result.ok and not compact_daily_users[id] then bus.emit(events.UI_NOTIFICATION,{player_id=id,level="error",message=result.error}) end
         M.send_daily(id,{target_day=payload.target_day,ok=result.ok==true,pending=result.pending==true,error=result.error})
-    end)
+        return result
+    end
+    compact_daily_handlers.daily=daily_claim_request
+    CustomGameEventManager:RegisterListener("survival_daily_claim",daily_claim_request)
     local benefit_times={}
-    CustomGameEventManager:RegisterListener("survival_benefit_claim",function(_,payload)
+    local function benefit_claim_request(_,payload)
         local id=tonumber(payload.PlayerID)
         if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end
         local now=GameRules:GetGameTime()
         if benefit_times[id] and now-benefit_times[id]<0.3 then return end
-        benefit_times[id]=now;daily_viewers[id]=true;archive_players[id]=true
+        benefit_times[id]=now
+        if not daily_delivery[id] and not compact_daily_users[id] then daily_viewers[id]=true end
+        archive_players[id]=true
         local result=M.benefit_claim(id,payload.track,payload.tier_id)
-        if not result.ok then bus.emit(events.UI_NOTIFICATION,{player_id=id,level="error",message=result.error}) end
+        if not result.ok and not compact_daily_users[id] then bus.emit(events.UI_NOTIFICATION,{player_id=id,level="error",message=result.error}) end
         M.send_daily(id,nil,{track=payload.track,tier_id=payload.tier_id,ok=result.ok==true,
             pending=result.pending==true,error=result.error,terminal=result.terminal==true})
-    end)
+        return result
+    end
+    compact_daily_handlers.benefit=benefit_claim_request
+    CustomGameEventManager:RegisterListener("survival_benefit_claim",benefit_claim_request)
     local purchase_times={}
-    CustomGameEventManager:RegisterListener("survival_pass_purchase",function(_,payload)
+    local function pass_purchase_request(_,payload)
         local id=tonumber(payload.PlayerID)
         if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end
         local now=GameRules:GetGameTime()
@@ -1138,19 +1678,18 @@ function M.init()
             M.send_daily(id)
         end)
         if not ok then bus.emit(events.UI_NOTIFICATION,{player_id=id,level="error",message="订单创建失败，请稍后重试"}) end
-    end)
+    end
+    compact_daily_handlers.purchase=pass_purchase_request
+    CustomGameEventManager:RegisterListener("survival_pass_purchase",pass_purchase_request)
+    local clock_day=require("systems/archive_calendar").day()
     scheduler.every(1,function()
+        -- Constant-cost wall-clock check. Expiring passes have their own single
+        -- deadline; account/benefit progress arrives through profile events.
+        local day=require("systems/archive_calendar").day()
+        if day==clock_day then return end
+        clock_day=day
         for id in pairs(archive_players) do
-            local profile=account_profile(id)
-            if profile then
-                local pass=has_pass(profile)
-                if pass_states[id]~=pass then
-                    pass_states[id]=pass
-                    bus.emit(events.PLAYER_PROFILE_CHANGED,{player_id=id,reason="archive_boss_refresh"})
-                end
-                if daily_viewers[id] then M.send_daily(id) end
-                if public_beta_viewers[id] then M.send_public_beta_gift(id) end
-            end
+            bus.emit(events.PLAYER_PROFILE_CHANGED,{player_id=id,reason="archive_day_reset"})
         end
     end,"archive_daily_clock")
     bus.subscribe("archive.final_wave_cleared", function(payload)
@@ -1163,14 +1702,15 @@ function M.init()
         -- PlayerID is injected by Dota. Never accept a client account/player_id.
         local id = tonumber(payload.PlayerID)
         if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end
-        local now = GameRules:GetGameTime()
-        if throttles[id] and now - throttles[id] < 0.15 then return end
-        throttles[id] = now
-        if payload.prefetch == 1 then sent_pages[id] = nil end
         local category = categories.by_id[tostring(payload.category_id or "clear")]
         if not category or not category.enabled then return end
+        local now = GameRules:GetGameTime()
+        -- A real category switch must still reprioritize the final selection
+        -- during fast clicking; duplicate requests keep the old throttle.
+        if selected[id]==category.category_id and throttles[id] and now-throttles[id]<0.15 then return end
+        throttles[id] = now
         selected[id] = category.category_id
-        send(id)
+        send(id,category.category_id,nil,payload.resync==1,true)
     end)
     local title_times = {}
     CustomGameEventManager:RegisterListener("survival_archive_title_equip",function(_,payload)
@@ -1242,6 +1782,14 @@ function M.init()
             bus.emit(events.UI_NOTIFICATION, { player_id = id, level = "error", message = result.error })
         end
     end)
+    setup_compact_daily()
+    if compact_daily_transport and type(compact_daily_transport.available)=="function" and compact_daily_transport.available() then
+        local ok,bridge=pcall(require,"ui/compact_archive_views")
+        if ok then
+            compact_archive_views=bridge;local active=bridge.init()
+            if active and active.reset then active.reset() end
+        end
+    end
 end
 
 M._test = { apply_effects = apply_effects, has_pass = has_pass, flush = flush }

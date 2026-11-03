@@ -24,6 +24,11 @@ local building_snapshot_sequence = 0
 local selected_unit_by_player = {}
 local building_push_coalescer
 local combat_push_coalescer
+local compact_lottery_transport
+local function compact_lottery_bound(id)
+    return compact_lottery_transport and compact_lottery_transport.is_bound
+        and compact_lottery_transport.is_bound(id)or false
+end
 
 local function safe_number(entity, method_name, fallback, ...)
     local method = entity and entity[method_name]
@@ -266,6 +271,7 @@ local function source_player_id(payload)
 end
 
 local function send_to_player(event_name, player_id, payload, difficulty_selection)
+    if compact_lottery_bound(player_id)and type(event_name)=='string'and event_name:sub(1,11)=='ui_lottery_'then return end
     if not valid_player_id(player_id, true, difficulty_selection) then return end
     local player = PlayerResource:GetPlayer(player_id)
     if player then
@@ -466,13 +472,6 @@ local function on_unit_combat_stats_changed(payload)
                 refresh_runtime_armor=reason:match("^poison_cloud_armor_") ~= nil or reason=="research_armor_reduction"})
         end
     end
-end
-
-local function on_hero_combat_stats_changed(payload)
-    local snapshot = payload and payload.snapshot
-    if type(snapshot) ~= "table" then return end
-    combat_push_coalescer.push({player_id=payload.player_id, entindex=snapshot.entindex,
-        reason=payload.reason or snapshot.reason or "hero_combat_stats_changed"})
 end
 
 local function build_building_snapshot(payload)
@@ -1507,12 +1506,31 @@ local function register_rogue_reward_requests()
 end
 
 local function register_lottery_requests()
+    local ok,transport=pcall(require,'ui/compact_ui_transport')
+    if ok and type(transport.available)=='function'and transport.available()then
+        compact_lottery_transport=transport
+        local service=require('systems/lottery_http_service')
+        for index,pool in ipairs(require('config/lottery_config').pool_order)do local own=pool.id
+            transport.register_view(200+index,{
+                open=function(id)if valid_player_id(id,true)then return service.compact_open(id,own)end end,
+                snapshot=function(id)if valid_player_id(id,true)then return service.compact_open(id,own)end end,
+                close=function()return true end,
+                intent=function(id,action,args)
+                    if not valid_player_id(id)or service.compact_pool(args.arg_a)~=own then return nil end
+                    if action=='lottery_draw'then
+                        if args.arg_c~=nil and args.arg_c~=0 and args.arg_c~=1 then return nil end
+                        return service.compact_draw(id,own,args.arg_b,args.request_token)
+                    elseif action=='lottery_read'and args.arg_c==nil then return service.compact_read(id,own,args.arg_b)end
+                end})
+        end
+    end
     local catalog_transfer=0
     local function public_player(player_id)
         return player_id~=nil and player_id>=0 and PlayerResource:IsValidPlayerID(player_id)
             and PlayerResource:GetPlayer(player_id) or nil
     end
     local function send_catalog(player_id,result)
+        if compact_lottery_bound(player_id)then return end
         local player=public_player(player_id)
         if not player then return end
         if not result or not result.ok then
@@ -1542,6 +1560,7 @@ local function register_lottery_requests()
     end
     CustomGameEventManager:RegisterListener('ui_lottery_catalog_sync',function(_,payload)
         local player_id=source_player_id(payload)
+        if compact_lottery_bound(player_id)then return end
         if not public_player(player_id) then return end
         event_bus.request(events.LOTTERY_CATALOG_REQUEST,{
             player_id=player_id,md5=tostring(payload and payload.md5 or ''),
@@ -1554,6 +1573,7 @@ local function register_lottery_requests()
     end)
     CustomGameEventManager:RegisterListener('ui_lottery_cache_resync',function(_,payload)
         local player_id=source_player_id(payload)
+        if compact_lottery_bound(player_id)then return end
         if not public_player(player_id) then return end
         -- A missing catalog chunk is repaired independently of mode/profile
         -- admission, while its private projection keeps the gameplay gate.
@@ -1565,6 +1585,7 @@ local function register_lottery_requests()
     end)
     CustomGameEventManager:RegisterListener('ui_lottery_read_ack',function(_,payload)
         local player_id=source_player_id(payload)
+        if compact_lottery_bound(player_id)then return end
         if not valid_player_id(player_id,true) then return end
         local function complete(result)
             local snapshot={}
@@ -1583,6 +1604,7 @@ local function register_lottery_requests()
     end)
     CustomGameEventManager:RegisterListener("ui_lottery_snapshot_request", function(_, payload)
         local player_id = source_player_id(payload)
+        if compact_lottery_bound(player_id)then return end
         if not valid_player_id(player_id, true) then return end
         local function complete(result)
             local snapshot={}
@@ -1603,6 +1625,7 @@ local function register_lottery_requests()
     end)
     CustomGameEventManager:RegisterListener("ui_lottery_draw_request", function(_, payload)
         local player_id = source_player_id(payload)
+        if compact_lottery_bound(player_id)then return end
         if not valid_player_id(player_id) then return end
         local result = event_bus.request(events.LOTTERY_DRAW_REQUEST, {
             complete = function(result) send_to_player('ui_lottery_result',player_id,result) end,
@@ -1616,6 +1639,7 @@ local function register_lottery_requests()
     end)
     CustomGameEventManager:RegisterListener("ui_lottery_exchange_request", function(_, payload)
         local player_id = source_player_id(payload)
+        if compact_lottery_bound(player_id)then return end
         if not valid_player_id(player_id) then return end
         local result = event_bus.request(events.LOTTERY_EXCHANGE_REQUEST, {
             complete = function(result) send_to_player('ui_lottery_exchange_result',player_id,result) end,
@@ -1639,6 +1663,7 @@ local function on_lottery_changed(payload)
     -- The authenticated profile may finish loading before the gameplay UI
     -- barrier opens. Cache its private lottery projection during admission.
     local player_id=tonumber(payload.player_id)
+    if compact_lottery_bound(player_id)then return end
     if player_id==nil or player_id<0 or not PlayerResource:IsValidPlayerID(player_id) then return end
     local player=PlayerResource:GetPlayer(player_id)
     if player then CustomGameEventManager:Send_ServerToPlayer(player,"ui_lottery_snapshot",payload.snapshot) end
@@ -1680,7 +1705,11 @@ function M.init()
     register_rogue_reward_requests()
     register_lottery_requests()
     event_bus.subscribe(events.UNIT_COMBAT_STATS_CHANGED, on_unit_combat_stats_changed)
-    event_bus.subscribe(events.HERO_COMBAT_STATS_CHANGED, on_hero_combat_stats_changed)
+    -- combat_stats_ui_service publishes every authoritative owner-hero change
+    -- to survival_combat_stats. Repeating the same update through a custom
+    -- event caused a second serialization and a second client render per hit.
+    -- Explicit selection replies and UNIT_COMBAT_STATS_CHANGED (temporary
+    -- armor, non-hero/clone changes) retain their existing direct path.
     event_bus.subscribe(events.UI_NOTIFICATION, on_notification)
     event_bus.subscribe(events.SHOP_STATE_CHANGED, on_shop_state_changed)
     event_bus.subscribe(events.LOTTERY_CHANGED, on_lottery_changed)

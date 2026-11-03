@@ -1,6 +1,6 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert');const cfg={};
 vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/ui_snapshot_cache.js','utf8'),{GameUI:{CustomUIConfig:()=>cfg}});cfg.SurvivalSnapshotCache.Warm=()=>{};
-const events={},renders=[],env={pageCache:{},pageAssemblies:{},pageVersions:{},resyncPages:{},array:v=>Array.isArray(v)?v:Object.values(v||{}),subscribe:(n,f)=>events[n]=f,GameUI:{CustomUIConfig:()=>cfg},render:x=>renders.push(x),request:()=>{throw Error('unexpected resync')},queueFullSync:()=>{throw Error('unexpected baseline miss')},buildingIcons:{},A:{},panel:()=>({}),opened:false,later(){}};
+const events={},renders=[],env={pageCache:{},pageAssemblies:{},pageVersions:{},resyncPages:{},array:v=>Array.isArray(v)?v:Object.values(v||{}),subscribe:(n,f)=>events[n]=f,GameUI:{CustomUIConfig:()=>cfg},render:x=>renders.push(x),request:()=>{throw Error('unexpected resync')},queueFullSync:()=>{throw Error('unexpected baseline miss')},beginArchiveLoad(){},endArchiveLoad(){},buildingIcons:{},A:{},panel:()=>({}),opened:false,later(){}};
 const code=fs.readFileSync('panorama/src/scripts/custom_game/archive_180de7e38b_titles_compact_v6.js','utf8');
 vm.runInNewContext(code.slice(code.indexOf('    function onArchiveSnapshot(data)'),code.indexOf('    subscribe("survival_endless_state"')),env);
 const send=events.survival_archive_snapshot;
