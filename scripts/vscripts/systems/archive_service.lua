@@ -39,6 +39,7 @@ local vip_viewers = {}
 local archive_players = {}
 local sent_pages = {}
 local archive_delivery, archive_head, archive_tail = {}, nil, nil
+local legacy_archive_players = {}
 local archive_queue_scheduled, archive_queue_running, archive_queue_generation = false, false, 0
 local archive_renderer_generation = 0
 local ui_json = require("core/json_encoder")
@@ -408,6 +409,21 @@ local function finish_archive_job(job)
     unlink_archive_job(job)
     if job.owner.jobs[job.category_id]==job then job.owner.jobs[job.category_id]=nil end
 end
+local function legacy_archive_active(player_id)
+    local player=PlayerResource and PlayerResource:GetPlayer(player_id)
+    return player~=nil and legacy_archive_players[player_id]==player and not compact_bound(player_id)
+end
+local function cancel_legacy_archive(player_id)
+    legacy_archive_players[player_id]=nil
+    local state=archive_delivery[player_id]
+    if state then
+        -- Indexed cancellation of this player's <=20 category jobs, once on
+        -- protocol transition. Never build/project an abandoned legacy page.
+        local _,job=next(state.jobs)
+        while job do finish_archive_job(job);_,job=next(state.jobs)end
+    end
+    archive_delivery[player_id]=nil;sent_pages[player_id]=nil
+end
 local function link_archive_job(job,priority)
     unlink_archive_job(job);job.queued=true
     if priority then
@@ -421,6 +437,7 @@ local function link_archive_job(job,priority)
     end
 end
 local function archive_job_current(job)
+    if not legacy_archive_active(job.player_id) then cancel_legacy_archive(job.player_id);return false end
     return job.generation==archive_queue_generation and archive_delivery[job.player_id]==job.owner
         and job.owner.jobs[job.category_id]==job and job.epoch==job.owner.epoch
         and PlayerResource and PlayerResource:GetPlayer(job.player_id)==job.owner.player
@@ -453,6 +470,7 @@ local function flush_archive_queue()
                     reject_ui_page(job.category_id,"packet_budget",range.first,bytes)
                     finish_archive_job(job);return
                 end
+                if not archive_job_current(job) then return end
                 CustomGameEventManager:Send_ServerToPlayer(job.owner.player,"survival_archive_snapshot",packet)
                 if not archive_job_current(job) then return end
                 page.max_bytes=math.max(page.max_bytes,bytes);page.next=page.next+1
@@ -500,6 +518,7 @@ local function enqueue_archive_page(state,category_id,priority,force_full)
     state.jobs[category_id]=job;link_archive_job(job,priority)
 end
 local function archive_source(player_id,profile,reuse_profile)
+    if not legacy_archive_active(player_id) then return end
     if not CustomGameEventManager or not PlayerResource then return end
     local player=PlayerResource:GetPlayer(player_id)
     if not player then return end
@@ -534,17 +553,20 @@ local function archive_source(player_id,profile,reuse_profile)
     return state,changed
 end
 local function send_page(player_id,category_id,profile)
-    if compact_bound(player_id) then return end
+    if compact_bound(player_id) then cancel_legacy_archive(player_id);return end
+    if not legacy_archive_active(player_id)then return end
     local state=archive_source(player_id,profile)
     if state then enqueue_archive_page(state,category_id,true,false);kick_archive_queue() end
 end
 local function send(player_id,priority,profile,resync,reuse_profile)
     if compact_bound(player_id) then
+        cancel_legacy_archive(player_id)
         if compact_archive_views then
             compact_archive_views.changed(player_id,profile or account_profile(player_id),{pending_changed=true})
         end
         return
     end
+    if not legacy_archive_active(player_id)then return end
     local state,changed=archive_source(player_id,profile,reuse_profile)
     if not state then return end
     priority=priority or selected[player_id]
@@ -1493,6 +1515,7 @@ function M.init()
     archive_queue_generation=archive_queue_generation+1
     scheduler.cancel("archive_ui_queue")
     archive_delivery,archive_head,archive_tail={},nil,nil
+    legacy_archive_players={}
     archive_queue_scheduled,archive_queue_running=false,false
     endless_generation = endless_generation + 1
     for id in pairs(pending) do scheduler.cancel("archive_endless_flush:" .. id) end
@@ -1549,6 +1572,7 @@ function M.init()
             local state=archive_delivery[id]
             if state then for _,job in pairs(state.jobs) do finish_archive_job(job) end end
             archive_delivery[id]=nil;sent_pages[id]=nil
+            legacy_archive_players[id]=nil
             daily_viewers[id]=nil
             compact_daily_states[id],compact_daily_users[id],compact_daily_tokens[id]=nil,nil,nil
             if compact_archive_views then compact_archive_views.disconnect(id) end
@@ -1702,8 +1726,12 @@ function M.init()
         -- PlayerID is injected by Dota. Never accept a client account/player_id.
         local id = tonumber(payload.PlayerID)
         if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end
+        if compact_bound(id)then cancel_legacy_archive(id);return end
         local category = categories.by_id[tostring(payload.category_id or "clear")]
         if not category or not category.enabled then return end
+        local player=PlayerResource:GetPlayer(id)
+        if not player then return end
+        legacy_archive_players[id]=player
         local now = GameRules:GetGameTime()
         -- A real category switch must still reprioritize the final selection
         -- during fast clicking; duplicate requests keep the old throttle.

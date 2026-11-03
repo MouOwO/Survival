@@ -163,6 +163,25 @@ end
 local minus_zero=assert(wire.float64_words(-1/math.huge))
 assert(minus_zero.hi==2147483648 and minus_zero.lo==0 and 1/wire.float64_from_words(minus_zero.hi,0)==-math.huge)
 rejected(function() return wire.float64_words(math.huge) end,"finite_float64_required")
+-- The registry may append fields through 255. The old record*128+field
+-- duplicate key collides for (record1,field129) and (record2,field1).
+local extended_definition={id=1,sha256=definition.sha256,records={1,2,65535},fields={
+    [1]={kind="uint"},[128]={kind="uint"},[129]={kind="uint"},[255]={kind="uint"}}}
+local extended_schema=assert(wire.compile_schema(extended_definition))
+local extended_changes={{record=1,field=129,value=7},{record=2,field=1,value=8},
+    {record=65535,field=255,value=4294967295},{record=1,field=128,remove=true}}
+local extended_packets,extended_report=assert(wire.encode(extended_schema,binding,1,extended_changes,{full=true}))
+local extended_receiver=assert(wire.new_receiver(extended_schema,binding))
+for _,packet in ipairs(extended_packets) do
+    assert(#packet.d<=24,"extended field must retain the measured value budget")
+    local tx=assert(extended_receiver.accept(packet))
+    if not tx.pending then assert(#tx.changes==4 and tx.changes[4].remove);assert(extended_receiver.commit(tx)) end
+end
+assert(extended_receiver.inspect().revision==1 and wire.limits.field_id==255)
+local invalid_extended=copy(extended_definition);invalid_extended.fields[256]={kind="uint"}
+rejected(function() return wire.compile_schema(invalid_extended) end,"field_registry_invalid")
+rejected(function() return wire.encode(extended_schema,binding,1,{{record=1,field=254,value=0}}) end,"field_unknown")
+rejected(function() return wire.encode(extended_schema,binding,1,{{record=1,field=129,value=1},{record=1,field=129,value=2}}) end,"duplicate_changed_index")
 local resync=assert(wire.encode_resync(schema,binding,0,1))
 local resync_value=assert(wire.decode_resync(schema,binding,resync))
 assert(resync_value.revision==0 and resync_value.reason==1)
@@ -194,12 +213,16 @@ rejected(function() return wire.measure_budget(bad) end,"native_measurement_iden
 assert(calls==1,"rejected evidence must never invoke a native emitter")
 local result={status="PASS_COMPACT_WIRE_SYNTHETIC_NOT_NATIVE",reject_cases=checks,
     golden_full=golden_full,golden_delta=golden_delta,golden_resync=resync,
+    extended_fields={schema=extended_definition,changes=extended_changes,packets=extended_packets,max_ascii_bytes=extended_report.max_value_bytes},
     one_change_lua_instructions_small_registry=small_instructions,
     one_change_lua_instructions_10000_registry=large_instructions,
     ten_thousand_records_one_change_packets=#sparse,thousand_changes_packets=#many_packets,
     thousand_changes_business_bytes=many_report.business_bytes,max_ascii_value_bytes=maximum,
     worst_context_packets=#worst,worst_context_max_ascii_bytes=worst_report.max_value_bytes,
     native_calls=0,sdk_calls=0,http_calls=0,actual_native_budget_measured=false,production_default_refuses=true}
+local extended_json_definition=copy(extended_definition);extended_json_definition.fields={}
+for id,field in pairs(extended_definition.fields) do extended_json_definition.fields[tostring(id)]=field end
+result.extended_fields.schema=extended_json_definition
 if arg and arg[1]=="catalog" then
     local path=arg[2] or "scripts/vscripts/config/generated/ui_static_catalog_lookup.lua"
     local catalogue=assert(loadfile(path))()

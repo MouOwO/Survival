@@ -36,6 +36,8 @@ local function pump()
     error("dispatch failed to become idle")
 end
 local bootstrap={schema=1,schema_sha256=lookup.sha256,session=1,epoch=1,view=1}
+local denied,why=runtime.receive(0,{d=string.rep("A",100000)})
+assert(not denied and why=="compact_packet_budget_exceeded"and #packets==0)
 assert(runtime.receive(0,assert(wire.encode_resync(schema,bootstrap,0,1))))
 pump()
 local header=assert(wire.peek_header(packets[1].packet))
@@ -74,6 +76,14 @@ assert(expected==5 and next(tasks)==nil);packets={}
 local frames_before=runtime.inspect().frames
 for _=1,1000 do assert(runtime.publish(0,3,{},{}).unchanged)end
 assert(runtime.inspect().frames==frames_before and next(tasks)==nil,"stable state adds no dispatch/timer/send")
+-- Rapid target/full replacements unlink obsolete queue nodes in O(1) each.
+-- The next dispatch sees only the latest transaction, not100 dead entries.
+for _=1,100 do assert(runtime.publish(0,3,snapshot(),{full=true,priority=false}))end
+assert(runtime.queue_depth(0,3)==1)
+local latest=tasks.compact_ui_dispatch;assert(latest);tasks.compact_ui_dispatch=nil;cpu=cpu+16;latest()
+assert(runtime.queue_depth(0,3)==0 and next(tasks)==nil,"obsolete replacements must not consume later dispatch quotas")
+assert(#packets==2,"only the latest full transaction should be emitted")
+packets={}
 -- Close invalidates pending full transactions instead of finishing them hidden.
 assert(runtime.publish(0,3,snapshot(),{full=true,priority=false}))
 command({{record=control,field=fields.visible,value=false},{record=control,field=fields.known,value=false}})

@@ -1,5 +1,7 @@
 # 新会话先读｜孤城逐晓项目知识库
 
+**2026-11-03 继续优化追加：网格／选中单位仍仅本地更新。** 唯一目录扩至7887记录／163字段／10代历史（codec cap255），schema `004ce5aa…`；双XML同schema不重复初始化。Dev04两次真实静态bitmap一致，抽为非权威本地候选；每局仍真实扫描，比对后同图K0为离线估算285B、K1为48B。grid7／selected8／codec15／generator18组通过，但不等于新native／FPS或发行验收。core曾双仓push game1f160c3a／contentc04eb46d，本追加不在这两提交内。正式0104、manifest `7025356658517360342`、WS4本追加未改；完整发行仍阻断。见[追加来源、精度、成本及接手](evidence/network50_grid_selected_handoff_20261103.md)。
+
 **2026-11-03 框选14目录已检查并清理**：解除111份已验证重复数据（约40.37GiB占用），原回执/peer脚本保留；117份未确认可再生的历史素材、录像/原包无损压缩且前后SHA一致，另节省1.84GiB。密钥、加密备份、安全环境、当前候选/事务与基线保留，两版签名/VPK复核通过。D盘收口约247.31GiB可用；本轮零后台/工坊写入。见[逐目录决定与核对证据](evidence/storage_selected_roots_cleanup_20261103.md)。
 
 **2026-11-03 UI 短消息本轮仅本地更新，完整发行仍阻断**：HUD／每日／存档／抽奖接本地公开目录与 typed 增量；Tools build10938/rev11175759 已实测双向 `cw/d` 24字节 value 的 S2C386bits、C2S390bits 均为49B，actor检查全true，但普通生产／FPS／SDK未验。历史及当前范围官方编译111次中109成功、2失败，另6项阻断；新完整0302族仅只读 production_plan，尚无完整recipe／ledger／authority。Dev01因content CSS依赖不全未完成UI验收，已正常关闭；Dev02准备中。正式0104 manifest `7025356658517360342`、后台WS4本轮未改；不要沿用旧固定9范围上传或把109编译通过写成已发布。见[当前证据、完整待发与接手限制](evidence/network50_ui_local_handoff_20261103.md)。下方旧阶段记录按历史保留。

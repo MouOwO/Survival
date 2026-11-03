@@ -1,5 +1,7 @@
 # 07｜关键决策、事故与未完成事项
 
+**2026-11-03 追加待办：网格／选中单位仍须最终同源编译与真实验收。** 唯一注册表10代／7887记录／163字段，保留所有旧ID；同schema双入口零重复初始化。真实Dev04候选atlas无身份数据，每局仍全量实际扫描且逐word比较后才能发base+K覆盖；单预算hunk新旧SHA分开记录，不能冒称相同源码或永久可建。grid7／selected8等离线通过不代替实际native／FPS；core双仓1f160c3a／c04eb46d不是本追加最终source pin。正式0104／WS4本追加未改，完整recipe／ledger／authority／签名／SDK／官方下载仍阻断，待发不清零。见[来源和完整边界](evidence/network50_grid_selected_handoff_20261103.md)。
+
 **2026-11-03 框选14目录已检查并清理**：解除111份已验证重复数据（约40.37GiB占用），原回执/peer脚本保留；117份未确认可再生的历史素材、录像/原包无损压缩且前后SHA一致，另节省1.84GiB。密钥、加密备份、安全环境、当前候选/事务与基线保留，两版签名/VPK复核通过。D盘收口约247.31GiB可用；本轮零后台/工坊写入。见[逐目录决定与核对证据](evidence/storage_selected_roots_cleanup_20261103.md)。
 
 **2026-11-03 当前最高优先待办：完整待发覆盖后才能发布，现仅本地更新。** 新本地目录／typed增量已接HUD、每日、存档和抽奖，Tools双向49B只证明build10938/rev11175759消息层预算。109成功编译不能消除2失败／6阻断，也不能替代历史未发布／运行删除／生产转换的完整绑定；0302完整族尚只有production_plan，无recipe／ledger／authority／签名。Dev01因content CSS依赖不全未UI验收，已正常关闭；Dev02及普通客户端／FPS／实际演出与交易／SDK／官方下载仍待。正式0104、manifest `7025356658517360342` 与本轮WS4不变。工作区前置检查故障中断约2h20，非unsafe拒绝；恢复后两仓stash→pull→pop正常。见[精确边界、测试与交接](evidence/network50_ui_local_handoff_20261103.md)。不改写下方历史失败及恢复记录。

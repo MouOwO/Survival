@@ -94,7 +94,7 @@ local function compile_schema(spec)
     need(type(spec.fields)=="table","field_registry_required")
     local field_count=0
     for id,field in pairs(spec.fields) do
-        need(integer(id,1,127) and type(field)=="table","field_registry_invalid")
+        need(integer(id,1,255) and type(field)=="table","field_registry_invalid")
         local kind=field.kind
         need(kind=="uint" or kind=="sint" or kind=="bool","field_type_unknown")
         local lower=kind=="sint" and -MAX_SINT or 0
@@ -201,7 +201,7 @@ local function encode_changes(data,changes)
         local record,field_id=change.record,change.field
         need(data.records[record],"record_unknown")
         local field=data.fields[field_id];need(field~=nil,"field_unknown")
-        local key=record*128+field_id;need(not seen[key],"duplicate_changed_index");seen[key]=true
+        local key=record*256+field_id;need(not seen[key],"duplicate_changed_index");seen[key]=true
         need(change.remove==nil or change.remove==true,"remove_flag_invalid")
         out[#out+1]=uint(record);out[#out+1]=uint(field_id*2+(change.remove and 1 or 0))
         if change.remove then need(change.value==nil,"removed_value_present")
@@ -221,7 +221,7 @@ local function decode_changes(data,raw)
         need(data.records[record],"record_unknown")
         local field_id,removed=math.floor(tag/2),tag%2==1
         local field=data.fields[field_id];need(field~=nil,"field_unknown")
-        local key=record*128+field_id;need(not seen[key],"duplicate_changed_index");seen[key]=true
+        local key=record*256+field_id;need(not seen[key],"duplicate_changed_index");seen[key]=true
         local change={record=record,field=field_id}
         if removed then change.remove=true
         else
@@ -439,5 +439,5 @@ function M.production_send(packet,proof,engine_build,emit,networksystem_sha256)
             layer="CUserMsg_CustomGameEvent",outer_transport_framing_included=false}
     end)
 end
-M.limits={record_id=65535,field_id=127,token=MAX_TOKEN,revision=MAX_REVISION,uint=MAX_UINT,sint=MAX_SINT}
+M.limits={record_id=65535,field_id=255,token=MAX_TOKEN,revision=MAX_REVISION,uint=MAX_UINT,sint=MAX_SINT}
 return M

@@ -527,7 +527,7 @@ function M.static_preview(payload)
         states[#states+1]=clear and 2 or 1
         count=count+1
         if payload and payload.yield_after and (count>=payload.yield_after
-            or (count>=8 and clock()-started>=number(payload.time_budget,0.002))) then
+            or (count>=1 and clock()-started>=number(payload.time_budget,0.002))) then
             coroutine.yield()
             started,count=clock(),0
         end

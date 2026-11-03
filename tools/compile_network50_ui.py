@@ -5,7 +5,7 @@ preserved before the first compile. Produces source/compiled SHA bindings; does
 not install, sign, upload, or infer release completion.
 """
 from pathlib import Path
-import argparse, hashlib, json, struct, subprocess
+import argparse, hashlib, json, re, struct, subprocess
 
 ROOT=Path(__file__).resolve().parents[1]
 ENGINE=ROOT.parents[1]
@@ -16,14 +16,16 @@ SOURCES=(
  'common/ui_static_catalog.js','common/compact_wire.js','common/compact_ui_runtime.js',
  'common/compact_archive_model.js','common/compact_daily_model.js',
  'common/compact_hud_model.js','common/compact_hud_source.js','common/compact_lottery_model.js',
+ 'common/compact_grid_model.js','common/compact_selected_model.js','common/network50_diagnostics.js',
  'common/lottery_cache.js','common/purple_shell.js',
  'archive_180de7e38b_titles_compact_v6.js','archive_v10.js','collection_gw2.js',
  'daily_remaining_5d5c1152eb.js','lottery_ui_remaining_5d5c1152eb.js',
  'survival_ui.js','topnav_remaining_5d5c1152eb.js',
+ 'survival_grid_placement.js','survival_grid_state.js','combat_stats.js',
  'lottery_cinematic_v1.js','lottery_gw2.js',
 )
-LAYOUTS=('survival_hud.xml','archive.xml')
-DEPENDENCIES=SOURCES[:8]
+LAYOUTS=('survival_hud.xml','archive.xml','survival_grid_placement.xml')
+DEPENDENCIES=SOURCES[:8]+('common/compact_grid_model.js','common/compact_selected_model.js','common/network50_diagnostics.js')
 sha=lambda raw:hashlib.sha256(raw).hexdigest()
 def need(ok,why):
     if not ok:raise ValueError(why)
@@ -68,10 +70,15 @@ def main():
         for name in LAYOUTS:
             path=ROOT/'panorama/src/layout/custom_game'/name
             text=path.read_text(encoding='utf-8')
-            if 'common/compact_ui_runtime.js' not in text:
-                need(text.count('<scripts>')==1,'unique_layout_script_container_required')
-                includes='\n'+''.join('        <include src="file://{resources}/scripts/custom_game/'+source+'" />\n' for source in DEPENDENCIES)
-                path.write_text(text.replace('<scripts>','<scripts>'+includes,1),encoding='utf-8',newline='\n')
+            need(text.count('<scripts>')==1,'unique_layout_script_container_required')
+            for source in DEPENDENCIES:
+                pattern=r'<include\s+src="file://\{resources\}/scripts/custom_game/'+re.escape(source)+r'"\s*/>'
+                text=re.sub(pattern,'',text)
+            includes='\n'+''.join('        <include src="file://{resources}/scripts/custom_game/'+source+'" />\n' for source in DEPENDENCIES)
+            text=text.replace('<scripts>','<scripts>'+includes,1)
+            text=re.sub(r'(?m)^[ \t]+$','',text)
+            text=re.sub(r'\n{3,}','\n\n',text)
+            path.write_text(text,encoding='utf-8',newline='\n')
         if not args.apply:
             print(json.dumps(dict(status='LOCAL_LAYOUT_DEPENDENCIES_WIRED',layouts=LAYOUTS)));return
     mappings=[('panorama/src/scripts/custom_game/'+name,'panorama/scripts/custom_game/'+name,

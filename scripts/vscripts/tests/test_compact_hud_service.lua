@@ -24,9 +24,12 @@ bus.handle_request("ui.projection.build_snapshot",function(p)
         wave={current_wave=0,total_waves=30,status="waiting",game_mode="standard",difficulty_id="N1",difficulty_selected=false}}
 end)
 local service=require("ui/ui_snapshot_service");service.init()
-for id=0,3 do bound[id]=true;opened[id]=true;assert(handlers[2].snapshot(id))end
 local function pump()local fn=tasks.ui_snapshot_flush;assert(fn);tasks.ui_snapshot_flush=nil;fn()end
-pump();assert(legacy_sends==0 and #compact_sends==0)
+pump();assert(builds==0 and legacy_sends==0 and #compact_sends==0,"pre-Hello setup is not a legacy subscription")
+for _=1,1000 do bus.emit(events.UI_DIRTY,{player_id=0});pump()end
+assert(builds==0 and legacy_sends==0 and #compact_sends==0,"1000 cold dirty batches neither build nor send a legacy DTO")
+for id=0,3 do bound[id]=true;opened[id]=true;assert(handlers[2].snapshot(id))end
+bus.emit(events.UI_DIRTY,{});pump();assert(legacy_sends==0 and #compact_sends==0)
 local before=builds
 for _=1,1000 do bus.emit(events.UI_DIRTY,{player_id=2,team=2})end
 wood=101;pump()
@@ -37,5 +40,10 @@ opened[2]=false;before=builds
 bus.emit(events.UI_DIRTY,{player_id=2});pump();assert(builds==before and #compact_sends==1)
 local before_queries=slot_queries;bus.emit(events.UI_DIRTY,{team=2});pump()
 assert(slot_queries-before_queries==4,"team changes visit the four indexed recipients, not64engine slots")
-bound[3]=false;service.publish_player(3);assert(legacy_sends==1,"only an old unnegotiated client takes the legacy seam")
+bound[3]=false;before=builds;service.publish_player(3)
+assert(legacy_sends==0 and builds==before,"being unnegotiated alone never opts into the legacy seam")
+bus.emit(events.UI_SNAPSHOT_REQUESTED,{player_id=3});assert(legacy_sends==1 and builds==before+1,"an actual old-client request activates its playerhandle")
+players[3]={};before=builds;service.publish_player(3)
+assert(legacy_sends==1 and builds==before,"a reused slot cannot inherit the old handle subscription")
+bus.emit(events.UI_SNAPSHOT_REQUESTED,{player_id=3});assert(legacy_sends==2 and builds==before+1)
 print("COMPACT_HUD_SERVICE_PASS: 4owners,1000burst1owner/1field,1000stable0send,closed0projection,team indexed4not64,no duplicate legacy")

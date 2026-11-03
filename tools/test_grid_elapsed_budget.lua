@@ -44,8 +44,15 @@ for _,method in ipairs({"preview_area","static_preview"}) do
     assert(ok,partial)
     assert(coroutine.status(job)=="suspended",method.." must yield before finishing")
     local first_samples=terrain_samples
-    -- Each clear terrain cell samples five points. The minimum batch is eight.
-    assert(first_samples>=8*5 and first_samples<128*5,method.." ignored elapsed-time budget")
+    -- Each clear terrain cell samples five points. Static startup now checks
+    -- elapsed time after every cell, preserving only one non-preemptible cell
+    -- of overshoot. Dynamic advisory scans retain their existing eight-cell
+    -- minimum here; this test must not hide that separate remaining boundary.
+    local minimum=method=="static_preview" and 1 or 8
+    assert(first_samples>=minimum*5 and first_samples<128*5,method.." ignored elapsed-time budget")
+    if method=="static_preview" then
+        assert(first_samples<8*5 and elapsed_ms<=3.7,"static scan must not run the former eight-native-cell burst")
+    end
     local batches,final=1,partial
     while coroutine.status(job)~="dead" do
         ok,final=coroutine.resume(job);assert(ok,final);batches=batches+1

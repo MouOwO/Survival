@@ -31,7 +31,7 @@ function environment() {
     const context = {pageVersions: {}, pageAssemblies: {}, pageCache: {}, resyncPages: {},
         opened: false, current: 'clear', resyncs: [],
         GameUI: {CustomUIConfig: () => config}, render: () => {},
-        beginArchiveLoad:()=>{},endArchiveLoad:()=>{},
+        beginArchiveLoad:()=>{},endArchiveLoad:()=>{},compactEnabled:()=>false,
         queueFullSync: category => context.resyncs.push(category)};
     vm.createContext(context);
     vm.runInContext(cacheSource, context, {timeout: 1000});

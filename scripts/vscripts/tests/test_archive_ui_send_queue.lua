@@ -7,7 +7,14 @@ local function copy(value)
 end
 local encoder=require("core/json_encoder")
 local encode,encodes=encoder.encode,0
-encoder.encode=function(value) encodes=encodes+1;return encode(value) end
+local compact_players,bind_on_packet_encode={},false
+encoder.encode=function(value)
+    encodes=encodes+1
+    if bind_on_packet_encode and value.sequence and value.chunk and value.rows and #value.rows>0 then
+        bind_on_packet_encode=false;compact_players[0]=true
+    end
+    return encode(value)
+end
 local timers,listeners,packets,profiles,players={},{},{},{},{}
 local game_time,wall_ms,profile_reads,page_builds,writes,http=0,0,0,0,0,0
 local budget_mode,fail_chunk,reenter=false,false,nil
@@ -21,6 +28,8 @@ package.loaded["systems/player_profile_service"]={
     get_provider=function() return provider end,
     update_save_sections=function() writes=writes+1;error("unexpected persistence") end}
 package.loaded["systems/archive_http_adapter"]={enabled=function() return false end}
+package.loaded["ui/compact_ui_transport"]={register_view=function()return true end,
+    is_bound=function(id)return compact_players[id]==true end,is_open=function()return false end,publish=function()return true end}
 package.loaded["debug/mode_unlock_test"]={is_enabled=function() return true end}
 package.loaded["debug/offline_logic_test"]={is_enabled=function() return true end,is_provider=function(value) return value==provider end}
 package.loaded["systems/match_setup_service"]={get_mode=function() return "standard" end,
@@ -56,6 +65,8 @@ local archive
 local function reset()
     bus.reset();timers,listeners,packets,profiles,players={},{},{},{},{}
     game_time,wall_ms,budget_mode,fail_chunk,reenter=0,0,false,false,nil
+    compact_players={}
+    bind_on_packet_encode=false
     for id=0,3 do
         players[id]={id=id}
         profiles[id]={account_id="synthetic_"..id,revision=1,entitlements={},save={gameplay_stats={},content_inventory={},archive={}}}
@@ -85,6 +96,30 @@ local function request(id,category,prefetch,resync)
 end
 local function changed(id) bus.emit(events.PLAYER_PROFILE_CHANGED,{player_id=id,reason="synthetic_queue_change"}) end
 local function clear_counts() packets={};profile_reads,page_builds,encodes=0,0,0 end
+
+-- A loaded private profile is not a legacy protocol subscription. Before the
+-- authenticated Hello, cold new clients must not build/queue the old 945 rows.
+reset();for id=0,3 do changed(id)end
+assert(#packets==0 and page_builds==0 and encodes==0 and not timers.archive_ui_queue,
+    "cold profile before Hello automatically generated legacy catalogue")
+for id=0,3 do compact_players[id]=true;changed(id)end
+assert(#packets==0 and page_builds==0 and not timers.archive_ui_queue)
+
+-- An explicit old request can queue work before a later protocol handshake.
+-- The handshake cancels that player's indexed queue before any projector runs.
+reset();request(0,"clear",1);compact_players[0]=true;pump()
+assert(#packets==0 and page_builds==0 and not timers.archive_ui_queue,
+    "pre-Hello queued legacy jobs survived authenticated compact binding")
+game_time=1;request(0,"clear",1)
+assert(#packets==0 and page_builds==0 and not timers.archive_ui_queue,"bound client reactivated old protocol")
+
+-- Also guard a page already built but deferred by the real work budget.
+reset();budget_mode=true;request(0,"clear",1);step();assert(page_builds==1 and #packets==0)
+compact_players[0]=true;local before=page_builds;pump()
+assert(#packets==0 and page_builds==before and not timers.archive_ui_queue,"built legacy page emitted after binding")
+reset();request(0,"clear",1);bind_on_packet_encode=true;pump()
+assert(compact_players[0]and #packets==0 and page_builds==1 and not timers.archive_ui_queue,
+    "native emit missed a protocol transition during packet encoding")
 
 reset();request(0,"endless",1)
 assert(page_builds==0 and #packets==0,"request must not synchronously project 945 rows")
@@ -156,5 +191,7 @@ assert(writes==0 and http==0)
 raw_print(encode({status="PASS_REAL_ARCHIVE_INDEXED_QUEUE_SYNTHETIC_NOT_NATIVE",initial_packets=initial_count,
     initial_rows=rows,categories=categories,max_packets_per_callback=max_sends,max_page_builds_per_callback=max_builds,
     same_source_prefetch_reads=0,same_source_prefetch_projections=0,same_source_prefetch_encodes=0,
+    cold_profile_before_hello_legacy_packets=0,cold_profile_before_hello_page_builds=0,
+    queued_handshake_cancels_before_projection=true,native_emit_rechecks_protocol=true,explicit_legacy_subscription=true,
     selected_priority=true,explicit_single_page_resync=true,partial_reentrant_failure_base_safe=true,
     real_clock_gate_simulated=true,four_player_reset_disconnect_safe=true,native_calls=0,http_calls=http,persistence_calls=writes}))

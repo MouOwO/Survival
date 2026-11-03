@@ -47,7 +47,9 @@ CustomGameEventManager = { RegisterListener=function(_, name, fn) listeners[name
     end }
 local bus, events = require("core/event_bus"), require("core/events")
 local definitions = require("config/generated/archive_categories")
+local legacy_requested=false
 local function reset()
+    legacy_requested=false
     bus.reset(); packets, timers, listeners, logs, fail_send = {}, {}, {}, {}, false
     profile={revision=1,save={gameplay_stats={},content_inventory={},archive={}},entitlements={}}
     for _, row in ipairs(require("config/generated/player_gameplay_stats").rows) do
@@ -68,6 +70,10 @@ local function pump()
     end
 end
 local function publish()
+    if not legacy_requested then
+        listeners.survival_archive_request(nil,{PlayerID=0,category_id="clear",prefetch=1})
+        legacy_requested=true
+    end
     bus.emit(events.PLAYER_PROFILE_CHANGED,{player_id=0,reason="synthetic_wire_budget"})
     pump()
 end

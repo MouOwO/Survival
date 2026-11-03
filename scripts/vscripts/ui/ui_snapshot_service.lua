@@ -11,6 +11,7 @@ local flush_pending = false
 local generation = 0
 local compact_factory, compact_players
 local recipients, recipients_by_team = {}, {}
+local legacy_players = {}
 
 local function build(player_id)
     return event_bus.request("ui.projection.build_snapshot", {
@@ -63,6 +64,7 @@ local function publish_player(player_id)
         if #operations == 0 then return true end
         return compact.publish(player_id, 2, operations, {priority=true}) ~= nil
     end
+    if legacy_players[player_id] ~= PlayerResource:GetPlayer(player_id) then return false end
     local snapshot = build(player_id)
     if not snapshot then return false end
     sequence = sequence + 1
@@ -111,7 +113,10 @@ local function on_dirty(payload)
 end
 
 local function on_snapshot_requested(payload)
-    publish_player(payload.player_id)
+    local player_id=tonumber(payload and payload.player_id)
+    if not player_id or not valid_player(player_id) then return end
+    legacy_players[player_id]=PlayerResource:GetPlayer(player_id)
+    publish_player(player_id)
 end
 
 function M.init()
@@ -121,6 +126,7 @@ function M.init()
     sequence = 0
     dirty_teams, dirty_players = {}, {}
     recipients, recipients_by_team = {}, {}
+    legacy_players = {}
     -- Initial registration is the only full engine-slot pass. Late arrivals
     -- register through readiness/personal state events and explicit resync.
     for player_id=0,DOTA_MAX_TEAM_PLAYERS-1 do remember_player(player_id)end

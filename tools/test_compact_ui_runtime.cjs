@@ -109,6 +109,23 @@ test("lottery read action 7 is typed and allowed only in its pool view",()=>{
 test("disposed callbacks and malformed frames are bounded and inactive",()=>{
  const t=setup({admitted:true}),v=t.rt.CreateView("daily",{});v.Open();t.feed(hello());const frame=encode(dailyOps())[0];v.Dispose();t.receive(frame);t.rt.Dispose();const sent=t.sent.length;for(let i=0;i<100;i++){t.receive({d:"A".repeat(9999)});t.receive(frame);}assert.equal(t.sent.length,sent);assert.equal(t.isDisposed(),true);
 });
+test("independent full C2S inputs recover after partial loss without replay or business nonces",()=>{
+ const t=setup({admitted:true}),grid=t.rt.CreateView("grid",{});t.feed(hello());grid.Open();
+ const args={grid_session:88,grid_request:1,grid_profile:R["grid:profile:ability_build_arrow_tower"],grid_actor:11,grid_ability:12,grid_x_hi:0,grid_x_lo:0,grid_y_hi:0,grid_y_lo:0,grid_z_hi:0,grid_z_lo:0};
+ assert.equal(grid.SendInput(2,args).sent,true);grid.SendInput(2,{...args,grid_request:2});grid.Close();grid.Open();grid.SendInput(2,{...args,grid_request:3});
+ assert.equal(t.rt.Inspect().intent_token,0);
+ const groups=new Map();for(const packet of t.sent){const h=W.PeekHeader(packet);if(h.view!==4)continue;assert.equal(h.full,true);if(!groups.has(h.revision))groups.set(h.revision,[]);groups.get(h.revision).push(packet);}
+ assert.ok(groups.get(2).length>1);
+ const forged=W.Encode(schema,binding(900,4,1),5,[{record:R["grid:input"],field:F.grid_action,value:2},{record:R["grid:input"],field:F.grid_request,value:99}],{full:true}).packets;
+ const packets=[t.sent[0],...groups.get(1),groups.get(2)[0],...groups.get(3),...groups.get(3),...groups.get(4),...groups.get(2).slice(1),...forged,...groups.get(5),...groups.get(6)];
+ const source=`package.path='scripts/vscripts/?.lua;'..package.path
+local W=require('ui/compact_wire');local L=require('config/generated/ui_static_catalog_lookup');local T=require('ui/compact_ui_transport');local cpu,tasks,accepted=0,{},{}
+local handle={};local rt=T.new({lookup=L,budget=require('config/generated/ui_compact_wire_budget'),player=function()return handle end,authorize=function()return true end,session_token=function()return 900 end,cpu_ms=function()return cpu end,after=function(_,fn,key)tasks[key]=fn end,cancel=function(key)tasks[key]=nil end,emit=function()return true end})
+rt.register_view(4,{snapshot=function()return{}end,input_record='grid:input',input_action_field='grid_action',input_actions={[2]=true},input_fields={grid_session=true,grid_request=true,grid_profile=true,grid_actor=true,grid_ability=true,grid_x_hi=true,grid_x_lo=true,grid_y_hi=true,grid_y_lo=true,grid_z_hi=true,grid_z_lo=true},input=function(_,action,args)accepted[#accepted+1]=args.grid_request;return true end})
+for _,p in ipairs({${packets.map(p=>`{d='${p.d}'}`).join(",")}})do rt.receive(0,p);for n=1,1000 do local fn=tasks.compact_ui_dispatch;if not fn then break end;tasks.compact_ui_dispatch=nil;cpu=cpu+16;fn()end end
+assert(#accepted==2 and accepted[1]==2 and accepted[2]==3,'loss/replay/closed input reached business handler');print('C2S_FULL_RECOVERY_PASS')`;
+ assert.match(cp.execFileSync(process.env.LUA51||"C:/Program Files/lua/bin/lua5.1.exe",["-"],{input:source,encoding:"utf8"}),/C2S_FULL_RECOVERY_PASS/);
+});
 test("two independent HUD XML roots reuse one same-build same-schema runtime in either order",()=>{
  const source=fs.readFileSync("panorama/src/scripts/custom_game/common/compact_ui_runtime.js","utf8");
  for(const order of [["hud","archive"],["archive","hud"]]){

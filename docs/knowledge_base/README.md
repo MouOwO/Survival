@@ -1,5 +1,7 @@
 # 孤城逐晓／Survival 统一知识库
 
+**2026-11-03 最新追加仍仅本地更新**：[网格／选中单位、非权威本地atlas与10代注册表](evidence/network50_grid_selected_handoff_20261103.md)。7887记录／163字段，schema004ce5aa…；同schema双入口初始化一次，静态候选只在本局实际扫描后按K覆盖，原validate／commit不改。离线grid7／selected8／codec15／generator18组过，不标新native／FPS／游廊通过；正式0104和本轮WS4保持，完整生产／发行工具链仍待。
+
 **2026-11-03 框选14目录已检查并清理**：解除111份已验证重复数据（约40.37GiB占用），原回执/peer脚本保留；117份未确认可再生的历史素材、录像/原包无损压缩且前后SHA一致，另节省1.84GiB。密钥、加密备份、安全环境、当前候选/事务与基线保留，两版签名/VPK复核通过。D盘收口约247.31GiB可用；本轮零后台/工坊写入。见[逐目录决定与核对证据](evidence/storage_selected_roots_cleanup_20261103.md)。
 
 **2026-11-03 最新：UI 短消息仅本地更新，完整0302待发未收口**：[本轮证据与后续门禁](evidence/network50_ui_local_handoff_20261103.md)。Tools 两向原生49B实测通过，不代表普通生产／FPS；111次官方编译中109成功、2失败，另6阻断。新完整族只有只读production_plan，recipe／ledger／authority及签发未完成。Dev01依赖加载失败未UI验收，已正常关闭，Dev02准备中；正式0104 manifest `7025356658517360342`、WS4本轮保持。旧记录保留，不能作为本轮发布依据。

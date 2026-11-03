@@ -24,6 +24,7 @@ local building_snapshot_sequence = 0
 local selected_unit_by_player = {}
 local building_push_coalescer
 local combat_push_coalescer
+local compact_selected,compact_selected_world
 local compact_lottery_transport
 local function compact_lottery_bound(id)
     return compact_lottery_transport and compact_lottery_transport.is_bound
@@ -271,6 +272,10 @@ local function source_player_id(payload)
 end
 
 local function send_to_player(event_name, player_id, payload, difficulty_selection)
+    if event_name=='ui_selected_unit_stats_snapshot'and compact_lottery_bound(player_id)then
+        if compact_selected then compact_selected.changed(player_id,payload)end
+        return
+    end
     if compact_lottery_bound(player_id)and type(event_name)=='string'and event_name:sub(1,11)=='ui_lottery_'then return end
     if not valid_player_id(player_id, true, difficulty_selection) then return end
     local player = PlayerResource:GetPlayer(player_id)
@@ -359,6 +364,7 @@ end
 local function register_selected_unit_stats_request()
     CustomGameEventManager:RegisterListener("ui_selected_unit_stats_request", function(_, payload)
         local player_id = source_player_id(payload)
+        if compact_lottery_bound(player_id)then return end
         if not valid_player_id(player_id, true) then return end
         local entindex = tonumber(payload and payload.entindex)
         local ok, unit = pcall(EntIndexToHScript, entindex or -1)
@@ -382,7 +388,7 @@ local function register_selected_unit_stats_request()
             return
         end
         local snapshot = combat_stat_projection.for_ui(unit_combat_snapshot(unit))
-        production_ui.decorate(player_id, unit, snapshot)
+        if not compact_lottery_bound(player_id)then production_ui.decorate(player_id, unit, snapshot)end
         snapshot.success = 1
         send_to_player("ui_selected_unit_stats_snapshot", player_id, snapshot)
     end)
@@ -498,7 +504,7 @@ local function build_building_snapshot(payload)
         or snapshot.runtime_armor
     snapshot.attack_speed = tonumber(payload.attack_speed) or snapshot.attack_speed
     snapshot.push_phase = "coalesced"
-    production_ui.decorate(player_id, unit, snapshot)
+    if not compact_lottery_bound(player_id)then production_ui.decorate(player_id, unit, snapshot)end
     snapshot = combat_stat_projection.for_ui(snapshot)
     return snapshot
 end
@@ -1704,6 +1710,24 @@ function M.init()
     register_return_home_request()
     register_rogue_reward_requests()
     register_lottery_requests()
+    if compact_lottery_transport and compact_lottery_transport.available()then
+        local own_world=event_bus.get_generation()
+        if compact_selected_world~=own_world then
+            if compact_selected then compact_selected.dispose()end
+            compact_selected=require('ui/compact_selected_views').new({transport=compact_lottery_transport,
+                lookup=require('config/generated/ui_static_catalog_lookup'),
+                current=function()return event_bus.get_generation()==own_world end,
+                allowed=function(id)return valid_player_id(id,true)end,
+                selected=function(id,entity)selected_unit_by_player[id]=entity end,
+                snapshot=function(id,entity)
+                    local ok,unit=pcall(EntIndexToHScript,entity)
+                    if not ok or not unit or unit:IsNull()then return{success=0,entindex=entity}end
+                    local snapshot=hero_ui_snapshot(id,entity,unit)or combat_stat_projection.for_ui(unit_combat_snapshot(unit))
+                    snapshot.success=1;return snapshot
+                end})
+            compact_selected_world=own_world
+        else compact_selected.reset()end
+    end
     event_bus.subscribe(events.UNIT_COMBAT_STATS_CHANGED, on_unit_combat_stats_changed)
     -- combat_stats_ui_service publishes every authoritative owner-hero change
     -- to survival_combat_stats. Repeating the same update through a custom
@@ -1716,6 +1740,7 @@ function M.init()
 end
 
 M._test = {
+    unit_combat_snapshot=unit_combat_snapshot,
     apply_portrait_metadata = apply_portrait_metadata,
     on_notification = on_notification,
 }

@@ -1,5 +1,6 @@
 -- Real private snapshot projection/transport: same-team player wave isolation.
 package.path = "scripts/vscripts/?.lua;" .. package.path
+package.loaded["config/test_access"]={enabled=false}
 local bus = require("core/event_bus")
 local events = require("core/events")
 local tasks, sent, queries = {}, {}, {}
@@ -47,6 +48,9 @@ bus.handle_request(events.BUILDING_LIST_REQUEST, function() return {buildings={}
 require("ui/ui_projection").init()
 local snapshots = require("ui/ui_snapshot_service")
 snapshots.init()
+-- The four legacy HUD fixtures subscribe through the actual service event;
+-- automatic world/profile dirty events alone must not activate old DTOs.
+for id=0,3 do bus.emit(events.UI_SNAPSHOT_REQUESTED,{player_id=id}) end
 for id = 0, 1 do
     bus.emit(events.BUILDING_CREATED, {player_id=id,team=2,building_id="main_city",level=id+3})
     bus.emit(events.BUILDING_CREATED, {player_id=id,team=2,building_id="building_research_lab"})

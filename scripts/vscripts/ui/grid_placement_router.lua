@@ -20,6 +20,22 @@ local last_area_perf_log = -100
 local static_area=""
 local static_area_players={}
 local scopes_by_player = {}
+local legacy_viewers,compact_handlers={},{}
+local compact_views,compact_transport
+local compact_world,listener_generation=nil,0
+local static_generation,static_performance=0,{}
+local function listen(name,handler)
+    compact_handlers[name]=handler
+    local own=event_bus.get_generation()
+    local listener_epoch=listener_generation
+    return CustomGameEventManager:RegisterListener(name,function(source,payload)
+        if event_bus.get_generation()~=own or listener_epoch~=listener_generation then return end
+        local id=tonumber(payload and payload.PlayerID)
+        if compact_transport and compact_transport.is_bound(id) then return end
+        if id~=nil then legacy_viewers[id]=true end
+        return handler(source,payload)
+    end)
+end
 
 local function current_mode()
     local setup = package.loaded["systems/match_setup_service"]
@@ -179,6 +195,10 @@ send = function(player_id, event_name, payload)
     local scope, version = current_scope(player_id)
     if payload.grid_scope and payload.grid_scope ~= scope then return end
     payload.grid_scope, payload.grid_scope_version = scope, version
+    if compact_views and compact_views.send(player_id,event_name,payload)then return end
+    -- Initial profile events do not opt a new client into an old large DTO.
+    -- Explicit legacy requests remain available for the migration reader.
+    if not legacy_viewers[player_id]then return end
     local player = PlayerResource:GetPlayer(player_id)
     if player then
         CustomGameEventManager:Send_ServerToPlayer(player, event_name, payload)
@@ -307,7 +327,7 @@ end
 -- Separate, cheap pose channel: fast mouse movement may pause validation,
 -- but must never leave the model at an old validation response position.
 local function register_preview_pose()
-    CustomGameEventManager:RegisterListener("ui_grid_placement_pose", function(_, payload)
+    listen("ui_grid_placement_pose", function(_, payload)
         local player_id = source_player_id(payload)
         if not valid_player_id(player_id) then return end
         local profile = profiles_by_ability[tostring(payload.ability_name or "")]
@@ -362,6 +382,7 @@ local function validate_preview(player_id, payload, profile, position)
 end
 
 local function send_static_area(player_id)
+    static_area_players[player_id]=true
     -- This shared atlas describes the ordinary island only. A completed scan
     -- must not repaint a separate arena after the player's mode has changed.
     if not advanced_mode() and static_area ~= "" then
@@ -404,7 +425,7 @@ local function send_profiles(player_id)
 end
 
 local function register_profile_request()
-    CustomGameEventManager:RegisterListener(
+    listen(
         "ui_grid_placement_profiles_request",
         function(_, payload)
             local player_id = source_player_id(payload)
@@ -426,7 +447,7 @@ local function preview_cells(cells)
 end
 
 local function register_validation_request()
-    CustomGameEventManager:RegisterListener(
+    listen(
         "ui_grid_placement_validate",
         function(_, payload)
             local player_id = source_player_id(payload)
@@ -522,7 +543,7 @@ local function register_validation_request()
 end
 
 local function register_preview_end()
-    CustomGameEventManager:RegisterListener("ui_grid_placement_pause_area",function(_,payload)
+    listen("ui_grid_placement_pause_area",function(_,payload)
         local player_id=source_player_id(payload)
         if not valid_player_id(player_id) then return end
         local session_id=request_number(payload,"session_id")
@@ -535,7 +556,7 @@ local function register_preview_end()
         scheduler.cancel("grid_preview_area:"..tostring(player_id))
         preview_areas[player_id]=nil
     end)
-    CustomGameEventManager:RegisterListener(
+    listen(
         "ui_grid_placement_preview_end",
         function(_, payload)
             local player_id = source_player_id(payload)
@@ -547,7 +568,7 @@ local function register_preview_end()
 end
 
 local function register_commit_request()
-    CustomGameEventManager:RegisterListener(
+    listen(
         "ui_grid_placement_commit",
         function(_, payload)
             local player_id = source_player_id(payload)
@@ -650,6 +671,12 @@ local function register_commit_request()
 end
 
 function M.init()
+    local own_world=event_bus.get_generation()
+    local retained=compact_views and compact_world==own_world
+    if compact_views then if retained then compact_views.reset()else compact_views.dispose()end end
+    if not retained then compact_views,compact_transport=nil,nil end
+    listener_generation=listener_generation+1
+    legacy_viewers,compact_handlers={},{}
     for player_id, _ in pairs(preview_areas) do destroy_preview(player_id) end
     preview_areas = {}
     preview_terrain_caches = {}
@@ -661,21 +688,36 @@ function M.init()
     require("systems/grid_preview_model_service").clear_all()
     static_area="";static_area_players={};scopes_by_player={}
     scheduler.cancel("grid_static_terrain")
+    static_generation=static_generation+1
+    local own_static_generation=static_generation
     local grid=require("systems/grid_placement_system")
     if grid.static_preview then
+        local clock=performance_clock.new()
+        local started=clock()
+        static_performance={batches=0,max_batch_ms=0,elapsed_ms=0,complete=false}
         local job=coroutine.create(function()
             return grid.static_preview({yield_after=128,time_budget=0.002})
         end)
         scheduler.after(0.05,function()
+            if own_static_generation~=static_generation then return end
             if advanced_mode() then return end
+            local batch_started=clock()
             local ok,result=coroutine.resume(job)
+            static_performance.batches=static_performance.batches+1
+            static_performance.max_batch_ms=math.max(static_performance.max_batch_ms,(clock()-batch_started)*1000)
             if not ok then print("[GridPlacement] static terrain failed: "..tostring(result));return end
             if coroutine.status(job)~="dead" then return 0.05 end
             static_area=type(result)=="string" and result or ""
+            static_performance.complete=true;static_performance.elapsed_ms=(clock()-started)*1000
+            local width,height=static_area:match('^3|[^|]+|[^|]+|[^|]+|(%d+)|(%d+)|')
+            static_performance.cells=(tonumber(width)or 0)*(tonumber(height)or 0)
+            static_performance.native_query_upper=static_performance.cells*16
             for player_id in pairs(static_area_players) do
                 send_static_area(player_id)
             end
             print("[GridPlacement] static terrain ready bytes="..#static_area)
+            print(string.format('[GridPlacement][STATIC_PERF] batches=%d cells=%d max_batch_ms=%.3f elapsed_ms=%.1f native_query_upper=%d',
+                static_performance.batches,static_performance.cells,static_performance.max_batch_ms,static_performance.elapsed_ms,static_performance.native_query_upper))
         end,"grid_static_terrain")
     end
     event_bus.subscribe(events.PLAYER_DEFEATED, function(payload)
@@ -700,10 +742,30 @@ function M.init()
     register_validation_request()
     register_preview_end()
     register_commit_request()
+    local transport=require('ui/compact_ui_transport')
+    if not retained and transport.available()then
+        local lookup=require('config/generated/ui_static_catalog_lookup')
+        if lookup.grid then
+            local own=event_bus.get_generation()
+            compact_transport=transport
+            compact_world=own
+            compact_views=require('ui/compact_grid_views').new({lookup=lookup,transport=transport,
+                current=function()return event_bus.get_generation()==own end,
+                bootstrap=send_profiles,
+                bootstrap_static=send_static_area,
+                close_static=function(id)static_area_players[id]=nil end,
+                close=function(id)close_preview_session(id,preview_sessions[id]);destroy_preview(id)end,
+                dispatch=function(name,payload)
+                    local handler=compact_handlers[name];if handler then return handler(nil,payload)end
+                end})
+        end
+    end
+    if retained then compact_views.restore()end
     print("[GridPlacement] UI router initialized")
 end
 
 M._build_profiles_for_test = build_profiles
 M._profiles_for_test = function() return profiles_by_ability end
+M._static_performance_for_test=function()return static_performance end
 
 return M

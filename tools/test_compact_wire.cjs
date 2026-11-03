@@ -61,6 +61,17 @@ test("holes, tombstones, enums and unknown defaults",()=>{
  const c=wire.NewClient(wire.CompileSchema({...spec,fields:{1:{kind:"uint",default:null}}}),binding);
  c.Accept(packet([]));assert.equal(c.Read(1,1),undefined);
 });
+test("append-only fields 128/129/255 preserve old goldens and do not collide",()=>{
+ const wide=golden.extended_fields,s=wire.CompileSchema(wide.schema),c=wire.NewClient(s,binding);
+ for(const p of wide.packets){assert.ok(p.d.length<=24);c.Accept(p);}
+ assert.equal(c.Read(1,129),7);assert.equal(c.Read(2,1),8);
+ assert.equal(c.Read(65535,255),4294967295);assert.equal(c.Read(1,128),undefined);
+ assert.equal(wire.limits.field_id,255);
+ reject(()=>wire.CompileSchema({...wide.schema,fields:{...wide.schema.fields,256:{kind:"uint"}}}),"field_registry_invalid");
+ reject(()=>wire.NewReceiver(s,binding).Accept(packet(changes([{record:1,field:254,value:0}]))),"field_unknown");
+ reject(()=>wire.NewReceiver(s,binding).Accept(packet(changes([{record:1,field:129,value:1},{record:1,field:129,value:2}]))),"duplicate_changed_index");
+ assert.deepEqual(wire.Encode(s,binding,1,wide.changes,{full:true}).packets,wide.packets);
+});
 test("transaction atomically rejects duplicate fields and bad final fragments",()=>{
  const r=wire.NewReceiver(schema,binding), body=changes([{record:1,field:1,value:9},{record:1,field:1,value:10}]);
  assert.equal(r.Accept(packet(body.slice(0,3),{index:1,count:2})).pending,true);
