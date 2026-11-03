@@ -11,7 +11,17 @@ local weapon_progression = require("systems/weapon_progression")
 
 local M = {}
 local states, generation = {}, 0
-local GROWTH_PUBLISH_INTERVAL = 0.1
+local metrics = {full_reads=0, tooltip_builds=0, table_writes=0, growth_ignored=0, stable_requests=0}
+local catalog_cache = {}
+local catalog_world
+
+local function equal(left,right)
+    if left==right then return true end
+    if type(left)~="table"or type(right)~="table"then return false end
+    for key,value in pairs(left)do if not equal(value,right[key])then return false end end
+    for key in pairs(right)do if left[key]==nil then return false end end
+    return true
+end
 
 local function copy(values)
     local result = {}
@@ -54,27 +64,20 @@ local function valid_player(id)
     return id ~= nil and id >= 0 and PlayerResource:IsValidPlayerID(id)
 end
 
-local function send(id, event_name, data)
+local function publish(id, reason, active, current)
     if not valid_player(id) then return end
-    local player = PlayerResource:GetPlayer(id)
-    if player then
-        CustomGameEventManager:Send_ServerToPlayer(player, event_name, data)
+    if not current.dirty and current.last_projection then metrics.stable_requests=metrics.stable_requests+1;return end
+    local function query(name)
+        metrics.full_reads=metrics.full_reads+1
+        return event_bus.request(name,{player_id=id})
     end
-end
-
-local function publish(id, reason, active)
-    if not valid_player(id) then return end
-    local equipment = event_bus.request(
-        events.WEAPON_EQUIPMENT_GET_REQUEST, { player_id = id })
+    local equipment = query(events.WEAPON_EQUIPMENT_GET_REQUEST)
     if not active() then return end
-    local growth = event_bus.request(
-        events.WEAPON_GROWTH_GET_REQUEST, { player_id = id })
+    local growth = query(events.WEAPON_GROWTH_GET_REQUEST)
     if not active() then return end
-    local instances = event_bus.request(
-        events.EQUIPMENT_INSTANCE_GET_REQUEST, { player_id = id })
+    local instances = query(events.EQUIPMENT_INSTANCE_GET_REQUEST)
     if not active() then return end
-    local equipment_growth = event_bus.request(
-        events.EQUIPMENT_GROWTH_GET_REQUEST, { player_id = id })
+    local equipment_growth = query(events.EQUIPMENT_GROWTH_GET_REQUEST)
     if not active() then return end
     local equipped = equipment and equipment.snapshot or { player_id = id }
     local raw_weapon_growth = growth and growth.snapshot or { player_id = id }
@@ -84,13 +87,19 @@ local function publish(id, reason, active)
         raw_weapon_growth,
         equipment_progress
     )
-    local combined = {
-        player_id = id,
-        reason = reason or "changed",
-        equipment = equipped,
-        growth = weapon_growth,
-        instances = instances and instances.instances or {},
-        equipment_growth = equipment_progress,
+    local main_id=tostring(equipped.main_hand_content_id or "")
+    local definition=weapons.by_id[main_id]or{}
+    metrics.tooltip_builds=metrics.tooltip_builds+1
+    -- Only the inventory tooltip consumes this public table. Its structural
+    -- view is rebuilt on real inventory/equipment changes. Per-hit counters
+    -- already arrive through selected's compact lane and native item charges.
+    local combined = {version=2,player_id=id,
+        main_hand_context={content_id=main_id,progression_type=definition.progression_type or "",
+            native_charge_counter=definition.progression_type=="monster_kill_count"and not weapon_progression.icon_level(definition)and 1 or 0,
+            stage_attack_target=weapon_growth.stage_attack_target or 0,
+            is_max_level=weapon_growth.is_max_level or 0,
+            progress_per_attack=weapon_growth.progress_per_attack or 1,
+            forging_hammer_count=weapon_growth.forging_hammer_count or 0},
         tooltip_view_model = tooltip_view_model.weapon_snapshot(
             equipped,
             weapon_growth,
@@ -99,20 +108,11 @@ local function publish(id, reason, active)
         ),
     }
     if not active() then return end
-    for _, entry in ipairs({
-        { "survival_weapon_equipment", equipped },
-        { "survival_weapon_growth", weapon_growth },
-        { "survival_equipment_instances", instances or { ok = false } },
-        { "survival_equipment_growth", equipment_growth or { ok = false } },
-        { "survival_weapon_snapshot", combined },
-    }) do
-        if not active() then return end
-        CustomNetTables:SetTableValue(entry[1], tostring(id), entry[2])
-    end
-    if not active() then return end
-    send(id, "ui_weapon_synthesis_snapshot", {
-        player_id = id, reason = reason or "changed", success = 1,
-    })
+    current.dirty=false
+    if equal(current.last_projection,combined)then return end
+    current.last_projection=combined
+    CustomNetTables:SetTableValue("survival_weapon_snapshot",tostring(id),combined)
+    metrics.table_writes=metrics.table_writes+1
 end
 
 local function state(id)
@@ -154,7 +154,7 @@ flush = function(id, current)
         local ok, err = pcall(publish, id, reason, function()
             return generation == active_generation and states[id] == current
                 and current.revision == revision
-        end)
+        end,current)
         current.publishing = false
         if not ok then error(err) end
         passes = passes + 1
@@ -166,6 +166,7 @@ end
 local function publish_immediately(id, reason)
     if not valid_player(id) then return end
     local current = state(id)
+    if current.removed then return end
     cancel_pending(current)
     current.revision = current.revision + 1
     current.immediate_reason = reason or "state_changed"
@@ -189,35 +190,45 @@ local function publish_catalog()
             }
         end
     end
-    CustomNetTables:SetTableValue(
-        "survival_weapon_recipes", "root", {
-            rows = enabled_recipes, ingredients = enabled_ingredients,
-        })
-    CustomNetTables:SetTableValue("survival_weapon_effects", "root", {
+    local function write(name,value)
+        if equal(catalog_cache[name],value)then return end
+        catalog_cache[name]=value;CustomNetTables:SetTableValue(name,"root",value)
+    end
+    write("survival_weapon_recipes",{rows = enabled_recipes, ingredients = enabled_ingredients})
+    write("survival_weapon_effects", {
         definitions = effects.definitions,
         unknown_policy = effects.unknown_policy,
         rows = effect_config.by_content_id or {},
     })
-    CustomNetTables:SetTableValue(
-        "survival_equipment_levels", "root", { rows = levels.rows or {} })
+    write("survival_equipment_levels",{ rows = levels.rows or {} })
 end
 
 local function changed(payload)
-    publish_immediately(tonumber(payload and payload.player_id), "state_changed")
+    local id=tonumber(payload and payload.player_id)
+    if not valid_player(id)then return end
+    local current=state(id)
+    if current.removed then return end
+    current.dirty=true;current.revision=current.revision+1
+    current.immediate_reason="state_changed"
+    -- Inventory subscribers are unordered; read the completed source once
+    -- after nested instance/equip events settle, not once for every observer.
+    if not current.publishing then schedule_publish(id,current,0)end
 end
 
 local function growth_changed(payload)
     local id = tonumber(payload and payload.player_id)
     if not valid_player(id) then return end
-    if payload.reason ~= "attack_landed" and payload.reason ~= "damage_dealt" then
-        changed(payload)
-        return
+    if payload.reason=="attack_landed"or payload.reason=="damage_dealt"then
+        metrics.growth_ignored=metrics.growth_ignored+1;return
     end
-    local current = state(id)
-    if current.removed then return end
-    -- Only defer UI projection. Growth counters and combat attributes have
-    -- already changed synchronously; read their newest values when flushing.
-    schedule_publish(id, current, GROWTH_PUBLISH_INTERVAL)
+    changed(payload)
+end
+
+local function equipment_growth_changed(payload)
+    if payload and(payload.reason=="normal_attack"or payload.reason=="legal_enemy_kill")then
+        metrics.growth_ignored=metrics.growth_ignored+1;return
+    end
+    changed(payload)
 end
 
 local function hero_summoned(payload)
@@ -225,7 +236,7 @@ local function hero_summoned(payload)
     if not valid_player(id) then return end
     local current = state(id)
     current.hero, current.removed = payload.unit, false
-    publish_immediately(id, "hero_summoned")
+    changed(payload)
 end
 
 local function hero_removed(payload)
@@ -243,6 +254,9 @@ end
 function M.init()
     for _, current in pairs(states) do cancel_pending(current) end
     states, generation = {}, generation + 1
+    local world=type(event_bus.get_generation)=="function"and event_bus.get_generation()or event_bus
+    if catalog_world~=world then catalog_world=world;catalog_cache={}end
+    metrics={full_reads=0,tooltip_builds=0,table_writes=0,growth_ignored=0,stable_requests=0}
     local active_generation = generation
     publish_catalog()
     for name, handler in pairs({
@@ -253,7 +267,7 @@ function M.init()
         [events.WEAPON_EQUIPPED_CHANGED] = changed,
         [events.WEAPON_GROWTH_CHANGED] = growth_changed,
         [events.EQUIPMENT_INSTANCE_CHANGED] = changed,
-        [events.EQUIPMENT_GROWTH_CHANGED] = changed,
+        [events.EQUIPMENT_GROWTH_CHANGED] = equipment_growth_changed,
         [events.WEAPON_SYNTHESIZED] = changed,
     }) do
         local callback = handler
@@ -261,6 +275,10 @@ function M.init()
             if generation == active_generation then callback(payload) end
         end)
     end
+end
+
+function M.inspect()
+    return copy(metrics)
 end
 
 return M

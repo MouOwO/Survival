@@ -136,4 +136,30 @@ local rejected,reason=gate_command(3,2,production);assert(not rejected and reaso
 assert(#gate_calls==0);assert(gate_command(7,2,production));assert(#gate_calls==1)
 assert(not gate_command(7,2,production));assert(#gate_calls==1,'duplicate fragments cannot execute again')
 gate.reset()
+local private_calls={}
+local private=transport.new({lookup=lookup,budget=budget,player=function()return handles[0]end,
+ authorize=function()return true end,session_token=function()return 1500 end,
+ after=function()end,cancel=function()end,emit=function()return true end})
+for view,expected in pairs({[9]='payment_capability',[10]='public_beta_claim'})do
+ private.register_view(view,{snapshot=function()return{}end,intent=function(_,action,args)
+  assert(action==expected and args.arg_a==nil and args.arg_b==nil and args.arg_c==nil)
+  assert(args.session_token==1500);private_calls[#private_calls+1]=action;return true
+ end})
+end
+assert(private.receive(0,assert(wire.encode_resync(schema,bootstrap,0,1))))
+local function private_command(view,revision,ops)
+ local b={schema=1,schema_sha256=lookup.sha256,session=1500,epoch=1,view=view}
+ local result,why;for _,p in ipairs(assert(wire.encode(schema,b,revision,ops,{full=true})))do result,why=private.receive(0,p)end
+ return result,why
+end
+for _,view in ipairs({9,10})do assert(private_command(view,1,{{record=control,field=fields.visible,value=true}}))end
+local function private_intent(code,extra)
+ local ops={{record=control,field=fields.action_code,value=code},{record=control,field=fields.request_token,value=1}}
+ if extra then ops[#ops+1]={record=control,field=fields.arg_a,value=2}end
+ return ops
+end
+local accepted,reason=private_command(9,2,private_intent(13));assert(not accepted and reason=='view_intent_not_allowed')
+accepted,reason=private_command(10,2,private_intent(13,true));assert(not accepted and reason=='intent_arguments_forbidden')
+assert(#private_calls==0);assert(private_command(9,3,private_intent(12)));assert(private_command(10,3,private_intent(13)))
+assert(#private_calls==2);private.reset()
 print("COMPACT_RUNTIME_SYNTHETIC_PASS: measured49-byte boundary, exact SHA hello, authorized numeric intents, ordered per-view tx,1000 idle updates0sends/timers,close cancellation,probe,disconnect/reset")

@@ -10,6 +10,7 @@ local web_auth = require("systems/player_web_auth")
 local M = {}
 local busy, orders, resets, catalogs, bindings = {}, {}, {}, {}, {}
 local serial, initialized = 0, false
+local initialized_generation, compact_capability
 local WEB_BASE = "https://pay.xiaofengnet.com/ws4-web"
 local ONLINE_ACTIONS = {catalog=true,create=true,status=true,cancel=true}
 local function session_id() return require("systems/match_setup_service").get_session_id() end
@@ -75,6 +76,11 @@ end
 local function correlation(value)
     return type(value) == "string" and #value > 0 and #value <= 96
         and value:match("^[a-zA-Z0-9_%-]+$") and value or nil
+end
+local function world_generation() return bus.get_generation and bus.get_generation() or bus end
+local function compact_bound(id)
+    local transport = package.loaded["ui/compact_ui_transport"]
+    return transport and transport.is_bound and transport.is_bound(id) == true
 end
 -- Catalog membership and all prices/rewards are checked by the payment server.
 local function valid_sku(sku)
@@ -309,12 +315,22 @@ end
 function M.publish_capability(id, request_id)
     local bound=binding_for(id)
     if not bound then return false end
+    local route=bound.capability_delivery
+    if not route then return false end
+    if route.kind=="legacy" and (route.player~=bound.player or compact_bound(id))then
+        bound.capability_serial=bound.capability_serial+1
+        bound.capability_request,bound.capability_delivery=nil,nil
+        return false
+    end
     bound.capability_serial=bound.capability_serial+1
     local generation=bound.capability_serial
     request_id=correlation(request_id)
     bound.capability_request=request_id
     local function publish(enabled)
         if not current(bound) or bound.capability_serial~=generation then return end
+        local delivery=bound.capability_delivery
+        if delivery and delivery.kind=="compact" then return delivery.send(enabled==true) end
+        if not delivery or delivery.player~=bound.player or compact_bound(id) then return end
         CustomGameEventManager:Send_ServerToPlayer(bound.player,"survival_payment_capability",{
             enabled=enabled==true, account_id=bound.account, match_session_id=bound.session,
             player_id=id, request_id=request_id,
@@ -333,6 +349,14 @@ function M.publish_capability(id, request_id)
     local ok=pcall(web_auth.resolve,bound.account,bound.session,ready,function()settled=true;publish(false)end)
     if not ok or not settled then publish(false) end
     return ok
+end
+local function evaluate_compact_capability(id, token, deliver)
+    local bound=binding_for(id)
+    if not bound or type(deliver)~="function" then return false end
+    bound.capability_delivery={kind="compact",send=deliver}
+    -- An internal correlation for the unchanged capability evaluator only.
+    -- It never crosses the wire or substitutes for account/match authority.
+    return M.publish_capability(id,"payment_compact_"..bound.generation.."_"..token)
 end
 function M.handle(source, payload)
     local id=actor(source)
@@ -407,27 +431,37 @@ function M.open_pass_checkout(id, selection, done)
     return finish(true,"请核对月卡价格并选择支付方式")
 end
 function M.init()
-    if initialized then return end
+    local expected=world_generation()
+    if initialized and initialized_generation==expected then return end
+    if compact_capability then compact_capability.dispose();compact_capability=nil end
+    if initialized then busy,orders,resets,catalogs,bindings={},{},{},{},{} end
     initialized=true
+    initialized_generation=expected
+    local function live() return initialized_generation==expected and world_generation()==expected end
+    local function guarded(fn) return function(...)if live()then return fn(...)end end end
     require("systems/commerce_service").init()
     require("systems/archive_service").set_purchase_provider(cash_policy.real_money_allowed()
         and {open_checkout=M.open_pass_checkout} or nil)
-    CustomGameEventManager:RegisterListener("survival_payment_request",M.handle)
-    CustomGameEventManager:RegisterListener("survival_payment_capability_request",function(source,payload)
+    CustomGameEventManager:RegisterListener("survival_payment_request",guarded(M.handle))
+    CustomGameEventManager:RegisterListener("survival_payment_capability_request",guarded(function(source,payload)
         local id=actor(source)
-        if id~=nil and type(payload)=="table" then M.publish_capability(id,payload.request_id) end
-    end)
-    bus.subscribe(events.PLAYER_DISCONNECTED,function(payload)
+        if id~=nil and type(payload)=="table" and not compact_bound(id) then
+            local bound=binding_for(id)
+            if bound then bound.capability_delivery={kind="legacy",player=bound.player};M.publish_capability(id,payload.request_id)end
+        end
+    end))
+    bus.subscribe(events.PLAYER_DISCONNECTED,guarded(function(payload)
         local id=payload and tonumber(payload.player_id)
         if id then clear_binding(id) end
-    end)
-    bus.subscribe(events.PLAYER_PROFILE_CHANGED,function(payload)
+    end))
+    bus.subscribe(events.PLAYER_PROFILE_CHANGED,guarded(function(payload)
         local id=payload and tonumber(payload.player_id)
         local bound=id and bindings[id]
         if bound and bound.capability_request then M.publish_capability(id,bound.capability_request) end
-    end)
+    end))
     if type(ListenToGameEvent)=="function" then
         local function connection_changed(payload)
+            if not live()then return end
             local id=type(payload)=="table" and tonumber(payload.PlayerID or payload.playerid) or nil
             local players=package.loaded["systems/multiplayer_player_service"]
             if not id and players and type(players.resolve_player_id)=="function" then
@@ -443,6 +477,12 @@ function M.init()
         end
         ListenToGameEvent("player_disconnect",connection_changed,nil)
         ListenToGameEvent("player_connect_full",connection_changed,nil)
+    end
+    local lookup=require("config/generated/ui_static_catalog_lookup")
+    if lookup.by_key["payment:capability"]then
+        compact_capability=assert(require("ui/compact_payment_capability").new({lookup=lookup,
+            transport=require("ui/compact_ui_transport"),scope=binding_for,scope_current=current,
+            current=live,evaluate=evaluate_compact_capability}))
     end
     require("debug/payment_test_commands").init()
 end

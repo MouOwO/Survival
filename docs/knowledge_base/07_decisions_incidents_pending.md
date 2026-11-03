@@ -1,5 +1,9 @@
 # 07｜关键决策、事故与未完成事项
 
+**2026-11-03 用户最新范围决定：高频同步≤50B，其他按总流量优化。** 此决定替代之前所有rare启动／通知均拆到50B的广泛目标，历史实测和未通过边界原样保留。继续收口payment高频、Beta静态化、gen4/native与完整发行；未知地图27KB／旧4.8KB留专门大数据优化，常见template候选路径优先，不以小碎片冒充总流量降低。仍须完整pending动态build／ledger／validators／authority，不能回到固定9文件或把Git推送称已同步游廊。见[用户决定与真实边界](evidence/network50_dev07_native_fps_20261103.md)。
+
+**2026-11-03 Dev07已取得有效无遮挡30秒测量，仍仅本地更新。** cw94帧／4576B／最大49B，旧VIP和英雄大包为0；全部观察事件≤1500B，但payment/Beta等9类仍>50B。N1前台样本v2平均60.000356FPS／P95 16.799335ms，v1 P95 16.947880ms／最大30.3278ms，≥33.33ms为0；capture有效但engineering_gate=false，不冒称16.7ms阈值通过。Dev06因区间PLAYER_DEFEAT重新判无效；Dev07首段gift弹窗只算overlay。尚无ordinary／online／四人或完整发行验收。见[真实证据、来源与限制](evidence/network50_dev07_native_fps_20261103.md)。
+
 **2026-11-03 严格Git gen3已生成，仍仅本地更新。** 输入game/operator8a48c567、content14c562b9、历史atlas0056；新schema26f90098…，11代／7932记录／186字段，旧7887ID／163字段完整保留。220game／4operator／6参考来源全入manifest；真runtime ID生产Lua／Node5、wire15／runtime16、VIP／worker重测通过。官方编译及最终产物提交由主操作者另记，新native／FPS与完整发行仍待，正式0104／本轮后台保持。见[gen3来源、精确摘要与未完项](evidence/network50_production_vip_phase3_20261103.md)。
 
 **2026-11-03 phase3仍仅本地更新，后台未改。** 生产view7恢复训练／研究／队列，VIP view8只传真实等级，英雄旧无消费者大包按订阅发送，Beta取消未就绪重复请求，工人容量真实变化触发刷新。24目录／12编译工具／5生产draft／22Beta及VIP边界通过；32官方编译由主操作者报告。当前实际目录仍fe1718，计划7932记录／186字段须新source冻结后严格Git生成；未新native／FPS，剩余legacy并未全部≤50 B，正式0104和完整发行待办保持。见[phase3真实范围、成本与待办](evidence/network50_production_vip_phase3_20261103.md)。

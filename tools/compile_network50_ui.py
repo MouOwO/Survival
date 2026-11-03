@@ -13,19 +13,23 @@ CONTENT=ENGINE.parent/'content/dota_addons/Survival'
 COMPILER=ENGINE/'bin/win64/resourcecompiler.exe'
 REPORT=ROOT/'output/network50_compile_20261103'
 SOURCES=(
- 'common/ui_static_catalog.js','common/compact_wire.js','common/compact_ui_runtime.js',
+ 'common/ui_static_catalog.js','common/compact_wire.js','common/compact_grid_bulk_wire.js','common/compact_ui_runtime.js',
  'common/compact_archive_model.js','common/compact_daily_model.js',
  'common/compact_hud_model.js','common/compact_hud_source.js','common/compact_lottery_model.js',
- 'common/compact_grid_model.js','common/compact_selected_model.js','common/compact_production_model.js','common/network50_diagnostics.js',
+ 'common/compact_grid_model.js','common/compact_selected_model.js','common/compact_production_model.js','common/compact_public_beta_model.js','common/network50_diagnostics.js',
  'common/lottery_cache.js','common/purple_shell.js',
  'archive_180de7e38b_titles_compact_v6.js','archive_v10.js','collection_gw2.js',
  'daily_remaining_5d5c1152eb.js','lottery_ui_remaining_5d5c1152eb.js',
  'survival_ui.js','topnav_remaining_5d5c1152eb.js',
- 'survival_grid_placement.js','survival_grid_state.js','combat_stats.js','production_progress.js','public_beta_gift.js','vip_window.js',
+ 'survival_grid_placement.js','survival_grid_state.js','combat_stats.js','inventory_tooltip.js','production_progress.js','public_beta_gift.js','vip_window.js','payment_capability.js',
  'lottery_cinematic_v1.js','lottery_gw2.js',
 )
-LAYOUTS=('survival_hud.xml','archive.xml','survival_grid_placement.xml')
-DEPENDENCIES=SOURCES[:8]+('common/compact_grid_model.js','common/compact_selected_model.js','common/compact_production_model.js','common/network50_diagnostics.js')
+LAYOUTS=('survival_hud.xml','archive.xml','survival_grid_placement.xml','payment_test.xml')
+CORE_DEPENDENCIES=('common/ui_static_catalog.js','common/compact_wire.js','common/compact_grid_bulk_wire.js','common/compact_ui_runtime.js')
+DEPENDENCIES=CORE_DEPENDENCIES+('common/compact_archive_model.js','common/compact_daily_model.js',
+ 'common/compact_hud_model.js','common/compact_hud_source.js','common/compact_lottery_model.js',
+ 'common/compact_grid_model.js','common/compact_selected_model.js','common/compact_production_model.js',
+ 'common/compact_public_beta_model.js','common/network50_diagnostics.js')
 sha=lambda raw:hashlib.sha256(raw).hexdigest()
 def need(ok,why):
     if not ok:raise ValueError(why)
@@ -74,7 +78,8 @@ def main():
             for source in DEPENDENCIES:
                 pattern=r'<include\s+src="file://\{resources\}/scripts/custom_game/'+re.escape(source)+r'"\s*/>'
                 text=re.sub(pattern,'',text)
-            includes='\n'+''.join('        <include src="file://{resources}/scripts/custom_game/'+source+'" />\n' for source in DEPENDENCIES)
+            selected_dependencies=CORE_DEPENDENCIES if name=='payment_test.xml' else DEPENDENCIES
+            includes='\n'+''.join('        <include src="file://{resources}/scripts/custom_game/'+source+'" />\n' for source in selected_dependencies)
             text=text.replace('<scripts>','<scripts>'+includes,1)
             text=re.sub(r'(?m)^[ \t]+$','',text)
             text=re.sub(r'\n{3,}','\n\n',text)

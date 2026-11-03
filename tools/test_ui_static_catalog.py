@@ -37,16 +37,18 @@ class StaticCatalogTests(unittest.TestCase):
         cls.source = ReviewedInputFixture((*PUBLIC_SOURCES,"scripts/vscripts/ui/selected_stats_schema.lua",
                                           "data/ui/grid_static_atlas_candidate_20261103.json"))
         cls.operator = ReviewedInputFixture(("tools/selected_stats_static_seed.lua","tools/production_ui_static_seed.lua",
+                                             "tools/public_beta_ui_static_seed.lua",
                                              "tools/extract_grid_static_atlas_20261103.py"))
         cls.outputs, cls.registry = m.build(cls.source, CONTENT, LUA, operator=cls.operator, atlas_reference=cls.reference)
         cls.records, cls.auxiliary = m.make_catalog(cls.source, LUA, cls.operator, cls.reference)
         cls.by_key = {row["key"]: row for row in cls.registry["records"]}
 
     def test_real_three_domains_and_public_configuration_coverage(self):
-        self.assertEqual(len(self.registry["records"]), 7932)
+        self.assertEqual(len(self.registry["records"]), 7935)
         manifest = json.loads(self.outputs[m.MANIFEST_PATH])
         self.assertEqual(manifest["domain_counts"], {"archive": 1146, "daily": 75, "lottery": 83, "hud": 1, "wire": 9,
-                                                   "grid": 4390, "selected": 2183, "production":44, "vip":1})
+                                                   "grid": 4390, "selected": 2183, "production":44, "vip":1,
+                                                   "payment":1, "public_beta":2})
         self.assertTrue(manifest["csv_runtime_config_rows_equal"])
         self.assertFalse(manifest["runtime_connected"])
         self.assertFalse(manifest["workshop_uploaded"])
@@ -138,7 +140,7 @@ class StaticCatalogTests(unittest.TestCase):
         m.validate_registry(old)
         updated = m.update_registry(self.records, old)
         self.assertEqual(updated["fields"][:22], old["fields"])
-        self.assertEqual(len(updated["fields"]), 186)
+        self.assertEqual(len(updated["fields"]), 188)
         self.assertEqual(updated["generation"], 2)
 
     def test_grid_static_profiles_maps_and_capacity_have_no_invented_terrain(self):
@@ -303,7 +305,46 @@ class StaticCatalogTests(unittest.TestCase):
         row=self.records["vip:state"]
         self.assertEqual((row["domain"],row["kind"],row["business_id"]),("vip","state","state"))
         self.assertEqual(row["definition"],{})
-        self.assertEqual(len(self.registry["fields"]),186)
+        self.assertEqual(len(self.registry["fields"]),188)
+
+    def test_payment_and_beta_records_keep_actual_display_metadata_only(self):
+        row=self.records["payment:capability"]
+        self.assertEqual((row["domain"],row["kind"],row["business_id"]),("payment","capability","capability"))
+        self.assertEqual(row["definition"],{})
+        beta=self.auxiliary["public_beta"]
+        self.assertEqual(beta["ticket_id"],"special_lottery_ticket")
+        self.assertEqual(beta["ticket_count"],int(beta["config"]["base_counts"][0]))
+        self.assertEqual(beta["config"]["base_item_ids"],[beta["ticket_id"]])
+        self.assertEqual(beta["config"]["reward_id"],beta["tier_id"])
+        self.assertEqual(beta["errors"],["","claim_failed"])
+        self.assertEqual(beta["failure_notice"],"领取未完成，请重试")
+        self.assertFalse({"active","eligible","claimed","revision","day_key","account_id","session_id"}.intersection(beta))
+        for kind in ("state","receipt"):
+            row=self.records["public_beta:"+kind]
+            self.assertEqual((row["domain"],row["kind"],row["business_id"]),("public_beta",kind,kind))
+
+    def test_public_beta_real_config_drift_rejects_fixed_old_dto(self):
+        original=self.source
+        class ChangedReward:
+            def read(self,path):
+                raw=original.read(path)
+                if path=="scripts/vscripts/config/generated/archive_benefit_rewards.lua":
+                    assert raw.count(b"return M")==1
+                    return raw.replace(b"return M",b"M.by_id.public_beta_login.base_counts={'3'}\nreturn M")
+                return raw
+        with self.assertRaises(subprocess.CalledProcessError)as caught:
+            m.public_beta_projection_seed(ChangedReward(),LUA,self.operator)
+        self.assertIn(b"beta_reward_count_changed",caught.exception.stderr)
+
+    def test_public_beta_revision_hi_and_error_codes_append_without_reusing_ids(self):
+        field=self.registry["fields"][-2]
+        self.assertEqual((field["id"],field["name"],field["max"],field["default"]),
+                         (187,"source_revision_hi",2097151,None))
+        flags=self.registry["fields"][-1]
+        self.assertEqual((flags["id"],flags["name"],flags["max"],flags["default"]),(188,"public_beta_flags",31,None))
+        candidate=copy.deepcopy(self.registry)
+        candidate["public_enums"]["public_beta_errors"][1]="changed_meaning"
+        with self.assertRaises(ValueError):m.validate_registry(candidate,self.registry)
 
     def test_public_csv_and_generated_runtime_drift_is_a_hard_failure(self):
         class ChangedSource:

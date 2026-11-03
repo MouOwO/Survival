@@ -12,7 +12,7 @@ function M.new(o)
  local factory=assert(require('ui/compact_grid_projection').new(lookup))
  local entries,capturing,scopes={},{},{}
  local scheduler=o.scheduler or require('core/scheduler')
- local backgrounds,delivered={},{}
+ local backgrounds,delivered,bulk_modes={},{},{}
  local restore_views={}
  local live=true
  local function active()return live and (not o.current or o.current())end
@@ -28,10 +28,51 @@ function M.new(o)
  end
  local function cancel_background(id)backgrounds[id]=nil;scheduler.cancel(task(id))end
  local function stage_static(id,state,ops)
-  cancel_background(id);delivered[id]={}
+  cancel_background(id);delivered[id]={};bulk_modes[id]=nil
   local F=lookup.field_by_name;local meta=lookup.by_key['grid:static:meta'];local base=0
   for _,op in ipairs(ops)do if op.record==meta and op.field==F.grid_atlas_base then base=op.value end end
   if base~=0 or #ops<=32 then remember(id,ops);return ops end
+  if transport.bulk_static_enabled and transport.bulk_static_enabled(id)and transport.publish_bulk_static then
+   local initial,words,metadata={},{},{}
+   for _,op in ipairs(ops)do local row=lookup.records[op.record]
+    if row and row.kind=='static_word'then if not op.remove then words[tonumber(row.business_id)]=op.value end
+    else
+     initial[#initial+1]={record=op.record,field=op.field,value=op.record==meta and op.field==F.grid_complete and 0 or op.value,remove=op.remove}
+     if op.record==meta then metadata[op.field]=op.value end
+    end
+   end
+   local cells=metadata[F.grid_width]*metadata[F.grid_height]
+   assert(cells>=1 and cells<=65536,'grid_bulk_cell_limit')
+   local length=math.ceil(cells/4);local bytes={}
+   for n=0,length-1 do local word=words[math.floor(n/4)+1]or 0;bytes[n+1]=string.char(math.floor(word/256^(n%4))%256)end
+   local raw=table.concat(bytes);initial[#initial+1]={record=meta,field=F.types,value=1}
+   local background={state=state,bulk=true,raw=raw,scope=metadata[F.grid_scope],attempts=0}
+   backgrounds[id]=background;bulk_modes[id]=true;remember(id,initial)
+   local function current()
+    return active()and backgrounds[id]==background and entries[id]and entries[id][6]==state and transport.is_open(id,6)
+   end
+   local function step()
+    if not current()then return end
+    background.attempts=background.attempts+1
+    if background.attempts>128 then backgrounds[id]=nil;print('[CompactGrid] bulk_binding_timeout');return end
+    if transport.queue_depth and transport.queue_depth(id,6)>0 then return 0.05 end
+    local binding=transport.bulk_binding(id)
+    if not binding or not binding.epoch or binding.epoch<1 or not binding.revision or binding.revision<1 then return 0.05 end
+    -- Every staged bitmap belongs to the preceding full metadata transaction
+    -- (R1). A real K delta may already have reached R2 while we waited for the
+    -- queue; it must overlay this original base rather than change its identity.
+    local epoch,revision=binding.epoch,1
+    local result,why=transport.publish_bulk_static(id,raw,background.scope,{epoch=epoch,base_revision=revision,on_complete=function()
+     if not current()then return end
+     local latest=transport.bulk_binding(id)
+     if not latest or latest.epoch~=epoch then return end
+     local final={{record=meta,field=F.grid_complete,value=1}}
+     remember(id,final);backgrounds[id]=nil;transport.publish(id,6,final,{priority=false})
+    end})
+    if not result then backgrounds[id]=nil;print('[CompactGrid] bulk_publish_rejected reason='..tostring(why))end
+   end
+   scheduler.after(0.05,step,task(id));return initial
+  end
   local initial,pending,order={},{},{}
   local background={state=state,pending=pending,order=order,cursor=1,priority={},priority_cursor=1,queued={}}
   for _,op in ipairs(ops)do
@@ -68,7 +109,7 @@ function M.new(o)
   scheduler.after(0.05,step,task(id));return initial
  end
  local function focus(id,x,y)
-  local bg=backgrounds[id];if not bg then return end;local F=lookup.field_by_name
+  local bg=backgrounds[id];if not bg or bg.bulk then return end;local F=lookup.field_by_name
   local size,h=bg[F.grid_size],bg[F.grid_height];if not size or not h then return end
   local gx,gy=math.floor(x/size),math.floor(y/size);local key=gx..':'..gy;if bg.focus==key then return end;bg.focus=key
   local ox,oy,w=bg[F.grid_origin_x],bg[F.grid_origin_y],bg[F.grid_width]
@@ -104,6 +145,15 @@ function M.new(o)
     if #operations>32 then
      operations=stage_static(id,state,state.full_ops());return transport.publish(id,6,operations,{full=true,priority=false})
     end
+    if bulk_modes[id]then
+     -- The bulk baseline is deliberately not thousands of cw receiver fields.
+     -- An absent cw field's remove is otherwise a no-op. Explicit zero keeps
+     -- the original bitmap semantics and makes it a real indexed delta.
+     local converted={};for _,op in ipairs(operations)do local row=lookup.records[op.record]
+      if op.remove and row and row.kind=='static_word'and op.field==lookup.field_by_name.grid_word then converted[#converted+1]={record=op.record,field=op.field,value=0}
+      else converted[#converted+1]=op end
+     end;operations=converted
+    end
     remember(id,operations)
    end
    return transport.publish(id,view,operations,{full=scope_reset,priority=event~='ui_grid_placement_static_area' and event~='ui_grid_placement_area'})
@@ -131,10 +181,11 @@ function M.new(o)
   if view==6 and #operations==0 then operations=assert(entries[id][view].ingest('ui_grid_placement_static_area',{area='',grid_scope_version=scopes[id]or 1}))end
   return view==6 and stage_static(id,entries[id][view],operations)or operations
  end
- transport.register_view(6,{open=function(id)return open(id,6)end,snapshot=function(id)
+ transport.register_view(6,{bulk_static=true,open=function(id)return open(id,6)end,snapshot=function(id)
   if not active()then return nil end
+  if bulk_modes[id]and entries[id]and entries[id][6]then return stage_static(id,entries[id][6],entries[id][6].full_ops())end
   return entries[id] and entries[id][6] and delivered_ops(id)or open(id,6)
- end,close=function(id)cancel_background(id);delivered[id]=nil;if entries[id]then entries[id][6]=nil end;if o.close_static then o.close_static(id)end;return true end})
+ end,close=function(id)cancel_background(id);delivered[id]=nil;bulk_modes[id]=nil;if entries[id]then entries[id][6]=nil end;if o.close_static then o.close_static(id)end;return true end})
  transport.register_view(4,{open=function(id)return open(id,4)end,snapshot=function(id)
   if not active()then return nil end
   return entries[id] and entries[id][4] and entries[id][4].full_ops() or open(id,4)
@@ -159,10 +210,10 @@ function M.new(o)
   -- independent uint32 counters and never consume reward/payment nonce space.
   return o.dispatch(EVENTS[action],payload,revision)
  end})
- function api.dispose()if not live then return end;live=false;for id in pairs(backgrounds)do cancel_background(id)end;entries,capturing,delivered={},{},{}end
+ function api.dispose()if not live then return end;live=false;for id in pairs(backgrounds)do cancel_background(id)end;entries,capturing,delivered,bulk_modes={},{},{},{}end
  function api.reset()
   restore_views={};for id in pairs(entries)do restore_views[id]={[4]=transport.is_open(id,4),[6]=transport.is_open(id,6)}end
-  for id in pairs(backgrounds)do cancel_background(id)end;entries,capturing,delivered,scopes={},{},{},{}
+  for id in pairs(backgrounds)do cancel_background(id)end;entries,capturing,delivered,scopes,bulk_modes={},{},{},{},{}
  end
  function api.restore()
   local pending=restore_views;restore_views={}

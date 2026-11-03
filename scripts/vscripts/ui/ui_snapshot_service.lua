@@ -134,7 +134,7 @@ function M.init()
     if compact.available() then
         local lookup = require("config/generated/ui_static_catalog_lookup")
         compact_factory = require("ui/compact_hud_projection").new(lookup)
-        compact.register_view(2, {snapshot=compact_full,
+        compact.register_view(2, {snapshot=compact_full,open=function(id)remember_player(id);return compact_full(id)end,
             close=function(player_id) compact_players[player_id]=nil end})
     else compact_factory = nil end
     event_bus.subscribe(events.UI_DIRTY, on_dirty)
@@ -146,7 +146,11 @@ function M.init()
     event_bus.subscribe(events.HERO_READY, ready)
     event_bus.subscribe(events.BUILDER_READY, ready)
     event_bus.subscribe(events.PLAYER_DISCONNECTED, function(payload)
-        if compact_players then compact_players[tonumber(payload.player_id)] = nil end
+        local id=tonumber(payload and payload.player_id);if not id then return end
+        if compact_players then compact_players[id] = nil end
+        local team=recipients[id]
+        if team and recipients_by_team[team]then recipients_by_team[team][id]=nil end
+        recipients[id],legacy_players[id],dirty_players[id]=nil,nil,nil
     end)
     on_dirty({})
 end

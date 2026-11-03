@@ -12,11 +12,14 @@ local function record(lookup,key)
 end
 local ACTIONS={[1]="daily_claim",[2]="benefit_claim",[3]="pass_purchase",
     [4]="lottery_draw",[5]="archive_title",[6]="archive_action",[7]="lottery_read",
-    [8]="production_train",[9]="production_research",[10]="production_auto",[11]="production_cancel"}
+    [8]="production_train",[9]="production_research",[10]="production_auto",[11]="production_cancel",
+    [12]="payment_capability",[13]="public_beta_claim"}
 local function action_view(code,view)
     if code<=3 then return view==3 end
     if code==4 or code==7 then return view>=201 and view<=204 end
     if code==5 or code==6 then return view>=101 and view<=120 end
+    if code==12 then return view==9 end
+    if code==13 then return view==10 end
     return code>=8 and code<=11 and view==7
 end
 
@@ -31,7 +34,8 @@ function M.new(options)
     local budget_started,budget_work,budget_background,budget_cpu=nil,0,0,0
     local budget_initialized=false
     local queues={{},{}}
-    local statistics={frames=0,native_bytes=0,max_native_bytes=0,transactions=0,rejected=0,drains=0}
+    local statistics={frames=0,native_bytes=0,max_native_bytes=0,transactions=0,rejected=0,drains=0,
+        bulk_frames=0,bulk_value_bytes=0,bulk_max_value_bytes=0}
     local api={}
     local function binding(state,view,epoch)
         return {schema=1,schema_sha256=lookup.sha256,session=state.session,epoch=epoch or 1,view=view}
@@ -90,16 +94,33 @@ function M.new(options)
                 invalidate(job.view);job.view.needs_full=true
             elseif job.active then
                 local packet=job.packets[job.next]
-                local sent=wire.production_send(packet,proof,options.budget.engine_build,function(event,value)
-                    return options.emit(job.owner.id,event,value)
-                end,options.budget.networksystem_sha256)
+                local sent
+                if job.bulk then
+                    local ok,result=pcall(options.emit,job.owner.id,"gb",packet)
+                    if ok and result~=false then sent={bulk=true}end
+                else
+                    sent=wire.production_send(packet,proof,options.budget.engine_build,function(event,value)
+                        return options.emit(job.owner.id,event,value)
+                    end,options.budget.networksystem_sha256)
+                end
                 if own_generation~=generation then break end
                 if not sent then
-                    job.active=false;job.view.needs_full=true;statistics.rejected=statistics.rejected+1
+                    -- A failed first job must not retain an inactive queue
+                    -- head that strands every later transaction for this view.
+                    invalidate(job.view);job.view.needs_full=true;statistics.rejected=statistics.rejected+1
                 else
-                    statistics.frames=statistics.frames+1
-                    statistics.native_bytes=statistics.native_bytes+sent.native_message_bytes
-                    statistics.max_native_bytes=math.max(statistics.max_native_bytes,sent.native_message_bytes)
+                    if sent.bulk then
+                        -- gb is rare first-load bitmap data, not part of the
+                        -- calibrated49-byte cw budget. Record real value size;
+                        -- its native envelope requires separate engine proof.
+                        statistics.bulk_frames=statistics.bulk_frames+1
+                        statistics.bulk_value_bytes=statistics.bulk_value_bytes+#packet.d
+                        statistics.bulk_max_value_bytes=math.max(statistics.bulk_max_value_bytes,#packet.d)
+                    else
+                        statistics.frames=statistics.frames+1
+                        statistics.native_bytes=statistics.native_bytes+sent.native_message_bytes
+                        statistics.max_native_bytes=math.max(statistics.max_native_bytes,sent.native_message_bytes)
+                    end
                     job.next=job.next+1
                     if job.next<=#job.packets then push(job,job.priority)
                     else
@@ -109,6 +130,10 @@ function M.new(options)
                         local keep={};for _,pending in ipairs(job.view.jobs)do if pending.active then keep[#keep+1]=pending end end
                         job.view.jobs=keep
                         if keep[1]then push(keep[1],keep[1].priority)end
+                        if job.on_complete and job.view.open and job.view.epoch==job.epoch and current(job.owner)then
+                            local ok=pcall(job.on_complete)
+                            if not ok then job.view.needs_full=true;statistics.rejected=statistics.rejected+1 end
+                        end
                     end
                 end
             end
@@ -183,6 +208,7 @@ function M.new(options)
     function api.register_view(id,handler)
         need(type(id)=="number" and id>=2 and id<=16383 and not handlers[id],"unique_compact_view_required")
         need(type(handler)=="table" and type(handler.snapshot)=="function","compact_snapshot_provider_required")
+        if handler.bulk_static~=nil then need(id==6 and handler.bulk_static==true,"bulk_static_view_not_allowed")end
         if handler.input then
             local prefix=id==4 and "grid"or id==5 and "selected"or id==7 and "production"or nil
             need(prefix~=nil,"typed_input_view_not_allowed")
@@ -220,6 +246,38 @@ function M.new(options)
         local state=state_for(id,false)
         local view=state and state.views[view_id]
         return view and #view.jobs or 0
+    end
+    function api.bulk_binding(id)
+        local state=state_for(id,false);local view=state and state.views[6]
+        if not view or not view.open or not view.bulk_static or view.epoch<1 then return nil end
+        local result=binding(state,6,view.epoch);result.revision=view.revision;result.base_revision=view.revision
+        return result
+    end
+    function api.bulk_static_enabled(id)
+        local state=state_for(id,false);local view=state and state.views[6]
+        return not not(view and view.open and view.bulk_static)
+    end
+    function api.publish_bulk_static(id,raw,scope,settings)
+        settings=settings or{}
+        local state=state_for(id,false);local view=state and state.views[6]
+        if not view or not view.open or not view.bulk_static or not handlers[6]or not handlers[6].bulk_static then return nil,"bulk_static_not_negotiated"end
+        if settings.epoch~=view.epoch or type(settings.base_revision)~="number" or settings.base_revision%1~=0
+            or settings.base_revision<1 or settings.base_revision>view.revision then return nil,"bulk_static_stale_base"end
+        if #view.jobs>=8 then return nil,"bounded_view_queue_requires_full_resync"end
+        local context=binding(state,6,view.epoch);context.base_revision=settings.base_revision;context.revision=settings.base_revision
+        local packets,metrics=require('ui/compact_grid_bulk_wire').Encode(context,scope,raw)
+        if not packets then return nil,metrics end
+        need(#packets>=1 and #packets<=32,"bulk_static_frame_limit")
+        for _,packet in ipairs(packets)do
+            need(type(packet)=="table"and type(packet.d)=="string"and #packet.d<=896,"bulk_static_value_limit")
+            for key in pairs(packet)do need(key=="d","bulk_static_packet_key_unknown")end
+        end
+        need(settings.on_complete==nil or type(settings.on_complete)=='function','bulk_completion_callback_invalid')
+        local job={owner=state,view=view,packets=packets,next=1,priority=false,bulk=true,active=true,
+            epoch=view.epoch,on_complete=settings.on_complete}
+        view.jobs[#view.jobs+1]=job;if #view.jobs==1 then push(job,false)end
+        statistics.transactions=statistics.transactions+1;schedule()
+        return {queued=true,frames=#packets,epoch=view.epoch,base_revision=settings.base_revision,metrics=metrics}
     end
     function api.publish(id,view_id,ops,settings)
         settings=settings or {};local state=state_for(id,false)
@@ -292,6 +350,7 @@ function M.new(options)
             if change.record~=control or change.remove then incoming.abort();return nil,"control_record_required"end
             local allowed=change.field==fields.visible or change.field==fields.known or change.field==fields.action_code
                 or change.field==fields.arg_a or change.field==fields.arg_b or change.field==fields.arg_c or change.field==fields.request_token
+                or header.view==6 and handler.bulk_static and change.field==fields.types
             if not allowed then incoming.abort();return nil,"control_field_not_allowed"end
             values[change.field]=change.value
         end
@@ -299,6 +358,9 @@ function M.new(options)
             local code=values[fields.action_code]
             local action=ACTIONS[code]
             if not action or not action_view(code,header.view)or not handler.intent or not view.open then incoming.abort();return nil,"view_intent_not_allowed"end
+            if code>=12 and(values[fields.arg_a]~=nil or values[fields.arg_b]~=nil or values[fields.arg_c]~=nil)then
+                incoming.abort();return nil,"intent_arguments_forbidden"
+            end
             local token=values[fields.request_token]
             if not token or token<1 or token>16383 then incoming.abort();return nil,"intent_token_required"end
             incoming.commit(tx)
@@ -306,9 +368,14 @@ function M.new(options)
                 session_token=state.session})
             return result==nil and true or result
         end
+        if values[fields.types]~=nil and values[fields.types]~=0 and values[fields.types]~=1 then incoming.abort();return nil,"bulk_static_capability_invalid"end
         incoming.commit(tx)
-        if values[fields.visible]==true or values[fields.visible]==1 then return full_snapshot(state,header.view,true)end
+        if values[fields.visible]==true or values[fields.visible]==1 then
+            if header.view==6 then view.bulk_static=handler.bulk_static==true and values[fields.types]==1 end
+            return full_snapshot(state,header.view,true)
+        end
         view.open=false
+        view.bulk_static=false
         -- A closed panel must not continue draining its former full catalogue.
         -- Its next tiny hint or real Open starts a fresh atomic epoch instead.
         invalidate(view);view.revision=0;view.needs_full=false
@@ -333,6 +400,7 @@ end
 
 local default,failed,pending_views=nil,false,{}
 local world,listener=nil,nil
+local disconnect_bus,disconnect_subscription
 -- Never recycle an alias while this server Lua/module lifecycle can still have
 -- queued callbacks. A fresh server/network channel has a separate namespace.
 local next_session_alias=0
@@ -346,10 +414,12 @@ local function ensure_world()
     local current=bus and bus.get_generation and bus.get_generation()
     if world and current and current~=world then
         if default then default.reset()end
+        if disconnect_bus and disconnect_subscription then disconnect_bus.unsubscribe(disconnect_subscription)end
         if listener and CustomGameEventManager and type(CustomGameEventManager.UnregisterListener)=="function"then
             pcall(CustomGameEventManager.UnregisterListener,CustomGameEventManager,listener)
         end
         default,failed,pending_views,listener=nil,false,{},nil
+        disconnect_bus,disconnect_subscription=nil,nil
     end
     world=current or world
 end
@@ -395,6 +465,13 @@ local function instance()
             value.receive(id,{d=payload.d})
         end)
         for id,handler in pairs(pending_views)do value.register_view(id,handler)end
+        local bus=require('core/event_bus');local own=world
+        disconnect_bus=bus
+        disconnect_subscription=bus.subscribe(require('core/events').PLAYER_DISCONNECTED,function(payload)
+            if default~=value or world~=own then return end
+            local id=tonumber(payload and payload.player_id)
+            if id then value.disconnect(id)end
+        end)
         return value
     end)
     if ok then default=result;return result end
@@ -414,5 +491,9 @@ function M.publish(...)local value=instance();if value then return value.publish
 function M.is_open(...)local value=instance();return value and value.is_open(...)or false end
 function M.is_bound(...)local value=instance();return value and value.is_bound(...)or false end
 function M.queue_depth(...)local value=instance();return value and value.queue_depth(...)or 0 end
+function M.bulk_binding(...)local value=instance();return value and value.bulk_binding(...)or nil end
+function M.bulk_static_enabled(...)local value=instance();return value and value.bulk_static_enabled(...)or false end
+function M.publish_bulk_static(...)local value=instance();if value then return value.publish_bulk_static(...)end;return nil,'compact_runtime_unavailable'end
+function M.disconnect(id)ensure_world();if default then default.disconnect(id);return true end;return false end
 function M.inspect()local value=instance();return value and value.inspect()or{available=false}end
 return M

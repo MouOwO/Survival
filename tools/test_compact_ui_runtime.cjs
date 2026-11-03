@@ -6,12 +6,12 @@ const W=require("../panorama/src/scripts/custom_game/common/compact_wire.js"),AP
 const cfg={};vm.runInNewContext(fs.readFileSync("panorama/src/scripts/custom_game/common/ui_static_catalog.js","utf8"),{GameUI:{CustomUIConfig:()=>cfg}});
 const C=cfg.SurvivalUICatalog.Data,schema=W.CompileLookup(C,1),F=Object.fromEntries(C.fields.map(f=>[f.name,f.id])),R=Object.fromEntries(C.records.filter(r=>!r.tombstone).map(r=>[r.key,r.id]));
 let tests=0;function test(name,fn){fn();tests++;console.log("ok",name);}
-function setup({memo,admitted=false}={}){
- let loading=admitted?{admission_complete:1,profiles_ready:1,session_id:"survival_test_world_A"}:null,listener,loadListener,now=0,disposed=false;
- const sent=[],timers=[],rt=API.CreateRuntime({wire:W,catalogue:C,memo,send(name,p){assert.equal(name,"cw");assert.deepEqual(Object.keys(p),["d"]);assert.ok(p.d.length<=24);sent.push(p);return true;},
-  subscribe(name,fn){assert.equal(name,"cw");listener=fn;return 1;},unsubscribe(){disposed=true;},getLoading:()=>loading,subscribeLoading(fn){loadListener=fn;return 2;},unsubscribeLoading(){},
+function setup({memo,admitted=false,bulk}={}){
+ let loading=admitted?{admission_complete:1,profiles_ready:1,session_id:"survival_test_world_A"}:null,listener,bulkListener,loadListener,now=0,disposed=false;
+ const sent=[],timers=[],rt=API.CreateRuntime({wire:W,bulk,catalogue:C,memo,send(name,p){assert.equal(name,"cw");assert.deepEqual(Object.keys(p),["d"]);assert.ok(p.d.length<=24);sent.push(p);return true;},
+  subscribe(name,fn){if(name==='gb'){assert.ok(bulk);bulkListener=fn;return 3;}assert.equal(name,"cw");listener=fn;return 1;},unsubscribe(){disposed=true;},getLoading:()=>loading,subscribeLoading(fn){loadListener=fn;return 2;},unsubscribeLoading(){},
   now:()=>now,schedule(ms,fn){const t={ms,fn,canceled:false};timers.push(t);return t;},cancel(t){t.canceled=true;}});
- return {rt,sent,timers,admit(value={admission_complete:1,profiles_ready:1,session_id:"survival_test_world_A"}){loading=value;loadListener();},receive(p){listener(p);},feed(ps){ps.forEach(listener);},advance(ms){now+=ms;for(const t of timers.splice(0))if(!t.canceled)t.fn();},isDisposed:()=>disposed};
+ return {rt,sent,timers,admit(value={admission_complete:1,profiles_ready:1,session_id:"survival_test_world_A"}){loading=value;loadListener();},receive(p){listener(p);},receiveBulk(p){assert.ok(bulkListener);bulkListener(p);},feed(ps){ps.forEach(listener);},advance(ms){now+=ms;for(const t of timers.splice(0))if(!t.canceled)t.fn();},isDisposed:()=>disposed};
 }
 function binding(session=900,view=3,epoch=1){return {schema:1,schema_sha256:C.sha256,session,epoch,view};}
 function encode(ops,{session=900,view=3,epoch=1,revision=1,full=true}={}){return W.Encode(schema,binding(session,view,epoch),revision,ops,{full}).packets;}
@@ -151,5 +151,51 @@ test("production consumes separate monotonic tokens and cannot use another view"
  for(const packet of t.sent){const h=W.PeekHeader(packet);if(h.view!==7)continue;assert.equal(h.full,true);const tx=rx.Accept(packet);if(tx.pending)continue;rx.Commit(tx);const token=tx.changes.find(c=>c.field===F.request_token);if(token){operations++;assert.equal(token.value,operations);}}
  assert.equal(operations,4);assert.ok(t.sent.every(packet=>packet.d.length<=24));
  p.Close();assert.equal(p.SendIntent("production_train",args).error,"not_ready");
+});
+test("capability and beta claims use separate typed views with no client reward/account arguments",()=>{
+ const t=setup({admitted:true}),p=t.rt.CreateView("payment",{}),b=t.rt.CreateView("public_beta",{});
+ p.Open();b.Open();assert.equal(t.rt.ScopeIdentity().loading_identity,"survival_test_world_A");
+ assert.equal(t.rt.ScopeIdentity().ready,false);t.feed(hello());
+ assert.equal(t.rt.ScopeIdentity().session,900);assert.equal(t.rt.ScopeIdentity().ready,true);
+ assert.equal(p.SendIntent("payment_capability",{}).request_token,1);
+ assert.equal(b.SendIntent("public_beta_claim",{}).request_token,2);
+ assert.equal(p.SendIntent("public_beta_claim",{}).error,"action_view_mismatch");
+ assert.equal(b.SendIntent("payment_capability",{}).error,"action_view_mismatch");
+ for(const args of [{quantity:2},{day:1},{account_id:3},{arg_a:1}])assert.equal(b.SendIntent("public_beta_claim",args).error,"intent_arguments_forbidden");
+ assert.equal(t.rt.Inspect().intent_token,2,"invalid inputs never reserve business tokens");
+ t.admit({admission_complete:0,profiles_ready:0,session_id:"survival_world_B"});assert.equal(t.rt.ScopeIdentity().ready,false);
+ assert.equal(p.SendIntent('payment_capability',{}).error,'not_ready','a prior alias cannot authorize requests during an unready transition');
+ t.admit({admission_complete:1,profiles_ready:1,session_id:"survival_world_B"});
+ assert.equal(t.rt.ScopeIdentity().loading_identity,"survival_world_B");assert.equal(t.rt.ScopeIdentity().ready,false,'new namespace still requires a fresh Hello');
+});
+test("destroying the actual subscription owner retires the shared runtime before HUD recreation",()=>{
+ const source=fs.readFileSync('panorama/src/scripts/custom_game/common/compact_ui_runtime.js','utf8');
+ const cfg={SurvivalCompactWire:W,SurvivalUICatalog:{Data:C}},callbacks=[];let subscriptions=0,unsubscribed=0;
+ function load(){const owner={IsValid:()=>true};vm.runInNewContext(source,{GameUI:{CustomUIConfig:()=>cfg},
+  GameEvents:{Subscribe(){subscriptions++;return subscriptions;},Unsubscribe(){unsubscribed++;},SendCustomGameEventToServer(){}},
+  CustomNetTables:{GetTableValue:()=>null,SubscribeNetTableListener:()=>1,UnsubscribeNetTableListener(){}},
+  $:{GetContextPanel:()=>owner,RegisterEventHandler(event,panel,fn){assert.equal(event,'PanelDeleted');assert.equal(panel,owner);callbacks.push(fn);},Schedule:()=>1,CancelScheduled(){}},Game:{}});}
+ load();const old=cfg.SurvivalCompactRuntime,view=old.CreateView('daily',{});load();assert.equal(cfg.SurvivalCompactRuntime,old);
+ assert.equal(subscriptions,1);callbacks[0]();assert.equal(old.Inspect().active,false);assert.equal(view.Inspect().active,false);assert.equal(unsubscribed,1);
+ load();assert.notEqual(cfg.SurvivalCompactRuntime,old);assert.equal(subscriptions,2);callbacks[0]();assert.equal(cfg.SurvivalCompactRuntime.Inspect().active,true,'old panel callback cannot dispose replacement');
+});
+test("infrequent grid bulk is negotiated, bound to metadata and cancelled independently of short cw",()=>{
+ const B=require('../panorama/src/scripts/custom_game/common/compact_grid_bulk_wire.js');
+ const t=setup({admitted:true,bulk:B}),completed=[];
+ const view=t.rt.CreateView('grid_static',{acceptBulk:h=>h.scope===7&&h.base_revision===1,onBulk:(h,raw)=>completed.push({h,raw})});
+ view.Open();t.feed(hello());
+ const meta=[{record:R['grid:static:meta'],field:F.known,value:1},{record:R['grid:static:meta'],field:F.grid_scope,value:7}];
+ t.feed(encode(meta,{view:6}));
+ const raw=String.fromCharCode(0x55).repeat(2304),make=(epoch=1,scope=7,session=900)=>B.Encode({...binding(session,6,epoch),base_revision:1},scope,raw).packets;
+ const packets=make();assert.equal(packets.length,4);assert.ok(packets.every(p=>p.d.length<=896));
+ make(1,8).forEach(t.receiveBulk);make(1,7,901).forEach(t.receiveBulk);assert.equal(completed.length,0);
+ t.receiveBulk(packets[0]);assert.ok(t.timers.some(timer=>timer.ms===5000&&!timer.canceled));
+ view.Close();const sent=t.sent.length;t.advance(6000);packets.slice(1).forEach(t.receiveBulk);
+ assert.equal(completed.length,0);assert.equal(t.sent.length,sent,'closed assembly cannot send a resync or apply late bulk');
+ view.Open();t.feed(encode(meta,{view:6,epoch:2}));packets.forEach(t.receiveBulk);assert.equal(completed.length,0);
+ const current=make(2);current.forEach(t.receiveBulk);assert.equal(completed.length,1);assert.equal(completed[0].raw,raw);
+ current.forEach(t.receiveBulk);assert.equal(completed.length,1,'replayed bulk cannot reapply a bitmap');
+ assert.ok(t.sent.every(p=>p.d.length<=24),'rare large S2C never loosens the cw/C2S guard');
+ view.Dispose();t.rt.Dispose();current.forEach(t.receiveBulk);assert.equal(completed.length,1);
 });
 console.log(JSON.stringify({status:"PASS_COMPACT_UI_RUNTIME_JS_LUA_SYNTHETIC_NOT_NATIVE",tests,native_calls:0,network_calls:0,sdk_calls:0,stable_sends:0,stable_timers:0}));

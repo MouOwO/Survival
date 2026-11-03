@@ -77,3 +77,11 @@ for _,size in ipairs({10,100,1000}) do
     stable.reset()
 end
 print("IMMUTABLE_PUSH_COST_PASS: N=10/100/1000, stable20 each => catalogue visits0, extra sends0; actual level change retained")
+local pending,disconnect_builds={},0
+local d=factory.new({task_prefix='disconnect:',scheduler={after=function(_,fn,key)pending[key]=fn end,cancel=function(key)pending[key]=nil end},
+ is_selected=function()return true end,build=function(payload)disconnect_builds=disconnect_builds+1;return payload end,send=function()end})
+d.push({player_id=0,entindex=9,value=1});local old=pending['disconnect:0'];assert(old)
+d.disconnect(0);d.push({player_id=0,entindex=9,value=2});local current=pending['disconnect:0'];assert(current and current~=old)
+old();assert(disconnect_builds==0 and pending['disconnect:0']==current,'cancelled callback cannot steal a reconnected recipient work item')
+current();assert(disconnect_builds==1);d.reset()
+print('STAT_PUSH_DISCONNECT_PASS O(1) slot retirement and same-entity reconnect; other recipients not invalidated')

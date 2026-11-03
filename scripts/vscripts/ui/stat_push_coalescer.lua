@@ -16,14 +16,19 @@ local function equal(a,b)
     return true
 end
 function M.new(options)
-    local latest, queued, sent, generation = {}, {}, {}, 0
+    local latest, queued, sent, versions, generation = {}, {}, {}, {}, 0
     local prefix = options.task_prefix or "building_ui_push_"
     local interval = options.interval or 0.15
     local api = {}
     function api.reset()
         generation = generation + 1
         for player in pairs(queued) do options.scheduler.cancel(prefix..player) end
-        latest, queued, sent = {}, {}, {}
+        latest, queued, sent, versions = {}, {}, {}, {}
+    end
+    function api.disconnect(player)
+        versions[player]=(versions[player]or 0)+1
+        options.scheduler.cancel(prefix..player)
+        latest[player],queued[player],sent[player]=nil,nil,nil
     end
     function api.push(payload)
         local player = tonumber(payload and payload.player_id)
@@ -38,8 +43,9 @@ function M.new(options)
         if queued[player] then return end
         queued[player] = true
         local current_generation = generation
+        local player_generation = versions[player]or 0
         options.scheduler.after(interval,function()
-            if generation ~= current_generation then return end
+            if generation ~= current_generation or (versions[player]or 0)~=player_generation then return end
             queued[player] = nil
             local value = latest[player]; latest[player] = nil
             if not value or not options.is_selected(player,tonumber(value.entindex)) then return end

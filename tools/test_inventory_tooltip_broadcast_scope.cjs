@@ -50,3 +50,41 @@ console.log('INVENTORY_TOOLTIP_BROADCAST_SCOPE_PASS: 1000 foreign keys=0 tasks/b
 
 const delayed=setup();delayed.event('dota_player_update_selected_unit',{PlayerID:0});delayed.advance(0);const laterImage=delayed.lateImage(0);assert.equal(laterImage.events.onmouseover,undefined);delayed.advance(210);assert.equal(typeof laterImage.events.onmouseover,'function','bounded trailing recovery binds native image children created after the first frame');laterImage.events.onmouseover();assert.equal(delayed.nodes.CustomInventoryItemTitle.text,'本地物品');
 console.log('INVENTORY_NATIVE_LATE_CHILD_PASS: trailing recovery is bounded and binds later native image children');
+
+// Actual v2 tooltip: dynamic values reuse the selected compact lane. A timer
+// exists only for the one visible item; it never walks slots or renders art.
+const live=setup();let growth={count:0,target:200,growth_attack:0},reads=0,writes=0,art=0,nativeHides=0;
+live.cfg.HandoffCombat={ReadWeaponGrowth:(unit,content)=>unit===10&&content==='own_item'?growth:null};
+live.data.survival_weapon_snapshot[0]={version:2,main_hand_context:{content_id:'own_item',stage_attack_target:200,is_max_level:0,progress_per_attack:3,forging_hammer_count:2,native_charge_counter:0},tooltip_view_model:{items:{own_item:{quantity:1,fields:[{label:'当前进度',value:'stale'}]}}}};
+live.hover(0);live.advance(100);
+function dynamicRows(){return JSON.parse(JSON.stringify(live.nodes.CustomInventoryItemFields.__fieldRows.filter(x=>x.visible).map(x=>[x.__left.text,x.__right.text])));}
+assert.deepEqual(dynamicRows(),[['当前进度','0 / 200'],['剩余进度','200'],['每次攻击进度','+3'],['锻造锤','2 / 4']]);
+for(const p of live.all){let text=p.text,visible=p.visible;Object.defineProperty(p,'text',{configurable:true,get:()=>text,set:v=>{writes++;text=v;}});Object.defineProperty(p,'visible',{configurable:true,get:()=>visible,set:v=>{writes++;visible=v;}});const set=p.SetImage;p.SetImage=function(...args){art++;return set.apply(this,args);};}
+const getSlot=live.env.Entities.GetItemInSlot;live.env.Entities.GetItemInSlot=function(...args){reads++;return getSlot(...args);};
+live.env.$.DispatchEvent=()=>nativeHides++;
+const beforeBindings=live.counts.binds;live.advance(100000);
+assert.equal(writes,0);assert.equal(art,0);assert.equal(nativeHides,0);assert.equal(live.counts.binds,beforeBindings);assert.equal(reads,1000,'one active slot read per visible tick, no six-slot scan');
+growth={count:7,target:200,growth_attack:.30000000000000004};live.advance(100);
+assert(dynamicRows().some(x=>x[0]==='当前进度'&&x[1]==='7 / 200'));assert(dynamicRows().some(x=>x[0]==='累计成长攻击'&&x[1]==='+0.3'));
+assert.equal(art,0);assert.equal(nativeHides,0);assert.equal(live.counts.binds,beforeBindings);
+const stoppedReads=reads;live.nodes.inventory_slot_0.events.onmouseout();live.advance(1000);assert.equal(reads,stoppedReads,'closed tooltip has no polling');
+// Kill progress comes only from the explicit native-remaining path. A zero
+// charge for a different weapon must not be mistaken for completed progress.
+let charges=150,chargeReads=0;live.env.Items={GetCurrentCharges:item=>{assert.equal(item,100);chargeReads++;return charges;}};
+live.data.survival_weapon_snapshot[0].main_hand_context.native_charge_counter=1;growth={count:999,target:200,growth_attack:0};live.hover(0);live.advance(100);
+assert(dynamicRows().some(x=>x[0]==='当前进度'&&x[1]==='50 / 200'));charges=0;live.advance(100);assert(dynamicRows().some(x=>x[0]==='当前进度'&&x[1]==='200 / 200'));
+live.data.survival_weapon_snapshot[0].main_hand_context.native_charge_counter=0;growth={count:12,target:200,growth_attack:0};live.hover(0);const oldChargeReads=chargeReads;live.advance(100);assert.equal(chargeReads,oldChargeReads);assert(dynamicRows().some(x=>x[0]==='当前进度'&&x[1]==='12 / 200'));
+live.data.survival_weapon_snapshot[0].main_hand_context.is_max_level=1;live.hover(0);assert(dynamicRows().some(x=>x[0]==='当前进度'&&x[1]==='MAX'));assert(!dynamicRows().some(x=>x[0]==='剩余进度'||x[0]==='每次攻击进度'));
+live.select(20);live.advance(100);assert(live.nodes.CustomInventoryItemTooltip.classes.has('Hidden'));const noSlotReads=reads;live.advance(1000);assert.equal(reads,noSlotReads);
+live.data.survival_inventory_item_identity[200]={content_id:'own_item'};live.hover(0);assert.equal(dynamicRows().length,0,'spectated unit must not borrow local growth metadata');
+const beforeDisposeReads=reads;live.cfg.SurvivalInventoryTooltip.DisposeTooltip();live.advance(1000);assert.equal(reads,beforeDisposeReads);
+console.log('INVENTORY_GROWTH_PASS:1000 stable visible ticks=0 writes/art/hides/rebinds,1slot/tick;closed0;exact progress/growth,killcharges,MAX,spectated/disposed guards');
+
+// Compare the actual display formatter with Lua5.1 tostring, not a second JS
+// approximation of the former text. No engine, player or gameplay IO.
+const cp=require('node:child_process'),numbers=[0,1,.30000000000000004,1234.567890123456,1e14,1e-5,1e-20,99999999999999.5];
+const lua='package.path="scripts/vscripts/?.lua;"..package.path;local x={'+numbers.join(',')+'};local r={};for i,n in ipairs(x)do r[i]=tostring(n)end;io.write(require("core/json_encoder").encode(r))';
+const expected=JSON.parse(cp.execFileSync('C:/Program Files/lua/bin/lua5.1.exe',['-e',lua],{encoding:'utf8'}));
+const formatter={};vm.runInNewContext(source.slice(source.indexOf('    function luaNumber('),source.indexOf('    function growthFields(')),formatter);
+assert.deepEqual(numbers.map(n=>formatter.luaNumber(n)),expected);
+console.log('INVENTORY_LUA_NUMBER_TEXT_PASS actual Lua tostring includes scientific exponents and floating growth');

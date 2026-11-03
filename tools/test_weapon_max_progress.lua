@@ -1,12 +1,13 @@
 -- Real growth, equipment shells, kill progression, UI projection and tooltip.
 -- Only engine entities/output and external inventory/profile inputs are mocked.
 package.path = "scripts/vscripts/?.lua;" .. package.path
+package.loaded["core/test_access_policy"]={enabled=function()return false end}
 local bus, events = require("core/event_bus"), require("core/events")
 local scheduler = require("core/scheduler")
 local weapons = require("config/generated/weapon_definitions")
 local progression = require("systems/weapon_progression")
 local counts, net, items, transactions = {}, {}, {}, {}
-local reduction, time, next_entity, equipped_id = 0, 0, 100, nil
+local reduction, time, next_entity, equipped_id, charge_writes = 0, 0, 100, nil, 0
 local native_print = print
 print = function(...)
     local first = tostring(select(1, ...))
@@ -32,15 +33,11 @@ CreateItem = function(name)
     return {id = next_entity, name = name, charges = -1,
         IsNull = function(self) return self.removed == true end,
         entindex = function(self) return self.id end,
-        SetCurrentCharges = function(self, value) self.charges = value end}
+        SetCurrentCharges = function(self, value) charge_writes=charge_writes+1;self.charges = value end}
 end
 UTIL_Remove = function(item) item.removed = true end
 bus.reset(); scheduler.clear()
 bus.handle_request(events.CONTENT_INVENTORY_GET_REQUEST, function() return {ok = true, snapshot = {counts = counts}} end)
-bus.handle_request(events.EQUIPMENT_INSTANCE_GET_REQUEST, function()
-    local instances = {}; for id, quantity in pairs(counts) do instances[id] = {quantity = quantity} end
-    return {ok = true, instances = instances}
-end)
 bus.handle_request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST, function()
     return {ok = true, totals = {weapon_upgrade_requirement_reduction = reduction}}
 end)
@@ -58,6 +55,7 @@ local function transaction(payload)
 end
 bus.handle_request(events.CONTENT_INVENTORY_TRANSACTION_REQUEST, transaction)
 bus.handle_request(events.INVENTORY_TRANSACTION_EXECUTE_REQUEST, transaction)
+require("systems/equipment_instance_service").init()
 require("systems/weapon_growth_service").init()
 require("systems/weapon_equipment_service").init()
 require("systems/equipment_growth_service").init()
@@ -69,6 +67,7 @@ local function shell()
     error("missing real equipment shell")
 end
 local function snapshot()
+    scheduler.think()
     ui.publish_player(0, "test_read")
     return net.survival_weapon_snapshot["0"]
 end
@@ -80,7 +79,7 @@ local function assert_max()
     assert(value.is_max_level == 1 and value.stage_attack_target == 0 and value.stage_attack_remaining == 0)
     assert(item.charges == 0, "terminal shell must never show fake native charges")
     assert(net.survival_inventory_item_identity[tostring(item.id)].is_max_level == 1)
-    assert(combined.growth.is_max_level == 1 and combined.growth.stage_attack_target == 0)
+    assert(combined.version==2 and combined.main_hand_context.is_max_level == 1 and combined.main_hand_context.stage_attack_target == 0)
     local view = combined.tooltip_view_model.items[equipped_id]
     assert(field(view, "当前进度") == "MAX" and field(view, "剩余进度") == nil)
 end
@@ -95,18 +94,27 @@ end
 
 equip("weapon_growth_sword_01")
 assert(growth().is_max_level == 0 and growth().stage_attack_target == 200 and shell().charges == 200)
+snapshot()
+local queries_before,charges_before=ui.inspect().full_reads,charge_writes
+for _=1,10 do bus.emit(events.HERO_MAIN_ATTACK_LANDED,{player_id=0,target=victim})end
+assert(growth().stage_attack_count==10 and shell().charges==190 and charge_writes==charges_before+10)
+assert(ui.inspect().full_reads==queries_before,"real native attack charges cannot depend on presentation getters")
+local prior_growth,prior_charges,prior_transactions=growth().growth_attack,charge_writes,#transactions
+for _,name in ipairs({events.WEAPON_EQUIPMENT_GET_REQUEST,events.WEAPON_GROWTH_GET_REQUEST,events.EQUIPMENT_INSTANCE_GET_REQUEST,events.EQUIPMENT_GROWTH_GET_REQUEST})do assert(bus.request(name,{player_id=0}).ok~=false)end
+assert(growth().growth_attack==prior_growth and charge_writes==prior_charges and #transactions==prior_transactions,"all four real getters have no charge/stat/transaction write side effect")
 equip("weapon_ice_blade_01")
 assert(growth().stage_attack_target == 200 and shell().charges == 200)
 reduction = 35
 bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {player_id = 0, totals = {weapon_upgrade_requirement_reduction = reduction}})
 equip("weapon_ice_blade_02")
 assert(growth().stage_attack_target == 215 and shell().charges == 215)
+snapshot();queries_before,charges_before=ui.inspect().full_reads,charge_writes
 kills(10); damages(3)
 local lower = snapshot()
-assert(lower.growth.stage_attack_count == 10 and lower.growth.stage_attack_target == 215
-    and lower.growth.stage_attack_remaining == 205 and shell().charges == 205,
+assert(lower.main_hand_context.stage_attack_target == 215 and lower.main_hand_context.native_charge_counter==1
+    and shell().charges == 205 and charge_writes==charges_before+10,
     "kill progress owns the counter and keeps the reduced authoritative target")
-assert(field(lower.tooltip_view_model.items[equipped_id], "当前进度") == "10 / 215")
+assert(ui.inspect().full_reads==queries_before,"10 kills/3 damage events require no presentation query; UI uses native remaining")
 
 -- Complete the authored kill upgrade to MAX, then interleave damage and kills.
 equip("weapon_ice_blade_04"); kills(315)
@@ -157,6 +165,7 @@ assert(progression.icon_level(weapons.by_id.weapon_legend_abyss_00) == 1)
 assert(progression.icon_level(weapons.by_id.weapon_legend_abyss_10) == 10)
 -- Inventory/synthesis material tooltips also show MAX when not equipped.
 counts.weapon_ice_blade_max = 1
+bus.emit(events.CONTENT_INVENTORY_CHANGED,{player_id=0,changes={weapon_ice_blade_max=1},snapshot={counts=counts}})
 local material = snapshot().tooltip_view_model.items.weapon_ice_blade_max
 assert(field(material, "当前进度") == "MAX")
-native_print("WEAPON_MAX_PROGRESS_PASS: real upgrade to MAX, native charge setter 0, identity/UI/tooltip MAX, reduced kill progress, 100 damage growth hits and terminal attack growth retained")
+native_print("WEAPON_MAX_PROGRESS_PASS: four real getters no gameplay writes;10 attacks/10 kill native charges independent of UI reads;real upgrade/MAX/identity/tooltip,100 damage growth hits and permanent growth retained")

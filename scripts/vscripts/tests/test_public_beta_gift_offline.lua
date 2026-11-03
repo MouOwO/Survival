@@ -47,6 +47,10 @@ local timestamp=1793307599
 calendar.set_clock(function() return timestamp end)
 local archive=require("systems/archive_service")
 archive.init()
+-- A legacy UI receipt is subscribed by the actual request handler, rather
+-- than treating any server-side reward operation as permission for a raw DTO.
+listeners.survival_public_beta_gift_request(nil,{PlayerID=0})
+listeners.survival_public_beta_gift_request(nil,{PlayerID=1})
 local function last()
     for i=#packets,1,-1 do if packets[i].name=="survival_public_beta_gift_snapshot" then return packets[i].data end end
 end

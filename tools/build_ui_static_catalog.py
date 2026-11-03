@@ -178,6 +178,8 @@ def fields():
         ("duration_hi", "uint", "ieee754_binary64_high32"), ("duration_lo", "uint", "ieee754_binary64_low32"),
         ("next_hi", "uint", "ieee754_binary64_high32"), ("next_lo", "uint", "ieee754_binary64_low32"),
         ("status", "uint", "production_research_status_code")))
+    definitions.append(("source_revision_hi", "uint", "safe_integer_revision_high32"))
+    definitions.append(("public_beta_flags", "uint", "public_beta_active_eligible_claimed_claim_pending_read_only_bits"))
     need(len(definitions) <= MAX_FIELD, "field_id_space_exhausted")
     result = []
     for index, (name, kind, unit) in enumerate(definitions, 1):
@@ -210,6 +212,8 @@ def fields():
         if name == "production_job_state": row.update(max=3, enum=[0,1,2,3], labels={"empty":0,"active":1,"blocked":2,"waiting":3})
         if name == "production_action": row.update(min=1, max=2, enum=[1,2], labels={"select":1,"clear":2})
         if name == "production_status": row["max"] = 65535
+        if name == "source_revision_hi": row["max"] = 2097151
+        if name == "public_beta_flags": row["max"] = 31
         result.append(row)
     return result
 
@@ -450,6 +454,53 @@ local fn=assert(loadstring(program,"@reviewed_operator/production_static_seed"))
     need(len(value["training"]) == 8 and len(value["research"]) == 19
          and sum(len(row["levels"]) - 1 for row in value["research"]) == 420,
          "production_configuration_scope_changed_requires_review")
+    value["generator_inputs"] = {seed_path: dict(sha256=digest(seed.encode()), normalization="CRLF_TO_LF", role="operator",
+        revision=operator.revision, origin=getattr(operator,"input_origin","IMMUTABLE_GIT_OPERATOR_BLOB"))}
+    return value
+
+
+def public_beta_projection_seed(source, lua, operator=None):
+    """Run the real public reward DTO, validating its actual configured grant.
+
+    Only display metadata is retained. The deterministic empty profile is not
+    a baseline for eligibility, active, revision, claimed or any account value.
+    """
+    operator = operator or source
+    seed_path = "tools/public_beta_ui_static_seed.lua"
+    seed = operator.read(seed_path).decode("utf-8-sig").replace("\r\n", "\n")
+    modules = ("systems/archive_benefit_rewards", "config/generated/archive_benefit_rewards",
+               "systems/archive_calendar", "core/json_encoder")
+    sources = {name: source.read("scripts/vscripts/" + name + ".lua").decode("utf-8-sig") for name in modules}
+    match = re.search(r"local source_paths\s*=\s*\{(.*?)\}", seed, re.S)
+    need(match is not None, "public_beta_seed_source_list_changed")
+    paths = re.findall(r'"([A-Za-z0-9_./]+)"', match[1])
+    need(0 < len(paths) <= 8 and len(paths) == len(set(paths)), "bounded_public_beta_source_list_required")
+    files = {path: source.read(path).decode("utf-8-sig") for path in paths}
+    program = "local sources=" + lua_literal(sources) + "\nlocal files=" + lua_literal(files) + "\nlocal program=" + lua_literal(seed) + "\n" + r'''
+local loaded,requiring={},{}
+local env={assert=assert,error=error,ipairs=ipairs,pairs=pairs,next=next,pcall=pcall,select=select,
+ tonumber=tonumber,tostring=tostring,type=type,unpack=unpack,math=math,string=string,table=table,
+ package={path="",loaded=loaded},print=function(value)io.write(value)end}
+env._G=env
+env.io={open=function(path,mode)
+ assert(mode=="rb"and files[path],"public_beta_non_public_file_refused")
+ local closed=false
+ return{read=function(_,what)assert(not closed and what=="*a");return files[path]end,
+ close=function()closed=true end}
+end}
+local function load_public(name)
+ if loaded[name]~=nil then return loaded[name]end
+ assert(sources[name],"missing_readonly_public_beta_module:"..tostring(name));assert(not requiring[name],"public_beta_seed_dependency_cycle")
+ requiring[name]=true;local fn=assert(loadstring(sources[name],"@immutable/"..name));setfenv(fn,env)
+ local value=fn();requiring[name]=nil;loaded[name]=value==nil and true or value;return loaded[name]
+end
+env.require=load_public
+local fn=assert(loadstring(program,"@reviewed_operator/public_beta_static_seed"));setfenv(fn,env);fn()
+'''
+    result = subprocess.run([lua, "-"], input=program.encode(), stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                            timeout=20, check=True, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+    need(len(result.stdout) <= 1024 * 1024, "public_beta_metadata_output_budget_exceeded")
+    value = json.loads(result.stdout)
     value["generator_inputs"] = {seed_path: dict(sha256=digest(seed.encode()), normalization="CRLF_TO_LF", role="operator",
         revision=operator.revision, origin=getattr(operator,"input_origin","IMMUTABLE_GIT_OPERATOR_BLOB"))}
     return value
@@ -905,6 +956,10 @@ def make_catalog(source, lua, operator=None, atlas_reference=None):
     for index in range(1, 9):
         add("production:receipt:" + str(index), "production", "receipt", index)
     add("vip:state", "vip", "state", "state")
+    add("payment:capability", "payment", "capability", "capability")
+    public_beta = public_beta_projection_seed(source, lua, operator)
+    for name in ("state", "receipt"):
+        add("public_beta:" + name, "public_beta", name, name)
     auxiliary = {name: [public_definition(row) for row in tables[name] if row.get("enabled") is not False] for name in
                  ("archive_daily_rules", "archive_daily_schedule", "archive_social_rules", "archive_building_rules", "archive_daily_limits")}
     auxiliary["fragment_levels"] = [{key: row[key] for key in ("fragment_id", "level", "required_total", "description") if key in row}
@@ -914,6 +969,7 @@ def make_catalog(source, lua, operator=None, atlas_reference=None):
     auxiliary["grid"] = grid
     auxiliary["selected"] = selected
     auxiliary["production"] = production
+    auxiliary["public_beta"] = public_beta
     daily_source = source.read("scripts/vscripts/systems/archive_daily_rewards.lua").decode("utf8")
     daily_text = {
         "subtitle": "每日领取 · 七次循环",
@@ -957,7 +1013,8 @@ def validate_registry(registry, previous=None):
     need(isinstance(enums, dict), "public_enum_registry_invalid")
     for name, values in enums.items():
         prefix = {"grid_errors": ["", "grid_validation_failed"],
-                  "production_errors": ["", "production_failed"], "production_status_codes": [""]}.get(name)
+                  "production_errors": ["", "production_failed"], "production_status_codes": [""],
+                  "public_beta_errors": ["", "claim_failed"]}.get(name)
         need(prefix is not None and isinstance(values, list) and len(prefix) <= len(values) <= 65536
              and values[:len(prefix)] == prefix
              and all(isinstance(value, str) for value in values) and len(values) == len(set(values)),
@@ -1068,6 +1125,9 @@ def build(game, content_revision, lua, previous=None, operator=None, atlas_refer
         values = [*old, *sorted(set(auxiliary["production"][key]) - set(old))]
         auxiliary["production"][key] = values
         public_enums[enum_name] = values
+    old_beta_errors = (previous or {}).get("public_enums", {}).get("public_beta_errors", ["", "claim_failed"])
+    auxiliary["public_beta"]["errors"] = [*old_beta_errors, *sorted(set(auxiliary["public_beta"]["errors"]) - set(old_beta_errors))]
+    public_enums["public_beta_errors"] = auxiliary["public_beta"]["errors"]
     registry = update_registry(records, previous, public_enums)
     record_ids = {row["key"]: row["id"] for row in registry["records"]}
     for metric in auxiliary["selected"]["metric_paths"]:
@@ -1100,7 +1160,7 @@ def build(game, content_revision, lua, previous=None, operator=None, atlas_refer
                   fields={row["id"]: row for row in registry["fields"]},
                   field_by_name={row["name"]: row["id"] for row in registry["fields"]},
                    archive_projection=auxiliary["archive_projection"], grid=auxiliary["grid"], selected=auxiliary["selected"],
-                   production=auxiliary["production"])
+                   production=auxiliary["production"], public_beta=auxiliary["public_beta"])
     server = ("-- AUTO-GENERATED display wire identities only; no reward rules.\nreturn " + lua_literal(lookup) + "\n").encode()
     manifest = dict(kind="IMMUTABLE_PUBLIC_UI_CATALOG_PROTOTYPE_NOT_CONNECTED", game_revision=game.revision,
                     content_revision=content_revision, schema_sha256=schema_sha, registry_sha256=registry_sha,
@@ -1108,7 +1168,7 @@ def build(game, content_revision, lua, previous=None, operator=None, atlas_refer
                     execution_lua_sha256=lua_sha256,
                     content_blob_inputs_read=0, content_revision_is_compile_pair_only=True,
                     source_hashes=source_hashes, source_binary_hashes=game.binary_hashes, records=len(registry["records"]), active_records=len(records),
-                    fields=len(registry["fields"]), domain_counts={domain: sum(row["domain"] == domain for row in records.values()) for domain in ("archive", "daily", "lottery", "hud", "wire", "grid", "selected", "production", "vip")},
+                    fields=len(registry["fields"]), domain_counts={domain: sum(row["domain"] == domain for row in records.values()) for domain in ("archive", "daily", "lottery", "hud", "wire", "grid", "selected", "production", "vip", "payment", "public_beta")},
                     csv_runtime_config_rows_equal=True, runtime_connected=False, workshop_uploaded=False,
                     outputs={CATALOG_PATH: digest(script), LOOKUP_PATH: digest(server), REGISTRY_PATH: registry_sha})
     return {CATALOG_PATH: script, LOOKUP_PATH: server, REGISTRY_PATH: canonical(registry), MANIFEST_PATH: canonical(manifest)}, registry

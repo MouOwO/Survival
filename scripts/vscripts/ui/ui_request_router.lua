@@ -1676,12 +1676,19 @@ local function on_lottery_changed(payload)
     if player then CustomGameEventManager:Send_ServerToPlayer(player,"ui_lottery_snapshot",payload.snapshot) end
 end
 
+function M.disconnect(payload)
+    local id=tonumber(payload and payload.player_id);if not id then return end
+    selected_unit_by_player[id],synthesis_requests[id]=nil,nil
+    building_push_coalescer.disconnect(id);combat_push_coalescer.disconnect(id)
+end
+
 function M.init()
     building_push_coalescer.reset()
     combat_push_coalescer.reset()
     synthesis_requests = {}
     building_snapshot_sequence = 0
     selected_unit_by_player = {}
+    event_bus.subscribe(events.PLAYER_DISCONNECTED,M.disconnect)
     register_client_diagnostic()
     register_selected_unit_stats_request()
     register_selected_tree_snapshot_push()

@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 29422,
-      "sha256": "66f6c1b312a6a42d9a9fdd8e3c314d58c52e9abaf53765637e2380e70552850b"
+      "bytes": 30657,
+      "sha256": "51afd33ae9e3ee1e35336f8e00554b1263f9cfcd0d922bcbd65998921a42289b"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 43343,
-      "sha256": "56cc0e5bb8e24c826d089ebc1437a739ebaa4b67dac6f8ec279619c26a16dfa9"
+      "bytes": 44578,
+      "sha256": "cf99b528e1bb50d54e376f13c3332cc797b1a6df63784b5c7b64fef83f9a0772"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 17498,
-      "sha256": "a809433b75376e68a167f7ee364f5cb3f02e849762d3ffc630b3b542cec664d8"
+      "bytes": 18733,
+      "sha256": "b38ef6a8a827ea5bdb1d6e26efe997bd4270e6baae7e8fe38e7e5b800c92398d"
     },
     {
       "path": "data/completed_work_index.json",
@@ -327,6 +327,11 @@
       "path": "evidence/native_arcade_cloud_20261027.public.json",
       "bytes": 1694,
       "sha256": "3d57d439d339f2655e98d9b690735cf65de3945a15e7b52b77ac29e1bc7d657b"
+    },
+    {
+      "path": "evidence/network50_dev07_native_fps_20261103.md",
+      "bytes": 8191,
+      "sha256": "60afb57b4bb3da460514ee95bd3b3c53d0b1f510e93238ff39441e0f411b891e"
     },
     {
       "path": "evidence/network50_grid_selected_handoff_20261103.md",

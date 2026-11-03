@@ -37,6 +37,7 @@ local function compact_bound(id)
         and compact_daily_transport.is_bound(id) or false
 end
 local vip_viewers = {}
+local legacy_vip_players = {}
 local archive_players = {}
 local sent_pages = {}
 local archive_delivery, archive_head, archive_tail = {}, nil, nil
@@ -46,6 +47,8 @@ local archive_renderer_generation = 0
 local ui_json = require("core/json_encoder")
 local UI_PACKET_JSON_BUDGET, UI_PACKET_ROW_LIMIT, UI_PACKET_ENVELOPE_RESERVE = 6 * 1024, 12, 256
 local public_beta_viewers, public_beta_sequences, public_beta_claims = {}, {}, {}
+local public_beta_legacy_subscribers={}
+local compact_public_beta,compact_public_beta_world
 local PUBLIC_BETA_TIER = "public_beta_login"
 local ENDLESS_FLUSH_INTERVAL, ENDLESS_BATCH_LIMIT = 5, 32
 local endless_due, endless_force = {}, {}
@@ -860,7 +863,7 @@ function M.send_vip(player_id,result)
     if compact_vip and compact_vip.changed(player_id)then return end
     if not PlayerResource or not CustomGameEventManager then return end
     local player=PlayerResource:GetPlayer(player_id)
-    if player and vip_viewers[player_id]==player then
+    if player and legacy_vip_players[player_id]==player then
         local snapshot=require("systems/archive_vip_rewards").snapshot(account_profile(player_id))
         snapshot.pending=M.has_pending(player_id) and 1 or 0
         if result then snapshot.action_result={ok=result.ok==true,error=result.error,terminal=result.terminal==true} end
@@ -1246,8 +1249,8 @@ function M.benefit_claim(player_id,track,tier_id)
     serial=(serial or 0)+1
     return enqueue(player_id,{id=session_id..":benefit:"..serial,kind="benefit_claim",track=track,tier_id=tier_id})
 end
-function M.public_beta_gift_snapshot(player_id)
-    local profile=account_profile(player_id)
+function M.public_beta_gift_snapshot(player_id,supplied_profile)
+    local profile=supplied_profile or account_profile(player_id)
     local snapshot=require("systems/archive_benefit_rewards").public_beta_snapshot(profile)
     public_beta_sequences[player_id]=(public_beta_sequences[player_id] or 0)+1
     snapshot.ok,snapshot.login_key,snapshot.sequence=profile~=nil,session_id or "",public_beta_sequences[player_id]
@@ -1256,11 +1259,12 @@ function M.public_beta_gift_snapshot(player_id)
     if not public_beta_writable() then snapshot.eligible,snapshot.read_only=0,1 end
     return snapshot
 end
-function M.send_public_beta_gift(player_id,result)
+function M.send_public_beta_gift(player_id,result,supplied_profile)
+    if compact_public_beta and compact_public_beta.changed(player_id,result,supplied_profile)then return end
     if not PlayerResource or not CustomGameEventManager then return end
     local player=PlayerResource:GetPlayer(player_id)
-    if not player then return end
-    local snapshot=M.public_beta_gift_snapshot(player_id)
+    if not player or public_beta_legacy_subscribers[player_id]~=player then return end
+    local snapshot=M.public_beta_gift_snapshot(player_id,supplied_profile)
     -- Re-query/hot reload can recover a lost ACK without creating a fresh
     -- claim. Keep the nonce and original receipt date from this world.
     result=result or public_beta_claims[player_id] and public_beta_claims[player_id].result
@@ -1268,6 +1272,18 @@ function M.send_public_beta_gift(player_id,result)
         ok=result.ok==true and 1 or 0,pending=result.pending==true and 1 or 0,
         terminal=result.terminal==true and 1 or 0,error=result.error} end
     CustomGameEventManager:Send_ServerToPlayer(player,"survival_public_beta_gift_snapshot",snapshot)
+end
+function M.subscribe_legacy_public_beta(player_id)
+    local player=PlayerResource and PlayerResource:GetPlayer(player_id)
+    if not player then return false end
+    public_beta_legacy_subscribers[player_id]=player
+    public_beta_viewers[player_id]=player
+    return true
+end
+function M.reset_public_beta_legacy()public_beta_legacy_subscribers={}end
+function M.disconnect_public_beta(player_id)
+    public_beta_legacy_subscribers[player_id],public_beta_viewers[player_id]=nil,nil
+    if compact_public_beta then compact_public_beta.disconnect(player_id)end
 end
 function M.public_beta_gift_claim(player_id,request_id)
     if type(request_id)~="string" or #request_id<8 or #request_id>64
@@ -1510,6 +1526,30 @@ function M.begin_finalization()
     for id in pairs(pending) do flush(id) end
 end
 
+-- Keep this bootstrap outside init: Lua 5.1 limits each closure to 60 upvalues.
+function M.setup_compact_public_beta()
+    if compact_daily_transport and compact_daily_lookup and compact_daily_lookup.by_key['public_beta:state']then
+        local own=type(bus.get_generation)=='function'and bus.get_generation()or bus
+        if compact_public_beta_world~=own then
+            if compact_public_beta then compact_public_beta.dispose()end
+            compact_public_beta=require('ui/compact_public_beta_view').new({lookup=compact_daily_lookup,transport=compact_daily_transport,
+                current=function()return(type(bus.get_generation)=='function'and bus.get_generation()or bus)==own end,
+                player=function(id)return PlayerResource and PlayerResource:GetPlayer(id)end,
+                snapshot=function(id,profile)
+                    local snapshot=M.public_beta_gift_snapshot(id,profile)
+                    snapshot.claim_result=public_beta_claims[id]and public_beta_claims[id].result
+                    return snapshot
+                end,claim=M.public_beta_gift_claim,
+                config=function()return require('config/generated/archive_benefit_rewards').by_id[PUBLIC_BETA_TIER]end,
+                subscribe=function(id,on)
+                    if on then public_beta_legacy_subscribers[id]=nil end
+                    public_beta_viewers[id]=on and PlayerResource:GetPlayer(id)or nil
+                end})
+            compact_public_beta_world=own
+        else compact_public_beta.reset()end
+    end
+end
+
 function M.init()
     require("systems/title_presentation_service").init()
     finalizing = false
@@ -1525,12 +1565,13 @@ function M.init()
     pending, busy, selected, throttles = {}, {}, {}, {}
     reward_notifications = {}
     public_beta_viewers, public_beta_sequences, public_beta_claims = {}, {}, {}
+    M.reset_public_beta_legacy()
     daily_generation=daily_generation+1
     for id,state in pairs(daily_delivery) do stop_daily_job(id,state) end
     for id in pairs(pass_deadlines) do scheduler.cancel("archive_pass_deadline:"..id) end
     daily_viewers,daily_delivery,daily_sequences,pass_deadlines={},{},{},{}
     compact_daily_states,compact_daily_users,compact_daily_tokens={},{},{}
-    vip_viewers = {}
+    vip_viewers,legacy_vip_players = {},{}
     archive_players = {}
     serial = 0
     session_id = runtime_id()
@@ -1563,7 +1604,7 @@ function M.init()
             else send(id,nil,profile) end
             if compact_daily_users[id] then compact_daily_changed(id,payload,profile)
             elseif daily_viewers[id] or daily_delivery[id] then M.send_daily(id,nil,nil,nil,profile) end
-            if public_beta_viewers[id] then M.send_public_beta_gift(id) end
+            if public_beta_viewers[id] then M.send_public_beta_gift(id,nil,profile) end
             if vip_viewers[id] then M.send_vip(id) end
             if not busy[id] then flush(id) end
         end
@@ -1575,7 +1616,9 @@ function M.init()
             if state then for _,job in pairs(state.jobs) do finish_archive_job(job) end end
             archive_delivery[id]=nil;sent_pages[id]=nil
             legacy_archive_players[id]=nil
+            vip_viewers[id],legacy_vip_players[id]=nil,nil
             daily_viewers[id]=nil
+            M.disconnect_public_beta(id)
             compact_daily_states[id],compact_daily_users[id],compact_daily_tokens[id]=nil,nil,nil
             if compact_archive_views then compact_archive_views.disconnect(id) end
             stop_daily_job(id,daily_delivery[id]);daily_delivery[id]=nil
@@ -1602,7 +1645,7 @@ function M.init()
         if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end
         local now=GameRules:GetGameTime()
         if vip_times[id] and now-vip_times[id]<0.3 then return end
-        vip_times[id]=now;vip_viewers[id]=PlayerResource:GetPlayer(id)
+        vip_times[id]=now;vip_viewers[id]=PlayerResource:GetPlayer(id);legacy_vip_players[id]=vip_viewers[id]
         if payload.action=="claim" or payload.action=="purchase" then
             local result=M.vip_action(id,payload.action=="claim" and "vip_claim" or "vip_purchase",payload.reward_id)
             M.send_vip(id,result)
@@ -1613,15 +1656,18 @@ function M.init()
     CustomGameEventManager:RegisterListener("survival_public_beta_gift_request",function(_,payload)
         local id=tonumber(payload.PlayerID)
         if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end
-        public_beta_viewers[id]=true
+        if compact_bound(id)then return end
+        if not M.subscribe_legacy_public_beta(id)then return end
         M.send_public_beta_gift(id)
     end)
     CustomGameEventManager:RegisterListener("survival_public_beta_gift_claim",function(_,payload)
         local id=tonumber(payload.PlayerID)
         if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end
+        if compact_bound(id)then return end
         local now=GameRules:GetGameTime()
         if public_beta_times[id] and now-public_beta_times[id]<0.3 then return end
-        public_beta_times[id]=now;public_beta_viewers[id]=true;archive_players[id]=true
+        if not M.subscribe_legacy_public_beta(id)then return end
+        public_beta_times[id]=now;archive_players[id]=true
         M.send_public_beta_gift(id,M.public_beta_gift_claim(id,payload.request_id))
     end)
     CustomGameEventManager:RegisterListener("survival_daily_request",function(_,payload)
@@ -1813,6 +1859,7 @@ function M.init()
         end
     end)
     setup_compact_daily()
+    M.setup_compact_public_beta()
     if compact_daily_transport and compact_daily_lookup and compact_daily_lookup.by_key['vip:state']then
         local own=type(bus.get_generation)=='function'and bus.get_generation()or bus
         if compact_vip_world~=own then
@@ -1821,7 +1868,10 @@ function M.init()
                 current=function()return(type(bus.get_generation)=='function'and bus.get_generation()or bus)==own end,
                 player=function(id)return PlayerResource and PlayerResource:GetPlayer(id)end,
                 profile=account_profile,rewards=require('systems/archive_vip_rewards'),
-                subscribe=function(id,on)vip_viewers[id]=on and PlayerResource:GetPlayer(id)or nil end})
+                subscribe=function(id,on)
+                    vip_viewers[id]=on and PlayerResource:GetPlayer(id)or nil
+                    if on then legacy_vip_players[id]=nil end
+                end})
             compact_vip_world=own
         else compact_vip.reset()end
     end

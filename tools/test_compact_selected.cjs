@@ -46,6 +46,24 @@ test('genuinely unknown resource marks only that field; verified combat values r
  const result=m.Apply({full:false},s.put(fixture.unknown_resource_ops),s.read);assert.equal(result.known,true);assert.equal(result.snapshot.attack_min,Number(fixture.exact_numeric.attack_min));
  assert.equal(result.snapshot.portrait_model_name,'');assert.equal(result.snapshot._selected_unknown_fields.portrait_model_name,true);
 });
+test('weapon growth getter is fixed size, rejects stale tokens/content and authoritative unknown',()=>{
+ const content=cp.execFileSync('C:/Program Files/lua/bin/lua5.1.exe',['-e','package.path="scripts/vscripts/?.lua;"..package.path;io.write(require("config/generated/weapon_definitions").rows[1].content_id)'],{encoding:'utf8'});
+ const m=api.Create(C),s=store();m.Select(90,11);assert.equal(m.WeaponGrowth(90,11,content),null);
+ s.put(fixture.initial_ops);s.put([{record:R['selected:metric:weapon_content_id'],field:F.target_record,value:R[C.Data.auxiliary.selected.text_by_value[content]]},{record:R['selected:metric:weapon_content_id'],field:F.known,value:1}]);
+ for(const [path,value]of [['weapon_growth_attack',3],['stage_attack_count',12],['stage_attack_target',200]])s.put([{record:R['selected:metric:'+path],field:F.selected_value_int,value}]);
+ m.Apply({full:true},[],s.read);const source=m.WeaponGrowth(90,11,content);
+ assert.ok(source);assert.equal(source.growth_attack,3);assert.equal(source.count,12);assert.equal(source.target,200);
+ assert.equal(m.WeaponGrowth(91,11,content),null);assert.equal(m.WeaponGrowth(90,11,'another_weapon'),null);
+ const before=m.Inspect().metric_visits;for(let i=0;i<1000;i++)assert.ok(m.WeaponGrowth(90,11,content));assert.equal(m.Inspect().metric_visits,before);
+ m.Select(91,12);m.Select(90,13);assert.equal(m.WeaponGrowth(90,13,content),null);
+ s.put([{record:R['selected:state'],field:F.selected_token,value:13}]);m.Apply({full:true},[],s.read);assert.ok(m.WeaponGrowth(90,13,content));
+ const root=R['selected:state'];m.Apply({full:false},s.put([{record:root,field:F.known,value:0}]),s.read);assert.equal(m.WeaponGrowth(90,13,content),null);
+ m.Apply({full:false},s.put([{record:root,field:F.known,value:1}]),s.read);assert.ok(m.WeaponGrowth(90,13,content));
+ const code=fs.readFileSync('panorama/src/scripts/custom_game/combat_stats.js','utf8'),method=code.match(/ReadWeaponGrowth:\s*(function\(unit,content\)\{[\s\S]*?\n        \}),/);
+ assert.ok(method);let live=true,shown=90;const env={contextActive:()=>live,displayUnit:()=>shown,compactSelectedModel:m,compactSelectedToken:13};
+ vm.createContext(env);vm.runInContext('read='+method[1],env);assert.equal(env.read(90,content).count,12);
+ shown=91;assert.equal(env.read(90,content),null);shown=90;env.compactSelectedToken=14;assert.equal(env.read(90,content),null);env.compactSelectedToken=13;live=false;assert.equal(env.read(90,content),null);
+});
 test('actual cold controller coalesces pre-Hello ABA to one ready request and invalidates disposed callbacks',()=>{
  const source=fs.readFileSync('panorama/src/scripts/custom_game/combat_stats.js','utf8');
  const start=source.indexOf('    function requestSelectedUnitStats('),end=source.indexOf('    function refreshHeroVitals(',start);
