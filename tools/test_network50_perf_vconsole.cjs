@@ -13,5 +13,11 @@ const assert=require("node:assert/strict"),{Readable}=require("node:stream"),API
  assert.equal(sent,1);assert.ok(closed>=1);assert.equal(output[0].ready,true);assert.equal(output[1].nonce,nonce);assert.equal(output[2].closed,true);
  sent=0;await assert.rejects(API.run(command,Readable.from(['{"op":"exec","command":"quit"}\n']),{write(){}},Fake),/read_only_inspect_required/);assert.equal(sent,0);
  sent=0;await assert.rejects(API.run(command,Readable.from([JSON.stringify({op:"inspect",nonce:nonce+";quit"})+"\n"]),{write(){}},Fake),/fresh_32hex_nonce_required/);assert.equal(sent,0);
+ class Unloaded extends Fake{async send(){const error=Error("Expected game response was not received: ");error.output="private authentication history";throw error;}}
+ let unloaded;try{await API.run(command,Readable.from([JSON.stringify({op:"inspect",nonce})+"\n"]),{write(){}},Unloaded);}catch(error){unloaded=API.failureEnvelope(error);}
+ assert.deepEqual(unloaded,{error:"readback_failed_no_raw_output_exported",reason:"fresh_inspect_reply_missing"});
+ const secret=Error("unexpected private account/session content");secret.output="private authentication history";
+ assert.equal(API.failureEnvelope(secret).reason,"readback_failed");assert.ok(!JSON.stringify(API.failureEnvelope(secret)).includes("private"));
+ assert.equal(API.failureEnvelope(new SyntaxError("private malformed JSON")).reason,"invalid_readback_json");
  console.log('NETWORK50_PERF_VCONSOLE_PASS persistent one-readback, no arbitrary console/Lua, nonce binding, close/failure cleanup; no native socket used');
 })().catch(error=>{console.error(error.message);process.exitCode=1;});

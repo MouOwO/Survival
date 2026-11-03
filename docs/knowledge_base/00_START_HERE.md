@@ -1,5 +1,7 @@
 # 新会话先读｜孤城逐晓项目知识库
 
+**2026-11-03 phase3仍仅本地更新，后台未改。** 生产view7恢复训练／研究／队列，VIP view8只传真实等级，英雄旧无消费者大包按订阅发送，Beta取消未就绪重复请求，工人容量真实变化触发刷新。24目录／12编译工具／5生产draft／22Beta及VIP边界通过；32官方编译由主操作者报告。当前实际目录仍fe1718，计划7932记录／186字段须新source冻结后严格Git生成；未新native／FPS，剩余legacy并未全部≤50 B，正式0104和完整发行待办保持。见[phase3真实范围、成本与待办](evidence/network50_production_vip_phase3_20261103.md)。
+
 **2026-11-03 严格Git gen2追加：仍仅本地更新。** game/operator输入c8722ee2、content输入5bdd9627已冻结并push，从Git重生成schema `fe171856…`，7887记录／163字段／10代历史不变；所有208 game、3 operator、6历史atlas来源摘要入manifest。主操作者报告同源28文件官方编译完成，catalog artifact `07d0d453…`；gen2产物最终提交、实际新客户端／FPS与完整发行仍待，不能拿输入冻结号当最终包来源。wire15/runtime15/grid9/selected8边界过；四纯配置与三保留新逻辑的production工具已落，未保护／签发。见[严格来源、摘要与后续限制](evidence/network50_grid_selected_handoff_20261103.md)。
 
 **2026-11-03 继续优化追加：网格／选中单位仍仅本地更新。** 唯一目录扩至7887记录／163字段／10代历史（codec cap255），schema `004ce5aa…`；双XML同schema不重复初始化。Dev04两次真实静态bitmap一致，抽为非权威本地候选；每局仍真实扫描，比对后同图K0为离线估算285B、K1为48B。grid7／selected8／codec15／generator18组通过，但不等于新native／FPS或发行验收。core曾双仓push game1f160c3a／contentc04eb46d，本追加不在这两提交内。正式0104、manifest `7025356658517360342`、WS4本追加未改；完整发行仍阻断。见[追加来源、精度、成本及接手](evidence/network50_grid_selected_handoff_20261103.md)。

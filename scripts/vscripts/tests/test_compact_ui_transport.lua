@@ -109,4 +109,31 @@ assert(fallback_frames<=8,"clockless synchronous publishers share one quota")
 local fn=fallback_tasks.compact_ui_dispatch;assert(fn);fallback_tasks.compact_ui_dispatch=nil;fn()
 assert(fallback_frames<=16,"only a scheduler dispatch replenishes the clockless quota")
 fallback.reset();assert(next(fallback_tasks)==nil)
+-- Server-side view guards are independent of the Javascript client: a crafted
+-- production action must not enter the daily handler, even with a valid token.
+local gate_calls,gate_tasks={},{}
+local gate=transport.new({lookup=lookup,budget=budget,player=function()return handles[0]end,
+ authorize=function()return true end,session_token=function()return 1500 end,
+ after=function(_,fn,key)gate_tasks[key]=fn end,cancel=function(key)gate_tasks[key]=nil end,
+ emit=function()return true end})
+gate.register_view(3,{snapshot=function()return{}end,intent=function()error('cross-view intent reached daily')end})
+gate.register_view(7,{snapshot=function()return{}end,intent=function(_,action,args)
+ assert(action=='production_train'and args.arg_a==122 and args.arg_b==1 and args.arg_c==3)
+ assert(args.request_token==1 and args.session_token==1500,'server session is bound internally')
+ gate_calls[#gate_calls+1]=action;return true
+end})
+assert(gate.receive(0,assert(wire.encode_resync(schema,bootstrap,0,1))))
+local function gate_command(view,revision,ops)
+ local b={schema=1,schema_sha256=lookup.sha256,session=1500,epoch=1,view=view}
+ local frames=assert(wire.encode(schema,b,revision,ops,{full=true}));local result,why
+ for _,p in ipairs(frames)do result,why=gate.receive(0,p)end
+ return result,why
+end
+for _,view in ipairs({3,7})do assert(gate_command(view,1,{{record=control,field=fields.visible,value=true}}))end
+local production={{record=control,field=fields.action_code,value=8},{record=control,field=fields.arg_a,value=122},
+ {record=control,field=fields.arg_b,value=1},{record=control,field=fields.arg_c,value=3},{record=control,field=fields.request_token,value=1}}
+local rejected,reason=gate_command(3,2,production);assert(not rejected and reason=='view_intent_not_allowed')
+assert(#gate_calls==0);assert(gate_command(7,2,production));assert(#gate_calls==1)
+assert(not gate_command(7,2,production));assert(#gate_calls==1,'duplicate fragments cannot execute again')
+gate.reset()
 print("COMPACT_RUNTIME_SYNTHETIC_PASS: measured49-byte boundary, exact SHA hello, authorized numeric intents, ordered per-view tx,1000 idle updates0sends/timers,close cancellation,probe,disconnect/reset")

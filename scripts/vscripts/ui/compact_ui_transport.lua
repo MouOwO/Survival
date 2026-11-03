@@ -11,7 +11,14 @@ local function record(lookup,key)
     return type(value)=="table" and value.id or value
 end
 local ACTIONS={[1]="daily_claim",[2]="benefit_claim",[3]="pass_purchase",
-    [4]="lottery_draw",[5]="archive_title",[6]="archive_action",[7]="lottery_read"}
+    [4]="lottery_draw",[5]="archive_title",[6]="archive_action",[7]="lottery_read",
+    [8]="production_train",[9]="production_research",[10]="production_auto",[11]="production_cancel"}
+local function action_view(code,view)
+    if code<=3 then return view==3 end
+    if code==4 or code==7 then return view>=201 and view<=204 end
+    if code==5 or code==6 then return view>=101 and view<=120 end
+    return code>=8 and code<=11 and view==7
+end
 
 function M.new(options)
     local lookup=options.lookup
@@ -177,7 +184,7 @@ function M.new(options)
         need(type(id)=="number" and id>=2 and id<=16383 and not handlers[id],"unique_compact_view_required")
         need(type(handler)=="table" and type(handler.snapshot)=="function","compact_snapshot_provider_required")
         if handler.input then
-            local prefix=id==4 and "grid"or id==5 and "selected"or nil
+            local prefix=id==4 and "grid"or id==5 and "selected"or id==7 and "production"or nil
             need(prefix~=nil,"typed_input_view_not_allowed")
             local input_key=prefix..":input"
             local action_name=prefix.."_action"
@@ -289,12 +296,14 @@ function M.new(options)
             values[change.field]=change.value
         end
         if values[fields.action_code]then
-            local action=ACTIONS[values[fields.action_code]]
-            if not action or not handler.intent or not view.open then incoming.abort();return nil,"view_intent_not_allowed"end
+            local code=values[fields.action_code]
+            local action=ACTIONS[code]
+            if not action or not action_view(code,header.view)or not handler.intent or not view.open then incoming.abort();return nil,"view_intent_not_allowed"end
             local token=values[fields.request_token]
             if not token or token<1 or token>16383 then incoming.abort();return nil,"intent_token_required"end
             incoming.commit(tx)
-            local result=handler.intent(id,action,{arg_a=values[fields.arg_a],arg_b=values[fields.arg_b],arg_c=values[fields.arg_c],request_token=token})
+            local result=handler.intent(id,action,{arg_a=values[fields.arg_a],arg_b=values[fields.arg_b],arg_c=values[fields.arg_c],request_token=token,
+                session_token=state.session})
             return result==nil and true or result
         end
         incoming.commit(tx)

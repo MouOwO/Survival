@@ -7,12 +7,25 @@ import tempfile
 import hashlib
 import struct
 import unittest
+import queue
 from unittest.mock import patch
 
 spec=importlib.util.spec_from_file_location('capture',Path(__file__).with_name('capture_network50_perf.py'))
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 
 class CaptureTests(unittest.TestCase):
+    def readback_reply(self,reply):
+        readback=object.__new__(m.Readback);readback.lines=queue.Queue()
+        readback.lines.put(json.dumps(reply));return readback
+
+    def test_bridge_failure_is_not_misreported_as_nonce_mismatch(self):
+        readback=self.readback_reply({'error':'readback_failed_no_raw_output_exported','reason':'fresh_inspect_reply_missing'})
+        with self.assertRaisesRegex(ValueError,'^readback_fresh_inspect_reply_missing$'):readback.receive(.1)
+        readback=self.readback_reply({'error':'private data','reason':'private auth output'})
+        with self.assertRaisesRegex(ValueError,'^readback_failed_no_raw_output_exported$'):readback.receive(.1)
+        readback=self.readback_reply({'nonce':'abc','sample':{}})
+        self.assertEqual(readback.receive(.1)['nonce'],'abc')
+
     def compiled_js(self,data,metadata=b'original'):
         # Real Valve block-table layout; metadata may change independently of DATA.
         raw=bytearray(16+24+len(metadata)+len(data))
@@ -65,9 +78,10 @@ class CaptureTests(unittest.TestCase):
             path.write_bytes(b'changed map')
             with self.assertRaisesRegex(ValueError,'critical_runtime_drift'):m.critical_resource_binding(base,row,{})
 
-    def test_run05_tools_helpers_are_explicitly_allowed_without_execution(self):
+    def test_run05_and_run06_tools_helpers_are_explicitly_allowed_without_execution(self):
         for relative in('tools/network50_dev_native_20261103.py','tools/network50_dev_input.ps1'):
-            self.assertIn("'run05'",(m.ROOT/relative).read_text(encoding='utf-8'))
+            for run in('run05','run06'):
+                self.assertIn(repr(run),(m.ROOT/relative).read_text(encoding='utf-8'))
 
     def sample(self,time=100,status='spawning'):
         return {'active':True,'tools':True,'game_time':time,'paused':False,'wave':{'status':status,'current':3,'alive':20,'defeated':False},'wire':{'ready':True,'views':4,'counters':{'sent':3}}}

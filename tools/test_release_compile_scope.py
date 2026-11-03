@@ -1,6 +1,7 @@
 """Compiler planning helpers only: no compiler, external file, Git or SDK writes."""
 from pathlib import Path
-import importlib.util,unittest
+from unittest import mock
+import importlib.util,struct,unittest
 
 spec=importlib.util.spec_from_file_location('release_compile_scope',Path(__file__).with_name('release_compile_scope.py'))
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
@@ -32,6 +33,94 @@ class CompileScopeTests(unittest.TestCase):
         children,engine=m.dependencies('panorama/layout/x.xml',b'<root><include src="file://{resources}/scripts/custom_game/a.js"/><include src="s2r://panorama/layout/hud.vxml"/></root>')
         self.assertEqual(children,['panorama/scripts/custom_game/a.js']);self.assertEqual(engine,['s2r://panorama/layout/hud.vxml'])
         with self.assertRaises(ValueError):m.dependencies('panorama/layout/x.xml',b'<include src="../../escape.xml"/>')
+
+    def test_manifest_layoutfile_and_xml_images_are_real_dependencies(self):
+        children,engine=m.dependencies('panorama/layout/custom_game/custom_ui_manifest.xml',
+            b'<root><CustomUIElement layoutfile="file://{resources}/layout/custom_game/archive.xml"/>'
+            b'<Image src="file://{images}/ui/page_assets/header.png"/></root>')
+        self.assertEqual(children,['panorama/images/ui/page_assets/header.png','panorama/layout/custom_game/archive.xml'])
+        self.assertEqual(engine,[])
+
+    def test_css_all_image_urls_imports_and_empty_weakrefs(self):
+        raw=b'''/* url("file://{images}/not_active.png") */
+        @import url("file://{resources}/styles/custom_game/common.css");
+        .a{background-image:url("file://{images}/custom_game/a.png");}
+        .b{background-image:url(file://{images}/custom_game/b.png);}
+        .c{background-image:url('s2r://panorama/images/masks/softedge_box_png.vtex');}'''
+        children,engine=m.dependencies('panorama/styles/custom_game/archive.css',raw)
+        self.assertEqual(children,['panorama/images/custom_game/a.png','panorama/images/custom_game/b.png',
+                                   'panorama/styles/custom_game/common.css'])
+        self.assertEqual(engine,['s2r://panorama/images/masks/softedge_box_png.vtex'])
+        for url in (b'url("")',b"url('')",b'url( )'):
+            with self.assertRaisesRegex(ValueError,'css_empty_url'):m.dependencies('panorama/styles/a.css',url)
+        with self.assertRaisesRegex(ValueError,'compiler_dependency_unreviewed'):
+            m.dependencies('panorama/styles/a.css',b'url("https://remote/image.png")')
+
+    def test_immutable_compiler_bytes_ignore_physical_mixed_eol(self):
+        for immutable in (b'a\nb\n',b'a\r\nb\r\n',b'a\r\nb\n'):
+            payload,normalization=m.compiler_bytes(immutable,True)
+            self.assertEqual(payload,b'a\r\nb\r\n')
+            self.assertIn(normalization,('GIT_IDENTITY','IMMUTABLE_GIT_TEXT_TO_COMPILER_CRLF_ONLY'))
+        self.assertEqual(m.compiler_bytes(b'\x89PNG\0\r\n',False),(b'\x89PNG\0\r\n','BINARY_GIT_IDENTITY'))
+        with self.assertRaisesRegex(ValueError,'lone_cr'):m.compiler_bytes(b'a\rb',True)
+
+    def test_complete_dependency_plan_uses_git_without_any_physical_source_read(self):
+        revision='a'*40;root=Path('Z:/not_a_checkout/compiler_test')
+        blobs={
+            'panorama/layout/custom_game/custom_ui_manifest.xml':b'<root><CustomUIElement layoutfile="file://{resources}/layout/custom_game/a.xml"/></root>\n',
+            'panorama/layout/custom_game/a.xml':b'<root><include src="file://{resources}/styles/custom_game/a.css"/></root>\n',
+            'panorama/styles/custom_game/a.css':b'.a{background-image:url("file://{images}/custom_game/a.png");}\n',
+            'panorama/images/custom_game/a.png':b'\x89PNG\0',
+            'panorama/images/custom_game/a.vtex':b'"m_fileName" "string" "panorama/images/custom_game/a.png"\n',
+        }
+        trees={'content':{p:{}for p in blobs},'game':{'panorama/src/'+p[len('panorama/'):]:{}for p in blobs}}
+        class Reader:
+            used=0;requests=0
+            def __init__(self,*args):pass
+            def get(self,role,path):
+                relative=path if role=='content'else'panorama/'+path[len('panorama/src/'):]
+                raw=blobs[relative]
+                return dict(repo=role,path=path,oid='b'*40,raw=raw,git_blob=m.checks(raw),content=m.checks(raw),lfs=False)
+            def close(self):pass
+        scope={'decisions':[dict(resource='panorama/layout/custom_game/custom_ui_manifest.vxml_c',
+            inventory_status='UNBOUND_COMPILED_ARTIFACT',review_decision='IMMUTABLE_AUTHORS_AVAILABLE_RECOMPILE_OR_VALIDATE_EMBEDDED_BINDING')]}
+        original=Path.read_bytes
+        def guarded(path):
+            if str(path).startswith(str(root)):raise AssertionError('physical source was read')
+            return original(path)
+        with mock.patch.object(m,'Reader',Reader),mock.patch.object(m,'immutable'),mock.patch.object(m.inventory,'git_tree',side_effect=lambda repo,*args:trees['game'if repo.name=='game'else'content']),mock.patch.object(Path,'read_bytes',guarded):
+            plan=m.make_plan(scope,'c'*64,{'game':revision,'content':revision},{'game':root/'game','content':root/'content'})
+        self.assertEqual(plan['counts'],{'READY_FOR_ISOLATED_OFFICIAL_COMPILE':1})
+        self.assertEqual(set(plan['inputs']),set(blobs))
+        self.assertEqual(plan['inputs']['panorama/styles/custom_game/a.css']['compiler_input'],m.checks(blobs['panorama/styles/custom_game/a.css'].replace(b'\n',b'\r\n')))
+        self.assertFalse(plan['publication_ready'])
+
+    def test_cli_requires_immutable_operator_before_reading_scope(self):
+        with mock.patch.object(m,'read_json')as read,mock.patch('sys.stderr'):
+            with self.assertRaises(SystemExit):m.main(['plan','--scope','x','--scope-sha256','a'*64,'--game-source','b'*40,'--content-source','c'*40,'--out','x'])
+            read.assert_not_called()
+
+    def test_loaded_operator_bytes_must_match_commit_not_only_later_disk(self):
+        def git(repo,*args):return (m.ROOT/args[-1].split(':',1)[1]).read_bytes()
+        with mock.patch.object(m,'immutable'),mock.patch.object(m,'run_git',side_effect=git):
+            binding=m.operator_binding('a'*40)
+            self.assertEqual(binding['revision'],'a'*40)
+            with mock.patch.object(m,'EXECUTED_INVENTORY_LF_SHA256','0'*64):
+                with self.assertRaisesRegex(ValueError,'loaded_operator_tool_differs'):
+                    m.operator_binding('a'*40)
+
+    def test_compiled_js_exact_data_and_native_block_bounds(self):
+        source=b'var immutable=true;\r\n'
+        artifact=struct.pack('<IHHII4sII',28+len(source),12,1,8,1,b'DATA',8,len(source))+source
+        proof=m.compiled_binding('panorama/scripts/a.vjs_c',artifact,source)
+        self.assertTrue(proof['compiled_js_DATA_equals_input'])
+        with self.assertRaisesRegex(ValueError,'compiled_js_data_differs'):
+            m.compiled_binding('panorama/scripts/a.vjs_c',artifact,source.replace(b'true',b'null'))
+        with self.assertRaisesRegex(ValueError,'header_invalid'):
+            m.compiled_binding('panorama/scripts/a.vjs_c',artifact+b'garbage',source)
+        corrupted=bytearray(artifact);struct.pack_into('<I',corrupted,20,len(artifact)+1)
+        with self.assertRaisesRegex(ValueError,'block_invalid'):
+            m.compiled_binding('panorama/scripts/a.vjs_c',bytes(corrupted),source)
 
     def test_scope_never_treats_history_or_unknown_as_compiled(self):
         rows=m.selected_rows({'decisions':[{'resource':'panorama/a.vjs_c','inventory_status':'UNBOUND_COMPILED_ARTIFACT','review_decision':'IMMUTABLE_AUTHORS_AVAILABLE_RECOMPILE_OR_VALIDATE_EMBEDDED_BINDING'}, {'resource':'panorama/b.vjs_c','review_decision':'LOCAL_HISTORICAL_MANIFEST_BYTES_MATCH_INPUT_BINDING_STILL_REQUIRED'}, {'resource':'panorama/c.vsvg_c','inventory_status':'UNMAPPED_SOURCE_PENDING'}]})

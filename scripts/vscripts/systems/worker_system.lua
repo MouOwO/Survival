@@ -28,10 +28,15 @@ local function player_tree(player_id)
 end
 local population_training_counts = {}
 local lumberjack_training = worker_training_progress.create(training_definitions)
+local commerce_capacity_bonus = {}
 function M.refresh_commerce_capacity(player_id)
     local effects=require('systems/commerce_effects')
-    lumberjack_training:set_capacity_bonus(player_id,
-        effects.owned(player_id,'immortal') and effects.owned(player_id,'lumber_fury') and 1 or 0)
+    local bonus=effects.owned(player_id,'immortal') and effects.owned(player_id,'lumber_fury') and 1 or 0
+    if commerce_capacity_bonus[player_id]==bonus then return false end
+    lumberjack_training:set_capacity_bonus(player_id,bonus)
+    commerce_capacity_bonus[player_id]=bonus
+    event_bus.emit(events.WORKER_CHANGED,{player_id=player_id,training_capacity_changed=1})
+    return true
 end
 local repairer_training = worker_training_progress.create(
     training_definitions,
@@ -1667,6 +1672,7 @@ function M.init()
     trees_by_player = {}
     population_training_counts = {}
     lumberjack_training:reset()
+    commerce_capacity_bonus = {}
     repairer_training:reset()
     disconnected_players = {}
     initialize_training_queue()

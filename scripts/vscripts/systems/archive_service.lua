@@ -31,6 +31,7 @@ local compact_daily_registered, compact_daily_send = false, nil
 local compact_daily_changed
 local compact_daily_handlers = {}
 local compact_archive_views
+local compact_vip,compact_vip_world
 local function compact_bound(id)
     return compact_daily_transport and compact_daily_transport.is_bound
         and compact_daily_transport.is_bound(id) or false
@@ -856,9 +857,10 @@ function M.equip_title(player_id, title_id)
 end
 
 function M.send_vip(player_id,result)
+    if compact_vip and compact_vip.changed(player_id)then return end
     if not PlayerResource or not CustomGameEventManager then return end
     local player=PlayerResource:GetPlayer(player_id)
-    if player then
+    if player and vip_viewers[player_id]==player then
         local snapshot=require("systems/archive_vip_rewards").snapshot(account_profile(player_id))
         snapshot.pending=M.has_pending(player_id) and 1 or 0
         if result then snapshot.action_result={ok=result.ok==true,error=result.error,terminal=result.terminal==true} end
@@ -1600,7 +1602,7 @@ function M.init()
         if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end
         local now=GameRules:GetGameTime()
         if vip_times[id] and now-vip_times[id]<0.3 then return end
-        vip_times[id]=now;vip_viewers[id]=true
+        vip_times[id]=now;vip_viewers[id]=PlayerResource:GetPlayer(id)
         if payload.action=="claim" or payload.action=="purchase" then
             local result=M.vip_action(id,payload.action=="claim" and "vip_claim" or "vip_purchase",payload.reward_id)
             M.send_vip(id,result)
@@ -1811,6 +1813,18 @@ function M.init()
         end
     end)
     setup_compact_daily()
+    if compact_daily_transport and compact_daily_lookup and compact_daily_lookup.by_key['vip:state']then
+        local own=type(bus.get_generation)=='function'and bus.get_generation()or bus
+        if compact_vip_world~=own then
+            if compact_vip then compact_vip.dispose()end
+            compact_vip=require('ui/compact_vip_view').new({lookup=compact_daily_lookup,transport=compact_daily_transport,
+                current=function()return(type(bus.get_generation)=='function'and bus.get_generation()or bus)==own end,
+                player=function(id)return PlayerResource and PlayerResource:GetPlayer(id)end,
+                profile=account_profile,rewards=require('systems/archive_vip_rewards'),
+                subscribe=function(id,on)vip_viewers[id]=on and PlayerResource:GetPlayer(id)or nil end})
+            compact_vip_world=own
+        else compact_vip.reset()end
+    end
     if compact_daily_transport and type(compact_daily_transport.available)=="function" and compact_daily_transport.available() then
         local ok,bridge=pcall(require,"ui/compact_archive_views")
         if ok then

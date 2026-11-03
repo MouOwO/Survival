@@ -1,5 +1,7 @@
 # 07｜关键决策、事故与未完成事项
 
+**2026-11-03 phase3仍仅本地更新，后台未改。** 生产view7恢复训练／研究／队列，VIP view8只传真实等级，英雄旧无消费者大包按订阅发送，Beta取消未就绪重复请求，工人容量真实变化触发刷新。24目录／12编译工具／5生产draft／22Beta及VIP边界通过；32官方编译由主操作者报告。当前实际目录仍fe1718，计划7932记录／186字段须新source冻结后严格Git生成；未新native／FPS，剩余legacy并未全部≤50 B，正式0104和完整发行待办保持。见[phase3真实范围、成本与待办](evidence/network50_production_vip_phase3_20261103.md)。
+
 **2026-11-03 当前接手：严格Git gen2输入已冻结，产物最终提交待补。** c8722ee2／5bdd9627只作为生成输入，新schema fe171856…；同源28官方编译完成但未冒称实际native／FPS／发布。production新工具保留3项运行逻辑，旧plan三项parent target已清空；真正186保护导出须等包含新lookup的第二game提交，不能拿c872旧lookup混新JS。完整recipe／ledger／authority、普通准入／SDK／官方下载仍阻断，正式0104保持。见[追加事实与全部SHA](evidence/network50_grid_selected_handoff_20261103.md)。
 
 **2026-11-03 追加待办：网格／选中单位仍须最终同源编译与真实验收。** 唯一注册表10代／7887记录／163字段，保留所有旧ID；同schema双入口零重复初始化。真实Dev04候选atlas无身份数据，每局仍全量实际扫描且逐word比较后才能发base+K覆盖；单预算hunk新旧SHA分开记录，不能冒称相同源码或永久可建。grid7／selected8等离线通过不代替实际native／FPS；core双仓1f160c3a／c04eb46d不是本追加最终source pin。正式0104／WS4本追加未改，完整recipe／ledger／authority／签名／SDK／官方下载仍阻断，待发不清零。见[来源和完整边界](evidence/network50_grid_selected_handoff_20261103.md)。

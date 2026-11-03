@@ -5,6 +5,18 @@ const readline=require("node:readline");
 const {ConsoleSession}=require("./map_c6/console-session.cjs");
 function parseCommand(value){if(typeof value!=="string"||!/^network50_inspect_[0-9]{10,16}_[0-9]{1,6}$/.test(value))throw Error("registered_inspect_command_required");return value;}
 function parseNonce(value){if(typeof value!=="string"||! /^[0-9a-f]{32}$/.test(value))throw Error("fresh_32hex_nonce_required");return value;}
+function failureEnvelope(error){
+ const message=typeof error?.message==="string"?error.message:"";
+ const known=new Set(["registered_inspect_command_required","fresh_32hex_nonce_required","bounded_request_required","read_only_inspect_required","fresh_inspect_reply_missing","inspect_object_required"]);
+ let reason=known.has(message)?message:"readback_failed";
+ // ConsoleSession attaches raw pending output to an Error. Never serialize it,
+ // or an arbitrary exception message, even when the UI has already unloaded.
+ if(message.startsWith("Expected game response was not received:"))reason="fresh_inspect_reply_missing";
+ else if(error instanceof SyntaxError)reason="invalid_readback_json";
+ else if(error?.code==="ECONNREFUSED")reason="console_connection_refused";
+ else if(error?.code==="ECONNRESET")reason="console_connection_closed";
+ return {error:"readback_failed_no_raw_output_exported",reason};
+}
 async function run(command,input=process.stdin,output=process.stdout,Session=ConsoleSession){
  command=parseCommand(command);
  const session=new Session({port:29069,timeoutMs:2500,historyTimeoutMs:4000,retainOutput:false,maxPendingOutputChars:1024*1024,closeDrainMs:250});
@@ -28,5 +40,5 @@ async function run(command,input=process.stdin,output=process.stdout,Session=Con
   }
  }finally{await session.close();}
 }
-module.exports={parseCommand,parseNonce,run};
-if(require.main===module)run(process.argv[2]).catch(()=>{process.stdout.write('{"error":"readback_failed_no_raw_output_exported"}\n');process.exitCode=1;});
+module.exports={parseCommand,parseNonce,failureEnvelope,run};
+if(require.main===module)run(process.argv[2]).catch(error=>{process.stdout.write(JSON.stringify(failureEnvelope(error))+"\n");process.exitCode=1;});

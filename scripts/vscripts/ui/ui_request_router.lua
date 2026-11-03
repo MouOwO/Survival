@@ -25,6 +25,7 @@ local selected_unit_by_player = {}
 local building_push_coalescer
 local combat_push_coalescer
 local compact_selected,compact_selected_world
+local compact_production,compact_production_world
 local compact_lottery_transport
 local function compact_lottery_bound(id)
     return compact_lottery_transport and compact_lottery_transport.is_bound
@@ -1699,6 +1700,9 @@ function M.init()
         send = send_to_player,
         selected = function(player_id) return selected_unit_by_player[player_id] end,
         push = publish_building_snapshot,
+        compact_refresh=function(id,payload)
+            return compact_production and compact_production.changed(id,payload)or false
+        end,
     })
     register_research_requests()
     register_weapon_synthesis_request()
@@ -1712,6 +1716,22 @@ function M.init()
     register_lottery_requests()
     if compact_lottery_transport and compact_lottery_transport.available()then
         local own_world=event_bus.get_generation()
+        if compact_production_world~=own_world then
+            if compact_production then compact_production.dispose()end
+            compact_production=require('ui/compact_production_views').new({transport=compact_lottery_transport,
+                lookup=require('config/generated/ui_static_catalog_lookup'),generation=own_world,
+                current=function()return event_bus.get_generation()==own_world end,
+                allowed=function(id)return valid_player_id(id,true)end,
+                player=function(id)return PlayerResource:GetPlayer(id)end,
+                execute=function(kind,payload)return production_ui.execute(kind,payload)end,
+                stamp=function(id,entity)return production_ui.stamp(id,entity)end,
+                snapshot=function(id,entity)
+                    local ok,unit=pcall(EntIndexToHScript,entity)
+                    if not ok or not unit or unit:IsNull()or(unit.IsAlive and not unit:IsAlive())then return{}end
+                    return production_ui.decorate(id,unit,{entindex=entity,success=1},true)
+                end})
+            compact_production_world=own_world
+        else compact_production.reset()end
         if compact_selected_world~=own_world then
             if compact_selected then compact_selected.dispose()end
             compact_selected=require('ui/compact_selected_views').new({transport=compact_lottery_transport,

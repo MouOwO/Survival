@@ -164,6 +164,20 @@ def fields():
     definitions.append(("grid_map", "uint", "grid_map_enum"))
     definitions.append(("grid_atlas_base", "uint", "grid_candidate_atlas_id_or_zero"))
     definitions.append(("selected_value_int", "sint", "exact_selected_integer"))
+    definitions.extend(("production_" + name, kind, unit) for name, kind, unit in (
+        ("entity", "uint", "entity_index"), ("selection", "uint", "production_selection_token"),
+        ("kind", "uint", "production_kind_enum"), ("revision", "uint", "production_revision"),
+        ("capacity", "uint", "count"), ("queue_count", "uint", "count"),
+        ("max_count", "sint", "count_or_minus_one_unlimited"), ("queued_count", "uint", "count"),
+        ("flags", "uint", "production_available_prereq_completed_autoenabled_autoavailable_bits"),
+        ("reserved_level", "uint", "level"), ("job_handle", "uint", "session_job_alias"),
+        ("job_state", "uint", "production_job_state_enum"), ("action", "uint", "production_action_enum"),
+        ("refunded", "bool", "flag"),
+        ("started_hi", "uint", "ieee754_binary64_high32"), ("started_lo", "uint", "ieee754_binary64_low32"),
+        ("finish_hi", "uint", "ieee754_binary64_high32"), ("finish_lo", "uint", "ieee754_binary64_low32"),
+        ("duration_hi", "uint", "ieee754_binary64_high32"), ("duration_lo", "uint", "ieee754_binary64_low32"),
+        ("next_hi", "uint", "ieee754_binary64_high32"), ("next_lo", "uint", "ieee754_binary64_low32"),
+        ("status", "uint", "production_research_status_code")))
     need(len(definitions) <= MAX_FIELD, "field_id_space_exhausted")
     result = []
     for index, (name, kind, unit) in enumerate(definitions, 1):
@@ -192,6 +206,10 @@ def fields():
         if name == "selected_token": row["min"] = 1
         if name == "grid_map": row.update(min=1, max=3, enum=[1,2,3], labels={"default":1,"template_map":2,"survival_c6":3})
         if name == "grid_atlas_base": row["max"] = 65535
+        if name == "production_kind": row.update(max=2, enum=[0,1,2], labels={"none":0,"training":1,"research":2})
+        if name == "production_job_state": row.update(max=3, enum=[0,1,2,3], labels={"empty":0,"active":1,"blocked":2,"waiting":3})
+        if name == "production_action": row.update(min=1, max=2, enum=[1,2], labels={"select":1,"clear":2})
+        if name == "production_status": row["max"] = 65535
         result.append(row)
     return result
 
@@ -372,6 +390,68 @@ local fn=assert(loadstring(program,"@reviewed_operator/selected_static_seed"));s
                                revision=operator.revision, origin=getattr(operator,"input_origin","IMMUTABLE_GIT_OPERATOR_BLOB")),
         operator_paths[1]: dict(sha256=digest(schema_source.encode()), normalization="CRLF_TO_LF", role="game",
                                revision=source.revision, origin=getattr(source,"input_origin","IMMUTABLE_GIT_RUNTIME_BLOB"))}
+    return value
+
+
+def production_projection_seed(source, lua, operator=None):
+    """Execute public production display functions against declared Git blobs.
+
+    Raw service sources are read only for literal dictionaries and reviewed pure
+    function slices; no service initialization, event bus or player API executes.
+    The tool is an explicit immutable operator input, never a workspace fallback.
+    """
+    operator = operator or source
+    seed_path = "tools/production_ui_static_seed.lua"
+    seed = operator.read(seed_path).decode("utf-8-sig").replace("\r\n", "\n")
+    match = re.search(r"local source_paths\s*=\s*\{(.*?)\}", seed, re.S)
+    need(match is not None, "production_seed_source_list_changed")
+    file_paths = re.findall(r'"([A-Za-z0-9_./]+)"', match[1])
+    need(0 < len(file_paths) <= 32 and len(file_paths) == len(set(file_paths)), "bounded_production_source_list_required")
+    files = {name: source.read(name).decode("utf-8-sig") for name in file_paths}
+    names = source.git("ls-tree", "-r", "--name-only", source.revision, "scripts/vscripts").decode().splitlines()
+    paths = {name[len("scripts/vscripts/"):-4]: name for name in names if name.endswith(".lua")}
+    pending = re.findall(r"\brequire\s*\(?\s*[\"']([^\"']+)[\"']", seed)
+    sources = {}
+    while pending:
+        name = pending.pop()
+        if name in sources: continue
+        need(name in paths, "immutable_production_dependency_missing:" + name)
+        text = source.read(paths[name]).decode("utf-8-sig");sources[name] = text
+        for dependency in re.findall(r"\brequire\s*\(?\s*[\"']([^\"']+)[\"']", text):
+            need(dependency in paths, "immutable_production_dependency_missing:" + dependency)
+            if dependency not in sources: pending.append(dependency)
+        need(len(sources) <= 32, "production_metadata_dependency_budget_exceeded")
+    program = "local sources=" + lua_literal(sources) + "\nlocal files=" + lua_literal(files) + "\nlocal program=" + lua_literal(seed) + "\n" + r'''
+local loaded,requiring={},{}
+local env={assert=assert,error=error,ipairs=ipairs,pairs=pairs,next=next,pcall=pcall,select=select,
+ tonumber=tonumber,tostring=tostring,type=type,unpack=unpack,rawget=rawget,rawset=rawset,
+ setmetatable=setmetatable,getmetatable=getmetatable,math=math,string=string,table=table,
+ loadstring=loadstring,setfenv=setfenv,package={path="",loaded=loaded},print=function(value) io.write(value) end}
+env._G=env
+env.io={open=function(path,mode)
+ assert(mode=="rb" and files[path],"production_non_public_file_refused")
+ local closed=false
+ return {read=function(_,what) assert(not closed and what=="*a");return files[path] end,
+ close=function() closed=true end}
+end}
+local function load_public(name)
+ if loaded[name]~=nil then return loaded[name] end
+ assert(sources[name],"missing_readonly_production_module:"..tostring(name));assert(not requiring[name],"production_catalogue_dependency_cycle")
+ requiring[name]=true;local fn=assert(loadstring(sources[name],"@immutable/"..name));setfenv(fn,env)
+ local value=fn();requiring[name]=nil;loaded[name]=value==nil and true or value;return loaded[name]
+end
+env.require=load_public
+local fn=assert(loadstring(program,"@reviewed_operator/production_static_seed"));setfenv(fn,env);fn()
+'''
+    result = subprocess.run([lua, "-"], input=program.encode(), stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                            timeout=20, check=True, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+    need(len(result.stdout) <= 8 * 1024 * 1024, "production_metadata_output_budget_exceeded")
+    value = json.loads(result.stdout)
+    need(len(value["training"]) == 8 and len(value["research"]) == 19
+         and sum(len(row["levels"]) - 1 for row in value["research"]) == 420,
+         "production_configuration_scope_changed_requires_review")
+    value["generator_inputs"] = {seed_path: dict(sha256=digest(seed.encode()), normalization="CRLF_TO_LF", role="operator",
+        revision=operator.revision, origin=getattr(operator,"input_origin","IMMUTABLE_GIT_OPERATOR_BLOB"))}
     return value
 
 
@@ -811,6 +891,20 @@ def make_catalog(source, lua, operator=None, atlas_reference=None):
         key = "selected:text:" + digest(value.encode("utf8"))
         add(key, "selected", "text", value, {"value": value})
         selected["text_by_value"][value] = key
+    production = production_projection_seed(source, lua, operator)
+    for name in ("state", "input"):
+        add("production:" + name, "production", name, name)
+    for row in production["training"]:
+        add("production:training:" + row["training_id"], "production", "training", row["training_id"],
+            {"training_id": row["training_id"], "level": row["level"]})
+    for row in production["research"]:
+        add("production:research:" + row["group"], "production", "research", row["group"],
+            {"group": row["group"], "ability_name": row["ability_name"]})
+    for index in range(1, production["queue_capacity"] + 1):
+        add("production:job:" + str(index), "production", "job", index)
+    for index in range(1, 9):
+        add("production:receipt:" + str(index), "production", "receipt", index)
+    add("vip:state", "vip", "state", "state")
     auxiliary = {name: [public_definition(row) for row in tables[name] if row.get("enabled") is not False] for name in
                  ("archive_daily_rules", "archive_daily_schedule", "archive_social_rules", "archive_building_rules", "archive_daily_limits")}
     auxiliary["fragment_levels"] = [{key: row[key] for key in ("fragment_id", "level", "required_total", "description") if key in row}
@@ -819,6 +913,7 @@ def make_catalog(source, lua, operator=None, atlas_reference=None):
     auxiliary["lottery_config_hash"] = seed["config_hash"]
     auxiliary["grid"] = grid
     auxiliary["selected"] = selected
+    auxiliary["production"] = production
     daily_source = source.read("scripts/vscripts/systems/archive_daily_rewards.lua").decode("utf8")
     daily_text = {
         "subtitle": "每日领取 · 七次循环",
@@ -861,8 +956,10 @@ def validate_registry(registry, previous=None):
     enums = registry.get("public_enums", {})
     need(isinstance(enums, dict), "public_enum_registry_invalid")
     for name, values in enums.items():
-        need(name == "grid_errors" and isinstance(values, list) and 2 <= len(values) <= 65536
-             and values[:2] == ["", "grid_validation_failed"]
+        prefix = {"grid_errors": ["", "grid_validation_failed"],
+                  "production_errors": ["", "production_failed"], "production_status_codes": [""]}.get(name)
+        need(prefix is not None and isinstance(values, list) and len(prefix) <= len(values) <= 65536
+             and values[:len(prefix)] == prefix
              and all(isinstance(value, str) for value in values) and len(values) == len(set(values)),
              "public_enum_registry_invalid")
     if previous is not None:
@@ -964,7 +1061,14 @@ def build(game, content_revision, lua, previous=None, operator=None, atlas_refer
     old_errors = (previous or {}).get("public_enums", {}).get("grid_errors", ["", "grid_validation_failed"])
     errors = [*old_errors, *sorted(set(auxiliary["grid"]["errors"]) - set(old_errors))]
     auxiliary["grid"]["errors"] = errors
-    registry = update_registry(records, previous, {"grid_errors": errors})
+    public_enums = {"grid_errors": errors}
+    for key, prefix in (("errors", ["", "production_failed"]), ("status_codes", [""])):
+        enum_name = "production_" + key
+        old = (previous or {}).get("public_enums", {}).get(enum_name, prefix)
+        values = [*old, *sorted(set(auxiliary["production"][key]) - set(old))]
+        auxiliary["production"][key] = values
+        public_enums[enum_name] = values
+    registry = update_registry(records, previous, public_enums)
     record_ids = {row["key"]: row["id"] for row in registry["records"]}
     for metric in auxiliary["selected"]["metric_paths"]:
         metric["record"] = record_ids[metric["key"]]
@@ -995,7 +1099,8 @@ def build(game, content_revision, lua, previous=None, operator=None, atlas_refer
                   by_key={row["key"]: row["id"] for row in registry["records"]},
                   fields={row["id"]: row for row in registry["fields"]},
                   field_by_name={row["name"]: row["id"] for row in registry["fields"]},
-                  archive_projection=auxiliary["archive_projection"], grid=auxiliary["grid"], selected=auxiliary["selected"])
+                   archive_projection=auxiliary["archive_projection"], grid=auxiliary["grid"], selected=auxiliary["selected"],
+                   production=auxiliary["production"])
     server = ("-- AUTO-GENERATED display wire identities only; no reward rules.\nreturn " + lua_literal(lookup) + "\n").encode()
     manifest = dict(kind="IMMUTABLE_PUBLIC_UI_CATALOG_PROTOTYPE_NOT_CONNECTED", game_revision=game.revision,
                     content_revision=content_revision, schema_sha256=schema_sha, registry_sha256=registry_sha,
@@ -1003,7 +1108,7 @@ def build(game, content_revision, lua, previous=None, operator=None, atlas_refer
                     execution_lua_sha256=lua_sha256,
                     content_blob_inputs_read=0, content_revision_is_compile_pair_only=True,
                     source_hashes=source_hashes, source_binary_hashes=game.binary_hashes, records=len(registry["records"]), active_records=len(records),
-                    fields=len(registry["fields"]), domain_counts={domain: sum(row["domain"] == domain for row in records.values()) for domain in ("archive", "daily", "lottery", "hud", "wire", "grid", "selected")},
+                    fields=len(registry["fields"]), domain_counts={domain: sum(row["domain"] == domain for row in records.values()) for domain in ("archive", "daily", "lottery", "hud", "wire", "grid", "selected", "production", "vip")},
                     csv_runtime_config_rows_equal=True, runtime_connected=False, workshop_uploaded=False,
                     outputs={CATALOG_PATH: digest(script), LOOKUP_PATH: digest(server), REGISTRY_PATH: registry_sha})
     return {CATALOG_PATH: script, LOOKUP_PATH: server, REGISTRY_PATH: canonical(registry), MANIFEST_PATH: canonical(manifest)}, registry

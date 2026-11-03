@@ -135,4 +135,21 @@ test("two independent HUD XML roots reuse one same-build same-schema runtime in 
   first.Dispose();load(order[0]);assert.notEqual(cfg.SurvivalCompactRuntime,first);assert.equal(subscriptions,2);
  }
 });
+test("production consumes separate monotonic tokens and cannot use another view",()=>{
+ const t=setup({admitted:true}),p=t.rt.CreateView("production",{}),daily=t.rt.CreateView("daily",{});
+ p.Open();daily.Open();t.feed(hello());
+ assert.equal(p.Inspect().id,7);
+ const args={entity:122,definition_record:1,selection:3};
+ assert.equal(daily.SendIntent("production_train",args).error,"action_view_mismatch");
+ assert.equal(p.SendIntent("daily_claim",{target_day:3}).error,"action_view_mismatch");
+ assert.equal(p.SendIntent("production_cancel",{entity:122,job_handle:0,selection:3}).error,"intent_argument_invalid");
+ for(const [index,action] of ["production_train","production_research","production_auto","production_cancel"].entries()){
+  const value=p.SendIntent(action,action==="production_cancel"?{entity:122,job_handle:4000000000,selection:3}:args);
+  assert.equal(value.sent,true);assert.equal(value.request_token,index+1);
+ }
+ const rx=W.NewReceiver(schema,binding(900,7,1));let operations=0;
+ for(const packet of t.sent){const h=W.PeekHeader(packet);if(h.view!==7)continue;assert.equal(h.full,true);const tx=rx.Accept(packet);if(tx.pending)continue;rx.Commit(tx);const token=tx.changes.find(c=>c.field===F.request_token);if(token){operations++;assert.equal(token.value,operations);}}
+ assert.equal(operations,4);assert.ok(t.sent.every(packet=>packet.d.length<=24));
+ p.Close();assert.equal(p.SendIntent("production_train",args).error,"not_ready");
+});
 console.log(JSON.stringify({status:"PASS_COMPACT_UI_RUNTIME_JS_LUA_SYNTHETIC_NOT_NATIVE",tests,native_calls:0,network_calls:0,sdk_calls:0,stable_sends:0,stable_timers:0}));

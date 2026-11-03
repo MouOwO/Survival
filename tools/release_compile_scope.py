@@ -6,12 +6,13 @@ junction pair. It never overwrites the project worktree, signs, submits, starts
 a game, deletes files, writes a release journal or changes Git.
 """
 from __future__ import annotations
-import argparse,hashlib,importlib.util,json,os,re,subprocess,time
-from collections import Counter
+import argparse,hashlib,importlib.util,json,os,re,struct,subprocess,time
+from collections import Counter,deque
 from datetime import datetime,timezone
 from pathlib import Path,PurePosixPath
 
 ROOT=Path(__file__).resolve().parents[1]
+EXECUTED_TOOL_LF_SHA256=hashlib.sha256(Path(__file__).read_bytes().replace(b'\r\n',b'\n')).hexdigest()
 CONTENT=ROOT.parents[2]/'content/dota_addons/Survival'
 ENGINE=ROOT.parents[2]
 COMPILER=ENGINE/'game/bin/win64/resourcecompiler.exe'
@@ -22,7 +23,10 @@ TEXT={'.js','.css','.xml','.vtex','.svg'}
 MAX_OBJECT=32*1024*1024
 MAX_TOTAL=256*1024*1024
 spec=importlib.util.spec_from_file_location('compile_scope_inventory',Path(__file__).with_name('release_pending_inventory.py'))
-inventory=importlib.util.module_from_spec(spec);spec.loader.exec_module(inventory)
+inventory=importlib.util.module_from_spec(spec)
+_inventory_bytes=Path(spec.origin).read_bytes()
+EXECUTED_INVENTORY_LF_SHA256=hashlib.sha256(_inventory_bytes.replace(b'\r\n',b'\n')).hexdigest()
+exec(compile(_inventory_bytes,spec.origin,'exec'),inventory.__dict__)
 
 def sha(raw):return hashlib.sha256(raw).hexdigest()
 def checks(raw):return dict(bytes=len(raw),sha256=sha(raw),md5=hashlib.md5(raw).hexdigest())
@@ -83,6 +87,29 @@ def checkout_binding(git_bytes,physical,text):
     need(text and b'\r'not in git_bytes and physical==git_bytes.replace(b'\n',b'\r\n'),'physical_source_differs_from_immutable_git')
     return 'GIT_LF_TO_COMPILER_CRLF_ONLY'
 
+def compiler_bytes(raw,text):
+    """Canonical compiler input is derived only from the immutable Git blob.
+
+    A physical checkout may have mixed line endings or unrelated user edits;
+    neither can change the bytes of an isolated source-bound compilation.
+    """
+    if not text:return raw,'BINARY_GIT_IDENTITY'
+    normalized=raw.replace(b'\r\n',b'\n')
+    need(b'\r'not in normalized,'immutable_text_lone_cr_requires_review')
+    result=normalized.replace(b'\n',b'\r\n')
+    return result,'GIT_IDENTITY'if result==raw else'IMMUTABLE_GIT_TEXT_TO_COMPILER_CRLF_ONLY'
+
+def operator_binding(revision):
+    immutable(ROOT,revision);result={}
+    for relative in ('tools/release_compile_scope.py','tools/release_pending_inventory.py'):
+        declared=run_git(ROOT,'show',revision+':'+relative).replace(b'\r\n',b'\n')
+        actual=(ROOT/relative).read_bytes().replace(b'\r\n',b'\n')
+        need(actual==declared,'executed_operator_tool_differs_from_commit:'+relative)
+        loaded=EXECUTED_TOOL_LF_SHA256 if relative.endswith('/release_compile_scope.py')else EXECUTED_INVENTORY_LF_SHA256
+        need(sha(declared)==loaded,'loaded_operator_tool_differs_from_commit:'+relative)
+        result[relative]=sha(declared)
+    return dict(revision=revision,tools_lf_sha256=result)
+
 def content_source(resource):
     safe(resource)
     suffix=PurePosixPath(resource).suffix
@@ -93,8 +120,25 @@ def artifact_for(source):
     path=PurePosixPath(safe(source));mapping={'.js':'.vjs_c','.css':'.vcss_c','.xml':'.vxml_c','.svg':'.vsvg_c','.vtex':'.vtex_c'}
     need(path.suffix in mapping,'unsupported_compiler_source_type');return str(path.with_suffix(mapping[path.suffix]))
 
+def compiled_binding(resource,raw,compiler_input):
+    """Validate native block bounds and exact embedded JS compiler bytes."""
+    need(28<=len(raw)<=MAX_OBJECT,'compiled_resource_absent_or_oversized')
+    size,version,_,offset,count=struct.unpack_from('<IHHII',raw);table=8+offset
+    need(size==len(raw)and version==12 and 1<=count<=64 and 16<=table<=len(raw)-12*count,'compiled_resource_header_invalid')
+    blocks={};ranges=[]
+    for index in range(count):
+        entry=table+index*12;tag,displacement,length=struct.unpack_from('<4sII',raw,entry);start=entry+4+displacement
+        need(all(32<=value<=126 for value in tag)and tag not in blocks and start>=table+count*12 and start+length<=len(raw)
+             and not any(start<end and begin<start+length for begin,end in ranges),'compiled_resource_block_invalid')
+        blocks[tag]=raw[start:start+length];ranges.append((start,start+length))
+    need(b'DATA'in blocks,'compiled_resource_data_missing')
+    is_js=resource.endswith('.vjs_c')
+    if is_js:need(blocks[b'DATA']==compiler_input,'compiled_js_data_differs_from_immutable_compiler_input')
+    return dict(blocks=[dict(tag=tag.decode('ascii'),bytes=len(value),sha256=sha(value))for tag,value in blocks.items()],
+                compiled_js_DATA_equals_input=True if is_js else None,rerl_bytes=len(blocks.get(b'RERL',b'')))
+
 def dependencies(path,raw):
-    """Compiler source includes and VTEX pixels, not guessed runtime assets."""
+    """Actual XML layouts, CSS image/import URLs and VTEX pixel dependencies."""
     suffix=PurePosixPath(path).suffix
     if suffix not in TEXT:return [],[]
     text=raw.decode('utf-8-sig');refs=[];engine=[]
@@ -104,18 +148,23 @@ def dependencies(path,raw):
         for pixel in pixels:
             safe(pixel);need(pixel.startswith('panorama/images/')and PurePosixPath(pixel).suffix.lower()in{'.png','.tga','.tif','.jpg','.jpeg'},'vtex_pixel_dependency_unreviewed')
             refs.append(pixel)
+    def reference(value):
+        if value.startswith('file://{resources}/'):refs.append(safe('panorama/'+value[len('file://{resources}/'):]))
+        elif value.startswith('file://{images}/'):refs.append(safe('panorama/images/'+value[len('file://{images}/'):]))
+        elif value.startswith('s2r://'):engine.append(value)
+        elif value.startswith('#'):return
+        else:raise ValueError('compiler_dependency_unreviewed:'+value)
     if suffix=='.xml':
-        for value in re.findall(r'<include\b[^>]*\bsrc\s*=\s*["\']([^"\']+)["\']',text):
-            prefix='file://{resources}/'
-            if value.startswith(prefix):refs.append(safe('panorama/'+value[len(prefix):]))
-            elif value.startswith('s2r://'):engine.append(value)
-            else:raise ValueError('xml_include_dependency_unreviewed:'+value)
+        for value in re.findall(r'\b(?:src|layoutfile)\s*=\s*["\']([^"\']+)["\']',text):reference(value)
     if suffix=='.css':
-        for value in re.findall(r'@import\s+(?:url\()?\s*["\']([^"\']+)["\']',text):
-            prefix='file://{resources}/'
-            if value.startswith(prefix):refs.append(safe('panorama/'+value[len(prefix):]))
-            elif value.startswith('s2r://'):engine.append(value)
-            else:raise ValueError('css_import_dependency_unreviewed:'+value)
+        # Do not confuse url() in comments with an active dependency, or miss
+        # unquoted background-image URLs. Empty URLs are invalid, never hidden.
+        text=re.sub(r'/\*.*?\*/','',text,flags=re.S)
+        for match in re.finditer(r'url\(\s*(?:"([^"\r\n]*)"|\'([^\'\r\n]*)\'|([^\s)]+))\s*\)',text):
+            value=next((value for value in match.groups()if value is not None),'')
+            need(bool(value),'css_empty_url_requires_review');reference(value)
+        need(re.search(r'url\(\s*\)',text)is None,'css_empty_url_requires_review')
+        for value in re.findall(r'@import\s+["\']([^"\']+)["\']',text):reference(value)
     if suffix=='.svg':
         for value in re.findall(r'(?:xlink:)?href=["\']([^"\']+)["\']',text):
             if value.startswith(('data:','#')):continue
@@ -130,35 +179,39 @@ def selected_rows(scope):
         elif row.get('inventory_status')=='UNMAPPED_SOURCE_PENDING'and str(row.get('resource','')).endswith('.vsvg_c'):rows.append(row)
     need(len({row['resource']for row in rows})==len(rows),'duplicate_compile_scope_resource');return rows
 
-def make_plan(scope,scope_sha,revisions,roots= None):
+def make_plan(scope,scope_sha,revisions,roots=None,operator_revision=None):
     roots=roots or{'game':ROOT,'content':CONTENT};counts=Counter(git_processes=0,git_tree_calls=0)
     for role in ('game','content'):immutable(roots[role],revisions[role])
     trees={role:inventory.git_tree(roots[role],counts,revisions[role])for role in roots}
-    reader=Reader(roots,trees);results=[];all_inputs={}
+    operator=operator_binding(operator_revision)if operator_revision else None
+    reader=Reader(roots,trees);results=[];all_inputs={};dependency_cache={}
     def source_pin(path):
-        value=reader.get('content',path);actual=roots['content']/path;no_reparse(actual,roots['content'])
-        need(actual.is_file()and actual.stat().st_size<=MAX_OBJECT,'physical_content_source_missing:'+path)
-        physical=actual.read_bytes();normalization=checkout_binding(value['raw'],physical,PurePosixPath(path).suffix in TEXT)
-        pin={k:v for k,v in value.items()if k!='raw'};pin.update(source_revision=revisions['content'],compiler_input=checks(physical),normalization=normalization)
+        value=reader.get('content',path)
+        payload,normalization=compiler_bytes(value['raw'],PurePosixPath(path).suffix in TEXT)
+        pin={k:v for k,v in value.items()if k!='raw'};pin.update(source_revision=revisions['content'],compiler_input=checks(payload),normalization=normalization)
         mirror='panorama/src/'+path[len('panorama/'):]if path.startswith('panorama/')else None
         if mirror and mirror in trees['game']:
-            game=reader.get('game',mirror);game_path=roots['game']/mirror;no_reparse(game_path,roots['game']);game_physical=game_path.read_bytes()
-            checkout_binding(game['raw'],game_physical,PurePosixPath(path).suffix in TEXT)
+            game=reader.get('game',mirror)
             if PurePosixPath(path).suffix in TEXT:
-                need(game['raw'].replace(b'\r\n',b'\n')==value['raw'].replace(b'\r\n',b'\n'),'game_content_authors_differ:'+path)
+                need(compiler_bytes(game['raw'],True)[0]==payload,'game_content_authors_differ:'+path)
             else:need(game['raw']==value['raw'],'game_content_binary_sources_differ:'+path)
-            pin['game_author']={k:v for k,v in game.items()if k!='raw'};pin['game_author'].update(source_revision=revisions['game'],physical=checks(game_physical))
-        return pin,physical
+            pin['game_author']={k:v for k,v in game.items()if k!='raw'};pin['game_author'].update(source_revision=revisions['game'])
+        return pin,payload
     try:
         for row in selected_rows(scope):
             resource=safe(row['resource']);result=dict(resource=resource,status='BLOCKED',sources=[],engine_references=[],review_decision=row['review_decision'])
             try:
-                primary=content_source(resource);queue=[primary];seen=set();pins=[];external=[]
+                primary=content_source(resource);queue=deque([primary]);seen=set();pins=[];external=[]
                 while queue:
-                    path=queue.pop(0)
+                    path=queue.popleft()
                     if path in seen:continue
-                    seen.add(path);pin,physical=source_pin(path);pins.append(pin)
-                    child,engine=dependencies(path,reader.get('content',path)['raw']);external.extend(engine);queue.extend(child)
+                    seen.add(path)
+                    pin,payload=source_pin(path);pins.append(pin)
+                    if path not in dependency_cache:dependency_cache[path]=dependencies(path,reader.get('content',path)['raw'])
+                    child,engine=dependency_cache[path];external.extend(engine);queue.extend(child)
+                    if PurePosixPath(path).suffix.lower()in{'.png','.jpg','.jpeg','.tga','.tif'}:
+                        descriptor=str(PurePosixPath(path).with_suffix('.vtex'))
+                        if descriptor in trees['content']:queue.append(descriptor)
                     existing=all_inputs.get(path)
                     need(not existing or existing['compiler_input']==pin['compiler_input'],'inconsistent_shared_compiler_input')
                     all_inputs[path]=pin
@@ -169,15 +222,15 @@ def make_plan(scope,scope_sha,revisions,roots= None):
     return dict(schema=1,kind='IMMUTABLE_ISOLATED_OFFICIAL_COMPILE_PLAN',scope_sha256=scope_sha,source_revisions=revisions,
         scope_observed_commits=scope.get('observed_commits'),resources=results,inputs=all_inputs,
         counts=dict(Counter(row['status']for row in results)),read_costs=dict(git_tree_calls=counts['git_tree_calls'],git_batch_processes=2,blob_requests=reader.requests,source_bytes=reader.used),
-        tool_sha256=sha(Path(__file__).read_bytes()),publication_ready=False,sdk_calls=0,git_mutations=0,project_worktree_writes=0)
+        tool_sha256=sha(Path(__file__).read_bytes()),operator_binding=operator,publication_ready=False,sdk_calls=0,git_mutations=0,project_worktree_writes=0)
 
 def compile_plan(plan,plan_sha,run_id,proof_dir):
     need(plan.get('kind')=='IMMUTABLE_ISOLATED_OFFICIAL_COMPILE_PLAN','immutable_compile_plan_required')
     need(plan.get('tool_sha256')==sha(Path(__file__).read_bytes()),'compiler_tool_changed_since_plan')
+    need(plan.get('operator_binding')and operator_binding(plan['operator_binding']['revision'])==plan['operator_binding'],'immutable_operator_binding_required')
     need(re.fullmatch(r'[a-z0-9_]{6,48}',run_id or''),'isolated_compile_run_id_required')
     roots={'game':ROOT,'content':CONTENT};revisions=plan['source_revisions']
-    # Recreate all source checks just before staging. The new plan must be
-    # supplied again if source bytes/physical mirrors changed in the meantime.
+    # Recreate immutable source checks. Physical worktree bytes are never inputs.
     for role in roots:immutable(roots[role],revisions[role])
     counts=Counter(git_processes=0,git_tree_calls=0);trees={role:inventory.git_tree(roots[role],counts,revisions[role])for role in roots};reader=Reader(roots,trees)
     stage=EXTERNAL/run_id;stage_game=stage/'game';stage_content=stage/'content';alias='svt_compile_'+run_id
@@ -193,45 +246,57 @@ def compile_plan(plan,plan_sha,run_id,proof_dir):
         for path in sorted(required):
             safe(path)
             pin=plan['inputs'][path];value=reader.get('content',path);need(value['git_blob']==pin['git_blob']and value['content']==pin['content']and value['oid']==pin['oid'],'immutable_git_input_pin_changed')
-            no_reparse(CONTENT/path,CONTENT)
-            physical=(CONTENT/path).read_bytes();need(checks(physical)==pin['compiler_input'],'physical_source_changed_after_plan:'+path)
-            checkout_binding(value['raw'],physical,PurePosixPath(path).suffix in TEXT)
+            payload,normalization=compiler_bytes(value['raw'],PurePosixPath(path).suffix in TEXT)
+            need(checks(payload)==pin['compiler_input']and normalization==pin['normalization'],'immutable_compiler_input_changed_after_plan:'+path)
             if pin.get('game_author'):
-                author=pin['game_author'];safe(author['path']);no_reparse(ROOT/author['path'],ROOT);game=reader.get('game',author['path']);need(game['git_blob']==author['git_blob']and checks((ROOT/author['path']).read_bytes())==author['physical'],'game_author_changed_after_plan:'+path)
-            payloads[path]=physical
+                author=pin['game_author'];safe(author['path']);game=reader.get('game',author['path']);need(game['git_blob']==author['git_blob']and game['content']==author['content'],'game_author_changed_after_plan:'+path)
+            payloads[path]=payload
     finally:reader.close()
     stage_game.mkdir(parents=True);stage_content.mkdir();proof_dir.mkdir(parents=True)
     for path,raw in payloads.items():write_new(stage_content/path,raw)
-    for mount,target in ((game_mount,stage_game),(content_mount,stage_content)):
-        subprocess.run(['powershell','-NoProfile','-NonInteractive','-Command',"New-Item -ItemType Junction -Path '"+str(mount)+"' -Target '"+str(target)+"' | Out-Null"],check=True)
-        need(mount.resolve()==target.resolve(),'isolated_compiler_mount_mismatch')
-    results=[]
-    for row in plan['resources']:
-        if row['status']!='READY_FOR_ISOLATED_OFFICIAL_COMPILE':results.append(dict(resource=row['resource'],status='BLOCKED',error=row.get('error')));continue
-        source=content_mount/row['primary_source'];artifact=stage_game/row['resource'];before=checks(artifact.read_bytes())if artifact.is_file()else None
-        args=[str(COMPILER),'-i',str(source),'-game',str(ENGINE/'game/dota'),'-fshallow','-nop4']
-        started=datetime.now(timezone.utc).isoformat();begin=time.monotonic();done=subprocess.run(args,capture_output=True,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0));elapsed=time.monotonic()-begin
-        log=done.stdout+done.stderr;log_name=row['resource'].replace('/','_')+'.log';write_new(proof_dir/'logs'/log_name,log)
-        result=dict(resource=row['resource'],started_utc=started,elapsed_seconds=round(elapsed,6),compiler_exit_code=done.returncode,compiler_argv=args,compiler_log_sha256=sha(log),compiler_log=log_name)
-        if done.returncode!=0 or b'0 failed'not in log or not artifact.is_file()or artifact.stat().st_size==0:
-            result.update(status='OFFICIAL_COMPILE_FAILED',error='compiler_exit_log_or_artifact_failed');results.append(result);continue
-        for pin in row['sources']:need(checks((stage_content/pin['path']).read_bytes())==pin['compiler_input'],'staged_source_changed_during_compile')
-        output=checks(artifact.read_bytes());result.update(status='OFFICIALLY_COMPILED_AND_SOURCE_BOUND',artifact_path=str(artifact),artifact=output,prior_stage_artifact=before,
-            primary_source=row['primary_source'],inputs=row['sources'],engine_references=row['engine_references'])
-        results.append(result)
-    report=dict(schema=1,kind='ISOLATED_OFFICIAL_COMPILER_PROOF',plan_sha256=plan_sha,source_revisions=revisions,scope_sha256=plan['scope_sha256'],
-        compiler_path=str(COMPILER),compiler_sha256=compiler_sha,tool_sha256=sha(Path(__file__).read_bytes()),external_stage=str(stage),game_mount=str(game_mount),content_mount=str(content_mount),
-        results=results,counts=dict(Counter(r['status']for r in results)),complete=all(r['status']=='OFFICIALLY_COMPILED_AND_SOURCE_BOUND'for r in results),
-        sdk_calls=0,git_mutations=0,project_worktree_writes=0,publication_ready=False)
-    write_new(proof_dir/'proof.json',canonical(report));return report
+    created_mounts=[]
+    try:
+        for mount,target in ((game_mount,stage_game),(content_mount,stage_content)):
+            subprocess.run(['powershell','-NoProfile','-NonInteractive','-Command',"New-Item -ItemType Junction -Path '"+str(mount)+"' -Target '"+str(target)+"' | Out-Null"],check=True)
+            created_mounts.append((mount,target))
+            need(mount.resolve()==target.resolve(),'isolated_compiler_mount_mismatch')
+        results=[]
+        for row in plan['resources']:
+            if row['status']!='READY_FOR_ISOLATED_OFFICIAL_COMPILE':results.append(dict(resource=row['resource'],status='BLOCKED',error=row.get('error')));continue
+            source=content_mount/row['primary_source'];artifact=stage_game/row['resource'];before=checks(artifact.read_bytes())if artifact.is_file()else None
+            args=[str(COMPILER),'-i',str(source),'-game',str(ENGINE/'game/dota'),'-fshallow','-nop4']
+            started=datetime.now(timezone.utc).isoformat();begin=time.monotonic();done=subprocess.run(args,capture_output=True,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0));elapsed=time.monotonic()-begin
+            log=done.stdout+done.stderr;log_name=row['resource'].replace('/','_')+'.log';write_new(proof_dir/'logs'/log_name,log)
+            result=dict(resource=row['resource'],started_utc=started,elapsed_seconds=round(elapsed,6),compiler_exit_code=done.returncode,compiler_argv=args,compiler_log_sha256=sha(log),compiler_log=log_name)
+            if done.returncode!=0 or b'0 failed'not in log or not artifact.is_file()or artifact.stat().st_size==0:
+                result.update(status='OFFICIAL_COMPILE_FAILED',error='compiler_exit_log_or_artifact_failed');results.append(result);continue
+            for pin in row['sources']:need(checks((stage_content/pin['path']).read_bytes())==pin['compiler_input'],'staged_source_changed_during_compile')
+            raw=artifact.read_bytes();output=checks(raw)
+            try:binding=compiled_binding(row['resource'],raw,payloads[row['primary_source']])
+            except ValueError as error:
+                result.update(status='OFFICIAL_COMPILE_FAILED',error=str(error));results.append(result);continue
+            result.update(status='OFFICIALLY_COMPILED_AND_SOURCE_BOUND',artifact_path=str(artifact),artifact=output,prior_stage_artifact=before,
+                primary_source=row['primary_source'],inputs=row['sources'],engine_references=row['engine_references'],**binding)
+            results.append(result)
+        report=dict(schema=1,kind='ISOLATED_OFFICIAL_COMPILER_PROOF',plan_sha256=plan_sha,source_revisions=revisions,scope_sha256=plan['scope_sha256'],
+            compiler_path=str(COMPILER),compiler_sha256=compiler_sha,tool_sha256=sha(Path(__file__).read_bytes()),operator_binding=plan['operator_binding'],external_stage=str(stage),game_mount=str(game_mount),content_mount=str(content_mount),
+            results=results,counts=dict(Counter(r['status']for r in results)),complete=all(r['status']=='OFFICIALLY_COMPILED_AND_SOURCE_BOUND'for r in results),
+            sdk_calls=0,git_mutations=0,project_worktree_writes=0,publication_ready=False)
+        write_new(proof_dir/'proof.json',canonical(report));return report
+    finally:
+        # Junction removal is nonrecursive and only targets mounts this call
+        # created after all immutable exports were checked. Preserve the LAB.
+        for mount,target in reversed(created_mounts):
+            need(mount.is_junction()and mount.resolve()==target.resolve(),'compiler_mount_changed_before_cleanup')
+            os.rmdir(mount)
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__);sub=parser.add_subparsers(dest='action',required=True)
-    plan=sub.add_parser('plan');plan.add_argument('--scope',type=Path,required=True);plan.add_argument('--scope-sha256',required=True);plan.add_argument('--game-source',required=True);plan.add_argument('--content-source',required=True);plan.add_argument('--out',type=Path,required=True)
+    plan=sub.add_parser('plan');plan.add_argument('--scope',type=Path,required=True);plan.add_argument('--scope-sha256',required=True);plan.add_argument('--game-source',required=True);plan.add_argument('--content-source',required=True);plan.add_argument('--operator-source',required=True);plan.add_argument('--out',type=Path,required=True)
     compile=sub.add_parser('compile');compile.add_argument('--plan',type=Path,required=True);compile.add_argument('--plan-sha256',required=True);compile.add_argument('--run-id',required=True);compile.add_argument('--proof-dir',type=Path,required=True)
     args=parser.parse_args(argv)
     if args.action=='plan':
-        scope=read_json(args.scope,args.scope_sha256);value=make_plan(scope,args.scope_sha256,{'game':args.game_source,'content':args.content_source});write_new(args.out,canonical(value))
+        scope=read_json(args.scope,args.scope_sha256);value=make_plan(scope,args.scope_sha256,{'game':args.game_source,'content':args.content_source},operator_revision=args.operator_source);write_new(args.out,canonical(value))
     else:value=compile_plan(read_json(args.plan,args.plan_sha256),args.plan_sha256,args.run_id,args.proof_dir)
     print(json.dumps(dict(kind=value['kind'],counts=value['counts'],complete=value.get('complete',False),publication_ready=False,project_worktree_writes=0),ensure_ascii=True))
 if __name__=='__main__':main()

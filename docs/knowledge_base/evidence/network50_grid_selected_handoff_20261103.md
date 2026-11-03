@@ -92,3 +92,35 @@ gen2 CLI `--check` 已复现同一输出。真实模块边界复跑：wire15、r
 生产变换准备也已落 `tools/complete_delivery_release_20261103/production.py`：四个纯配置取真实0104已审字节；addoninfo保留新 lobby并恢复正式入口／四人容量，client入口保留 hosted lobby 初始化，admission保留当前去 onboarding 的逻辑。旧只读 plan 已将这三项旧 parent target 清空并指向明确变换，避免重新覆盖丢逻辑或复活已删 helper。production8、plan6测试通过；真实0104／不可变源的五账号与拒绝相邻第六账号、四配置常量、lobby／原入口均做了纯逻辑探针，未做实际 Steam 登录。
 
 只读复核当前保护选择为186项，仍需实际固定 Prometheus 全值／RNG验证。真正保护导出应等待包含新 lookup 的最终 game 第二提交；以 c872 导出会拿到原型旧 lookup，不能与新 JS 混包。完整 recipe／ledger／authority及发行验收仍阻断，不造 ready。
+
+## 后续追加：Dev05 原生消息收口，FPS 未取得
+
+**仅本地更新。** 这次实际 Tools／offline 冷进程绑定最终 game `173fb251b64c087f6a3a3200cc3704016b3d5852`、content `9f8be070deb3defb097357cf5d2e6fd8544dd569`。树外独立副本为 10,825 文件／5,268,611,341 B，manifest SHA `585c530bed29b0d583659d274481202e8003c7827bc1359dbb74574c83d7211a`；逐文件复制摘要、来源 stat／摘要二次核对通过，硬链接为零。原 manifest 保持不变。Tools 合法重编的 `.vjs_c` 只有实际 DATA 逐字节等于该不可变副本的 CRLF 作者源时才允许只读诊断绑定，另记 prelaunch 与实际 postcompile 摘要；这不是普通签包准入。
+
+关闭后的日志 raw SHA 为 `393d33a170947f7923fb5f688e2eb1672885abc331fd2c3941348801923176c2`，`log_closed=true`。公共聚合路径为 `data/ui/network50_dev05_evidence_20261103.json`；可由 `python -X utf8 -B tools/summarize_compact_native_log.py output/network50_dev_20261103/run05/engine.log` 从保留的本机原始日志重算。Git 不收录原日志、KV、scope、账号或认证内容。
+
+实际 `cw` 为 **93 帧／4,529 B，最大49 B**，可完整解码的视图为 1、2、3、4、5、6，未解析帧零。这里计量 `CUserMsg_CustomGameEvent`，不含 UDP／IP／Steam 外层开销；也不是网络往返时间。此局旧 `survival_ui_private_snapshot`、`survival_archive_snapshot`、`ui_selected_unit_stats_snapshot` 和五种 `ui_grid_placement_*` profiles／static_area／area／validation／commit_result 事件均观察为零，只证明本局实际经过的路径没有这些旧包，不能外推所有窗口及交互已经完整验收。
+
+**全事件≤50 B 仍未达成。** 同一真实日志尚有：
+
+| 事件 | 次数 | 最大原生 B |
+| --- | ---: | ---: |
+| `survival_vip_snapshot` | 3 | 2,316 |
+| `ui_hero_summon_state` | 6 | 2,908 |
+| `survival_public_beta_gift_snapshot` | 49 | 365 |
+| `survival_payment_capability` | 29 | 240 |
+| `survival_loading_mode_result` | 1 | 191 |
+| `ui_notification` | 1 | 149 |
+| `ui_difficulty_select_result` | 1 | 102 |
+| `ui_weapon_synthesis_snapshot` | 1 | 97 |
+| `ui_shop_unlock_state` | 6 | 96 |
+| `survival_select_unit` | 1 | 75 |
+| `ui_combat_effects_state` | 1 | 55 |
+
+真实 `[STATIC_PERF]` 为 73 batches／9,216 cells，最大 batch **2.018 ms**，分批整体 elapsed **16,189.4 ms**，`native_query_upper=147456`。这是单局 Tools 的实际批处理记录；elapsed 是从开始到完成的分批总时长，不能写成一次16秒主线程阻塞，也不能将 upper bound 当作逐 API 实测计数或 FPS 提升。
+
+**有效 FPS 采集为零，没有平均 FPS／p95 结论。** 这轮先后遇到只读 PID／端口核查超时、前台条件不满足和读回失败；端口核查已改为固定端口的有界原生 listener 表查询，仍保留 PID、创建时间、精确 alias 与端口 owner 校验。随后确认 16:09:23 已因 `wall_not_built_in_time` 自然判负并回主菜单，旧 UI context 卸载，不能再取得该 context 的新 nonce 回应。桥原来把 generic error 误报成 `fresh_inspect_nonce_mismatch`，现仅输出固定安全原因，缺回应会明确 `readback_fresh_inspect_reply_missing`，不导出原始错误／控制台历史。失败样本仍拒绝，`Game.IsGamePaused` 在这个实际 UI 中也未取得合格读回，不能用本地 DLL 字符串或 Mock 代替。
+
+Dev05 已正常关闭并解除两个确切挂载，树外副本和回执保留。新版 production 训练／研究视图、快速切换／网格操作、四人原生隔离及真实抽奖不在这次完整验收范围。runner／只读输入 helper 仅新增显式 `run06` allowlist，未复制或启动新副本；须等新增 production 双端及目录完成同源提交／编译后，再 fresh copy，尽快选模式和 N1，并在自然结束前采集真实前台游戏30秒。
+
+正式游廊仍为0104／manifest `7025356658517360342`；本轮 Tools 无 SDK 上传、正式安装替换、后台改动或真实交易。完整生产转换／签名／普通准入／发布与官方完整下载待办保持，不能据93个短帧清空完整待发清单。

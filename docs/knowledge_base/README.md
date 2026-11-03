@@ -1,5 +1,7 @@
 # 孤城逐晓／Survival 统一知识库
 
+**2026-11-03 phase3仍仅本地更新，后台未改。** 生产view7恢复训练／研究／队列，VIP view8只传真实等级，英雄旧无消费者大包按订阅发送，Beta取消未就绪重复请求，工人容量真实变化触发刷新。24目录／12编译工具／5生产draft／22Beta及VIP边界通过；32官方编译由主操作者报告。当前实际目录仍fe1718，计划7932记录／186字段须新source冻结后严格Git生成；未新native／FPS，剩余legacy并未全部≤50 B，正式0104和完整发行待办保持。见[phase3真实范围、成本与待办](evidence/network50_production_vip_phase3_20261103.md)。
+
 **2026-11-03 最新：严格Git gen2已生成，仍仅本地更新**：[追加来源与阶段边界](evidence/network50_grid_selected_handoff_20261103.md)。输入c8722ee2／5bdd9627、旧atlas参考0056e2bf；新schema fe171856…，十代IDs未变。官方28编译回执不等于最终产物提交或新native／FPS验收，原游廊0104与WS4保持，完整生产／发行仍阻断。
 
 **2026-11-03 最新追加仍仅本地更新**：[网格／选中单位、非权威本地atlas与10代注册表](evidence/network50_grid_selected_handoff_20261103.md)。7887记录／163字段，schema004ce5aa…；同schema双入口初始化一次，静态候选只在本局实际扫描后按K覆盖，原validate／commit不改。离线grid7／selected8／codec15／generator18组过，不标新native／FPS／游廊通过；正式0104和本轮WS4保持，完整生产／发行工具链仍待。

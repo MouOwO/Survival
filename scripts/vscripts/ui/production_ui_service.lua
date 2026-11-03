@@ -8,7 +8,17 @@ local runtime_builder = require("ui/ability_runtime_builder")
 -- Selected-building presentation and authenticated intent routing only.
 -- The worker/shop systems own jobs, prices, limits and completion timers.
 local M = {}
+local compact_execute
 local research_cache, research_generation = {}, {}
+local presentation_versions,building_versions,presentation_cache,building_signatures={},{},{},{}
+local active_lifecycle
+function M.stamp(player_id,entity)
+    return tostring(event_bus.get_generation())..':'..tostring(presentation_versions[player_id]or 0)..':'..tostring(building_versions[entity]or 0)
+end
+local function invalidate_presentation(payload)
+    local id=tonumber(payload and payload.player_id)
+    if id~=nil then presentation_versions[id]=(presentation_versions[id]or 0)+1 end
+end
 local operation_error_messages = {wood_not_enough = "木材不足", insufficient_wood = "木材不足",
         gold_not_enough = "金币不足", insufficient_gold = "金币不足",
         population_not_enough = "人口不足", insufficient_population = "人口不足",
@@ -51,12 +61,20 @@ local function resolve_entity(index)
     return unit
 end
 
-function M.decorate(player_id, unit, snapshot)
+function M.decorate(player_id, unit, snapshot,compact)
     snapshot = snapshot or {}
     if not unit or unit:IsNull() then return snapshot end
     local entindex = entity_index(snapshot.entindex)
         or (unit.entindex and unit:entindex())
     if not entindex then return snapshot end
+    local cache_key=tostring(player_id)..':'..tostring(entindex)
+    local stamp=M.stamp(player_id,entindex)
+    local old=presentation_cache[cache_key]
+    if old and old.unit==unit and old.stamp==stamp then
+        snapshot.training,snapshot.research,snapshot.building_id=old.training,old.research,old.building_id
+        if compact then snapshot._production_stamp=stamp end
+        return snapshot
+    end
     local building = event_bus.request(events.BUILDING_QUERY_REQUEST, {
         entindex = entindex, read_only = true,
     })
@@ -100,26 +118,36 @@ function M.decorate(player_id, unit, snapshot)
         local key=tostring(player_id)..":"..tostring(entindex)
         local generation=research_generation[player_id] or 0
         local cached=research_cache[key]
-        if not cached or cached.generation~=generation then
+        if not cached or cached.generation~=generation or cached.unit~=unit or cached.building_id~=id then
             local abilities={}
             for _, mapping in ipairs(research_abilities.rows or {}) do
                 if mapping.enabled ~= false and mapping.building_id == id then
                     abilities[mapping.ability_name] = runtime_builder.build(mapping.ability_name,view,nil)
                 end
             end
-            cached={generation=generation,abilities=abilities}
+            cached={generation=generation,abilities=abilities,unit=unit,building_id=id}
             research_cache[key]=cached
         end
         snapshot.research.abilities_by_name = cached.abilities
     end
+    if compact then snapshot._production_stamp=stamp end
+    presentation_cache[cache_key]={unit=unit,stamp=stamp,training=snapshot.training,research=snapshot.research,building_id=snapshot.building_id}
     return snapshot
 end
 
 function M.init(options)
+    compact_execute = nil
     research_cache,research_generation={},{}
+    presentation_versions,building_versions,presentation_cache,building_signatures={},{},{},{}
+    local lifecycle={};active_lifecycle=lifecycle;local world=event_bus.get_generation()
+    local function current()return active_lifecycle==lifecycle and event_bus.get_generation()==world end
     local function refresh(payload)
+        if not current()then return end
         local player_id = tonumber(payload and payload.player_id)
         if player_id == nil then return end
+        -- The compact production view owns its own selection and preserves the
+        -- viewer's private lane. Do not route it through the combat-only DTO.
+        if options.compact_refresh and options.compact_refresh(player_id,payload) then return end
         local selected = entity_index(options.selected(player_id))
         if not selected then return end
         local building = event_bus.request(events.BUILDING_QUERY_REQUEST, {
@@ -142,6 +170,7 @@ function M.init(options)
         })
     end
     event_bus.subscribe(events.WORKER_CHANGED, function(payload)
+        if not current()then return end
         if not payload or not payload.super_lumberjack or not payload.removed_entindexes then return end
         local player = PlayerResource:GetPlayer(tonumber(payload.player_id))
         if not player then return end
@@ -152,10 +181,16 @@ function M.init(options)
             target_entindex = payload.entindex, consumed_entindexes = consumed,
         })
     end)
-    event_bus.subscribe(events.WORKER_CHANGED, refresh)
+    event_bus.subscribe(events.WORKER_CHANGED,function(payload)
+        if not current()then return end
+        if payload and(payload.training_queue_changed or payload.training or payload.training_capacity_changed)then invalidate_presentation(payload)end
+        refresh(payload)
+    end)
     -- Training prices and unlocks change with progression or queue events.
     -- Wallet changes are checked on a training click and do not repaint options.
     local function refresh_research(payload)
+        if not current()then return end
+        invalidate_presentation(payload)
         invalidate_research(payload)
         refresh(payload)
     end
@@ -168,11 +203,31 @@ function M.init(options)
         if type(payload and payload.totals)=="table" then refresh_research(payload) end
     end)
     event_bus.subscribe(events.BUILDING_DESTROYED,function(payload)
+        if not current()then return end
+        local entity=tonumber(payload and payload.entindex)
+        if entity then building_versions[entity]=(building_versions[entity]or 0)+1;building_signatures[entity]=nil end
         for key in pairs(research_cache) do
             if key:match(":"..tostring(payload.entindex).."$") then research_cache[key]=nil end
         end
+        refresh(payload)
     end)
-    local function research_request(operation, request_event, payload)
+    local function changed_building(payload)
+        if not current()or not payload then return end
+        local id=payload.building_id
+        if id~='main_city'and id~='building_research_lab'and id~='building_advanced_research_lab'then return end
+        local entity=tonumber(payload.entindex);if not entity then return end
+        local signature=tostring(payload.player_id)..':'..tostring(payload.team)..':'..tostring(payload.level)..':'..id
+        if signature~=building_signatures[entity]then
+            building_signatures[entity]=signature;building_versions[entity]=(building_versions[entity]or 0)+1
+            refresh(payload)
+        end
+    end
+    event_bus.subscribe(events.BUILDING_CHANGED,changed_building)
+    for _,event in ipairs({events.PLAYER_DEFEATED,events.PLAYER_DISCONNECTED})do
+        event_bus.subscribe(event,function(payload)if current()then invalidate_presentation(payload);refresh(payload)end end)
+    end
+    local function research_request(operation, request_event, payload, capture)
+        if not current()then return end
         payload = payload or {}
         local player_id = options.source_player_id(payload)
         local request_id = tostring(payload.request_id or "")
@@ -224,19 +279,21 @@ function M.init(options)
                 .. " error=" .. tostring(result.error or "")
                 .. " status_code=" .. tostring(result.error_code or ""))
         end
-        options.send("ui_operation_result", player_id, {
+        local receipt = {
             operation = operation, request_id = request_id,
             source_entindex = source or -1, success = result.ok and 1 or 0,
             queued = result.queued and 1 or 0,
             refunded = result.refunded and 1 or 0,
             error = result.ok and "" or operation_error(result.error, "研究排队失败"),
             error_code = result.ok and "" or tostring(result.error_code or ""),
-        })
+        }
+        if not capture then options.send("ui_operation_result", player_id, receipt) end
         if result.ok then refresh({player_id = player_id, source_entindex = source})
-        else
+        elseif not capture then
             event_bus.emit(events.UI_NOTIFICATION, {player_id = player_id,
                 message = operation_error(result.error, "研究排队失败"), level = "error"})
         end
+        return receipt
     end
     CustomGameEventManager:RegisterListener("ui_research_queue_request", function(_, payload)
         research_request("research_queue", events.TECHNOLOGY_PURCHASE_NEXT_REQUEST, payload)
@@ -244,7 +301,8 @@ function M.init(options)
     CustomGameEventManager:RegisterListener("ui_research_cancel_request", function(_, payload)
         research_request("research_cancel", events.TECHNOLOGY_RESEARCH_CANCEL_REQUEST, payload)
     end)
-    CustomGameEventManager:RegisterListener("ui_worker_train_request", function(_, payload)
+    local function worker_request(payload,capture)
+        if not current()then return end
         payload = payload or {}
         local player_id = options.source_player_id(payload)
         if not options.valid_player_id(player_id) then return end
@@ -277,7 +335,7 @@ function M.init(options)
                 source_entindex = source,
             })
         end
-        options.send("ui_operation_result", player_id, {
+        local receipt = {
             operation = "worker_train",
             request_id = tostring(payload.request_id or ""),
             source_entindex = source or -1,
@@ -286,17 +344,35 @@ function M.init(options)
             job_id = result.job_id,
             training = training,
             error = result.ok and "" or operation_error(result.error, "训练失败"),
-        })
+        }
+        if not capture then options.send("ui_operation_result", player_id, receipt) end
         if result.ok then
             refresh({ player_id = player_id, source_entindex = source })
-        else
+        elseif not capture then
             event_bus.emit(events.UI_NOTIFICATION, {
                 player_id = player_id,
                 message = operation_error(result.error, "训练失败"),
                 level = "error",
             })
         end
-    end)
+        return receipt
+    end
+    CustomGameEventManager:RegisterListener("ui_worker_train_request", function(_,payload) return worker_request(payload,false) end)
+    compact_execute = function(kind,payload)
+        if kind=="production_train" then return worker_request(payload,true) end
+        local routes={production_research={"research_queue",events.TECHNOLOGY_PURCHASE_NEXT_REQUEST},
+            production_auto={"shop_auto_research_toggle",events.SHOP_AUTO_RESEARCH_TOGGLE_REQUEST},
+            production_cancel={"research_cancel",events.TECHNOLOGY_RESEARCH_CANCEL_REQUEST}}
+        local route=routes[kind]
+        if route then return research_request(route[1],route[2],payload,true) end
+    end
+end
+
+-- Called only by the authenticated compact view adapter. All original source,
+-- owner/team, queue, price, refund and completion checks still run above.
+function M.execute(kind,payload)
+    if not compact_execute then return nil,"production_not_initialized" end
+    return compact_execute(kind,payload)
 end
 
 return M

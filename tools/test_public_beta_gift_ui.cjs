@@ -12,7 +12,7 @@ const layers = fs.readFileSync("panorama/src/scripts/custom_game/ui_layers.js", 
 // receipt races and lifecycle ownership; native layout pixels are separate.
 function fixture() {
     const nodes = {}, jobs = new Map(), events = new Map(), tables = new Map(), sends = [];
-    let serial = 0, stamp = 1800000000000, admission = false, sequence = 0;
+    let serial = 0, stamp = 1800000000000, admission = false, profilesReady = false, sequence = 0;
     function panel(type, parent, id) {
         const p = {id, type, parent, children:[], style:{}, classes:new Set(), events:{}, visible:true,
             valid:true, hittest:false, hittestchildren:true, enabled:true, text:"",
@@ -35,7 +35,7 @@ function fixture() {
     const $ = {GetContextPanel:()=>context, CreatePanel:panel, RegisterEventHandler(){},
         Schedule(delay,fn){const id=++serial;jobs.set(id,{delay,fn});return id;}, CancelScheduled:id=>jobs.delete(id)};
     const sandbox = vm.createContext({$, Date:{now:()=>stamp}, GameUI:{CustomUIConfig:()=>cfg},
-        CustomNetTables:{GetTableValue:()=>({admission_complete:admission?1:0}),
+        CustomNetTables:{GetTableValue:()=>({admission_complete:admission?1:0,profiles_ready:profilesReady?1:0}),
             SubscribeNetTableListener(name,fn){const id=++serial;tables.set(id,fn);return id;},UnsubscribeNetTableListener:id=>tables.delete(id)},
         GameEvents:{Subscribe(name,fn){const id=++serial;events.set(id,{name,fn});return id;},Unsubscribe:id=>events.delete(id),
             SendCustomGameEventToServer(name,data){sends.push({name,data:JSON.parse(JSON.stringify(data))});}}});
@@ -50,7 +50,7 @@ function fixture() {
     }
     load();
     return {cfg,nodes,jobs,events,tables,sends,load,tick,snapshot,
-        admit(value=true){admission=value;for(const fn of tables.values())fn();},
+        admit(value=true,profiles=value){admission=value;profilesReady=profiles;for(const fn of tables.values())fn();},
         click(){nodes.PublicBetaGiftClaim.events.onactivate();},
         close(){nodes.PublicBetaGiftClose.events.onactivate();},
         inspect(){return cfg.SurvivalPublicBetaGift.Inspect();},
@@ -65,9 +65,10 @@ test("no query or popup before admission, cached eligible snapshot waits",()=>{
     const f=fixture();f.snapshot();assert.equal(f.inspect().open,false);assert.equal(f.queries().length,0);
     f.admit();f.tick();assert.equal(f.inspect().open,true);assert.equal(f.queries().length,1);
 });
-test("unloaded profile cannot open and retries query without writing",()=>{
+test("unloaded profile stays closed until the authoritative profile push",()=>{
     const f=fixture();f.admit();f.tick();f.snapshot({ok:0});f.tick(6000);
-    assert.equal(f.inspect().open,false);assert.equal(f.claims().length,0);assert.equal(f.queries().length,2);
+    assert.equal(f.inspect().open,false);assert.equal(f.claims().length,0);assert.equal(f.queries().length,1);
+    f.snapshot();assert.equal(f.inspect().open,true);assert.equal(f.queries().length,1);
 });
 test("eligible player automatically sees the approved fixed reward",()=>{
     const f=fixture();f.eligible();assert.equal(f.inspect().open,true);
@@ -106,6 +107,15 @@ test("terminal failure permits an explicit retry with a new nonce",()=>{
 test("timeout queries status and cannot automatically replay a claim",()=>{
     const f=fixture();f.eligible();f.click();f.tick(11000);assert(f.queries().length>=2);
     assert.equal(f.claims().length,1);assert.equal(f.nodes.PublicBetaGiftClaimText.text,"正在确认…");
+    const queries=f.queries().length;for(let n=0;n<100;n++)f.tick(5000);
+    assert.equal(f.queries().length,queries,"one failure-only status read per original claim");
+});
+
+test("admission without a loaded profile never starts repeated snapshots",()=>{
+    const f=fixture();f.admit(true,false);for(let n=0;n<1000;n++)f.tick(5000);
+    assert.equal(f.queries().length,0);f.admit(true,true);f.tick();
+    assert.equal(f.queries().length,1);for(let n=0;n<1000;n++)f.tick(5000);
+    assert.equal(f.queries().length,1,"profile/error recovery uses authoritative pushes, not recurring reads");
 });
 test("closing suppresses further popup pushes in the same login",()=>{
     const f=fixture();f.eligible();f.close();f.snapshot();f.tick();assert.equal(f.inspect().open,false);assert.equal(f.inspect().dismissed,true);

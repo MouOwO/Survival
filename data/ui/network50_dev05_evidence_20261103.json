@@ -1,0 +1,201 @@
+{
+  "schema": 1,
+  "status": "LOCAL_TOOLS_NATIVE_PARTIAL_EVIDENCE_NOT_FPS_OR_WORKSHOP_ACCEPTANCE",
+  "run": "run05",
+  "date": "2026-11-03",
+  "source_heads": {
+    "game": "173fb251b64c087f6a3a3200cc3704016b3d5852",
+    "content": "9f8be070deb3defb097357cf5d2e6fd8544dd569"
+  },
+  "snapshot": {
+    "manifest_sha256": "585c530bed29b0d583659d274481202e8003c7827bc1359dbb74574c83d7211a",
+    "files": 10825,
+    "bytes": 5268611341,
+    "copied_files_sha256_verified": true,
+    "source_second_pass_verified": true,
+    "hardlinks": 0,
+    "original_manifest_preserved": true
+  },
+  "native": {
+    "status": "NATIVE_LOG_AGGREGATE_NOT_FPS_OR_ORDINARY_ACCEPTANCE",
+    "log_sha256": "393d33a170947f7923fb5f688e2eb1672885abc331fd2c3941348801923176c2",
+    "log_closed": true,
+    "events": {
+      "survival_vip_snapshot": {
+        "count": 3,
+        "max_native_bytes": 2316,
+        "total_native_bytes": 4719
+      },
+      "survival_payment_capability": {
+        "count": 29,
+        "max_native_bytes": 240,
+        "total_native_bytes": 6951
+      },
+      "ui_combat_effects_state": {
+        "count": 1,
+        "max_native_bytes": 55,
+        "total_native_bytes": 55
+      },
+      "survival_public_beta_gift_snapshot": {
+        "count": 49,
+        "max_native_bytes": 365,
+        "total_native_bytes": 17833
+      },
+      "survival_loading_mode_result": {
+        "count": 1,
+        "max_native_bytes": 191,
+        "total_native_bytes": 191
+      },
+      "ui_hero_summon_state": {
+        "count": 6,
+        "max_native_bytes": 2908,
+        "total_native_bytes": 17334
+      },
+      "ui_shop_unlock_state": {
+        "count": 6,
+        "max_native_bytes": 96,
+        "total_native_bytes": 554
+      },
+      "ui_weapon_synthesis_snapshot": {
+        "count": 1,
+        "max_native_bytes": 97,
+        "total_native_bytes": 97
+      },
+      "survival_select_unit": {
+        "count": 1,
+        "max_native_bytes": 75,
+        "total_native_bytes": 75
+      },
+      "cw": {
+        "count": 93,
+        "max_native_bytes": 49,
+        "total_native_bytes": 4529
+      },
+      "ui_difficulty_select_result": {
+        "count": 1,
+        "max_native_bytes": 102,
+        "total_native_bytes": 102
+      },
+      "ui_notification": {
+        "count": 1,
+        "max_native_bytes": 149,
+        "total_native_bytes": 149
+      }
+    },
+    "compact_views": {
+      "1": {
+        "frames": 7,
+        "full_frames": 7,
+        "delta_frames": 0,
+        "max_native_bytes": 49,
+        "transactions": 1
+      },
+      "2": {
+        "frames": 33,
+        "full_frames": 33,
+        "delta_frames": 0,
+        "max_native_bytes": 49,
+        "transactions": 2
+      },
+      "4": {
+        "frames": 15,
+        "full_frames": 15,
+        "delta_frames": 0,
+        "max_native_bytes": 49,
+        "transactions": 1
+      },
+      "6": {
+        "frames": 6,
+        "full_frames": 6,
+        "delta_frames": 0,
+        "max_native_bytes": 49,
+        "transactions": 1
+      },
+      "3": {
+        "frames": 1,
+        "full_frames": 1,
+        "delta_frames": 0,
+        "max_native_bytes": 47,
+        "transactions": 1
+      },
+      "5": {
+        "frames": 31,
+        "full_frames": 19,
+        "delta_frames": 12,
+        "max_native_bytes": 49,
+        "transactions": 2
+      }
+    },
+    "compact_unparsed": 0,
+    "layer": "CUserMsg_CustomGameEvent; UDP/IP/Steam headers excluded",
+    "raw_payloads_disclosed": false
+  },
+  "observed_absent_legacy_events": {
+    "survival_ui_private_snapshot": 0,
+    "survival_archive_snapshot": 0,
+    "ui_grid_placement_profiles": 0,
+    "ui_grid_placement_static_area": 0,
+    "ui_grid_placement_area": 0,
+    "ui_grid_placement_validation": 0,
+    "ui_grid_placement_commit_result": 0,
+    "ui_selected_unit_stats_snapshot": 0
+  },
+  "absence_scope": "Only this one completed Tools/offline session; no assertion that every UI path or ordinary production client was exercised.",
+  "static_grid_scan": {
+    "batches": 73,
+    "cells": 9216,
+    "max_batch_ms": 2.018,
+    "elapsed_ms": 16189.4,
+    "native_query_upper": 147456,
+    "measurement": "actual Tools STATIC_PERF line, not FPS, not every individual API call measured"
+  },
+  "fps": {
+    "valid_captures": 0,
+    "valid_frames": 0,
+    "accepted_mean_fps": null,
+    "accepted_p95_ms": null,
+    "passed": false,
+    "failure_categories": [
+      "read_only_identity_port_query_timeout",
+      "foreground_preflight_rejected",
+      "fresh_inspect_reply_missing_after_ui_context_unloaded"
+    ],
+    "original_bridge_report_reason": "fresh_inspect_nonce_mismatch",
+    "reason_correction": "A generic bridge error was incorrectly reported as nonce mismatch. Helper now preserves only fixed safe error categories. This does not make the failed capture valid.",
+    "genuine_game_paused_api_readback_verified": false
+  },
+  "session_end": {
+    "local_log_time": "2026-11-03 16:09:23",
+    "reason": "wall_not_built_in_time",
+    "natural_game_defeat": true,
+    "main_menu_observed_by_operator": true,
+    "log_closed": true,
+    "owned_mounts_retired": true,
+    "snapshot_files_preserved": true
+  },
+  "limits": {
+    "ordinary_client_acceptance": false,
+    "all_events_at_most_50_bytes": false,
+    "rapid_selection_and_grid_native_acceptance": false,
+    "production_training_and_research_native_acceptance": false,
+    "four_player_native_acceptance": false,
+    "lottery_real_transaction_acceptance": false,
+    "raw_logs_or_payloads_committed": false,
+    "account_scope_or_auth_data_disclosed": false
+  },
+  "delivery": {
+    "state": "LOCAL_ONLY",
+    "workshop_release": "0104",
+    "steam_manifest": "7025356658517360342",
+    "workshop_uploaded": false,
+    "official_target_download_verified": false,
+    "backend_changed_in_this_dev_session": false,
+    "automatic_real_transactions": 0
+  },
+  "next": [
+    "Freeze the new production view and paired catalogue/compiled resources to exact dual-repository commits before a fresh run06 copy.",
+    "Select mode and N1 promptly after launch, then collect foreground live-game FPS before natural match end.",
+    "Verify remaining oversized VIP, hero summon, public beta and other event paths rather than extrapolating cw size to all messages.",
+    "Use complete signed ordinary-client, upload and exact official-download checks before claiming Workshop synchronization."
+  ]
+}

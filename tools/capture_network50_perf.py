@@ -31,6 +31,42 @@ COLLECTOR=ROOT/'output/four_client_perf_20261012/bin/PresentMon-2.6.0-x64.exe'
 COLLECTOR_SHA='b2a706bc6ad475749e3b7e3409263aa1e6906d45bdcf993f6dbc0f660188f1af'
 PORT=29069
 CREATE_NO_WINDOW=getattr(subprocess,'CREATE_NO_WINDOW',0)
+TCP_LISTENERS_CS=r'''
+using System;using System.Collections.Generic;using System.Net;using System.Runtime.InteropServices;
+public static class N50TcpListeners {
+ public sealed class Row {public int pid;public string address;}
+ [DllImport("iphlpapi.dll",SetLastError=true)]static extern uint GetExtendedTcpTable(IntPtr data,ref int size,bool order,int family,int table,uint reserved);
+ public static Row[] ForPort(int port){
+  var result=new List<Row>();
+  foreach(int family in new int[]{2,23}){
+   int size=0;uint code=GetExtendedTcpTable(IntPtr.Zero,ref size,false,family,3,0);
+   if(code!=0&&code!=122)throw new Exception("tcp_listener_size_failed");
+   bool complete=false;
+   for(int attempt=0;attempt<3;attempt++){
+    if(size<4||size>8388608)throw new Exception("tcp_listener_buffer_limit");
+    IntPtr buffer=Marshal.AllocHGlobal(size);
+    try{
+     code=GetExtendedTcpTable(buffer,ref size,false,family,3,0);
+     if(code==122)continue;if(code!=0)throw new Exception("tcp_listener_read_failed");
+     int count=Marshal.ReadInt32(buffer),stride=family==2?24:56;
+     if(count<0||count>65536||4L+(long)count*stride>size)throw new Exception("tcp_listener_rows_invalid");
+     for(int index=0;index<count;index++){
+      IntPtr row=IntPtr.Add(buffer,4+index*stride);int offset=family==2?8:20;
+      int actualPort=Marshal.ReadByte(row,offset)*256+Marshal.ReadByte(row,offset+1);
+      if(actualPort!=port)continue;
+      int state=Marshal.ReadInt32(row,family==2?0:48);if(state!=2)throw new Exception("tcp_listener_state_invalid");
+      byte[] address=new byte[family==2?4:16];Marshal.Copy(IntPtr.Add(row,family==2?4:0),address,0,address.Length);
+      result.Add(new Row{pid=Marshal.ReadInt32(row,family==2?20:52),address=new IPAddress(address).ToString()});
+     }
+     complete=true;break;
+    }finally{Marshal.FreeHGlobal(buffer);}
+   }
+   if(!complete)throw new Exception("tcp_listener_retry_limit");
+  }
+  return result.ToArray();
+ }
+}
+'''
 
 def module(name,file):
     spec=importlib.util.spec_from_file_location(name,ROOT/'tools'/file)
@@ -138,7 +174,9 @@ def bindings(run):
 
 def live_identity(binding):
     pid=binding['pid']
-    data=ps("$p=Get-CimInstance Win32_Process -Filter 'ProcessId="+str(pid)+"';$l=@(Get-NetTCPConnection -State Listen -LocalPort 29069 -ErrorAction SilentlyContinue);[ordered]@{pid=if($p){[int]$p.ProcessId}else{0};created=if($p){$p.CreationDate.ToUniversalTime().ToString('o')}else{''};exe=if($p){$p.ExecutablePath}else{''};command=if($p){$p.CommandLine}else{''};listeners=@($l|ForEach-Object{[ordered]@{pid=[int]$_.OwningProcess;address=$_.LocalAddress}})}|ConvertTo-Json -Compress -Depth 4")
+    script="Add-Type -TypeDefinition @'\n"+TCP_LISTENERS_CS+"\n'@;"
+    script+="$p=Get-CimInstance Win32_Process -Filter 'ProcessId="+str(pid)+"';$l=@([N50TcpListeners]::ForPort(29069));[ordered]@{pid=if($p){[int]$p.ProcessId}else{0};created=if($p){$p.CreationDate.ToUniversalTime().ToString('o')}else{''};exe=if($p){$p.ExecutablePath}else{''};command=if($p){$p.CommandLine}else{''};listeners=@($l|ForEach-Object{[ordered]@{pid=[int]$_.pid;address=$_.address}})}|ConvertTo-Json -Compress -Depth 4"
+    data=ps(script)
     need(data.get('pid')==pid and data.get('created')==binding['created'],'process_generation_changed')
     need(os.path.normcase(str(Path(data.get('exe','')).resolve()))==os.path.normcase(binding['exe']),'dota_executable_mismatch')
     # Match the exact standalone addon token, never a substring of another lab.
@@ -209,8 +247,14 @@ class Readback:
         except Exception:
             self.close();raise
     def receive(self,seconds):
-        try:return json.loads(self.lines.get(timeout=seconds))
+        try:reply=json.loads(self.lines.get(timeout=seconds))
         except queue.Empty:raise ValueError('bounded_readback_timeout')from None
+        need(isinstance(reply,dict),'readback_object_required')
+        if 'error'in reply:
+            reasons={'registered_inspect_command_required','fresh_32hex_nonce_required','bounded_request_required','read_only_inspect_required','fresh_inspect_reply_missing','inspect_object_required','invalid_readback_json','console_connection_refused','console_connection_closed','readback_failed'}
+            reason=reply.get('reason')
+            raise ValueError('readback_'+reason if reason in reasons else 'readback_failed_no_raw_output_exported')
+        return reply
     def inspect(self):
         nonce=uuid.uuid4().hex
         self.child.stdin.write(json.dumps({'op':'inspect','nonce':nonce})+'\n');self.child.stdin.flush()

@@ -3,6 +3,7 @@ from pathlib import Path
 import copy
 import json
 import shutil
+import struct
 import subprocess
 import tempfile
 import unittest
@@ -35,16 +36,17 @@ class StaticCatalogTests(unittest.TestCase):
         cls.reference = m.GitSource(m.ROOT, GAME)
         cls.source = ReviewedInputFixture((*PUBLIC_SOURCES,"scripts/vscripts/ui/selected_stats_schema.lua",
                                           "data/ui/grid_static_atlas_candidate_20261103.json"))
-        cls.operator = ReviewedInputFixture(("tools/selected_stats_static_seed.lua","tools/extract_grid_static_atlas_20261103.py"))
+        cls.operator = ReviewedInputFixture(("tools/selected_stats_static_seed.lua","tools/production_ui_static_seed.lua",
+                                             "tools/extract_grid_static_atlas_20261103.py"))
         cls.outputs, cls.registry = m.build(cls.source, CONTENT, LUA, operator=cls.operator, atlas_reference=cls.reference)
         cls.records, cls.auxiliary = m.make_catalog(cls.source, LUA, cls.operator, cls.reference)
         cls.by_key = {row["key"]: row for row in cls.registry["records"]}
 
     def test_real_three_domains_and_public_configuration_coverage(self):
-        self.assertEqual(len(self.registry["records"]), 7887)
+        self.assertEqual(len(self.registry["records"]), 7932)
         manifest = json.loads(self.outputs[m.MANIFEST_PATH])
         self.assertEqual(manifest["domain_counts"], {"archive": 1146, "daily": 75, "lottery": 83, "hud": 1, "wire": 9,
-                                                   "grid": 4390, "selected": 2183})
+                                                   "grid": 4390, "selected": 2183, "production":44, "vip":1})
         self.assertTrue(manifest["csv_runtime_config_rows_equal"])
         self.assertFalse(manifest["runtime_connected"])
         self.assertFalse(manifest["workshop_uploaded"])
@@ -136,7 +138,7 @@ class StaticCatalogTests(unittest.TestCase):
         m.validate_registry(old)
         updated = m.update_registry(self.records, old)
         self.assertEqual(updated["fields"][:22], old["fields"])
-        self.assertEqual(len(updated["fields"]), 163)
+        self.assertEqual(len(updated["fields"]), 186)
         self.assertEqual(updated["generation"], 2)
 
     def test_grid_static_profiles_maps_and_capacity_have_no_invented_terrain(self):
@@ -245,6 +247,63 @@ class StaticCatalogTests(unittest.TestCase):
         self.assertEqual(by_name["grid_map"]["id"], 161)
         self.assertEqual(by_name["selected_value_hi"]["unit"], "ieee754_binary64_high32")
         self.assertTrue(all(row["default"] is None for row in self.registry["fields"][127:]))
+
+    def test_production_actual_static_corpus_reserved_targets_and_unknowns(self):
+        production = self.auxiliary["production"]
+        self.assertEqual(len(production["training"]), 8)
+        self.assertEqual(len(production["research"]), 19)
+        self.assertEqual(sum(len(row["levels"]) - 1 for row in production["research"]), 420)
+        self.assertEqual(production["queue_capacity"], 7)
+        self.assertEqual(production["cost_timing_text"], "开始训练时扣费，排队未扣费")
+        for row in production["training"]:
+            self.assertNotIn("count", row)
+            self.assertNotIn("completed", row)
+            self.assertNotIn("max_count", row)
+            self.assertEqual(row["cost_wood"], row["wood_cost"])
+        for row in production["research"]:
+            self.assertEqual(row["group"], row["mapping"]["technology_group"])
+            self.assertEqual(row["group"], row["definition"]["legacy_group"])
+            for level, display in enumerate(row["levels"]):
+                self.assertEqual(display["level"], level)
+                self.assertEqual(display["fields"], [{"label":"当前累计", "value":display["effect_summary"]}])
+                if level:
+                    self.assertEqual(display["upgrade_effect_text"],
+                                     "升级后Lv." + str(level) + "：" + display["effect_summary"] + "。")
+            self.assertEqual(row["levels"][-1]["next_effect_text"], "")
+        self.assertNotIn("production:receipt", self.by_key)
+        for index in range(1, 9): self.assertIn("production:receipt:" + str(index), self.by_key)
+        field_by_name = {row["name"]:row for row in self.registry["fields"]}
+        self.assertEqual(field_by_name["production_entity"]["id"], 164)
+        self.assertEqual(field_by_name["production_status"]["id"], 186)
+        self.assertEqual(field_by_name["production_max_count"]["min"], -2147483647)
+        self.assertEqual(field_by_name["production_started_hi"]["unit"], "ieee754_binary64_high32")
+        self.assertTrue(all(row["default"] is None for row in self.registry["fields"][163:]))
+        self.assertIn("tools/production_ui_static_seed.lua", production["generator_inputs"])
+
+    def test_production_binary64_precision_and_append_only_status_dictionary(self):
+        production = self.auxiliary["production"]
+        speed = next(row for row in production["research"] if row["group"] == "advanced_lumberjack_speed")
+        value = speed["levels"][6]["research_effect_value"]
+        self.assertEqual(struct.pack(">d", value).hex(), "3faeb851eb851eb9")
+        self.assertNotEqual(value, float(format(value, ".14g")))
+        self.assertEqual(production["status_labels"]["queued_max_level"], "已排队至最高等级")
+        self.assertEqual(production["errors"][:2], ["", "production_failed"])
+        for name in ("production_errors", "production_status_codes"):
+            candidate = copy.deepcopy(self.registry)
+            candidate["public_enums"][name][2:4] = reversed(candidate["public_enums"][name][2:4])
+            with self.assertRaisesRegex(ValueError, "historical_public_enum_meaning_changed"):
+                m.validate_registry(candidate, self.registry)
+        class MissingOperator:
+            revision=GAME
+            def read(self,path):raise ValueError("immutable_operator_missing:"+path)
+        with self.assertRaisesRegex(ValueError, "immutable_operator_missing:tools/production_ui_static_seed.lua"):
+            m.production_projection_seed(self.source, LUA, MissingOperator())
+
+    def test_vip_state_has_no_reward_rule_or_private_static_metadata(self):
+        row=self.records["vip:state"]
+        self.assertEqual((row["domain"],row["kind"],row["business_id"]),("vip","state","state"))
+        self.assertEqual(row["definition"],{})
+        self.assertEqual(len(self.registry["fields"]),186)
 
     def test_public_csv_and_generated_runtime_drift_is_a_hard_failure(self):
         class ChangedSource:
