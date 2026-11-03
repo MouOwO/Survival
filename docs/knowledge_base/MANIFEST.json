@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 24840,
-      "sha256": "0e21e22928bf945b9e244c427efadbdfd85c1da9618af721c4e69407f8160006"
+      "bytes": 25396,
+      "sha256": "03edd9328617b1997ef3b84dd37f156b13b9ed9e80eef3b19e67857d9280e693"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -35,13 +35,13 @@
     },
     {
       "path": "06_build_release_ops.md",
-      "bytes": 26098,
-      "sha256": "10f0c2e449f471215f296fcd20653285ae83e4b21e22ccbc6f353b79e842e1b8"
+      "bytes": 26654,
+      "sha256": "0835dc74295a2a5cd862d0eb300029d7c19d55f611ed72ee3d10b3b1e27f5a20"
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 38840,
-      "sha256": "a3ff4976ec1cbfd759c99773991b2cbaddf21439a15364186e5ab0020b2f57dc"
+      "bytes": 39396,
+      "sha256": "ab7e40f08f050d0d91b3a7baf2e0a8d186113dc7088375c3fd6173fff03bcdb4"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 13752,
-      "sha256": "ceec6ce67e1945c490f334b99a43ee046d358d09ecd994b6903b9e82d6ecd99e"
+      "bytes": 14308,
+      "sha256": "7c4c31e893bde0e432c28c9d59084bdce70de7a747628f150fa3123b7340ec45"
     },
     {
       "path": "data/completed_work_index.json",
@@ -472,6 +472,16 @@
       "path": "evidence/storage_cleanup_20261103.md",
       "bytes": 3689,
       "sha256": "a87ce88d07edb26ababa77fe2f29764d1e2758648a91301e3304bf5463238b7a"
+    },
+    {
+      "path": "evidence/storage_rehearsal_output_cleanup_20261103.md",
+      "bytes": 4623,
+      "sha256": "a030ae22cae73caaf13c772160ce73f42ba585566ff9205a9e982a31a5cb3d16"
+    },
+    {
+      "path": "evidence/storage_rehearsal_output_cleanup_20261103.public.json",
+      "bytes": 5019,
+      "sha256": "3683b8423d81e8f4e75fbda4954017b7fb34c9d4eb3cb99462409bfc4a9b87bc"
     },
     {
       "path": "evidence/teammate_builder_portrait_20261031.md",
