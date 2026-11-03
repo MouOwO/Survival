@@ -1,0 +1,86 @@
+{
+  "status": "CLEANUP_CLOSEOUT_INDEPENDENTLY_VERIFIED",
+  "checked_unix": 1793665793,
+  "aliases_deleted": 8,
+  "empty_content_deleted": 8,
+  "deleted_logical_bytes": 30304751974,
+  "c_archive_removed": true,
+  "d_archive_files": 130,
+  "d_archive_logical_bytes": 30305114165,
+  "d_archive_stored_bytes": 17850113120,
+  "compression": [
+    {
+      "path": "D:\\Survival_本地排演\\20261101_ws4_five_account_portrait_v05\\run01_five_portrait",
+      "files": 34,
+      "logical_bytes": 7576255916,
+      "stored_bytes": 4462383129,
+      "before_stored_bytes": null,
+      "saved_bytes": null
+    },
+    {
+      "path": "D:\\Survival_本地排演\\20261101_ws4_shared_boss_portrait_v07\\run01_shared_boss_portrait",
+      "files": 30,
+      "logical_bytes": 7576261538,
+      "stored_bytes": 4462753880,
+      "before_stored_bytes": null,
+      "saved_bytes": null
+    },
+    {
+      "path": "D:\\Survival_本地排演\\20261101_ws4_shared_boss_portrait_v07\\run02_shared_boss_portrait",
+      "files": 30,
+      "logical_bytes": 7576261538,
+      "stored_bytes": 4462753880,
+      "before_stored_bytes": null,
+      "saved_bytes": null
+    },
+    {
+      "path": "D:\\Survival_本地排演\\20261101_ws4_shared_boss_portrait_v07\\run04_shared_boss_portrait",
+      "files": 30,
+      "logical_bytes": 7576261538,
+      "stored_bytes": 4462753880,
+      "before_stored_bytes": null,
+      "saved_bytes": null
+    },
+    {
+      "path": "D:\\Survival_本地排演\\20261102_ws4_lottery_replay_v11\\run01",
+      "files": 28,
+      "logical_bytes": 7576238793,
+      "stored_bytes": 4462205650,
+      "before_stored_bytes": null,
+      "saved_bytes": null
+    },
+    {
+      "path": "D:\\Survival_本地排演\\20261102_ws4_lottery_snapshot_v10\\run05_snapshot_preview",
+      "files": 27,
+      "logical_bytes": 7576237011,
+      "stored_bytes": 4462278669,
+      "before_stored_bytes": null,
+      "saved_bytes": null
+    },
+    {
+      "path": "D:\\Survival_本地排演\\20261102_ws4_shared_boss_portrait_v08\\run01_resolution_two_pc",
+      "files": 34,
+      "logical_bytes": 8647994024,
+      "stored_bytes": 5144029195,
+      "before_stored_bytes": null,
+      "saved_bytes": null
+    }
+  ],
+  "compression_logical_bytes": 54105510358,
+  "compression_stored_bytes": 31919158283,
+  "compression_measurement_correction": "v01 dictionary aggregation returned zero for before/logical totals; these fields and saving totals are invalid. v02 independently measures current storage; exact before/saving unknown.",
+  "preserved_roots": [
+    "D:\\Survival_本地排演\\20261103_ws4_lottery_redemption_v12",
+    "D:\\Survival_本地排演\\20261101_ws4_shared_boss_portrait_v07\\run03_shared_boss_portrait",
+    "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival"
+  ],
+  "c_free_bytes": 34611118080,
+  "d_free_bytes": 33673404416,
+  "workshop_writes": 0,
+  "backend_writes": 0,
+  "c_archive_original_files": 129,
+  "c_archive_original_logical_bytes": 30304999690,
+  "relocation_pointers_added": 4,
+  "workspace_error_denied_path_identified": false,
+  "workspace_acl_changed": false
+}

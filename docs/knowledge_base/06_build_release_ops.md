@@ -1,5 +1,7 @@
 # 06｜构建、签名、工坊分发与恢复
 
+**2026-11-03 本地清理已复核**：八个旧 svt 测试副本及对应空 content 目录已移除（30.30GB逻辑文件）；C盘排演归档129文件全量校验后迁至 `D:\Survival_排演归档`，C原目录已删除。D本地排演七个已收口目录无损压缩，当前候选及未收口事务保留；本轮没有工坊或后台写入。权限报错在Codex请求重试日志中，具体拒绝路径未明，工程当前可读。见[范围、指标修正与恢复位置](evidence/storage_alias_cleanup_20261103.md)。
+
 **2026-11-02 最新：0203仍未上传，本机已再次恢复正式0104，等待连续客户端验证窗口。** run04出现非Root发送的实际抽奖结果，不能作无消耗准入；run05正常退出后又出现Steam新客户端，恢复一度被占用，现已正常关闭菜单客户端并取得run05完整restore回执，实际0个Dota进程。操作者及原进程退出原因尚待确认，不归咎用户或认定崩溃。下一轮辅助脚本已备好；未调用SDK Submit，正式远端仍0104。详见[真实阶段](evidence/lottery_arcade_delivery_20261102.md)。
 
 **2026-11-02 当前：本机run03已完整恢复0104，用户已确认客机恢复0104；0203不准入、不发布。** Root实际restore exit0／`ORIGINAL0104_FIVE_FILES_FULLY_RESTORED`，fresh-only官方result1／cachefalse／maxcache0／time_updated1793536475／3788093063字节与0104一致，ACF manifest `7025356658517360342`未改。客机须用0201专用Restore和原`SurvivalPeerBackup_0201_run01`，保留旧1107及0201备份，不删订阅目录、不改ACF；用户已报告`ORIGINAL0104_RESTORED`；尚待重开后实际联机核验。signed8ae7…ec10五项候选保留，未Submit／未官方下载；原始INCOMPLETE/indexfalse和所有失败轮次不改。另有205项历史非maps裸VPK在output／tmp待归属审阅隔离，本轮没有新造裸VPK，不自动移动用户字节备份，不据此断言版本失配根因。见[产物和接手](evidence/lottery_arcade_delivery_20261102.md)及[机器摘要](evidence/lottery_arcade_delivery_20261102.public.json)。

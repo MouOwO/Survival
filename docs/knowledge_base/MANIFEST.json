@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 23736,
-      "sha256": "86184efcb9f5d4c8c8dc0bb2dfcfa2e772600e84676ec1eea5fccdf3625175e1"
+      "bytes": 24269,
+      "sha256": "395a0e04b1a45be7def12055b28334e1c4336e6a70d1f5952ddc4d4761f403d9"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -35,13 +35,13 @@
     },
     {
       "path": "06_build_release_ops.md",
-      "bytes": 24994,
-      "sha256": "f89718f47ef02b2b9455ac4341c7a3cccf38ff99161dda62b24b0a8cd1e068fd"
+      "bytes": 25527,
+      "sha256": "eec47e3422883094b9751fb33a14015588b030423ea7e87cae01917c178ec9d2"
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 37736,
-      "sha256": "6db616e4a5d7896198640a2aaef3fbcfdb928ddfbd847ae4cd0aafd1d1e65b7a"
+      "bytes": 38269,
+      "sha256": "0ed245e878828ab21dbdbef3a9bf1859f39f2786cdcbc4c3be461ce4aaf51dcb"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 12648,
-      "sha256": "ea666fe44b673398d3c26e852bb10161e584927de909ac03ac03ed52393169dd"
+      "bytes": 13181,
+      "sha256": "9a1b35e50b93a6687bec2a6f50df18bcb15714b1138509a05dbf7fbd8fce4dad"
     },
     {
       "path": "data/completed_work_index.json",
@@ -447,6 +447,16 @@
       "path": "evidence/steam_login_relay_recovery_20261101.public.json",
       "bytes": 4081,
       "sha256": "c9b67c8c2de8c8491678e4c25599ce8f79e826d34a9a5cde131dcc47776e8a27"
+    },
+    {
+      "path": "evidence/storage_alias_cleanup_20261103.md",
+      "bytes": 4602,
+      "sha256": "d8e5171bd013e9539f44da93da679d920660080eaa17921474f73f7c669f6d17"
+    },
+    {
+      "path": "evidence/storage_alias_cleanup_20261103.public.json",
+      "bytes": 3114,
+      "sha256": "1c8316f52ee2c90271f6845e93c6d36aff037152a7c53767886e79cf676f37db"
     },
     {
       "path": "evidence/storage_cleanup_20261103.md",
