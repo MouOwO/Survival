@@ -38,14 +38,26 @@ class ProductionPlanTests(unittest.TestCase):
               mock.patch.object(m.protection,'dependency_identity',return_value={'verified_source_tree_sha256':policy['dependency']['source_tree_sha256']})):
             return m.plan('a'*40,'b'*40)
 
-    def test_seven_overrides_preserve_parent_bytes_instead_of_development_bytes(self):
+    def test_only_four_constant_overrides_preserve_parent_bytes(self):
         value=self.fixture_plan()
         self.assertEqual(len(value['production_overrides']),7)
         for row in value['production_overrides']:
             self.assertEqual(row['development_sha256'],'e'*64)
-            self.assertEqual(row['target']['sha256'],'d'*64)
+            self.assertEqual(row['authenticated_policy_baseline']['sha256'],'d'*64)
+            if row['path'] in m.CONSTANT_OVERRIDES:
+                self.assertEqual(row['target']['sha256'],'d'*64)
+                self.assertFalse(row['replacing_with_parent_would_discard_new_runtime_logic'])
+            else:
+                self.assertIsNone(row['target'])
+                self.assertTrue(row['replacing_with_parent_would_discard_new_runtime_logic'])
+                self.assertEqual(row['required_transform_tool'],'tools/complete_delivery_release_20261103/production.py')
             self.assertFalse(row['production_rules_or_account_limits_relaxed'])
             self.assertEqual(row['changed_source_logic_outside_policy_review'],'NOT_REVIEWED_BLOCKING')
+
+    def test_lobby_entry_and_removed_preview_policy_cannot_be_replaced_by_old_parent(self):
+        value=self.fixture_plan()
+        merged={r['path']:r for r in value['production_overrides'] if r['target'] is None}
+        self.assertEqual(set(merged),{'addoninfo.txt','scripts/vscripts/addon_game_mode_client.lua','scripts/vscripts/core/test_access_policy.lua'})
 
     def test_all_new_generated_configuration_is_selected_and_proof_is_not_fabricated(self):
         value=self.fixture_plan()

@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 import subprocess
 import tempfile
+import hashlib
+import struct
 import unittest
 from unittest.mock import patch
 
@@ -11,6 +13,62 @@ spec=importlib.util.spec_from_file_location('capture',Path(__file__).with_name('
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 
 class CaptureTests(unittest.TestCase):
+    def compiled_js(self,data,metadata=b'original'):
+        # Real Valve block-table layout; metadata may change independently of DATA.
+        raw=bytearray(16+24+len(metadata)+len(data))
+        struct.pack_into('<II',raw,8,8,2)
+        struct.pack_into('<4sII',raw,16,b'REDI',40-20,len(metadata))
+        struct.pack_into('<4sII',raw,28,b'DATA',40+len(metadata)-32,len(data))
+        raw[40:40+len(metadata)]=metadata;raw[40+len(metadata):]=data
+        return bytes(raw)
+
+    def resource_fixture(self,base,author=b'const value=1;\r\n'):
+        relative='panorama/scripts/custom_game/common/compact_ui_runtime.vjs_c'
+        authored=relative[:-6]+'.js'
+        source=base/'content'/authored;source.parent.mkdir(parents=True);source.write_bytes(author)
+        path=base/'game'/relative;path.parent.mkdir(parents=True)
+        old=self.compiled_js(author);path.write_bytes(old)
+        row={'area':'game','relative':relative,'sha256':hashlib.sha256(old).hexdigest()}
+        index={('content',authored):{'area':'content','relative':authored,'sha256':hashlib.sha256(author).hexdigest()}}
+        return path,source,row,index
+
+    def test_tools_metadata_recompile_binds_actual_data_to_immutable_author(self):
+        with tempfile.TemporaryDirectory()as temporary:
+            base=Path(temporary);path,source,row,index=self.resource_fixture(base)
+            manifest=base/'files.manifest.json';manifest.write_text(json.dumps([row,*index.values()]))
+            original_manifest=manifest.read_bytes()
+            path.write_bytes(self.compiled_js(source.read_bytes(),b'on-demand metadata changed'))
+            result=m.critical_resource_binding(base,row,index)
+            self.assertTrue(result['tools_recompiled']);self.assertEqual(result['prelaunch_sha256'],row['sha256'])
+            self.assertEqual(result['actual_postcompile_sha256'],m.sha(path));self.assertTrue(result['compiled_data_equals_copied_author'])
+            self.assertIn('NOT_SIGNED_ACCEPTANCE',result['binding_kind']);self.assertEqual(manifest.read_bytes(),original_manifest)
+            self.assertEqual(result,m.critical_resource_binding(base,row,index))
+            path.write_bytes(self.compiled_js(source.read_bytes(),b'changed again during capture'))
+            self.assertNotEqual(result,m.critical_resource_binding(base,row,index),'actual postcompile hashes must stay stable through capture')
+
+    def test_recompile_cannot_hide_changed_data_author_or_line_endings(self):
+        with tempfile.TemporaryDirectory()as temporary:
+            base=Path(temporary);path,source,row,index=self.resource_fixture(base)
+            path.write_bytes(self.compiled_js(b'const evil=2;\r\n',b'legitimate-looking metadata'))
+            with self.assertRaisesRegex(ValueError,'actual_js_data_differs'):m.critical_resource_binding(base,row,index)
+            source.write_bytes(b'const different=3;\r\n')
+            with self.assertRaisesRegex(ValueError,'immutable_copied_author_drift'):m.critical_resource_binding(base,row,index)
+        with tempfile.TemporaryDirectory()as temporary:
+            base=Path(temporary);_,_,row,index=self.resource_fixture(base,b'const value=1;\n')
+            with self.assertRaisesRegex(ValueError,'crlf_author_required'):m.critical_resource_binding(base,row,index)
+
+    def test_normal_map_never_uses_js_recompile_exception(self):
+        with tempfile.TemporaryDirectory()as temporary:
+            base=Path(temporary);path=base/'game/maps/template_map.vpk';path.parent.mkdir(parents=True);path.write_bytes(b'map')
+            row={'relative':'maps/template_map.vpk','sha256':m.sha(path)}
+            self.assertEqual(m.critical_resource_binding(base,row,{})['binding_kind'],'EXACT_PRELAUNCH_BYTES')
+            path.write_bytes(b'changed map')
+            with self.assertRaisesRegex(ValueError,'critical_runtime_drift'):m.critical_resource_binding(base,row,{})
+
+    def test_run05_tools_helpers_are_explicitly_allowed_without_execution(self):
+        for relative in('tools/network50_dev_native_20261103.py','tools/network50_dev_input.ps1'):
+            self.assertIn("'run05'",(m.ROOT/relative).read_text(encoding='utf-8'))
+
     def sample(self,time=100,status='spawning'):
         return {'active':True,'tools':True,'game_time':time,'paused':False,'wave':{'status':status,'current':3,'alive':20,'defeated':False},'wire':{'ready':True,'views':4,'counters':{'sent':3}}}
 

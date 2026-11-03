@@ -19,6 +19,7 @@ import queue
 import re
 import shutil
 import subprocess
+import struct
 import sys
 import threading
 import time
@@ -37,6 +38,7 @@ def module(name,file):
 
 focus=module('network50_focus','observe_live_perf_focus.py')
 v1=module('network50_v1','analyze_presentmon_capture.py')
+compiler=module('network50_compiled_blocks','compile_network50_ui.py')
 
 def need(value,reason):
     if not value:raise ValueError(reason)
@@ -68,6 +70,39 @@ def command_from_log(path):
     need(matches,'tools_inspect_ready_command_missing')
     return matches[-1]
 
+
+def critical_resource_binding(base,row,index):
+    """Read current Tools output against immutable copied author, not a new manifest.
+
+    Tools can change REDI/RERL/compiler metadata on legitimate on-demand compile.
+    Only JS with byte-exact DATA matching its copied CRLF author is admitted;
+    map bytes and author bytes must still match the untouched launch manifest.
+    """
+    relative=row['relative'];path=base/'game'/relative
+    actual=path.read_bytes();actual_sha=hashlib.sha256(actual).hexdigest()
+    result={'path':relative,'sha256':actual_sha,'prelaunch_sha256':row['sha256'],
+            'actual_postcompile_sha256':actual_sha,'tools_recompiled':actual_sha!=row['sha256']}
+    if not relative.endswith('.vjs_c'):
+        need(actual_sha==row['sha256'],'critical_runtime_drift:'+relative)
+        result['binding_kind']='EXACT_PRELAUNCH_BYTES'
+        return result
+    author_relative=relative[:-6]+'.js'
+    source_row=index.get(('content',author_relative))
+    need(source_row is not None,'immutable_copied_author_missing:'+relative)
+    author=(base/'content'/author_relative).read_bytes()
+    author_sha=hashlib.sha256(author).hexdigest()
+    need(author_sha==source_row['sha256'],'immutable_copied_author_drift:'+author_relative)
+    lf=author.replace(b'\r\n',b'\n')
+    need(b'\r'not in lf and lf.replace(b'\n',b'\r\n')==author,'copied_compiler_crlf_author_required:'+author_relative)
+    data=compiler.blocks(actual).get(b'DATA')
+    offset,count=struct.unpack_from('<II',actual,8);start=8+offset
+    need(sum(actual[start+n*12:start+n*12+4]==b'DATA'for n in range(count))==1,'unique_compiled_data_block_required')
+    need(data==author,'actual_js_data_differs_from_immutable_author:'+relative)
+    result.update(binding_kind='TOOLS_CURRENT_DATA_EQUALS_IMMUTABLE_COPIED_AUTHOR_NOT_SIGNED_ACCEPTANCE',
+                  author_relative=author_relative,author_sha256=author_sha,
+                  compiled_data_sha256=hashlib.sha256(data).hexdigest(),compiled_data_equals_copied_author=True)
+    return result
+
 def bindings(run):
     need(re.fullmatch(r'run[0-9]{2}',run)is not None,'fixed_dev_run_required')
     base=STORE/run
@@ -91,10 +126,11 @@ def bindings(run):
     selected={'panorama/scripts/custom_game/common/network50_diagnostics.vjs_c',
               'panorama/scripts/custom_game/common/compact_ui_runtime.vjs_c',
               'panorama/scripts/custom_game/common/ui_static_catalog.vjs_c','maps/template_map.vpk'}
+    index={(row['area'],row['relative']):row for row in manifest['files']}
+    need(len(index)==len(manifest['files']),'unique_immutable_manifest_paths_required')
     for row in manifest['files']:
         if row['area']=='game'and row['relative']in selected:
-            path=base/'game'/row['relative'];need(sha(path)==row['sha256'],'critical_runtime_drift:'+row['relative'])
-            critical.append({'path':row['relative'],'sha256':row['sha256']})
+            critical.append(critical_resource_binding(base,row,index))
     need({r['path']for r in critical}==selected,'diagnostic_runtime_closure_missing')
     return dict(run=run,pid=pid,created=process['created'],alias=alias,manifest_sha256=digest,
                 process_receipt_sha256=hashlib.sha256(raw).hexdigest(),prepared_sha256=hashlib.sha256(prepared_raw).hexdigest(),

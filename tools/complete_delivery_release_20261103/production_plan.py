@@ -31,6 +31,7 @@ OVERRIDES=(
     'scripts/vscripts/config/workshop_connection.lua',
     'scripts/vscripts/core/test_access_policy.lua',
 )
+CONSTANT_OVERRIDES=frozenset(OVERRIDES[2:6])
 NEW_GENERATED=(
     'scripts/vscripts/config/generated/ui_compact_wire_budget.lua',
     'scripts/vscripts/config/generated/ui_static_catalog_lookup.lua',
@@ -81,9 +82,14 @@ def plan(game_revision,content_revision):
         need(path in parent,'production_override_missing_from_authenticated_parent:'+path)
         fact=facts.get(path,{})
         need(fact.get('hash_state')=='VERIFIED','production_development_input_unavailable:'+path)
+        constant=path in CONSTANT_OVERRIDES
         overrides.append(dict(path=path,development_source_revision=game_revision,development_git_oid=trees['game'][path]['oid'],
-                              development_sha256=fact['sha256'],target=dict(bytes=parent[path]['bytes'],sha256=parent[path]['sha256']),
-                              target_origin='AUTHENTICATED0104_PRODUCTION_POLICY_BYTES',
+                              development_sha256=fact['sha256'],
+                              target=dict(bytes=parent[path]['bytes'],sha256=parent[path]['sha256']) if constant else None,
+                              authenticated_policy_baseline=dict(bytes=parent[path]['bytes'],sha256=parent[path]['sha256']),
+                              target_origin='AUTHENTICATED0104_PRODUCTION_POLICY_BYTES' if constant else 'REQUIRES_REVIEWED_IMMUTABLE_SOURCE_PRODUCTION_TRANSFORM',
+                              required_transform_tool=None if constant else 'tools/complete_delivery_release_20261103/production.py',
+                              replacing_with_parent_would_discard_new_runtime_logic=not constant,
                               authenticated_parent_manifest_sha256=baseline['parent_manifest_sha256'],
                               preserve_current_source_in_git=True,production_rules_or_account_limits_relaxed=False,
                               changed_source_logic_outside_policy_review='NOT_REVIEWED_BLOCKING'))
@@ -106,7 +112,8 @@ def plan(game_revision,content_revision):
                             historical_protected_pending=sum(row['historical_deferred'] for row in protected),
                             new_network50_configurations=sum(row['new_network50_configuration'] for row in protected),
                             production_overrides=len(overrides)),missing_new_configurations=new_missing,
-                preparation_recipe=dict(tool='tools/protect_runtime_lua.py',source='NEW_EXTERNAL_IMMUTABLE_PRODUCTION_EXPORT_REQUIRED',
+                preparation_recipe=dict(tool='tools/protect_runtime_lua.py',production_transform_tool='tools/complete_delivery_release_20261103/production.py',
+                    source='NEW_EXTERNAL_IMMUTABLE_PRODUCTION_EXPORT_REQUIRED',
                     destination='NEW_EXTERNAL_PROTECTED_LUA_TREE_REQUIRED',flags=['--data-string-obfuscation'],
                     before_key_use='VERIFY_EVERY_GENERATED_VALUE_AND_BUSINESS_PROBE_AND_SOURCE_HASH',
                     plaintext_fallback_allowed=False,installed_or_frozen_tree_writes_allowed=False),

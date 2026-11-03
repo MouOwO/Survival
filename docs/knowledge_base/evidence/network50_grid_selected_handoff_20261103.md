@@ -66,3 +66,29 @@ selected 视图复用原真实 `unit_combat_snapshot`；静态 unit／model／we
 selected fixture 62 full ops：production 首 header 45 帧／估算 2,195 B，最后 epoch 50 帧／2,446 B，codec 最大 header 67 帧／3,277 B；关键首屏 27／30 帧，辅助 19／21 帧。四人共用 160 packets/s 下，关键队列理论值 0.675／0.75 秒，不代表真实 RTT 或保证响应时间。
 
 新增视图／首屏／atlas 还须在最终同源编译后的实际客户端观察、检查所有剩余 legacy 大包旁路和真实 FPS。完整生产构建、所有历史未发布项／运行删除／保护转换、完整0302 recipe／ledger／authority、签名、普通准入、SDK 与官方完整下载依旧没有因上述测试自动完成；待发清单不能清零，不能标“已同步游廊”。
+
+## 后续追加：严格 Git gen2，最终产物提交仍待
+
+本节是后续阶段，前文 `004ce5aa…` 及其工作区原型来源按历史保留。**仍仅本地更新**，本节没有 SDK、签名、后台或官方下载结果，也没有新增普通客户端／FPS通过结论。
+
+phase2 输入源码及 operator 已冻结并双仓 push：game／operator `c8722ee2d2e21fdbfaf23d4b7b0fdff952a6fcb4`，content `5bdd96279a6cd05d6ee513dc90fad6891479ae0e`。严格 gen2 使用这些明确 Git 提交，历史 atlas 另明确指定 game `0056e2bf88106a2045b0575011196d15b7ee2383`。协议 schema、原生候选、六个当前 grid 源、NPC、registry 和全部 history 均从所选 Git blob 读取；seed 从 operator Git blob 读取；执行生成器／helper 也须与 operator 的规范 LF 字节一致。不存在读取临时工作区后冒称新 source 的回退。
+
+生成结果：schema `fe171856112a688beca04f89951cac8c81df69d238ffa02be38758f9741a3748`。registry 保持 `e48c13b036086e5de6fb9c6c51c0bc87f693aa59b18b74c907feb35f03b9fd84`，仍为 7,887 records／163 fields／generation10；旧 ID、字段和十代历史未变。生成输入有 208 个 game blob、3 个 operator blob、6 个历史 atlas 参考源。`ui_static_catalog_lookup.lua` 自身及预算生成文件不作为旧投影的依赖载入，避免目录自引用。
+
+`data/ui/ui_static_catalog_manifest.json` 包含全部来源摘要，当前 raw SHA 为 `c2f087dc78b7f0da20c828d9456f5846832484f95962ceb033a547515748ea93`。content revision 在此仅标示配套编译来源，生成器没有读取 content blob；纹理／编译资源仍必须单独绑定，不能把这个 revision 字段当成美术或编译证明。
+
+| gen2 文件 | 规范 LF SHA256 |
+| --- | --- |
+| `panorama/src/scripts/custom_game/common/ui_static_catalog.js` | `0e3a82ef1c81a6bedf872d2a2f63b6bc78c3684814cc8d3a768a449b27039467` |
+| `scripts/vscripts/config/generated/ui_static_catalog_lookup.lua` | `43955e5e4a9d82468bf25e6e62271c99a172d0ebc0453f8cf2ffbf1c918a4031` |
+| operator `tools/build_ui_static_catalog.py` | `9e3a522044189926d7cd627543e9faa58f774717665cb1dec3c1bfce3bc9bb7a` |
+| operator `tools/extract_grid_static_atlas_20261103.py` | `a07f3374ba40e92b34d0a9f81339ec996615b5db4e94636b24010ae9da2cff69` |
+| operator `tools/selected_stats_static_seed.lua` | `5dadf55d43d6e44f7bb99530ec31f62d83084aeefa2d48838f3f9caabd4c4e8d` |
+
+gen2 CLI `--check` 已复现同一输出。真实模块边界复跑：wire15、runtime15、grid9、selected8通过。runtime 新增独立 full C2S 丢片恢复；grid 包含四 owner 隔离、模式 scope 退役和迟到 word 拒绝。当前静态 K0 在 fixture 为6帧／估算292 B，K1为48 B，full29帧／1,415 B，C2S输入10帧／488 B。前文285 B属于之前阶段；这些仍是模拟校准字节，不能写成新的 native 实测。
+
+主操作者报告同源官方28文件编译完成，gen2 catalog `.vjs_c` artifact SHA 为 `07d0d453c5aa7ea9bac2fc3adf1793dd7accbf4d56c1cc6f39c947f2e04c1e10`。生成后的 game／content 最终产物提交尚待，因此上方 c872／5bdd 是**生成输入冻结**，不是已包含新 gen2 产物的最终发行 source pin。后续实际 Tools／普通客户端、FPS、签名、SDK及官方完整下载均另记，不能从这条编译回执推定通过。
+
+生产变换准备也已落 `tools/complete_delivery_release_20261103/production.py`：四个纯配置取真实0104已审字节；addoninfo保留新 lobby并恢复正式入口／四人容量，client入口保留 hosted lobby 初始化，admission保留当前去 onboarding 的逻辑。旧只读 plan 已将这三项旧 parent target 清空并指向明确变换，避免重新覆盖丢逻辑或复活已删 helper。production8、plan6测试通过；真实0104／不可变源的五账号与拒绝相邻第六账号、四配置常量、lobby／原入口均做了纯逻辑探针，未做实际 Steam 登录。
+
+只读复核当前保护选择为186项，仍需实际固定 Prometheus 全值／RNG验证。真正保护导出应等待包含新 lookup 的最终 game 第二提交；以 c872 导出会拿到原型旧 lookup，不能与新 JS 混包。完整 recipe／ledger／authority及发行验收仍阻断，不造 ready。

@@ -1,5 +1,7 @@
 # 孤城逐晓／Survival 统一知识库
 
+**2026-11-03 最新：严格Git gen2已生成，仍仅本地更新**：[追加来源与阶段边界](evidence/network50_grid_selected_handoff_20261103.md)。输入c8722ee2／5bdd9627、旧atlas参考0056e2bf；新schema fe171856…，十代IDs未变。官方28编译回执不等于最终产物提交或新native／FPS验收，原游廊0104与WS4保持，完整生产／发行仍阻断。
+
 **2026-11-03 最新追加仍仅本地更新**：[网格／选中单位、非权威本地atlas与10代注册表](evidence/network50_grid_selected_handoff_20261103.md)。7887记录／163字段，schema004ce5aa…；同schema双入口初始化一次，静态候选只在本局实际扫描后按K覆盖，原validate／commit不改。离线grid7／selected8／codec15／generator18组过，不标新native／FPS／游廊通过；正式0104和本轮WS4保持，完整生产／发行工具链仍待。
 
 **2026-11-03 框选14目录已检查并清理**：解除111份已验证重复数据（约40.37GiB占用），原回执/peer脚本保留；117份未确认可再生的历史素材、录像/原包无损压缩且前后SHA一致，另节省1.84GiB。密钥、加密备份、安全环境、当前候选/事务与基线保留，两版签名/VPK复核通过。D盘收口约247.31GiB可用；本轮零后台/工坊写入。见[逐目录决定与核对证据](evidence/storage_selected_roots_cleanup_20261103.md)。

@@ -41,6 +41,6 @@ if __name__=='__main__':
     actions={'launch':launch,'close':close,'retire':retire}
     if len(sys.argv)not in (2,3)or sys.argv[1]not in actions:raise SystemExit('explicit launch/close/retire required')
     if len(sys.argv)==3:
-        if sys.argv[2]not in ('run02','run03','run04'):raise SystemExit('known fresh development run required')
+        if sys.argv[2]not in ('run02','run03','run04','run05'):raise SystemExit('known fresh development run required')
         STORE=dev.STORE/sys.argv[2]
     print(json.dumps(actions[sys.argv[1]]()))

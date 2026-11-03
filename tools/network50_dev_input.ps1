@@ -1,6 +1,6 @@
 param(
  [Parameter(Mandatory=$true)][ValidateSet('Focus','Click','Screenshot')][string]$Action,
- [ValidateSet('run02','run03','run04')][string]$Run='run02',
+ [ValidateSet('run02','run03','run04','run05')][string]$Run='run02',
  [int]$X=-1,[int]$Y=-1,
  [ValidatePattern('^[a-z0-9_-]{1,60}$')][string]$Name='screen'
 )
