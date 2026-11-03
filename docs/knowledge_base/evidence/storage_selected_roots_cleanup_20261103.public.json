@@ -1,0 +1,161 @@
+{
+  "status": "ALL_FOURTEEN_SELECTED_ROOTS_CHECKED_AND_CLEANUP_COMPLETE",
+  "selected_roots": [
+    {
+      "root": "D:\\survival_ui_backups",
+      "before_files": 114,
+      "before_logical_bytes": 10035183019,
+      "before_unique_stored_bytes": 10035183019,
+      "action": "保留未确认可重建的素材与录像，无损压缩并逐文件复核SHA256"
+    },
+    {
+      "root": "D:\\survival_安全工具",
+      "before_files": 1389,
+      "before_logical_bytes": 31061789,
+      "before_unique_stored_bytes": 31061789,
+      "action": "保留当前Python/验签工具运行环境，未读取私钥或更改工具"
+    },
+    {
+      "root": "D:\\Survival_本地排演",
+      "before_files": 3106,
+      "before_logical_bytes": 26164638934,
+      "before_unique_stored_bytes": 26164638934,
+      "action": "前轮已清理已恢复旧事务；当前0301、网络测试及未收口Boss事务保留"
+    },
+    {
+      "root": "D:\\Survival_测试配置",
+      "before_files": 28,
+      "before_logical_bytes": 722285,
+      "before_unique_stored_bytes": 722285,
+      "action": "保留历史信任配置及诊断证据，占用不足1MiB"
+    },
+    {
+      "root": "D:\\Survival_发布候选",
+      "before_files": 102716,
+      "before_logical_bytes": 53752921446,
+      "before_unique_stored_bytes": 7762243125,
+      "action": "前轮已移除40旧展开目录；现有基线、待发候选和源增量保留"
+    },
+    {
+      "root": "D:\\Survival_工坊备份",
+      "before_files": 1,
+      "before_logical_bytes": 3766823010,
+      "before_unique_stored_bytes": 3766823010,
+      "action": "单份历史原包未确认可丢弃，保留并无损压缩"
+    },
+    {
+      "root": "D:\\Survival_工坊输出",
+      "before_files": 70,
+      "before_logical_bytes": 53023466232,
+      "before_unique_stored_bytes": 20264257072,
+      "action": "前轮已清理32旧目录；正式及11月候选完整成包保留"
+    },
+    {
+      "root": "D:\\Survival_加密备份",
+      "before_files": 1,
+      "before_logical_bytes": 805565629,
+      "before_unique_stored_bytes": 805565629,
+      "action": "保留加密原始恢复备份，不解密、不删除"
+    },
+    {
+      "root": "D:\\Survival_密钥",
+      "before_files": 4,
+      "before_logical_bytes": 418,
+      "before_unique_stored_bytes": 418,
+      "action": "保留发行密钥，不读取私钥、不修改权限"
+    },
+    {
+      "root": "D:\\Survival_排演归档",
+      "before_files": 130,
+      "before_logical_bytes": 30305114165,
+      "before_unique_stored_bytes": 17850113120,
+      "action": "移除40份已逐SHA256确认有保留源的VPK副本，原始回执及迁移证据保留"
+    },
+    {
+      "root": "D:\\Survival_排演实验归档",
+      "before_files": 147,
+      "before_logical_bytes": 43958104009,
+      "before_unique_stored_bytes": 22659407316,
+      "action": "移除62份已验证重复的LAB数据，原实验脚本和回执保留"
+    },
+    {
+      "root": "D:\\Survival_清理归档",
+      "before_files": 2,
+      "before_logical_bytes": 6781630971,
+      "before_unique_stored_bytes": 6781630971,
+      "action": "保留未确认可重建的历史文件ZIP，无损压缩并逐SHA256复核"
+    },
+    {
+      "root": "D:\\Survival_清理记录",
+      "before_files": 10,
+      "before_logical_bytes": 27255616,
+      "before_unique_stored_bytes": 27255616,
+      "action": "保留审计/迁移/删除记录，新增本轮证据"
+    },
+    {
+      "root": "D:\\Survival_双机测试",
+      "before_files": 30,
+      "before_logical_bytes": 6256125407,
+      "before_unique_stored_bytes": 6256125407,
+      "action": "移除8份重复VPK及已核验的旧0201传输RAR，脚本/签名/说明保留"
+    }
+  ],
+  "duplicate_payloads_removed": 111,
+  "duplicate_logical_bytes": 80509461719,
+  "estimated_duplicate_storage_reclaimed": 43351101600,
+  "verified_canonical_sources": 19,
+  "protected_sensitive_and_tool_file_metadata_verified": 1394,
+  "metadata_archive": "D:\\Survival_清理记录\\20261103_框选目录\\original_receipts_helpers_and_indexes.zip",
+  "metadata_archive_sha256": "83478ed5749c55e6fbcce9d16b5e890d671a794a280039178fd3c29456e51e0e",
+  "metadata_members": 218,
+  "unique_backup_compression": {
+    "storage_before": 20583637000,
+    "storage_after": 18603337831,
+    "storage_saved": 1980299169,
+    "d_free_before": 263570247680,
+    "d_free_after": 265545875456,
+    "roots": [
+      {
+        "root": "D:\\survival_ui_backups",
+        "files": 114,
+        "logical_bytes": 10035183019,
+        "stored_before": 10035183019,
+        "stored_after": 9648433255,
+        "storage_saved": 386749764,
+        "all_sha256_verified": true,
+        "deleted_files": 0
+      },
+      {
+        "root": "D:\\Survival_工坊备份",
+        "files": 1,
+        "logical_bytes": 3766823010,
+        "stored_before": 3766823010,
+        "stored_after": 2215776256,
+        "storage_saved": 1551046754,
+        "all_sha256_verified": true,
+        "deleted_files": 0
+      },
+      {
+        "root": "D:\\Survival_清理归档",
+        "files": 2,
+        "logical_bytes": 6781630971,
+        "stored_before": 6781630971,
+        "stored_after": 6739128320,
+        "storage_saved": 42502651,
+        "all_sha256_verified": true,
+        "deleted_files": 0
+      }
+    ]
+  },
+  "estimated_total_storage_reclaimed": 45331400769,
+  "d_free_closeout": 265542832128,
+  "c_free_closeout": 41766346752,
+  "current_baseline_and_candidate_complete_signature_vpk_verification": true,
+  "full_release_plan_passed": false,
+  "preexisting_release_plan_blocker": "DIRTY_OR_UNCOMMITTED_AUXILIARY_INPUT: tools/release_pipeline.py",
+  "unknown_big_payloads_remaining": [],
+  "backend_writes": 0,
+  "workshop_writes": 0,
+  "runtime_resource_changes": [],
+  "disk_delta_may_include_parallel_work": true
+}
