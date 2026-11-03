@@ -75,7 +75,12 @@ function M.new(lookup)
         end end
         put("wave_phase",enumeration(wave.status,M.phases,"phase"))
         put("wave_game_mode",enumeration(wave.game_mode,M.modes,"mode"))
-        put("defeat_reason",enumeration(wave.defeat_reason,M.defeat_reasons,"defeat_reason"))
+        -- Optional explanatory text cannot discard authoritative defeat flags
+        -- or the rest of the HUD. Unregistered reasons use the existing wire
+        -- value for unknown; the server retains its original diagnostic text.
+        local reason=wave.defeat_reason
+        if reason~=nil and reason~="" and M.defeat_reasons[reason]==nil then reason="unknown"end
+        put("defeat_reason",enumeration(reason,M.defeat_reasons,"defeat_reason"))
         if wave.difficulty_id~=nil then
             local id=wave.difficulty_id=="" and 0 or tonumber(tostring(wave.difficulty_id):match("^N(%d+)$"))
             need(id~=nil and id<=10,"hud_difficulty_invalid");put("wave_difficulty",id)

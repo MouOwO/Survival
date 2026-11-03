@@ -8,6 +8,7 @@ import hashlib
 import struct
 import unittest
 import queue
+from datetime import timezone,timedelta
 from unittest.mock import patch
 
 spec=importlib.util.spec_from_file_location('capture',Path(__file__).with_name('capture_network50_perf.py'))
@@ -78,13 +79,62 @@ class CaptureTests(unittest.TestCase):
             path.write_bytes(b'changed map')
             with self.assertRaisesRegex(ValueError,'critical_runtime_drift'):m.critical_resource_binding(base,row,{})
 
-    def test_run05_and_run06_tools_helpers_are_explicitly_allowed_without_execution(self):
+    def test_run05_through_run07_tools_helpers_are_explicitly_allowed_without_execution(self):
         for relative in('tools/network50_dev_native_20261103.py','tools/network50_dev_input.ps1'):
-            for run in('run05','run06'):
+            for run in('run05','run06','run07'):
                 self.assertIn(repr(run),(m.ROOT/relative).read_text(encoding='utf-8'))
 
     def sample(self,time=100,status='spawning'):
-        return {'active':True,'tools':True,'game_time':time,'paused':False,'wave':{'status':status,'current':3,'alive':20,'defeated':False},'wire':{'ready':True,'views':4,'counters':{'sent':3}}}
+        return {'active':True,'tools':True,'game_time':time,'paused':False,
+                'engine':{'api_available':True,'enums_available':True,'in_progress_enum':37,'post_game_enum':99,'game_in_progress':True,'post_game':False},
+                'wave':{'status':status,'current':3,'alive':20,'defeated':False},'wire':{'ready':True,'views':4,'counters':{'sent':3}}}
+
+    def test_cached_live_hud_never_overrides_fresh_engine_postgame_or_missing_api(self):
+        for patch in({'game_in_progress':False,'post_game':True},{'api_available':False},{'enums_available':False},
+                     {'game_in_progress':1},{'post_game':None},{'api_error':True},{'in_progress_enum':True},
+                     {'in_progress_enum':99}):
+            after=self.sample(130);after['engine'].update(patch)
+            self.assertFalse(m.gameplay_validation(self.sample(),after)['valid'],patch)
+        after=self.sample(130);del after['engine']
+        self.assertFalse(m.gameplay_validation(self.sample(),after)['valid'])
+
+    def native_log(self,path,extra=''):
+        path.write_text("11/03 17:44:56 [Server] S:Gamerules: entering state 'DOTA_GAMERULES_STATE_GAME_IN_PROGRESS'\n"
+                        "11/03 17:44:56 [Client] C:Gamerules: entering state 'DOTA_GAMERULES_STATE_GAME_IN_PROGRESS'\n"
+                        "11/03 17:50:20 private account/auth unrelated text\n"+extra,encoding='utf-8')
+
+    def log_validation(self,path,start='2026-11-03T09:50:32.614878+00:00',end='2026-11-03T09:51:02.835108+00:00'):
+        return m.log_gameplay_validation(path,start,end,timezone(timedelta(hours=8)))
+
+    def test_native_log_rejects_actual_dev06_mid_capture_defeat_and_postgame(self):
+        with tempfile.TemporaryDirectory()as temporary:
+            path=Path(temporary)/'engine.log';self.native_log(path,
+                "11/03 17:50:43 [VScript] [PLAYER_DEFEAT] player=0 reason=wall_not_built_in_time\n"
+                "11/03 17:50:43 [Server] S:Gamerules: entering state 'DOTA_GAMERULES_STATE_POST_GAME'\n"
+                "11/03 17:50:43 [Client] C:Gamerules: entering state 'DOTA_GAMERULES_STATE_POST_GAME'\n")
+            result=self.log_validation(path)
+            self.assertFalse(result['valid']);self.assertEqual(result['rejected_events_total'],3)
+            self.assertIn('engine_log_player_defeat_before_or_during_capture',result['invalid_reasons'])
+            self.assertIn('engine_log_non_gameplay_state_during_capture',result['invalid_reasons'])
+            self.assertNotIn('private',json.dumps(result));self.assertNotIn('player=0',json.dumps(result))
+
+    def test_native_log_accepts_live_interval_but_not_missing_or_already_ended_state(self):
+        with tempfile.TemporaryDirectory()as temporary:
+            path=Path(temporary)/'engine.log';self.native_log(path)
+            self.assertTrue(self.log_validation(path)['valid'])
+            self.native_log(path,"11/03 17:51:10 [Server] S:Gamerules: entering state 'DOTA_GAMERULES_STATE_POST_GAME'\n")
+            self.assertTrue(self.log_validation(path)['valid'],'a later natural match end does not invalidate earlier live gameplay')
+            self.native_log(path,"11/03 17:50:00 [Server] S:Gamerules: entering state 'DOTA_GAMERULES_STATE_POST_GAME'\n")
+            self.assertFalse(self.log_validation(path)['valid'])
+            path.write_text("11/03 17:50:00 [VScript] cached HUD says countdown defeated0\n")
+            self.assertFalse(self.log_validation(path)['valid'],'no native S/C evidence is unknown')
+
+    def test_native_log_coarse_boundary_and_bad_clock_fail_closed(self):
+        with tempfile.TemporaryDirectory()as temporary:
+            path=Path(temporary)/'engine.log';self.native_log(path,"11/03 17:51:03 [Client] C:Gamerules: entering state 'DOTA_GAMERULES_STATE_POST_GAME'\n")
+            self.assertFalse(self.log_validation(path)['valid'],'one-second log precision widens rejection')
+            self.native_log(path,"[Server] S:Gamerules: entering state 'DOTA_GAMERULES_STATE_POST_GAME'\n")
+            self.assertIn('engine_log_state_timestamp_unverified',self.log_validation(path)['invalid_reasons'])
 
     def test_only_public_diagnostic_fields_leave_capture(self):
         source=self.sample();source.update(account_id='private',session_id='private');source['wave']['account_id']='private';source['wire']['counters']['secret']='private'

@@ -29,6 +29,11 @@ local delta=assert(state.update(fixture));assert(#delta==2,"only low/high resour
 fixture.wave.defeat_reason="wall_destroyed";fixture.wave.player_defeated=true
 delta=assert(state.update(fixture));assert(#delta==2)
 fixture.wave.defeat_reason="";delta=assert(state.update(fixture));assert(#delta==1 and delta[1].remove)
+fixture.wave.defeat_reason="wall_not_built_in_time";fixture.wave.status="defeat";fixture.wave.defeat_settled=true
+delta=assert(state.update(fixture));local ending={};for _,op in ipairs(delta)do ending[op.field]=op.value end
+assert(ending[F.defeat_reason]==projector.defeat_reasons.unknown and ending[F.wave_phase]==projector.phases.defeat
+ and ending[F.wave_defeat_settled]==true,'an unregistered optional reason cannot discard authoritative end-state')
+fixture.wave.defeat_reason="future_private_reason";assert(#assert(state.update(fixture))==0,'unknown explanations retain the same explicit unknown code')
 fixture.wave.game_mode="bad_mode";assert(not state.update(fixture),"unknown enum never guesses another mode")
 fixture.wave.game_mode="standard";fixture.resources.wood=0.1
 assert(not state.update(fixture),"bad count never silently changes authority/precision")

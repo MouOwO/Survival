@@ -8,7 +8,7 @@ from __future__ import annotations
 import argparse
 import concurrent.futures
 import csv
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import hashlib
 import importlib.util
 import json
@@ -190,6 +190,8 @@ def public_sample(value):
     need(isinstance(value,dict),'inspect_sample_required')
     wave=value.get('wave');wire=value.get('wire')
     result={key:value.get(key)for key in('active','tools','game_time','paused')}
+    engine=value.get('engine')
+    result['engine']={key:engine.get(key)for key in('api_available','enums_available','in_progress_enum','post_game_enum','game_in_progress','post_game','api_error')}if isinstance(engine,dict)else None
     result['wave']={key:wave.get(key)for key in('status','current','alive','defeated')}if isinstance(wave,dict)else None
     result['wire']={'ready':wire.get('ready'),'views':wire.get('views'),'counters':{}}if isinstance(wire,dict)else None
     if result['wire']is not None:
@@ -205,6 +207,13 @@ def gameplay_validation(before,after,seconds=30):
     for label,sample in(('before',before),('after',after)):
         if sample.get('active')is not True or sample.get('tools')is not True:reasons.append(label+'_inactive_or_not_tools')
         if sample.get('paused')is not False:reasons.append(label+'_paused_or_unknown')
+        engine=sample.get('engine')or{}
+        playing,post=engine.get('in_progress_enum'),engine.get('post_game_enum')
+        if engine.get('api_available')is not True or engine.get('enums_available')is not True or engine.get('api_error')is True \
+            or type(playing)is not int or type(post)is not int or not 0<=playing<=255 or not 0<=post<=255 or playing==post:
+            reasons.append(label+'_native_engine_state_api_or_enum_unverified')
+        elif engine.get('game_in_progress')is not True or engine.get('post_game')is not False:
+            reasons.append(label+'_native_engine_not_game_in_progress')
         wave=sample.get('wave')or{}
         if wave.get('status')not in allowed or wave.get('defeated')in(True,1):reasons.append(label+'_not_live_gameplay_or_victory_defeat')
         if not sample.get('wire')or sample['wire'].get('ready')is not True:reasons.append(label+'_compact_not_ready')
@@ -212,7 +221,58 @@ def gameplay_validation(before,after,seconds=30):
     delta=b-a if type(a)in(int,float)and type(b)in(int,float)and math.isfinite(a)and math.isfinite(b)else None
     if delta is None or not seconds-1.5<=delta<=seconds+3:reasons.append('game_clock_pause_speed_or_coverage_mismatch')
     return {'valid':not reasons,'invalid_reasons':reasons,'game_clock_seconds':delta,
-            'limit':'Two endpoint samples and clock progress cannot rule out every transient pause, overlay or scene change; review the bracketing screenshots separately.'}
+            'authority':'Fresh native Game.GameStateIs using runtime DOTA_GameState constants; cached HUD is context only.',
+            'limit':'Fresh endpoint engine state is additionally checked against interval native S/C Gamerules and defeat logs; neither proves every transient overlay or pause.'}
+
+
+def log_gameplay_validation(path,started_utc,ended_utc,local_timezone=None):
+    """One bounded log pass per capture, never a polling game-state source.
+
+    Export only native state names/times and defeat occurrence, never raw lines
+    or player/account identities. Coarse engine timestamps widen rejection by
+    one second. Missing/malformed native state evidence fails closed.
+    """
+    path=Path(path);need(path.is_file()and path.stat().st_size<=128*1024*1024,'bounded_engine_log_required')
+    start=datetime.fromisoformat(started_utc);end=datetime.fromisoformat(ended_utc)
+    need(start.tzinfo is not None and end.tzinfo is not None and end>=start,'aware_ordered_capture_interval_required')
+    zone=local_timezone or datetime.now().astimezone().tzinfo
+    start=start.astimezone(zone);end=end.astimezone(zone)
+    first=start.replace(microsecond=0);last=end.replace(microsecond=0)+timedelta(seconds=1)
+    raw=path.read_bytes();need(len(raw)<=128*1024*1024,'bounded_engine_log_required')
+    states={};rows=[];bad_timestamp=False
+    for line in raw.decode('utf-8',errors='replace').splitlines():
+        state=re.search(r"\b([SC]):Gamerules: entering state '(DOTA_GAMERULES_STATE_[A-Z_]+)'",line)
+        defeat=re.search(r'\[VScript\]\s+\[PLAYER_DEFEAT\]\s+player=\d+\b',line)
+        if not state and not defeat:continue
+        clock=re.match(r'^(\d{2}/\d{2} \d{2}:\d{2}:\d{2})\b',line)
+        if not clock:bad_timestamp=True;continue
+        candidates=[]
+        for year in(start.year-1,start.year,start.year+1):
+            try:candidates.append(datetime.strptime(str(year)+'/'+clock[1],'%Y/%m/%d %H:%M:%S').replace(tzinfo=zone))
+            except ValueError:pass
+        if not candidates:bad_timestamp=True;continue
+        moment=min(candidates,key=lambda v:abs((v-start).total_seconds()))
+        row={'at':moment.isoformat(),'kind':'native_state'if state else'player_defeat'}
+        if state:row.update(side=state[1],state=state[2])
+        if moment<=first and state:states[state[1]]=row
+        if moment<=last:rows.append((moment,row))
+    reasons=[]
+    if bad_timestamp:reasons.append('engine_log_state_timestamp_unverified')
+    for side in('S','C'):
+        if states.get(side,{}).get('state')!='DOTA_GAMERULES_STATE_GAME_IN_PROGRESS':reasons.append('engine_log_'+side.lower()+'_not_in_progress_at_capture_start')
+    # Any defeat since this world's verified native entry invalidates a scene
+    # sample, including a defeat already present before ETW began.
+    baseline=min((datetime.fromisoformat(row['at'])for row in states.values()),default=first)
+    rejected=[]
+    for moment,row in rows:
+        if row['kind']=='player_defeat'and moment>=baseline:
+            reasons.append('engine_log_player_defeat_before_or_during_capture');rejected.append(row)
+        elif row['kind']=='native_state'and first<=moment<=last and row['state']!='DOTA_GAMERULES_STATE_GAME_IN_PROGRESS':
+            reasons.append('engine_log_non_gameplay_state_during_capture');rejected.append(row)
+    return {'valid':not reasons,'invalid_reasons':sorted(set(reasons)),'started_local':start.isoformat(),'ended_local':end.isoformat(),
+            'initial_native_states':states,'rejected_events':rejected[:32],'rejected_events_total':len(rejected),
+            'log_prefix_bytes':len(raw),'log_prefix_sha256':hashlib.sha256(raw).hexdigest(),'timestamp_rejection_margin_seconds':1,
+            'scope':'Same owned-process log, native S/C Gamerules and any defeat; no raw payloads or player identifiers exported.'}
 
 def v2_statistics(path,pid):
     groups={};foreign=0
@@ -277,6 +337,8 @@ def capture(run,label):
     try:
         readback=Readback(binding['command']);before=readback.inspect();save(out/'inspect_before.json',before)
         need(gameplay_validation(before['sample'],before['sample'],0)['valid'],'before_capture_not_active_unpaused_gameplay')
+        log_before=log_gameplay_validation(binding['log'],before['utc'],before['utc']);save(out/'engine_log_before.json',log_before)
+        need(log_before['valid'],'before_capture_native_log_not_live_gameplay')
         started=datetime.now(timezone.utc).isoformat();wall=time.perf_counter()
         with concurrent.futures.ThreadPoolExecutor(max_workers=1)as pool:
             observation=pool.submit(focus.observe,binding['pid'],30,0)
@@ -287,24 +349,26 @@ def capture(run,label):
             for child,log,_ in children:
                 child.wait(timeout=max(.1,38-(time.perf_counter()-wall)));log.close();need(child.returncode==0,'collector_nonzero_exit')
             observed=observation.result(timeout=2)
-        elapsed=time.perf_counter()-wall;save(out/'focus.json',observed)
+        elapsed=time.perf_counter()-wall;ended=datetime.now(timezone.utc).isoformat();save(out/'focus.json',observed)
         after=readback.inspect();save(out/'inspect_after.json',after)
         identity_after=live_identity(binding);need(bindings(run)==binding,'immutable_dev_binding_changed_during_capture')
         first=v1.analyze(out/'frames_v1.csv',binding['pid']);save(out/'statistics_v1.json',first)
         second=v2_statistics(out/'frames_v2.csv',binding['pid']);save(out/'statistics_v2.json',second)
         validation=gameplay_validation(before['sample'],after['sample'])
         reasons=list(validation['invalid_reasons'])
+        log_interval=log_gameplay_validation(binding['log'],before['utc'],after['utc']);save(out/'engine_log_interval.json',log_interval)
+        reasons.extend(log_interval['invalid_reasons'])
         if not observed['validation']['valid']:reasons.extend(observed['validation']['invalid_reasons'])
         primary=first.get('primary')
         if first['selection']['group_count']!=1 or not primary:reasons.append('v1_single_nonzero_swapchain_required')
         elif primary['accepted_interval_count']<120 or primary['accepted_interval_sum_seconds']<28.5 or primary['timestamp_span_seconds']<28.5:reasons.append('v1_30second_coverage_required')
         if second['accepted_frames']<120 or second['interval_sum_seconds']<28.5 or second['cpu_span_seconds']<28.5:reasons.append('v2_30second_coverage_required')
         if not 29<=elapsed<=38:reasons.append('bounded_capture_wall_duration_mismatch')
-        report.update(valid=not reasons,invalid_reasons=sorted(set(reasons)),started_utc=started,wall_seconds=elapsed,
-            process_before=identity_before,process_after=identity_after,gameplay=validation,focus=observed['validation'],
+        report.update(valid=not reasons,invalid_reasons=sorted(set(reasons)),started_utc=started,ended_utc=ended,wall_seconds=elapsed,
+            process_before=identity_before,process_after=identity_after,gameplay=validation,engine_log=log_interval,focus=observed['validation'],
             frames_v1_sha256=sha(out/'frames_v1.csv'),frames_v2_sha256=sha(out/'frames_v2.csv'),statistics_v1=primary,statistics_v2=second,
             collector_argv=[argv for _,_,argv in children],engineering_gate=bool(not reasons and second['mean_fps']>=90 and second['p95_ms']<=16.7),
-            limits=['1Hz foreground observations do not prove uninterrupted visibility between samples.','Endpoint state/clock probes do not prove every intermediate scene; bracketing screenshots require operator review.','Two simultaneous read-only ETW collectors add measurement overhead; compare captures using the same setup.','Present cadence is not displayed-frame cadence, server tick time or ordinary signed-client acceptance.'])
+            limits=['1Hz foreground observations do not prove uninterrupted visibility between samples.','Fresh native engine endpoint state plus interval native-state/defeat logs reject postgame captures; transient overlays/pauses still require review.','Two simultaneous read-only ETW collectors add measurement overhead; compare captures using the same setup.','Present cadence is not displayed-frame cadence, server tick time or ordinary signed-client acceptance.'])
     except Exception as error:
         report['invalid_reasons'].append(str(error)if isinstance(error,ValueError)else type(error).__name__)
     finally:

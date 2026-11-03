@@ -1,0 +1,162 @@
+{
+  "schema": 1,
+  "status": "RECLASSIFIED_INVALID_GAMEPLAY_CAPTURE_ORIGINAL_RETAINED",
+  "run": "run06",
+  "delivery_state": "LOCAL_ONLY",
+  "backend_changed": false,
+  "workshop_uploaded": false,
+  "ordinary_acceptance": false,
+  "original_report": {
+    "path": "output/network50_perf_20261103/run06/n1_hud_a1dac2f2bede4f0ebf0c7163c20a7928/capture.json",
+    "sha256": "d3683279a4e4fb83c4bdeccd1eb82266442fec4f2322e9d1645a5aecb6f2a8f3",
+    "reported_valid": true,
+    "preserved_without_rewrite": true
+  },
+  "source_heads": {
+    "game": "cf7bb4a2a76957e9920c9afc7eb47f48a676ef2a",
+    "content": "32f884dcb4e2c68aa7d669eec4eb17d0616e9f9d"
+  },
+  "snapshot_manifest_sha256": "d927803ebe5d7a6649b1758c708aeb72ecdcba1a473bc746d698863d9ebf2b23",
+  "capture_interval": {
+    "started_utc": "2026-11-03T09:50:32.614878+00:00",
+    "wall_seconds": 30.147120299981907,
+    "fresh_before_utc": "2026-11-03T09:50:32.614476+00:00",
+    "fresh_after_utc": "2026-11-03T09:51:02.835108+00:00"
+  },
+  "corrected_valid": false,
+  "valid_gameplay_fps_captures": 0,
+  "accepted_mean_fps": null,
+  "accepted_p95_ms": null,
+  "reasons": [
+    "engine_log_non_gameplay_state_during_capture",
+    "engine_log_player_defeat_before_or_during_capture",
+    "original_endpoint_samples_used_cached_hud_as_gameplay_authority",
+    "original_native_engine_state_api_readback_absent"
+  ],
+  "native_log_interval_evidence": {
+    "valid": false,
+    "invalid_reasons": [
+      "engine_log_non_gameplay_state_during_capture",
+      "engine_log_player_defeat_before_or_during_capture"
+    ],
+    "started_local": "2026-11-03T17:50:32.614476+08:00",
+    "ended_local": "2026-11-03T17:51:02.835108+08:00",
+    "initial_native_states": {
+      "S": {
+        "at": "2026-11-03T17:44:56+08:00",
+        "kind": "native_state",
+        "side": "S",
+        "state": "DOTA_GAMERULES_STATE_GAME_IN_PROGRESS"
+      },
+      "C": {
+        "at": "2026-11-03T17:44:56+08:00",
+        "kind": "native_state",
+        "side": "C",
+        "state": "DOTA_GAMERULES_STATE_GAME_IN_PROGRESS"
+      }
+    },
+    "rejected_events": [
+      {
+        "at": "2026-11-03T17:50:43+08:00",
+        "kind": "player_defeat"
+      },
+      {
+        "at": "2026-11-03T17:50:43+08:00",
+        "kind": "native_state",
+        "side": "S",
+        "state": "DOTA_GAMERULES_STATE_POST_GAME"
+      },
+      {
+        "at": "2026-11-03T17:50:43+08:00",
+        "kind": "native_state",
+        "side": "C",
+        "state": "DOTA_GAMERULES_STATE_POST_GAME"
+      }
+    ],
+    "rejected_events_total": 3,
+    "log_prefix_bytes": 610887,
+    "log_prefix_sha256": "215e7fc48e69e2a7a7c282dba8e85bf0dc12d037fbcac96714d5283778df6308",
+    "timestamp_rejection_margin_seconds": 1,
+    "scope": "Same owned-process log, native S/C Gamerules and any defeat; no raw payloads or player identifiers exported."
+  },
+  "discarded_scene_frame_statistics": {
+    "measurement": "Real ETW present samples spanning live game and natural defeat/postgame; not valid gameplay FPS evidence.",
+    "v1": {
+      "process_id": 9608,
+      "swapchain_address": "0x0000029631c5d890",
+      "applications": [
+        "dota2.exe"
+      ],
+      "observed_present_rows": 1784,
+      "excluded_first_present_rows": 1,
+      "discarded_invalid_rows": 0,
+      "discarded_invalid_reasons": {},
+      "accepted_interval_count": 1783,
+      "mean_present_fps": 59.699101,
+      "mean_fps_definition": "accepted_interval_count / sum(accepted MsBetweenPresents in seconds). With no invalid rows this equals (observed_present_rows - 1) / sum.",
+      "present_interval_ms": {
+        "mean": 16.750671,
+        "p50": 16.666,
+        "p95": 16.90754,
+        "p99": 17.798736,
+        "max": 111.4377
+      },
+      "slowest_1_percent_fps": {
+        "fps": 34.576546,
+        "interval_count": 18,
+        "fraction_of_accepted_intervals": 0.010095344924284913,
+        "mean_interval_ms": 28.921339,
+        "definition": "1000 divided by the arithmetic mean of the slowest ceil(accepted_interval_count * 0.01) present intervals; not the reciprocal of P99."
+      },
+      "intervals_at_least_ms": {
+        "33.33": 3,
+        "50": 3,
+        "100": 1
+      },
+      "dropped_present_rows": 0,
+      "dropped_status_unknown_rows": 0,
+      "dropped_metric_note": "Dropped presents remain in present-cadence intervals; mean FPS does not assert displayed FPS.",
+      "first_timestamp_seconds": 0.0835925,
+      "last_timestamp_seconds": 29.9500387,
+      "timestamp_span_seconds": 29.866446,
+      "accepted_interval_sum_seconds": 29.866446,
+      "interval_sum_minus_timestamp_span_seconds": 0.0,
+      "warnings": []
+    },
+    "v2": {
+      "swapchain": "0x29631C5D890",
+      "accepted_frames": 1784,
+      "mean_fps": 59.699201623903946,
+      "p95_ms": 16.78444,
+      "interval_sum_seconds": 29.8831467,
+      "cpu_span_seconds": 29.883228300000003,
+      "first_row_excluded": true
+    }
+  },
+  "cause": "Both endpoint HUD snapshots retained countdown/defeated0 while the authoritative native state transitioned to POST_GAME and PLAYER_DEFEAT occurred inside the capture. Game clock continued advancing, so clock plus cached HUD could not reject it.",
+  "fix": {
+    "diagnostic": "Each fresh nonce queries Game.GameStateIs twice using actual runtime DOTA_GameState GAME_IN_PROGRESS/POST_GAME constants; missing API/enums/nonboolean/exception fail closed.",
+    "collector": "Require verified fresh engine state before and after; independently require native S/C in-progress state before interval and reject interval non-gameplay transitions or any defeat since current native entry.",
+    "log_check": "Bounded 128MiB maximum one-pass read per before/after check, no timer, raw payloads or identities exported.",
+    "new_native_run_required": "run07 after paired author/compiled commit; frozen run06 is not patched."
+  },
+  "api_symbol_audit": {
+    "file": "game/dota/bin/win64/client.dll",
+    "bytes": 107535000,
+    "sha256": "ff471c7719ddc4a3e3111b30c0e6eddc738ff04ad183e27907198c2cd8f20bbc",
+    "GameStateIs_symbol_present": true,
+    "both_native_enum_names_present": true,
+    "numeric_ids_hardcoded": false,
+    "actual_new_GameStateIs_readback_verified": false,
+    "limit": "DLL symbols and mock tests are not proof that the live Panorama API call succeeded; new native readback remains required."
+  },
+  "privacy": {
+    "raw_logs_exported": false,
+    "raw_kv_exported": false,
+    "account_scope_or_auth_data_exported": false
+  },
+  "official_release_unchanged": {
+    "release_sequence": "0104",
+    "steam_manifest": "7025356658517360342"
+  }
+}
