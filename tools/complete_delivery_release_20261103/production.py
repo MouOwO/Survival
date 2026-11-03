@@ -241,16 +241,30 @@ def export_lua(ctx, destination):
                 need(len(raw) == entry.size and not raw.startswith(b"version https://git-lfs.github.com/spec/v1"),
                      "plain_immutable_lua_blob_required")
                 oid = ctx["tree"][entry.name]["oid"]
-                actual_oid = hashlib.new("sha1" if len(oid)==40 else "sha256", b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+                def blob_oid(value):
+                    return hashlib.new("sha1" if len(oid)==40 else "sha256", b"blob "+str(len(value)).encode()+b"\0"+value).hexdigest()
+                actual_oid = blob_oid(raw)
+                normalization = "EXACT_GIT_BLOB"
+                if actual_oid != oid:
+                    # Windows git archive applies checkout conversion when
+                    # core.autocrlf is enabled. Accept a reversal only when its
+                    # complete bytes reproduce the declared immutable Git OID.
+                    # Intentional CRLF blobs already passed the identity branch.
+                    restored = raw.replace(b"\r\n", b"\n")
+                    need(blob_oid(restored) == oid, "archived_lua_differs_from_immutable_git_blob:" + entry.name)
+                    raw, actual_oid = restored, oid
+                    normalization = "ARCHIVE_CRLF_REVERSED_WITH_EXACT_GIT_OID_PROOF"
                 need(actual_oid == oid, "archived_lua_differs_from_immutable_git_blob:" + entry.name)
                 target = source / entry.name
                 need(target.resolve().is_relative_to(source.resolve()), "lua_export_path_escaped")
                 target.parent.mkdir(parents=True, exist_ok=True);target.write_bytes(raw)
                 records[entry.name] = dict(path=entry.name, source_revision=ctx["game"], git_oid=oid,
-                                          source_sha256=sha(raw), source_bytes=len(raw))
+                                          source_sha256=sha(raw), source_bytes=len(raw),
+                                          archive_normalization=normalization)
         need(process.wait(timeout=30) == 0 and set(records) == allowed, "immutable_lua_archive_incomplete")
     finally:
         if process.poll() is None: process.kill();process.wait()
+        process.stdout.close();process.stderr.close()
     for path, raw in ctx["targets"].items():
         target = source / path;target.parent.mkdir(parents=True, exist_ok=True);target.write_bytes(raw)
     return source, records

@@ -3,8 +3,12 @@ from pathlib import Path
 import collections
 import copy
 import importlib.util
+import hashlib
+import io
+import tarfile
 import tempfile
 import unittest
+from unittest.mock import patch
 
 spec=importlib.util.spec_from_file_location("complete_production",Path(__file__).parent/"complete_delivery_release_20261103/production.py")
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
@@ -70,6 +74,37 @@ class ProductionGuards(unittest.TestCase):
 
 
 class Actual0104Integration(unittest.TestCase):
+    def test_actual_windows_git_archive_exports_exact_immutable_blob(self):
+        rev='9ee4a3c411b42c84d4afe712e0eea9383a271457'
+        name='scripts/vscripts/abilities/ability_build_advanced_research_lab.lua'
+        counts=collections.Counter();raw=m.git_blob(m.ROOT,rev,name,counts)
+        oid=hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()
+        ctx=dict(paths=[name],game=rev,tree={name:{'oid':oid}},targets={})
+        with tempfile.TemporaryDirectory(prefix='production-exact-archive-')as folder:
+            source,records=m.export_lua(ctx,Path(folder))
+            self.assertEqual((source/name).read_bytes(),raw)
+            self.assertEqual(records[name]['source_sha256'],m.sha(raw))
+
+    def test_archive_normalization_never_accepts_changed_code(self):
+        name='scripts/vscripts/config/example.lua';raw=b'return 1\n'
+        oid=hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()
+        for archived,valid in [(b'return 1\r\n',True),(b'return 2\r\n',False)]:
+            archive=io.BytesIO()
+            with tarfile.open(fileobj=archive,mode='w')as stream:
+                entry=tarfile.TarInfo(name);entry.size=len(archived);stream.addfile(entry,io.BytesIO(archived))
+            class Process:
+                stdout=io.BytesIO(archive.getvalue())
+                stderr=io.BytesIO()
+                def wait(self,timeout=None):return 0
+                def poll(self):return 0
+            ctx=dict(paths=[name],game='a'*40,tree={name:{'oid':oid}},targets={})
+            with tempfile.TemporaryDirectory(prefix='production-archive-guard-')as folder,patch.object(m.subprocess,'Popen',return_value=Process()):
+                if valid:
+                    source,records=m.export_lua(ctx,Path(folder));self.assertEqual((source/name).read_bytes(),raw)
+                    self.assertEqual(records[name]['archive_normalization'],'ARCHIVE_CRLF_REVERSED_WITH_EXACT_GIT_OID_PROOF')
+                else:
+                    with self.assertRaisesRegex(ValueError,'differs_from_immutable'):m.export_lua(ctx,Path(folder))
+
     def test_authentic_parent_and_actual_immutable_source_behavior(self):
         if not m.pending.PARENT_MANIFEST.is_file():self.skipTest('requires retained authenticated0104 external baseline')
         rev='1f160c3a848e57db81f5b9498cc0d59b733fc501';counts=collections.Counter()

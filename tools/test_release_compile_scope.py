@@ -126,4 +126,19 @@ class CompileScopeTests(unittest.TestCase):
         rows=m.selected_rows({'decisions':[{'resource':'panorama/a.vjs_c','inventory_status':'UNBOUND_COMPILED_ARTIFACT','review_decision':'IMMUTABLE_AUTHORS_AVAILABLE_RECOMPILE_OR_VALIDATE_EMBEDDED_BINDING'}, {'resource':'panorama/b.vjs_c','review_decision':'LOCAL_HISTORICAL_MANIFEST_BYTES_MATCH_INPUT_BINDING_STILL_REQUIRED'}, {'resource':'panorama/c.vsvg_c','inventory_status':'UNMAPPED_SOURCE_PENDING'}]})
         self.assertEqual(len(rows),2);self.assertTrue(all('status'not in r for r in rows))
 
+    def test_texture_image_payload_follows_bounded_resource_metadata(self):
+        data=b'actual texture metadata'
+        metadata=struct.pack('<IHHII4sII',28+len(data),12,1,8,1,b'DATA',8,len(data))+data
+        pixels=b'\x01\x02\x03\xff'*16
+        proof=m.compiled_binding('panorama/images/a.vtex_c',metadata+pixels,b'vtex recipe')
+        self.assertEqual(proof['resource_metadata_bytes'],len(metadata))
+        self.assertEqual(proof['texture_external_payload_bytes'],len(pixels))
+        self.assertEqual(proof['texture_external_payload_sha256'],m.sha(pixels))
+        with self.assertRaisesRegex(ValueError,'header_invalid'):
+            m.compiled_binding('panorama/images/a.vsvg_c',metadata+pixels,b'svg')
+        # A block cannot use image payload bytes to escape its metadata bounds.
+        malformed=bytearray(metadata+pixels);struct.pack_into('<I',malformed,24,len(data)+1)
+        with self.assertRaisesRegex(ValueError,'block_invalid'):
+            m.compiled_binding('panorama/images/a.vtex_c',bytes(malformed),b'vtex recipe')
+
 if __name__=='__main__':unittest.main()

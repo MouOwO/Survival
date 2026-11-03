@@ -124,17 +124,23 @@ def compiled_binding(resource,raw,compiler_input):
     """Validate native block bounds and exact embedded JS compiler bytes."""
     need(28<=len(raw)<=MAX_OBJECT,'compiled_resource_absent_or_oversized')
     size,version,_,offset,count=struct.unpack_from('<IHHII',raw);table=8+offset
-    need(size==len(raw)and version==12 and 1<=count<=64 and 16<=table<=len(raw)-12*count,'compiled_resource_header_invalid')
+    texture=resource.endswith('.vtex_c')
+    # Native texture files append image payload after the resource metadata.
+    # Other reviewed Panorama resource types must end at their declared size.
+    need((16<=size<=len(raw)if texture else size==len(raw))and version==12 and 1<=count<=64
+         and 16<=table<=size-12*count,'compiled_resource_header_invalid')
     blocks={};ranges=[]
     for index in range(count):
         entry=table+index*12;tag,displacement,length=struct.unpack_from('<4sII',raw,entry);start=entry+4+displacement
-        need(all(32<=value<=126 for value in tag)and tag not in blocks and start>=table+count*12 and start+length<=len(raw)
+        need(all(32<=value<=126 for value in tag)and tag not in blocks and start>=table+count*12 and start+length<=size
              and not any(start<end and begin<start+length for begin,end in ranges),'compiled_resource_block_invalid')
         blocks[tag]=raw[start:start+length];ranges.append((start,start+length))
     need(b'DATA'in blocks,'compiled_resource_data_missing')
     is_js=resource.endswith('.vjs_c')
     if is_js:need(blocks[b'DATA']==compiler_input,'compiled_js_data_differs_from_immutable_compiler_input')
     return dict(blocks=[dict(tag=tag.decode('ascii'),bytes=len(value),sha256=sha(value))for tag,value in blocks.items()],
+                resource_metadata_bytes=size,texture_external_payload_bytes=len(raw)-size if texture else 0,
+                texture_external_payload_sha256=sha(raw[size:])if texture and len(raw)>size else None,
                 compiled_js_DATA_equals_input=True if is_js else None,rerl_bytes=len(blocks.get(b'RERL',b'')))
 
 def dependencies(path,raw):
