@@ -1,5 +1,7 @@
 # 孤城逐晓／Survival 统一知识库
 
+**2026-11-03 低频网格 bulk 尺寸已实测，仍仅本地更新。** 独立最小 Tools addon 的 gb/d 五档64/128/256/512/896 ASCII实际为89/155/283/539/923B，最大923B<1KiB；较大载荷封装27B，不能沿用小包+25。Client实际10938:11198969，与旧cw标定revision不同；同DLL摘要不能冒称同版本。零交易/SDK；尚未完整网格、普通客户端或FPS验收，正式同步状态另由主操作者记录。见[真实闭合日志、脱敏证据与范围](evidence/network50_grid_bulk_native_20261103.md)。
+
 **2026-11-03 用户最新范围决定：高频同步≤50B，其他按总流量优化。** 此决定替代之前所有rare启动／通知均拆到50B的广泛目标，历史实测和未通过边界原样保留。继续收口payment高频、Beta静态化、gen4/native与完整发行；未知地图27KB／旧4.8KB留专门大数据优化，常见template候选路径优先，不以小碎片冒充总流量降低。仍须完整pending动态build／ledger／validators／authority，不能回到固定9文件或把Git推送称已同步游廊。见[用户决定与真实边界](evidence/network50_dev07_native_fps_20261103.md)。
 
 **2026-11-03 Dev07已取得有效无遮挡30秒测量，仍仅本地更新。** cw94帧／4576B／最大49B，旧VIP和英雄大包为0；全部观察事件≤1500B，但payment/Beta等9类仍>50B。N1前台样本v2平均60.000356FPS／P95 16.799335ms，v1 P95 16.947880ms／最大30.3278ms，≥33.33ms为0；capture有效但engineering_gate=false，不冒称16.7ms阈值通过。Dev06因区间PLAYER_DEFEAT重新判无效；Dev07首段gift弹窗只算overlay。尚无ordinary／online／四人或完整发行验收。见[真实证据、来源与限制](evidence/network50_dev07_native_fps_20261103.md)。

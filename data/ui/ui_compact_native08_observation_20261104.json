@@ -1,0 +1,283 @@
+{
+  "kind": "CLOSED_NATIVE08_WIRE_OBSERVATION_WITH_UNKNOWN_UI_INPUT_PROVENANCE_NOT_VISUAL_OR_TRANSACTION_ACCEPTANCE",
+  "source_heads": {
+    "content": "e5c1b70d8ad2370389c87a0d645a6fccbe0d4178",
+    "game": "9ee4a3c411b42c84d4afe712e0eea9383a271457"
+  },
+  "snapshot_manifest_sha256": "9b528dd9d824ee9562ff61d5bc5b4c743cef267d7f3f38a950392f750716c9bb",
+  "source_is_workspace_observation_not_immutable_release": true,
+  "closed_log_sha256": "673ca35b24437835a05fd686fdfd99cf9ac5ea1631dcc41752813ae9913a4cb4",
+  "closed_log_bytes": 2042356,
+  "normally_closed": true,
+  "host_strict_cim_zero_processes_verified": true,
+  "exact_owned_mounts_retired": true,
+  "external_snapshot_preserved": true,
+  "retirement_receipt_sha256": "8451ba971487f076145fb4a2c98cc5b6eba9cf345ec753b9b3cb7f65a922ecbb",
+  "event_sizes": {
+    "ui_combat_effects_state": {
+      "count": 1,
+      "max_native_bytes": 55,
+      "total_native_bytes": 55
+    },
+    "survival_loading_mode_result": {
+      "count": 1,
+      "max_native_bytes": 191,
+      "total_native_bytes": 191
+    },
+    "ui_shop_unlock_state": {
+      "count": 1,
+      "max_native_bytes": 96,
+      "total_native_bytes": 96
+    },
+    "survival_select_unit": {
+      "count": 1,
+      "max_native_bytes": 75,
+      "total_native_bytes": 75
+    },
+    "cw": {
+      "count": 698,
+      "max_native_bytes": 49,
+      "total_native_bytes": 33427
+    },
+    "ui_difficulty_select_result": {
+      "count": 1,
+      "max_native_bytes": 102,
+      "total_native_bytes": 102
+    },
+    "ui_notification": {
+      "count": 7,
+      "max_native_bytes": 148,
+      "total_native_bytes": 976
+    },
+    "survival_commerce_result": {
+      "count": 1,
+      "max_native_bytes": 152,
+      "total_native_bytes": 152
+    },
+    "survival_leaderboard_result": {
+      "count": 2,
+      "max_native_bytes": 149,
+      "total_native_bytes": 298
+    }
+  },
+  "compact_views": {
+    "1": {
+      "frames": 7,
+      "max_native_bytes": 49,
+      "full_frames": 7,
+      "delta_frames": 0,
+      "transactions": 1
+    },
+    "2": {
+      "frames": 96,
+      "max_native_bytes": 49,
+      "full_frames": 33,
+      "delta_frames": 63,
+      "transactions": 65
+    },
+    "8": {
+      "frames": 1,
+      "max_native_bytes": 47,
+      "full_frames": 1,
+      "delta_frames": 0,
+      "transactions": 1
+    },
+    "4": {
+      "frames": 310,
+      "max_native_bytes": 49,
+      "full_frames": 15,
+      "delta_frames": 295,
+      "transactions": 12
+    },
+    "6": {
+      "frames": 6,
+      "max_native_bytes": 49,
+      "full_frames": 6,
+      "delta_frames": 0,
+      "transactions": 1
+    },
+    "9": {
+      "frames": 11,
+      "max_native_bytes": 49,
+      "full_frames": 1,
+      "delta_frames": 10,
+      "transactions": 10
+    },
+    "3": {
+      "frames": 46,
+      "max_native_bytes": 49,
+      "full_frames": 46,
+      "delta_frames": 0,
+      "transactions": 2
+    },
+    "5": {
+      "frames": 74,
+      "max_native_bytes": 49,
+      "full_frames": 43,
+      "delta_frames": 31,
+      "transactions": 4
+    },
+    "7": {
+      "frames": 60,
+      "max_native_bytes": 49,
+      "full_frames": 30,
+      "delta_frames": 30,
+      "transactions": 6
+    },
+    "201": {
+      "frames": 2,
+      "max_native_bytes": 49,
+      "full_frames": 2,
+      "delta_frames": 0,
+      "transactions": 1
+    },
+    "114": {
+      "frames": 5,
+      "max_native_bytes": 49,
+      "full_frames": 5,
+      "delta_frames": 0,
+      "transactions": 1
+    },
+    "101": {
+      "frames": 3,
+      "max_native_bytes": 49,
+      "full_frames": 3,
+      "delta_frames": 0,
+      "transactions": 1
+    },
+    "102": {
+      "frames": 3,
+      "max_native_bytes": 49,
+      "full_frames": 3,
+      "delta_frames": 0,
+      "transactions": 1
+    },
+    "108": {
+      "frames": 5,
+      "max_native_bytes": 49,
+      "full_frames": 5,
+      "delta_frames": 0,
+      "transactions": 1
+    },
+    "107": {
+      "frames": 3,
+      "max_native_bytes": 49,
+      "full_frames": 3,
+      "delta_frames": 0,
+      "transactions": 1
+    },
+    "103": {
+      "frames": 3,
+      "max_native_bytes": 49,
+      "full_frames": 3,
+      "delta_frames": 0,
+      "transactions": 1
+    },
+    "120": {
+      "frames": 3,
+      "max_native_bytes": 49,
+      "full_frames": 3,
+      "delta_frames": 0,
+      "transactions": 1
+    },
+    "111": {
+      "frames": 3,
+      "max_native_bytes": 49,
+      "full_frames": 3,
+      "delta_frames": 0,
+      "transactions": 1
+    },
+    "115": {
+      "frames": 36,
+      "max_native_bytes": 49,
+      "full_frames": 36,
+      "delta_frames": 0,
+      "transactions": 1
+    },
+    "116": {
+      "frames": 5,
+      "max_native_bytes": 49,
+      "full_frames": 5,
+      "delta_frames": 0,
+      "transactions": 1
+    },
+    "104": {
+      "frames": 8,
+      "max_native_bytes": 49,
+      "full_frames": 8,
+      "delta_frames": 0,
+      "transactions": 2
+    },
+    "106": {
+      "frames": 8,
+      "max_native_bytes": 49,
+      "full_frames": 8,
+      "delta_frames": 0,
+      "transactions": 1
+    }
+  },
+  "compact_unparsed_frames": 0,
+  "hello_schema_sha256": "9e5d7b6ecfb03405cd89f8e93d9ab4fa4d098a373d88057687d269396c446100",
+  "snapshot_schema_sha256": "9e5d7b6ecfb03405cd89f8e93d9ab4fa4d098a373d88057687d269396c446100",
+  "hello_words_match_frozen_snapshot": true,
+  "runtime_error_count": 0,
+  "mode_difficulty_result_events": [
+    {
+      "event": "survival_loading_mode_result",
+      "log_time": "11/04 07:12:08"
+    },
+    {
+      "event": "ui_difficulty_select_result",
+      "log_time": "11/04 07:12:09"
+    }
+  ],
+  "ui_input_provenance": "Unknown. The operator issued no further input after approval timeouts; the root also reported no mode input. The final closed trace nevertheless contains later mode/difficulty events and cannot be attributed as this operator visual verification.",
+  "initial_mode_selection_screenshot_observed": true,
+  "later_gameplay_screenshot_observed": false,
+  "production7_wire_observed": true,
+  "production7_visual_or_operation_acceptance": false,
+  "payment9_wire_observed": true,
+  "public_beta10_wire_observed": false,
+  "public_beta10_passed": false,
+  "template_grid6_wire_observed": true,
+  "unknown_map_bulk_exercised": false,
+  "lottery201_state_audit": [
+    {
+      "known": [
+        0
+      ],
+      "error_codes": [
+        2
+      ],
+      "request_token_fields": 0,
+      "receipt_fields": 0
+    }
+  ],
+  "paid_action_log_audit": {
+    "lottery_draw": {
+      "registration_lines": 1,
+      "non_registration_lines": 0
+    },
+    "lottery_exchange": {
+      "registration_lines": 1,
+      "non_registration_lines": 0
+    },
+    "survival_public_beta_gift_claim": {
+      "registration_lines": 1,
+      "non_registration_lines": 0
+    }
+  },
+  "lottery_draw_result_events": 0,
+  "no_ledger_http_post_ack_markers_observed": true,
+  "paid_action_audit_limit": "S2C net_showmsg alone does not prove absence of arbitrary external C2S input. Observed lottery view201 is known0/error2 with no receipt or request-token fields; no positive transaction acceptance is claimed.",
+  "operator_coupon_consumption_actions": 0,
+  "operator_redemption_actions": 0,
+  "operator_gift_claim_actions": 0,
+  "backend_enabled": false,
+  "sdk_calls": 0,
+  "workshop_install_written": false,
+  "fps_measured": false,
+  "ordinary_production_acceptance": false,
+  "all_custom_events_within_50B": false,
+  "source_fix_required_after_observation": "public_beta_gift.xml own dependencies and event-driven late-runtime attachment are fixed locally after this frozen run; this log is not evidence of that new fix."
+}

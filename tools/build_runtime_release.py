@@ -17,6 +17,7 @@ import sys
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
+EXECUTED_SOURCE_LF_SHA256 = hashlib.sha256(Path(__file__).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
 RULES = {
     "scripts/npc": {".txt"},
     "scripts/vscripts": {".lua"},

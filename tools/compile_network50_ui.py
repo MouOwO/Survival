@@ -24,7 +24,7 @@ SOURCES=(
  'survival_grid_placement.js','survival_grid_state.js','combat_stats.js','inventory_tooltip.js','production_progress.js','public_beta_gift.js','vip_window.js','payment_capability.js',
  'lottery_cinematic_v1.js','lottery_gw2.js',
 )
-LAYOUTS=('survival_hud.xml','archive.xml','survival_grid_placement.xml','payment_test.xml')
+LAYOUTS=('survival_hud.xml','archive.xml','survival_grid_placement.xml','payment_test.xml','public_beta_gift.xml')
 CORE_DEPENDENCIES=('common/ui_static_catalog.js','common/compact_wire.js','common/compact_grid_bulk_wire.js','common/compact_ui_runtime.js')
 DEPENDENCIES=CORE_DEPENDENCIES+('common/compact_archive_model.js','common/compact_daily_model.js',
  'common/compact_hud_model.js','common/compact_hud_source.js','common/compact_lottery_model.js',
@@ -78,7 +78,8 @@ def main():
             for source in DEPENDENCIES:
                 pattern=r'<include\s+src="file://\{resources\}/scripts/custom_game/'+re.escape(source)+r'"\s*/>'
                 text=re.sub(pattern,'',text)
-            selected_dependencies=CORE_DEPENDENCIES if name=='payment_test.xml' else DEPENDENCIES
+            selected_dependencies=(CORE_DEPENDENCIES if name=='payment_test.xml' else
+                CORE_DEPENDENCIES+('common/compact_public_beta_model.js',) if name=='public_beta_gift.xml' else DEPENDENCIES)
             includes='\n'+''.join('        <include src="file://{resources}/scripts/custom_game/'+source+'" />\n' for source in selected_dependencies)
             text=text.replace('<scripts>','<scripts>'+includes,1)
             text=re.sub(r'(?m)^[ \t]+$','',text)

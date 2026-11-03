@@ -22,6 +22,24 @@ ROOT = Path(__file__).resolve().parents[1]
 POLICY = Path(__file__).with_name("lua_protection_policy.json")
 SUPPORT = Path(__file__).with_name("lua_protection")
 EXPECTED_STEPS = ["ConstantArray", "NumbersToExpressions", "WrapInFunction"]
+EXECUTED_SOURCE_LF_SHA256 = hashlib.sha256(Path(__file__).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+LOADED_TOOL_LF_HASHES = {
+    "tools/protect_runtime_lua.py": EXECUTED_SOURCE_LF_SHA256,
+    "tools/build_runtime_release.py": runtime.EXECUTED_SOURCE_LF_SHA256,
+    **{path.relative_to(ROOT).as_posix(): hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+       for path in sorted(SUPPORT.glob("*.lua"))},
+}
+
+
+def loaded_tool_bindings() -> list[dict]:
+    records = []
+    for path, loaded in sorted(LOADED_TOOL_LF_HASHES.items()):
+        actual = hashlib.sha256((ROOT / path).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+        if actual != loaded:
+            raise ValueError("Loaded protection tool/helper changed after import: " + path)
+        records.append({"path": path, "loaded_lf_sha256": loaded,
+                        "normalization": "CRLF_TO_LF"})
+    return records
 
 
 def check_policy(data: dict) -> None:
@@ -132,7 +150,10 @@ def compare_values(source: Path, destination: Path, rows: list[dict], lua: Path,
 
 
 def protect(source: Path, destination: Path, dependency: Path, lua: Path, luac: Path, policy: dict,
-            *, data_strings: bool = False) -> dict:
+            *, data_strings: bool = False, lua_only_input: bool = False) -> dict:
+    if type(lua_only_input) is not bool:
+        raise ValueError("lua_only_input must be an explicit boolean")
+    tools = loaded_tool_bindings()
     check_policy(policy)
     source = source.resolve(strict=True)
     runtime.require_production(source)
@@ -140,7 +161,7 @@ def protect(source: Path, destination: Path, dependency: Path, lua: Path, luac: 
     identity = dependency_identity(dependency, policy)
     if not lua.is_file() or not luac.is_file():
         raise ValueError("Explicit Lua 5.1 and luac 5.1 executables are required")
-    paths = [relative for relative in runtime.select(source)[0]
+    paths = [relative for relative in runtime.select(source, check_critical=not lua_only_input)[0]
              if relative.startswith("scripts/vscripts/") and relative.endswith(".lua")]
     rows = selected_files(paths, policy)
     selected = {row["path"] for row in rows}
@@ -154,6 +175,10 @@ def protect(source: Path, destination: Path, dependency: Path, lua: Path, luac: 
               "generated_steps": ["ConstantArray", "EncryptStrings", "NumbersToExpressions", "WrapInFunction"]
                                  if data_strings else policy["steps"],
               "source_files": len(paths), "selected_files": len(rows), "unchanged_plaintext_modules": len(paths) - len(rows),
+              "input_scope": "LUA_ONLY_PROJECTION" if lua_only_input else "FULL_RUNTIME_SOURCE",
+              "critical_runtime_assets_checked": not lua_only_input,
+              "complete_candidate_materialization_verified": False,
+              "executed_tool_inputs": tools,
               "source_modified": False, "network_used_for_transform": False, "native_dota_smoke_test": "NOT_RUN",
               "workshop_upload_performed": False, "files": []}
     destination.mkdir(parents=True, exist_ok=False)
@@ -190,6 +215,8 @@ def protect(source: Path, destination: Path, dependency: Path, lua: Path, luac: 
         report["syntax"] = {"status": "PASS", "all_lua_files": len(paths), "compiler": str(luac)}
         report["semantic_verification"] = compare_values(source, destination, rows, lua, work)
         dependency_identity(dependency, policy)
+        if loaded_tool_bindings() != tools:
+            raise ValueError("Protection tools changed during preparation")
         for relative in paths:
             if runtime.checksums(source / relative) != original[relative]:
                 raise ValueError("Development source changed during protection: " + relative)
@@ -215,10 +242,13 @@ def main() -> int:
     parser.add_argument("--policy", type=Path, default=POLICY)
     parser.add_argument("--data-string-obfuscation", action="store_true",
                         help="Also obfuscate pure generated-table strings with an isolated private decoder RNG")
+    parser.add_argument("--lua-only-input", action="store_true",
+                        help="Explicit Lua projection input; skip only non-Lua critical asset presence, not production policy or later full-candidate/native validation")
     args = parser.parse_args()
     try:
         report = protect(args.source, args.output, args.prometheus_root, args.lua, args.luac,
-                         json.loads(args.policy.read_text(encoding="utf-8-sig")), data_strings=args.data_string_obfuscation)
+                         json.loads(args.policy.read_text(encoding="utf-8-sig")), data_strings=args.data_string_obfuscation,
+                         lua_only_input=args.lua_only_input)
     except (OSError, ValueError, KeyError, TypeError, subprocess.TimeoutExpired) as error:
         print("Lua protection failed: " + str(error), file=sys.stderr)
         return 1

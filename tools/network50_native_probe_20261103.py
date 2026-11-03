@@ -41,10 +41,18 @@ def write_new(path,raw):
     path.parent.mkdir(parents=True,exist_ok=True)
     with path.open('xb') as stream:stream.write(raw)
 def ps(script):
-    done=subprocess.run(['powershell','-NoProfile','-NonInteractive','-Command',script],capture_output=True,check=True,encoding='utf8')
+    # CIM errors are normally non-terminating in Windows PowerShell. An access
+    # failure must never become an empty process list and authorize retirement.
+    strict="$ErrorActionPreference='Stop'; "+script
+    done=subprocess.run(['powershell','-NoProfile','-NonInteractive','-Command',strict],capture_output=True,check=True,encoding='utf8')
     return json.loads(done.stdout or 'null')
 def clients():
-    return ps("@(Get-CimInstance Win32_Process -Filter \"name='dota2.exe'\"|ForEach-Object {[ordered]@{pid=[int]$_.ProcessId;created=$_.CreationDate.ToUniversalTime().ToString('o')}})|ConvertTo-Json -Compress")
+    observed=ps("$probeProcesses=@(Get-CimInstance Win32_Process -Filter \"name='dota2.exe'\" -ErrorAction Stop|ForEach-Object {[ordered]@{pid=[int]$_.ProcessId;created=$_.CreationDate.ToUniversalTime().ToString('o')}}); ConvertTo-Json -InputObject $probeProcesses -Compress")
+    if not isinstance(observed,list):raise ValueError('process_query_must_return_explicit_array')
+    for row in observed:
+        if not isinstance(row,dict) or type(row.get('pid'))is not int or row['pid']<1 or not isinstance(row.get('created'),str) or not row['created']:
+            raise ValueError('process_query_identity_invalid')
+    return observed
 def launch():
     if clients():raise ValueError('existing_dota_client_preserved')
     if STORE.exists():raise ValueError('fresh_single_probe_paths_required')

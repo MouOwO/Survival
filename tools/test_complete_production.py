@@ -7,6 +7,8 @@ import hashlib
 import io
 import tarfile
 import tempfile
+import json
+import subprocess
 import unittest
 from unittest.mock import patch
 
@@ -34,6 +36,73 @@ def fixtures():
 
 
 class ProductionGuards(unittest.TestCase):
+    def test_prepare_explicitly_marks_lua_projection_and_checks_child_loaded_tool_proof(self):
+        relative = "scripts/vscripts/config/generated/fixture.lua"
+        plain, protected = b"return {value=1}\n", b"return {value=(0+1)}\n"
+        tools = [{"path": path, "executed_lf_sha256": value}
+                 for path, value in m.LOADED_OPERATOR_LF_HASHES.items()]
+        ctx = dict(game="a"*40, content="b"*40, operator="c"*40, counts=collections.Counter(),
+                   policy={}, baseline={"parent_manifest_sha256": "d"*64}, reviews=[], tools=tools,
+                   selected=[{"path": relative, "kind": "generated_table"}])
+        with tempfile.TemporaryDirectory(prefix="production-projection-protocol-") as folder:
+            root = Path(folder)
+            lua, luac = root / "lua5.1.exe", root / "luac5.1.exe"
+            lua.write_bytes(b"fixture executable, never launched")
+            luac.write_bytes(b"fixture compiler, never launched")
+            def export(_, destination):
+                source = destination / "source_export"
+                path = source / relative
+                path.parent.mkdir(parents=True)
+                path.write_bytes(plain)
+                return source, {relative: {"source_sha256": m.sha(plain)}}
+            def child(command, **kwargs):
+                self.assertIn("--lua-only-input", command)
+                destination = Path(command[command.index("--output")+1])
+                path = destination / relative
+                path.parent.mkdir(parents=True)
+                path.write_bytes(protected)
+                proof = {"status": "PASS_REQUIRES_NATIVE_SMOKE", "input_scope": "LUA_ONLY_PROJECTION",
+                         "critical_runtime_assets_checked": False, "complete_candidate_materialization_verified": False,
+                         "generated_string_obfuscation": {"enabled": True},
+                         "semantic_verification": {"status": "PASS", "all_generated_values_exact": True,
+                                                   "gameplay_rng_untouched_while_loading": True, "summary": {"files": 1}},
+                         "executed_tool_inputs": [{"path": p, "loaded_lf_sha256": value}
+                                                   for p, value in m.protection.LOADED_TOOL_LF_HASHES.items()],
+                         "files": [{"path": relative, "kind": "generated_table", "before": {"sha256": m.sha(plain)},
+                                    "after": {"sha256": m.sha(protected), "bytes": len(protected)}}]}
+                (destination / "_lua_protection_report.json").write_bytes(m.canonical(proof))
+                return subprocess.CompletedProcess(command, 0, b"simulated child boundary", b"")
+            with patch.object(m.protection, "dependency_identity", return_value={}), \
+                 patch.object(m, "export_lua", side_effect=export), \
+                 patch.object(m, "run_probes", return_value={}), \
+                 patch.object(m, "tool_bindings", return_value=tools), \
+                 patch.object(m.subprocess, "run", side_effect=child):
+                report = m.prepare(ctx, root / "new_projection", lua, root, build_protected=True)
+            self.assertTrue(report["protection_verified"])
+            self.assertEqual(report["protection_input_scope"], "LUA_ONLY_PROJECTION")
+            self.assertFalse(report["complete_candidate_materialization_verified"])
+            self.assertFalse(report["publication_ready"])
+
+    def test_loaded_operator_binding_rejects_changed_cached_module_or_lua_helper(self):
+        support = [p for p in m.LOADED_OPERATOR_LF_HASHES if p.startswith("tools/lua_protection/")]
+        def blob(_, revision, path, counts):
+            return (m.ROOT / path).read_bytes()
+        with patch.object(m.pending, "_git", return_value=("\n".join(support) + "\n").encode()), \
+             patch.object(m, "git_blob", side_effect=blob):
+            records = m.tool_bindings("a" * 40, collections.Counter())
+            self.assertEqual({row["path"] for row in records}, set(m.LOADED_OPERATOR_LF_HASHES))
+            for path in ("tools/complete_delivery_release_20261103/production.py",
+                         "tools/release_pending_inventory.py", "tools/protect_runtime_lua.py",
+                         "tools/build_runtime_release.py", "tools/lua_protection/verify_values.lua"):
+                with self.subTest(path=path), patch.dict(m.LOADED_OPERATOR_LF_HASHES, {path: "0" * 64}):
+                    with self.assertRaisesRegex(ValueError, "loaded_operator_does_not_match_commit"):
+                        m.tool_bindings("a" * 40, collections.Counter())
+
+    def test_operator_helper_set_change_requires_new_load_not_late_disk_adoption(self):
+        with patch.object(m.pending, "_git", return_value=b"tools/lua_protection/unreviewed.lua\n"):
+            with self.assertRaisesRegex(ValueError, "helper_scope_changed_after_import"):
+                m.tool_bindings("a" * 40, collections.Counter())
+
     def test_four_constant_configs_preserve_exact_parent_bytes(self):
         source,parent=fixtures();parent[m.CONSTANTS[0]]=parent[m.CONSTANTS[0]].replace(b'\n',b'\r\n')
         target,_=m.transform_overrides(source,parent)

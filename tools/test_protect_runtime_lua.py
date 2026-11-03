@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
+import sys
 from unittest.mock import patch
 
 import protect_runtime_lua as protection
@@ -96,6 +97,88 @@ class ProtectionTests(unittest.TestCase):
         self.assertFalse((destination / paths[0]).exists())
         self.assertEqual((self.root / paths[0]).read_bytes(), b"return {}")
         self.assertEqual((destination / "scripts/vscripts/systems/unselected.lua").read_bytes(), b"return {}")
+
+    def lua_projection(self):
+        (self.root / "addoninfo.txt").write_bytes(b'"AddonInfo" {"maps" "ws4_entry"}\n')
+        paths = ["scripts/vscripts/config/generated/projection.lua", protection.runtime.RELEASE_PROFILE,
+                 *self.policy["business_modules"]]
+        for relative in paths:
+            path = self.root / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(b'return {channel="production"}\n' if relative == protection.runtime.RELEASE_PROFILE
+                             else b'return {}\n')
+        executable = self.root / "fake_lua.exe"
+        executable.write_bytes(b"fixture only, never executed")
+        return paths, executable
+
+    def test_default_still_requires_full_critical_assets_before_transform(self):
+        _, executable = self.lua_projection()
+        destination = Path(self.temp.name) / "missing_assets"
+        with patch.object(protection, "dependency_identity", return_value={}), \
+             patch.object(protection, "run") as run:
+            with self.assertRaisesRegex(ValueError, "Missing required runtime files"):
+                protection.protect(self.root, destination, self.root, executable, executable, self.policy)
+            run.assert_not_called()
+        self.assertFalse(destination.exists())
+
+    def test_explicit_lua_projection_preserves_policy_and_marks_no_complete_candidate(self):
+        paths, executable = self.lua_projection()
+        # These resources need not be exported or copied to a Lua-only tree.
+        (self.root / "panorama/images").mkdir(parents=True)
+        (self.root / "panorama/images/unused.vtex_c").write_bytes(b"not consumed")
+        destination = Path(self.temp.name) / "lua_projection"
+        def simulated_transform(command, **_):
+            source, target = Path(command[3]), Path(command[4])
+            target.write_bytes(source.read_bytes() + b"-- transformed boundary fixture\n")
+            return ""
+        with patch.object(protection, "dependency_identity", return_value={}), \
+             patch.object(protection, "syntax_check"), \
+             patch.object(protection, "run", side_effect=simulated_transform), \
+             patch.object(protection, "compare_values", return_value={"status": "PASS", "summary": {}}):
+            report = protection.protect(self.root, destination, self.root, executable, executable,
+                                        self.policy, lua_only_input=True)
+        self.assertEqual(report["input_scope"], "LUA_ONLY_PROJECTION")
+        self.assertFalse(report["critical_runtime_assets_checked"])
+        self.assertFalse(report["complete_candidate_materialization_verified"])
+        self.assertEqual(report["native_dota_smoke_test"], "NOT_RUN")
+        self.assertEqual(report["source_files"], len(paths))
+        self.assertFalse((destination / "panorama").exists())
+        self.assertEqual((destination / protection.runtime.RELEASE_PROFILE).read_bytes(),
+                         (self.root / protection.runtime.RELEASE_PROFILE).read_bytes())
+
+    def test_projection_mode_cannot_bypass_development_or_selected_module_requirements(self):
+        _, executable = self.lua_projection()
+        profile = self.root / protection.runtime.RELEASE_PROFILE
+        profile.write_bytes(b'return {channel="development"}\n')
+        with self.assertRaisesRegex(ValueError, "production"):
+            protection.protect(self.root, Path(self.temp.name) / "bad_profile", self.root,
+                               executable, executable, self.policy, lua_only_input=True)
+        profile.write_bytes(b'return {channel="production"}\n')
+        (self.root / self.policy["business_modules"][0]).unlink()
+        with patch.object(protection, "dependency_identity", return_value={}):
+            with self.assertRaisesRegex(ValueError, "Business modules.*missing"):
+                protection.protect(self.root, Path(self.temp.name) / "missing_module", self.root,
+                                   executable, executable, self.policy, lua_only_input=True)
+
+    def test_projection_flag_requires_boolean_and_cli_default_remains_false(self):
+        with self.assertRaisesRegex(ValueError, "explicit boolean"):
+            protection.protect(self.root, self.root, self.root, self.root, self.root,
+                               self.policy, lua_only_input="yes")
+        fake = {"status": "PASS_REQUIRES_NATIVE_SMOKE", "selected_files": 1, "source_files": 2,
+                "semantic_verification": {"summary": {}}}
+        args = ["protect", "--output", "unused-output", "--prometheus-root", "unused-dependency"]
+        for enabled in (False, True):
+            with patch.object(sys, "argv", args + (["--lua-only-input"] if enabled else [])), \
+                 patch.object(protection, "protect", return_value=fake) as invoke:
+                self.assertEqual(protection.main(), 0)
+                self.assertIs(invoke.call_args.kwargs["lua_only_input"], enabled)
+
+    def test_loaded_protection_and_lua_helper_snapshots_cannot_be_changed_after_import(self):
+        for path in ("tools/protect_runtime_lua.py", "tools/build_runtime_release.py",
+                     "tools/lua_protection/verify_values.lua"):
+            with self.subTest(path=path), patch.dict(protection.LOADED_TOOL_LF_HASHES, {path: "0" * 64}):
+                with self.assertRaisesRegex(ValueError, "changed after import"):
+                    protection.loaded_tool_bindings()
 
     @unittest.skipUnless(os.environ.get("SURVIVAL_PROMETHEUS_ROOT"), "Set an explicit audited offline dependency for integration checks")
     def test_real_transform_preserves_high_precision_numbers_and_isolates_string_rng(self):

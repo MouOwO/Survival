@@ -37,6 +37,17 @@ TOOL_INPUTS = (
     "tools/admission_five_20261101/test_projected_policy.lua",
     "tools/lua_protection/prometheus_offline_driver.lua", "tools/lua_protection/verify_values.lua",
 )
+EXECUTED_SOURCE_LF_SHA256 = hashlib.sha256(Path(__file__).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+LOADED_OPERATOR_LF_HASHES = {
+    "tools/complete_delivery_release_20261103/production.py": EXECUTED_SOURCE_LF_SHA256,
+    "tools/release_pending_inventory.py": pending.EXECUTED_SOURCE_LF_SHA256,
+    "tools/protect_runtime_lua.py": protection.EXECUTED_SOURCE_LF_SHA256,
+    "tools/build_runtime_release.py": protection.runtime.EXECUTED_SOURCE_LF_SHA256,
+}
+for _path in sorted(set(TOOL_INPUTS) | {
+        path.relative_to(ROOT).as_posix() for path in (ROOT / "tools/lua_protection").glob("*.lua")}):
+    if _path not in LOADED_OPERATOR_LF_HASHES:
+        LOADED_OPERATOR_LF_HASHES[_path] = hashlib.sha256((ROOT / _path).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
 LEGACY_BLOCKS = (
     'local offline_onboarding = require("debug/offline_onboarding_test")\n',
     '    -- Latch the explicit preview choice before an online match can mutate a\n'
@@ -132,12 +143,15 @@ def tool_bindings(operator_revision, counts):
     support = pending._git(ROOT, "ls-tree", "-r", "--name-only", operator_revision,
                            "tools/lua_protection", counts=counts).decode().splitlines()
     paths = sorted(set(TOOL_INPUTS) | {path for path in support if path.endswith(".lua")})
+    need(set(paths) == set(LOADED_OPERATOR_LF_HASHES), "loaded_operator_helper_scope_changed_after_import")
     for path in paths:
         raw = git_blob(ROOT, operator_revision, path, counts)
         actual = (ROOT / path).read_bytes()
         need(lf(actual) == lf(raw), "executed_operator_does_not_match_commit:" + path)
+        need(sha(lf(raw)) == LOADED_OPERATOR_LF_HASHES[path],
+             "loaded_operator_does_not_match_commit:" + path)
         records.append(dict(path=path, revision=operator_revision, git_sha256=sha(raw),
-                            executed_lf_sha256=sha(lf(actual)), normalization="CRLF_TO_LF"))
+                            executed_lf_sha256=LOADED_OPERATOR_LF_HASHES[path], normalization="CRLF_TO_LF"))
     return records
 
 
@@ -292,6 +306,7 @@ def prepare(ctx, destination, lua, prometheus, build_protected=False):
                   executed_operator_inputs=ctx["tools"], behavior_probes=probes, pinned_prometheus=dependency,
                   lua_binaries=binaries,
                   protection_selected=ctx["selected"], protection_verified=False,
+                  protection_input_scope="LUA_ONLY_PROJECTION", complete_candidate_materialization_verified=False,
                   full_runtime_recipe_ledger_authority_ready=False, signing_ready=False, publication_ready=False,
                   sdk_calls=0, git_mutations=0, installed_tree_writes=0)
     if build_protected:
@@ -300,7 +315,7 @@ def prepare(ctx, destination, lua, prometheus, build_protected=False):
                    "--source", str(source), "--output", str(destination / "protected_lua"),
                    "--prometheus-root", str(prometheus), "--policy", str(policy), "--lua", str(lua),
                    "--luac", str(luac),
-                   "--data-string-obfuscation"]
+                   "--data-string-obfuscation", "--lua-only-input"]
         result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=1800,
                                 creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         (destination / "protection.stdout.txt").write_bytes(result.stdout)
@@ -311,10 +326,19 @@ def prepare(ctx, destination, lua, prometheus, build_protected=False):
         proof_raw = proof_path.read_bytes();proof = json.loads(proof_raw)
         semantic = proof.get("semantic_verification", {})
         need(proof.get("status") == "PASS_REQUIRES_NATIVE_SMOKE"
+             and proof.get("input_scope") == "LUA_ONLY_PROJECTION"
+             and proof.get("critical_runtime_assets_checked") is False
+             and proof.get("complete_candidate_materialization_verified") is False
              and proof.get("generated_string_obfuscation", {}).get("enabled") is True
              and semantic.get("status") == "PASS" and semantic.get("all_generated_values_exact") is True
              and semantic.get("gameplay_rng_untouched_while_loading") is True,
              "all_values_or_rng_protection_proof_incomplete")
+        operator_hashes = {row["path"]: row["executed_lf_sha256"] for row in ctx["tools"]}
+        child_tools = proof.get("executed_tool_inputs")
+        need(isinstance(child_tools, list) and len(child_tools) == len({row.get("path") for row in child_tools})
+             and {row["path"] for row in child_tools} == set(protection.LOADED_TOOL_LF_HASHES)
+             and all(row.get("loaded_lf_sha256") == operator_hashes.get(row.get("path")) for row in child_tools),
+             "protected_child_loaded_operator_binding_incomplete")
         expected = {row["path"]: row for row in ctx["selected"]}
         actual = {row["path"]: row for row in proof.get("files", [])}
         need(set(actual) == set(expected) and len(actual) == len(proof["files"])

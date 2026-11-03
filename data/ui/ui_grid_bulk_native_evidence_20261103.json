@@ -1,0 +1,60 @@
+{
+  "kind": "CLOSED_NATIVE_TOOLS_GB_SIZING_NOT_FULL_GRID_OR_FPS",
+  "measurement_receipt_sha256": "9c4e2c4e13afbdcdd1986054ef7d33e3b1f9a83e2d8ee42ea9fcb895f93ad41b",
+  "method": "net_showmsg",
+  "layer": "CUserMsg_CustomGameEvent [148]",
+  "event": "gb",
+  "key": "d",
+  "engine_build": "10938:11198969",
+  "source_log_sha256": "ce05e75e1373de45e37d10a9232b387d6ac49ad15089f79a9f32c0c54ff9ceac",
+  "samples": [
+    {
+      "value_ascii_bytes": 64,
+      "native_bits": 706,
+      "native_bytes": 89,
+      "observed_envelope_bytes": 25
+    },
+    {
+      "value_ascii_bytes": 128,
+      "native_bits": 1234,
+      "native_bytes": 155,
+      "observed_envelope_bytes": 27
+    },
+    {
+      "value_ascii_bytes": 256,
+      "native_bits": 2258,
+      "native_bytes": 283,
+      "observed_envelope_bytes": 27
+    },
+    {
+      "value_ascii_bytes": 512,
+      "native_bits": 4306,
+      "native_bytes": 539,
+      "observed_envelope_bytes": 27
+    },
+    {
+      "value_ascii_bytes": 896,
+      "native_bits": 7378,
+      "native_bytes": 923,
+      "observed_envelope_bytes": 27
+    }
+  ],
+  "max_native_bytes": 923,
+  "all_samples_within_1KiB": true,
+  "envelope_assumed": false,
+  "raw_payloads_disclosed": false,
+  "tools_only": true,
+  "ordinary_production_acceptance": false,
+  "fps_measured": false,
+  "transactions": 0,
+  "layer_note": "Incoming engine message bits rounded to bytes; excludes UDP/IP/Steam packet headers. Rare bulk exception, not a 50-byte high-frequency claim.",
+  "networksystem_sha256": "7acebae03d1c558e819963d2e552c2d1aab0487c6688b6ece21b6b659f3506e2",
+  "normal_map_sha256": "59c5856b44a75a3db5659fb15dd2038480a102c450ae5a27141e890b201bcf33",
+  "probe_source_sha256": "ac611b132b1fc4bcd073fcb05b71302bd4a8a4061fc95321f8651c54677da220",
+  "workshop_install_written": false,
+  "actual_grid_payload_tested": false,
+  "total_grid_transfer_measured": false,
+  "sdk_calls": 0,
+  "scope": "Five synthetic ASCII payloads over the real private server-to-client gb/d event in an isolated minimal template_map addon. Rare <=1KiB bulk budget only; high-frequency cw retains its independent 50B budget.",
+  "engine_revision_note": "This run observed 10938:11198969. Earlier cw calibration observed 10938:11175759. The networksystem.dll SHA256 matches, but the client revisions are not claimed identical."
+}

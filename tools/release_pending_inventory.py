@@ -17,6 +17,7 @@ import re
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
+EXECUTED_SOURCE_LF_SHA256 = hashlib.sha256(Path(__file__).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
 CONTENT = Path('D:/SteamLibrary/steamapps/common/dota 2 beta/content/dota_addons/Survival')
 BASELINE = ROOT/'tools/shared_boss_portrait_release_20261101/source_baseline_0104.json'
 BASELINE_SHA256 = '3a60ddab9a93b58fa936e789f1a9d2008d39ed7eca9545487e1f40bf32219ee3'

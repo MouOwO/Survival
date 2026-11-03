@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 30657,
-      "sha256": "51afd33ae9e3ee1e35336f8e00554b1263f9cfcd0d922bcbd65998921a42289b"
+      "bytes": 31200,
+      "sha256": "bd51834f3eb0420ac4860cff8d2fe71195368467935f863913107dc604d8971f"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 44578,
-      "sha256": "cf99b528e1bb50d54e376f13c3332cc797b1a6df63784b5c7b64fef83f9a0772"
+      "bytes": 45121,
+      "sha256": "2045be980cfed11819de40e8f64fc03d062c3d15f53b33c4a819648a98d75673"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 18733,
-      "sha256": "b38ef6a8a827ea5bdb1d6e26efe997bd4270e6baae7e8fe38e7e5b800c92398d"
+      "bytes": 19276,
+      "sha256": "a9e83f2966020044a0a2e266c5b5b862e93898b1affd1fb37b82045c3c40edaa"
     },
     {
       "path": "data/completed_work_index.json",
@@ -332,6 +332,11 @@
       "path": "evidence/network50_dev07_native_fps_20261103.md",
       "bytes": 8191,
       "sha256": "60afb57b4bb3da460514ee95bd3b3c53d0b1f510e93238ff39441e0f411b891e"
+    },
+    {
+      "path": "evidence/network50_grid_bulk_native_20261103.md",
+      "bytes": 3615,
+      "sha256": "d2ce6d0baeab80eddf3cae9912b556da43a6cb141775ec547a256e10830e0eb5"
     },
     {
       "path": "evidence/network50_grid_selected_handoff_20261103.md",
