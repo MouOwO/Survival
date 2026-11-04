@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 32548,
-      "sha256": "0ab394f4908a503eeae434ca40c673ef03d5bf9f0fca051de4e046a4c1cb536f"
+      "bytes": 32503,
+      "sha256": "16768a731fbea457ca5c2866dfa42e0c1d50ae5cb96c691c8b67fcb13e24822b"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 46469,
-      "sha256": "616d5b30d2b7a0944c30829f7c9fe686dbd3f25bf87438bb97db910f43418efc"
+      "bytes": 46424,
+      "sha256": "17e0145a72ae23d5740ffa574a2d00c8ee5c0ebdb6c7e6983893c63820edcbd7"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 20624,
-      "sha256": "423322df441effa07b804629648f0478c4aecd54e5467d249d67d6bbe2ee4c60"
+      "bytes": 20579,
+      "sha256": "20704ad02be05b828a42402815cc51844102e9e16c59e7d7cf7a82a10c106b40"
     },
     {
       "path": "data/completed_work_index.json",
@@ -355,8 +355,8 @@
     },
     {
       "path": "evidence/network50_s9_catalog_latency_20261104.md",
-      "bytes": 7675,
-      "sha256": "67755cba8c3936c724f9059e90ce2639aae9169c0f0a2ccd7cffa14a731159ed"
+      "bytes": 9010,
+      "sha256": "1e6f2a65a4afbae24475a31907e7cf9e40088290609cc7a184878a9bad391dd3"
     },
     {
       "path": "evidence/network50_ui_local_handoff_20261103.md",

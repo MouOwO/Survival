@@ -4,10 +4,13 @@ from __future__ import annotations
 import ast
 import base64
 import contextlib
+import hashlib
+import hmac
 import importlib.util
 import io
 import json
 from pathlib import Path
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -59,6 +62,46 @@ class OfflineScope(unittest.TestCase):
         with patch.object(deploy,'git_blob',return_value=b'drift'):
             with self.assertRaisesRegex(RuntimeError,'immutable_worker_cache_source_changed'):
                 deploy.source_payloads(deploy.SOURCE)
+
+    def test_probe_baseline_uses_actual_unchanged_service_normalization(self):
+        # Execute the actual probe baseline with a fake worker process, and
+        # the actual immutable service's return normalizer. Empty maps from a
+        # successful Lua claim must not be compared against unnormalized [].
+        service=ast.parse(deploy.git_blob(deploy.SOURCE,'server/archive_backend/service.py').decode())
+        normalizer=[n for n in service.body if isinstance(n,ast.FunctionDef) and n.name=='object_maps']
+        self.assertEqual(len(normalizer),1)
+        contract={}
+        exec(compile(ast.Module(body=normalizer,type_ignores=[]),'<immutable service normalization>','exec'),contract)
+        raw=dict(ok=True,archive=dict(clear_counts=[],completed=[],shadow_counts=[]))
+        calls=[]
+        def worker(*args,**kwargs):
+            calls.append((args,kwargs))
+            return SimpleNamespace(stdout=json.dumps(raw).encode())
+        probe=[n for n in ast.walk(ast.parse(deploy.REMOTE)) if isinstance(n,ast.FunctionDef) and n.name=='baseline']
+        self.assertEqual(len(probe),1)
+        context=dict(pepper='synthetic-only',hashlib=hashlib,hmac=hmac,json=json,frozen=1770000000,
+            bundle=SimpleNamespace(configs={},directory='/synthetic-only'),
+            subprocess=SimpleNamespace(run=worker,PIPE=-1),
+            service_module=SimpleNamespace(object_maps=contract['object_maps']))
+        exec(compile(ast.Module(body=probe,type_ignores=[]),'<actual probe baseline>','exec'),context)
+        result=context['baseline']({'account_id':'100'},{'id':'synthetic_claim','kind':'daily_claim'})
+        self.assertEqual(result,contract['object_maps'](raw))
+        self.assertEqual(result['archive']['completed'],{})
+        self.assertNotEqual(result,raw)
+        self.assertEqual(len(calls),1)
+
+    def test_recipe_has_fresh_candidate_and_receipt_namespace(self):
+        plan=deploy.plan()
+        self.assertEqual(deploy.RECIPE,'normalized-parity-v2')
+        self.assertEqual(deploy.OUT.name,'ws4_worker_cache_20261104_v02')
+        self.assertNotEqual(plan['candidate'],'20261104-ws4-worker-cache-61a909872b49')
+        assignments=[n for n in ast.parse(deploy.REMOTE).body if isinstance(n,ast.Assign)
+            and any(isinstance(t,ast.Name) and t.id=='new' for t in n.targets)]
+        self.assertEqual(len(assignments),1)
+        values=dict(base=Path('/synthetic-releases'),sha=deploy.sha,json=json,
+            pins=plan['derived_payload_sha256'],RECIPE=deploy.RECIPE)
+        exec(compile(ast.Module(body=assignments,type_ignores=[]),'<remote candidate derivation>','exec'),values)
+        self.assertEqual(values['new'].name,plan['candidate'])
 
     def test_controlled_parent_outside_method_is_byte_preserved(self):
         # The source deliberately has different imports/other methods. Only the
