@@ -4,6 +4,7 @@ local M={}
 local config=require("config/lottery_config")
 local aliases=require("config/content_id_aliases")
 local stackables=require("systems/archive_stackable_items")
+local catalog_manifest=require("config/generated/lottery_catalog_manifest")
 local MAX,BASE=9007199254740991,4294967296
 local quality={n=1,r=2,sr=3,ssr=4,ur=5,[""]=0}
 M.error_text={[0]="",[1]="抽奖未完成，请重试",[2]="档案尚未载入",[3]="抽奖券不足",[4]="奖池尚未解锁",
@@ -26,6 +27,8 @@ local function make(L)
  local pools,pool_by_record,item_by_record,all_items,currency={},{},{},{},{}
  for _,pool in ipairs(config.pool_order)do
   local p={id=pool.id,record=rec("lottery:pool:"..pool.id),source=pool,members={},allowed={}}
+  p.revision=catalog_manifest.pool_revisions and catalog_manifest.pool_revisions[pool.id]
+  need(type(p.revision)=="string"and p.revision~="","lottery_catalog_revision_missing:"..pool.id)
   pools[pool.id]=p;pool_by_record[p.record]=pool.id
   for _,item in ipairs(pool.items)do
    local id=rec("lottery:item:"..item.id);p.members[#p.members+1]=item.id;p.allowed[id]=true
@@ -94,7 +97,7 @@ local function make(L)
     for _,source in ipairs(config.pool_order)do local pool=pools[source.id];metrics.pools=metrics.pools+1;local s=(state.pools or{})[source.id]or{}
      local status=config.unlock_status(source,state)
      put(pool.record,"known",1);big(pool.record,"tickets",number((p.save.content_inventory or{})[source.ticket_content_id]));big(pool.record,"draws",number(s.draws))
-     put(pool.record,"unlocked",status.unlocked and 1 or 0);put(pool.record,"unlock_progress",number(status.unlock_progress));put(pool.record,"update_unread",s.details_revision~=source.revision and 1 or 0);put(pool.record,"notice_unread",s.notice_revision~=source.revision and 1 or 0)
+     put(pool.record,"unlocked",status.unlocked and 1 or 0);put(pool.record,"unlock_progress",number(status.unlock_progress));put(pool.record,"update_unread",s.details_revision~=pool.revision and 1 or 0);put(pool.record,"notice_unread",s.notice_revision~=pool.revision and 1 or 0)
     end
     for id,r in pairs(currency)do put(r,"known",1);big(r,"owned_count",overrides and overrides[id]or totals[id]or 0)end
    end

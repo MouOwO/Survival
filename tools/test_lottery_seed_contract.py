@@ -20,9 +20,11 @@ MANIFEST = "scripts/vscripts/config/generated/lottery_catalog_manifest.lua"
 
 
 class Source:
-    def __init__(self, bundle=BUNDLE, config=BUNDLE, md5=MD5):
+    def __init__(self, bundle=BUNDLE, config=BUNDLE, md5=MD5, revisions=None):
+        pool_map = ", ".join("["+json.dumps(k)+"] = "+json.dumps(v) for k,v in sorted((revisions or {}).items()))
         self.files = {DECLARATION: ('return { hash = "' + bundle + '" }').encode(),
-            MANIFEST: ('return { config_hash = "' + config + '", catalog_md5 = "' + md5 + '" }').encode()}
+            MANIFEST: ('return { config_hash = "' + config + '", catalog_md5 = "' + md5
+                       + '", pool_revisions = { ' + pool_map + ' } }').encode()}
         self.reads = []
     def read(self, name):
         self.reads.append(name)
@@ -32,7 +34,8 @@ class Source:
 class StaticContractTests(unittest.TestCase):
     def test_matching_public_seed_records_both_immutable_source_dependencies(self):
         source = Source()
-        static_builder.validate_lottery_seed_contract(source, {"config_hash": BUNDLE, "md5": MD5})
+        static_builder.validate_lottery_seed_contract(source, {"config_hash": BUNDLE, "md5": MD5,
+            "catalog_json":'{"schema":1,"snapshots":[]}'})
         self.assertEqual(source.reads, [DECLARATION, MANIFEST])
     def test_s9_stale_seed_can_be_self_consistent_and_still_wrong_for_game(self):
         public = '{"schema":1,"snapshots":[]}'
@@ -51,6 +54,11 @@ class StaticContractTests(unittest.TestCase):
         source = Source();source.files[DECLARATION] = b"return {}"
         with self.assertRaisesRegex(ValueError, "production_bundle_hash_missing"):
             static_builder.validate_lottery_seed_contract(source, {"config_hash": BUNDLE, "md5": MD5})
+    def test_revision_map_must_match_public_seed_even_when_md5_and_config_match(self):
+        seed={"config_hash":BUNDLE,"md5":MD5,"catalog_json":json.dumps({"snapshots":[
+            {"selected_pool":{"id":"map","revision":"production"}}]})}
+        with self.assertRaisesRegex(ValueError,"pool_revisions_mismatch"):
+            static_builder.validate_lottery_seed_contract(Source(revisions={"map":"unpublished-local"}),seed)
 
 
 class BuilderContractTests(unittest.TestCase):
@@ -87,6 +95,18 @@ class BuilderContractTests(unittest.TestCase):
                  patch("server.archive_backend.lottery_catalog.catalog_document",return_value=self.document()):
                 seed_builder.generate(root,"lua-unused")
             load.assert_called_once_with(root/"server/bundles"/BUNDLE)
+    def test_lua_pool_revisions_come_from_same_canonical_document(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary);self.fixture(root)
+            public={"schema":1,"snapshots":[{"selected_pool":{"id":"map","revision":"123-456"}}]}
+            raw=json.dumps(public,ensure_ascii=True,sort_keys=True,separators=(",",":"))
+            document={"catalog_json":raw,"catalog_md5":hashlib.md5(raw.encode("ascii"),usedforsecurity=False).hexdigest(),
+                "config_hash":BUNDLE,"catalog":public}
+            with patch("server.archive_backend.bundle.Bundle",return_value=SimpleNamespace(hash=BUNDLE)), \
+                 patch("server.archive_backend.lottery_catalog.catalog_document",return_value=document):
+                files,_=seed_builder.generate(root,"lua-unused")
+            source=Source(md5=document["catalog_md5"]);source.files[MANIFEST]=files[MANIFEST].encode()
+            static_builder.validate_lottery_seed_contract(source,json.loads(files["data/ui/lottery_catalog.json"]))
 
 
 if __name__ == "__main__":unittest.main()

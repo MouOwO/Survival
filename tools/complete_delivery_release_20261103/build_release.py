@@ -24,7 +24,7 @@ from complete_delivery_release_20261103 import ledger
 ROOT = TOOLS.parent
 EXECUTED_SOURCE_LF_SHA256 = hashlib.sha256(Path(__file__).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
 REPORT = ROOT / "output/complete_delivery_release_20261103"
-SEQUENCE = 2026110302
+SEQUENCE = 2026110401
 MANIFEST = "_release_manifest.json"
 SIGNATURE = "_release_signature.json"
 MARKER = "_UNSIGNED_DO_NOT_INSTALL_OR_UPLOAD.json"

@@ -100,9 +100,9 @@ def digest(raw):
 def validate_lottery_seed_contract(source, seed):
     """Bind public metadata to the same immutable game's production contract.
 
-    Two small GitSource reads once per generation, O(header bytes), with no
-    account, HTTP, reward evaluation or runtime polling. These inputs become
-    part of the catalogue source readset and schema digest.
+    Two GitSource header reads plus one parse of the 82KB public document,
+    once per generation, O(public metadata bytes). No account, HTTP, reward
+    evaluation or runtime polling. Inputs join the source readset/schema.
     """
     declaration = source.read("scripts/vscripts/config/generated/archive_http_bundle.lua").decode("utf-8-sig")
     manifest = source.read("scripts/vscripts/config/generated/lottery_catalog_manifest.lua").decode("utf-8-sig")
@@ -114,6 +114,13 @@ def validate_lottery_seed_contract(source, seed):
          "lottery_seed_production_bundle_mismatch")
     need(config is not None and md5 is not None and config[1] == bundle[1]
          and md5[1] == seed.get("md5"), "lottery_seed_lua_manifest_mismatch")
+    public = json.loads(seed["catalog_json"])
+    expected = {row["selected_pool"]["id"]: row["selected_pool"]["revision"]
+                for row in public["snapshots"]}
+    revisions = re.search(r'\bpool_revisions\s*=\s*\{([^{}]*)\}', manifest)
+    pairs = re.findall(r'\["([^"\\]+)"\]\s*=\s*"([^"\\]+)"', revisions[1]) if revisions else []
+    need(revisions is not None and len(pairs) == len(expected) and dict(pairs) == expected,
+         "lottery_seed_pool_revisions_mismatch")
 
 
 def fields():

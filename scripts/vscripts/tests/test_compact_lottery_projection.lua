@@ -26,6 +26,21 @@ p.revision=2;p.save.content_inventory[id]=1
 ops=assert(s.update(p,{inventory={id},headers=true},{}));apply(ops)
 assert(s.inspect().metrics.inventory_reads<=2 and s.inspect().metrics.inventory_entries_scanned==0 and s.inspect().metrics.items==1)
 local changed=copy(ops);local expected_changed=legacy.snapshots(p)
+-- Read acknowledgement uses the actual public HTTP catalogue revisions even
+-- when local authoring metadata has newer, unpublished display text.
+local manifest=require("config/generated/lottery_catalog_manifest")
+local read_profile=copy(p)
+for _,pool in ipairs(config.pool_order)do
+ local revision=assert(manifest.pool_revisions[pool.id])
+ assert(revision~=pool.revision,"fixture must exercise independent production revisions")
+ read_profile.save.archive.lottery_state.pools[pool.id]={details_revision=revision,notice_revision=revision}
+end
+local _,read_ops=assert(factory.initialize(read_profile,{}))
+local read_values={};for _,op in ipairs(read_ops)do read_values[op.record]=read_values[op.record]or{};read_values[op.record][op.field]=op.value end
+for _,pool in ipairs(config.pool_order)do
+ local row=assert(read_values[R["lottery:pool:"..pool.id]])
+ assert(row[F.update_unread]==0 and row[F.notice_unread]==0,pool.id)
+end
 -- Authoritative receipt ownership is pre-grant for a new nonstackable. Keep
 -- it separate from the post-commit item ownership; never optimistically add.
 local item=config.by_id[id]
@@ -56,5 +71,5 @@ local wire=require("ui/compact_wire");local schema=assert(wire.compile_lookup(lo
 local packets,stats=assert(wire.encode(schema,binding,100000,s.full_ops("map"),{full=true,value_budget=24}))
 for _,packet in ipairs(packets)do assert(#packet.d<=24)end
 if arg and arg[1]=="emit"then
- print(require("core/json_encoder").encode({initial_ops=initial,initial_expected=expected,changed_ops=changed,changed_expected=expected_changed,receipt_ops=receipt,receipt_expected=response}))
+ print(require("core/json_encoder").encode({initial_ops=initial,initial_expected=expected,changed_ops=changed,changed_expected=expected_changed,read_ops=read_ops,receipt_ops=receipt,receipt_expected=response}))
 else print("compact lottery projection: real 4 pools + 105 memberships, initial inventory10003 once; 1000 stable updates0scans/0item/header visits; K1<=2 direct reads; typed receipt/profile mismatch/unknown error/high counters/native24 passed")end

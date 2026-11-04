@@ -355,8 +355,8 @@
     },
     {
       "path": "evidence/network50_s9_catalog_latency_20261104.md",
-      "bytes": 4667,
-      "sha256": "ac3d1c4c48751238c26fbd3eb7354ea6c1c006d4f7d543b745f0593e79cce3a0"
+      "bytes": 7675,
+      "sha256": "67755cba8c3936c724f9059e90ce2639aae9169c0f0a2ccd7cffa14a731159ed"
     },
     {
       "path": "evidence/network50_ui_local_handoff_20261103.md",

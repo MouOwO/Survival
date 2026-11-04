@@ -173,6 +173,7 @@ panorama/src/scripts/custom_game/native_transport_probe.js text eol=crlf
 
 # Knowledge manifests hash UTF-8 LF bytes across Windows checkouts.
 docs/knowledge_base/** text eol=lf
+docs/knowledge_base/**/*.gz -text
 
 # The WS4 operator plan seals exact source bytes before remote execution.
 tools/ws4_catalog_sync_20261031/*.py text eol=lf
@@ -293,3 +294,4 @@ scripts/vscripts/config/generated/lottery_catalog_manifest.lua text eol=lf
 server/archive_backend/service.py text eol=lf
 server/archive_backend/settlement_runner.py text eol=lf
 server/archive_backend/worker_fast.lua text eol=lf
+tools/ws4_worker_cache_20261104/*.py text eol=lf

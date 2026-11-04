@@ -52,7 +52,9 @@ local compact_public_beta,compact_public_beta_world
 local PUBLIC_BETA_TIER = "public_beta_login"
 local ENDLESS_FLUSH_INTERVAL, ENDLESS_BATCH_LIMIT = 5, 32
 local endless_due, endless_force = {}, {}
-local endless_generation = 0
+-- Only never-submitted explicit intents enter O(1) ready lists. A completion
+-- must not replay a failed payment while waking another authorized operation.
+local queue_runtime = {index={},wakes={},generation=0}
 
 local function runtime_id()
     local parts = { "archive" }
@@ -639,16 +641,57 @@ local function local_settle(player_id, command)
 end
 
 local flush
-local function endless_pending(player_id)
-    for _, command in pairs(pending[player_id] or {}) do
-        if command.kind == "endless" then return true end
+local function ready_remove(state,node)
+    if not node or not node.ready then return end
+    local group=node.group
+    if node.previous then node.previous.next=node.next else state.head[group]=node.next end
+    if node.next then node.next.previous=node.previous else state.tail[group]=node.previous end
+    node.previous,node.next,node.ready=nil,nil,false
+end
+local function index_add(player_id,command)
+    local state=queue_runtime.index[player_id]
+    if not state then
+        state={nodes={},head={},tail={},endless=0};queue_runtime.index[player_id]=state
     end
-    return false
+    if state.nodes[command.id] then return end
+    local node={id=command.id,command=command};state.nodes[command.id]=node
+    if command.kind=="endless" then state.endless=state.endless+1;return end
+    node.group=(command.kind=="work_upgrade" or command.kind=="building_upgrade") and 1 or 2
+    local tail=state.tail[node.group]
+    node.previous,node.ready=tail,true
+    if tail then tail.next=node else state.head[node.group]=node end
+    state.tail[node.group]=node
+end
+local function index_complete(player_id,id)
+    local state=queue_runtime.index[player_id];local node=state and state.nodes[id]
+    if not node then return end
+    ready_remove(state,node);state.nodes[id]=nil
+    if node.command.kind=="endless" then state.endless=state.endless-1 end
+end
+local function wake_ready(player_id,queue)
+    local state=queue_runtime.index[player_id]
+    if pending[player_id]~=queue or not state or queue_runtime.wakes[player_id]
+        or not (state.head[1] or state.head[2]) then return end
+    local token={};queue_runtime.wakes[player_id]=token
+    local generation=queue_runtime.generation
+    local world=type(bus.get_generation)=="function" and bus.get_generation() or bus
+    scheduler.after(0,function()
+        if queue_runtime.wakes[player_id]~=token then return end
+        queue_runtime.wakes[player_id]=nil
+        if generation~=queue_runtime.generation or queue_runtime.index[player_id]~=state
+            or pending[player_id]~=queue
+            or (type(bus.get_generation)=="function" and bus.get_generation() or bus)~=world then return end
+        flush(player_id,true)
+    end,"archive_ready:"..player_id)
+end
+local function endless_pending(player_id)
+    local state=queue_runtime.index[player_id]
+    return state~=nil and state.endless>0
 end
 local function schedule_endless(player_id, delay)
-    local generation = endless_generation
+    local generation = queue_runtime.generation
     scheduler.after(math.max(0, delay), function()
-        if generation == endless_generation then flush(player_id) end
+        if generation == queue_runtime.generation then flush(player_id) end
     end, "archive_endless_flush:" .. player_id)
 end
 local function submit_endless_batch(provider, player_id, commands, complete)
@@ -675,7 +718,7 @@ local function submit_endless_batch(provider, player_id, commands, complete)
     next_command()
 end
 
-flush = function(player_id)
+flush = function(player_id,ready_only)
     if busy[player_id] then return end
     local queue = pending[player_id]
     if not queue then return end
@@ -684,7 +727,13 @@ flush = function(player_id)
     local ordered = {}
     local held_delay
     local current_time = remote_provider and GameRules:GetGameTime()
-    for id, command in pairs(queue) do
+    if ready_only then
+        local state=queue_runtime.index[player_id]
+        local node=state and (state.head[1] or state.head[2])
+        if not node then return end
+        ordered[1]={id=node.id,command=node.command}
+    else
+      for id, command in pairs(queue) do
         local held = false
         if remote_provider and command.kind == "endless" and not finalizing and not endless_force[player_id] then
             endless_due[player_id] = endless_due[player_id] or current_time + ENDLESS_FLUSH_INTERVAL
@@ -692,6 +741,7 @@ flush = function(player_id)
             if delay > 0 then held_delay = held_delay or delay; held = true end
         end
         if not held then ordered[#ordered+1] = {id=id,command=command} end
+      end
     end
     if held_delay then schedule_endless(player_id, held_delay) end
     table.sort(ordered, function(a, b)
@@ -717,6 +767,8 @@ flush = function(player_id)
             if not finalizing and not endless_force[player_id] then schedule_endless(player_id, ENDLESS_FLUSH_INTERVAL) end
         end
         local attempt = {}
+        local state=queue_runtime.index[player_id]
+        ready_remove(state,state and state.nodes[id])
         busy[player_id] = attempt
         local function complete(result)
             if busy[player_id] ~= attempt then return end
@@ -737,12 +789,15 @@ flush = function(player_id)
                     if type(value)=="table" and submitted[value.id]
                         and (value.ok==true or value.terminal==true) then
                         queue[value.id], submitted[value.id] = nil, nil
+                        index_complete(player_id,value.id)
                         if value.terminal==true and value.ok~=true then
                             terminal_error = terminal_error or value.error or "存档请求被拒绝"
                         end
                     end
                 end
-            elseif result and (result.ok or result.terminal) then queue[id] = nil end
+            elseif result and (result.ok or result.terminal) then
+                queue[id] = nil;index_complete(player_id,id)
+            end
             if (terminal_error or result and result.terminal and not result.ok)
                 and not (compact_daily_users[player_id] and (command.kind=="daily_claim" or command.kind=="benefit_claim")) then
                 bus.emit(events.UI_NOTIFICATION,{player_id=player_id,level="error",message=terminal_error or result.error or "存档请求被拒绝"})
@@ -801,6 +856,9 @@ flush = function(player_id)
                 -- Cross a server frame before the next bounded final batch.
                 schedule_endless(player_id, 0)
             end
+            -- Drain only a different, never-attempted intent after this reply.
+            -- Legacy retry policy retains ownership of uncertain old receipts.
+            wake_ready(player_id,queue)
         end
         if remote_provider then
             scheduler.after(35, function()
@@ -840,7 +898,9 @@ local function enqueue(player_id, command)
     player_id = tonumber(player_id)
     if not integer(player_id) then return { ok = false, error = "player_invalid" } end
     pending[player_id] = pending[player_id] or {}
-    pending[player_id][command.id] = pending[player_id][command.id] or command
+    if not pending[player_id][command.id] then
+        pending[player_id][command.id]=command;index_add(player_id,command)
+    end
     return flush(player_id) or { ok = true, pending = true }
 end
 
@@ -1559,7 +1619,9 @@ function M.init()
     archive_delivery,archive_head,archive_tail={},nil,nil
     legacy_archive_players={}
     archive_queue_scheduled,archive_queue_running=false,false
-    endless_generation = endless_generation + 1
+    queue_runtime.generation=queue_runtime.generation+1
+    for id in pairs(queue_runtime.wakes) do scheduler.cancel("archive_ready:"..id) end
+    queue_runtime.index,queue_runtime.wakes={},{}
     for id in pairs(pending) do scheduler.cancel("archive_endless_flush:" .. id) end
     endless_due, endless_force = {}, {}
     pending, busy, selected, throttles = {}, {}, {}, {}

@@ -1,19 +1,43 @@
 "use strict";
-const assert=require("node:assert/strict"),fs=require("node:fs"),vm=require("node:vm"),cp=require("node:child_process");
+const assert=require("node:assert/strict"),fs=require("node:fs"),vm=require("node:vm"),cp=require("node:child_process"),crypto=require("node:crypto");
 const api=require("../panorama/src/scripts/custom_game/common/compact_lottery_model.js"),cfg={};
 vm.runInNewContext(fs.readFileSync("panorama/src/scripts/custom_game/common/ui_static_catalog.js","utf8"),{GameUI:{CustomUIConfig:()=>cfg}});
 const C=cfg.SurvivalUICatalog,fixture=JSON.parse(cp.execFileSync(process.env.LUA51||"C:/Program Files/lua/bin/lua5.1.exe",["scripts/vscripts/tests/test_compact_lottery_projection.lua","emit"],{encoding:"utf8"}).trim().split(/\r?\n/).at(-1));
+// Static metadata belongs to the production HTTP public catalogue, not the
+// local settlement configuration. Account ownership/balances still use the
+// independent real Lua settlement oracle below.
+const seed=JSON.parse(fs.readFileSync("data/ui/lottery_catalog.json","utf8")),publicCatalog=JSON.parse(seed.catalog_json);
+assert.equal(crypto.createHash("md5").update(seed.catalog_json,"ascii").digest("hex"),seed.md5);
+assert.equal(C.Data.auxiliary.lottery_config_hash,seed.config_hash);
+assert.deepEqual(JSON.parse(JSON.stringify(C.Data.auxiliary.lottery_public)),publicCatalog);
 function store(){const values={};return {put(ops){const seen=new Set();for(const op of ops){const row=values[op.record]||(values[op.record]={});if(op.remove)delete row[op.field];else row[op.field]=op.value;seen.add(op.record);}return [...seen];},read:(r,f)=>values[r]&&values[r][f]};}
-function subset(a,e,label="snapshot"){if(e===null||typeof e!=="object"){assert.equal(a,e,label);return;}assert.ok(a&&typeof a==="object",label);for(const k of Object.keys(e)){if(["reason","version"].includes(k))continue;subset(a[k],e[k],label+"."+k);}}
+function subset(a,e,label="snapshot"){if(e===null||typeof e!=="object"){assert.equal(a,e,label);return;}assert.ok(a&&typeof a==="object",label);if(Array.isArray(e))assert.equal(a.length,e.length,label+".length");for(const k of Object.keys(e))subset(a[k],e[k],label+"."+k);}
+function dynamic(a,legacy,stat,label="snapshot"){
+ for(const k of Object.keys(legacy)){
+  if(label==="snapshot"&&k==="reason"){assert.equal(a.reason,"compact");continue;}
+  if(!Object.hasOwn(stat,k)){subset(a[k],legacy[k],label+"."+k);continue;}
+  if(legacy[k]&&typeof legacy[k]==="object"){
+   assert.ok(stat[k]&&typeof stat[k]==="object",label+"."+k);
+   if(Array.isArray(legacy[k]))assert.equal(legacy[k].length,stat[k].length,label+"."+k+".length");
+   dynamic(a[k],legacy[k],stat[k],label+"."+k);
+  }
+ }
+}
+function checkSnapshot(actual,legacy){const stat=publicCatalog.snapshots.find(x=>x.selected_pool_id===legacy.selected_pool_id);assert.ok(stat);subset(actual,stat);dynamic(actual,legacy,stat);}
 let tests=0;function test(name,fn){fn();tests++;console.log("ok",name);}
-for(const old of fixture.initial_expected)test("real Lua all dynamic/static fields reconstruct "+old.selected_pool_id,()=>{
- const m=api.Create(C,old.selected_pool_id),s=store();let result=m.Apply({full:true,revision:1},s.put(fixture.initial_ops),s.read);assert.equal(result.known,true);subset(result.snapshot,old);
- const original=result.snapshot,items=original.items;result=m.Apply({full:false,revision:2},s.put(fixture.changed_ops),s.read);subset(result.snapshot,fixture.changed_expected.find(x=>x.selected_pool_id===old.selected_pool_id));assert.equal(result.snapshot,original);assert.equal(result.snapshot.items,items);
+for(const old of fixture.initial_expected)test("production public static + real Lua account fields reconstruct "+old.selected_pool_id,()=>{
+ const m=api.Create(C,old.selected_pool_id),s=store();let result=m.Apply({full:true,revision:1},s.put(fixture.initial_ops),s.read);assert.equal(result.known,true);checkSnapshot(result.snapshot,old);
+ const original=result.snapshot,items=original.items;result=m.Apply({full:false,revision:2},s.put(fixture.changed_ops),s.read);checkSnapshot(result.snapshot,fixture.changed_expected.find(x=>x.selected_pool_id===old.selected_pool_id));assert.equal(result.snapshot,original);assert.equal(result.snapshot.items,items);
  const before=m.Inspect().metrics;for(let n=0;n<1000;n++){result=m.Apply({full:false,revision:n+3},[],s.read);assert.equal(result.changes.items.length,0);assert.equal(result.changes.pools.length,0);assert.equal(result.changes.summary,false);}assert.equal(m.Inspect().metrics.record_visits,before.record_visits);
+});
+test("production catalogue revisions clear both unread flags",()=>{
+ const m=api.Create(C,"map"),s=store(),result=m.Apply({full:true,revision:1},s.put(fixture.read_ops),s.read);
+ subset(result.snapshot,publicCatalog.snapshots.find(x=>x.selected_pool_id==="map"));
+ for(const pool of result.snapshot.pools){assert.equal(pool.update_unread,false,pool.id);assert.equal(pool.notice_unread,false,pool.id);}
 });
 test("receipt matches local intent; pregrant receipt ownership stays distinct",()=>{
  const m=api.Create(C,"map"),s=store();m.Apply({full:true,revision:1},s.put(fixture.initial_ops),s.read);m.Apply({full:false,revision:2},s.put(fixture.changed_ops),s.read);m.BindIntent(51,"local_request");
- let result=m.Apply({full:false,revision:3},s.put(fixture.receipt_ops),s.read);assert.equal(result.result.request_id,"local_request");subset(result.result,fixture.receipt_expected);assert.equal(result.result.results[0].owned_count,0);assert.equal(result.snapshot.items.find(x=>x.id===fixture.receipt_expected.results[0].id).owned_count,1);
+ let result=m.Apply({full:false,revision:3},s.put(fixture.receipt_ops),s.read);assert.equal(result.result.request_id,"local_request");subset(result.result,fixture.receipt_expected);const reward=publicCatalog.snapshots.find(x=>x.selected_pool_id==="map").items.find(x=>x.id===fixture.receipt_expected.results[0].id);subset(result.result.results[0],reward,"receipt.public_item");assert.equal(result.result.results[0].owned_count,0);assert.equal(result.snapshot.items.find(x=>x.id===fixture.receipt_expected.results[0].id).owned_count,1);
  result=m.Apply({full:false,revision:4},[],s.read);assert.equal(result.result,null);
 });
 test("unknown state and unknown receipt item never fabricate valid reward",()=>{

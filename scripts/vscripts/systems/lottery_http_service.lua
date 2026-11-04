@@ -539,7 +539,9 @@ function M.compact_read(id,pool,action)
     local config=require('config/lottery_config');local definition=config.pools[pool]
     local actions={[1]='visit',[2]='details',[3]='notice'}
     if not compact_bound(id)or not definition or not actions[action]or not compact_catalog_ready()then return nil end
-    return submit({player_id=id,pool_id=pool,read_action=actions[action],revision=definition.revision,
+    local revision=seed.pool_revisions and seed.pool_revisions[pool]
+    if type(revision)~='string'or revision==''then return nil end
+    return submit({player_id=id,pool_id=pool,read_action=actions[action],revision=revision,
         compact_token=0,complete=function()end},'lottery_read')
 end
 return M
