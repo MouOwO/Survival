@@ -224,30 +224,16 @@ def collect_verified(auth, builder, request, receipt_path, *, full):
     if full:
         from complete_delivery_release_20261103 import publication_validator as publication
         native = publication._native_policy(ctx.config, report["operator_revision"])
-        native_summary = native.validate_native_release(request, report, manifest, signed)
-        need(native_summary.get("ordinary_production_acceptance") is True,
-             "complete_baseline_real_ordinary_admission_required")
-        # No new download/Steam initialization: recheck the exact callback-named
-        # installed files using the original frozen signature/CRC/VPK verifier.
-        from complete_delivery_release_20261103 import verify_download as downloaded
-        downloaded.REPORT_SHA = expected
-        downloaded.configure(report)
-        protocol = downloaded.protocol()
-        actual_folder = guard.regular(receipt["download"]["install_folder"])
-        need(actual_folder == guard.regular(protocol.INSTALLED), "complete_baseline_official_install_folder_changed")
-        with builder.scene_maps(ctx), builder.inc.trusted_source(builder.TRUSTED):
-            actual = protocol.verify.verify_installed(copy.deepcopy(receipt["download"]), builder.VIEW, journal)
-            need(actual["signature_valid"] is True and actual["package_files"] == report["package_files"]
-                 and actual["vpk_sha256"] == report["vpk_sha256"]
-                 and actual["verification"]["files"] == report["files"]
-                 and actual["verification"]["archive_count"] == len(report["package_files"])-1
-                 and all(actual["verification"].get(name) is True for name in protocol.callbacks.CHECKS),
-                 "complete_baseline_actual_official_package_reverification_failed")
-            acf_raw = protocol.api.pack.read_metadata(protocol.ACF, protocol.api.pack.MAX_MANIFEST)
-            observed_manifest, observed_row = protocol.acf_manifest(acf_raw, receipt["post_query"],
-                sum(row["bytes"] for row in report["package_files"]), receipt["steam_manifest"])
-            need(observed_manifest == receipt["steam_manifest"] and observed_row == receipt["acf_installed_entry"],
-                 "complete_baseline_official_acf_changed")
+        # The current installation is now the official target, whereas the
+        # original same-process close/restore evidence remains mandatory.
+        # This closed entry performs the existing full official verifier once
+        # before rechecking the unchanged native evidence; no user phase flag.
+        native_summary = native.validate_post_download_native_release(request, report, manifest, signed,
+            receipt_ref={"path":str(path),"sha256":sha(receipt_raw)})
+        need(native_summary.get("ordinary_production_acceptance") is True
+             and native_summary.get("official_full_installation_reverified") is True
+             and native_summary.get("official_receipt_sha256") == sha(receipt_raw),
+             "complete_baseline_real_ordinary_and_official_admission_required")
     else:
         # The writer already performed both real verifications. The reader
         # recomputes the signed projection and all mutual original-byte pins.

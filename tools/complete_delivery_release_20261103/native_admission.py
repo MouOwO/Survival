@@ -9,6 +9,7 @@ synthetic MovieError classes, logs alone and source tests cannot admit a package
 from __future__ import annotations
 import argparse
 import base64
+import copy
 from collections import Counter, deque
 from datetime import datetime, timedelta, timezone
 import hashlib
@@ -32,6 +33,74 @@ HELPERS = ROOT/"tools/lottery_hotfix_release_20261102/native_admission.py"
 HELPERS_SHA = "935f0958a188dce736baa08282b3b4cd2cd30794767ddb9e8060527600c7a8ab"
 _HELPERS = None
 _EXECUTED_HELPERS = {}
+_OFFICIAL_INSTALL_SEAL = object()
+
+
+class _VerifiedOfficialInstallation:
+    """RAM-only capability; never selected by a request/review Boolean."""
+    def __init__(self,seal,installed,report_sha,files,snapshots,protocol,receipt_sha):
+        need(seal is _OFFICIAL_INSTALL_SEAL,"complete_native_closed_official_binding_required")
+        self.seal,self.installed,self.report_sha=seal,Path(installed).resolve(),report_sha
+        self.files=tuple((v["name"],v["bytes"],v["sha256"]) for v in files)
+        self.snapshots,self.protocol,self.receipt_sha=snapshots,protocol,receipt_sha
+
+
+def _post_download_operator(relative,operator_revision,expected_raw_sha=None):
+    """Execute exactly the current Git-bound, optionally authority-pinned bytes."""
+    b,ops,_=environment();path=(ROOT/relative).resolve();raw=path.read_bytes()
+    need(path.is_relative_to(ROOT/"tools") and len(raw)<=1024*1024,"complete_native_bounded_operator_required")
+    if expected_raw_sha is not None:need(sha(raw)==expected_raw_sha,"complete_native_official_operator_pin_changed")
+    pin=sha(raw.replace(b"\r\n",b"\n"));b.verify_operator_paths({relative:pin},operator_revision)
+    module=ModuleType("complete_native_official_"+sha(raw)[:20]);module.__file__=str(path)
+    with ops.capture_operator_imports():exec(compile(raw,str(path),"exec"),module.__dict__)
+    _EXECUTED_HELPERS.update(ops._EXECUTED_OPERATOR_PINS);_EXECUTED_HELPERS[relative]=pin
+    return module
+
+
+def _verify_official_installation(request,report,manifest,receipt_ref):
+    """Real SDK lineage/official receipt and whole installed signature/VPK/CRC."""
+    b,ops,p=environment();expected=request.get("report_sha256");op=report["operator_revision"]
+    pipeline=_post_download_operator("tools/release_pipeline.py",op);auth=pipeline.authority()
+    complete=_post_download_operator("tools/complete_delivery_release_20261103/complete_baseline.py",op,auth.policy["baseline_completion_sha256"])
+    downloaded=_post_download_operator("tools/complete_delivery_release_20261103/verify_download.py",op,auth.policy["download_sha256"])
+    complete.checked_authority(auth)
+    receipt,raw=b.checked_json(receipt_ref,limit=32*1024*1024);path=Path(receipt_ref["path"]).resolve()
+    need(path.is_relative_to((b.REPORT/"download_evidence").resolve()) and path.name=="verification.json",
+         "complete_native_original_official_receipt_required")
+    journal,journal_raw,state,state_raw=complete.current_head(auth,report,expected,request)
+    complete.verified_delivery(report,manifest,expected,journal,sha(journal_raw),receipt)
+    downloaded.REPORT_SHA=expected;downloaded.configure(report);protocol=downloaded.protocol()
+    installed=p.regular(Path(receipt["download"]["install_folder"]))
+    need(installed==p.regular(protocol.INSTALLED)==p.regular(p.INSTALLED),"complete_native_official_fixed_installation_required")
+    snapshots={path:raw,Path(auth.policy["canonical_journal"]):journal_raw,Path(auth.policy["lineage_state"]):state_raw}
+    with b.scene_maps(),b.inc.trusted_source(b.TRUSTED):
+        actual=protocol.verify.verify_installed(copy.deepcopy(receipt["download"]),b.VIEW,journal)
+        need(actual["signature_valid"] is True and actual["package_files"]==report["package_files"]
+             and actual["vpk_sha256"]==report["vpk_sha256"] and actual["verification"]["files"]==report["files"]
+             and actual["verification"]["archive_count"]==len(report["package_files"])-1
+             and all(actual["verification"].get(key) is True for key in protocol.callbacks.CHECKS),
+             "complete_native_actual_official_installation_failed")
+        acf_raw=protocol.api.pack.read_metadata(protocol.ACF,protocol.api.pack.MAX_MANIFEST)
+        observed,row=protocol.acf_manifest(acf_raw,receipt["post_query"],sum(v["bytes"] for v in report["package_files"]),receipt["steam_manifest"])
+        need(observed==receipt["steam_manifest"] and row==receipt["acf_installed_entry"],"complete_native_official_acf_changed")
+        snapshots[Path(protocol.ACF)]=acf_raw
+    protocol.unchanged(snapshots)
+    b.verify_operator_paths(dict(downloaded._PROTOCOL_EXECUTED_PINS),op)
+    return _VerifiedOfficialInstallation(_OFFICIAL_INSTALL_SEAL,installed,expected,report["package_files"],snapshots,protocol,sha(raw))
+
+
+def _lifecycle_packages(folder,report,manifest,parent,parent_manifest,expected,ops,p,official):
+    if official is None:
+        ops.require_rows(p.INSTALLED,parent["package_files"]);ops.full_vpk(p.INSTALLED,parent_manifest)
+    else:
+        need(type(official) is _VerifiedOfficialInstallation and official.seal is _OFFICIAL_INSTALL_SEAL
+             and official.installed==Path(p.INSTALLED).resolve() and official.report_sha==expected
+             and official.files==tuple((v["name"],v["bytes"],v["sha256"]) for v in report["package_files"]),
+             "complete_native_verified_official_phase_required")
+        ops.require_rows(p.INSTALLED,report["package_files"]);ops.full_vpk(p.INSTALLED,manifest)
+        official.protocol.unchanged(official.snapshots)
+    ops.require_rows(folder/"backup",parent["package_files"])
+    ops.require_rows(folder/"retained_candidate",report["package_files"])
 
 def need(ok, why):
     if not ok: raise ValueError(why)
@@ -74,7 +143,7 @@ def exact_bindings(document, report, expected_sha):
         and document.get("content_sha256")==report["content_sha256"]
         and document.get("signed_manifest_sha256")==report["signed_manifest_sha256"])
 
-def lifecycle(review,origin,report,expected_sha,reader,b,ops,p):
+def lifecycle(review,origin,report,expected_sha,reader,b,ops,p,*,official=None,target_manifest=None):
     refs=review["rehearsal"]
     tx,tx_path=reader.document(refs["transaction"],origin);folder=tx_path.parent
     process,process_path=reader.document(refs["process"],origin)
@@ -161,9 +230,7 @@ def lifecycle(review,origin,report,expected_sha,reader,b,ops,p):
         r"NETWORK_DISCONNECT_SNAPSHOTERROR|Failed\s+to\s+serialize\s+(?:CUserMsg_)?CustomGameEvent|"
         r"SendData[^\r\n]*reliable\s+data\s+too\s+big|VPK directory corrupt",text,re.I) is None,
         "complete_native_script_network_package_fatal")
-    ops.require_rows(p.INSTALLED,parent["package_files"]);ops.full_vpk(p.INSTALLED,parent_manifest)
-    ops.require_rows(folder/"backup",parent["package_files"])
-    ops.require_rows(folder/"retained_candidate",report["package_files"])
+    _lifecycle_packages(folder,report,target_manifest,parent,parent_manifest,expected_sha,ops,p,official)
     return process,times,text
 
 def captures(case,roles,process,bounds,reader,origin):
@@ -640,7 +707,7 @@ def network_case_windows(review,process,bounds,reader,origin):
          "complete_native_bounded_same_window_late_listener_case_required")
     return ((_engine_clock(shots[0]["start"]),_engine_clock(shots[-1]["end"])),)
 
-def validate_native_release(request,report,manifest,signed):
+def _validate_native_release(request,report,manifest,signed,*,official=None):
     b,ops,p=environment();expected=request.get("report_sha256")
     actual,actual_manifest,actual_signed=b.load_package(expected,full=True)
     need((actual,actual_manifest,actual_signed)==(report,manifest,signed),"complete_native_authenticated_package_objects_differ")
@@ -660,7 +727,7 @@ def validate_native_release(request,report,manifest,signed):
          "no_crash_or_hang","normal_exit_without_force","keeper_held_continuously_reviewed")),
          "complete_native_real_authenticated_ordinary_scope_required")
     need(same_process(request["native_process_generation"],review["process"]),"complete_native_request_generation_differs")
-    process,bounds,text=lifecycle(review,origin,report,expected,reader,b,ops,p)
+    process,bounds,text=lifecycle(review,origin,report,expected,reader,b,ops,p,official=official,target_manifest=manifest)
     ui=ui_cases(review,process,bounds,reader,origin)
     lottery=lottery_cases(review,process,bounds,text,reader,origin,manifest=manifest,original_evidence=report["original_evidence"])
     network=network_summary(text,explicit_snapshot_windows=network_case_windows(review,process,bounds,reader,origin),
@@ -673,6 +740,21 @@ def validate_native_release(request,report,manifest,signed):
         ui_cases=ui,lottery=lottery,network=network,original0104_fully_restored=True,
         native_file_use_policy=POLICY,all_gameplay_paths_verified=False,native_fps_measured=False,
         official_download=False,post_upload_arcade_verified=False,sdk_initialized=False,updates_submitted=0)
+
+
+def validate_native_release(request,report,manifest,signed):
+    """Pre-publication always requires the actual original0104 installation."""
+    return _validate_native_release(request,report,manifest,signed)
+
+
+def validate_post_download_native_release(request,report,manifest,signed,*,receipt_ref):
+    """Closed post-download phase; no caller Boolean can skip original evidence."""
+    official=_verify_official_installation(request,report,manifest,receipt_ref)
+    result=_validate_native_release(request,report,manifest,signed,official=official)
+    official.protocol.unchanged(official.snapshots)
+    result.update(official_full_installation_reverified=True,official_receipt_sha256=official.receipt_sha,
+        current_installation_phase="OFFICIAL_TARGET_FULLY_REVERIFIED",native_restore_is_historical=True)
+    return result
 
 def review_template(report,report_sha256):
     """Pure private worksheet, deliberately unable to satisfy this gate.
