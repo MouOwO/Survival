@@ -1,5 +1,7 @@
 # 孤城逐晓／Survival 统一知识库
 
+**2026-11-04：S9已签未准入，已完整恢复0104，仍仅本地更新。** 普通日志570个cw最大49B，但实际奖池error6源于本地seed与WS4公开元数据不一致；后台实测每笔1.6MB静态配置重复处理约0.7秒，正在修复。另150真实编译产物尚需配套Git提交，Root自动券0/30、本轮未上传/部署。见[真实构建、恢复、目录差异和后端计时](evidence/network50_s9_catalog_latency_20261104.md)。
+
 **2026-11-04 S5双仓已push，仍仅本地更新，后台本轮未部署。** game `a717903f…`／content `3700b232…`，S4 operator `27ea3dc0…`；gen5 schema `b9f73807…`，7935记录／188字段／registry代际12。186项真实Lua保护及7个override逐值/RNG已过，只是Lua投影、非完整candidate；gen5主批148项及补批2项实际官方编译/来源绑定已过，累计150项覆盖，非实机验收；146项保护产物字节不同及95项无源Git diff的derived变化仍待collector并入完整清单，总pending计数未收口。unsigned／签名／最终同源实机／SDK／官方下载仍待，正式0104 manifest `7025356658517360342`保持。Native08未知输入只认wire49B/698帧，Dev07开局FPS工程阈值未过，bulk923B仅独立低频尺寸。见[当前来源、复杂度和交付门禁](evidence/network50_s5_quality_handoff_20261104.md)。
 
 **2026-11-03 低频网格 bulk 尺寸已实测，仍仅本地更新。** 独立最小 Tools addon 的 gb/d 五档64/128/256/512/896 ASCII实际为89/155/283/539/923B，最大923B<1KiB；较大载荷封装27B，不能沿用小包+25。Client实际10938:11198969，与旧cw标定revision不同；同DLL摘要不能冒称同版本。零交易/SDK；尚未完整网格、普通客户端或FPS验收，正式同步状态另由主操作者记录。见[真实闭合日志、脱敏证据与范围](evidence/network50_grid_bulk_native_20261103.md)。

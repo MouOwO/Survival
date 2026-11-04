@@ -31,7 +31,7 @@
     ]
   },
   "recipe_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/complete_delivery_release_20261103/pipeline_recipe.py",
-  "recipe_sha256": "59be96e7f23989a3dd97952095517928d73233cc6c5864ab643b02d0a9d38763",
+  "recipe_sha256": "ee0c3dbd93a35f04709bd3f2f14f037b1fa40c9ea73e71f801e2de0f5aa15f6c",
   "validator_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/complete_delivery_release_20261103/publication_validator.py",
   "validator_sha256": "03c59bfbd29280baac4f3a0883e0beb98b4f16d868881e335205020c366676cd",
   "rehearsal_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/complete_delivery_release_20261103/rehearsal.py",
@@ -41,5 +41,6 @@
   "native_admission_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/complete_delivery_release_20261103/native_admission.py",
   "native_admission_sha256": "43d55eb7bad9f4b80462acce818b5aacc8d7cb98646238f42c987c296ec01ecb",
   "baseline_completion_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/complete_delivery_release_20261103/complete_baseline.py",
-  "baseline_completion_sha256": "20145ed9c02845d6854e39901a72503ac6ff7070b0c54ea36672f2b5792edc04"
+  "baseline_completion_sha256": "20145ed9c02845d6854e39901a72503ac6ff7070b0c54ea36672f2b5792edc04",
+  "report_directory": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/output/complete_delivery_release_20261103_v02"
 }

@@ -14,13 +14,18 @@ def generate(root: Path, lua: str, bundle_path: Path | None = None):
     from server.archive_backend.bundle import Bundle
     from server.archive_backend.lottery_catalog import catalog_document
 
+    # An explicit path selects the same immutable production contract; it must
+    # never silently generate a future catalogue for the current game's hash.
+    declaration = (root / "scripts/vscripts/config/generated/archive_http_bundle.lua").read_text(encoding="utf-8-sig")
+    match = re.search(r'\bhash\s*=\s*"([0-9a-f]{64})"', declaration)
+    if not match:
+        raise ValueError("lottery_seed_bundle_missing")
     if bundle_path is None:
-        declaration = (root / "scripts/vscripts/config/generated/archive_http_bundle.lua").read_text(encoding="utf-8-sig")
-        match = re.search(r'\bhash\s*=\s*"([0-9a-f]{64})"', declaration)
-        if not match:
-            raise ValueError("lottery_seed_bundle_missing")
         bundle_path = root / "server/bundles" / match[1]
-    document = catalog_document(Bundle(bundle_path), lua)
+    selected = Bundle(bundle_path)
+    if selected.hash != match[1]:
+        raise ValueError("lottery_seed_bundle_contract_mismatch")
+    document = catalog_document(selected, lua)
     seed = {"md5": document["catalog_md5"], "config_hash": document["config_hash"],
             "catalog_json": document["catalog_json"]}
     raw = json.dumps(seed, ensure_ascii=True, sort_keys=True, separators=(",", ":"))

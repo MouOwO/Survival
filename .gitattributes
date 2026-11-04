@@ -286,3 +286,10 @@ data/ui/registry_history/*.json text eol=lf
 data/ui/ui_compact_wire_native_evidence_20261103.json text eol=lf
 tools/complete_delivery_release_20261103/*.py text eol=lf
 publishing/workshop/release_authority_complete_20261103.json text eol=lf
+# Generated public seeds and Linux settlement entrypoints keep exact bytes.
+data/ui/lottery_catalog.json text eol=lf
+panorama/src/scripts/custom_game/lottery_catalog_seed.js text eol=lf
+scripts/vscripts/config/generated/lottery_catalog_manifest.lua text eol=lf
+server/archive_backend/service.py text eol=lf
+server/archive_backend/settlement_runner.py text eol=lf
+server/archive_backend/worker_fast.lua text eol=lf

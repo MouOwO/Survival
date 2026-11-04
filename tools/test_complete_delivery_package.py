@@ -187,7 +187,7 @@ class BoundaryTests(unittest.TestCase):
         with patch.object(m.ledger,"verify_compiler_receipt",side_effect=[first,second]) as verify, \
              patch.object(m.ledger,"verify_protection_receipt",return_value={"protected_outputs":{},"production_overrides":{}}), \
              patch.object(m.ledger,"verify_item_generator_receipt",return_value={"outputs":{}}):
-            result=m.verify_original_evidence(evidence,pins,target,[])
+            result=m.verify_original_evidence(evidence,pins,target,[],source_raw={"game:resource/a":b"a","game:resource/b":b"b"})
             self.assertEqual(verify.call_count,2)
             self.assertEqual(result["compiler"]["original_receipts"],[first,second])
             self.assertEqual(set(result["compiler"]["outputs"]),{"resource/a","resource/b"})
@@ -199,6 +199,20 @@ class BoundaryTests(unittest.TestCase):
         for value in ([],[{}]*33,[True]):
             with self.assertRaisesRegex(ValueError,"original_compiler_receipt_list"):
                 m.compiler_entries(value)
+
+    def test_fresh_compiler_output_must_also_exist_as_exact_target_git_resource(self):
+        pins={"game":"a"*40,"content":"b"*40,"operator":"c"*40}
+        origins={**pins,"operator":"d"*40};name="panorama/scripts/a.vjs_c";raw=b"actual official output"
+        proof={"outputs":{name:fp(raw)}};target=manifest({name:raw})
+        evidence={key:{"source_revisions":origins} for key in ("compiler","protection","item_generator")}
+        with patch.object(m.ledger,"verify_compiler_receipt",return_value=proof), \
+             patch.object(m.ledger,"verify_protection_receipt",return_value={"protected_outputs":{},"production_overrides":{}}), \
+             patch.object(m.ledger,"verify_item_generator_receipt",return_value={"outputs":{}}):
+            for source in (None,{}, {"game:"+name:b"old committed output"}):
+                with self.subTest(source=source),self.assertRaisesRegex(ValueError,"not_committed_target_git_resource"):
+                    m.verify_original_evidence(evidence,pins,target,[],source_raw=source)
+            result=m.verify_original_evidence(evidence,pins,target,[],source_raw={"game:"+name:raw})
+            self.assertEqual(result["target_git_compiled_outputs"][name],{"target_commit":pins["game"],"output":fp(raw)})
 
     def test_changed_loaded_operator_is_rejected_before_key_use(self):
         with patch.object(m.pending,"_git",return_value=b"not the imported operator"), \

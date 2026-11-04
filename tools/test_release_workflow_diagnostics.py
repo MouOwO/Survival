@@ -1,10 +1,32 @@
 """Offline integration boundaries, never a query/install/publication."""
 from pathlib import Path
+from types import SimpleNamespace
 import tempfile,unittest
 from unittest.mock import patch
 import release_workflow_diagnostics as d
 
 class DiagnosticsTests(unittest.TestCase):
+    def test_complete_report_directory_selects_new_controls_and_preserves_old_family(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder).resolve();new=root/'output/complete_delivery_release_20261103_v02';new.mkdir(parents=True)
+            policy=dict(recipe_path=str(root/'tools/complete_delivery_release_20261103/pipeline_recipe.py'),report_directory=str(new))
+            with patch.object(d,'ROOT',root):
+                self.assertEqual(d.report_directory(SimpleNamespace(policy=policy)),new)
+                old=SimpleNamespace(policy=dict(recipe_path=str(root/'tools/lottery_redemption_release_20261103/build_release.py')))
+                self.assertEqual(d.report_directory(old),root/'output/lottery_redemption_release_20261103')
+
+    def test_report_directory_cannot_escape_output_or_override_another_family(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder).resolve();(root/'output').mkdir();outside=root/'outside';outside.mkdir()
+            recipe=str(root/'tools/complete_delivery_release_20261103/pipeline_recipe.py')
+            with patch.object(d,'ROOT',root):
+                for value in ('relative/path',str(outside),str(root/'output'),str(root/'output/../outside')):
+                    with self.subTest(value=value),self.assertRaises(ValueError):
+                        d.report_directory(SimpleNamespace(policy=dict(recipe_path=recipe,report_directory=value)))
+                other=str(root/'tools/lottery_redemption_release_20261103/build_release.py')
+                with self.assertRaisesRegex(ValueError,'requires_complete_family'):
+                    d.report_directory(SimpleNamespace(policy=dict(recipe_path=other,report_directory=str(outside))))
+
     def test_buildable_pending_bytes_and_runtime_dirty_are_not_silently_dropped(self):
         rows=[dict(source=dict(repo='game',path='scripts/a.lua'),status='PENDING_RUNTIME_UPDATE',blocking=False),
               dict(source=dict(repo='content',path='panorama/a.js'),status='UNCOMPILED_BINDING_REQUIRED',blocking=True),

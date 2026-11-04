@@ -179,12 +179,11 @@ class ArchiveService:
             scope = profile["account_id"] + ":" + command["id"]
         seed=int.from_bytes(hmac.new(self.app.account_id_pepper.encode(),
             scope.encode(),hashlib.sha256).digest()[:4],"big")%2147483646+1
-        payload={"configs":self.bundle.configs,"profile":profile,"command":command,"has_pass":has_pass,"seed":seed,"server_time":int(time.time())}
+        payload={"profile":profile,"command":command,"has_pass":has_pass,"seed":seed,"server_time":int(time.time())}
         if not self.slots.acquire(timeout=2): raise TimeoutError("archive_workers_busy")
         try:
-            completed=subprocess.run([self.lua,"worker.lua"],cwd=self.bundle.directory,
-                input=json.dumps(payload,ensure_ascii=False,allow_nan=False).encode(),stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,timeout=10,check=True,creationflags=getattr(subprocess,"CREATE_NO_WINDOW",0))
+            from .settlement_runner import run
+            completed=run(self.bundle,self.lua,payload)
         finally: self.slots.release()
         result=object_maps(json.loads(completed.stdout))
         if not isinstance(result,dict): raise ArchiveError("archive_worker_invalid")

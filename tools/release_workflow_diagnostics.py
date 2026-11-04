@@ -6,7 +6,7 @@ This does not replace signed/native/SDK/download validation at publication.
 """
 from contextlib import redirect_stdout
 from pathlib import Path
-import hashlib,io,json
+import hashlib,io,json,os,stat
 
 ROOT=Path(__file__).resolve().parents[1]
 MAX_CONTROL_BYTES=16*1024*1024
@@ -57,13 +57,34 @@ def pending_source_keys(pending):
     sources+=['dirty:'+row['repo']+':'+row['path'] for row in pending.get('dirty',[]) if row.get('runtime_related')]
     return sorted(set(sources))
 
+def report_directory(auth):
+    """Use the fixed complete-family control directory without following links."""
+    family=Path(auth.policy['recipe_path']).parent
+    if family.parent.resolve()!=(ROOT/'tools').resolve():raise ValueError('registered_delivery_family_required')
+    if 'report_directory' not in auth.policy:
+        return ROOT/'output'/family.name
+    if family.name!='complete_delivery_release_20261103':
+        raise ValueError('report_directory_override_requires_complete_family')
+    configured=auth.policy['report_directory']
+    if not isinstance(configured,str):raise ValueError('absolute_real_report_directory_required')
+    path=Path(configured)
+    if not path.is_absolute() or '..' in path.parts:raise ValueError('absolute_real_report_directory_required')
+    for entry in (path,*path.parents):
+        if os.path.lexists(entry):
+            info=entry.lstat()
+            if stat.S_ISLNK(info.st_mode) or getattr(info,'st_file_attributes',0)&0x400:
+                raise ValueError('report_directory_reparse_refused')
+    path=path.resolve(strict=True);base=(ROOT/'output').resolve(strict=True)
+    if not path.is_dir() or path==base or not path.is_relative_to(base):
+        raise ValueError('report_directory_must_be_beneath_output')
+    return path
+
+
 def delivery_status(auth,*,download_receipt=None,pending=None):
     import release_delivery_state as delivery
     import release_pending_inventory as inventory
     pending=pending if pending is not None else pending_inventory()
-    family=Path(auth.policy['recipe_path']).parent
-    if family.parent.resolve()!=ROOT/'tools':raise ValueError('registered_delivery_family_required')
-    folder=ROOT/'output'/family.name
+    folder=report_directory(auth)
     local,report_sha=read_control(folder/'package.json')
     journal,journal_sha=read_control(auth.policy['canonical_journal'])
     receipt={}

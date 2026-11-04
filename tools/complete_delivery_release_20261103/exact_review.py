@@ -24,6 +24,7 @@ EXECUTED_SHA = hashlib.sha256(Path(__file__).read_bytes().replace(b'\r\n', b'\n'
 MANIFEST = 'data/ui/ui_static_catalog_manifest.json'
 REGISTRY = 'data/ui/ui_static_catalog_registry.json'
 ATLAS = 'data/ui/grid_static_atlas_candidate_20261103.json'
+LOTTERY_SEED = 'data/ui/lottery_catalog.json'
 JS = 'panorama/src/scripts/custom_game/common/ui_static_catalog.js'
 CONTENT_JS = 'panorama/scripts/custom_game/common/ui_static_catalog.js'
 LUA = 'scripts/vscripts/config/generated/ui_static_catalog_lookup.lua'
@@ -158,7 +159,33 @@ def validate_catalog(blobs):
         need(new.get('authority') is False and new.get('requires_current_live_scan') is True, 'atlas_must_remain_non_authoritative')
     checks.update(schema_sha256=manifest['schema_sha256'], generated_js_lua_hashes_verified=True,
                   content_mirror_exact=True, atlas_embedded_and_non_authoritative=True)
+    if LOTTERY_SEED in blobs:
+        checks.update(validate_lottery_seed(blobs[LOTTERY_SEED], manifest, data))
     return checks
+
+
+def validate_lottery_seed(raw, manifest, data):
+    """Prove this exact build input is embedded in the generated public data."""
+    need(manifest.get('source_hashes', {}).get(LOTTERY_SEED) == sha(raw),
+         'lottery_seed_source_manifest_sha_mismatch')
+    seed = json.loads(raw)
+    need(set(seed) == {'md5', 'config_hash', 'catalog_json'}
+         and re.fullmatch('[a-f0-9]{64}', str(seed['config_hash']))
+         and isinstance(seed['catalog_json'], str)
+         and hashlib.md5(seed['catalog_json'].encode('utf8')).hexdigest() == seed['md5'],
+         'lottery_seed_public_document_md5_invalid')
+    public = json.loads(seed['catalog_json'])
+    need(public.get('schema') == 1 and isinstance(public.get('snapshots'), list)
+         and len(public['snapshots']) == 4
+         and {row.get('selected_pool_id') for row in public['snapshots']} ==
+             {'map', 'cultivation', 'dragon_knight', 'summer'}, 'lottery_seed_four_public_pools_required')
+    auxiliary = data.get('auxiliary', {})
+    need(auxiliary.get('lottery_public') == public
+         and auxiliary.get('lottery_config_hash') == seed['config_hash'],
+         'lottery_seed_not_exact_generated_runtime_data')
+    return {'lottery_seed_md5': seed['md5'], 'lottery_config_hash': seed['config_hash'],
+            'public_seed_embedded_exactly': True, 'public_snapshot_count': 4,
+            'probabilities_or_rewards_modified_by_review': False}
 
 
 def make_reviews(scope, scope_sha256, pins, blobs, facts, scan, scan_sha256):
@@ -166,7 +193,10 @@ def make_reviews(scope, scope_sha256, pins, blobs, facts, scan, scan_sha256):
     rows = [r for r in scope['decisions'] if r['inventory_status'] == 'UNMAPPED_SOURCE_PENDING']
     paths = {r['source']['path'] for r in rows}
     manifest = json.loads(blobs[MANIFEST]); histories = {p for p in manifest['source_hashes'] if p.startswith('data/ui/registry_history/')}
-    need(len(rows) == len(paths) == 21 and paths == {ATLAS, MANIFEST, REGISTRY, *EVIDENCE, *histories}, 'unmapped_set_not_exact_reviewed_twenty_one')
+    expected = {ATLAS, MANIFEST, REGISTRY, *EVIDENCE, *histories}
+    if LOTTERY_SEED in paths: expected.add(LOTTERY_SEED)
+    need(len(rows) == len(paths) == len(expected) and paths == expected,
+         'unmapped_set_not_exact_reviewed_paths')
     checks = validate_catalog(blobs)
     need(not scan['runtime_read_blockers'], 'runtime_reference_or_loader_requires_manual_review')
     reviews = []
@@ -187,6 +217,12 @@ def make_reviews(scope, scope_sha256, pins, blobs, facts, scan, scan_sha256):
             classification = 'PUBLIC_BUILD_INPUT_WITH_RUNTIME_DATA_EMBEDDED_IN_GENERATED_CATALOG'
             reason = 'Exact candidate atlas bytes are pinned by the generated manifest and its area/map values are embedded in verified JS/Lua outputs. Runtime consumes the generated catalogue and still requires live authoritative scans; exclude only the standalone JSON, not its generated targets.'
             targets = TARGETS; extra = checks
+        elif path == LOTTERY_SEED:
+            classification = 'EXACT_PUBLIC_LOTTERY_BUILD_INPUT_EMBEDDED_IN_GENERATED_RUNTIME'
+            reason = 'Parsed this exact seed, verified its public-document MD5 and manifest source SHA, and compared all public fields with the generated runtime catalogue. Runtime reads generated Lua/compiled JS; the standalone JSON is a build input, not a replacement for those resources. The original bundle projection and generated seed contract require separate verification.'
+            targets = [*TARGETS, 'panorama/scripts/custom_game/lottery_catalog_seed.vjs_c',
+                       'scripts/vscripts/config/generated/lottery_catalog_manifest.lua']
+            extra = checks
         elif path == MANIFEST:
             classification = 'EXACT_GENERATOR_SOURCE_OUTPUT_MANIFEST_NOT_RUNTIME_FILE'
             reason = 'Parsed manifest pins exact current registry, all twelve concrete history nodes, atlas and generated JS/Lua source bytes. It is build provenance rather than a runtime JSON loader; generated targets remain separately required.'

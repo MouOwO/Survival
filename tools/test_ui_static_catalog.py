@@ -35,7 +35,10 @@ class StaticCatalogTests(unittest.TestCase):
         from extract_grid_static_atlas_20261103 import PUBLIC_SOURCES
         cls.reference = m.GitSource(m.ROOT, GAME)
         cls.source = ReviewedInputFixture((*PUBLIC_SOURCES,"scripts/vscripts/ui/selected_stats_schema.lua",
-                                          "data/ui/grid_static_atlas_candidate_20261103.json"))
+                                          "data/ui/grid_static_atlas_candidate_20261103.json",
+                                          "data/ui/lottery_catalog.json",
+                                          "scripts/vscripts/config/generated/archive_http_bundle.lua",
+                                          "scripts/vscripts/config/generated/lottery_catalog_manifest.lua"))
         cls.operator = ReviewedInputFixture(("tools/selected_stats_static_seed.lua","tools/production_ui_static_seed.lua",
                                              "tools/public_beta_ui_static_seed.lua",
                                              "tools/extract_grid_static_atlas_20261103.py"))

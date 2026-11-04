@@ -97,6 +97,25 @@ def digest(raw):
     return hashlib.sha256(raw).hexdigest()
 
 
+def validate_lottery_seed_contract(source, seed):
+    """Bind public metadata to the same immutable game's production contract.
+
+    Two small GitSource reads once per generation, O(header bytes), with no
+    account, HTTP, reward evaluation or runtime polling. These inputs become
+    part of the catalogue source readset and schema digest.
+    """
+    declaration = source.read("scripts/vscripts/config/generated/archive_http_bundle.lua").decode("utf-8-sig")
+    manifest = source.read("scripts/vscripts/config/generated/lottery_catalog_manifest.lua").decode("utf-8-sig")
+    bundle = re.search(r'\bhash\s*=\s*"([0-9a-f]{64})"', declaration)
+    config = re.search(r'\bconfig_hash\s*=\s*"([0-9a-f]{64})"', manifest)
+    md5 = re.search(r'\bcatalog_md5\s*=\s*"([0-9a-f]{32})"', manifest)
+    need(bundle is not None, "lottery_production_bundle_hash_missing")
+    need(isinstance(seed, dict) and seed.get("config_hash") == bundle[1],
+         "lottery_seed_production_bundle_mismatch")
+    need(config is not None and md5 is not None and config[1] == bundle[1]
+         and md5[1] == seed.get("md5"), "lottery_seed_lua_manifest_mismatch")
+
+
 def fields():
     # Do not reorder. New meanings are appended, never assigned an old ID.
     definitions = [
@@ -888,6 +907,7 @@ def make_catalog(source, lua, operator=None, atlas_reference=None):
     for kind in ("claim", "benefit"):
         add("daily:ack:" + kind, "daily", "ack", kind)
     seed = json.loads(source.read("data/ui/lottery_catalog.json"))
+    validate_lottery_seed_contract(source, seed)
     need(hashlib.md5(seed["catalog_json"].encode("ascii"), usedforsecurity=False).hexdigest() == seed["md5"], "lottery_public_catalog_digest_invalid")
     public = json.loads(seed["catalog_json"])
     need(public.get("schema") == 1, "lottery_public_schema_unknown")

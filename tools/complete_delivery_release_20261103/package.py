@@ -454,19 +454,82 @@ def _verify_signed_rebind(binding, *, pins, target_rows, parent_rows, parent_roo
             "output": output, "invented_historical_source_revision": False, "fresh_compilation_claimed": False}
 
 
+def _producer_target_readset_binding(label, kwargs, pins, source_raw):
+    """Verify actual old/target Git objects without relabelling an old receipt.
+
+    Only this producer's real receipt-bound readset is considered. Compiler
+    outputs are not compiler inputs. Same-role commits are read once; changed
+    role commits are independently re-read. Cold cost is O(readset bytes) and
+    at most four Git batches; no timer, mutation, SDK or tool rerun exists here.
+    """
+    producers = kwargs["source_revisions"]
+    need(isinstance(source_raw, dict), "semantic_evidence_runtime_source_mismatch_unproved_readset")
+    values = {}
+    def add(key, value):
+        ledger.source_id(key)
+        git_raw, content, lfs = ledger._resolved_git_bytes(value)
+        need(key not in values or values[key] == (git_raw, content, lfs),
+             "producer_target_original_readsets_disagree:" + key)
+        values[key] = (git_raw, content, lfs)
+    if label.startswith("compiler["):
+        for key, value in kwargs["source_bytes"].items():
+            add(key, value)
+    elif label == "protection":
+        for name, value in kwargs["source_bytes"].items():
+            add("game:" + name, value)
+    elif label == "item_generator":
+        for key, value in kwargs["input_bytes"].items():
+            add(key, value)
+        for name, value in kwargs["output_bytes"].items():
+            add("game:" + name, value)
+        for name, value in kwargs["content_mirrors"].items():
+            add("content:" + name, value)
+    else:
+        raise ValueError("unknown_original_producer_readset_kind")
+    need(values, "producer_target_nonempty_original_readset_required")
+    raw, old_facts, new_facts, rows = {}, {}, {}, {}
+    for key, (git_raw, content, lfs) in sorted(values.items()):
+        role = key.split(":", 1)[0]
+        need(source_raw.get(key) == content, "producer_target_current_readset_bytes_differ:" + key)
+        oid = hashlib.sha1(b"blob " + str(len(git_raw)).encode() + b"\0" + git_raw).hexdigest()
+        fingerprint = ledger.byte_fingerprint(content)
+        common = {"git_oid": oid, **fingerprint, "lfs": lfs, "lfs_content_verified": lfs}
+        raw[key] = content
+        old_facts[key] = {"commit": producers[role], **common}
+        new_facts[key] = {"commit": pins[role], **common}
+        rows[key] = {"producer_commit": producers[role], "target_commit": pins[role],
+                     "git_oid": oid, "git_blob_sha256": ledger.sha(git_raw), **fingerprint, "lfs": lfs}
+    # Both immutable revision:path lookups must resolve to this exact blob, with
+    # actual payload bytes separately checked for LFS. No READY input is used.
+    _git_sources(producers, raw, old_facts)
+    changed = {key: value for key, value in raw.items()
+               if producers[key.split(":", 1)[0]] != pins[key.split(":", 1)[0]]}
+    if changed:
+        _git_sources(pins, changed, {key: new_facts[key] for key in changed})
+    return {"kind": "ORIGINAL_PRODUCER_TO_TARGET_GIT_READSET_EQUIVALENCE",
+            "producer": label, "producer_source_revisions": producers.copy(),
+            "target_source_revisions": {role: pins[role] for role in ("game", "content")},
+            "inputs": rows, "readset_sha256": ledger.sha(ledger.canonical(rows)),
+            "original_receipt_sha256": kwargs.get("proof_sha256", kwargs.get("production_sha256")),
+            "git_revisions_relabelled": False, "producer_outputs_recreated": False}
+
+
 def verify_original_evidence(evidence, pins, manifest, bindings, *, parent_raw=None, parent_sha256=None,
                              parent_root=None, source_raw=None, binding_receipts=None):
     """Consume original compiler/protection/generator receipts and real bytes."""
     need(isinstance(evidence, dict) and set(evidence) == {"compiler", "protection", "item_generator"},
          "complete_original_semantic_evidence_required")
-    answers = {}; compiler_results = []
-    for kwargs in compiler_entries(evidence["compiler"]):
+    answers = {}; compiler_results = []; producer_target_bindings = []
+    for index, kwargs in enumerate(compiler_entries(evidence["compiler"])):
         producers = kwargs.get("source_revisions", {})
-        need(set(producers) == {"game", "content", "operator"}
-             and all(producers.get(role) == pins[role] for role in ("game", "content")),
+        need(set(producers) == {"game", "content", "operator"},
              "semantic_evidence_runtime_source_mismatch")
-        ledger.revision(producers["operator"])
+        for value in producers.values(): ledger.revision(value)
+        changed_source = any(producers[role] != pins[role] for role in ("game", "content"))
+        need(not changed_source or isinstance(source_raw, dict), "semantic_evidence_runtime_source_mismatch")
         compiler_results.append(ledger.verify_compiler_receipt(**kwargs))
+        if changed_source:
+            producer_target_bindings.append(_producer_target_readset_binding("compiler[%d]" % index, kwargs, pins, source_raw))
     if isinstance(evidence["compiler"], list):
         merged = {}
         for result in compiler_results:
@@ -481,11 +544,14 @@ def verify_original_evidence(evidence, pins, manifest, bindings, *, parent_raw=N
                          ("item_generator", ledger.verify_item_generator_receipt)):
         kwargs = evidence[name]
         producers = kwargs.get("source_revisions", {})
-        need(set(producers) == {"game", "content", "operator"}
-             and all(producers.get(role) == pins[role] for role in ("game", "content")),
+        need(set(producers) == {"game", "content", "operator"},
              "semantic_evidence_runtime_source_mismatch")
-        ledger.revision(producers["operator"])
+        for value in producers.values(): ledger.revision(value)
+        changed_source = any(producers[role] != pins[role] for role in ("game", "content"))
+        need(not changed_source or isinstance(source_raw, dict), "semantic_evidence_runtime_source_mismatch")
         answers[name] = verify(**kwargs)
+        if changed_source:
+            producer_target_bindings.append(_producer_target_readset_binding(name, kwargs, pins, source_raw))
     rows = {row["path"]: ledger.fingerprint(row) for row in manifest["files"]}
     compiled = answers["compiler"]["outputs"]
     protected = answers["protection"]["protected_outputs"]
@@ -493,6 +559,13 @@ def verify_original_evidence(evidence, pins, manifest, bindings, *, parent_raw=N
     generated = answers["item_generator"]["outputs"]
     for name, output in {**compiled, **protected, **overrides}.items():
         need(rows.get(name) == output, "original_semantic_output_not_in_complete_manifest:" + name)
+    target_compiled = {}
+    for name, output in compiled.items():
+        key = "game:" + name
+        need(isinstance(source_raw, dict) and key in source_raw
+             and ledger.byte_fingerprint(source_raw[key]) == output,
+             "compiled_output_not_committed_target_git_resource:" + name)
+        target_compiled[name] = {"target_commit": pins["game"], "output": output}
     signed_parent = None; rebinds = {}
     for binding in bindings:
         name, kind = binding["resource"], binding["kind"]
@@ -513,6 +586,10 @@ def verify_original_evidence(evidence, pins, manifest, bindings, *, parent_raw=N
     if signed_parent is not None:
         pack.inventory_unchanged(signed_parent[0], signed_parent[2])
         answers["original_signed_rebinds"] = rebinds
+    if producer_target_bindings:
+        answers["producer_target_bindings"] = producer_target_bindings
+    if target_compiled:
+        answers["target_git_compiled_outputs"] = target_compiled
     return answers
 
 

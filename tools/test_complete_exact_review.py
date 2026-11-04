@@ -56,7 +56,43 @@ class ExactReviewTests(unittest.TestCase):
     def test_extra_unmapped_under_familiar_directory_still_blocks(self):
         pins={'game':'a'*40,'content':'b'*40,'operator':'c'*40}
         scope={'observed_commits':{k:pins[k] for k in ('game','content')},'decisions':[{'inventory_status':'UNMAPPED_SOURCE_PENDING','source':{'path':'data/ui/registry_history/unreviewed.json'}}]}
-        with self.assertRaisesRegex(ValueError,'exact_reviewed_twenty_one'):
+        with self.assertRaisesRegex(ValueError,'exact_reviewed_paths'):
             m.make_reviews(scope,'f'*64,pins,{m.MANIFEST:b'{"source_hashes":{}}'},{},{},'e'*64)
+
+
+class LotteryBuildInputReviewTests(unittest.TestCase):
+    def fixture(self):
+        public={'schema':1,'snapshots':[{'selected_pool_id':pool,'items':[{'id':'same','name':'public','quantity':1}]} for pool in ('map','cultivation','dragon_knight','summer')]}
+        text=json.dumps(public,sort_keys=True,separators=(',',':'))
+        seed={'md5':hashlib.md5(text.encode()).hexdigest(),'config_hash':'a'*64,'catalog_json':text}
+        raw=m.canonical(seed)
+        return raw,{'source_hashes':{m.LOTTERY_SEED:m.sha(raw)}},{'auxiliary':{'lottery_public':public,'lottery_config_hash':seed['config_hash']}}
+    def test_exact_build_input_matches_all_generated_public_fields(self):
+        raw,manifest,data=self.fixture()
+        result=m.validate_lottery_seed(raw,manifest,data)
+        self.assertTrue(result['public_seed_embedded_exactly'])
+        self.assertFalse(result['probabilities_or_rewards_modified_by_review'])
+    def test_wrong_input_pin_or_catalog_md5_blocks_review(self):
+        raw,manifest,data=self.fixture()
+        with self.assertRaisesRegex(ValueError,'source_manifest_sha'):
+            m.validate_lottery_seed(raw+b' ',manifest,data)
+        value=json.loads(raw);value['md5']='0'*32;raw=m.canonical(value)
+        manifest['source_hashes'][m.LOTTERY_SEED]=m.sha(raw)
+        with self.assertRaisesRegex(ValueError,'document_md5'):
+            m.validate_lottery_seed(raw,manifest,data)
+    def test_same_name_but_changed_reward_or_config_cannot_be_excluded(self):
+        for change in ('reward','config'):
+            raw,manifest,data=self.fixture()
+            if change=='reward':data['auxiliary']['lottery_public']['snapshots'][0]['items'][0]['quantity']=2
+            else:data['auxiliary']['lottery_config_hash']='b'*64
+            with self.assertRaisesRegex(ValueError,'not_exact_generated_runtime'):
+                m.validate_lottery_seed(raw,manifest,data)
+    def test_missing_pool_is_not_a_complete_public_seed(self):
+        raw,manifest,data=self.fixture();seed=json.loads(raw)
+        public=json.loads(seed['catalog_json']);public['snapshots'].pop()
+        seed['catalog_json']=json.dumps(public);seed['md5']=hashlib.md5(seed['catalog_json'].encode()).hexdigest()
+        raw=m.canonical(seed);manifest['source_hashes'][m.LOTTERY_SEED]=m.sha(raw)
+        with self.assertRaisesRegex(ValueError,'four_public_pools'):
+            m.validate_lottery_seed(raw,manifest,data)
 
 if __name__=='__main__':unittest.main()
