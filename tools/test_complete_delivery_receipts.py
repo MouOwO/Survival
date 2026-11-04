@@ -64,7 +64,7 @@ def protection_case():
     for name in overrides: production[name] = ("production " + name + "\n").encode()
     selected = [{"path": name, "kind": "generated_table" if name == generated else "business"} for name in sorted((generated, business))]
     dependency_files = {"LICENSE": b"original license", "cli.lua": b"cli", "src/main.lua": b"main"}
-    records = [{"path": name, "bytes": len(raw), "sha256": m.sha(raw)} for name, raw in sorted(dependency_files.items())]
+    records = [{"path": name, "bytes": len(raw), "sha256": m.sha(raw)} for name, raw in sorted(dependency_files.items(), key=lambda pair: tuple(p.lower() for p in Path(pair[0]).parts))]
     dependency = {"source_tree_files": 3, "source_tree_sha256": m.sha(m.canonical(records)[:-1]), "license_sha256": m.sha(dependency_files["LICENSE"])}
     identity = {**dependency, "verified_source_tree_sha256": dependency["source_tree_sha256"]}
     policy = {"generated_prefix": "scripts/vscripts/config/generated/", "generated_exclusions": {"item_resources.lua": "separate resolver"},

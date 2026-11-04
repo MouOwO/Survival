@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "snapshot_date": "2026-11-03",
+  "snapshot_date": "2026-11-04",
   "scope": "Curated project knowledge and historical snapshot; raw chat excluded",
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 31200,
-      "sha256": "bd51834f3eb0420ac4860cff8d2fe71195368467935f863913107dc604d8971f"
+      "bytes": 32086,
+      "sha256": "e8fc9ea52a1f8e079dec5f94d13621af48ad17fb648902fd2e814cc138830cf3"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 45121,
-      "sha256": "2045be980cfed11819de40e8f64fc03d062c3d15f53b33c4a819648a98d75673"
+      "bytes": 46007,
+      "sha256": "4b50176e7d26726743b97c2d3230731dcb0bb5e4596a9e55bba392dd484dfcae"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 19276,
-      "sha256": "a9e83f2966020044a0a2e266c5b5b862e93898b1affd1fb37b82045c3c40edaa"
+      "bytes": 20162,
+      "sha256": "9e23c3dcd2fbe0ca935f5a0e03c17b75ddf5dbb0407d40c047248d93f887cfa0"
     },
     {
       "path": "data/completed_work_index.json",
@@ -347,6 +347,11 @@
       "path": "evidence/network50_production_vip_phase3_20261103.md",
       "bytes": 8488,
       "sha256": "6f68ab44164ffa1edd89bcd1677bb91554d2188d2e05d4561b40303f0fbde5d8"
+    },
+    {
+      "path": "evidence/network50_s5_quality_handoff_20261104.md",
+      "bytes": 8459,
+      "sha256": "3dd9cb4abe628725231f4a5f1974a062b38370daa61bdc526ec2bee6e5cb87af"
     },
     {
       "path": "evidence/network50_ui_local_handoff_20261103.md",

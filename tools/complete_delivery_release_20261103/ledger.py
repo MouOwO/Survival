@@ -11,7 +11,9 @@ import hashlib
 import json
 import re
 import struct
-from pathlib import PurePosixPath
+from pathlib import Path, PurePosixPath
+
+EXECUTED_SOURCE_LF_SHA256 = hashlib.sha256(Path(__file__).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
 
 MAX_DOCUMENT = 32 * 1024 * 1024
 KINDS = frozenset(("identity", "compiled", "generated", "protected", "production_override"))
@@ -275,7 +277,10 @@ def verify_protection_receipt(*, production_raw, production_sha256, protection_r
     need(isinstance(dependency_files, dict) and len(dependency_files) == dependency.get("source_tree_files")
          and len(dependency_files) <= 512 and "LICENSE" in dependency_files and "cli.lua" in dependency_files, "exact_pinned_prometheus_source_set_required")
     records, total = [], 0
-    for name, raw in sorted(dependency_files.items()):
+    # The original Windows producer sorts Path objects, whose path-part order
+    # is case-insensitive (cli.lua precedes LICENSE). Reproduce that exact
+    # recipe, rather than accepting a second guessed source-tree digest.
+    for name, raw in sorted(dependency_files.items(), key=lambda pair: tuple(p.lower() for p in PurePosixPath(pair[0]).parts)):
         path(name); need(name in ("LICENSE", "cli.lua") or (name.startswith("src/") and name.endswith(".lua")), "unreviewed_prometheus_dependency_file")
         value = byte_fingerprint(raw); total += len(raw); need(total <= 64 * 1024 * 1024, "prometheus_dependency_budget_exceeded")
         records.append({"path": name, "bytes": value["bytes"], "sha256": value["sha256"]})

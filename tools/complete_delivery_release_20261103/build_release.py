@@ -22,6 +22,7 @@ if str(TOOLS) not in sys.path:
 from complete_delivery_release_20261103 import ledger
 
 ROOT = TOOLS.parent
+EXECUTED_SOURCE_LF_SHA256 = hashlib.sha256(Path(__file__).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
 REPORT = ROOT / "output/complete_delivery_release_20261103"
 SEQUENCE = 2026110302
 MANIFEST = "_release_manifest.json"
