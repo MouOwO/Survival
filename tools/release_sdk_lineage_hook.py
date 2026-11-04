@@ -13,7 +13,7 @@ CANONICAL_JOURNAL = ROOT / 'output/four_accounts_20261022/steam_upload_state.jso
 AUTHORITY_FILE = ROOT / 'publishing/workshop/release_authority_complete_20261103.json'
 # Root freezes the exact tracked authority after its validator is reviewed.
 # Missing authority is an explicit publication refusal, never a legacy bypass.
-AUTHORITY_SHA256 = 'ecda59063cac131bcd352b06576f07a09df9789882c6ea2964fd35c80bc12cd5'
+AUTHORITY_SHA256 = '167b7795e2bfc74c6652b947dbaa1ebde234ee191e0322d21f2350b436eaec0c'
 
 # Local query construction and official download/subscription stay available.
 # An unknown UGC entry is guarded by default, rather than accidentally becoming

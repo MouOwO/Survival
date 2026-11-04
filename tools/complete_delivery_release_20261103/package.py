@@ -365,7 +365,97 @@ def verify_unsigned(*, inputs, reviewed_projection_raw, reviewed_projection_sha2
     return actual, parent, manifest, root
 
 
-def verify_original_evidence(evidence, pins, manifest, bindings):
+def _signed_rebind_parent(parent_raw, parent_sha256, parent_root):
+    """Authenticate the exact original0104 parent, without inventing a producer."""
+    need(parent_raw is not None and parent_sha256 is not None and parent_root is not None,
+         "original_signed_rebind_parent_inputs_required")
+    parent = ledger.document(parent_raw, parent_sha256)
+    frozen = pending._read_json(pending.BASELINE, pending.BASELINE_SHA256)
+    need(frozen.get("parent_sequence") == 2026110104 and parent_sha256 == frozen["parent_manifest_sha256"]
+         and parent["content_sha256"] == frozen["parent_content_sha256"], "original_signed_rebind_fixed_parent_required")
+    root = build_release._plain(parent_root, directory=True)
+    actual, document, snapshots = inc.metadata(root)
+    need(actual == parent and snapshots[build_release.MANIFEST] == parent_raw,
+         "original_signed_rebind_parent_bytes_changed")
+    policy, public = pack.handoff.trusted_policy(pack.handoff.POLICY)
+    signature = pack.verify_signed_snapshot(actual, document, public,
+        policy["integrity"]["minimum_release_sequence"], policy["integrity"]["trusted_key_id"])
+    need(signature["release_sequence"] == 2026110104, "original_signed_rebind_parent_sequence_changed")
+    return root, ledger.parent_rows(parent), snapshots, signature
+
+
+def _verify_signed_rebind(binding, *, pins, target_rows, parent_rows, parent_root,
+                          parent_sha256, source_raw, binding_receipts, item_evidence, item_verified):
+    """Re-derive a generated JS binding from actual signed bytes and generation.
+
+    This is deliberately separate from fresh compiler outputs. The S6 normalized
+    receipt retains its original generator reference, not an invented historical
+    compilation record; all additional parent/DATA checks are repeated here.
+    """
+    need(isinstance(source_raw, dict) and isinstance(binding_receipts, dict),
+         "original_signed_rebind_source_and_raw_receipts_required")
+    name = ledger.path(binding["resource"])
+    need(binding["kind"] == "compiled" and name.startswith("panorama/scripts/") and name.endswith(".vjs_c"),
+         "original_signed_rebind_generated_js_only")
+    source_name = "panorama/src/" + name[len("panorama/"):-len(".vjs_c")] + ".js"
+    generated = item_evidence.get("output_bytes", {})
+    need(source_name in generated and source_name in item_verified["outputs"],
+         "original_signed_rebind_actual_generator_output_required")
+    generated_raw = generated[source_name]
+    need(ledger.byte_fingerprint(generated_raw) == item_verified["outputs"][source_name]
+         and source_raw.get("game:" + source_name) == generated_raw,
+         "original_signed_rebind_generated_source_changed")
+    keys = set(item_evidence["input_bytes"]) | {"game:" + source_name, "game:" + name}
+    mirror = source_name.replace("panorama/src/", "panorama/", 1)
+    if mirror in item_evidence["content_mirrors"]:
+        need(item_evidence["content_mirrors"][mirror] == generated_raw,
+             "original_signed_rebind_generator_mirror_changed")
+        keys.add("content:" + mirror)
+    need(keys <= set(source_raw) and all(type(source_raw[key]) is bytes for key in keys),
+         "original_signed_rebind_complete_source_readset_required")
+    inputs = {key: ledger.sha(source_raw[key]) for key in sorted(keys)}
+    need(binding.get("inputs") == inputs, "original_signed_rebind_typed_input_set_changed")
+    output = ledger.fingerprint(binding["output"])
+    need(name in parent_rows and target_rows.get(name) == output == ledger.fingerprint(parent_rows[name]),
+         "original_signed_rebind_parent_target_output_changed")
+    artifact_path = build_release._plain(parent_root / name, directory=False)
+    need(artifact_path.stat().st_size <= ledger.MAX_DOCUMENT, "original_signed_rebind_artifact_budget_exceeded")
+    artifact = artifact_path.read_bytes()
+    need(ledger.byte_fingerprint(artifact) == output == ledger.byte_fingerprint(source_raw["game:" + name]),
+         "original_signed_rebind_entire_artifact_changed")
+    blocks, _ = ledger._compiled_data(artifact)
+    need(b"\r" not in generated_raw.replace(b"\r\n", b"\n"), "original_signed_rebind_source_lone_cr")
+    if blocks[b"DATA"] == generated_raw:
+        normalization = "IDENTITY_EXACT_GENERATED_GIT_BYTES"
+    else:
+        need(b"\r" not in generated_raw and blocks[b"DATA"] == generated_raw.replace(b"\n", b"\r\n"),
+             "original_signed_rebind_data_not_exact_generator_output")
+        normalization = "GIT_LF_TO_COMPILER_CRLF_ONLY"
+    proof = ledger.document(item_evidence["proof_raw"], item_evidence["proof_sha256"])
+    generator_reference = {"kind": proof["kind"], "original_receipt_sha256": item_evidence["proof_sha256"],
+                           "original_source_revisions": item_evidence["source_revisions"]}
+    receipt_sha = ledger.digest(binding.get("receipt_sha256"))
+    need(receipt_sha in binding_receipts, "original_signed_rebind_raw_binding_receipt_missing")
+    receipt = ledger.document(binding_receipts[receipt_sha], receipt_sha)
+    expected = {"kind": "compiled", "inputs": inputs, "output": output, "original_receipts": [generator_reference]}
+    need(receipt.get("kind") == "COMPLETE_RUNTIME_BINDING_RECEIPT" and receipt.get("source_revisions") == pins
+         and receipt.get("declaration_is_not_package_authority") is True
+         and ledger.canonical(receipt.get("bindings", {}).get(name)) == ledger.canonical(expected),
+         "original_signed_rebind_serialized_binding_changed")
+    original = {"kind": proof["kind"], "sha256": item_evidence["proof_sha256"],
+                "source_revisions": item_evidence["source_revisions"],
+                "verification_sha256": ledger.sha(ledger.canonical(item_verified))}
+    need(receipt.get("original_receipts", []).count(original) == 1,
+         "original_signed_rebind_original_generator_reference_changed")
+    return {"kind": "ORIGINAL_SIGNED_RESOURCE_REBIND", "evidence_recomputed": True, "resource": name,
+            "parent_manifest_sha256": parent_sha256, "parent_resource_sha256": output["sha256"],
+            "current_generated_source_sha256": ledger.sha(generated_raw), "normalization": normalization,
+            "binding_receipt_sha256": receipt_sha, "generator_proof_sha256": item_evidence["proof_sha256"],
+            "output": output, "invented_historical_source_revision": False, "fresh_compilation_claimed": False}
+
+
+def verify_original_evidence(evidence, pins, manifest, bindings, *, parent_raw=None, parent_sha256=None,
+                             parent_root=None, source_raw=None, binding_receipts=None):
     """Consume original compiler/protection/generator receipts and real bytes."""
     need(isinstance(evidence, dict) and set(evidence) == {"compiler", "protection", "item_generator"},
          "complete_original_semantic_evidence_required")
@@ -403,13 +493,26 @@ def verify_original_evidence(evidence, pins, manifest, bindings):
     generated = answers["item_generator"]["outputs"]
     for name, output in {**compiled, **protected, **overrides}.items():
         need(rows.get(name) == output, "original_semantic_output_not_in_complete_manifest:" + name)
+    signed_parent = None; rebinds = {}
     for binding in bindings:
         name, kind = binding["resource"], binding["kind"]
+        if kind == "compiled" and name not in compiled:
+            if signed_parent is None:
+                signed_parent = _signed_rebind_parent(parent_raw, parent_sha256, parent_root)
+            base, parent_entries, snapshots, signature = signed_parent
+            rebinds[name] = _verify_signed_rebind(binding, pins=pins, target_rows=rows,
+                parent_rows=parent_entries, parent_root=base, parent_sha256=parent_sha256,
+                source_raw=source_raw, binding_receipts=binding_receipts,
+                item_evidence=evidence["item_generator"], item_verified=answers["item_generator"])
+            continue
         expected = (compiled if kind == "compiled" else protected if kind == "protected"
                     else overrides if kind == "production_override" else generated if kind == "generated" else None)
         if expected is not None:
             need(name in expected and expected[name] == binding["output"],
                  "typed_scope_binding_missing_original_semantic_receipt:" + name)
+    if signed_parent is not None:
+        pack.inventory_unchanged(signed_parent[0], signed_parent[2])
+        answers["original_signed_rebinds"] = rebinds
     return answers
 
 
@@ -417,6 +520,44 @@ def compiler_entries(value):
     result = value if isinstance(value, list) else [value]
     need(1 <= len(result) <= 32 and all(isinstance(row, dict) for row in result),
          "bounded_original_compiler_receipt_list_required")
+    return result
+
+
+def admission_resource_bytes(names, selected_sources, production_targets, protection_evidence,
+                             verified_protection, target_rows, *, parent_root=None, parent_rows=None,
+                             source_bindings=None):
+    """Use proved producer bytes or an exact signed-parent newline rebind."""
+    protected = protection_evidence["protected_outputs"]
+    fingerprints = verified_protection["protected_outputs"]
+    result = {}
+    for name in sorted(names):
+        need(name in target_rows, "admission_required_resource_absent_from_target:" + name)
+        if name in protected:
+            need(name not in production_targets and name in fingerprints
+                 and ledger.byte_fingerprint(protected[name]) == fingerprints[name],
+                 "admission_protected_output_not_original_receipt:" + name)
+            raw = protected[name]
+            kind = "ORIGINAL_PROTECTION_OUTPUT"
+        else:
+            raw = production_targets[name] if name in production_targets else selected_sources[name]
+            kind = "REVIEWED_PRODUCTION_OVERRIDE" if name in production_targets else "IMMUTABLE_GIT_SOURCE_IDENTITY"
+            if name not in production_targets and ledger.byte_fingerprint(raw) != ledger.fingerprint(target_rows[name]):
+                need(parent_root is not None and isinstance(parent_rows, dict) and name in parent_rows
+                     and ledger.fingerprint(parent_rows[name]) == ledger.fingerprint(target_rows[name]),
+                     "admission_original_signed_parent_equivalence_required:" + name)
+                path = build_release._plain(parent_root / name, directory=False)
+                need(path.stat().st_size <= ledger.MAX_DOCUMENT, "admission_original_parent_artifact_budget")
+                original = path.read_bytes()
+                need(ledger.byte_fingerprint(original) == ledger.fingerprint(parent_rows[name])
+                     and b"\r" not in raw and original == raw.replace(b"\n", b"\r\n"),
+                     "admission_parent_not_exact_git_lf_to_crlf:" + name)
+                raw = original; kind = "ORIGINAL_SIGNED_GIT_LF_TO_CRLF_REBIND"
+        need(name in target_rows and ledger.byte_fingerprint(raw) == ledger.fingerprint(target_rows[name]),
+             "admission_expected_output_not_in_complete_target:" + name)
+        result[name] = raw
+        if source_bindings is not None:
+            source_bindings[name] = {"kind": kind, "source_sha256": ledger.sha(selected_sources[name]),
+                                     "output": ledger.byte_fingerprint(raw)}
     return result
 
 
@@ -447,7 +588,9 @@ def sign_package(*, inputs, reviewed_projection_raw, reviewed_projection_sha256,
     need(set(facts) <= set(source_facts)
          and all(source_facts[name] == value for name, value in facts.items()), "all_complete_scope_source_facts_required")
     original_evidence = verify_original_evidence(semantic_evidence, pins, target,
-                                                actual["coverage_ledger"]["resource_bindings"])
+        actual["coverage_ledger"]["resource_bindings"], parent_raw=inputs["parent_raw"],
+        parent_sha256=inputs["parent_sha256"], parent_root=parent_root, source_raw=source_raw,
+        binding_receipts=inputs["receipts"])
     source_raw, source_facts = semantic_readset(semantic_evidence, pins, source_raw, source_facts)
     source_hashes = _git_sources(pins, source_raw, source_facts)
     producer_operators = verify_producer_operators(semantic_evidence)
@@ -498,8 +641,10 @@ def sign_package(*, inputs, reviewed_projection_raw, reviewed_projection_sha256,
                      for name in (*production.OVERRIDES, production.ACCESS)}
     production_targets, policy_reviews = production.transform_overrides(selected_sources, parent_policy)
     approved = _approved_ids(parent_policy[production.ACCESS])
-    expected_files = {name: production_targets.get(name, selected_sources[name]) for name in required}
-    expected_files.update({name: production_targets[name] for name in production.OVERRIDES})
+    admission_bindings = {}
+    expected_files = admission_resource_bytes(required | set(production.OVERRIDES), selected_sources, production_targets,
+        semantic_evidence["protection"], original_evidence["protection"], {row["path"]: row for row in target["files"]},
+        parent_root=base, parent_rows=ledger.parent_rows(old), source_bindings=admission_bindings)
     for name, raw in expected_files.items():
         need((unsigned / name).read_bytes() == raw, "unsigned_admission_or_production_policy_source_mismatch:" + name)
     info = h.kv(production_targets["addoninfo.txt"].decode("utf8"))
@@ -553,8 +698,8 @@ def sign_package(*, inputs, reviewed_projection_raw, reviewed_projection_sha256,
          "new_signed_manifest_or_sequence_mismatch")
     transcript["status"] = "SIGNED_MANIFEST_VERIFIED_FULL_VIEW_PENDING"
     pack.runtime.atomic_write_json(transcript_path, transcript)
-    with admission_adapter(trusted, approved, info, production_targets["scripts/vscripts/addon_game_mode_client.lua"],
-                           selected_sources["scripts/vscripts/addon_game_mode.lua"], scenes):
+    with admission_adapter(trusted, approved, info, expected_files["scripts/vscripts/addon_game_mode_client.lua"],
+                           expected_files["scripts/vscripts/addon_game_mode.lua"], scenes):
         sources, merged = inc.validate_merged(base, overlay, old, target, trusted)
         need(merged == set(actual["changed_runtime_paths"]), "merged_dynamic_scope_changed")
         inc.materialize(view, sources, merged, target, signed_metadata)
@@ -590,6 +735,7 @@ def sign_package(*, inputs, reviewed_projection_raw, reviewed_projection_sha256,
               "package_files": package_files, "verification": verification, "disk_preflight": space,
               "executed_operator_inputs": tools, "source_sha256s": source_hashes,
               "production_policy_reviews": policy_reviews, "signature": signature, "signature_valid": True,
+              "admission_source_bindings": admission_bindings,
               "full_candidate_authenticated": True, "all_vpk_resources_crc_and_dual_hash_verified": True,
               "five_accounts_and_four_players_preserved": True, "hosted_lobby_source_preserved": True,
               "native_admission_verified": False, "sdk_calls": 0, "journal_writes": 0, "installed": False,

@@ -343,8 +343,17 @@ def _admission_values(ctx):
     scenes = {row["path"] for row in ctx.projection["projected_rows"]
               if row["path"].startswith("maps/") and row["path"].endswith(".vpk")}
     scenes -= {"maps/ws4_entry.vpk", "maps/template_map.vpk"}
-    expected = {name: outputs.get(name, selected[name]) for name in required}
-    return approved, info, outputs["scripts/vscripts/addon_game_mode_client.lua"], selected["scripts/vscripts/addon_game_mode.lua"], scenes, expected
+    verified = d.ledger.verify_protection_receipt(**ctx.semantic_evidence["protection"])
+    base, parent_rows, snapshots, _ = d.package._signed_rebind_parent(ctx.inputs["parent_raw"],
+        ctx.inputs["parent_sha256"], ctx.parent_root)
+    source_bindings = {}
+    complete_expected = d.package.admission_resource_bytes(required | set(d.production.OVERRIDES), selected, outputs,
+        ctx.semantic_evidence["protection"], verified, {row["path"]: row for row in ctx.projection["projected_rows"]},
+        parent_root=base, parent_rows=parent_rows, source_bindings=source_bindings)
+    d.package.pack.inventory_unchanged(base, snapshots)
+    ctx.admission_source_bindings = source_bindings
+    expected = {name: complete_expected[name] for name in required}
+    return approved, info, expected["scripts/vscripts/addon_game_mode_client.lua"], expected["scripts/vscripts/addon_game_mode.lua"], scenes, expected
 
 
 def verify_trusted_sources(ctx, expected):
@@ -464,7 +473,9 @@ def load_package(report_sha256, *, full=True):
     target = d.build.projected_manifest(parent, ctx.projection)
     verify_report_projection(report, ctx, target)
     original = d.package.verify_original_evidence(ctx.semantic_evidence, ctx.projection["source_revisions"],
-                   target, ctx.projection["coverage_ledger"]["resource_bindings"])
+        target, ctx.projection["coverage_ledger"]["resource_bindings"], parent_raw=ctx.inputs["parent_raw"],
+        parent_sha256=ctx.inputs["parent_sha256"], parent_root=ctx.parent_root, source_raw=ctx.source_raw,
+        binding_receipts=ctx.inputs["receipts"])
     need(canonical(original) == canonical(report.get("original_evidence")), "original_producer_evidence_changed")
     source_raw, source_facts = d.package.semantic_readset(ctx.semantic_evidence, ctx.projection["source_revisions"],
                                                         ctx.source_raw, ctx.source_facts)
@@ -499,6 +510,8 @@ def load_package(report_sha256, *, full=True):
         d.package.pack.inventory_unchanged(ctx.view, snapshots)
     need(report.get("protected_modules_verified") == len(original["protection"]["protected_outputs"]),
          "actual_protected_module_count_changed")
+    need(canonical(report.get("admission_source_bindings")) == canonical(ctx.admission_source_bindings),
+         "signed_admission_source_normalization_bindings_changed")
     controls_unchanged(ctx)
     return report, manifest, signed
 
