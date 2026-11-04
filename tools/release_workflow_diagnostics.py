@@ -27,6 +27,13 @@ def read_control(path):
     return value,hashlib.sha256(raw).hexdigest()
 
 def pending_inventory():
+    complete=ROOT/'output/release_baselines/complete_active.json'
+    if complete.exists():
+        # Fixed new loader authenticates the SDK/full official receipt, signed
+        # projection, exact dual Git checkpoint and current lineage generation.
+        # Never feed complete typed origins into the legacy sparse loader.
+        from complete_delivery_release_20261103 import complete_pending
+        return complete_pending.inventory()
     import release_pending_inventory as pending
     arguments=[]
     active=ROOT/'output/release_baselines/active.json'

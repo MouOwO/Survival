@@ -285,3 +285,4 @@ data/ui/ui_static_catalog_manifest.json text eol=lf
 data/ui/registry_history/*.json text eol=lf
 data/ui/ui_compact_wire_native_evidence_20261103.json text eol=lf
 tools/complete_delivery_release_20261103/*.py text eol=lf
+publishing/workshop/release_authority_complete_20261103.json text eol=lf

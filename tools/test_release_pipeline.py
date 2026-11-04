@@ -267,19 +267,18 @@ class PipelineTests(unittest.TestCase):
             self.assertEqual(capture.getvalue(),'1234');self.assertTrue(capture.overflow)
 
 
-class ActiveHotfixRegistrationTests(unittest.TestCase):
-    def test_actual_registered_hotfix_paths_and_all_reviewed_pins(self):
+class ActiveCompleteRegistrationTests(unittest.TestCase):
+    def test_actual_registered_complete_paths_and_all_reviewed_pins(self):
         auth=p.authority()
-        self.assertEqual(auth.policy['release_sequence'],2026110301)
-        self.assertEqual(auth.policy['scope'],'LOTTERY_REDEMPTION_REFRESH_EIGHT_RESOURCES')
-        for prefix in ('validator','recipe','rehearsal','download','native_admission'):
+        self.assertEqual(auth.policy['release_sequence'],2026110302)
+        self.assertEqual(auth.policy['scope'],'ALL_CURRENT_AND_HISTORICAL_RUNTIME_CHANGES_AND_DELETIONS')
+        for prefix in ('validator','recipe','rehearsal','download','native_admission','baseline_completion'):
             path,raw=p.pinned_bytes(auth,prefix)
-            self.assertEqual(path.parent.name,'lottery_redemption_release_20261103')
+            self.assertEqual(path.parent.name,'complete_delivery_release_20261103')
         loaded=g._validator(auth)
-        self.assertEqual(loaded.RELEASE_SEQUENCE,2026110301)
-        self.assertIsNone(loaded.b)
-        self.assertIsNone(loaded.c)
-        with self.assertRaisesRegex(ValueError,'Only this exact eight-resource'):
+        self.assertEqual(loaded.RELEASE_SEQUENCE,2026110302)
+        self.assertEqual(set(auth.policy['required_feature_ancestors']),{'game','content'})
+        with self.assertRaisesRegex(ValueError,'registered_complete_candidate_sequence_required'):
             loaded.validate_release({'release_sequence':2026110202,'generation':1,'READY':True})
 
     def test_actual_registered_hook_still_rejects_mutation_without_lease(self):

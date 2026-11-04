@@ -277,16 +277,17 @@ def _approved_ids(raw):
 
 
 @contextmanager
-def admission_adapter(review_root, approved, expected_info, expected_client, expected_main, scene_maps):
+def admission_adapter(review_root, approved, expected_info, expected_client, expected_main, scene_maps, *, pack_api=None):
     """Keep canonical signature/hash/gate checks; adapt only evolved lobby code.
 
     Trusted files are separately constructed from immutable reviewed sources,
     never copied from an unverified candidate to manufacture self-trust.
     """
-    h = pack.handoff
+    api = pack if pack_api is None else pack_api
+    h = api.handoff
     saved = {name: getattr(h, name) for name in ("ROOT", "POLICY", "steamids", "NATIVE_CLOUD_TESTERS",
              "NATIVE_CLOUD_ENTRY_LAYOUT", "NATIVE_CLOUD_INERT_CLIENT", "require_native_cloud_entry")}
-    old_scenes = pack.runtime.SCENE_MAPS
+    old_scenes = api.runtime.SCENE_MAPS
     def exact_ids(values):
         need(isinstance(values, list) and len(values) == len(set(values)) == 5
              and sorted(values) == approved, "candidate_changed_original_five_accounts")
@@ -298,10 +299,10 @@ def admission_adapter(review_root, approved, expected_info, expected_client, exp
              "reviewed_entry4_template4_lobby_layout_required")
         for path, raw in (("scripts/vscripts/addon_game_mode_client.lua", expected_client),
                           ("scripts/vscripts/addon_game_mode.lua", expected_main)):
-            need(pack.protect_data.source_path(candidate, path).read_bytes() == raw,
+            need(api.protect_data.source_path(candidate, path).read_bytes() == raw,
                  "native_or_lobby_source_not_reviewed:" + path)
         need(h.configured_ids(candidate) == approved, "candidate_five_account_roster_changed")
-        need(h.literal_flat_config(candidate, pack.runtime.RELEASE_PROFILE) ==
+        need(h.literal_flat_config(candidate, api.runtime.RELEASE_PROFILE) ==
              {"channel": "production", "native_cloud_roster_required": True}, "native_production_roster_required")
         need(h.literal_flat_config(candidate, "scripts/vscripts/config/player_web_auth.lua") ==
              {"enabled": True, "base_url": h.NATIVE_CLOUD_BASE}, "fixed_https_auth_origin_required")
@@ -313,18 +314,18 @@ def admission_adapter(review_root, approved, expected_info, expected_client, exp
         actual_maps = {p.relative_to(candidate).as_posix() for p in (candidate / "maps").rglob("*.vpk")}
         need(actual_maps == set(scene_maps) | {"maps/ws4_entry.vpk", "maps/template_map.vpk"},
              "exact_reviewed_runtime_map_set_required")
-        for path in actual_maps: pack.protect_data.source_path(candidate, path)
-        pack.runtime.require_production(candidate)
+        for path in actual_maps: api.protect_data.source_path(candidate, path)
+        api.runtime.require_production(candidate)
     try:
         h.ROOT = review_root; h.POLICY = ROOT / "tools/release_security/protection_policy.json"
         h.steamids = exact_ids; h.NATIVE_CLOUD_TESTERS = approved
         h.NATIVE_CLOUD_ENTRY_LAYOUT = expected_info; h.NATIVE_CLOUD_INERT_CLIENT = expected_client
         h.require_native_cloud_entry = native
-        pack.runtime.SCENE_MAPS = set(scene_maps)
+        api.runtime.SCENE_MAPS = set(scene_maps)
         yield
     finally:
         for name, value in saved.items(): setattr(h, name, value)
-        pack.runtime.SCENE_MAPS = old_scenes
+        api.runtime.SCENE_MAPS = old_scenes
 
 
 def _full_tree(root, manifest, extras):

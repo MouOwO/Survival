@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "app_id": 570,
+  "workshop_id": "3824360109",
+  "owner": "76561198845461206",
+  "canonical_journal": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/output/four_accounts_20261022/steam_upload_state.json",
+  "lineage_state": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/output/release_lineage_20261101/state.json",
+  "publication_lock": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/output/four_accounts_20261022/steam_upload_state.json.lock",
+  "repositories": {
+    "game": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival",
+    "content": "D:/SteamLibrary/steamapps/common/dota 2 beta/content/dota_addons/Survival"
+  },
+  "listing_template_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/publishing/workshop/release_listing_template_20261101.json",
+  "listing_template_sha256": "3f0031eb39e84f5db0195793d7b1abed00a1d428f25a7c1a138ecca9d63f9ef0",
+  "reviewed_source_baseline_sha256": "3a60ddab9a93b58fa936e789f1a9d2008d39ed7eca9545487e1f40bf32219ee3",
+  "native_launch_profiles": [
+    "direct",
+    "lobby"
+  ],
+  "manual_attach_adopt_allowed": false,
+  "release_sequence": 2026110302,
+  "scope": "ALL_CURRENT_AND_HISTORICAL_RUNTIME_CHANGES_AND_DELETIONS",
+  "source_anchor_is_full_published_tree": false,
+  "historical_deferred_policy": "EXPLICIT_COMPLETE_LEDGER_COVERAGE_REQUIRED",
+  "required_feature_ancestors": {
+    "game": [
+      "a717903f6219086da17f72d872f63ef8de153160"
+    ],
+    "content": [
+      "3700b2328007c157325cdf204dbe47dcf7c42a9e"
+    ]
+  },
+  "recipe_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/complete_delivery_release_20261103/pipeline_recipe.py",
+  "recipe_sha256": "45e4f4e3fc8133705d3f330722eb53aa00d501881c9d1649d024cf9e3324b0cb",
+  "validator_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/complete_delivery_release_20261103/publication_validator.py",
+  "validator_sha256": "e646a0239ff742ead53837e06fb125edd0147cc528467f6d085090a2d87b704c",
+  "rehearsal_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/complete_delivery_release_20261103/rehearsal.py",
+  "rehearsal_sha256": "a481b1302923bd5276c303d103299bab5d3cf2831efd6d714815048be0d83646",
+  "download_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/complete_delivery_release_20261103/verify_download.py",
+  "download_sha256": "c951ddc6ed2a3e2fbd767666c002ae313f76f916a7bb886546f124175a6b41f6",
+  "native_admission_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/complete_delivery_release_20261103/native_admission.py",
+  "native_admission_sha256": "43d55eb7bad9f4b80462acce818b5aacc8d7cb98646238f42c987c296ec01ecb",
+  "baseline_completion_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/complete_delivery_release_20261103/complete_baseline.py",
+  "baseline_completion_sha256": "20145ed9c02845d6854e39901a72503ac6ff7070b0c54ea36672f2b5792edc04"
+}
