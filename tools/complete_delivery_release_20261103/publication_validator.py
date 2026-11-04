@@ -7,6 +7,7 @@ identity facts. No signing, SDK, install or journal writes occur here.
 """
 from __future__ import annotations
 
+from collections import Counter
 import hashlib
 import json
 from pathlib import Path
@@ -36,7 +37,7 @@ def same_plan(left, right):
 
 def _operator_file(name, raw, revision):
     d = recipe.dependencies()
-    declared = d.package.pending._git(ROOT, "show", revision + ":" + name)
+    declared = d.package.pending._git(ROOT, "show", revision + ":" + name, counts=Counter())
     need(declared.replace(b"\r\n", b"\n") == raw.replace(b"\r\n", b"\n"),
          "publication_tool_not_in_declared_operator:" + name)
     return hashlib.sha256(declared).hexdigest()

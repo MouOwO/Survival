@@ -8,6 +8,7 @@ rechecked. A signed package still requires ordinary/native/publish admission.
 from __future__ import annotations
 
 from contextlib import contextmanager
+from collections import Counter
 import hashlib
 import importlib.util
 import json
@@ -92,9 +93,9 @@ for _name, _module in (("tools/complete_delivery_release_20261103/production.py"
 def verify_operator(revision):
     """Only fixed operator bytes execute; an uncommitted wrapper cannot sign."""
     ledger.revision(revision)
-    result = []
+    result = []; counts = Counter()
     for path, loaded in sorted(LOADED_OPERATOR_SHA256.items()):
-        raw = pending._git(ROOT, "show", revision + ":" + path)
+        raw = pending._git(ROOT, "show", revision + ":" + path, counts=counts)
         actual = (ROOT / path).read_bytes()
         need(ledger.sha(_lf(raw)) == ledger.sha(_lf(actual)) == loaded,
              "loaded_package_operator_not_exact_commit:" + path)
@@ -254,7 +255,7 @@ def semantic_readset(evidence, pins, source_raw, source_facts):
 
 
 def verify_producer_operators(evidence):
-    records = []
+    records = []; counts = Counter()
     producers = [(f"compiler[{i}]", value) for i, value in enumerate(compiler_entries(evidence["compiler"]))]
     producers += [(name, evidence[name]) for name in ("protection", "item_generator")]
     for kind, kwargs in producers:
@@ -262,7 +263,7 @@ def verify_producer_operators(evidence):
         tools = kwargs["operator_bytes" if kind == "item_generator" else "operator_tools"]
         for name, supplied in tools.items():
             ledger.path(name)
-            actual = pending._git(ROOT, "show", revision + ":" + name)
+            actual = pending._git(ROOT, "show", revision + ":" + name, counts=counts)
             need(_lf(actual) == _lf(supplied), "original_producer_operator_bytes_not_git_commit:" + name)
             records.append({"producer": kind, "revision": revision, "path": name,
                             "git_sha256": ledger.sha(actual), "provided_sha256": ledger.sha(supplied)})

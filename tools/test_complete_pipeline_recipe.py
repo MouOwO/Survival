@@ -1,5 +1,7 @@
 """Security boundaries of the complete canonical recipe (no SDK/sign/key)."""
 from __future__ import annotations
+import ast
+from collections import Counter
 from contextlib import contextmanager
 import hashlib
 import json
@@ -298,6 +300,72 @@ class RealSdkAdmissionContextTests(unittest.TestCase):
         for api,old in zip(apis,saved):
             self.assertEqual((api.handoff.ROOT,api.handoff.steamids,api.handoff.require_native_cloud_entry,
                               api.runtime.SCENE_MAPS),old)
+
+
+class ActualGitPinIntegrationTests(unittest.TestCase):
+    """Use the real repository/Git reader; no returned Git bytes are mocked."""
+    @classmethod
+    def setUpClass(cls):
+        try:
+            import cryptography
+        except ImportError:
+            raise unittest.SkipTest("actual signing environment provides cryptography")
+        cls.d=r.dependencies()
+        cls.head=cls.d.package.pending._git(r.ROOT,"rev-parse","HEAD",counts=Counter()).decode().strip()
+
+    def test_actual_publication_operator_pin_and_tampered_bytes(self):
+        name="tools/release_pending_inventory.py"
+        physical=(r.ROOT/name).read_bytes()
+        declared=self.d.package.pending._git(r.ROOT,"show",self.head+":"+name,counts=Counter())
+        self.assertEqual(v._operator_file(name,physical,self.head),r.sha(declared))
+        with self.assertRaisesRegex(ValueError,"not_in_declared_operator"):
+            v._operator_file(name,physical+b"\n# changed",self.head)
+
+    def test_actual_facade_pin_passes_only_when_committed_bytes_match(self):
+        physical=Path(r.__file__).read_bytes().replace(b"\r\n",b"\n")
+        declared=self.d.package.pending._git(r.ROOT,"show",self.head+":"+r.TOOL,counts=Counter())
+        if declared.replace(b"\r\n",b"\n")==physical:
+            proof=r.verify_facade_operator(self.head)
+            self.assertEqual(proof["git_sha256"],r.sha(declared))
+        else:
+            with self.assertRaisesRegex(ValueError,"recipe_not_in_immutable_package_operator"):
+                r.verify_facade_operator(self.head)
+
+    def test_actual_package_operator_reader_reaches_source_identity_check(self):
+        module=self.d.package
+        committed=self.d.package.pending._git(r.ROOT,"show",self.head+":"+module.TOOL,counts=Counter())
+        if committed.replace(b"\r\n",b"\n")==Path(module.__file__).read_bytes().replace(b"\r\n",b"\n"):
+            proof=module.verify_operator(self.head)
+            self.assertTrue(proof)
+            self.assertEqual({row["revision"] for row in proof},{self.head})
+        else:
+            with self.assertRaisesRegex(ValueError,"loaded_package_operator_not_exact_commit"):
+                module.verify_operator(self.head)
+
+    def test_actual_original_producer_tools_are_bound_to_git(self):
+        name="tools/release_pending_inventory.py"
+        raw=(r.ROOT/name).read_bytes()
+        proof={"source_revisions":{"operator":self.head},"operator_tools":{name:raw}}
+        evidence={"compiler":[proof],"protection":proof,
+                  "item_generator":{"source_revisions":{"operator":self.head},"operator_bytes":{name:raw}}}
+        actual=self.d.package.verify_producer_operators(evidence)
+        self.assertEqual(len(actual),3)
+        self.assertEqual({row["revision"] for row in actual},{self.head})
+        bad={**evidence,"compiler":[{**proof,"operator_tools":{name:raw+b"\n# changed"}}]}
+        with self.assertRaisesRegex(ValueError,"original_producer_operator_bytes_not_git_commit"):
+            self.d.package.verify_producer_operators(bad)
+
+
+class FamilyGitApiTests(unittest.TestCase):
+    def test_every_family_git_reader_supplies_keyword_only_counts(self):
+        family=Path(r.__file__).parent
+        calls=[]
+        for path in sorted(family.glob("*.py")):
+            for node in ast.walk(ast.parse(path.read_bytes(),filename=str(path))):
+                if isinstance(node,ast.Call) and isinstance(node.func,ast.Attribute) and node.func.attr=="_git":
+                    calls.append((path.name,node.lineno))
+                    self.assertIn("counts",{arg.arg for arg in node.keywords},str((path.name,node.lineno)))
+        self.assertGreaterEqual(len(calls),4)
 
 
 if __name__=="__main__":

@@ -7,6 +7,7 @@ background watcher, journal mutation or install occurs during import/plan.
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 from contextlib import contextmanager, ExitStack
 import hashlib
 import importlib
@@ -118,7 +119,7 @@ def verify_facade_operator(revision):
     d.ledger.revision(revision)
     raw = Path(__file__).read_bytes()
     need(sha(raw.replace(b"\r\n", b"\n")) == LOADED_LF_SHA256, "recipe_changed_after_import")
-    declared = d.package.pending._git(ROOT, "show", revision + ":" + TOOL)
+    declared = d.package.pending._git(ROOT, "show", revision + ":" + TOOL, counts=Counter())
     need(declared.replace(b"\r\n", b"\n") == raw.replace(b"\r\n", b"\n"),
          "recipe_not_in_immutable_package_operator")
     return {"path": TOOL, "revision": revision, "git_sha256": sha(declared),
