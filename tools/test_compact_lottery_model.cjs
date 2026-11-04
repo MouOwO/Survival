@@ -45,4 +45,11 @@ test("unknown state and unknown receipt item never fabricate valid reward",()=>{
  m.Apply({full:true,revision:2},s.put(fixture.initial_ops),s.read);m.BindIntent(51,"local_request");const bad=fixture.receipt_ops.map(x=>({...x}));bad.find(x=>x.record===m.Record("lottery:result:1")&&x.field===m.Field("target_record")).value=m.Record("daily:state");
  assert.throws(()=>m.Apply({full:false,revision:3},s.put(bad),s.read),/item_unknown/);
 });
+test("catalog pending state preserves the distinct account and version errors",()=>{
+ const m=api.Create(C,"map"),s=store(),state=m.Record("lottery:state"),ops=[
+  {record:state,field:m.Field("known"),value:0},{record:state,field:m.Field("enabled"),value:0},{record:state,field:m.Field("error_code"),value:8}];
+ const result=m.Apply({full:true,revision:1},s.put(ops),s.read);
+ assert.equal(result.known,false);assert.equal(result.error,"奖池配置尚未同步，请稍候");
+ assert.equal(api.ErrorText(2),"档案尚未载入");assert.equal(api.ErrorText(6),"奖池版本已更新，请重新进入");
+});
 console.log("compact lottery model",tests,"tests passed; synthetic reconstruction, no native/FPS measurement");

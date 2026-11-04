@@ -64,22 +64,54 @@ local function current(record)
         and account_for(record.id) == record.account
 end
 
-local function public_state(record)
+local function public_state(record, explicit_snapshot)
     if not current(record) or not CustomGameEventManager
         or type(CustomGameEventManager.Send_ServerToPlayer) ~= "function" then return end
-    -- An explicit allowlist keeps credentials out of event payloads and tables.
+    -- Compare a fixed tuple. Wall-clock expiry countdown is not new state.
+    -- No JSON serialization/hash, timer or collection scan occurs here.
     local diagnostic = record.status == "failed" and record.diagnostic or nil
+    local status = record.status or "requesting"
+    local error = FAILURE_CODES[record.error] and record.error or ""
+    local code = status == "pending" and record.user_code or ""
+    local uri = status == "pending" and record.verification_uri or ""
+    local expiry = record.code_expires or 0
+    local revision = diagnostic and DIAGNOSTIC_REVISION or ""
+    local phase = diagnostic and diagnostic.phase or ""
+    local stage = diagnostic and diagnostic.stage or ""
+    local diagnostic_status = diagnostic and diagnostic.status or 0
+    local last = record.last_public_state
+    local same = last and last.status == status and last.error == error
+        and last.code == code and last.uri == uri and last.expiry == expiry
+        and last.revision == revision and last.phase == phase and last.stage == stage
+        and last.diagnostic_status == diagnostic_status
+    local explicit_stamp
+    if same then
+        if not explicit_snapshot then return end
+        -- A fresh private UI request can recover a late subscription. Coalesce
+        -- same-second duplicate requests; this never schedules periodic sends.
+        local stamp = now()
+        if record.last_explicit_snapshot_at
+            and stamp - record.last_explicit_snapshot_at < 1 then return end
+        explicit_stamp = stamp
+    end
+    local published = {status=status,error=error,code=code,uri=uri,
+        expiry=expiry,revision=revision,phase=phase,stage=stage,diagnostic_status=diagnostic_status}
+    -- One sparse, non-sensitive marker per actual native send, so native
+    -- review can distinguish recovery input from unsolicited state repeats.
+    print("[PLAYER_WEB_AUTH_PUBLIC] reason=" .. (same and "explicit_snapshot" or "state_change")
+        .. " status=" .. status)
     CustomGameEventManager:Send_ServerToPlayer(record.player, "survival_player_web_auth_state", {
         session_id = record.session, player_id = record.id,
-        status = record.status or "requesting", error = FAILURE_CODES[record.error] and record.error or "",
-        user_code = record.status == "pending" and record.user_code or "",
-        verification_uri = record.status == "pending" and record.verification_uri or "",
-        expires_in = math.max(0, math.floor((record.code_expires or now()) - now())),
-        diagnostic_revision = diagnostic and DIAGNOSTIC_REVISION or "",
-        diagnostic_phase = diagnostic and diagnostic.phase or "",
-        diagnostic_stage = diagnostic and diagnostic.stage or "",
-        diagnostic_status = diagnostic and diagnostic.status or 0,
+        status = status, error = error, user_code = code, verification_uri = uri,
+        expires_in = math.max(0, math.floor(expiry - now())),
+        diagnostic_revision = revision,
+        diagnostic_phase = phase, diagnostic_stage = stage,
+        diagnostic_status = diagnostic_status,
     })
+    -- The native API accepts a void return. A thrown send cannot poison the
+    -- memo or consume the explicit recovery allowance.
+    record.last_public_state = published
+    if explicit_stamp then record.last_explicit_snapshot_at = explicit_stamp end
 end
 
 local function bounded_number(value, minimum, maximum)
@@ -297,7 +329,30 @@ function M.init(session)
         local profiles = package.loaded["systems/player_profile_service"]
         if not account or profiles and profiles.is_authenticated_for_account(id, account) then return end
         -- Payload PlayerID/account fields never participate in identity resolution.
-        M.resolve(account, active_session, function() end, function() end)
+        local record = records[account]
+        local last = record and record.last_public_state
+        local rejected = false
+        M.resolve(account, active_session, function() end, function(reason)
+            rejected = reason == "player_web_auth_binding_changed"
+                or reason == "player_web_auth_configuration_invalid"
+        end)
+        local resolved_record = records[account]
+        if rejected or not resolved_record or resolved_record.id ~= id
+            or resolved_record.player ~= entity or not current(resolved_record) then return end
+        -- Count a validated UI input that actually caused an immediate state
+        -- publication. This consumes its input ordinal, never a replay grant.
+        if resolved_record.last_public_state and (resolved_record ~= record
+            or resolved_record.last_public_state ~= last) then
+            print("[PLAYER_WEB_AUTH_REQUEST] accepted=1 generation=" .. tostring(epoch)
+                .. " slot=" .. tostring(id) .. " mode=state_change")
+        -- Only a stable retained record needs a bounded subscriber snapshot.
+        elseif last and (not record.last_explicit_snapshot_at
+            or now() - record.last_explicit_snapshot_at >= 1) then
+            -- Slot/epoch are local numbers, never account or session values.
+            print("[PLAYER_WEB_AUTH_REQUEST] accepted=1 generation=" .. tostring(epoch)
+                .. " slot=" .. tostring(id) .. " mode=explicit_snapshot")
+            public_state(record, true)
+        end
     end)
 end
 

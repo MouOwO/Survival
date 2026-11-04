@@ -1,5 +1,6 @@
 """Synthetic release-tool tests. These never admit a real client or spend tickets."""
 import base64
+import struct,zlib
 from copy import deepcopy
 import hashlib
 import importlib.util
@@ -30,13 +31,16 @@ def package_rows(blobs):
 class NativeProtocolTests(unittest.TestCase):
     def log(self,size=49,data=None,event="cw"):
         if data is None:data=base64.urlsafe_b64encode(b"\x10"+b"\x01"*17).decode().rstrip("=")
-        return ('message (%d bits/%d bytes):\nCUserMsg_CustomGameEvent [148]\nevent_name: "%s"\n'
-            'data: \\000\\000\\001d\\000%s\\000\\013\\013\n')%(size*8,size,event,data)
+        raw=b"\0\0\x01d\0"+data.encode()+b"\0\x0b\x0b"
+        raw=b"VBKV"+struct.pack("<I",zlib.crc32(raw))+raw
+        escaped="".join(chr(v) if 32<=v<127 and v not in (34,92) else "\\%03o"%v for v in raw)
+        return ('11/04 12:00:00 [Networking] message (%d bits/%d bytes):\nCUserMsg_CustomGameEvent [148]\nevent_name: "%s"\n'
+            'data: "%s"\n')%(size*8,size,event,escaped)
     def test_native_layer_budget_accepts_measured_49_bytes(self):
         value=n.network_summary(self.log());self.assertEqual(value["max_native_bytes"],49)
         self.assertFalse(value["native_fps_measured"])
     def test_over_frequent_budget_rejected(self):
-        with self.assertRaisesRegex(ValueError,"exceeds_50"):n.network_summary(self.log(51))
+        with self.assertRaisesRegex(ValueError,"network_gate"):n.network_summary(self.log(51))
     def test_body_budget_cannot_be_hidden_by_small_native_size_label(self):
         with self.assertRaises(ValueError):n.network_summary(self.log(data="A"*25))
     def test_missing_or_extra_native_key_is_not_accepted_as_d(self):
@@ -136,6 +140,36 @@ class LotteryAdmissionCaseTests(unittest.TestCase):
         review,text,shots=self.fixture()
         text=text.replace("result_count=10 server_count=10","result_count=10 server_count=1",1)
         with self.assertRaisesRegex(ValueError,"ten_reward_native_ack"):self.run_case(review,text,shots)
+
+    def test_cold_response_windows_are_derived_from_each_validated_real_draw_ack(self):
+        review,text,shots=self.fixture()
+        for index,second in enumerate((35,45,55)):
+            marker="[SURVIVAL_LOTTERY_UI] stage=result_received request="+review["consecutive_draws"][index]["request_id"]
+            text=text.replace(marker,"11/04 08:00:%02d [Panorama] "%second+marker)
+        value=self.run_case(review,text,shots)
+        self.assertEqual(len(value["_network_response_windows"]),3)
+        self.assertTrue(all(end-start==2 for start,end in value["_network_response_windows"]))
+
+    def test_additional_zero_consumption_probe_cannot_replace_normal_pools_or_real_draws(self):
+        review,text,shots=self.fixture(draw_fallback=False,preview_fallback=False)
+        review["decoder_probe"]={"only_synthetic_case_shape":True}
+        start=datetime(2026,11,4,tzinfo=timezone.utc)
+        extra=dict(extra_zero_consumption_decoder_probes=1,actual_movie_presentations=0,
+            ordinary_tickets_consumed=0,actual_decoder_fallbacks=1,_window=(7,1280,720))
+        with patch.object(n,"captures",side_effect=shots),patch.object(n,"_decoder_probe_case",return_value=extra.copy()) as probe:
+            value=n.lottery_cases(review,{},[start,start+timedelta(hours=1)],text,None,None,manifest={},original_evidence={})
+            self.assertEqual(value["ordinary_tickets_consumed"],30)
+            self.assertEqual(value["actual_movie_presentations"],7)
+            self.assertEqual(value["additional_decoder_probe"]["ordinary_tickets_consumed"],0)
+            self.assertEqual(value["additional_decoder_probe"]["actual_movie_presentations"],0)
+            probe.assert_called_once()
+        for key in ("lottery_previews","consecutive_draws"):
+            invalid=deepcopy(review)
+            if key=="lottery_previews":invalid[key].pop("summer")
+            else:invalid[key].pop()
+            with self.subTest(key=key),patch.object(n,"captures",side_effect=shots),patch.object(n,"_decoder_probe_case",side_effect=AssertionError("normal requirements must run first")):
+                with self.assertRaises(ValueError):
+                    n.lottery_cases(invalid,{},[start,start+timedelta(hours=1)],text,None,None,manifest={},original_evidence={})
 
 class PackageSetTests(unittest.TestCase):
     def test_volume_count_is_from_complete_rows(self):

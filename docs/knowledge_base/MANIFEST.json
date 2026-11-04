@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 32503,
-      "sha256": "16768a731fbea457ca5c2866dfa42e0c1d50ae5cb96c691c8b67fcb13e24822b"
+      "bytes": 32596,
+      "sha256": "99651d624371ce43d874326ed0afea08f80e437af18cecba229dacdfbc95d414"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 46424,
-      "sha256": "17e0145a72ae23d5740ffa574a2d00c8ee5c0ebdb6c7e6983893c63820edcbd7"
+      "bytes": 46517,
+      "sha256": "c2c33daa87e3632aaf2adc05648dcd1820df7fba295e294f4bc6e836d448f5bd"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 20579,
-      "sha256": "20704ad02be05b828a42402815cc51844102e9e16c59e7d7cf7a82a10c106b40"
+      "bytes": 20672,
+      "sha256": "7b15c63a3231a9948b1bbcc9eec3e8005abf0620820ab143ebe777476cd0d5dc"
     },
     {
       "path": "data/completed_work_index.json",
@@ -327,6 +327,11 @@
       "path": "evidence/native_arcade_cloud_20261027.public.json",
       "bytes": 1694,
       "sha256": "3d57d439d339f2655e98d9b690735cf65de3945a15e7b52b77ac29e1bc7d657b"
+    },
+    {
+      "path": "evidence/network50_0401_native_recovery_20261104.md",
+      "bytes": 6659,
+      "sha256": "4c22dba005a32f0c61673bbd3cb5713905932c30283ea0a135b48009800915f6"
     },
     {
       "path": "evidence/network50_dev07_native_fps_20261103.md",

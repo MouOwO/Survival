@@ -12,7 +12,24 @@ local serial,operation,initialized=0,0,false
 local initialized_world
 local catalog,active_hash,catalog_loading,catalog_waiters=nil,bundle.hash,false,{}
 local catalog_serial=0
+local catalog_recovery={attempted=false,waiting=false}
 local catalog_session,catalog_generation,require_expected_hash=nil,0,false
+local catalog_failure={player_web_auth_pending='auth_pending',player_web_auth_expired='auth_expired',
+    player_web_auth_unavailable='auth_unavailable',player_web_auth_binding_changed='auth_binding_changed',
+    player_web_auth_configuration_invalid='auth_configuration',http_request_create_failed='http_create',
+    http_json_invalid='http_json',lottery_catalog_provider_required='provider_missing',
+    lottery_catalog_invalid='catalog_invalid',http_status_401='auth_rejected',http_status_403='auth_rejected',
+    http_status_429='rate_limited',http_status_503='upstream_unavailable',http_status_0='network_unavailable'}
+local function catalog_clock()
+    return type(GetSystemTimeMS)=='function' and GetSystemTimeMS() or nil
+end
+local function catalog_log(stage,started,config_match,md5_match,failure)
+    local current=catalog_clock()
+    local elapsed=started and current and math.floor(math.max(0,current-started)) or -1
+    print('[LOTTERY_CATALOG_STATE] stage='..stage..' generation='..catalog_generation
+        ..' elapsed_ms='..elapsed..' config_match='..tostring(config_match==true)
+        ..' md5_match='..tostring(md5_match==true)..' failure='..(failure or 'none'))
+end
 local seed_ok,seed=pcall(require,'config/generated/lottery_catalog_manifest')
 local seed_md5=seed_ok and type(seed)=='table' and seed.config_hash==bundle.hash and type(seed.catalog_md5)=='string'
     and #seed.catalog_md5==32 and not seed.catalog_md5:find('[^0-9a-f]') and seed.catalog_md5 or nil
@@ -30,6 +47,8 @@ local function catalog_scope()
         catalog_session=current_session;catalog_generation=catalog_generation+1
         catalog,active_hash,catalog_loading,catalog_waiters=nil,bundle.hash,false,{}
         catalog_serial,require_expected_hash=0,false
+        catalog_recovery={attempted=false,waiting=false}
+        catalog_log('scope_reset')
         caches,versions,loading,waiters,busy={},{},{},{},{}
         owners,epochs,published_epochs,full_required={},{},{},{}
         compact_states,compact_failures={},{}
@@ -149,18 +168,22 @@ end
 local function valid_hash(value,length)
     return type(value)=='string' and #value==length and not value:find('[^0-9a-f]')
 end
-local function check_catalog(complete,force_body)
+local recover_catalog_after_ready
+local function check_catalog(complete,force_body,stage)
     local match_session=catalog_scope()
     if complete then catalog_waiters[#catalog_waiters+1]=complete end
     if catalog_loading then return end
     local provider=profiles.get_provider()
     if not provider or type(provider.lottery_catalog)~='function' then
+        catalog_log('failure',nil,false,false,'provider_missing')
         local callbacks=catalog_waiters;catalog_waiters={}
         for _,fn in ipairs(callbacks) do fn({ok=false,error='lottery_catalog_provider_required'}) end
         return
     end
     catalog_loading=true
     local generation=catalog_generation
+    local started=catalog_clock()
+    if stage then catalog_log(stage,started) end
     local function done(result)
         if generation~=catalog_generation or match_session~=catalog_scope() then return end
         catalog_loading=false
@@ -172,6 +195,11 @@ local function check_catalog(complete,force_body)
             accepted=type(result.catalog_json)=='string' and #result.catalog_json>0
                 and #result.catalog_json<=2097152 and not result.catalog_json:find('[\128-\255]')
         end
+        local config_match=result and result.config_hash==bundle.hash
+        local md5_match=result and result.catalog_md5==seed_md5
+        local reason=accepted and (not config_match or not md5_match) and 'version_mismatch'
+            or not accepted and (catalog_failure[result and result.error] or (result and result.ok and 'catalog_invalid' or 'unclassified'))
+        catalog_log(accepted and not reason and 'ready' or 'failure',started,config_match,md5_match,reason)
         if accepted then
             local changed=not catalog or catalog.catalog_md5~=result.catalog_md5 or catalog.config_hash~=result.config_hash
             if result.config_hash~=bundle.hash or (catalog and catalog.catalog_md5~=result.catalog_md5)
@@ -201,9 +229,31 @@ local function check_catalog(complete,force_body)
             end
         else result={ok=false,error=result and result.error or 'lottery_catalog_invalid'} end
         local callbacks=catalog_waiters;catalog_waiters={}
+        if accepted then catalog_recovery.waiting=false end
         for _,fn in ipairs(callbacks) do fn(accepted and catalog or result) end
+        -- A real ready edge may arrive while the unauthenticated startup
+        -- request is still in flight. Retry it once after that request fails.
+        if not accepted and catalog_recovery.waiting then recover_catalog_after_ready() end
     end
     provider.lottery_catalog({md5=not force_body and (catalog and catalog.catalog_md5 or seed_md5) or ''},done,function(error) done({ok=false,error=error}) end)
+end
+recover_catalog_after_ready=function()
+    if catalog or catalog_recovery.attempted then return end
+    if catalog_loading then catalog_recovery.waiting=true;return end
+    catalog_recovery.waiting=false;catalog_recovery.attempted=true
+    check_catalog(nil,nil,'profile_ready')
+end
+local function recover_catalog_for_profile(id)
+    catalog_scope()
+    -- Stable profile events never poll a verified catalog or repeat a failed
+    -- ready-edge recovery. The existing low-frequency refresh remains intact.
+    if catalog or catalog_recovery.attempted or catalog_recovery.waiting then return end
+    local owner=scope(id)
+    if not owner or type(profiles.is_authenticated_for_account)~='function'
+        or type(profiles.is_loaded_for_account)~='function'
+        or not profiles.is_authenticated_for_account(id,owner.account)
+        or not profiles.is_loaded_for_account(id,owner.account) then return end
+    recover_catalog_after_ready()
 end
 local function catalog_for(md5,complete)
     catalog_scope()
@@ -412,6 +462,7 @@ function M.init()
     end)
     subscribe(events.PLAYER_PROFILE_CHANGED,function(p)
         if p and p.player_id~=nil then
+            recover_catalog_for_profile(p.player_id)
             local job=busy[p.player_id]
             if compact_bound(p.player_id) then
                 local context=require('ui/compact_profile_context').current(p.player_id)
@@ -435,7 +486,7 @@ function M.init()
     end)
     local provider=profiles.get_provider()
     if provider and type(provider.lottery_catalog)=='function' then
-        check_catalog()
+        check_catalog(nil,nil,'startup')
         require('core/scheduler').every(30,function()if current_world() then check_catalog() end end,'lottery_catalog_poll')
     end
 end
@@ -455,7 +506,7 @@ end
 local function compact_unknown()
     if not compact_setup()then return nil end
     local r=compact_lookup.by_key['lottery:state'];local f=compact_lookup.field_by_name
-    local code=catalog and 6 or 2
+    local code=catalog and 6 or 8
     return {{record=r,field=f.known,value=0},{record=r,field=f.enabled,value=0},{record=r,field=f.error_code,value=code}},code
 end
 local function compact_entry(id,profile,replace)

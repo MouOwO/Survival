@@ -148,6 +148,16 @@ def dependencies(path,raw):
     suffix=PurePosixPath(path).suffix
     if suffix not in TEXT:return [],[]
     text=raw.decode('utf-8-sig');refs=[];engine=[]
+    if suffix=='.js' and path=='panorama/scripts/custom_game/lottery_cinematic_v1.js':
+        # The decoder probe loads an EXISTING compiled CSS through Movie API.
+        # Bind its content CSS author and recursive image closure, never a
+        # nonexistent content .vcss_c. Its runtime is independently compiled
+        # and checked in the complete manifest/native probe evidence.
+        probe=re.search(r"\bvar DECODER_PROBE_MOVIE='([^']+)';",text)
+        if probe:
+            need(probe[1]=='file://{resources}/styles/custom_game/lottery_cinematic_v1.vcss_c','fixed_existing_decoder_probe_uri_required')
+            refs.append(content_source('panorama/styles/custom_game/lottery_cinematic_v1.vcss_c'))
+        else:need('PreviewDecoderProbe' not in text,'decoder_probe_typed_dependency_missing')
     if suffix=='.vtex':
         pixels=re.findall(r'"m_fileName"\s+"string"\s+"([^"\r\n]+)"',text)
         need(bool(pixels),'vtex_actual_pixel_dependency_required')

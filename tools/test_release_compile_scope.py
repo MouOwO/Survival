@@ -29,6 +29,14 @@ class CompileScopeTests(unittest.TestCase):
         for bad in (b'"m_fileName" "string" "../outside.png"',b'"m_fileName" "string" "https://x/a.png"',b'no actual pixels'):
             with self.assertRaises(ValueError):m.dependencies('panorama/images/a.vtex',bad)
 
+    def test_decoder_probe_runtime_css_binds_the_actual_content_author(self):
+        path='panorama/scripts/custom_game/lottery_cinematic_v1.js'
+        raw=b"var DECODER_PROBE_MOVIE='file://{resources}/styles/custom_game/lottery_cinematic_v1.vcss_c';\nPreviewDecoderProbe:previewDecoderProbe"
+        self.assertEqual(m.dependencies(path,raw),(['panorama/styles/custom_game/lottery_cinematic_v1.css'],[]))
+        self.assertEqual(m.dependencies(path,b'normalMoviePlayback();'),([],[]))
+        for bad in (raw.replace(b'lottery_cinematic_v1.vcss_c',b'missing.vcss_c'),b'PreviewDecoderProbe:unbound'):
+            with self.assertRaises(ValueError):m.dependencies(path,bad)
+
     def test_explicit_include_graph_and_unknown_refs(self):
         children,engine=m.dependencies('panorama/layout/x.xml',b'<root><include src="file://{resources}/scripts/custom_game/a.js"/><include src="s2r://panorama/layout/hud.vxml"/></root>')
         self.assertEqual(children,['panorama/scripts/custom_game/a.js']);self.assertEqual(engine,['s2r://panorama/layout/hud.vxml'])

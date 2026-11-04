@@ -9,7 +9,8 @@ synthetic MovieError classes, logs alone and source tests cannot admit a package
 from __future__ import annotations
 import argparse
 import base64
-from datetime import datetime
+from collections import Counter, deque
+from datetime import datetime, timedelta, timezone
 import hashlib
 import importlib.util
 import json
@@ -17,6 +18,8 @@ import math
 from pathlib import Path
 import re
 import subprocess
+import struct
+import zlib
 from types import ModuleType, SimpleNamespace
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -189,7 +192,66 @@ def ui_cases(review,process,bounds,reader,origin):
     return dict(cases=list(required),captures=count,ordinary_native_pixels_reviewed=True,
         all_gameplay_paths_verified=False,no_purchase_or_claim_required=True)
 
-def lottery_cases(review,process,bounds,text,reader,origin):
+DECODER_PROBE_RESOURCE = "panorama/styles/custom_game/lottery_cinematic_v1.vcss_c"
+
+
+def _decoder_probe_case(case, process, bounds, text, reader, origin, captures, manifest, original_evidence):
+    """Optional *additional* no-consumption evidence; 4-pool/3-ten still run."""
+    need(case.get("mode") == "ZERO_CONSUMPTION_NATIVE_DECODER_PROBE" and case.get("pool") == "map"
+         and case.get("resource") == DECODER_PROBE_RESOURCE and case.get("presentation") == "fallback",
+         "fixed_zero_consumption_decoder_probe_required")
+    need(type(case.get("tickets_before")) is int and case["tickets_before"] == case.get("tickets_after")
+         and case.get("actual_draw_inputs") == 0 and case.get("ordinary_client") is True,
+         "probe_cannot_consume_or_replace_actual_draws")
+    resources = {row["path"]:row for row in manifest["files"]}
+    actual = resources.get(DECODER_PROBE_RESOURCE)
+    compiled = original_evidence["compiler"]["outputs"].get(DECODER_PROBE_RESOURCE)
+    need(actual and compiled and all(actual.get(k) == compiled.get(k) for k in ("bytes","sha256","md5")),
+         "probe_resource_must_be_real_signed_compiler_output")
+    shots = captures(case,("window_before","animation_a","animation_b","window_after"),process,bounds,reader,origin)
+    visual = case.get("visual_review",{})
+    need(shots[1]["sha256"] != shots[2]["sha256"] and all(visual.get(k) is True for k in
+         ("fallback_animation_content","animation_progressed","returned_to_lottery_window",
+          "no_movie_error_visible_after_fallback","no_draw_inputs")), "probe_requires_actual_native_pixels")
+    probe = case.get("probe_id"); need(type(probe) is int and 1 <= probe <= 1000000,"bounded_real_probe_id_required")
+    prefix = r"\[LOTTERY_DECODER_PROBE\] stage="
+    suffix = r" probe="+str(probe)+r" pool=map"
+    markers = [(match.start(),match.end(),match[1],match[2]) for match in re.finditer(prefix+r"([a-z_]+)"+suffix+r"([^\r\n]*)",text)]
+    stages = [row[2] for row in markers]
+    need(stages == ["begin","set_movie","error","fallback","complete"],"probe_requires_one_actual_error_fallback_lifecycle")
+    need("resource="+DECODER_PROBE_RESOURCE in markers[0][3] and "no_consumption=true" in markers[0][3]
+         and "resource="+DECODER_PROBE_RESOURCE in markers[1][3], "probe_actual_setmovie_resource_evidence_required")
+    reason = case.get("fallback_reason")
+    need(reason in ("native_error","sync_error") and "reason="+reason in markers[3][3]
+         and "outcome="+reason in markers[4][3],"probe_inconclusive_cannot_satisfy_decoder_failure")
+    if reason == "native_error":
+        need("cause=native_error native_class=MovieError" in markers[2][3],"probe_requires_actual_native_movie_error")
+    else:
+        need(re.search(r"cause=sync_error api=(SetMovie|Play)\b",markers[2][3]),"probe_requires_actual_media_api_exception")
+    # This native host is configured Asia/Shanghai. Bind engine's one-second
+    # local timestamps to the same lifecycle/capture window with that precision.
+    times = []
+    for position, unused_end, unused_stage, unused_tail in markers:
+        start = text.rfind("\n",0,position)+1
+        found = re.match(r"(\d\d)/(\d\d) (\d\d):(\d\d):(\d\d)",text[start:position])
+        need(found is not None,"probe_actual_engine_timestamps_required")
+        times.append(datetime(int(process["created_utc"][:4]),*map(int,found.groups()),tzinfo=timezone(timedelta(hours=8))))
+    tolerance = timedelta(seconds=1)
+    need(times == sorted(times) and bounds[0] <= times[0]+tolerance and times[-1] <= bounds[1]
+         and shots[0]["end"] <= times[0]+tolerance and times[3] <= shots[1]["start"]
+         and shots[2]["end"] <= times[4]+tolerance and times[4] <= shots[3]["start"],
+         "probe_lifecycle_must_match_actual_four_captures")
+    segment = text[markers[0][0]:markers[-1][1]]
+    need("[SURVIVAL_LOTTERY_UI] stage=result_received request=" not in segment,
+         "probe_must_be_isolated_from_real_reward_transactions")
+    windows={(s["hwnd"],s["width"],s["height"]) for s in shots}
+    need(len(windows)==1,"probe_requires_one_actual_native_window")
+    return dict(extra_zero_consumption_decoder_probes=1, actual_movie_presentations=0,
+        ordinary_tickets_consumed=0, real_draw_case_replacement=False, actual_decoder_fallbacks=1,_window=next(iter(windows)))
+
+
+
+def lottery_cases(review,process,bounds,text,reader,origin,*,manifest=None,original_evidence=None):
     previews=review.get("lottery_previews",{})
     need(set(previews)==set(POOLS),"complete_native_four_pool_previews_required")
     actual_movie=0;native_fallback=0;windows=set()
@@ -220,7 +282,7 @@ def lottery_cases(review,process,bounds,text,reader,origin):
     preview_movies,preview_fallbacks=actual_movie,native_fallback
     draws=review.get("consecutive_draws",[])
     need(len(draws)==3,"complete_native_three_authorized_consecutive_ten_draws_required")
-    previous=None;previous_end=None;requests=set();total=0
+    previous=None;previous_end=None;requests=set();total=0;response_windows=[]
     for case in draws:
         need(case.get("pool")=="map" and case.get("count")==10 and case.get("ticket_kind")=="ordinary"
             and case.get("real_player_transaction") is True and case.get("skip_animation") is False,
@@ -244,6 +306,11 @@ def lottery_cases(review,process,bounds,text,reader,origin):
         marker="[SURVIVAL_LOTTERY_UI] stage=result_received request="+request
         need(text.count(marker)==1,"complete_native_exact_actual_draw_ack_missing_or_duplicated")
         left=text.index(marker);next_ack=text.find("[SURVIVAL_LOTTERY_UI] stage=result_received request=",left+len(marker))
+        stamp=_time(text[text.rfind("\n",0,left)+1:left])
+        if stamp is not None:
+            need(_engine_clock(shots[0]["start"])-1<=stamp<=_engine_clock(shots[-1]["end"])+1,
+                 "complete_native_draw_ack_must_match_its_actual_case")
+            response_windows.append((stamp-1,stamp+1))
         segment=text[left:next_ack if next_ack>=0 else len(text)]
         need(re.search(r"\[SURVIVAL_LOTTERY_UI\] result_count=10 server_count=10\b",segment)
             and "[SURVIVAL_LOTTERY_UI] stage=cards_ready count=10" in segment
@@ -266,36 +333,312 @@ def lottery_cases(review,process,bounds,text,reader,origin):
     observed_requests=re.findall(r"\[SURVIVAL_LOTTERY_UI\] stage=result_received request=([A-Za-z0-9_:-]+)",text)
     need(len(observed_requests)==3 and set(observed_requests)==requests,
         "complete_native_unexpected_additional_draw_ack_exceeds_review_scope")
-    need(actual_movie>0 and native_fallback>0,
+    extra=None
+    if review.get("decoder_probe") is not None:
+        need(isinstance(manifest,dict) and isinstance(original_evidence,dict),"complete_native_probe_requires_authenticated_package_evidence")
+        extra=_decoder_probe_case(review["decoder_probe"],process,bounds,text,reader,origin,captures,manifest,original_evidence)
+        windows.add(extra.pop("_window"))
+    need(len(windows)==1,"complete_native_all_lottery_and_probe_same_window_required")
+    need(actual_movie>0 and (native_fallback>0 or extra is not None),
         "complete_native_both_actual_movie_and_decoder_fallback_must_be_observed")
     return dict(pools=list(POOLS),actual_movie_previews=preview_movies,decoder_fallback_previews=preview_fallbacks,
         actual_movie_presentations=actual_movie,actual_decoder_fallbacks=native_fallback,
         same_pool_consecutive_real_ten_draws=3,ordinary_tickets_consumed=total,
+        additional_decoder_probe=extra,_network_response_windows=tuple(response_windows),
         real_player_transaction_performed=True,synthetic_results=False)
 
-def network_summary(text):
-    header=None;event=None;count=0;maximum=0;total=0;payloads=0
+AUTH = "survival_player_web_auth_state"
+STATUSES = {"requesting", "pending", "approved", "failed", "expired"}
+AUTH_KEYS = {"session_id", "player_id", "status", "error", "user_code", "verification_uri", "expires_in",
+             "diagnostic_revision", "diagnostic_phase", "diagnostic_stage", "diagnostic_status"}
+MAX_LOG = 64 * 1024 * 1024
+
+
+def _need(ok, code):
+    if not ok: raise ValueError(code)
+
+
+def _time(line):
+    match = re.match(r"(\d\d)/(\d\d) (\d\d):(\d\d):(\d\d)\b", line)
+    if not match: return None
+    mo, day, hour, minute, second = map(int, match.groups())
+    return datetime(2000, mo, day, hour, minute, second,tzinfo=timezone(timedelta(hours=8))).timestamp()
+
+
+def _engine_clock(value):
+    return value.astimezone(timezone(timedelta(hours=8))).replace(year=2000).timestamp()
+
+
+def _unescape(text):
+    if text.startswith('"'):
+        _need(text.endswith('"'), "native_data_quote_invalid")
+        text = text[1:-1]
+    result = bytearray(); offset = 0
+    while offset < len(text):
+        char = text[offset]; offset += 1
+        if char != "\\":
+            _need(ord(char) < 128, "native_data_must_use_byte_escapes")
+            result.append(ord(char)); continue
+        _need(offset < len(text), "native_data_escape_truncated")
+        if text[offset] in "01234567":
+            end = offset
+            while end < min(offset+3, len(text)) and text[end] in "01234567": end += 1
+            value = int(text[offset:end], 8); _need(value < 256, "native_data_octal_invalid")
+            result.append(value); offset = end
+        else:
+            escapes = {"n":10, "r":13, "t":9, "\\":92, '"':34, "'":39}
+            _need(text[offset] in escapes, "native_data_escape_unknown")
+            result.append(escapes[text[offset]]); offset += 1
+    return bytes(result)
+
+
+def _vbkv(raw):
+    """Flat Source2 VBKV event object; full bounded consumption is mandatory."""
+    _need(len(raw) >= 10 and raw[:4] == b"VBKV"
+          and zlib.crc32(raw[8:]) == struct.unpack("<I", raw[4:8])[0], "native_vbkv_container_invalid")
+    offset = 8
+    def take(size):
+        nonlocal offset
+        _need(0 <= size <= len(raw)-offset, "native_vbkv_truncated")
+        value = raw[offset:offset+size]; offset += size; return value
+    def string():
+        nonlocal offset
+        end = raw.find(b"\0", offset)
+        _need(end >= offset, "native_vbkv_string_truncated")
+        value = raw[offset:end].decode("utf8"); offset = end+1; return value
+    _need(take(2) == b"\0\0", "native_vbkv_root_invalid")
+    values = {}
+    while True:
+        kind = take(1)[0]
+        if kind == 11: break
+        key = string()
+        _need(re.fullmatch(r"[A-Za-z0-9_]{1,64}", key) and key not in values,
+              "native_vbkv_key_invalid")
+        if kind == 1: value = string()
+        elif kind == 2: value = struct.unpack("<i", take(4))[0]
+        elif kind == 3:
+            value = struct.unpack("<f", take(4))[0]
+            _need(math.isfinite(value), "native_vbkv_nonfinite_number")
+        elif kind == 7: value = struct.unpack("<Q", take(8))[0]
+        elif kind == 8: value = take(1)[0]
+        elif kind == 9: value = 0
+        elif kind == 10: value = 1
+        else: raise ValueError("native_vbkv_flat_type_unsupported")
+        values[key] = value
+    _need(take(1) == b"\x0b" and offset == len(raw), "native_vbkv_trailing_or_missing_end")
+    return values
+
+
+def _cw(raw):
+    values = _vbkv(raw)
+    _need(set(values) == {"d"} and isinstance(values["d"], str)
+          and re.fullmatch(r"[A-Za-z0-9_-]{1,24}", values["d"]), "native_cw_single_bounded_d_key_required")
+    token = values["d"]
+    body = base64.urlsafe_b64decode(token + "="*(-len(token) % 4))
+    _need(0 < len(body) <= 18 and body[0] in (16,17,18), "native_cw_body_invalid")
+    offset = 1; integers = []
+    for unused in range(7):
+        value = 0
+        for shift in range(0,35,7):
+            _need(offset < len(body), "native_cw_header_truncated")
+            byte = body[offset]; offset += 1; value |= (byte & 127) << shift
+            if byte < 128: break
+        else: raise ValueError("native_cw_header_overflow")
+        integers.append(value)
+    return body[0], tuple(integers)
+
+
+def _all_custom_event_audit(text, *, explicit_snapshot_budget=0, explicit_snapshot_windows=(), cold_response_windows=(),cold_event_budget=None,
+                    world_large_budget=None):
+    """Budget is this reviewed native scenario's allowance, not a server cap.
+
+    The caller binds this allowance to the exact captured native case.
+    A marker alone cannot grant unlimited duplicate sends. An unknown >50B
+    event sent once is cold traffic; repeated/persistent large traffic is held
+    for per-operation evidence and budgets, never exempted by an event name.
+    """
+    _need(isinstance(text, str) and len(text.encode("utf8")) <= MAX_LOG, "bounded_native_log_required")
+    _need(type(explicit_snapshot_budget) is int and 0 <= explicit_snapshot_budget <= 1,
+          "one_reviewed_late_listener_snapshot_maximum")
+    _need(len(explicit_snapshot_windows)==explicit_snapshot_budget,"explicit_snapshot_case_window_required")
+    _need(len(cold_response_windows)<=3,"only_three_validated_transaction_response_windows")
+    errors = Counter(); worlds = {}; current = 0; header = None; marker = None; accepted_request = None
+    def world():
+        if current not in worlds:
+            worlds[current] = dict(events={}, phase="before_auth", auth_last={}, expires_last={},
+                auth=Counter(), used_snapshot=0, request_ordinals={},explicit_requests={},large_bytes=0, hello={}, authorized=False, protocol_ready=False)
+        return worlds[current]
+    def finish():
+        nonlocal header, marker, accepted_request
+        h = header; header = None
+        if not h or not h.get("custom"): return
+        if not h.get("event") or h.get("data") is None or h["time"] is None:
+            errors["incomplete_native_custom_event"] += 1; return
+        state = worlds[h["world"]]; event, size, stamp = h["event"], h["size"], h["time"]
+        if math.ceil(h["bits"] / 8) != size or size <= 0:
+            errors["native_size_header_inconsistent"] += 1
+        stats = state["events"].setdefault(event, dict(count=0, total_bytes=0, max_bytes=0,
+            phases=Counter(), one=deque(), ten=deque(), peak_1s=0, peak_10s=0,
+            large_count=0, large_buckets=set(), large_times=[], repeats=Counter()))
+        stats["count"] += 1; stats["total_bytes"] += size; stats["max_bytes"] = max(stats["max_bytes"], size)
+        stats["phases"][h["phase"]] += 1
+        for seconds, key, peak in ((1,"one","peak_1s"),(10,"ten","peak_10s")):
+            queue = stats[key]
+            while queue and queue[0] < stamp-seconds: queue.popleft()
+            queue.append(stamp); stats[peak] = max(stats[peak], len(queue))
+        if size > 50:
+            stats["large_count"] += 1; stats["large_buckets"].add(int(stamp//5))
+            stats["large_times"].append(stamp)
+            state["large_bytes"] += size
+            if cold_event_budget is not None and size > cold_event_budget: errors["single_cold_event_requires_smaller_total_traffic_plan"] += 1
+        try:
+            if event == "cw":
+                _need(size <= 50, "frequent_cw_exceeds_50_bytes")
+                kind, values = _cw(_unescape(h["data"]))
+                schema, session, epoch, view, revision, index, count = values
+                if kind == 17 and view == 1 and not state["protocol_ready"]:
+                    _need(1 <= index <= count <= 16383, "native_cw_hello_fragments_invalid")
+                    parts = state["hello"].setdefault((schema,session,epoch,revision,count), set()); parts.add(index)
+                    if len(parts) == count:
+                        state["protocol_ready"] = True; state["phase"] = "protocol_ready"
+                        state["hello"].clear()
+            elif event == AUTH:
+                raw = _unescape(h["data"])
+                _need(len(raw) <= 16*1024, "native_auth_payload_oversized")
+                value = _vbkv(raw)
+                _need(set(value) == AUTH_KEYS and value.get("status") in STATUSES, "native_auth_shape_or_status_invalid")
+                recipient=value["player_id"]
+                _need(isinstance(recipient,(int,float)) and not isinstance(recipient,bool)
+                      and math.isfinite(recipient) and 0<=recipient<=63 and recipient==int(recipient),
+                      "native_auth_recipient_invalid")
+                recipient=int(recipient)
+                # Credentials and identities are used only for equality in RAM.
+                semantic = tuple((key,value[key]) for key in sorted(value) if key != "expires_in")
+                duplicate = semantic == state["auth_last"].get(recipient)
+                request=state["explicit_requests"].pop(recipient,None)
+                public=request.get("public_marker") if request else None
+                explicit = (public and request and public["world"] == h["world"]
+                    and request["world"] == h["world"] and public["reason"] == "explicit_snapshot"
+                    and request["slot"] == value["player_id"]
+                    and public["status"] == value["status"] and public["time"] is not None
+                    and request["time"] is not None
+                    and 0 <= stamp-public["time"] <= 1 and 0 <= public["time"]-request["time"] <= 1)
+                if duplicate:
+                    state["auth"]["semantic_duplicates"] += 1
+                    if value["expires_in"] != state["expires_last"].get(recipient): state["auth"]["clock_only_duplicates"] += 1
+                    if explicit and request["ordinal"] == 1:
+                        state["auth"]["cold_listener_bootstraps"] += 1
+                    elif (explicit and state["used_snapshot"] < explicit_snapshot_budget
+                          and any(start<=request["time"]<=stamp<=end for start,end in explicit_snapshot_windows)):
+                        state["used_snapshot"] += 1; state["auth"]["reviewed_late_listener_snapshots"] += 1
+                    else: errors["auth_repeated_semantic_state_without_bounded_request"] += 1
+                else: state["auth"]["semantic_changes"] += 1
+                if accepted_request is request:accepted_request=None
+                state["auth_last"][recipient], state["expires_last"][recipient] = semantic, value["expires_in"]
+                if value["status"] == "approved":
+                    state["authorized"] = True
+                    if not state["protocol_ready"]: state["phase"] = "authorized_wait_protocol"
+                elif not state["protocol_ready"]: state["phase"] = "auth_pending"
+            elif size > 50:
+                # Keep only RAM identities. No body/hash appears in the report.
+                stats["repeats"][h["data"]] += 1
+        except (ValueError, UnicodeError, struct.error):
+            errors["native_body_validation_failed:" + event] += 1
     for line in text.splitlines():
-        found=re.search(r"\((\d+) bits/(\d+) bytes\):",line)
+        if "[Survival][INFO][Addon] initialized" in line:
+            finish(); current += 1; marker = None; accepted_request = None; world()
+        found = re.search(r"\((\d+) bits/(\d+) bytes\):", line)
         if found:
-            header=tuple(map(int,found.groups()));event=None
-        elif "CUserMsg_CustomGameEvent [148]" in line:event=""
-        elif event is not None and "event_name:" in line:
-            found=re.search(r'event_name: "([A-Za-z0-9_]+)"',line)
-            if found and header:
-                event=found[1]
-                if event=="cw":
-                    bits,size=header;need(math.ceil(bits/8)==size and 0<size<=50,"complete_native_frequent_event_exceeds_50_bytes")
-                    count+=1;maximum=max(maximum,size);total+=size
-        elif event=="cw" and "data:" in line:
-            found=re.search(r"\\000\\000\\001d\\000([A-Za-z0-9_-]+)\\000\\013\\013",line)
-            need(found is not None and len(found[1])<=24,"complete_native_cw_single_bounded_d_key_required")
-            raw=base64.urlsafe_b64decode(found[1]+"="*(-len(found[1])%4))
-            need(0<len(raw)<=18,"complete_native_cw_raw_body_limit");payloads+=1
-    need(count>0 and payloads==count,"complete_native_current_ordinary_cw_measurements_required")
-    return dict(layer="CUserMsg_CustomGameEvent; excludes UDP/IP/Steam headers",frames=count,
-        max_native_bytes=maximum,total_native_bytes=total,frequent_limit_bytes=50,
-        cold_bulk_uses_separate_total_traffic_policy=True,raw_payloads_disclosed=False,native_fps_measured=False)
+            finish(); state = world()
+            header = dict(bits=int(found[1]),size=int(found[2]),time=_time(line),world=current,phase=state["phase"])
+        elif "CUserMsg_CustomGameEvent [148]" in line:
+            if header is None: errors["custom_event_without_native_size_header"] += 1
+            else: header["custom"] = True
+        elif header and header.get("custom") and "event_name:" in line:
+            found = re.search(r'event_name: "([A-Za-z0-9_]{1,128})"', line)
+            if found: header["event"] = found[1]
+            else: errors["native_event_name_invalid"] += 1
+        elif header and header.get("custom") and "data:" in line:
+            found = re.search(r"\bdata:\s*(.*)$", line); header["data"] = found[1]
+        found = re.search(r"\[PLAYER_WEB_AUTH_PUBLIC\] reason=(state_change|explicit_snapshot) status=(requesting|pending|approved|failed|expired)\b",line)
+        if found:
+            finish()
+            marker = dict(world=current, time=_time(line), reason=found[1], status=found[2])
+            if (marker["reason"]=="explicit_snapshot" and accepted_request
+                and accepted_request["world"]==current):
+                accepted_request["public_marker"]=marker
+        found = re.search(r"\[PLAYER_WEB_AUTH_REQUEST\] accepted=1 generation=(\d+) slot=(\d+) mode=(state_change|explicit_snapshot)\b",line)
+        if found:
+            finish()
+            state=world();slot=int(found[2])
+            state["request_ordinals"][slot]=state["request_ordinals"].get(slot,0)+1
+            # A state-changing accepted input can be logged after its send.
+            # It consumes the first-input ordinal but grants no later send.
+            if found[3]=="explicit_snapshot":
+                accepted_request = dict(world=current, time=_time(line), generation=int(found[1]), slot=slot,
+                                        ordinal=state["request_ordinals"][slot])
+                state["explicit_requests"][slot]=accepted_request
+            else:
+                previous=state["explicit_requests"].pop(slot,None)
+                if accepted_request is previous:accepted_request=None
+        elif "[PLAYER_WEB_AUTH_REQUEST] accepted=1" in line:
+            errors["native_auth_accepted_request_mode_missing_or_invalid"]+=1
+    finish()
+    safe_worlds = []
+    for number, state in sorted(worlds.items()):
+        events = {}
+        for name, stats in sorted(state["events"].items()):
+            if name not in (AUTH,"cw") and stats["large_count"]:
+                repeated = max(stats["repeats"].values(), default=0) >= 3
+                persistent = len(stats["large_buckets"]) >= 3
+                # A validated real draw can have one necessary cold response
+                # per event. This is an operation-bound budget, no name list.
+                used=set();covered=True
+                for stamp in stats["large_times"]:
+                    index=next((i for i,(start,end) in enumerate(cold_response_windows) if i not in used and start<=stamp<=end),None)
+                    if index is None:covered=False;break
+                    used.add(index)
+                stats["validated_transaction_responses"]=len(used) if covered else 0
+                if (repeated or persistent) and not covered: errors["unexplained_repeated_large_event:" + name] += 1
+            events[name] = {k:v for k,v in stats.items() if k not in ("one","ten","large_buckets","large_times","repeats")}
+        if world_large_budget is not None and state["large_bytes"] > world_large_budget: errors["world_cold_total_traffic_budget_exceeded"] += 1
+        safe_worlds.append(dict(world=number, events=events, auth=dict(state["auth"]),
+            authorization_observed=state["authorized"], protocol_ready_observed=state["protocol_ready"],
+            profile_ready_proven=False, large_total_bytes=state["large_bytes"]))
+    if not any(w["events"].get("cw",{}).get("count") for w in safe_worlds): errors["native_cw_missing"] += 1
+    return dict(kind="ALL_CUSTOM_EVENT_SAFE_NATIVE_NETWORK_AUDIT", accepted=not errors,
+        layer="CUserMsg_CustomGameEvent; excludes UDP/IP/Steam headers", worlds=safe_worlds,
+        blockers=dict(sorted(errors.items())), frequent_limit_bytes=50,
+        explicit_snapshot_review_budget=explicit_snapshot_budget, event_body_or_identity_disclosed=False,
+        payload_hashes_disclosed=False, native_fps_measured=False)
+
+
+def network_summary(text, *, explicit_snapshot_windows=(),cold_response_windows=()):
+    result=_all_custom_event_audit(text,explicit_snapshot_budget=len(explicit_snapshot_windows),
+                                   explicit_snapshot_windows=explicit_snapshot_windows,cold_response_windows=cold_response_windows)
+    need(result["accepted"],"complete_native_all_custom_event_network_gate:"+",".join(result["blockers"]))
+    cw=[w["events"].get("cw",{}) for w in result["worlds"]]
+    result.update(frames=sum(v.get("count",0) for v in cw),max_native_bytes=max((v.get("max_bytes",0) for v in cw),default=0),
+        total_native_bytes=sum(v.get("total_bytes",0) for v in cw),cold_bulk_uses_separate_total_traffic_policy=True,
+        raw_payloads_disclosed=False)
+    return result
+
+
+def network_case_windows(review,process,bounds,reader,origin):
+    cases=review.get("network_cases",{})
+    need(isinstance(cases,dict) and set(cases)<= {"late_auth_listener_snapshot"},"complete_native_known_bounded_network_cases_required")
+    if not cases:return ()
+    case=cases["late_auth_listener_snapshot"]
+    need(case.get("mode")=="EXPLICIT_LATE_AUTH_LISTENER_SNAPSHOT" and case.get("actual_ui_request") is True,
+         "complete_native_real_late_listener_ui_action_required")
+    shots=captures(case,("before","after"),process,bounds,reader,origin)
+    visual=case.get("visual_review",{})
+    need(all(visual.get(key) is True for key in ("normal_auth_ui_open","actual_ui_request","returned_state_visible","no_synthetic_request")),
+         "complete_native_late_listener_actual_pixels_required")
+    need(shots[-1]["end"]-shots[0]["start"]<=timedelta(seconds=15)
+         and len({(s["hwnd"],s["width"],s["height"]) for s in shots})==1,
+         "complete_native_bounded_same_window_late_listener_case_required")
+    return ((_engine_clock(shots[0]["start"]),_engine_clock(shots[-1]["end"])),)
 
 def validate_native_release(request,report,manifest,signed):
     b,ops,p=environment();expected=request.get("report_sha256")
@@ -319,8 +662,9 @@ def validate_native_release(request,report,manifest,signed):
     need(same_process(request["native_process_generation"],review["process"]),"complete_native_request_generation_differs")
     process,bounds,text=lifecycle(review,origin,report,expected,reader,b,ops,p)
     ui=ui_cases(review,process,bounds,reader,origin)
-    lottery=lottery_cases(review,process,bounds,text,reader,origin)
-    network=network_summary(text)
+    lottery=lottery_cases(review,process,bounds,text,reader,origin,manifest=manifest,original_evidence=report["original_evidence"])
+    network=network_summary(text,explicit_snapshot_windows=network_case_windows(review,process,bounds,reader,origin),
+                            cold_response_windows=lottery.pop("_network_response_windows"))
     reader.unchanged()
     b.verify_operator_paths(dict(_EXECUTED_HELPERS),report["operator_revision"])
     return dict(ordinary_production_acceptance=True,scope=SCOPE,release_sequence=report["release_sequence"],
@@ -357,6 +701,8 @@ def review_template(report,report_sha256):
     value["ui_cases"]={name:case(("visible",),("actual_data_visible","normal_ui_open",
         "not_loading_or_placeholder","no_stall")) for name in
         ("n1_gameplay","archive","hud_selection","grid","production","vip","payment","public_beta")}
+    value["decoder_probe"]=None
+    value["network_cases"]={}
     value["lottery_previews"]={}
     for pool in POOLS:
         item=case(("window_before","animation_a","animation_b","window_after"),

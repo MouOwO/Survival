@@ -211,7 +211,16 @@ assert(requests[#requests].headers.Authorization == "Bearer legacy_fixture_serve
 -- Each failure phase exports only one bounded enum tuple to its own player.
 -- No HTTP body, native exception, account, session or capability is logged.
 local ordinary_print, diagnostics = print, {}
-print = function(value) diagnostics[#diagnostics + 1] = value end
+print = function(value)
+    if value:find("[WS4-WEB-04]", 1, true) == 1 then diagnostics[#diagnostics + 1] = value
+    else
+        assert(value:match("^%[PLAYER_WEB_AUTH_PUBLIC%] reason=state_change status=%a+$")
+            or value:match("^%[PLAYER_WEB_AUTH_PUBLIC%] reason=explicit_snapshot status=%a+$")
+            or value:match("^%[PLAYER_WEB_AUTH_REQUEST%] accepted=1 generation=%d+ slot=%d+ mode=state_change$")
+            or value:match("^%[PLAYER_WEB_AUTH_REQUEST%] accepted=1 generation=%d+ slot=%d+ mode=explicit_snapshot$"),
+            "unexpected diagnostic output")
+    end
+end
 local diagnostic_case = 0
 local function reset_diagnostic()
     diagnostic_case = diagnostic_case + 1
