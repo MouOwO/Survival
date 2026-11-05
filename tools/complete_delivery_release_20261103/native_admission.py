@@ -578,14 +578,19 @@ class _BuildCatalog:
         _need(len(self.profiles) == expected and expected>0, "all_known_build_profiles_required")
 
 
-def _build_catalog_from_sources(raw, config, runtime, construction, building_source, research=b"", arrow=b""):
+def _build_catalog_from_sources(raw, config, runtime, construction, building_source, research=b"", arrow=b"",
+                                training=b"",worker=b"",queue=b"",views=b"",router=b""):
     """Pure parser of already source-bound generated JSON and narrow Lua anchors."""
     text = raw.decode("utf8")
     prefix = "var data="
     _need(text.count(prefix) == 1, "single_generated_catalog_json_required")
     data, _ = json.JSONDecoder().raw_decode(text[text.index(prefix) + len(prefix):])
-    return _BuildCatalog(_BUILD_CATALOG_SEAL, data, config.decode("utf8"), runtime.decode("utf8"),
+    catalog = _BuildCatalog(_BUILD_CATALOG_SEAL, data, config.decode("utf8"), runtime.decode("utf8"),
                          construction.decode("utf8"), building_source.decode("utf8"),research.decode("utf8"),arrow.decode("utf8"))
+    catalog.training = (_TrainingCatalog(_TRAINING_CATALOG_SEAL,
+        *[v.decode("utf8") for v in (training,worker,queue,views,router)])
+        if training and b"[WORKER_TRAINING_TRACE] v=1 phase=" in worker else None)
+    return catalog
 
 
 def _load_build_catalog(builder, report):
@@ -597,7 +602,12 @@ def _load_build_catalog(builder, report):
              "scripts/vscripts/config/generated/building_construction_rules.lua",
              "scripts/vscripts/systems/building_system.lua",
              "scripts/vscripts/config/generated/research_lab_abilities.lua",
-             "scripts/vscripts/config/generated/arrow_tower_base.lua")
+             "scripts/vscripts/config/generated/arrow_tower_base.lua",
+             "scripts/vscripts/config/generated/training_definitions.lua",
+             "scripts/vscripts/systems/worker_system.lua",
+             "scripts/vscripts/systems/worker_training_queue_service.lua",
+             "scripts/vscripts/ui/compact_production_views.lua",
+             "scripts/vscripts/ui/production_ui_service.lua")
     git = builder.dependencies().package.pending._git
     raw = [git(ROOT, "show", report["source_revisions"]["game"] + ":" + name, counts=Counter()) for name in names]
     _need(sum(map(len, raw)) <= 8*1024*1024, "bounded_build_operation_catalog_required")
@@ -830,6 +840,163 @@ class _BuildOperations:
                     invalid_wire_transactions=self.invalid,metrics=self.metrics.copy())
 
 
+_TRAINING_CATALOG_SEAL = object()
+
+
+class _TrainingCatalog:
+    """Only package-bound sources may create completion-message definitions."""
+    def __init__(self, seal, definitions, worker, queue, views, router):
+        _need(seal is _TRAINING_CATALOG_SEAL, "internal_training_catalog_required")
+        self.seal, self.definitions, self.messages = seal, {}, {}
+        anchors = ((worker, ('[WORKER_TRAINING_TRACE] v=1 phase=',
+                    'trace = training_trace,', '_training_trace = payload._training_trace,',
+                    'notify(city_state.player_id, tostring(training.name) .. "训练完成")')),
+                   (queue, ('trace("enqueue", job)', 'trace("start", job)',
+                    'trace("complete", job, result)', 'result.entindex > 0',
+                    'if queues[queue.source_entindex] ~= queue or queue.jobs[1] ~= job then return end')),
+                   (views, ('owner_serial=state.owner_serial, request_token=token,',
+                    'production_selection=state.selection, action_code=8}',
+                    'state.used[token]={identity=identity};state.busy=true')),
+                   (router, ('_training_trace = capture and payload._training_trace or nil,',
+                    'worker_request(payload,false)')))
+        for source, required in anchors:
+            _need(all(value in source for value in required), "reviewed_training_trace_source_required")
+        for line in definitions.splitlines():
+            if 'enabled = false' in line: continue
+            found = re.search(r'training_id\s*=\s*"(train_lumberjack_[0-9]+)"', line)
+            if not found: continue
+            name = re.search(r'\bname\s*=\s*"([^"\\]+)"', line)
+            duration = re.search(r'\btraining_duration_seconds\s*=\s*([0-9.]+)', line)
+            _need(name is not None and duration is not None and float(duration[1]) >= .05,
+                  "reviewed_training_definition_required")
+            key, message = found[1], name[1] + "训练完成"
+            _need(key not in self.definitions and message not in self.messages,
+                  "unique_training_definition_required")
+            self.definitions[key] = dict(message=message,duration=float(duration[1]))
+            self.messages[message] = key
+        _need(self.definitions, "training_definitions_required")
+
+
+class _TrainingOperations:
+    """One world, one credit per real successful job, never an event whitelist.
+
+    Initialization O(definitions). Parsing O(log bytes+markers+notices), final
+    matching O(jobs+notices) with indexed FIFO queues. No per-tick/gameplay scan,
+    no input injection, no extra network traffic, no cold-response allowance.
+    IDs remain RAM-only. Source-bound producers log at most 3 lines per job.
+    """
+    FIELDS = frozenset(('v','phase','world','queue','job','player','source','owner',
+                       'adapter','token','selection','action','training','duration','started','finish','now','unit'))
+    ID_FIELDS = ('world','queue','job','player','source','adapter','owner','token','selection','action','training','duration')
+    def __init__(self, catalog):
+        _need(type(catalog) is _TrainingCatalog and catalog.seal is _TRAINING_CATALOG_SEAL,
+              "internal_source_bound_training_catalog_required")
+        self.c, self.jobs, self.origins, self.notifications = catalog, {}, {}, []
+        self.world, self.invalid = None, 0
+        self.completed = []
+        self.metrics = dict(marker_lines=0,job_lookups=0,notification_checks=0,retired_permits=0)
+
+    def line(self, line, ordinal):
+        tag = '[WORKER_TRAINING_TRACE] '
+        if tag not in line: return
+        self.metrics['marker_lines'] += 1
+        try:
+            stamp = _time(line); _need(stamp is not None, 'training_trace_clock_required')
+            body = line.split(tag,1)[1].strip()
+            pairs = [part.split('=',1) for part in body.split(' ')]
+            _need(all(len(pair)==2 for pair in pairs), 'training_trace_shape')
+            row = dict(pairs)
+            _need(len(row)==len(pairs) and set(row)==self.FIELDS, 'training_trace_fields')
+            for key in self.FIELDS-{'phase','training','duration','started','finish','now'}:
+                _need(re.fullmatch(r'\d{1,10}',row[key]) is not None, 'training_trace_integer')
+                row[key] = int(row[key]); _need(row[key] <= 4294967295,'training_trace_integer_range')
+            for key in ('duration','started','finish','now'):
+                _need(re.fullmatch(r'-?\d{1,12}\.\d{6}',row[key]) is not None,'training_trace_float')
+                row[key] = float(row[key]); _need(math.isfinite(row[key]),'training_trace_finite')
+            _need(row['v']==1 and row['action']==8 and row['phase'] in ('enqueue','start','complete')
+                  and 0 <= row['player'] <= 63 and 1 <= row['token'] <= 16383
+                  and all(row[key]>0 for key in ('world','queue','job','source','adapter','owner','selection')),
+                  'training_trace_identity')
+            definition = self.c.definitions.get(row['training'])
+            _need(definition is not None and abs(row['duration']-definition['duration']) <= .000001,
+                  'training_trace_definition')
+            if self.world is None: self.world = row['world']
+            _need(self.world==row['world'],'training_trace_world_changed')
+            identity = (row['world'],row['queue'],row['job'])
+            origin = (row['world'],row['adapter'],row['owner'],row['token'])
+            self.metrics['job_lookups'] += 1
+            job = self.jobs.get(identity)
+            if row['phase']=='enqueue':
+                if identity in self.jobs or origin in self.origins:
+                    if job is not None: job['invalid']=True
+                    previous = self.jobs.get(self.origins.get(origin))
+                    if previous is not None: previous['invalid']=True
+                    raise ValueError('training_trace_replayed_action_or_job')
+                _need(row['unit']==0 and row['started']==0 and row['finish']==0,'training_enqueue_state')
+                self.jobs[identity] = dict(identity=identity,row=row,phase='enqueue',ordinal=ordinal,
+                    time=stamp,invalid=False,started=None,completed=None)
+                self.origins[origin] = identity
+                return
+            _need(job is not None,'training_trace_missing_enqueue')
+            try:
+                _need(not job['invalid'] and all(row[key]==job['row'][key] for key in self.ID_FIELDS),
+                      'training_trace_job_changed')
+                _need(ordinal>job['ordinal'] and stamp>=job['time'],'training_trace_order')
+                _need(abs(row['finish']-row['started']-row['duration']) <= .000002,
+                      'training_trace_duration')
+                if row['phase']=='start':
+                    _need(job['phase']=='enqueue' and row['unit']==0
+                          and row['started']>=job['row']['now'] and abs(row['now']-row['started']) <= .000001,
+                          'training_trace_start_state')
+                    job['phase'],job['started'] = 'start',row
+                else:
+                    start = job['started']
+                    _need(job['phase']=='start' and row['unit']>0 and start is not None
+                          and row['started']==start['started'] and row['finish']==start['finish']
+                          and row['now']+.000001>=row['finish'], 'training_trace_completion_state')
+                    job['phase'],job['completed'] = 'complete',dict(row=row,time=stamp,ordinal=ordinal)
+                    self.completed.append(job)
+            except (ValueError,TypeError):
+                job['invalid']=True
+                raise
+        except (ValueError,TypeError,KeyError):
+            self.invalid += 1
+
+    def event(self, header):
+        if header['event'] != 'ui_notification' or header['time'] is None: return
+        try: value = _vbkv(_unescape(header['data']))
+        except (ValueError,UnicodeError,struct.error): return
+        training = self.c.messages.get(value.get('message'))
+        if training is None: return
+        shape = (set(value)=={'audience','kind','level','message','player_id','rich_text'}
+                 and value['audience']=='player' and value['kind']=='message'
+                 and value['level']=='info' and value['rich_text']==0
+                 and type(value['player_id']) is int and 0 <= value['player_id'] <= 63)
+        self.notifications.append(dict(ordinal=header['ordinal'],time=header['time'],
+            training=training,player=value.get('player_id'),shape=shape))
+
+    def finish(self):
+        permits, matched = {}, set()
+        successful = 0
+        for job in self.completed:
+            if job['invalid']: continue
+            row = job['row']; key = (row['player'],row['training'])
+            permits.setdefault(key,deque()).append(job); successful += 1
+        for notice in self.notifications:
+            self.metrics['notification_checks'] += 1
+            if not notice['shape']: continue
+            queue = permits.get((notice['player'],notice['training']))
+            if queue is None: continue
+            while queue and queue[0]['completed']['time'] < notice['time']-1:
+                queue.popleft(); self.metrics['retired_permits'] += 1
+            if not queue: continue
+            job = queue[0]
+            if job['completed']['time'] <= notice['time']+1 and job['ordinal'] < notice['ordinal']:
+                queue.popleft(); matched.add(notice['ordinal'])
+        return dict(matched=matched,unproven=len(self.notifications)-len(matched),
+                    operations=successful,invalid_lifecycle=self.invalid,metrics=self.metrics.copy())
+
+
 def _all_custom_event_audit(text, *, explicit_snapshot_budget=0, explicit_snapshot_windows=(), cold_response_windows=(),cold_event_budget=None,
                     world_large_budget=None,build_catalog=None):
     """Budget is this reviewed native scenario's allowance, not a server cap.
@@ -849,7 +1016,8 @@ def _all_custom_event_audit(text, *, explicit_snapshot_budget=0, explicit_snapsh
         if current not in worlds:
             worlds[current] = dict(events={}, phase="before_auth", auth_last={}, expires_last={},
                 auth=Counter(), used_snapshot=0, request_ordinals={},explicit_requests={},large_bytes=0, hello={}, authorized=False, protocol_ready=False,
-                build=_BuildOperations(build_catalog) if build_catalog is not None else None)
+                build=_BuildOperations(build_catalog) if build_catalog is not None else None,
+                training=_TrainingOperations(build_catalog.training) if getattr(build_catalog,'training',None) is not None else None)
         return worlds[current]
     def finish():
         nonlocal header, marker, accepted_request
@@ -932,6 +1100,7 @@ def _all_custom_event_audit(text, *, explicit_snapshot_budget=0, explicit_snapsh
         if "[Survival][INFO][Addon] initialized" in line:
             finish(); current += 1; marker = None; accepted_request = None; world()
         if build_catalog is not None: world()["build"].line(line,ordinal)
+        if world()["training"] is not None: world()["training"].line(line,ordinal)
         found = re.search(r"\((\d+) bits/(\d+) bytes\):", line)
         if found:
             finish(); state = world()
@@ -946,6 +1115,7 @@ def _all_custom_event_audit(text, *, explicit_snapshot_budget=0, explicit_snapsh
         elif header and header.get("custom") and "data:" in line:
             found = re.search(r"\bdata:\s*(.*)$", line); header["data"] = found[1]
             if build_catalog is not None and header.get("event"): world()["build"].event(header)
+            if world()["training"] is not None and header.get("event"): world()["training"].event(header)
         found = re.search(r"\[PLAYER_WEB_AUTH_PUBLIC\] reason=(state_change|explicit_snapshot) status=(requesting|pending|approved|failed|expired)\b",line)
         if found:
             finish()
@@ -974,11 +1144,17 @@ def _all_custom_event_audit(text, *, explicit_snapshot_budget=0, explicit_snapsh
     for number, state in sorted(worlds.items()):
         build = state["build"].finish() if state["build"] is not None else dict(matched=set(),unproven=0,operations=0,invalid_wire_transactions=0,metrics={})
         if build["unproven"]: errors["unproven_build_operation_notification"] += build["unproven"]
+        training = state["training"].finish() if state["training"] is not None else dict(
+            matched=set(),unproven=0,operations=0,invalid_lifecycle=0,metrics={})
+        if training["unproven"]: errors["unproven_training_operation_notification"] += training["unproven"]
+        if training["invalid_lifecycle"]: errors["invalid_training_lifecycle"] += training["invalid_lifecycle"]
         events = {}
         for name, stats in sorted(state["events"].items()):
             if name not in (AUTH,"cw") and stats["large_count"]:
-                remaining=[(stamp,body) for ordinal,stamp,body in stats["large_items"] if ordinal not in build["matched"]]
-                stats["validated_build_operation_notifications"]=stats["large_count"]-len(remaining)
+                remaining=[(stamp,body) for ordinal,stamp,body in stats["large_items"]
+                           if ordinal not in build["matched"] and ordinal not in training["matched"]]
+                stats["validated_build_operation_notifications"]=sum(ordinal in build["matched"] for ordinal,_,_ in stats["large_items"])
+                stats["validated_training_operation_notifications"]=sum(ordinal in training["matched"] for ordinal,_,_ in stats["large_items"])
                 # Adjudicate each real-operation response first. A distinct
                 # unrelated cold message never erases already-proven credits.
                 # At most three validated ACK windows; O(1) checks per packet.
@@ -1013,7 +1189,9 @@ def _all_custom_event_audit(text, *, explicit_snapshot_budget=0, explicit_snapsh
             authorization_observed=state["authorized"], protocol_ready_observed=state["protocol_ready"],
             profile_ready_proven=False, large_total_bytes=state["large_bytes"],
             build_operations=dict(accepted_operations=build["operations"],matched_notifications=len(build["matched"]),
-                invalid_wire_transactions=build["invalid_wire_transactions"],work=build["metrics"])))
+                invalid_wire_transactions=build["invalid_wire_transactions"],work=build["metrics"]),
+            training_operations=dict(successful_jobs=training["operations"],matched_notifications=len(training["matched"]),
+                invalid_lifecycle=training["invalid_lifecycle"],work=training["metrics"])))
     if not any(w["events"].get("cw",{}).get("count") for w in safe_worlds): errors["native_cw_missing"] += 1
     return dict(kind="ALL_CUSTOM_EVENT_SAFE_NATIVE_NETWORK_AUDIT", accepted=not errors,
         layer="CUserMsg_CustomGameEvent; excludes UDP/IP/Steam headers", worlds=safe_worlds,

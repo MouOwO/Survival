@@ -1,10 +1,19 @@
 local M = {}
+local trace_generation = 0
 
 -- A city owns one serial production queue. Waiting jobs reserve training
 -- quotas, while their currency and population are charged only at the head.
 function M.create(deps)
     local queues, revisions, sequence = {}, {}, 0
     local service = {}
+    trace_generation = trace_generation + 1
+    local generation = trace_generation
+    local function trace(phase, job, result)
+        if deps.trace and job._training_trace then
+            -- Diagnostics cannot alter a reservation, queue or gameplay result.
+            pcall(deps.trace, phase, job, result, generation)
+        end
+    end
     local function publish(queue)
         revisions[queue.source_entindex] = (revisions[queue.source_entindex] or 0) + 1
         deps.changed(queue.player_id, queue.team, queue.source_entindex)
@@ -39,6 +48,8 @@ function M.create(deps)
             deps.cancel(queue.task_id)
         end
         queues, revisions, sequence = {}, {}, 0
+        trace_generation = trace_generation + 1
+        generation = trace_generation
     end
     function service:reserved(player_id, training_id)
         local count = 0
@@ -127,6 +138,7 @@ function M.create(deps)
         queue.blocked_reason = ""
         job.started_at = deps.now()
         job.finish_at = job.started_at + job.duration
+        trace("start", job)
         schedule(queue, job.duration, function()
             if queue.jobs[1] ~= job then return end
             local still_valid, reason = deps.validate(job)
@@ -139,6 +151,10 @@ function M.create(deps)
                 refund(job, ok and result and result.error or "training_completion_failed")
             end
             if queues[queue.source_entindex] ~= queue or queue.jobs[1] ~= job then return end
+            if ok and result and result.ok and not job.refunded
+                and type(result.entindex) == "number" and result.entindex > 0 then
+                trace("complete", job, result)
+            end
             table.remove(queue.jobs, 1)
             start_next(queue)
         end)
@@ -169,6 +185,7 @@ function M.create(deps)
             queues[key] = queue
         end
         queue.jobs[#queue.jobs + 1] = job
+        trace("enqueue", job)
         if #queue.jobs == 1 then start_next(queue) else publish(queue) end
         return {ok = true, queued = true, job_id = job.job_id, queue_count = #queue.jobs}
     end

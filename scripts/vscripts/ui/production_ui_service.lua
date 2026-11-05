@@ -326,6 +326,7 @@ function M.init(options)
                 source_entindex = source,
                 training_id = tostring(payload.training_id or ""),
                 source = "main_city_training_ui",
+                _training_trace = capture and payload._training_trace or nil,
             }) or { ok = false, error = "训练请求未响应" }
             -- Reconcile this accepted or rejected click against the same
             -- authenticated city's current reservations. This is a per-click

@@ -56,6 +56,10 @@ end
 bus.handle_request(events.BUILDING_QUERY_REQUEST,function(payload)return buildings[payload.entindex]end)
 bus.handle_request(events.WORKER_TRAINING_GET_REQUEST,function(payload)return training(payload.player_id,payload.source_entindex)end)
 bus.handle_request(events.WORKER_TRAIN_REQUEST,function(payload)
+ assert(payload._training_trace and payload._training_trace.action_code==8
+  and payload._training_trace.request_token==1 and payload._training_trace.production_selection==1
+  and payload._training_trace.owner_serial>0 and payload._training_trace.adapter_generation>0,
+  'accepted compact input carries server-created owner/token provenance without exposing it on the wire')
  train_calls=train_calls+1;local row=require('config/generated/training_definitions').by_id[payload.training_id]
  return queue:enqueue({player_id=payload.player_id,source_entindex=payload.source_entindex,team=2,training_id=payload.training_id,name=row.name,level=row.level,duration=row.training_duration_seconds})
 end)

@@ -70,13 +70,25 @@ function M.new(options)
         view.jobs={}
     end
     local function current(state)
-        return players[state.id]==state and options.player(state.id)==state.handle and options.authorize(state.id)
+        local ok,result=pcall(function()
+            return players[state.id]==state and (not options.is_current or options.is_current())
+                and options.player(state.id)==state.handle and options.authorize(state.id)
+        end)
+        if not ok then statistics.rejected=statistics.rejected+1 end
+        return ok and result
+    end
+    local function cancel_idle()
+        if queued and not running and not has_jobs()then
+            queued=false;pcall(options.cancel,"compact_ui_dispatch")
+        end
     end
     local schedule
     local function drain(from_scheduler)
         if running then return end
         queued=false;running=true;statistics.drains=statistics.drains+1
         local own_generation=generation
+        local active_job
+        local ok=pcall(function()
         local started=options.cpu_ms and options.cpu_ms()
         -- Concurrent recipients/publish calls share this real-time window;
         -- each synchronous caller cannot restart another eight-frame/2ms slice.
@@ -85,12 +97,15 @@ function M.new(options)
             budget_started,budget_work,budget_background,budget_cpu=started,0,0,0
             budget_initialized=true
         end
-        while has_jobs() and budget_work<8 do
+        while own_generation==generation and has_jobs() and budget_work<8 do
             if started and budget_cpu+options.cpu_ms()-started>=2 then break end
             if not queues[1].head and budget_background>=2 then break end
             local job,lane=pop();budget_work=budget_work+1
+            active_job=job
             if lane==2 then budget_background=budget_background+1 end
-            if job.active and not current(job.owner)then
+            local owner_current=job.active and current(job.owner)
+            if own_generation~=generation then break end
+            if job.active and not owner_current then
                 invalidate(job.view);job.view.needs_full=true
             elseif job.active then
                 local packet=job.packets[job.next]
@@ -103,16 +118,9 @@ function M.new(options)
                         return options.emit(job.owner.id,event,value)
                     end,options.budget.networksystem_sha256)
                 end
-                if own_generation~=generation then break end
-                if not sent then
-                    -- A failed first job must not retain an inactive queue
-                    -- head that strands every later transaction for this view.
-                    invalidate(job.view);job.view.needs_full=true;statistics.rejected=statistics.rejected+1
-                else
+                if sent then
                     if sent.bulk then
-                        -- gb is rare first-load bitmap data, not part of the
-                        -- calibrated49-byte cw budget. Record real value size;
-                        -- its native envelope requires separate engine proof.
+                        -- Rare gb data has separate native-envelope proof.
                         statistics.bulk_frames=statistics.bulk_frames+1
                         statistics.bulk_value_bytes=statistics.bulk_value_bytes+#packet.d
                         statistics.bulk_max_value_bytes=math.max(statistics.bulk_max_value_bytes,#packet.d)
@@ -121,6 +129,17 @@ function M.new(options)
                         statistics.native_bytes=statistics.native_bytes+sent.native_message_bytes
                         statistics.max_native_bytes=math.max(statistics.max_native_bytes,sent.native_message_bytes)
                     end
+                end
+                if own_generation~=generation then break end
+                if not job.active then
+                    -- Native emission can synchronously close/disconnect or
+                    -- replace this view. Never resurrect its old transaction
+                    -- or invalidate the replacement after an old send fails.
+                elseif not sent then
+                    -- A failed first job must not retain an inactive queue
+                    -- head that strands every later transaction for this view.
+                    invalidate(job.view);job.view.needs_full=true;statistics.rejected=statistics.rejected+1
+                else
                     job.next=job.next+1
                     if job.next<=#job.packets then push(job,job.priority)
                     else
@@ -130,21 +149,44 @@ function M.new(options)
                         local keep={};for _,pending in ipairs(job.view.jobs)do if pending.active then keep[#keep+1]=pending end end
                         job.view.jobs=keep
                         if keep[1]then push(keep[1],keep[1].priority)end
-                        if job.on_complete and job.view.open and job.view.epoch==job.epoch and current(job.owner)then
+                        if job.on_complete and current(job.owner) and own_generation==generation
+                            and job.view.open and job.view.epoch==job.epoch then
                             local ok=pcall(job.on_complete)
-                            if not ok then job.view.needs_full=true;statistics.rejected=statistics.rejected+1 end
+                            if not ok then
+                                if own_generation==generation and job.view.epoch==job.epoch then job.view.needs_full=true end
+                                statistics.rejected=statistics.rejected+1
+                            end
                         end
                     end
                 end
             end
+            active_job=nil
         end
-        if started then budget_cpu=budget_cpu+math.max(0,options.cpu_ms()-started)end
-        running=false;schedule()
+        if started and own_generation==generation then budget_cpu=budget_cpu+math.max(0,options.cpu_ms()-started)end
+        end)
+        running=false
+        if not ok and own_generation==generation then
+            statistics.rejected=statistics.rejected+1
+            if active_job and active_job.active then invalidate(active_job.view);active_job.view.needs_full=true end
+            -- An unknown clock/codec/provider error does not spin every frame.
+            -- A known failed job is retired; unrelated/replacement jobs can
+            -- continue. A clock failure waits for an explicit publish/resync.
+            queued=false
+            if active_job then schedule()end
+            return
+        end
+        schedule()
     end
     schedule=function()
         if queued or running or not has_jobs()then return end
-        queued=true;local own=generation
-        options.after(0,function()if own==generation then drain(true)end end,"compact_ui_dispatch")
+        local ticket={};queued=ticket;local own=generation
+        local ok,result=pcall(options.after,0,function()if own==generation and queued==ticket then drain(true)end end,"compact_ui_dispatch")
+        if not ok or result==false then
+            if own==generation and queued==ticket then
+                queued=false;statistics.rejected=statistics.rejected+1
+                pcall(options.cancel,"compact_ui_dispatch")
+            end
+        end
     end
     local function state_for(id,create)
         local handle=options.player(id)
@@ -379,6 +421,7 @@ function M.new(options)
         -- A closed panel must not continue draining its former full catalogue.
         -- Its next tiny hint or real Open starts a fresh atomic epoch instead.
         invalidate(view);view.revision=0;view.needs_full=false
+        cancel_idle()
         if values[fields.known]==true or values[fields.known]==1 then
             if handler.probe then local result=handler.probe(id);return result==nil and true or result end
         elseif handler.close then local result=handler.close(id);return result==nil and true or result end
@@ -387,12 +430,13 @@ function M.new(options)
     function api.disconnect(id)
         local state=players[id];if state then for _,view in pairs(state.views)do invalidate(view)end end
         players[id]=nil
+        cancel_idle()
     end
     function api.reset()
         generation=generation+1;players={};queues={{},{}};queued=false
         budget_started,budget_work,budget_background,budget_cpu=nil,0,0,0
         budget_initialized=false
-        options.cancel("compact_ui_dispatch")
+        pcall(options.cancel,"compact_ui_dispatch")
     end
     function api.inspect()return statistics end
     return api
@@ -400,6 +444,7 @@ end
 
 local default,failed,pending_views=nil,false,{}
 local world,listener=nil,nil
+local default_mode,default_driver
 local disconnect_bus,disconnect_subscription
 -- Never recycle an alias while this server Lua/module lifecycle can still have
 -- queued callbacks. A fresh server/network channel has a separate namespace.
@@ -412,14 +457,18 @@ end
 local function ensure_world()
     local bus=package.loaded["core/event_bus"]
     local current=bus and bus.get_generation and bus.get_generation()
-    if world and current and current~=world then
+    local mode=GameRules and GameRules:GetGameModeEntity()
+    if world and current and current~=world or default_mode and mode~=default_mode
+        or disconnect_bus and bus~=disconnect_bus then
         if default then default.reset()end
+        if default_driver then default_driver.dispose()end
         if disconnect_bus and disconnect_subscription then disconnect_bus.unsubscribe(disconnect_subscription)end
         if listener and CustomGameEventManager and type(CustomGameEventManager.UnregisterListener)=="function"then
             pcall(CustomGameEventManager.UnregisterListener,CustomGameEventManager,listener)
         end
         default,failed,pending_views,listener=nil,false,{},nil
         disconnect_bus,disconnect_subscription=nil,nil
+        default_mode,default_driver=nil,nil
     end
     world=current or world
 end
@@ -430,7 +479,12 @@ local function instance()
     local ok,result=pcall(function()
         local lookup=require("config/generated/ui_static_catalog_lookup")
         local budget=require("config/generated/ui_compact_wire_budget")
-        local scheduler=require("core/scheduler")
+        local bus=require('core/event_bus');local own=bus.get_generation();world=own
+        local mode=GameRules:GetGameModeEntity()
+        local driver=require('ui/compact_dispatch_driver').new({entity=mode,is_current=function()
+            return package.loaded['core/event_bus']==bus and bus.get_generation()==own
+                and GameRules:GetGameModeEntity()==mode and not mode:IsNull()
+        end})
         local cpu_ms
         if type(GetSystemTimeMS)=="function"then
             local valid,sample=pcall(GetSystemTimeMS)
@@ -447,7 +501,7 @@ local function instance()
         local value=M.new({lookup=lookup,budget=budget,
             player=function(id)return PlayerResource and PlayerResource:GetPlayer(id)end,authorize=authorize,
             session_token=allocate_session_alias,
-            after=scheduler.after,cancel=scheduler.cancel,
+            after=driver.after,cancel=driver.cancel,is_current=driver.is_current,
             cpu_ms=cpu_ms,
             emit=function(id,event,packet)
                 local player=PlayerResource:GetPlayer(id)
@@ -455,7 +509,7 @@ local function instance()
                 return CustomGameEventManager:Send_ServerToPlayer(player,event,packet)
             end})
         listener=CustomGameEventManager:RegisterListener("cw",function(source,payload)
-            if value~=default then return end
+            if value~=default or not driver.is_current()then return end
             local id=tonumber(payload and payload.PlayerID)
             if not id or not authorize(id)or type(payload.d)~="string"then return end
             local player=PlayerResource:GetPlayer(id)
@@ -465,13 +519,13 @@ local function instance()
             value.receive(id,{d=payload.d})
         end)
         for id,handler in pairs(pending_views)do value.register_view(id,handler)end
-        local bus=require('core/event_bus');local own=world
         disconnect_bus=bus
         disconnect_subscription=bus.subscribe(require('core/events').PLAYER_DISCONNECTED,function(payload)
             if default~=value or world~=own then return end
             local id=tonumber(payload and payload.player_id)
             if id then value.disconnect(id)end
         end)
+        default_mode,default_driver=mode,driver
         return value
     end)
     if ok then default=result;return result end

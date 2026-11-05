@@ -1094,10 +1094,38 @@ local function training_source_valid(job)
     return true
 end
 
+-- Local, source-bound evidence for actual compact action-8 jobs. Zero idle
+-- work and zero network sends; at most three short lines per accepted job.
+-- Owner is a server-local owner generation, not an account or auth token.
+local training_trace_world = 0
+local function training_trace(phase, job, result, queue_generation)
+    local trace = job._training_trace
+    if type(trace) ~= "table" or trace.action_code ~= 8 then return end
+    local function uint(value, low, high)
+        return type(value) == "number" and value == math.floor(value)
+            and value >= low and value <= high
+    end
+    if not uint(trace.adapter_generation, 1, 4294967295)
+        or not uint(trace.owner_serial, 1, 4294967295)
+        or not uint(trace.request_token, 1, 16383)
+        or not uint(trace.production_selection, 1, 4294967295)
+        or not uint(job.player_id, 0, 63)
+        or not uint(job.source_entindex, 1, 4294967295)
+        or not tostring(job.training_id):match("^train_lumberjack_%d+$") then return end
+    print(string.format("[WORKER_TRAINING_TRACE] v=1 phase=%s world=%d queue=%d job=%d player=%d source=%d adapter=%d owner=%d token=%d selection=%d action=8 training=%s duration=%.6f started=%.6f finish=%.6f now=%.6f unit=%d",
+        phase, training_trace_world, queue_generation, job.job_id,
+        job.player_id, job.source_entindex, trace.adapter_generation, trace.owner_serial, trace.request_token,
+        trace.production_selection, job.training_id, job.duration,
+        job.started_at or 0, job.finish_at or 0, GameRules:GetGameTime(),
+        result and result.entindex or 0))
+end
+
 local function initialize_training_queue()
+    training_trace_world = training_trace_world + 1
     if training_queue then training_queue:reset() end
     training_queue = worker_training_queue.create({
         capacity = 7,
+        trace = training_trace,
         now = function() return GameRules:GetGameTime() end,
         schedule = scheduler.after,
         cancel = scheduler.cancel,
@@ -1181,6 +1209,7 @@ local function enqueue_lumberjack(payload)
     local row = training_definitions.by_id[training_id]
     return training_queue:enqueue({city = city, source_entindex = city:entindex(),
         player_id = player_id, team = state.team, training_id = training_id,
+        _training_trace = payload._training_trace,
         level = progress.level, name = progress.name, definition = row,
         duration = math.max(0.05, tonumber(row.training_duration_seconds) or 1),
         wood_cost = math.max(0, tonumber(row.wood_cost) or 0),

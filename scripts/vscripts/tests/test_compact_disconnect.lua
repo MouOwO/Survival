@@ -4,8 +4,18 @@ package.loaded['core/test_access_policy']={enforce=function()return true end}
 package.loaded['systems/startup_loading_service']={is_player_ready=function()return true end}
 local bus=require('core/event_bus');local events=require('core/events');bus.reset()
 local tasks,listeners,packets={},{},{}
-local scheduler={after=function(_,fn,key)tasks[key]=fn end,cancel=function(key)tasks[key]=nil end}
-package.loaded['core/scheduler']=scheduler
+local cpu=0
+local mode={IsNull=function()return false end,SetContextThink=function(_,key,fn,delay)assert(delay==0);tasks[key]=fn end}
+GameRules={GetGameModeEntity=function()return mode end}
+GetSystemTimeMS=function()return cpu end
+local function pump()
+ for _=1,100 do
+  local key,fn=next(tasks);if not fn then return end
+  cpu=cpu+16;local again=fn()
+  if again==nil and tasks[key]==fn then tasks[key]=nil end
+ end
+ error('native driver did not become idle')
+end
 local actor={GetPlayerID=function()return 0 end}
 PlayerResource={IsValidPlayerID=function(_,id)return id==0 end,GetPlayer=function(_,id)if id==0 then return actor end end}
 EntIndexToHScript=function(index)if index==7 then return actor end end
@@ -31,13 +41,30 @@ open(1,1);assert(T.is_bound(0)and T.queue_depth(0,3)>0 and builds==1)
 bus.emit(events.PLAYER_DISCONNECTED,{player_id=0})
 assert(not T.is_bound(0)and not T.is_open(0,3)and T.queue_depth(0,3)==0,'disconnect retires state even while native actor/readiness stay valid')
 local sent=#packets
-for n=1,100 do local fn=tasks.compact_ui_dispatch;if not fn then break end;tasks.compact_ui_dispatch=nil;fn()end
+pump()
 assert(#packets==sent,'cancelled old jobs cannot drain after disconnect')
-native(bootstrap);for n=1,100 do local fn=tasks.compact_ui_dispatch;if not fn then break end;tasks.compact_ui_dispatch=nil;fn()end
+native(bootstrap);pump()
 assert(T.is_bound(0));for n=sent+1,#packets do assert(W.peek_header(packets[n]).session==2)end
 open(1,2);assert(builds==1,'old aliases cannot reopen a reconnected player')
 open(2,1);assert(builds==2)
-local old_listener=listeners[#listeners];bus.reset();assert(T.available());assert(not T.is_bound(0))
+local old_listener=listeners[#listeners];bus.reset()
+local old_builds=builds;open(2,2)
+assert(builds==old_builds,'old-world native input is rejected before lazy instance rebuild')
+assert(T.available());assert(not T.is_bound(0))
 old_listener(7,{PlayerID=0,d=bootstrap.d});assert(not T.is_bound(0),'old-world native callback is inert')
 assert(T.disconnect(0));assert(not T.is_bound(0))
+-- First native availability may be the module that initially imports the bus.
+-- Its driver must bind the generation returned by require, never a prior nil.
+package.loaded['core/event_bus']=nil
+local cold=assert(loadfile('scripts/vscripts/ui/compact_ui_transport.lua'))()
+assert(cold.register_view(3,{snapshot=snapshot}))
+local before=#packets;listeners[#listeners](7,{PlayerID=0,d=bootstrap.d})
+pump();assert(cold.is_bound(0) and #packets>before,'cold bus import must bind a live dispatch world')
+-- Entity replacement also expires the native listener without a bus reset.
+local old_mode_listener=listeners[#listeners]
+mode={IsNull=function()return false end,SetContextThink=function(_,key,fn,delay)assert(delay==0);tasks[key]=fn end}
+before=#packets;old_mode_listener(7,{PlayerID=0,d=bootstrap.d})
+assert(#packets==before,'old-mode native input is rejected before lazy instance rebuild')
+assert(cold.available() and not cold.is_bound(0))
+old_mode_listener(7,{PlayerID=0,d=bootstrap.d});assert(not cold.is_bound(0))
 print('COMPACT_DISCONNECT_PASS real native listener/event bus,queued cancellation,same-handle reconnect,new alias,old-world callback retired')

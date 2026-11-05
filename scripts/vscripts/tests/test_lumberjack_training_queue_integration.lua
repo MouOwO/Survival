@@ -561,3 +561,26 @@ bus.emit(events.ENGINE_ENTITY_KILLED,{victim_entindex=spawned[1]:entindex(),vict
 assert(repairer_view(0,"train_repairer_01").count==6)
 assert(repairer_view(1,"train_repairer_01").count==5 and train_repairer(0).ok)
 print("INTERNSHIP_OWNER_CAP_PASS: same-team isolation, junior-only +2, normal costs/population and replacement after death")
+
+-- Exercise the actual formatter and successful worker creation, including
+-- event_bus generations (opaque tables, never numeric account identifiers).
+reset()
+local trace_lines, old_print = {}, print
+print = function(value)
+    if type(value)=="string" and value:find("[WORKER_TRAINING_TRACE]",1,true) then
+        trace_lines[#trace_lines+1]=value
+    end
+end
+local accepted = bus.request(events.WORKER_TRAIN_REQUEST,{city=cities[0],player_id=0,
+    training_id="train_lumberjack_01",_training_trace={adapter_generation=1,
+        owner_serial=1,request_token=11,production_selection=1,action_code=8}})
+assert(accepted.ok and #trace_lines==2)
+tick(1)
+print = old_print
+assert(#trace_lines==3 and #spawned==1)
+assert(trace_lines[1]:find("phase=enqueue",1,true) and trace_lines[2]:find("phase=start",1,true)
+    and trace_lines[3]:find("phase=complete",1,true))
+assert(trace_lines[3]:match("world=%d+ queue=%d+ job=1 player=0 source=10 adapter=1 owner=1 token=11 selection=1 action=8"))
+assert(trace_lines[3]:find("now=1.000000 unit=100",1,true))
+assert(accounts[0].wood==999990 and accounts[0].population==1,"diagnostics preserve exact charge and output")
+print("WORKER_TRAINING_TRACE_PASS: actual enqueue/start/spawn, 3 bounded lines, numeric local generations, unchanged costs")

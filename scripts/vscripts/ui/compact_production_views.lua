@@ -1,8 +1,11 @@
 -- One private production lane per viewer. Selection identifiers are not
 -- transaction nonces; consumptive intents retain independently cached tokens.
 local M={}
+local trace_adapter_serial=0
 local ACTION={production_train=8,production_research=9,production_auto=10,production_cancel=11}
 function M.new(o)
+ trace_adapter_serial=trace_adapter_serial+1
+ local trace_adapter_generation=trace_adapter_serial
  local factory=assert(require('ui/compact_production_projection').new(o.lookup))
  local players,live,owner_serial={},true,0
  local function current()return live and(not o.current or o.current())end
@@ -58,7 +61,14 @@ function M.new(o)
   else
    local definition=factory.definition(args.arg_b)
    if not definition or(action=='production_train')~=(definition.kind=='training')then return rejected('training_definition_invalid')end
-   if action=='production_train'then payload.training_id=definition.key else payload.technology_group=definition.key end
+   if action=='production_train'then
+    payload.training_id=definition.key
+    -- Server-created provenance is passed only through the compact capture
+    -- route; legacy client payload fields are never trusted as provenance.
+    payload._training_trace={adapter_generation=trace_adapter_generation,
+     owner_serial=state.owner_serial, request_token=token,
+     production_selection=state.selection, action_code=8}
+   else payload.technology_group=definition.key end
   end
   -- Mark before calling the real services: they can synchronously publish
   -- resource/queue changes and re-enter UI subscribers. Never execute twice.

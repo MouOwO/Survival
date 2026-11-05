@@ -130,7 +130,7 @@ test("two independent HUD XML roots reuse one same-build same-schema runtime in 
  const source=fs.readFileSync("panorama/src/scripts/custom_game/common/compact_ui_runtime.js","utf8");
  for(const order of [["hud","archive"],["archive","hud"]]){
   const cfg={SurvivalCompactWire:W,SurvivalUICatalog:{Data:C}},events=new Map();let subscriptions=0,unsubscribed=0;
-  function load(name){const env={GameUI:{CustomUIConfig:()=>cfg},GameEvents:{Subscribe(event,fn){subscriptions++;events.set(subscriptions,fn);return subscriptions;},Unsubscribe(id){unsubscribed++;events.delete(id);},SendCustomGameEventToServer(){}},CustomNetTables:{GetTableValue(){return null;},SubscribeNetTableListener(){return 1;},UnsubscribeNetTableListener(){}},$:{Schedule(){return 1;},CancelScheduled(){}},Game:{GetLocalPlayerID:()=>0}};vm.runInNewContext(source,env,{filename:name});}
+  function load(name){const env={GameUI:{CustomUIConfig:()=>cfg},GameEvents:{Subscribe(event,fn){subscriptions++;events.set(subscriptions,fn);return subscriptions;},Unsubscribe(id){unsubscribed++;events.delete(id);},SendCustomGameEventToServer(){}},CustomNetTables:{GetTableValue(){return null;},SubscribeNetTableListener(){return 1;},UnsubscribeNetTableListener(){}},$:{GetContextPanel(){return {IsValid:()=>true};},CreatePanel(){return {IsValid:()=>true,DeleteAsync(){}};},RegisterEventHandler(){throw Error("native_invalid_event_type");},Schedule(){return 1;},CancelScheduled(){}},Game:{GetLocalPlayerID:()=>0}};vm.runInNewContext(source,env,{filename:name});}
   load(order[0]);const first=cfg.SurvivalCompactRuntime,view=first.CreateView("daily",{});view.Open();load(order[1]);assert.equal(cfg.SurvivalCompactRuntime,first);assert.equal(subscriptions,1);assert.equal(unsubscribed,0);assert.equal(view.Inspect().active,true);
   first.Dispose();load(order[0]);assert.notEqual(cfg.SurvivalCompactRuntime,first);assert.equal(subscriptions,2);
  }
@@ -168,16 +168,16 @@ test("capability and beta claims use separate typed views with no client reward/
  t.admit({admission_complete:1,profiles_ready:1,session_id:"survival_world_B"});
  assert.equal(t.rt.ScopeIdentity().loading_identity,"survival_world_B");assert.equal(t.rt.ScopeIdentity().ready,false,'new namespace still requires a fresh Hello');
 });
-test("destroying the actual subscription owner retires the shared runtime before HUD recreation",()=>{
+test("destroying the actual owner retires shared runtime without a fabricated native deletion event",()=>{
  const source=fs.readFileSync('panorama/src/scripts/custom_game/common/compact_ui_runtime.js','utf8');
- const cfg={SurvivalCompactWire:W,SurvivalUICatalog:{Data:C}},callbacks=[];let subscriptions=0,unsubscribed=0;
- function load(){const owner={IsValid:()=>true};vm.runInNewContext(source,{GameUI:{CustomUIConfig:()=>cfg},
-  GameEvents:{Subscribe(){subscriptions++;return subscriptions;},Unsubscribe(){unsubscribed++;},SendCustomGameEventToServer(){}},
+ const cfg={SurvivalCompactWire:W,SurvivalUICatalog:{Data:C}},owners=[],callbacks=[];let subscriptions=0,unsubscribed=0;
+ function load(){const owner={valid:true,IsValid(){return this.valid;}};owners.push(owner);vm.runInNewContext(source,{GameUI:{CustomUIConfig:()=>cfg},
+  GameEvents:{Subscribe(name,fn){subscriptions++;callbacks.push(fn);return subscriptions;},Unsubscribe(){unsubscribed++;},SendCustomGameEventToServer(){}},
   CustomNetTables:{GetTableValue:()=>null,SubscribeNetTableListener:()=>1,UnsubscribeNetTableListener(){}},
-  $:{GetContextPanel:()=>owner,RegisterEventHandler(event,panel,fn){assert.equal(event,'PanelDeleted');assert.equal(panel,owner);callbacks.push(fn);},Schedule:()=>1,CancelScheduled(){}},Game:{}});}
+  $:{GetContextPanel:()=>owner,CreatePanel(){const marker={valid:true,IsValid(){return this.valid&&owner.valid;},DeleteAsync(){this.valid=false;}};return marker;},RegisterEventHandler(){throw Error("native_invalid_event_type");},Schedule:()=>1,CancelScheduled(){}},Game:{}});}
  load();const old=cfg.SurvivalCompactRuntime,view=old.CreateView('daily',{});load();assert.equal(cfg.SurvivalCompactRuntime,old);
- assert.equal(subscriptions,1);callbacks[0]();assert.equal(old.Inspect().active,false);assert.equal(view.Inspect().active,false);assert.equal(unsubscribed,1);
- load();assert.notEqual(cfg.SurvivalCompactRuntime,old);assert.equal(subscriptions,2);callbacks[0]();assert.equal(cfg.SurvivalCompactRuntime.Inspect().active,true,'old panel callback cannot dispose replacement');
+ assert.equal(subscriptions,1);owners[0].valid=false;callbacks[0]({d:'late'});assert.equal(old.Inspect().active,false);assert.equal(view.Inspect().active,false);assert.equal(unsubscribed,1);
+ load();assert.notEqual(cfg.SurvivalCompactRuntime,old);assert.equal(subscriptions,2);callbacks[0]({d:'late'});assert.equal(cfg.SurvivalCompactRuntime.Inspect().active,true,'old native callback cannot dispose replacement');
 });
 test("infrequent grid bulk is negotiated, bound to metadata and cancelled independently of short cw",()=>{
  const B=require('../panorama/src/scripts/custom_game/common/compact_grid_bulk_wire.js');
