@@ -14,13 +14,14 @@ DOTA_GAMERULES_STATE_POST_GAME = 8
 DOTA_UNIT_TARGET_TEAM_BOTH, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_BASIC = 3, 1, 2
 DOTA_UNIT_TARGET_BUILDING, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER = 4, 64, 0
 Vector = function(x, y, z) return { x = x, y = y, z = z } end
-local scheduled, winners, finalized, created, granted, archive_clears
+local scheduled, scheduled_due, winners, finalized, created, granted, archive_clears
 local active_players, markers_ready, reward_pending, last_projection, defeated, personal_finalized
 local match_mode, preload_calls, scheduled_count = "standard", 0, 0
 local cooperative_payloads, fake_players = {}, {}
 local visual_deaths, hero_visual_deaths, visual_cleanups, boss_rewards
 local death_metadata
 local overflow_notices
+local native_alive_checks=0
 local function active_player(id)
     for _, value in ipairs(active_players or {}) do if value==id then return true end end
     return false
@@ -42,7 +43,7 @@ local function unit(name, position)
     local result = { id = serial, name = name, abilities = {}, alive = true,
         position = position or Vector(0,0,30) }
     function result:IsNull() return self.removed == true end
-    function result:IsAlive() return self.alive end
+    function result:IsAlive() native_alive_checks=native_alive_checks+1;return self.alive end
     function result:entindex() return self.id end
     function result:GetAbsOrigin() return self.position end
     function result:GetHullRadius() return self.name:match("^npc_archive_challenge_") and 64 or 32 end
@@ -103,8 +104,11 @@ ListenToGameEvent = function(_, callback) state_listener = callback; return 1 en
 StopListeningToGameEvent = noop
 package.loaded["core/scheduler"] = {
     every = function(_, callback, key) scheduled_count = scheduled_count + 1; scheduled[key] = callback end,
-    after = function(_, callback, key) scheduled_count = scheduled_count + 1; scheduled[key or (#scheduled + 1)] = callback end,
-    cancel = function(key) scheduled[key] = nil end,
+    after = function(delay, callback, key)
+        scheduled_count = scheduled_count + 1;key=key or (#scheduled + 1)
+        scheduled[key]=callback;scheduled_due[key]=clock+delay
+    end,
+    cancel = function(key) scheduled[key] = nil;scheduled_due[key]=nil end,
     task_count = function() return 0 end,
 }
 for _, name in ipairs({ "systems/asset_preload_service", "config/asset_catalog",
@@ -219,7 +223,7 @@ local function restart(difficulty, without_archive, players, mode)
     clock, engine_state, serial = 0, 7, 0
     match_mode, preload_calls, scheduled_count = mode or "standard", 0, 0
     cooperative_payloads, fake_players = {}, {}
-    scheduled, winners, finalized, created, granted, archive_clears = {}, {}, {}, {}, {}, {}
+    scheduled, scheduled_due, winners, finalized, created, granted, archive_clears = {}, {}, {}, {}, {}, {}, {}
     visual_deaths, hero_visual_deaths, visual_cleanups, boss_rewards = {}, {}, {}, {}
     active_players, markers_ready, reward_pending = players or {0, 1}, true, {}
     defeated, last_projection, personal_finalized = {}, nil, {}
@@ -258,7 +262,10 @@ end
 local function tick(at, player)
     clock = at
     local key = "wave_monster_overflow:" .. player
-    assert(scheduled[key], "overflow timer must exist for player " .. player)()
+    local callback=assert(scheduled[key], "overflow timer must exist for player " .. player)
+    if not scheduled_due[key] or clock>=scheduled_due[key]then
+        scheduled[key]=nil;scheduled_due[key]=nil;callback()
+    end
 end
 local function prepare_lanes()
     upvalue("rebuild_wave_channels")()
@@ -458,45 +465,126 @@ prepare_lanes()
 for id = 0, 1 do assert(scheduled["archive_hubs_retry:" .. id]() == false) end
 assert(#created == 8)
 
--- Every second has exactly one private center-tip; other publications cannot spam it.
+-- One real deadline task and existing HUD state replace all per-second large tips.
 state = restart("N1", true, {0, 1})
 prepare_lanes()
 local warned = spawn_lane(0, 91)
-assert(#overflow_notices == 1 and overflow_notices[1].message == "您需在20s内清理怪物")
-assert(overflow_notices[1].player_id == 0 and not snapshot(1).overflow_active)
+assert(#overflow_notices == 0 and snapshot(0).overflow_deadline == 20)
+assert(snapshot(0).overflow_active and not snapshot(1).overflow_active)
+native_alive_checks=0
 for second = 1, 19 do
+    local before=last_projection
     tick(second, 0)
+    assert(last_projection==before,"no server refresh callback runs between real population changes")
     assert(#defeated == 0 and #winners == 0, "no loss before twenty seconds")
-    assert(#overflow_notices == second+1)
-    assert(overflow_notices[#overflow_notices].message == "您需在" .. (20-second) .. "s内清理怪物")
-    assert(overflow_notices[#overflow_notices].player_id == 0)
+    assert(#overflow_notices == 0 and snapshot(0).overflow_remaining == 20-second)
+    assert(scheduled_due["wave_monster_overflow:0"]==20,"one original absolute task remains scheduled")
     publish("unrelated_hud_refresh")
     tick(second, 0) -- game time does not advance while paused
-    assert(#overflow_notices == second+1, "duplicate publishes/paused ticks cannot duplicate tips")
+    assert(#overflow_notices == 0, "duplicate publishes/paused ticks emit no legacy tips")
 end
+assert(native_alive_checks==0,"stable grace performs zero full-scene native IsAlive scans")
 kill(warned[1])
 assert(snapshot(0).alive == 90 and snapshot(0).overflow_active, "ninety does not cancel an existing warning")
 tick(20, 0)
 assert(snapshot(0).player_defeated and not snapshot(1).player_defeated)
-assert(#overflow_notices == 20, "expiry sends no zero/negative countdown")
+assert(#overflow_notices == 0, "all warning text is derived locally from the existing authoritative HUD")
 assert(#winners == 0 and #defeated == 1, "only the overflowing player loses")
 -- Clearing before the deadline cancels the task; subsequent overload gets a full new grace.
 state = restart("N1", true, {0})
 prepare_lanes()
 local recovered = spawn_lane(0, 91)
+local old_deadline_callback=scheduled["wave_monster_overflow:0"]
 clock = 19.99
 kill(recovered[1]); kill(recovered[2])
 assert(snapshot(0).alive == 89 and not snapshot(0).overflow_active)
 assert(scheduled["wave_monster_overflow:0"] == nil and #defeated == 0)
-assert(overflow_notices[#overflow_notices].message == "怪物数量已恢复，警报解除")
+assert(#overflow_notices==0,"recovery is one authoritative HUD transition, not another full-text event")
 clock = 25
 spawn_lane(0, 2)
 assert(snapshot(0).overflow_deadline == 45 and snapshot(0).overflow_remaining == 20)
+local before_stale=last_projection
+assert(old_deadline_callback()==false and last_projection==before_stale and #defeated==0,
+    "a canceled earlier deadline cannot expire or republish a later overload")
 tick(44.99, 0)
 assert(#defeated == 0)
 tick(45, 0)
 assert(#defeated == 1 and #winners == 1)
-print("PASS overflow grace: private center tips 20..1, no duplicate/paused tips, strict recovery below 90, fresh grace, expiry at 20s")
+print("PASS overflow grace: one deadline task, zero stable server refresh/legacy tip events, paused game clock, strict recovery below 90, fresh grace, exact expiry at20s")
+
+-- Exact-ID native invalidation replaces the old full-scene watchdog. Its
+-- single delayed check preserves the one-second silent-removal bound without
+-- preempting normal death/reward delivery or removing alive replacements.
+local function invalidate(value, owner)
+    return wave.observe_enemy_modifier_destroyed(value,value:entindex(),owner,
+        upvalue("lane_view_scope").world,bus.get_generation())
+end
+local function run_invalidation(value, at)
+    clock=at;local key="wave_entity_invalidation:"..value:entindex()
+    local callback=assert(scheduled[key]);assert(clock>=scheduled_due[key])
+    scheduled[key]=nil;scheduled_due[key]=nil;return callback()
+end
+state=restart("N1",true,{0});prepare_lanes()
+local silent=spawn_lane(0,91)
+local before_tasks=scheduled_count
+assert(invalidate(silent[1],0) and invalidate(silent[1],0) and invalidate(silent[2],0))
+assert(scheduled_count==before_tasks+2,"duplicate modifier destruction coalesces by exact native ID")
+assert(not invalidate(silent[3],1),"a mismatching cached owner cannot retire a formal enemy")
+silent[1].removed=true;silent[2].removed=true;clock=.99
+assert(snapshot(0).alive==91 and snapshot(0).overflow_active)
+native_alive_checks=0
+run_invalidation(silent[1],1);run_invalidation(silent[2],1)
+assert(snapshot(0).alive==89 and not snapshot(0).overflow_active and #defeated==0)
+assert(native_alive_checks==0,"two invalid handles cause no unrelated native alive checks")
+assert(scheduled["wave_monster_overflow:0"]==nil,"silent removal recovers within one second")
+
+state=restart("N1",true,{0});prepare_lanes()
+local live=spawn_lane(0,91);local original_deadline=snapshot(0).overflow_deadline
+assert(invalidate(live[1],0));local before_alive=last_projection
+run_invalidation(live[1],1)
+assert(snapshot(0).alive==91 and snapshot(0).overflow_deadline==original_deadline
+    and last_projection==before_alive,"alive purge/modifier replacement cannot change population or grace")
+
+assert(invalidate(live[2],0));local normal_key="wave_entity_invalidation:"..live[2]:entindex()
+local late_normal=scheduled[normal_key];kill(live[2])
+assert(scheduled[normal_key]==nil,"real death retires its pending invalidation")
+local after_kill=state.killed;late_normal()
+assert(state.killed==after_kill and snapshot(0).alive==90,"late invalidation cannot duplicate death credit")
+
+assert(invalidate(live[3],0));local reused_key="wave_entity_invalidation:"..live[3]:entindex()
+local late_reused=scheduled[reused_key]
+local replacement=unit("replacement");replacement.id=live[3]:entindex()
+upvalue("enemies")[replacement.id]={unit=replacement,player_id=0}
+late_reused();assert(upvalue("enemies")[replacement.id].unit==replacement)
+assert(not invalidate(live[3],0),"late old handle cannot target a reused entity ID")
+
+assert(invalidate(live[4],0));local old_world=scheduled["wave_entity_invalidation:"..live[4]:entindex()]
+state=restart("N1",true,{0});prepare_lanes();spawn_lane(0,91)
+local current_projection=last_projection;old_world()
+assert(last_projection==current_projection and snapshot(0).alive==91 and #defeated==0,
+    "old world/generation callbacks cannot mutate the replacement roster")
+print("PASS indexed native invalidation: silent removal<=1s, duplicate coalescing, alive replacement, owner/handle/ID/world guards, normal death credit once, zero stable polling")
+
+local function invalid_final_boss(use_lifecycle)
+    local final=restart("N1",false,{0});prepare_lanes()
+    local boss=spawn_lane(0,1,true)[1];final_ready(final)
+    if use_lifecycle then assert(invalidate(boss,0)) end
+    boss.alive=false
+    if use_lifecycle then run_invalidation(boss,1) else upvalue("update_targets")() end
+    local result={alive=final.alive,boss_alive=final.boss_alive,killed=final.killed,
+        rewards=#boss_rewards,clears=#archive_clears,status=final.status,victory_settled=final.victory_settled}
+    final_check();assert(#archive_clears==result.clears,"terminal hygiene cannot repeat clear credit")
+    return result
+end
+local original_hygiene=invalid_final_boss(false)
+local indexed_hygiene=invalid_final_boss(true)
+for key,value in pairs(original_hygiene)do
+    assert(indexed_hygiene[key]==value,"final-boss native invalidation preserves existing hygiene: "..key)
+end
+assert(indexed_hygiene.alive==0 and indexed_hygiene.boss_alive==false
+    and indexed_hygiene.killed==0 and indexed_hygiene.rewards==0,
+    "silent final-boss invalidation removes population without manufacturing a kill or boss reward")
+print("PASS final-boss invalidation parity: existing cleanup/clear-once behavior, zero manufactured kill/boss rewards")
 
 -- All four players have independent capacity: combined population is not a cap.
 local enemies
@@ -528,7 +616,7 @@ clock = 2
 spawn_lane(1, 11)
 assert(snapshot(1).overflow_active and snapshot(1).overflow_remaining == 20)
 tick(3.2, 0)
-assert(last_projection.hud_clock_only==true,"clock ticks do not request HUD rebuilds")
+assert(last_projection.hud_clock_only~=true,"no synthetic clock publication occurs before the deadline")
 assert(snapshot(0).overflow_deadline==20 and snapshot(1).overflow_deadline==22,"absolute personal deadlines are exposed")
 assert(snapshot(0).overflow_remaining == 17 and snapshot(1).overflow_remaining == 19,
     "a later owner's timer must not inherit the first owner's deadline")

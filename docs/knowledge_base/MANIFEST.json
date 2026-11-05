@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 33063,
-      "sha256": "d571605469bcc4c0f19b76ffb4f94c2563b91cc3c691e971a714ba8faa99d300"
+      "bytes": 33520,
+      "sha256": "d1f046a5f53c30d1b64674f5835ba15c233cd81fc6ba2afaa01672878c9bf181"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 46984,
-      "sha256": "d062627d1360120a0cf6a8b3c80561d50146a701c143dddff96df2dbbfe89805"
+      "bytes": 47441,
+      "sha256": "11430b19522bcdead3f4a1f0ad6268d924dfdd2f91a0f66234783704c1de7f70"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -327,6 +327,11 @@
       "path": "evidence/network50_0402_native_followup_20261105.md",
       "bytes": 5871,
       "sha256": "4075ce9b9b6777a84cc80f9d9c2dd9b51ba41bf8076f118c1637c0b1efab21bc"
+    },
+    {
+      "path": "evidence/network50_0501_native_followup_20261105.md",
+      "bytes": 7169,
+      "sha256": "9d80b533b844116f2da42841a3bb4057b969e81bc9541e7c07811ee07e908dcb"
     },
     {
       "path": "evidence/network50_dev07_native_fps_20261103.md",
@@ -680,8 +685,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 21139,
-      "sha256": "999cc88bef183d55cd8e5d3182ef54bfec3a7f7803c6d06597e69572efb1b066"
+      "bytes": 21596,
+      "sha256": "1d9ddabb5fb8c2a02cb150bfc0a7a66639ae5c691d33f7b0688d606d7220d584"
     },
     {
       "path": "tools/verify_knowledge.py",

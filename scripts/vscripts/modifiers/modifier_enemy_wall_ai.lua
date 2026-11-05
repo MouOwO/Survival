@@ -11,6 +11,7 @@ local attack_observer = require("systems/enemy_attack_observer")
 local wall_targets = require("systems/wall_target_service")
 local ranged_stationary = require("systems/enemy_ranged_stationary")
 local wave_attack_rules = require("systems/wave_attack_rules")
+local wave_lifetime_bus = require("core/event_bus")
 local function shared_death_ready()
     return type(attack_observer.can_route_death)=='function' and type(attack_observer.register_death)=='function'
         and type(attack_observer.bind_death_wall)=='function' and type(attack_observer.unregister_death)=='function'
@@ -174,6 +175,15 @@ function M:OnCreated(params)
     if not IsServer() then return end
     local parent = self:GetParent()
     if parent.survival_is_wave_monster == true then
+        -- Cache identity before native removal can invalidate GetParent/ID.
+        -- A destroyed modifier produces one bounded lifecycle check, never a
+        -- world scan or a new steady timer. Alive replacements remain valid.
+        self.wave_lifetime_unit = parent
+        self.wave_lifetime_entindex = parent:entindex()
+        self.wave_lifetime_player_id = parent.survival_player_id
+        self.wave_lifetime_world = GameRules and GameRules.GetGameModeEntity
+            and GameRules:GetGameModeEntity() or GameRules
+        self.wave_lifetime_generation = wave_lifetime_bus.get_generation()
         -- Native melee needs this flag even for a forced explicit wall order
         -- (verified on a formal N1 spawn). Keep its search radius at zero;
         -- order, retaliation and damage rules still reject non-wall targets.
@@ -588,6 +598,13 @@ end
 
 function M:OnDestroy()
     if not IsServer() then return end
+    local wave = package.loaded["systems/wave_system"]
+    if self.wave_lifetime_unit and wave and wave.observe_enemy_modifier_destroyed then
+        wave.observe_enemy_modifier_destroyed(self.wave_lifetime_unit,
+            self.wave_lifetime_entindex, self.wave_lifetime_player_id,
+            self.wave_lifetime_world, self.wave_lifetime_generation)
+    end
+    self.wave_lifetime_unit = nil
     self:ReleaseRangedStationary("destroyed")
     if type(attack_observer.unregister_death)=='function' then attack_observer.unregister_death(self) end
     self.boundary_position=nil

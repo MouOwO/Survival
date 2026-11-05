@@ -57,7 +57,15 @@ const ids = ['ArchiveWindow', 'ArchiveScrim', 'ArchiveHeader', 'ArchiveTitle', '
     'ArchiveContext', 'ArchiveHint', 'ArchiveStatus', 'EndlessStatus'];
 ids.forEach(id => new Panel('Panel', root, id));
 nodes.EndlessStatus.AddClass('ArchiveHidden');
+let gameClock=100,hudAlive=true,scope={active:true,ready:true,session:1,loading_identity:1};
+const hudCallbacks=new Map(),retiredHUDCallbacks=[];let hudSerial=0;
+const runtime={ScopeIdentity:()=>scope};
+const hudSource={Runtime:runtime,IsAlive:()=>hudAlive,
+    Subscribe(owner,sections,callback){assert.equal(sections.join(','),'wave');hudCallbacks.set(++hudSerial,callback);return hudSerial;},
+    Unsubscribe(id){retiredHUDCallbacks.push(hudCallbacks.get(id));hudCallbacks.delete(id);}};
+function waveState(wave){for(const callback of hudCallbacks.values())callback({wave});}
 const cfg = {
+    SurvivalCompactRuntime:runtime,SurvivalCompactHUDSource:hudSource,
     SurvivalArchiveColors: {number: '#ffd800'},
     ArchiveHandoffAssets: {'icon_check_light.png': 'check', 'icon_lock_light.png': 'lock'},
     SurvivalUI: {
@@ -86,7 +94,7 @@ const $ = {
     CancelScheduled(id) { scheduled.delete(id); }, RegisterEventHandler() {}
 };
 vm.runInNewContext(source, {
-    $, GameUI: {CustomUIConfig: () => cfg}, Game: {GetLocalPlayerID: () => 0},
+    $, GameUI: {CustomUIConfig: () => cfg}, Game: {GetLocalPlayerID: () => 0,GetGameTime:()=>gameClock},
     GameEvents: {
         Subscribe(name, callback) { subscriptions[name] = callback; return name; },
         Unsubscribe() {},
@@ -181,17 +189,55 @@ subscriptions.survival_endless_state({...latestState,wave:1001,seconds:59,remain
 assert(nodes.EndlessStatus.BHasClass('ArchiveHidden'),'ordinary per-second state changes do not reopen the tip');
 subscriptions.survival_endless_state({...latestState,wave:1002});
 assert(!nodes.EndlessStatus.BHasClass('ArchiveHidden'),'a new wave gets a fresh brief tip');
+const countdownTimers=()=>[...scheduled.values()].filter(timer=>timer.delay===0.25);
+waveState({overflow_active:true,overflow_deadline:120,status:'spawning'});
+assert.equal(hudCallbacks.size,1,'one owner subscription reuses the existing HUD view');
+assert.equal(tipTimers().length,0,'starting overflow cancels an old transient hide');
+assert.equal(countdownTimers().length,1);
+const staleCountdown=countdownTimers()[0].callback;
 for(let seconds=20;seconds>0;seconds--){
-    subscriptions.ui_notification({kind:'wave_overflow_tip',player_id:0,message:'您需在'+seconds+'s内清理怪物'});
+    gameClock=120-seconds;
+    fireTimer(countdownTimers()[0]);
     assert.equal(nodes.EndlessStatus.text,'您需在'+seconds+'s内清理怪物');
     assert(!nodes.EndlessStatus.BHasClass('ArchiveHidden'));
-    assert.equal(tipTimers().length,1,'per-second warnings replace the existing center-tip timer');
+    assert.equal(countdownTimers().length,1);
+    const before={...metrics};
+    for(let paused=0;paused<10;paused++)fireTimer(countdownTimers()[0]);
+    assert.deepEqual(metrics,before,'paused game clock performs zero setters, tree walks or panel creation');
+    waveState({overflow_active:true,overflow_deadline:120,status:'spawning',alive:91+seconds});
+    assert.deepEqual(metrics,before,'unrelated real population deltas do not restart the same countdown');
 }
-subscriptions.ui_notification({kind:'wave_overflow_tip',player_id:1,message:'其他玩家的警报'});
-assert.equal(nodes.EndlessStatus.text,'您需在1s内清理怪物','another player cannot replace the local warning');
-subscriptions.ui_notification({kind:'wave_overflow_tip',player_id:0,message:'怪物数量已恢复，警报解除'});
+const oldWarning=nodes.EndlessStatus.text;
+subscriptions.ui_notification({kind:'wave_overflow_tip',player_id:0,message:'legacy重复'});
+assert.equal(nodes.EndlessStatus.text,oldWarning,'old full-text event cannot duplicate an authoritative HUD warning');
+subscriptions.ui_notification({kind:'endless_tip',player_id:0,message:'低优先级提示'});
+assert.equal(nodes.EndlessStatus.text,oldWarning,'overflow warning has priority over a brief unrelated tip');
+waveState({overflow_active:false,overflow_deadline:0,status:'spawning',alive:89});
 assert.equal(nodes.EndlessStatus.text,'怪物数量已恢复，警报解除');
+assert.equal(countdownTimers().length,0);assert.equal(tipTimers().length,1);
+staleCountdown();assert.equal(nodes.EndlessStatus.text,'怪物数量已恢复，警报解除','old countdown cannot overwrite recovery');
+gameClock=125;waveState({overflow_active:true,overflow_deadline:145,status:'spawning'});
+assert.equal(nodes.EndlessStatus.text,'您需在20s内清理怪物','a second overload receives a fresh authoritative deadline');
+assert.equal(tipTimers().length,0);
+gameClock=145;fireTimer(countdownTimers()[0]);
+assert(nodes.EndlessStatus.BHasClass('ArchiveHidden'),'expiry never renders a zero or negative warning');
+assert.equal(countdownTimers().length,0);
+waveState({overflow_active:false,overflow_deadline:0,status:'defeat',player_defeated:true});
+assert.equal(tipTimers().length,0,'defeat does not masquerade as recovery');
+scope={...scope,session:2};gameClock=150;
+waveState({overflow_active:true,overflow_deadline:170,status:'spawning'});
+const staleWorld=countdownTimers()[0].callback;
+scope={...scope,session:3};fireTimer(countdownTimers()[0]);
+assert(nodes.EndlessStatus.BHasClass('ArchiveHidden'),'scope replacement clears the old world warning');
+assert.equal(countdownTimers().length,0);
+waveState({overflow_active:true,overflow_deadline:180,status:'spawning'});
+assert.equal(countdownTimers().length,1);
+const staleDispose=countdownTimers()[0].callback;
 api.Dispose();assert(nodes.EndlessStatus.BHasClass('ArchiveHidden'),'controller disposal hides its tip');
+assert.equal(hudCallbacks.size,0);assert.equal(countdownTimers().length,0);
+const afterDispose={...metrics};staleDispose();
+for(const callback of retiredHUDCallbacks)callback({wave:{overflow_active:true,overflow_deadline:200}});
+assert.deepEqual(metrics,afterDispose,'disposed callbacks cannot resurrect the old panel');
 const css=fs.readFileSync(path.join(project,'panorama/src/styles/custom_game/archive.css'),'utf8');
 const tipStyle=css.match(/#EndlessStatus\s*\{([^}]+)\}/)[1];
 assert.match(tipStyle,/horizontal-align:\s*center/);assert.match(tipStyle,/vertical-align:\s*center/);
@@ -201,4 +247,4 @@ const first=ui.indexOf('    function showNotification('),last=ui.indexOf('    fu
 vm.runInNewContext(ui.slice(first,last)+'\nshowNotification({kind:"endless_tip",message:"倒计时"});\nshowNotification({kind:"wave_overflow_tip",message:"您需在20s内清理怪物"});',{
     panel(){throw new Error('endless tips must not create an ordinary top notification');}
 });
-console.log('ARCHIVE_ENDLESS_REFRESH_PASS: cached snapshots, bounded center-tip timer, stale-hide guard, local countdown, wave/end dedup, no top duplicate, disposal and centered styling');
+console.log('ARCHIVE_ENDLESS_REFRESH_PASS: cached snapshots, bounded center-tip timer, stale-hide guard, single-authority overflow deadlines/paused local countdown/recovery/restart/expiry/scope, wave/end dedup, no top duplicate, disposal and centered styling');

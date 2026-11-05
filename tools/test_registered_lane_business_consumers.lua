@@ -1,6 +1,10 @@
 -- Real wave/pilot factory, bus, four consumers and corrosive modifier. Engine
 -- services are mocked; "legacy" loads exact pre-change consumer backups.
 package.path='scripts/vscripts/?.lua;'..package.path
+-- Synthetic engine slots have no Steam identity. Keep the real private pilot
+-- and four-owner/profile checks, while isolating unrelated account admission.
+-- The real restricted-account policy is exercised by test_test_access_policy.
+package.loaded['config/test_access']={enabled=false}
 class=function(t) return t end
 local legacy=arg and arg[1]=='legacy'
 local bus,events=require('core/event_bus'),require('core/events')
@@ -104,6 +108,10 @@ local function unit(name,p)
     function u:HasModifier(name) return self.mods[name]~=nil end
     function u:FindModifierByName(name) return self.mods[name] end
     function u:AddNewModifier(_,_,name,params)
+        if name=='modifier_enemy_wall_ai' then
+            check(self.survival_is_wave_monster==true and type(self.survival_player_id)=='number',
+                'Actual formal factory tags identity before native AI creation/OnCreated')
+        end
         if flags.stat_throw and name=='modifier_debug_attack_cap' then error('native modifier failed') end
         local m=copy(params or {});m.parent=self
         function m:IsNull() return false end;function m:GetParent() return self.parent end
@@ -341,6 +349,27 @@ case('dead_valid_prune_retains_body_without_forging_kill',function()
     apply_both(0)
     check(u:HasModifier('modifier_rogue_corrosive_shield_attack') and u:HasModifier('modifier_rogue_enemy_attack_speed'),'Both real rogue consumers include pruned body')
     UTIL_Remove(u);check(run_cleanup()==false,'Pruned body history ends on actual native removal')
+end)
+
+case('silent_native_invalidation_preserves_real_registered_lane_history',function()
+    local u=born(1);u.alive=false
+    local before=bus.request(events.WAVE_STATE_GET_REQUEST,{})
+    local prior_rewards=boss_rewards
+    check(wave.observe_enemy_modifier_destroyed(u,u.id,1,mode,bus.get_generation()),
+        'Real private current lane admits only its exact cached native identity')
+    local key='wave_entity_invalidation:'..u.id
+    check(type(tasks[key])=='function','One exact native invalidation deadline')
+    local callback=tasks[key];tasks[key]=nil;time=time+1;callback()
+    local after=bus.request(events.WAVE_STATE_GET_REQUEST,{})
+    check(after.alive==0 and after.killed==before.killed and boss_rewards==prior_rewards,
+        'Silent removal follows original invalid-enemy no-kill/no-reward settlement')
+    check(wave._registered_lane_view_snapshot_for_test().pending==1 and lane_view.append({})[1]==u,
+        'Actual registered dead-valid lane remains visible through its owned retirement history')
+    apply_both(0)
+    check(u:HasModifier('modifier_rogue_corrosive_shield_attack') and u:HasModifier('modifier_rogue_enemy_attack_speed'),
+        'Original valid-only business consumers preserve the silent dead-valid body')
+    UTIL_Remove(u);check(run_cleanup()==false,'Actual native removal drains that exact history')
+    check(wave._registered_lane_view_snapshot_for_test().pending==0,'No retained lane history after physical removal')
 end)
 
 case('known_existing_index_only_late_death_boundary_preserved',function()

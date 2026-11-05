@@ -149,4 +149,20 @@ observer:OnDeath({unit=new_ai:GetParent()});assert(#handled==before+1)
 owners[3]:OnDestroy();assert(not old_mode.survival_enemy_death_observer_registry.units[owners[3]:GetParent()])
 new_ai:OnDestroy();assert(not mode.survival_enemy_death_observer_registry.walls[new_wall])
 assert(old_holder~=holder)
+-- The actual modifier caches identity before native removal makes its parent
+-- unusable. Non-wave AI instances never enter this personal population path.
+local invalidations={}
+local previous_wave=package.loaded['systems/wave_system']
+package.loaded['systems/wave_system']={observe_enemy_modifier_destroyed=function(...)
+    invalidations[#invalidations+1]={...}
+end}
+local formal=entity(60000);formal.survival_is_wave_monster=true;formal.survival_player_id=2
+local formal_ai=ai(formal,new_wall);local cached_world=mode
+local cached_epoch=require('core/event_bus').get_generation()
+formal.null=true;formal_ai:OnDestroy();formal_ai:OnDestroy()
+assert(#invalidations==1 and invalidations[1][1]==formal and invalidations[1][2]==60000
+    and invalidations[1][3]==2 and invalidations[1][4]==cached_world and invalidations[1][5]==cached_epoch,
+    'invalid parent uses one exact cached unit/ID/owner/world/generation')
+local unrelated=ai(entity(60001),new_wall);unrelated:OnDestroy();assert(#invalidations==1)
+package.loaded['systems/wave_system']=previous_wave
 print('ENEMY_SHARED_DEATH_ROUTE_PASS: 244 own deaths instead of broadcasts, 61-per-wall ordered snapshot, rebind/index reuse, mutation/error isolation, exact disposal, no holes, old holder/module fallback, reload authority and new-map cleanup')

@@ -515,8 +515,323 @@ def _cw(raw):
     return body[0], tuple(integers)
 
 
+_BUILD_CATALOG_SEAL = object()
+
+
+class _BuildCatalog:
+    def __init__(self, seal, data, config, runtime, construction, building_source, research="", arrow=""):
+        _need(seal is _BUILD_CATALOG_SEAL, "internal_build_catalog_required")
+        self.seal = seal
+        self.fields = {row["id"]: row for row in data["fields"]}
+        self.field_ids = {row["name"]: row["id"] for row in data["fields"]}
+        self.records = {row["id"]: row for row in data["records"] if not row.get("tombstone")}
+        _need(len(self.fields) == len(self.field_ids) == len(data["fields"])
+              and all(type(v) is int and 1 <= v <= 255 for v in self.fields), "unique_build_fields_required")
+        keys = {row["key"]: row["id"] for row in self.records.values()}
+        self.commit, self.validation = keys["grid:commit"], keys["grid:validation"]
+        self.view = int(re.search(r"keys\.grid=(\d+);", runtime)[1])
+        self.schema = int(re.search(r"return \{schema:(\d+),schema_sha256:C\.sha256", runtime)[1])
+        _need(re.fullmatch("[a-f0-9]{64}", data["sha256"]), "build_catalog_digest_required")
+        for name in ("known", "success", "grid_error", "grid_scope", "grid_session", "grid_profile"):
+            _need(name in self.field_ids, "build_catalog_field_missing")
+        self.profiles, self.anchors, self.messages = {}, {}, {}
+        starts=list(re.finditer(r"\bM\.([A-Za-z0-9_]+)\s*=\s*\{",config))
+        sections={m[1]:config[m.end():(starts[i+1].start() if i+1<len(starts) else len(config))]
+                  for i,m in enumerate(starts)}
+        durations={m[1]:float(m[2]) for m in re.finditer(
+            r'building_id\s*=\s*"([A-Za-z0-9_]+)"[^\n]*build_time\s*=\s*([0-9.]+)',construction)}
+        research_first={}
+        for line in research.splitlines():
+            if "enabled = false" in line: continue
+            row={key:value for key,value in re.findall(r'(ability_name|building_id)\s*=\s*"([A-Za-z0-9_]+)"',line)}
+            order={key:int(value) for key,value in re.findall(r'(slot_order|chain_order)\s*=\s*(\d+)',line)}
+            if len(row)!=2 or len(order)!=2: continue
+            rank=(order['slot_order'],order['chain_order'])
+            old=research_first.get(row['building_id'])
+            if old is None or rank<old[0]:research_first[row['building_id']]=(rank,row['ability_name'])
+        expected=0
+        for profile in data["auxiliary"]["grid"]["profiles"]:
+            building = profile["building_id"]
+            if profile.get("placement_action"): continue
+            expected+=1
+            _need(building in sections and building in durations, "known_build_source_definition_required")
+            section=sections[building]
+            literal=re.search(r'abilities\s*=\s*\{\s*"([A-Za-z0-9_]+)"',section)
+            anchor=literal[1] if literal else None
+            if anchor is None:
+                _need(re.search(r'abilities\s*=\s*(research_lab_skill_names|research_lab_ability_sync\.initial_abilities)',section)
+                      and building in research_first,"known_dynamic_build_anchor_required")
+                anchor=research_first[building][1]
+            if building=='arrow_tower':
+                first=re.search(r'active_skill_ids\s*=\s*\{\s*"([A-Za-z0-9_]+)"',arrow)
+                _need(first is not None and first[1]==anchor,"actual_arrow_initial_ability_anchor_required")
+            duration=durations[building]
+            _need(duration > 0, "reviewed_build_duration_required")
+            record = keys["grid:profile:" + profile["ability_name"]]
+            item = dict(profile, record=record, anchor=anchor, duration=duration)
+            self.profiles[record] = item
+            _need(anchor not in self.anchors, "unique_build_lifecycle_anchor_required")
+            self.anchors[anchor] = item
+            for phase, suffix in (("approach", "正在前往建造位置"), ("start", "开始建造"), ("complete", "已建造")):
+                _need('.. "' + suffix + '"' in building_source, "reviewed_build_notification_source_changed")
+                self.messages[profile["display_name"] + suffix] = (item, phase)
+        _need(len(self.profiles) == expected and expected>0, "all_known_build_profiles_required")
+
+
+def _build_catalog_from_sources(raw, config, runtime, construction, building_source, research=b"", arrow=b""):
+    """Pure parser of already source-bound generated JSON and narrow Lua anchors."""
+    text = raw.decode("utf8")
+    prefix = "var data="
+    _need(text.count(prefix) == 1, "single_generated_catalog_json_required")
+    data, _ = json.JSONDecoder().raw_decode(text[text.index(prefix) + len(prefix):])
+    return _BuildCatalog(_BUILD_CATALOG_SEAL, data, config.decode("utf8"), runtime.decode("utf8"),
+                         construction.decode("utf8"), building_source.decode("utf8"),research.decode("utf8"),arrow.decode("utf8"))
+
+
+def _load_build_catalog(builder, report):
+    # load_package has already verified the complete compiler/generator readset
+    # against these exact immutable source revisions. Never read the worktree.
+    names = ("panorama/src/scripts/custom_game/common/ui_static_catalog.js",
+             "scripts/vscripts/config/buildings_config.lua",
+             "panorama/src/scripts/custom_game/common/compact_ui_runtime.js",
+             "scripts/vscripts/config/generated/building_construction_rules.lua",
+             "scripts/vscripts/systems/building_system.lua",
+             "scripts/vscripts/config/generated/research_lab_abilities.lua",
+             "scripts/vscripts/config/generated/arrow_tower_base.lua")
+    git = builder.dependencies().package.pending._git
+    raw = [git(ROOT, "show", report["source_revisions"]["game"] + ":" + name, counts=Counter()) for name in names]
+    _need(sum(map(len, raw)) <= 8*1024*1024, "bounded_build_operation_catalog_required")
+    return _build_catalog_from_sources(*raw)
+
+
+def _wire_uint(raw, offset):
+    value = 0
+    for shift in range(0, 35, 7):
+        _need(offset < len(raw), "build_wire_truncated")
+        byte = raw[offset]; offset += 1; value |= (byte & 127) << shift
+        if byte < 128:
+            _need(value <= 4294967295, "build_wire_integer_overflow")
+            return value, offset
+    raise ValueError("build_wire_integer_overflow")
+
+
+class _BuildOperations:
+    """One-world evidence index; no operation is authorized by text alone.
+
+    Initialization O(catalogue records+fields). One pass O(log bytes+decoded
+    changes+operations); indexed phase matching uses at most three clock keys.
+    Retained state is bounded by the log, 256KiB/current wire assembly and the
+    fixed grid schema. No native/API/runtime or recurring scene scan occurs.
+    """
+    def __init__(self, catalog):
+        _need(type(catalog) is _BuildCatalog and catalog.seal is _BUILD_CATALOG_SEAL,
+              "internal_source_bound_build_catalog_required")
+        self.c = catalog
+        self.builders, self.pending_anchor, self.entities = {}, {}, {}
+        self.active, self.submitted = None, None
+        self.last_cycle, self.latest = {}, {}
+        self.assembly, self.binding, self.revision, self.values = None, None, 0, {}
+        self.seen, self.operations, self.notifications = set(), [], []
+        self.invalid = 0
+        self.metrics = dict(wire_frames=0, decoded_changes=0, phase_clock_probes=0, retired_permits=0)
+
+    def line(self, line, ordinal):
+        stamp = _time(line)
+        if stamp is None: return
+        found = re.search(r"\[BUILDER_READY\] player=(\d+)\b.* entindex=(\d+)\b", line)
+        if found:
+            player, unit = map(int, found.groups())
+            if player <= 63: self.builders[unit] = player
+        found = re.search(r"\[SURVIVAL_CAST\]\[CLIENT\] POINT_TARGET_BEGIN unit=(\d+) ability=(\d+) name=([A-Za-z0-9_]+)\b", line)
+        if found:
+            unit, ability, name = int(found[1]), int(found[2]), found[3]
+            old = self.last_cycle.get(unit)
+            if old is not None: old["next_begin"] = ordinal
+            self.active = dict(unit=unit, ability=ability, name=name, player=self.builders.get(unit),
+                               begin=ordinal, time=stamp, submit=None, next_begin=None)
+            self.last_cycle[unit] = self.active
+        if "[SURVIVAL_CAST][CLIENT] POINT_TARGET_CANCEL reason=" in line:
+            if self.active is not None and "POINT_TARGET_CANCEL reason=grid_submitted" in line:
+                self.active.update(submit=ordinal, submit_time=stamp)
+                self.submitted = self.active
+            self.active = None
+        found = re.search(r"\[BuildingAbility\] add begin unit=(\d+) ability=([A-Za-z0-9_]+)\b", line)
+        if found and found[2] in self.c.anchors:
+            self.pending_anchor[(int(found[1]), found[2])] = (stamp, ordinal)
+        found = re.search(r"\[BuildingAbility\] AddAbility OK unit=(\d+) ability=([A-Za-z0-9_]+) index=0\b", line)
+        if not found or found[2] not in self.c.anchors: return
+        unit, anchor = int(found[1]), found[2]
+        before = self.pending_anchor.pop((unit, anchor), None)
+        if before is None or not 0 <= stamp-before[0] <= 1: return
+        item = self.c.anchors[anchor]
+        entity = self.entities.get(unit)
+        if entity is None:
+            operation = self.latest.get(item["record"])
+            if operation is None: return
+            cycle = operation["cycle"]
+            if (operation["ordinal"] >= ordinal or cycle["unit"] == unit
+                    or cycle["next_begin"] is not None and cycle["next_begin"] <= ordinal): return
+            entity = dict(operation=operation, anchor=anchor, first=(stamp, ordinal), second=None, matched_start=False)
+            self.entities[unit] = entity
+            operation["entities"].append(entity)
+        elif entity["anchor"] == anchor and entity["second"] is None:
+            entity["second"] = (stamp, ordinal)
+
+    def event(self, header):
+        """Consume at the actual data line, before subsequent lifecycle logs."""
+        event, stamp = header["event"], header["time"]
+        if stamp is None: return
+        if event == "ui_notification":
+            try:
+                value = _vbkv(_unescape(header["data"]))
+            except (ValueError, UnicodeError, struct.error): return
+            match = self.c.messages.get(value.get("message"))
+            if match is None: return
+            shape = (set(value) == {"audience","kind","level","message","player_id","rich_text"}
+                     and value["audience"] == "player" and value["kind"] == "message"
+                     and value["level"] == "info" and value["rich_text"] == 0
+                     and type(value["player_id"]) is int and 0 <= value["player_id"] <= 63)
+            self.notifications.append(dict(ordinal=header["ordinal"],time=stamp,body=header["data"],
+                profile=match[0]["record"],phase=match[1],player=value.get("player_id"),shape=shape))
+            return
+        if event != "cw" or header["size"] > 50 or math.ceil(header["bits"]/8) != header["size"]: return
+        try: self._wire(header)
+        except (ValueError, UnicodeError, struct.error, IndexError):
+            self.assembly, self.binding, self.values, self.revision = None, None, {}, 0
+            self.invalid += 1
+
+    def _wire(self, header):
+        value = _vbkv(_unescape(header["data"]))
+        _need(set(value) == {"d"} and isinstance(value["d"], str), "build_wire_shape")
+        raw = base64.urlsafe_b64decode(value["d"] + "="*(-len(value["d"]) % 4))
+        _need(0 < len(raw) <= 18 and raw[0] in (16,17,18), "build_wire_budget")
+        at, head = 1, []
+        for unused in range(7):
+            item, at = _wire_uint(raw, at); head.append(item)
+        schema, session, epoch, view, revision, index, count = head
+        if view != self.c.view: return
+        self.metrics["wire_frames"] += 1
+        _need(schema == self.c.schema and session > 0 and epoch > 0 and 1 <= index <= count <= 16383,
+              "build_wire_binding")
+        if raw[0] == 18: return
+        binding = (schema,session,epoch,view)
+        _need(revision > 0, "build_wire_revision")
+        identity = (*binding,revision,raw[0],count)
+        if self.assembly is None or identity != self.assembly["identity"]:
+            _need(self.assembly is None, "build_wire_fragment_identity")
+            _need(raw[0] == 17 or self.binding == binding and revision == self.revision+1,
+                  "build_wire_missing_base")
+            self.assembly = dict(identity=identity,parts={},bytes=0)
+        a = self.assembly; old = a["parts"].get(index)
+        _need(old is None, "build_wire_duplicate_fragment")
+        a["parts"][index] = raw[at:]; a["bytes"] += len(raw)-at
+        _need(a["bytes"] <= 262144, "build_wire_assembly_budget")
+        if len(a["parts"]) != count: return
+        body = b"".join(a["parts"][part] for part in range(1,count+1)); at = 0
+        previous_session = self.values.get((self.c.commit,self.c.field_ids["grid_session"]))
+        previous_scope = self.values.get((self.c.commit,self.c.field_ids["grid_scope"]))
+        changes = {}; values = {} if raw[0] == 17 else self.values
+        while at < len(body):
+            record, at = _wire_uint(body,at); tag, at = _wire_uint(body,at); field = tag//2
+            _need(record in self.c.records and field in self.c.fields, "build_wire_unknown_index")
+            key = (record,field); _need(key not in changes, "build_wire_duplicate_index")
+            self.metrics["decoded_changes"] += 1
+            v = None
+            if not tag & 1:
+                v, at = _wire_uint(body,at); definition = self.c.fields[field]
+                if definition["kind"] == "sint": v = -(v//2)-1 if v&1 else v//2
+                _need(definition["min"] <= v <= definition["max"], "build_wire_value_range")
+            changes[key] = v
+            if v is None: values.pop(key,None)
+            else: values[key] = v
+        self.binding, self.revision, self.values, self.assembly = binding, revision, values, None
+        F = self.c.field_ids
+        get = lambda rec,name: values.get((rec,F[name]))
+        token = get(self.c.commit,"grid_session")
+        changed_session = (self.c.commit,F["grid_session"]) in changes and token != previous_session
+        if raw[0] != 16 or not changed_session or not token: return
+        scope = get(self.c.commit,"grid_scope"); identity = (*binding,scope,token)
+        if type(scope) is not int or scope<=0 or type(token) is not int or token<=0:return
+        if scope==previous_scope and previous_session is not None and token<=previous_session:return
+        _need(identity not in self.seen, "build_operation_token_replay")
+        self.seen.add(identity)
+        if (get(self.c.commit,"known") != 1 or get(self.c.commit,"success") != 1
+                or get(self.c.commit,"grid_error") != 0
+                or get(self.c.validation,"known") != 1 or get(self.c.validation,"success") != 1
+                or get(self.c.validation,"grid_error") != 0
+                or get(self.c.validation,"grid_scope") != scope
+                or get(self.c.validation,"grid_session") != token): return
+        profile = self.c.profiles.get(get(self.c.validation,"grid_profile"))
+        if profile is None: return
+        cycle = self.active or self.submitted
+        if cycle is None or cycle["player"] is None or cycle["name"] != profile["ability_name"]: return
+        operation = dict(identity=identity,ordinal=header["ordinal"],time=header["time"],profile=profile,
+                         cycle=cycle,entities=[],approach=False)
+        self.operations.append(operation); self.latest[profile["record"]] = operation
+
+    def finish(self):
+        # O(operations + notifications + lifecycle anchors), with constant three
+        # one-second lookup keys. No per-notification operation/scene scan.
+        permits, consumed = {}, set()
+        def put(profile,player,phase,point,operation,entity=None):
+            key = (profile,player,phase,int(point[0]))
+            permits.setdefault(key,deque()).append((point,operation,entity))
+        valid = []
+        for op in self.operations:
+            cycle = op["cycle"]
+            if cycle["submit"] is None or abs(cycle["submit_time"]-op["time"]) > 1: continue
+            valid.append(op)
+            put(op["profile"]["record"],cycle["player"],"approach",(op["time"],op["ordinal"]),op)
+            for entity in op["entities"]:
+                put(op["profile"]["record"],cycle["player"],"start",entity["first"],op,entity)
+                if entity["second"] is not None and entity["second"][0]-entity["first"][0] >= op["profile"]["duration"]-1:
+                    put(op["profile"]["record"],cycle["player"],"complete",entity["second"],op,entity)
+        matched = set()
+        def eligible(permit, notice):
+            point,op,entity = permit; cycle = op["cycle"]
+            return ((op["identity"],notice["phase"]) not in consumed
+                and (notice["phase"] == "approach" or op["approach"])
+                and (notice["phase"] != "complete" or entity["matched_start"])
+                and cycle["begin"] <= notice["ordinal"]
+                and (notice["phase"] != "approach" or cycle["next_begin"] is None
+                     or cycle["next_begin"] > notice["ordinal"])
+                and (notice["phase"] == "approach" or point[1] < notice["ordinal"]))
+        for notice in self.notifications:
+            candidates = []
+            for second in (int(notice["time"])-1,int(notice["time"]),int(notice["time"])+1):
+                self.metrics["phase_clock_probes"] += 1
+                key = (notice["profile"],notice["player"],notice["phase"],second)
+                queue = permits.get(key,deque())
+                while queue:
+                    permit = queue[0]
+                    point,op,entity = permit
+                    identity = (op["identity"],notice["phase"])
+                    cycle = op["cycle"]
+                    impossible = (identity in consumed
+                        or notice["phase"] != "approach" and not op["approach"]
+                        or notice["phase"] == "complete" and not entity["matched_start"]
+                        or notice["phase"] == "approach" and cycle["next_begin"] is not None
+                           and cycle["next_begin"] <= notice["ordinal"])
+                    if impossible:
+                        queue.popleft(); self.metrics["retired_permits"] += 1; continue
+                    if cycle["begin"] > notice["ordinal"]: break
+                    if notice["phase"] != "approach" and point[1] >= notice["ordinal"]: break
+                    candidates.append((identity,permit))
+                    # Any second possible permit is ambiguous. Inspect at most
+                    # two heads per clock key; never scan a dense operation set.
+                    if len(queue) > 1 and eligible(queue[1],notice): candidates.append((None,None))
+                    break
+                if len(candidates) > 1: break
+            if not notice["shape"] or len(candidates) != 1: continue
+            identity,(point,op,entity) = candidates[0]; consumed.add(identity); matched.add(notice["ordinal"])
+            if notice["phase"] == "approach": op["approach"] = True
+            elif notice["phase"] == "start": entity["matched_start"] = True
+        return dict(matched=matched,unproven=len(self.notifications)-len(matched),operations=len(valid),
+                    invalid_wire_transactions=self.invalid,metrics=self.metrics.copy())
+
+
 def _all_custom_event_audit(text, *, explicit_snapshot_budget=0, explicit_snapshot_windows=(), cold_response_windows=(),cold_event_budget=None,
-                    world_large_budget=None):
+                    world_large_budget=None,build_catalog=None):
     """Budget is this reviewed native scenario's allowance, not a server cap.
 
     The caller binds this allowance to the exact captured native case.
@@ -533,7 +848,8 @@ def _all_custom_event_audit(text, *, explicit_snapshot_budget=0, explicit_snapsh
     def world():
         if current not in worlds:
             worlds[current] = dict(events={}, phase="before_auth", auth_last={}, expires_last={},
-                auth=Counter(), used_snapshot=0, request_ordinals={},explicit_requests={},large_bytes=0, hello={}, authorized=False, protocol_ready=False)
+                auth=Counter(), used_snapshot=0, request_ordinals={},explicit_requests={},large_bytes=0, hello={}, authorized=False, protocol_ready=False,
+                build=_BuildOperations(build_catalog) if build_catalog is not None else None)
         return worlds[current]
     def finish():
         nonlocal header, marker, accepted_request
@@ -546,7 +862,7 @@ def _all_custom_event_audit(text, *, explicit_snapshot_budget=0, explicit_snapsh
             errors["native_size_header_inconsistent"] += 1
         stats = state["events"].setdefault(event, dict(count=0, total_bytes=0, max_bytes=0,
             phases=Counter(), one=deque(), ten=deque(), peak_1s=0, peak_10s=0,
-            large_count=0, large_buckets=set(), large_times=[], repeats=Counter()))
+            large_count=0, large_buckets=set(), large_times=[], repeats=Counter(),large_items=[]))
         stats["count"] += 1; stats["total_bytes"] += size; stats["max_bytes"] = max(stats["max_bytes"], size)
         stats["phases"][h["phase"]] += 1
         for seconds, key, peak in ((1,"one","peak_1s"),(10,"ten","peak_10s")):
@@ -556,6 +872,7 @@ def _all_custom_event_audit(text, *, explicit_snapshot_budget=0, explicit_snapsh
         if size > 50:
             stats["large_count"] += 1; stats["large_buckets"].add(int(stamp//5))
             stats["large_times"].append(stamp)
+            stats["large_items"].append((h["ordinal"],stamp,h["data"]))
             state["large_bytes"] += size
             if cold_event_budget is not None and size > cold_event_budget: errors["single_cold_event_requires_smaller_total_traffic_plan"] += 1
         try:
@@ -611,13 +928,14 @@ def _all_custom_event_audit(text, *, explicit_snapshot_budget=0, explicit_snapsh
                 stats["repeats"][h["data"]] += 1
         except (ValueError, UnicodeError, struct.error):
             errors["native_body_validation_failed:" + event] += 1
-    for line in text.splitlines():
+    for ordinal,line in enumerate(text.splitlines()):
         if "[Survival][INFO][Addon] initialized" in line:
             finish(); current += 1; marker = None; accepted_request = None; world()
+        if build_catalog is not None: world()["build"].line(line,ordinal)
         found = re.search(r"\((\d+) bits/(\d+) bytes\):", line)
         if found:
             finish(); state = world()
-            header = dict(bits=int(found[1]),size=int(found[2]),time=_time(line),world=current,phase=state["phase"])
+            header = dict(bits=int(found[1]),size=int(found[2]),time=_time(line),world=current,phase=state["phase"],ordinal=ordinal)
         elif "CUserMsg_CustomGameEvent [148]" in line:
             if header is None: errors["custom_event_without_native_size_header"] += 1
             else: header["custom"] = True
@@ -627,6 +945,7 @@ def _all_custom_event_audit(text, *, explicit_snapshot_budget=0, explicit_snapsh
             else: errors["native_event_name_invalid"] += 1
         elif header and header.get("custom") and "data:" in line:
             found = re.search(r"\bdata:\s*(.*)$", line); header["data"] = found[1]
+            if build_catalog is not None and header.get("event"): world()["build"].event(header)
         found = re.search(r"\[PLAYER_WEB_AUTH_PUBLIC\] reason=(state_change|explicit_snapshot) status=(requesting|pending|approved|failed|expired)\b",line)
         if found:
             finish()
@@ -653,25 +972,48 @@ def _all_custom_event_audit(text, *, explicit_snapshot_budget=0, explicit_snapsh
     finish()
     safe_worlds = []
     for number, state in sorted(worlds.items()):
+        build = state["build"].finish() if state["build"] is not None else dict(matched=set(),unproven=0,operations=0,invalid_wire_transactions=0,metrics={})
+        if build["unproven"]: errors["unproven_build_operation_notification"] += build["unproven"]
         events = {}
         for name, stats in sorted(state["events"].items()):
             if name not in (AUTH,"cw") and stats["large_count"]:
-                repeated = max(stats["repeats"].values(), default=0) >= 3
-                persistent = len(stats["large_buckets"]) >= 3
-                # A validated real draw can have one necessary cold response
-                # per event. This is an operation-bound budget, no name list.
-                used=set();covered=True
-                for stamp in stats["large_times"]:
-                    index=next((i for i,(start,end) in enumerate(cold_response_windows) if i not in used and start<=stamp<=end),None)
-                    if index is None:covered=False;break
-                    used.add(index)
-                stats["validated_transaction_responses"]=len(used) if covered else 0
-                if (repeated or persistent) and not covered: errors["unexplained_repeated_large_event:" + name] += 1
-            events[name] = {k:v for k,v in stats.items() if k not in ("one","ten","large_buckets","large_times","repeats")}
+                remaining=[(stamp,body) for ordinal,stamp,body in stats["large_items"] if ordinal not in build["matched"]]
+                stats["validated_build_operation_notifications"]=stats["large_count"]-len(remaining)
+                # Adjudicate each real-operation response first. A distinct
+                # unrelated cold message never erases already-proven credits.
+                # At most three validated ACK windows; O(1) checks per packet.
+                used=set();unresolved=[]
+                for stamp,body in remaining:
+                    windows=[i for i,(start,end) in enumerate(cold_response_windows) if start<=stamp<=end]
+                    index=next((i for i in windows if i not in used),None)
+                    if index is not None: used.add(index)
+                    elif windows:
+                        errors["duplicate_validated_transaction_response:" + name] += 1
+                        unresolved.append((stamp,body))
+                    else: unresolved.append((stamp,body))
+                stats["validated_transaction_responses"]=len(used)
+                stats["unresolved_large_count"]=len(unresolved)
+                lifetime=Counter(body for stamp,body in unresolved)
+                stats["unresolved_identical_lifetime_peak"]=max(lifetime.values(),default=0)
+                recent={};repeat_peak=0
+                for stamp,body in unresolved:
+                    queue=recent.setdefault(body,deque())
+                    while queue and queue[0]<stamp-15:queue.popleft()
+                    queue.append(stamp);repeat_peak=max(repeat_peak,len(queue))
+                stats["unresolved_identical_15s_peak"]=repeat_peak
+                repeated=repeat_peak>=3
+                buckets={int(stamp//5) for stamp,body in unresolved}
+                # Three isolated cold operations minutes apart are not a
+                # persistent loop. Require three consecutive five-second bins.
+                persistent=any(bucket+1 in buckets and bucket+2 in buckets for bucket in buckets)
+                if repeated or persistent: errors["unexplained_repeated_large_event:" + name] += 1
+            events[name] = {k:v for k,v in stats.items() if k not in ("one","ten","large_buckets","large_times","repeats","large_items")}
         if world_large_budget is not None and state["large_bytes"] > world_large_budget: errors["world_cold_total_traffic_budget_exceeded"] += 1
         safe_worlds.append(dict(world=number, events=events, auth=dict(state["auth"]),
             authorization_observed=state["authorized"], protocol_ready_observed=state["protocol_ready"],
-            profile_ready_proven=False, large_total_bytes=state["large_bytes"]))
+            profile_ready_proven=False, large_total_bytes=state["large_bytes"],
+            build_operations=dict(accepted_operations=build["operations"],matched_notifications=len(build["matched"]),
+                invalid_wire_transactions=build["invalid_wire_transactions"],work=build["metrics"])))
     if not any(w["events"].get("cw",{}).get("count") for w in safe_worlds): errors["native_cw_missing"] += 1
     return dict(kind="ALL_CUSTOM_EVENT_SAFE_NATIVE_NETWORK_AUDIT", accepted=not errors,
         layer="CUserMsg_CustomGameEvent; excludes UDP/IP/Steam headers", worlds=safe_worlds,
@@ -680,9 +1022,9 @@ def _all_custom_event_audit(text, *, explicit_snapshot_budget=0, explicit_snapsh
         payload_hashes_disclosed=False, native_fps_measured=False)
 
 
-def network_summary(text, *, explicit_snapshot_windows=(),cold_response_windows=()):
+def network_summary(text, *, explicit_snapshot_windows=(),cold_response_windows=(),build_catalog=None):
     result=_all_custom_event_audit(text,explicit_snapshot_budget=len(explicit_snapshot_windows),
-                                   explicit_snapshot_windows=explicit_snapshot_windows,cold_response_windows=cold_response_windows)
+                                   explicit_snapshot_windows=explicit_snapshot_windows,cold_response_windows=cold_response_windows,build_catalog=build_catalog)
     need(result["accepted"],"complete_native_all_custom_event_network_gate:"+",".join(result["blockers"]))
     cw=[w["events"].get("cw",{}) for w in result["worlds"]]
     result.update(frames=sum(v.get("count",0) for v in cw),max_native_bytes=max((v.get("max_bytes",0) for v in cw),default=0),
@@ -731,7 +1073,7 @@ def _validate_native_release(request,report,manifest,signed,*,official=None):
     ui=ui_cases(review,process,bounds,reader,origin)
     lottery=lottery_cases(review,process,bounds,text,reader,origin,manifest=manifest,original_evidence=report["original_evidence"])
     network=network_summary(text,explicit_snapshot_windows=network_case_windows(review,process,bounds,reader,origin),
-                            cold_response_windows=lottery.pop("_network_response_windows"))
+                            cold_response_windows=lottery.pop("_network_response_windows"),build_catalog=_load_build_catalog(b,report))
     reader.unchanged()
     b.verify_operator_paths(dict(_EXECUTED_HELPERS),report["operator_revision"])
     return dict(ordinary_production_acceptance=True,scope=SCOPE,release_sequence=report["release_sequence"],

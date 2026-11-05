@@ -18,7 +18,7 @@
     "lobby"
   ],
   "manual_attach_adopt_allowed": false,
-  "release_sequence": 2026110501,
+  "release_sequence": 2026110502,
   "scope": "ALL_CURRENT_AND_HISTORICAL_RUNTIME_CHANGES_AND_DELETIONS",
   "source_anchor_is_full_published_tree": false,
   "historical_deferred_policy": "EXPLICIT_COMPLETE_LEDGER_COVERAGE_REQUIRED",
@@ -31,7 +31,7 @@
     ]
   },
   "recipe_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/complete_delivery_release_20261103/pipeline_recipe.py",
-  "recipe_sha256": "9a221e6bf118f94b37f4e7a72d4330f2236fd74fb3fd47eaebfdbe0a3b0ab2e3",
+  "recipe_sha256": "2a1ac2e5977afdd5cb32da3b752e49930954a29a06d876ae85f28f459d9c0f85",
   "validator_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/complete_delivery_release_20261103/publication_validator.py",
   "validator_sha256": "03c59bfbd29280baac4f3a0883e0beb98b4f16d868881e335205020c366676cd",
   "rehearsal_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/complete_delivery_release_20261103/rehearsal.py",
@@ -39,8 +39,8 @@
   "download_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/complete_delivery_release_20261103/verify_download.py",
   "download_sha256": "c951ddc6ed2a3e2fbd767666c002ae313f76f916a7bb886546f124175a6b41f6",
   "native_admission_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/complete_delivery_release_20261103/native_admission.py",
-  "native_admission_sha256": "77e717d32798e78d9c8d5a3fd23072b45bc067a5148f108d85b488bba9c1816a",
+  "native_admission_sha256": "ea00fab30147e70607acd4047f8b197926dbb20e91014366bd0a3a37043d79f1",
   "baseline_completion_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/complete_delivery_release_20261103/complete_baseline.py",
   "baseline_completion_sha256": "f3c20e0ff6737205176750b9015f8f716e08da60a3f6e19a696212e65bb76c7e",
-  "report_directory": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/output/complete_delivery_release_20261105_v01"
+  "report_directory": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/output/complete_delivery_release_20261105_v02"
 }

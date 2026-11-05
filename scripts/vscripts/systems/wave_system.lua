@@ -525,7 +525,6 @@ local function clear_player_overflow(player_id, population)
     end
     population.overflow_active, population.overflow_remaining = false, 0
     population.overflow_deadline = nil
-    population.overflow_notified_remaining = nil
 end
 
 local function clear_overflow()
@@ -541,6 +540,10 @@ end
 local function unregister_enemy(entindex, reason)
     local meta = enemies[entindex]
     if not meta then return nil end
+    if meta.invalidation_task then
+        scheduler.cancel(meta.invalidation_task)
+        meta.invalidation_task = nil
+    end
     if reason == "all_monsters_finished" or reason == "invalid_enemy_removed" then
         local record = registered_lane_record()
         if record and record.entindex == entindex and record.unit == meta.unit then
@@ -589,34 +592,28 @@ local function update_population_limit()
         if population.player_defeated or disconnected_players[player_id]
             or population.alive < state.alive_limit
             or (not population.overflow_active and population.alive <= state.alive_limit) then
-            local recovered = population.overflow_active and not population.player_defeated
-                and not disconnected_players[player_id]
             clear_player_overflow(player_id, population)
-            if recovered then
-                event_bus.emit(events.UI_NOTIFICATION, {player_id = player_id, level = "info",
-                    kind = "wave_overflow_tip", message = "怪物数量已恢复，警报解除"})
-            end
         else
             if not population.overflow_active then
                 population.overflow_active = true
                 population.overflow_deadline = current_game_time() + state.overflow_grace_seconds
                 local timer_player_id, timer_population = player_id, population
-                scheduler.every(1, function()
-                    if player_populations[timer_player_id] ~= timer_population then return false end
+                local timer_deadline = population.overflow_deadline
+                -- The existing HUD sends this authoritative deadline once.
+                -- Its local paused game clock owns the visible countdown.
+                -- Reconcile native deaths only at the real expiry boundary,
+                -- rather than scanning every enemy and sending tips each sec.
+                scheduler.after(state.overflow_grace_seconds, function()
+                    if player_populations[timer_player_id] ~= timer_population
+                        or not timer_population.overflow_active
+                        or timer_population.overflow_deadline ~= timer_deadline then return false end
                     local removed=prune_invalid_enemies()
-                    publish(removed>0 and "invalid_enemies_removed" or "monster_limit_countdown")
-                    return timer_population.overflow_active == true
+                    publish(removed>0 and "invalid_enemies_removed" or "monster_limit_deadline")
+                    return false
                 end, OVERFLOW_TASK_ID .. ":" .. tostring(player_id))
             end
             population.overflow_remaining = math.max(0,
                 math.ceil(population.overflow_deadline - current_game_time()))
-            if population.overflow_remaining > 0
-                and population.overflow_notified_remaining ~= population.overflow_remaining then
-                population.overflow_notified_remaining = population.overflow_remaining
-                event_bus.emit(events.UI_NOTIFICATION, {player_id = player_id, level = "warning",
-                    kind = "wave_overflow_tip",
-                    message = "您需在" .. population.overflow_remaining .. "s内清理怪物"})
-            end
             if population.overflow_remaining <= 0 then expired[#expired + 1] = player_id end
         end
     end
@@ -1392,6 +1389,30 @@ local function clear_normal_wave_enemies()
     return removed
 end
 
+-- Native modifier destruction can precede either death delivery or a silent
+-- entity removal. Reconcile only this exact ID once, allowing the original
+-- kill/reward listener the same one-second window as the former watchdog.
+-- A live purge/replacement must not touch population, grace or rewards.
+function M.observe_enemy_modifier_destroyed(unit, entindex, player_id, world, epoch)
+    if world ~= lane_view_scope.world or epoch ~= event_bus.get_generation() then return false end
+    local meta = enemies[entindex]
+    if not meta or meta.unit ~= unit or meta.player_id ~= player_id then return false end
+    if meta.invalidation_task then return true end
+    local key = "wave_entity_invalidation:" .. tostring(entindex)
+    meta.invalidation_task = key
+    scheduler.after(1, function()
+        if world ~= lane_view_scope.world or epoch ~= event_bus.get_generation()
+            or enemies[entindex] ~= meta then return false end
+        meta.invalidation_task = nil
+        if valid(unit) and unit:IsAlive() then return false end
+        unregister_enemy(entindex, "invalid_enemy_removed")
+        publish("invalid_enemies_removed", meta.player_id)
+        check_final_victory()
+        return false
+    end, key)
+    return true
+end
+
 local function get_wave_state(payload)
     refresh_selection_state()
     local player_id = population_player_id(type(payload) == "table" and payload.player_id)
@@ -1419,7 +1440,8 @@ local function get_wave_state(payload)
         alive = player_id ~= nil and (population and population.alive or 0) or state.alive,
         alive_limit = state.alive_limit,
         overflow_active = population and population.overflow_active == true or false,
-        overflow_remaining = population and population.overflow_remaining or 0,
+        overflow_remaining = population and population.overflow_active
+            and math.max(0, math.ceil((population.overflow_deadline or 0) - current_game_time())) or 0,
         overflow_deadline = population and population.overflow_deadline or 0,
         overflow_grace_seconds = state.overflow_grace_seconds,
         player_defeated = population and population.player_defeated == true or false,
