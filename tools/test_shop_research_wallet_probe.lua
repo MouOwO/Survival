@@ -7,6 +7,8 @@ print = function(...)
     if line:find("handler error", 1, true) or line:find("task failed", 1, true) then error(line) end
 end
 package.loaded["systems/player_context_service"] = { is_defeated = function() return false end }
+package.loaded["core/test_access_policy"] = { enforce = function(id) return id >= 0 and id < 4 end,
+    allowed = function(id) return id >= 0 and id < 4 end, enabled = function() return false end }
 local bus, events = require("core/event_bus"), require("core/events")
 local scheduler = require("core/scheduler")
 local resource = require("systems/resource_system")

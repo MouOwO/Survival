@@ -588,6 +588,7 @@ local function register_shop_open_request()
             player_id = player_id,
             request_id = payload.request_id,
             known_sequence = tonumber(payload.known_sequence) or 0,
+            hud_wallet = payload.hud_wallet == 1 and 1 or 0,
             mode = payload.mode,
             source_entindex = tonumber(payload.source_entindex),
         })

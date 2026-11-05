@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "snapshot_date": "2026-11-04",
+  "snapshot_date": "2026-11-05",
   "scope": "Curated project knowledge and historical snapshot; raw chat excluded",
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 32596,
-      "sha256": "99651d624371ce43d874326ed0afea08f80e437af18cecba229dacdfbc95d414"
+      "bytes": 33063,
+      "sha256": "d571605469bcc4c0f19b76ffb4f94c2563b91cc3c691e971a714ba8faa99d300"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 46517,
-      "sha256": "c2c33daa87e3632aaf2adc05648dcd1820df7fba295e294f4bc6e836d448f5bd"
+      "bytes": 46984,
+      "sha256": "d062627d1360120a0cf6a8b3c80561d50146a701c143dddff96df2dbbfe89805"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -72,16 +72,6 @@
       "path": "13_art_ui_qa.md",
       "bytes": 11865,
       "sha256": "613a00e1a83302042f3f1d23f8b4653b59937cee9616a214485db2ecfebab896"
-    },
-    {
-      "path": "NEW_CHAT_PROMPT.txt",
-      "bytes": 829,
-      "sha256": "59e6930906e62202d56d95ce3dd7390a7a90a6133c6ac204da10fd62f4fee10d"
-    },
-    {
-      "path": "README.md",
-      "bytes": 20672,
-      "sha256": "7b15c63a3231a9948b1bbcc9eec3e8005abf0620820ab143ebe777476cd0d5dc"
     },
     {
       "path": "data/completed_work_index.json",
@@ -332,6 +322,11 @@
       "path": "evidence/network50_0401_native_recovery_20261104.md",
       "bytes": 6659,
       "sha256": "4c22dba005a32f0c61673bbd3cb5713905932c30283ea0a135b48009800915f6"
+    },
+    {
+      "path": "evidence/network50_0402_native_followup_20261105.md",
+      "bytes": 5871,
+      "sha256": "4075ce9b9b6777a84cc80f9d9c2dd9b51ba41bf8076f118c1637c0b1efab21bc"
     },
     {
       "path": "evidence/network50_dev07_native_fps_20261103.md",
@@ -629,11 +624,6 @@
       "sha256": "3e9d78ecd41b1e4aaa4335fc0c33fdca621d5e94a98a4d082af5d299d00a2380"
     },
     {
-      "path": "history/20261024/README.md",
-      "bytes": 3523,
-      "sha256": "8fb412555efbff16e4191ae220fb68c521283ef11131c5d4a5c8ad6f8820868b"
-    },
-    {
       "path": "history/20261024/data/commerce_facts.json",
       "bytes": 10585,
       "sha256": "6105f8496427aab2540ee0572bd1e084247114c6b36dc50cec305269c0bf864e"
@@ -674,9 +664,24 @@
       "sha256": "40bd838081c9322b471aa29977d19958932c9cbb87c14d7b54728f9883a86817"
     },
     {
+      "path": "history/20261024/README.md",
+      "bytes": 3523,
+      "sha256": "8fb412555efbff16e4191ae220fb68c521283ef11131c5d4a5c8ad6f8820868b"
+    },
+    {
       "path": "history/README.md",
       "bytes": 449,
       "sha256": "5ebf48f3b52e07d03945ecfb8e7c2883c1905c48a7ed6fb544604525da474bec"
+    },
+    {
+      "path": "NEW_CHAT_PROMPT.txt",
+      "bytes": 829,
+      "sha256": "59e6930906e62202d56d95ce3dd7390a7a90a6133c6ac204da10fd62f4fee10d"
+    },
+    {
+      "path": "README.md",
+      "bytes": 21139,
+      "sha256": "999cc88bef183d55cd8e5d3182ef54bfec3a7f7803c6d06597e69572efb1b066"
     },
     {
       "path": "tools/verify_knowledge.py",

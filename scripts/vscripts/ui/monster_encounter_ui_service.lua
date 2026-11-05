@@ -84,14 +84,6 @@ local function on_reward_granted(payload)
     )
 end
 
-local function on_progression_changed(payload)
-    send(
-        tonumber(payload.player_id),
-        "ui_hero_progression_state",
-        payload
-    )
-end
-
 function M.init()
     CustomGameEventManager:RegisterListener(
         "ui_monster_encounter_start_request",
@@ -108,10 +100,6 @@ function M.init()
     event_bus.subscribe(
         events.MONSTER_REWARD_GRANTED,
         on_reward_granted
-    )
-    event_bus.subscribe(
-        events.HERO_PROGRESSION_CHANGED,
-        on_progression_changed
     )
 end
 

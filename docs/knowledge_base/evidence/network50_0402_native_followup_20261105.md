@@ -1,0 +1,37 @@
+# 2026-11-05｜0402实测未通过，继续清理遗漏高频通道
+
+当前仍仅本地更新，正式游廊保留2026110104、Steam manifest `7025356658517360342`。后台缓存优化维持此前已验证的 `20261104-ws4-worker-cache-3f53908aaea0`。0402签包已真实普通测试，但全事件网络验收未通过，未执行SDK上传；Root实际抽奖券消耗0/30。下一独立版本为2026110501，控制目录 `output/complete_delivery_release_20261105_v01`，不覆盖0402证据。
+
+## 冻结来源与构建
+
+0402绑定game/operator `df44b2df838f86bd13d35f00ab8d8f527a478b03`、content `9fcb8477265b81f36fde96f942bce4fa861d7ef8`，双仓已推送。Gen6r3原producer为game/operator `d0f945975b191c96d9db8e90a856352be8e6eb2c`、content `49fe7445cfac05de03d6937505eb845eb6ae7382`；schema `9c95f263b959ced12504bcf211df4511e2ec2a1ba1f716a6a97736dc707f11d2`，7935记录/188字段，原registry全部保留。
+
+150项官方编译及186项保护、7个override的原producer为game/operator `03ad79bd10c643cece6055f9b539c97b132a90d2`、content `9fcb8477265b81f36fde96f942bce4fa861d7ef8`。保护preparation SHA `da30c15fcea04c12a188fa83451d8be9bb8538b924e93987bbb4050a261ed265`；保护报告 `d3c1ba757dd7192a0f520292e7bde4dd7c647fbfda91f4935f42ef49ec4be75f`；编译报告 `4deb43b893a67ec129aa5068f0937f1c09d8e68b20184bc210a25785d3d3e4c0`。原回执身份未改写；150项真实产物提交9dd7后再追加工具提交df44。
+
+最终collector完整覆盖546行（入口408加138派生扩展）、302待发资源、433绑定；95项源OID不变而保护输出变化均有明确审阅。完整7031资源、3,806,435,757字节、7运行删除，未用固定PAYLOAD清单。真实签包报告SHA `0555535071f2dd3ff1421d201b946ca26078ebf6eaa03e2541f6780e5ec7b5b4`、内容SHA `0189cd676fbeee993488e94db21d0c8fe767276fda09b863b90bb9ca5ba96980`、签名manifest SHA `1c1b525897de2643f736ccd9be6460fc97d4a869fe3eba7b157af30ff4c6a5e1`；索引及4数据卷，控制目录v03保留。
+
+## 普通实机事实
+
+事务 `complete0402_run01`，PID22504、创建UTC `2026-11-04T23:24:58.2218850Z`、HWND68884。真实普通N1进入实际战斗及已建营地，主城LV4生产选项、选中单位HUD、存档、VIP提示已观察；商城和抽奖部分截图仍未知状态，未判通过。模态窗口会吞F9，不能在窗口尚开时假定游戏已恢复；暂停下的服务器调度等待不能冒充网络请求耗时。
+
+真实档案就绪边沿触发目录请求，392ms成功，config/MD5均一致；下一次372ms。证明启动恢复补丁生效，但不是抽奖或领奖端到端时延。129秒授权等待期间不再每5秒重复发送完整状态；仍暴露首次state_change后另一UI组件同秒显式请求产生相同requesting快照，须补成功发送时间的同秒合并，保留晚到监听器恢复与正常HTTP轮询。
+
+只读日志截面：8038个CW，原生最大49B、无同binding/revision/index重帧。全事件另发现：`ui_hero_progression_state` 97条、每条145B；`ui_shop_snapshot` 80条，其中67条约1KB资源delta、13条约14KB全量。不能只统计CW就宣布高频≤50B完成。
+
+英雄成长的相同amount、递增tick是合法逐次属性增量，不能去重内部事件。真实game/content作者及载入清单没有 `ui_hero_progression_state` 消费者；多余的是UI服务的整表网络转发，后续仅移除此转发，保留全部内部成长及selected/HUD路径。商店同时受资源事件及纯英雄成长事件触发，后续复用已有CW HUD资金数据，用价格阈值索引更新显示；交易、库存及非资金资格继续由服务端判定。
+
+另有4条约88KB的payment结果及一次128段commerce目录，必须区分真实操作响应与自动重复，不能把128段错报成128次HTTP。Beta实际active/eligible、未领取，已有4次terminal失败回执，错误被客户端协议折叠为generic claim_failed；尚不能反推业务原因，也未把它当成功领取。关闭Beta自动弹窗后当前没有正常重开入口，本局缺少该项有效截图；不脚本重开或改档补证。
+
+Root没有发出任何抽奖，闭合日志draw ACK为0。最终日志3,997,183字节、SHA `ba02a9d4dbe7454f0a23cc3b0c6248e2eb58aa99c4e8118880c3261aa473007d`，保存在ignored实际验收目录，不提交认证正文或其指纹。
+
+## 正常结束与发行工具修复
+
+Root已通过canonical正常WM_CLOSE结束22504；keeper同一保留句柄确认退出，随后完整恢复0104，close/keeper/restore实际exit0。当前0402树外backup、retained candidate、首末inspect、关闭与恢复回执全部保留；不把部分截图当成全准入。
+
+本轮还修复了官方下载后的阶段收口：旧流程在安装新版后仍强制现场是0104，必然拒绝。新封闭post-download入口先重验成功SDK、current lineage、原官方下载回执及固定安装目录全部签名/VPK/CRC，再重验原普通进程、截图、网络、关闭/恢复和树外0104证据。没有可由请求Boolean选择的豁免。原preflight仍要求现场0104；post阶段现场只能是真正官方下载的目标完整包。阶段11项加注册/recipe等60项实际通过；这是工具回归，仍不代表发生上传或下载。
+
+后续必须重新冻结新源、目录/编译/保护来源，完整签包，重新普通N1全事件审计、8项UI、4池预览及获授权的3次真实十连、真实解码失败兜底与领取时延，再走唯一SDK入口和官方完整下载，最终pending为空才能报告已同步游廊。
+
+## 本轮范围补充
+
+用户已明确确认先验收并发布高频优化，约88KB支付目录的公共/私有版本及增量协议单独处理。本次不改共享支付数据库或PWA接口，也不以支付目录压缩作为0501发行前置。正常商城实际数据仍须查看，不能把支付目录标记为已优化。

@@ -15,10 +15,11 @@ assert(manifest.includes('/survival_hud.xml"'), 'the root manifest must load thi
 assert(hud.includes('/' + shopScript + '"'), 'test the shop controller used by the real HUD');
 const scripts = ['common/ui_registry.js', 'common/ui_components.js', 'ui_layers.js',
     'remaining_5d5c1152eb.js', 'archive_v10_data.js', 'common/menu_v10.js',
-    'shop_tooltip_remaining_5d5c1152eb.js', shopScript];
+    'shop_tooltip_remaining_5d5c1152eb.js', 'common/shop_wallet_model.js', shopScript];
 const sources = new Map(scripts.map(name => [name, fs.readFileSync(path.join(scriptDirectory, name), 'utf8')]));
+sources.set('shop_ui.js',fs.readFileSync(path.join(scriptDirectory,'shop_ui.js'),'utf8'));
 
-function harness() {
+function harness(options={}) {
     const counts = {created: 0, deleted: 0, cleared: 0, text: 0, style: 0, classes: 0,
         properties: 0, images: 0, events: 0, priceUpdates: 0, tooltipUpdates: 0, tooltipHides: 0};
     const nodes = new Map(), subscriptions = new Map(), timers = new Map(), requests = [];
@@ -98,6 +99,14 @@ function harness() {
         if (!token[3]) stack.push(panel);
     }
     const cfg = {};
+    const walletSubscribers=new Map();let walletSerial=0;
+    if(options.wallet){
+        const runtime={ScopeIdentity:()=>({active:true,ready:true})};
+        cfg.SurvivalCompactRuntime=runtime;
+        cfg.SurvivalCompactHUDSource={Runtime:runtime,IsAlive:()=>true,
+            Subscribe(owner,sections,callback){walletSubscribers.set(++walletSerial,callback);return walletSerial;},
+            Unsubscribe(id){walletSubscribers.delete(id);}};
+    }
     function $(id) { return nodes.get(id.slice(1)); }
     $.GetContextPanel = () => root;
     $.CreatePanel = (type, parent, id) => new Panel(type, parent, id);
@@ -119,7 +128,10 @@ function harness() {
                 listeners.push(callback); netListeners.set(table, listeners); return callback;
             }, UnsubscribeNetTableListener() {}}
     });
-    for (const name of scripts) vm.runInContext(sources.get(name), env, {filename: name});
+    for (const included of scripts) {
+        const name=options.legacy&&included===shopScript?'shop_ui.js':included;
+        vm.runInContext(sources.get(name), env, {filename: name});
+    }
     for (const [object, key, counter] of [[cfg.RemainingHandoff, 'UpdateShopPrices', 'priceUpdates'],
         [cfg.SurvivalShopTooltip, 'UpdateEntry', 'tooltipUpdates'], [cfg.SurvivalShopTooltip, 'Hide', 'tooltipHides']]) {
         const original = object[key];
@@ -127,6 +139,7 @@ function harness() {
     }
     const clone = value => JSON.parse(JSON.stringify(value));
     function emit(name, payload) { for (const listener of subscriptions.get(name) || []) listener(clone(payload)); }
+    function emitRaw(name,payload){for(const listener of subscriptions.get(name)||[])listener(payload);}
     function full(overrides = {}) {
         current = {...(current || {ui_mode: 'shop', entries: [], categories: [], resources: {wood: 1000, gold: 1000}}),
             ...overrides, sequence: ++latest, full: 1};
@@ -156,7 +169,9 @@ function harness() {
     cfg.SurvivalShop.SetUnlocks({shop: true, research: true});
     runTimers(0.29);
     reset();
-    return {cfg, nodes, counts, requests, emit, full, delta, reset, cards, card, runTimers, setTable,
+    return {cfg, nodes, counts, requests, emit, emitRaw, full, delta, reset, cards, card, runTimers, setTable,
+        wallet(resources){for(const cb of walletSubscribers.values())cb({resources});},
+        walletSubscribers:()=>walletSubscribers.size,
         timerCount(delay) { return [...timers.values()].filter(timer => timer.delay === delay).length; },
         setTime(value) { now = value; }, get sequence() { return latest; }, get data() { return current; }};
 }
@@ -180,6 +195,69 @@ function assertNoRebuild(h, message) {
     for (const key of ['created', 'deleted', 'cleared', 'images', 'tooltipHides']) assert.equal(h.counts[key], 0, message + ': ' + key);
 }
 function purchaseRequests(h) { return h.requests.filter(request => request.name === 'ui_shop_purchase_request'); }
+
+for(const legacy of [false,true]){
+    test((legacy?'legacy':'loaded')+' controller patches one of 10000 cached rows without reading any unaffected row',()=>{
+        const h=harness({legacy});h.cfg.SurvivalShop.Open();
+        let armed=false,unaffectedReads=0;
+        const rows=Array.from({length:10000},(_,i)=>new Proxy(item({entry_id:'row'+i,visible:i===42?1:0}),{
+            get(target,key){if(armed&&i!==42)unaffectedReads++;return Reflect.get(target,key);}
+        }));
+        h.emitRaw('ui_shop_snapshot',{full:1,sequence:1,ui_mode:'shop',entries:rows,categories:[],resources:{wood:1000,gold:1000}});
+        const original=h.card('row42'),before=h.cfg.SurvivalShop.InspectPerformance();
+        armed=true;h.reset();
+        h.emitRaw('ui_shop_snapshot',{full:0,sequence:2,base_sequence:1,ui_mode:'shop',
+            changed_entries:[item({entry_id:'row42',stock:0,purchasable:0,disabled_reason_code:'stock_empty'})]});
+        const after=h.cfg.SurvivalShop.InspectPerformance();
+        assert.equal(unaffectedReads,0,'no old shelf reconstruction, sort, signature walk or lookup scan');
+        assert.equal(after.full_rows,before.full_rows);assert.equal(after.delta_rows-before.delta_rows,1);
+        assert.equal(after.render_rows-before.render_rows,1);assert.equal(after.container_builds,before.container_builds);
+        assert.equal(h.card('row42'),original);assert(original.BHasClass('Unavailable'));assertNoRebuild(h,'same-shape row patch');
+        h.reset();
+        for(let sequence=3;sequence<103;sequence++)h.emitRaw('ui_shop_snapshot',{
+            full:0,sequence,base_sequence:sequence-1,ui_mode:'shop',reason:'same_state'});
+        assert.equal(unaffectedReads,0);assertNoDOM(h,'transport-only deltas do not invalidate cached presentation');
+    });
+    test((legacy?'legacy':'loaded')+' cooldown ticks visit only the indexed source and stop after close',()=>{
+        const h=harness({legacy});h.cfg.SurvivalShop.OpenResearch(123);
+        const rows=Array.from({length:512},(_,i)=>technology({entry_id:'tech'+i,technology_group:'group'+i,sort_order:i}));
+        h.full({ui_mode:'research',research_source_entindex:123,entries:rows,
+            technology_cooldown_until:160,technology_cooldown_total:60,technology_cooldown_remaining:60,
+            technology_cooldown_source_group:'group42'});
+        const before=h.cfg.SurvivalShop.InspectPerformance();
+        h.setTime(101);h.runTimers(0.05);
+        const after=h.cfg.SurvivalShop.InspectPerformance();
+        assert.equal(after.cooldown_rows-before.cooldown_rows,1,'20Hz tick does not enumerate all 512 cards');
+        assert.equal(after.render_rows,before.render_rows);
+        assert.match(h.card('tech42').__survivalCooldownMask.style.clip,/354\.00deg/);
+        h.cfg.SurvivalShop.Close();const closed=h.cfg.SurvivalShop.InspectPerformance();h.reset();h.runTimers(0.05);
+        assert.equal(h.cfg.SurvivalShop.InspectPerformance().cooldown_rows,closed.cooldown_rows);assertNoDOM(h,'stale timer after close');
+        h.cfg.SurvivalShop.OpenResearch(123);h.full();h.cfg.SurvivalShop.DisposeWallet();
+        const disposed=h.cfg.SurvivalShop.InspectPerformance();h.reset();h.runTimers(0.05);
+        assert.equal(h.cfg.SurvivalShop.InspectPerformance().cooldown_rows,disposed.cooldown_rows);assertNoDOM(h,'replaced controller retires its old timer');
+    });
+}
+
+test('negotiated real HUD resources update only crossed cards and their hovered tooltip without requesting a catalog',()=>{
+    const h=harness({wallet:true});h.cfg.SurvivalShop.Open();
+    assert.equal(h.requests.at(-1).payload.hud_wallet,1);assert.equal(h.walletSubscribers(),1);
+    h.wallet({wood:100,gold:199});
+    const r=item({purchasable:0,disabled_reason:'金币不足',disabled_reason_code:'insufficient_gold',
+        wallet_purchasable:1,wallet_disabled_reason:'',wallet_disabled_reason_code:''});
+    h.full({hud_wallet:1,entries:[r]});const card=h.card('sword');const cardChildren=card.Children().slice();card.events.onmouseover();
+    assert(card.BHasClass('Unavailable'));h.reset();const requests=h.requests.length;
+    for(let n=0;n<1000;n++)h.wallet({wood:100,gold:199});assertNoDOM(h,'stable HUD resources');
+    h.wallet({wood:100,gold:200});assert(!card.BHasClass('Unavailable'));
+    assert.equal(h.cfg.SurvivalShopTooltip.Inspect().purchaseEnabled,true);
+    assert.equal(h.requests.length,requests,'no full/resync request for resource changes');
+    assert.equal(h.card('sword'),card,'the crossed card retains its identity');
+    assert.equal(card.Children().length,cardChildren.length);
+    assert(card.Children().every((child,n)=>child===cardChildren[n]),'crossing retains the complete card subtree; only the active tooltip content changes');
+    assert.equal(h.counts.tooltipHides,0);
+    const before=purchaseRequests(h).length;h.cfg.SurvivalShop.PurchaseEntry('sword');assert.equal(purchaseRequests(h).length,before+1);
+    h.reset();h.wallet({wood:100,gold:201});assert.equal(h.counts.tooltipUpdates,0);assert.equal(h.counts.priceUpdates,0);
+    h.cfg.SurvivalShop.Close();assert.equal(h.walletSubscribers(),0);h.reset();h.wallet({wood:0,gold:0});assertNoDOM(h,'closed stream');
+});
 
 test('1000 advancing closed snapshots cache data without building or warming hidden DOM', () => {
     const h = harness();

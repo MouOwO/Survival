@@ -90,8 +90,8 @@ local function public_state(record, explicit_snapshot)
         -- A fresh private UI request can recover a late subscription. Coalesce
         -- same-second duplicate requests; this never schedules periodic sends.
         local stamp = now()
-        if record.last_explicit_snapshot_at
-            and stamp - record.last_explicit_snapshot_at < 1 then return end
+        if record.last_public_sent_at
+            and stamp - record.last_public_sent_at < 1 then return end
         explicit_stamp = stamp
     end
     local published = {status=status,error=error,code=code,uri=uri,
@@ -111,6 +111,9 @@ local function public_state(record, explicit_snapshot)
     -- The native API accepts a void return. A thrown send cannot poison the
     -- memo or consume the explicit recovery allowance.
     record.last_public_state = published
+    -- A just-delivered state transition also satisfies a second UI component
+    -- asking for that same state. Commit only after a successful native send.
+    record.last_public_sent_at = now()
     if explicit_stamp then record.last_explicit_snapshot_at = explicit_stamp end
 end
 
@@ -346,8 +349,8 @@ function M.init(session)
             print("[PLAYER_WEB_AUTH_REQUEST] accepted=1 generation=" .. tostring(epoch)
                 .. " slot=" .. tostring(id) .. " mode=state_change")
         -- Only a stable retained record needs a bounded subscriber snapshot.
-        elseif last and (not record.last_explicit_snapshot_at
-            or now() - record.last_explicit_snapshot_at >= 1) then
+        elseif last and (not record.last_public_sent_at
+            or now() - record.last_public_sent_at >= 1) then
             -- Slot/epoch are local numbers, never account or session values.
             print("[PLAYER_WEB_AUTH_REQUEST] accepted=1 generation=" .. tostring(epoch)
                 .. " slot=" .. tostring(id) .. " mode=explicit_snapshot")

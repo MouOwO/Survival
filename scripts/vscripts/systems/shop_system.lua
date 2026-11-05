@@ -23,6 +23,7 @@ local enqueue_research
 local run_research_queue
 local queue_research
 local push_snapshot
+local close_shop
 -- Inert, default-off Workshop candidate. It only reuses a proven research
 -- projection; resource admission and the authoritative context still run.
 local wallet_probe
@@ -58,6 +59,8 @@ local function reset_state()
         purchased_count = {},
         processed_requests = {},
         opened_players = {},
+        hud_wallet_players = {},
+        projected_rebirth_by_player = {},
         city_level_by_team = {},
         building_counts_by_team = {},
         sequence_by_player = {},
@@ -83,6 +86,35 @@ end
 local function player_team(player_id)
     return PlayerResource:GetTeam(player_id)
 end
+-- Only the negotiated modern display lane may reuse the private HUD wallet.
+-- Identity, world, live CW binding and the real match session are checked in
+-- O(1). None of these display capabilities bypasses purchase admission.
+local function hud_wallet_current(player_id)
+    local owner = state.hud_wallet_players[player_id]
+    if not owner then return false end
+    local transport = package.loaded["ui/compact_ui_transport"]
+    local setup = package.loaded["systems/match_setup_service"]
+    return owner.player == PlayerResource:GetPlayer(player_id)
+        and owner.world == event_bus.get_generation()
+        and setup and type(setup.get_session_id) == "function"
+        and owner.session == setup.get_session_id()
+        and transport and transport.is_bound and transport.is_bound(player_id) == true
+end
+local function negotiate_hud_wallet(player_id, requested)
+    state.hud_wallet_players[player_id] = nil
+    if requested ~= 1 then return end
+    local transport = package.loaded["ui/compact_ui_transport"]
+    local setup = package.loaded["systems/match_setup_service"]
+    local session = setup and setup.get_session_id and setup.get_session_id()
+    local player = PlayerResource:GetPlayer(player_id)
+    if player and type(session) == "string" and session ~= ""
+        and transport and transport.is_bound and transport.is_bound(player_id) == true then
+        state.hud_wallet_players[player_id] = {
+            player=player, world=event_bus.get_generation(), session=session,
+        }
+    end
+end
+
 local function notify(player_id, message, level, presentation)
     presentation = presentation or {}
     event_bus.emit(events.UI_NOTIFICATION, {
@@ -427,7 +459,29 @@ local function snapshot_context(player_id, reason, mode, source_entindex)
 end
 local function build_snapshot(player_id, reason, mode)
     local context = snapshot_context(player_id, reason or "open", mode)
-    return catalog.build_snapshot(player_id, context), context
+    state.projected_rebirth_by_player[player_id] = context.rebirth_level
+    local modern = hud_wallet_current(player_id)
+    local display = context
+    if modern then
+        -- Pure display projection through the exact same catalog/evaluator.
+        -- Prices, stock, permissions, queues and limits retain their server
+        -- values; only the final resource shortage is separated for the HUD.
+        -- This runs on open/real structural changes, never on wallet ticks.
+        display = {}
+        for key, value in pairs(context) do display[key] = value end
+        display.resources = {wood=9007199254740991,gold=9007199254740991}
+    end
+    local snapshot = catalog.build_snapshot(player_id, display)
+    if modern then
+        for _, entry in ipairs(snapshot.entries or {}) do
+            entry.wallet_purchasable = entry.purchasable
+            entry.wallet_disabled_reason = entry.disabled_reason
+            entry.wallet_disabled_reason_code = entry.disabled_reason_code
+        end
+        snapshot.hud_wallet = 1
+        snapshot.resources = context.resources
+    end
+    return snapshot, context
 end
 
 local function values_equal(left, right)
@@ -666,6 +720,7 @@ local function build_patch(previous, current)
         reason = current.reason,
         player_id = current.player_id,
         ui_mode = current.ui_mode,
+        hud_wallet = current.hud_wallet,
         changed_entries = changed,
         removed_entry_ids = removed,
         technology_cooldown_remaining = current.technology_cooldown_remaining,
@@ -678,7 +733,7 @@ local function build_patch(previous, current)
         purchase_cooldowns = current.purchase_cooldowns,
         shop_stock = current.shop_stock,
     }
-    if not values_equal(previous.resources or {}, current.resources or {}) then
+    if current.hud_wallet ~= 1 and not values_equal(previous.resources or {}, current.resources or {}) then
         patch.resources = current.resources
     end
     if not values_equal(previous.purchase_cooldowns or {}, current.purchase_cooldowns or {}) then
@@ -723,6 +778,10 @@ local function publish_snapshot(player_id, reason, structural)
 end
 push_snapshot = function(player_id, reason)
     if not state.opened_players[player_id] then return end
+    if state.hud_wallet_players[player_id] then
+        if not hud_wallet_current(player_id) then close_shop({player_id=player_id}); return end
+        if reason == "resource_changed" then return end
+    end
     local queued = state.pending_push_reason[player_id] ~= nil
     state.pending_push_reason[player_id] = reason or "changed"
     if reason ~= "resource_changed" then
@@ -820,6 +879,7 @@ local function open_shop(payload)
         state.research_source_entindex_by_player[player_id] = source_entindex
     end
     state.opened_players[player_id] = mode
+    negotiate_hud_wallet(player_id, payload.hud_wallet)
     state.research_wallet_proofs[player_id] = nil
     local snapshot, context = build_snapshot(player_id, "opened", mode)
     remember_wallet_proof(player_id, snapshot, context)
@@ -830,8 +890,10 @@ local function open_shop(payload)
         snapshot = snapshot,
     }
 end
-local function close_shop(payload)
+close_shop = function(payload)
     state.opened_players[payload.player_id] = nil
+    state.hud_wallet_players[payload.player_id] = nil
+    state.projected_rebirth_by_player[payload.player_id] = nil
     state.snapshot_cache_by_player[payload.player_id] = nil
     state.pending_push_reason[payload.player_id] = nil
     state.pending_push_structural[payload.player_id] = nil
@@ -1692,6 +1754,17 @@ local function on_resource_changed(payload)
         push_team(payload.team, "resource_changed")
     end
 end
+local function on_hero_progression_changed(payload)
+    -- Shop predicates read rebirth, not the per-attack/per-second combat
+    -- growth fields. Do not turn an unrelated growth tick into a wallet DTO.
+    local id = tonumber(payload and payload.player_id)
+    local level = tonumber(payload and payload.rebirth_level)
+    if id and level and state.projected_rebirth_by_player[id] == level then return end
+    local reason = payload and payload.reason
+    if reason == "star_blessing_attributes_per_second"
+        or reason == "archive_building_minute_growth" then return end
+    on_player_changed(payload)
+end
 local function on_monster_killed(payload)
     local player_id = tonumber(payload and payload.player_id)
     local encounter_id = tostring(payload and payload.encounter_id or "")
@@ -1796,7 +1869,7 @@ function M.init()
     event_bus.subscribe(events.BUILDING_DESTROYED, on_building_destroyed)
     event_bus.subscribe(events.HERO_SUMMON_STATE_CHANGED, on_player_changed)
     event_bus.subscribe(events.PLAYER_ENTITLEMENT_CHANGED, on_player_changed)
-    event_bus.subscribe(events.HERO_PROGRESSION_CHANGED, on_player_changed)
+    event_bus.subscribe(events.HERO_PROGRESSION_CHANGED, on_hero_progression_changed)
     event_bus.subscribe(events.CONTENT_INVENTORY_CHANGED, on_player_changed)
     event_bus.subscribe(events.MONSTER_KILLED, on_monster_killed)
     event_bus.subscribe(events.MONSTER_ENCOUNTER_CHANGED, function(payload)

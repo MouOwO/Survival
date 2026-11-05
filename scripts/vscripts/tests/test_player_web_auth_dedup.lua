@@ -47,10 +47,16 @@ local function explicit(payload,source)
 end
 web.init(session);resolve()
 check(#requests==1 and #events==1 and events[1].body.status=="requesting","initial requesting exactly once")
+local cold_markers=#request_markers
+for _=1,1000 do explicit()end
+check(#requests==1 and #events==1 and #request_markers==cold_markers,"successful automatic requesting state coalesces an immediate second UI component")
 for _=1,1000 do resolve()end
 check(#requests==1 and #events==1,"1000 inflight resolver repeats must send zero duplicate snapshots")
 reply(1,pending())
 check(#events==2 and events[2].body.status=="pending","initial pending exactly once")
+local transition_markers=#request_markers
+for _=1,1000 do explicit()end
+check(#events==2 and #request_markers==transition_markers,"new pending state sends immediately but its same-clock explicit replay is suppressed")
 for _,stamp in ipairs({0.25,0.75,1.25,2.75})do clock=stamp;resolve()end
 check(#events==2 and #requests==1,"expiry countdown changes are not public state changes or early HTTP polls")
 clock=3;resolve();check(#requests==2,"original 3s HTTP poll deadline retained")
@@ -139,6 +145,23 @@ local ok=pcall(explicit);failed_native_attempts=failed_native_attempts+1
 CustomGameEventManager.Send_ServerToPlayer=native_send
 check(not ok and #events==before,"native send failure must not fabricate delivery")
 explicit();check(#events==before+1,"same-clock recovery is still allowed after native send failure")
+-- Complete the synthetic in-flight poll before simulating a much later UI
+-- refresh. This models the real pending response rather than a timed-out poll.
+reply(#requests,{ok=true,status="pending"})
+clock=133;before=#events;local requests_before_late=#requests
+explicit()
+check(#events==before+1 and events[#events].body.status=="pending"and events[#events].body.expires_in>0,"129-second later genuine subscriber snapshot remains available")
+check(#requests==requests_before_late+1,"late explicit recovery preserves the overdue real authorization poll")
+-- A failed first state-change send also leaves the same-clock allowance free.
+session="web_auth_fixture_match_7";web.init(session);clock=0;before=#events
+CustomGameEventManager.Send_ServerToPlayer=function()error("fixture_initial_native_send_failed")end
+ok=pcall(resolve);failed_native_attempts=failed_native_attempts+1
+CustomGameEventManager.Send_ServerToPlayer=native_send
+check(not ok and #events==before,"initial state-change send failure cannot fabricate delivery or memo")
+explicit()
+check(#events==before+1 and events[#events].body.status=="requesting","same-clock retry remains available after a failed state-change send")
+local recovered_markers=#request_markers;explicit()
+check(#events==before+1 and #request_markers==recovered_markers,"successful recovered state then coalesces immediate second UI replay")
 check(#public_markers==#events+failed_native_attempts,"one sparse safe marker per actual native send attempt")
 local explicit_markers=0;for _,value in ipairs(public_markers)do if value:find("reason=explicit_snapshot",1,true)then explicit_markers=explicit_markers+1 end end
 local accepted_snapshots=0;for _,value in ipairs(request_markers)do if value:find("mode=explicit_snapshot",1,true)then accepted_snapshots=accepted_snapshots+1 end end

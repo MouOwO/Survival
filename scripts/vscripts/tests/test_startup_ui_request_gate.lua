@@ -166,4 +166,19 @@ assert(calls.difficulty == 1 and calls.place == 1 and calls.build == 1)
 assert(calls.draw == 1 and calls.exchange == 1 and #packets == 4)
 assert(tickets == 3 and permanent_items == 1 and wood == 80 and cooldown == 3)
 
-print("STARTUP_UI_REQUEST_GATE_PASS: real router blocks loading/late/revoked actors; ready difficulty/build/lottery paths preserved")
+-- Modern wallet presentation is opt-in through the same admitted native
+-- listener. A string flag or a loading/revoked actor cannot negotiate it.
+local shop_payload, shop_calls=nil,0
+bus.handle_request(events.SHOP_OPEN_REQUEST,function(payload)
+    shop_payload=payload;shop_calls=shop_calls+1;return{ok=true,snapshot={entries={}}}
+end)
+admitted[0]=true
+listeners.ui_shop_open_request(nil,{PlayerID=0,request_id="shop_wallet_fixture",hud_wallet=1,mode="shop"})
+assert(shop_calls==1 and shop_payload.hud_wallet==1)
+listeners.ui_shop_open_request(nil,{PlayerID=0,request_id="shop_legacy_fixture",hud_wallet="1",mode="shop"})
+assert(shop_calls==2 and shop_payload.hud_wallet==0)
+admitted[0]=false
+listeners.ui_shop_open_request(nil,{PlayerID=0,request_id="shop_denied_fixture",hud_wallet=1,mode="shop"})
+assert(shop_calls==2,"wallet capability cannot bypass current admission")
+
+print("STARTUP_UI_REQUEST_GATE_PASS: real router blocks loading/late/revoked actors; ready difficulty/build/lottery/shop wallet paths preserved")
