@@ -146,6 +146,28 @@ def generator_inputs(case):
 
 
 class OriginalReceiptTests(unittest.TestCase):
+    def test_raw_movie_runtime_copy_requires_exact_dual_authors_and_recorded_bytes(self):
+        c = compiler_case(); name = "panorama/videos/custom_game/map.webm"; raw = b"\x1aE\xdf\xa3raw movie"
+        fact = dict(path=name, oid=oid(raw), mode="100644", git_blob=fp(raw), content=fp(raw), lfs=False)
+        pin = dict(fact, repo="content", source_revision=PINS["content"], compiler_input=fp(raw), normalization="BINARY_GIT_IDENTITY",
+                   game_author=dict(fact, repo="game", source_revision=PINS["game"]))
+        c["plan"]["resources"][0]["sources"].append(pin)
+        c["plan"]["inputs"][name] = pin
+        c["proof"]["results"][0]["inputs"].append(pin)
+        c["proof"]["results"][0]["runtime_raw_dependencies"] = {name: fp(raw)}
+        c["source_bytes"].update({"content:" + name: raw, "game:" + name: raw})
+        m.verify_compiler_receipt(**compiler_inputs(c))
+        for replacement in ({}, {name: fp(raw + b"changed")}):
+            bad = deepcopy(c); bad["proof"]["results"][0]["runtime_raw_dependencies"] = replacement
+            with self.assertRaisesRegex(ValueError, "compiler_raw_movie_runtime_binding_mismatch"):
+                m.verify_compiler_receipt(**compiler_inputs(bad))
+        bad = deepcopy(c); del bad["proof"]["results"][0]["runtime_raw_dependencies"]
+        with self.assertRaisesRegex(ValueError, "compiler_raw_movie_runtime_binding_mismatch"):
+            m.verify_compiler_receipt(**compiler_inputs(bad))
+        bad = deepcopy(c); del bad["plan"]["inputs"][name]["game_author"]
+        with self.assertRaisesRegex(ValueError, "compiler_raw_movie_dual_author_required"):
+            m.verify_compiler_receipt(**compiler_inputs(bad))
+
     def test_real_compiler_schema_and_actual_js_data(self):
         result = m.verify_compiler_receipt(**compiler_inputs(compiler_case()))
         self.assertEqual(len(result["outputs"]), 1); self.assertFalse(result["publication_ready"])

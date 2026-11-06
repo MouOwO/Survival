@@ -1,7 +1,7 @@
 """Compiler planning helpers only: no compiler, external file, Git or SDK writes."""
 from pathlib import Path
 from unittest import mock
-import importlib.util,struct,unittest
+import importlib.util,struct,tempfile,unittest
 
 spec=importlib.util.spec_from_file_location('release_compile_scope',Path(__file__).with_name('release_compile_scope.py'))
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
@@ -72,21 +72,38 @@ class CompileScopeTests(unittest.TestCase):
         self.assertEqual(m.compiler_bytes(b'\x89PNG\0\r\n',False),(b'\x89PNG\0\r\n','BINARY_GIT_IDENTITY'))
         with self.assertRaisesRegex(ValueError,'lone_cr'):m.compiler_bytes(b'a\rb',True)
 
+    def test_raw_movie_stages_exactly_in_both_trees_without_other_runtime_copies(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);content=root/'content';game=root/'game'
+            path='panorama/videos/custom_game/lottery_cinematic_v1/map.webm'
+            raw=b'\x1aE\xdf\xa3\0binary\r\nmovie'
+            m.stage_source(content,game,path,raw)
+            self.assertEqual((content/path).read_bytes(),raw)
+            self.assertEqual((game/path).read_bytes(),raw)
+            m.stage_source(content,game,'panorama/layout/a.xml',b'<root/>')
+            self.assertFalse((game/'panorama/layout/a.xml').exists())
+            with self.assertRaises(FileExistsError):m.stage_source(content,game,path,raw)
+            for bad in ('../outside.webm','panorama/videos/../outside.webm'):
+                with self.assertRaises(ValueError):m.stage_source(content,game,bad,raw)
+        for path in ('panorama/images/x.webm','panorama/videos/x.mp4'):
+            self.assertFalse(m.runtime_raw_dependency(path))
+
     def test_complete_dependency_plan_uses_git_without_any_physical_source_read(self):
         revision='a'*40;root=Path('Z:/not_a_checkout/compiler_test')
         blobs={
             'panorama/layout/custom_game/custom_ui_manifest.xml':b'<root><CustomUIElement layoutfile="file://{resources}/layout/custom_game/a.xml"/></root>\n',
-            'panorama/layout/custom_game/a.xml':b'<root><include src="file://{resources}/styles/custom_game/a.css"/></root>\n',
+            'panorama/layout/custom_game/a.xml':b'<root><include src="file://{resources}/styles/custom_game/a.css"/><MoviePanel src="file://{resources}/videos/custom_game/map.webm"/></root>\n',
             'panorama/styles/custom_game/a.css':b'.a{background-image:url("file://{images}/custom_game/a.png");}\n',
             'panorama/images/custom_game/a.png':b'\x89PNG\0',
             'panorama/images/custom_game/a.vtex':b'"m_fileName" "string" "panorama/images/custom_game/a.png"\n',
+            'panorama/videos/custom_game/map.webm':b'\x1aE\xdf\xa3immutable raw movie',
         }
-        trees={'content':{p:{}for p in blobs},'game':{'panorama/src/'+p[len('panorama/'):]:{}for p in blobs}}
+        trees={'content':{p:{}for p in blobs},'game':{p if m.runtime_raw_dependency(p) else 'panorama/src/'+p[len('panorama/'):]:{}for p in blobs}}
         class Reader:
             used=0;requests=0
             def __init__(self,*args):pass
             def get(self,role,path):
-                relative=path if role=='content'else'panorama/'+path[len('panorama/src/'):]
+                relative=path if role=='content'or m.runtime_raw_dependency(path) else'panorama/'+path[len('panorama/src/'):]
                 raw=blobs[relative]
                 return dict(repo=role,path=path,oid='b'*40,raw=raw,git_blob=m.checks(raw),content=m.checks(raw),lfs=False)
             def close(self):pass
@@ -101,6 +118,7 @@ class CompileScopeTests(unittest.TestCase):
         self.assertEqual(plan['counts'],{'READY_FOR_ISOLATED_OFFICIAL_COMPILE':1})
         self.assertEqual(set(plan['inputs']),set(blobs))
         self.assertEqual(plan['inputs']['panorama/styles/custom_game/a.css']['compiler_input'],m.checks(blobs['panorama/styles/custom_game/a.css'].replace(b'\n',b'\r\n')))
+        self.assertEqual(plan['inputs']['panorama/videos/custom_game/map.webm']['game_author']['path'],'panorama/videos/custom_game/map.webm')
         self.assertFalse(plan['publication_ready'])
 
     def test_cli_requires_immutable_operator_before_reading_scope(self):

@@ -99,6 +99,17 @@ def compiler_bytes(raw,text):
     result=normalized.replace(b'\n',b'\r\n')
     return result,'GIT_IDENTITY'if result==raw else'IMMUTABLE_GIT_TEXT_TO_COMPILER_CRLF_ONLY'
 
+def runtime_raw_dependency(path):
+    """MoviePanel src checks raw WebM in game, not the content source tree."""
+    safe(path)
+    return path.startswith('panorama/videos/') and PurePosixPath(path).suffix=='.webm'
+
+def stage_source(stage_content,stage_game,path,raw):
+    # One write per unique dependency. Only immutable plan payloads reach this
+    # function; raw movies are mirrored without conversion or directory scans.
+    safe(path);write_new(stage_content/path,raw)
+    if runtime_raw_dependency(path):write_new(stage_game/path,raw)
+
 def operator_binding(revision):
     immutable(ROOT,revision);result={}
     for relative in ('tools/release_compile_scope.py','tools/release_pending_inventory.py'):
@@ -205,7 +216,8 @@ def make_plan(scope,scope_sha,revisions,roots=None,operator_revision=None):
         value=reader.get('content',path)
         payload,normalization=compiler_bytes(value['raw'],PurePosixPath(path).suffix in TEXT)
         pin={k:v for k,v in value.items()if k!='raw'};pin.update(source_revision=revisions['content'],compiler_input=checks(payload),normalization=normalization)
-        mirror='panorama/src/'+path[len('panorama/'):]if path.startswith('panorama/')else None
+        mirror=path if runtime_raw_dependency(path) else 'panorama/src/'+path[len('panorama/'):]if path.startswith('panorama/')else None
+        if runtime_raw_dependency(path):need(mirror in trees['game'],'raw_movie_game_author_missing:'+path)
         if mirror and mirror in trees['game']:
             game=reader.get('game',mirror)
             if PurePosixPath(path).suffix in TEXT:
@@ -269,7 +281,7 @@ def compile_plan(plan,plan_sha,run_id,proof_dir):
             payloads[path]=payload
     finally:reader.close()
     stage_game.mkdir(parents=True);stage_content.mkdir();proof_dir.mkdir(parents=True)
-    for path,raw in payloads.items():write_new(stage_content/path,raw)
+    for path,raw in payloads.items():stage_source(stage_content,stage_game,path,raw)
     created_mounts=[]
     try:
         for mount,target in ((game_mount,stage_game),(content_mount,stage_content)):
@@ -280,19 +292,29 @@ def compile_plan(plan,plan_sha,run_id,proof_dir):
         for row in plan['resources']:
             if row['status']!='READY_FOR_ISOLATED_OFFICIAL_COMPILE':results.append(dict(resource=row['resource'],status='BLOCKED',error=row.get('error')));continue
             source=content_mount/row['primary_source'];artifact=stage_game/row['resource'];before=checks(artifact.read_bytes())if artifact.is_file()else None
+            for pin in row['sources']:
+                if runtime_raw_dependency(pin['path']):
+                    need(checks((stage_game/pin['path']).read_bytes())==pin['compiler_input'],'staged_runtime_raw_changed_before_compile')
             args=[str(COMPILER),'-i',str(source),'-game',str(ENGINE/'game/dota'),'-fshallow','-nop4']
             started=datetime.now(timezone.utc).isoformat();begin=time.monotonic();done=subprocess.run(args,capture_output=True,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0));elapsed=time.monotonic()-begin
             log=done.stdout+done.stderr;log_name=row['resource'].replace('/','_')+'.log';write_new(proof_dir/'logs'/log_name,log)
             result=dict(resource=row['resource'],started_utc=started,elapsed_seconds=round(elapsed,6),compiler_exit_code=done.returncode,compiler_argv=args,compiler_log_sha256=sha(log),compiler_log=log_name)
             if done.returncode!=0 or b'0 failed'not in log or not artifact.is_file()or artifact.stat().st_size==0:
                 result.update(status='OFFICIAL_COMPILE_FAILED',error='compiler_exit_log_or_artifact_failed');results.append(result);continue
-            for pin in row['sources']:need(checks((stage_content/pin['path']).read_bytes())==pin['compiler_input'],'staged_source_changed_during_compile')
+            runtime_raw={}
+            for pin in row['sources']:
+                need(checks((stage_content/pin['path']).read_bytes())==pin['compiler_input'],'staged_source_changed_during_compile')
+                if runtime_raw_dependency(pin['path']):
+                    actual=checks((stage_game/pin['path']).read_bytes())
+                    need(actual==pin['compiler_input'],'staged_runtime_raw_changed_during_compile')
+                    runtime_raw[pin['path']]=actual
             raw=artifact.read_bytes();output=checks(raw)
             try:binding=compiled_binding(row['resource'],raw,payloads[row['primary_source']])
             except ValueError as error:
                 result.update(status='OFFICIAL_COMPILE_FAILED',error=str(error));results.append(result);continue
             result.update(status='OFFICIALLY_COMPILED_AND_SOURCE_BOUND',artifact_path=str(artifact),artifact=output,prior_stage_artifact=before,
                 primary_source=row['primary_source'],inputs=row['sources'],engine_references=row['engine_references'],**binding)
+            if runtime_raw:result['runtime_raw_dependencies']=runtime_raw
             results.append(result)
         report=dict(schema=1,kind='ISOLATED_OFFICIAL_COMPILER_PROOF',plan_sha256=plan_sha,source_revisions=revisions,scope_sha256=plan['scope_sha256'],
             compiler_path=str(COMPILER),compiler_sha256=compiler_sha,tool_sha256=sha(Path(__file__).read_bytes()),operator_binding=plan['operator_binding'],external_stage=str(stage),game_mount=str(game_mount),content_mount=str(content_mount),

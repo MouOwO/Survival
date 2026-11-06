@@ -210,6 +210,9 @@ def verify_compiler_receipt(*, plan_raw, plan_sha256, proof_raw, proof_sha256, s
             need(pin.get("compiler_input") == byte_fingerprint(payload) and pin.get("normalization") == normalization
                  and plan.get("inputs", {}).get(source_name) == pin, "compiler_checkout_or_global_input_binding_mismatch")
             author = pin.get("game_author")
+            if source_name.startswith("panorama/videos/") and source_name.endswith(".webm"):
+                need(isinstance(author, dict) and author.get("path") == source_name,
+                     "compiler_raw_movie_dual_author_required")
             if author is not None:
                 author_name = path(author.get("path")); author_key = "game:" + author_name
                 need(author_key in source_bytes, "compiler_dual_author_blob_missing")
@@ -223,6 +226,11 @@ def verify_compiler_receipt(*, plan_raw, plan_sha256, proof_raw, proof_sha256, s
                 need(a == payload, "compiler_game_content_authors_differ")
                 used_sources[author_key] = sha(a_raw); used_git_sources[author_key] = sha(a_git)
             local[source_name] = payload; used_sources[key] = sha(raw); used_git_sources[key] = sha(git_raw)
+        runtime_raw = {key: byte_fingerprint(raw) for key, raw in local.items()
+                       if key.startswith("panorama/videos/") and key.endswith(".webm")}
+        if runtime_raw or "runtime_raw_dependencies" in result:
+            need(result.get("runtime_raw_dependencies") == runtime_raw,
+                 "compiler_raw_movie_runtime_binding_mismatch")
         artifact = artifacts[name]; actual = byte_fingerprint(artifact)
         need(result.get("artifact") == actual, "actual_compiler_artifact_hash_mismatch")
         texture = name.endswith(".vtex_c")
