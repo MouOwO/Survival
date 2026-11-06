@@ -45,7 +45,10 @@ package.loaded["systems/archive_online_clock"]={init=function() end,observe=func
     disconnect=function() end,sample=function() end,flush=function() end}
 package.loaded["systems/title_presentation_service"]={init=function() end}
 package.loaded["config/generated/archive_categories"]={rows={},by_id={}}
-GameRules={GetGameTime=function() return game_time end,IsCheatMode=function() return false end}
+-- This provider fixture has no native game-mode entity. The compact bridge
+-- tests inject their own transport; native dispatch is tested separately.
+GameRules={GetGameTime=function() return game_time end,IsCheatMode=function() return false end,
+    GetGameModeEntity=function() return nil end}
 PlayerResource={GetPlayer=function(_,id) if accounts[id] then return id end end,
     IsValidPlayerID=function(_,id) return accounts[id]~=nil end}
 CustomGameEventManager={RegisterListener=function(_,name,f) listeners[name]=f end,
