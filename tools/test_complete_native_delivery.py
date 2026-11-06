@@ -333,11 +333,25 @@ class StaticPlanTests(unittest.TestCase):
         for route in r.LAUNCH_ROUTES:
             with self.subTest(route=route):
                 arguments=r.arguments(log,route)
+                self.assertEqual(arguments.count("-vconsole"),1)
+                self.assertEqual(arguments.count("-vconport"),1)
+                self.assertEqual(arguments[arguments.index("-vconport")+1],"29072")
+                self.assertEqual(arguments[arguments.index("-console")+1],"-vconsole")
+                self.assertFalse(any(value in arguments for value in
+                    ("-tools","-addon","+survival_offline_logic_test")))
                 self.assertEqual(arguments[arguments.index("+sv_cheats")+1],"0")
+                self.assertEqual(arguments[arguments.index("+survival_archive_http_enabled")+1],"1")
                 self.assertEqual(arguments[arguments.index("+net_showmsg")+1],"CUserMsg_CustomGameEvent")
                 self.assertEqual(arguments[arguments.index("+net_restrict_showmsg_socket")+1],"client")
                 self.assertEqual(arguments[arguments.index("-con_logfile")+1],str(log))
                 self.assertEqual("+dota_launch_custom_game" in arguments,route=="direct")
+    def test_launch_arguments_reject_custom_routes_and_do_not_query_native_state(self):
+        log=Path("D:/Survival_本地排演/test-only-engine.log")
+        with patch.object(r,"environment",side_effect=AssertionError("native side effect")):
+            for route in ("tools","manual_gc","direct -tools","direct;quit",""):
+                with self.subTest(route=route), self.assertRaisesRegex(ValueError,"explicit_launch_route"):
+                    r.arguments(log,route)
+            self.assertIn("-vconsole",r.arguments(log,"direct"))
     def test_all_three_default_plans_do_not_load_packages_or_native_helpers(self):
         for module,blocked in ((n,"environment"),(r,"environment"),(d,"recipe")):
             with self.subTest(module=module.__name__),patch.object(module,blocked,side_effect=AssertionError("action")):

@@ -1,19 +1,25 @@
 """Lossless references within one authenticated HTTP reply, never a save delta.
 
-Only an explicit v1 consumer receives references. Equality includes JSON types,
+Only an explicit v1/v2 consumer receives references. Equality includes JSON types,
 so false is never replaced by 0. No client baseline, cache, database access or
-timer is used. Init/idle O(1); each low-frequency response costs O(B) comparisons
-and size accounting for its B bytes, with shallow O(K) container copies. A
-packing failure preserves the original committed reply.
+timer is used. Init/idle O(1); each low-frequency response costs O(B+R) for B
+bytes and at most 256 daily rows (currently 40), with shallow container copies.
+V2 removes the exact rows/by_key duplicate, independent of local configuration.
+A packing failure preserves a valid v1/full committed reply.
 """
 import json
+import re
 
 CAPABILITY = 'archive_profile_refs_v1'
+CAPABILITY_V2 = 'archive_profile_refs_v2'
 MARKER = '_http_profile_refs'
 ACCOUNT_FIELDS = ('schema_version', 'account_id', 'revision', 'entitlements',
                   'achievements', 'save', 'public')
 ROOT_DAILY = 128
 PROGRESSION_DAILY = 256
+DAILY_ROWS = 512
+MAX_DAILY_ROWS = 256
+_DAILY_KEY = re.compile(r'[a-z][a-z0-9_]{0,95}\Z')
 
 
 def _same(left, right, depth=0):
@@ -34,7 +40,7 @@ def _field_bytes(key, value):
                           separators=(',', ':')).encode('utf-8')) - 1
 
 
-def pack(payload, response):
+def _pack_v1(payload, response):
     capabilities = payload.get('response_capabilities') if isinstance(payload, dict) else None
     if (type(capabilities) is not dict or capabilities.get(CAPABILITY) is not True
             or not isinstance(response, dict) or MARKER in response):
@@ -78,3 +84,54 @@ def pack(payload, response):
         # Optional transport optimisation cannot turn a durable grant into an
         # apparent failed transaction. Legacy bytes remain valid for v1 clients.
         return response
+
+
+def _pack_daily_rows(response):
+    profile = response.get('profile')
+    daily = profile.get('daily_limits') if isinstance(profile, dict) else None
+    if not isinstance(daily, dict):
+        return response
+    rows, index = daily.get('rows'), daily.get('by_key')
+    if (type(rows) is not list or not 1 <= len(rows) <= MAX_DAILY_ROWS
+            or type(index) is not dict):
+        return response
+    expected = {}
+    for row in rows:
+        key = row.get('key') if type(row) is dict else None
+        if type(key) is not str or not _DAILY_KEY.fullmatch(key) or key in expected:
+            return response
+        expected[key] = row
+    if not _same(index, expected):
+        return response  # Extra/index-only fields and JSON type differences survive.
+    old_marker = response.get(MARKER)
+    mask = old_marker['m'] if old_marker is not None else 0
+    marker = {'v': 2, 'm': mask + DAILY_ROWS}
+    marker_cost = _field_bytes(MARKER, marker)
+    if old_marker is not None:
+        marker_cost -= _field_bytes(MARKER, old_marker)
+    # rows remains in this object, so removing by_key also removes one comma.
+    # Keep a one-byte safety margin for compact JSON accounting.
+    if _field_bytes('by_key', index) - 1 <= marker_cost:
+        return response
+    result = dict(response)
+    result['profile'] = dict(profile)
+    result['profile']['daily_limits'] = dict(daily)
+    del result['profile']['daily_limits']['by_key']
+    result[MARKER] = marker
+    return result
+
+
+def pack(payload, response):
+    capabilities = payload.get('response_capabilities') if isinstance(payload, dict) else None
+    if type(capabilities) is not dict or capabilities.get(CAPABILITY_V2) is not True:
+        return _pack_v1(payload, response)
+    if not isinstance(response, dict) or MARKER in response:
+        return response
+    # V2 includes v1 decoding. An old server can still return v1 or full JSON;
+    # this local capability copy never changes the caller or business payload.
+    local_payload = dict(payload, response_capabilities=dict(capabilities, archive_profile_refs_v1=True))
+    base = _pack_v1(local_payload, response)
+    try:
+        return _pack_daily_rows(base)
+    except (ValueError, TypeError, OverflowError, RecursionError):
+        return base

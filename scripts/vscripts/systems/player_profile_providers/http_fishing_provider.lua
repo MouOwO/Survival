@@ -112,6 +112,7 @@ local function request(path, payload, on_success, on_error)
         local capabilities={}
         for key,value in pairs(type(body.response_capabilities)=='table'and body.response_capabilities or{})do capabilities[key]=value end
         capabilities.archive_profile_refs_v1=true
+        capabilities.archive_profile_refs_v2=true
         body.response_capabilities=capabilities
     end
     body.match_session_id = session

@@ -10,9 +10,10 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'server'))
 sys.path.insert(0, str(ROOT / 'server/tests'))
-from archive_backend.http_profile_wire import pack, MARKER, CAPABILITY
+from archive_backend.http_profile_wire import pack, MARKER, CAPABILITY, CAPABILITY_V2
 
 CAP = {'response_capabilities': {CAPABILITY: True}}
+CAP_V2 = {'response_capabilities': {CAPABILITY: True, CAPABILITY_V2: True}}
 
 
 def fixture(mode='standard'):
@@ -36,6 +37,19 @@ def fixture(mode='standard'):
 
 def size(value):
     return len(json.dumps(value, ensure_ascii=False, separators=(',', ':')).encode())
+
+
+def daily_fixture(mode='standard', monthly=False):
+    from archive_backend.bundle import Bundle
+    from archive_backend.daily_limits import snapshot
+    bundle = Bundle(ROOT / 'server/bundles/f8ab7087c042cc82f43555500e134262211062e78c88190b6691dcce57ebff42')
+    source = fixture(mode)
+    daily = snapshot({'save': {}, 'entitlements': {'archive_pass': {'active': monthly}}},
+                     bundle, now=1793961863)
+    source['profile']['daily_limits'] = deepcopy(daily)
+    source['profile']['progression']['daily_limits'] = deepcopy(daily)
+    source['daily_limits'] = deepcopy(daily)
+    return source
 
 
 class HttpProfileWireTests(unittest.TestCase):
@@ -144,6 +158,120 @@ class HttpProfileWireTests(unittest.TestCase):
             legacy = module.project(SimpleNamespace(), {}, source, context)
             packed = module.project(SimpleNamespace(), CAP, source, context)
             self.assertIn(MARKER, packed)
+            self.decode_vectors([{'wire': packed, 'expected': legacy}])
+
+    def test_v2_real_daily_config_all_modes_and_revision_order(self):
+        rows = []
+        for mode in ('standard', 'pure', 'rich', 'cold', 'scourge', 'ruins', 'celestial'):
+            for monthly in (False, True):
+                for revision in (50, 51, 51, 49, 1):
+                    source = daily_fixture(mode, monthly)
+                    source['profile']['revision'] = source['profile']['account_profile']['revision'] = revision
+                    saved = deepcopy(source)
+                    packed = pack(CAP_V2, source)
+                    self.assertEqual(source, saved)
+                    self.assertEqual(packed[MARKER]['v'], 2)
+                    self.assertEqual(len(source['profile']['daily_limits']['rows']), 40)
+                    self.assertGreater(size(pack(CAP, source)) - size(packed), 5800)
+                    self.assertNotIn('by_key', packed['profile']['daily_limits'])
+                    rows.append({'wire': packed, 'expected': source})
+        self.decode_vectors(rows)
+
+    def test_v2_negotiation_is_exact_and_v1_fallback_is_preserved(self):
+        source = daily_fixture()
+        legacy = pack(CAP, source)
+        rows = [{'wire': legacy, 'expected': source}, {'wire': source, 'expected': source}]
+        for value in (None, False, 0, 1, 'true', {}, []):
+            request = {'response_capabilities': {CAPABILITY: True, CAPABILITY_V2: value}}
+            self.assertEqual(pack(request, source), legacy)
+        request = {'response_capabilities': {CAPABILITY_V2: True, 'unrelated': True}}
+        saved = deepcopy(request)
+        rows.append({'wire': pack(request, source), 'expected': source})
+        self.assertEqual(request, saved)
+        # An existing marker belongs to a previous encoder and must not be packed twice.
+        already = pack(CAP_V2, source)
+        self.assertIs(pack(CAP_V2, already), already)
+        self.decode_vectors(rows)
+
+    def test_v2_unknown_fields_types_and_nonmatching_indexes(self):
+        source = daily_fixture()
+        daily = source['profile']['daily_limits']
+        daily['future'] = [False, None, 0, '保留']
+        daily['rows'][0]['future'] = {'false': False, 'zero': 0, 'null': None}
+        daily['by_key'][daily['rows'][0]['key']] = deepcopy(daily['rows'][0])
+        rows = [{'wire': pack(CAP_V2, source), 'expected': source}]
+        deep = deepcopy(source)
+        node = deep
+        for _ in range(70):
+            node['unrelated'] = {}
+            node = node['unrelated']
+        rows.append({'wire': pack(CAP_V2, deep), 'expected': deep})
+        for change in ('extra', 'missing', 'type', 'duplicate', 'too_many', 'bad_key', 'empty'):
+            bad = deepcopy(source)
+            daily = bad['profile']['daily_limits']
+            if change == 'extra': daily['by_key']['extra'] = {'key': 'extra'}
+            elif change == 'missing': daily['by_key'].pop(daily['rows'][0]['key'])
+            elif change == 'type': daily['by_key'][daily['rows'][0]['key']]['future']['false'] = 0
+            elif change == 'duplicate': daily['rows'].append(deepcopy(daily['rows'][0]))
+            elif change == 'too_many': daily['rows'] *= 7
+            elif change == 'empty': daily['rows'] = []; daily['by_key'] = {}
+            else: daily['rows'][0]['key'] = 'INVALID'
+            packed = pack(CAP_V2, bad)
+            self.assertNotEqual(packed.get(MARKER, {}).get('v'), 2)
+            rows.append({'wire': packed, 'expected': bad})
+        self.decode_vectors(rows)
+
+    def test_v2_daily_only_and_small_payloads_never_grow(self):
+        rows = []
+        for length in range(0, 90, 3):
+            row = {'key': 'only', 'caption': '字' * length}
+            source = {'profile': {'daily_limits': {'rows': [row], 'by_key': {'only': deepcopy(row)}}}}
+            packed = pack(CAP_V2, source)
+            self.assertLessEqual(size(packed), size(source))
+            if MARKER in packed:
+                self.assertEqual(packed[MARKER], {'v': 2, 'm': 512})
+            rows.append({'wire': packed, 'expected': source})
+        self.decode_vectors(rows)
+
+    def test_v2_malformed_rows_and_late_v1_failure_are_atomic(self):
+        valid = pack(CAP_V2, daily_fixture())
+        rows = []
+        for marker in ({'v': 2, 'm': 0}, {'v': 2, 'm': 511}, {'v': 2, 'm': 1024},
+                       {'v': 2, 'm': 512.5}, {'v': 2, 'm': True},
+                       {'v': 2, 'm': 512, 'future': True}, {'v': 3, 'm': 512}):
+            bad = deepcopy(valid); bad[MARKER] = marker
+            rows.append({'wire': bad, 'invalid': True})
+        for change in ('overwrite', 'missing_rows', 'null_rows', 'object_rows', 'null_row',
+                       'duplicate', 'bad_key', 'too_many', 'root_collision', 'account_collision', 'deep'):
+            bad = deepcopy(valid)
+            daily = bad['profile']['daily_limits']
+            if change == 'overwrite': daily['by_key'] = {}
+            elif change == 'missing_rows': del daily['rows']
+            elif change == 'null_rows': daily['rows'] = None
+            elif change == 'object_rows': daily['rows'] = {'1': daily['rows'][0]}
+            elif change == 'null_row': daily['rows'][0] = None
+            elif change == 'duplicate': daily['rows'].append(deepcopy(daily['rows'][0]))
+            elif change == 'bad_key': daily['rows'][0]['key'] = 'INVALID'
+            elif change == 'too_many': daily['rows'] *= 7
+            elif change == 'root_collision': bad['daily_limits'] = {}
+            elif change == 'account_collision': bad['profile']['account_profile']['save'] = {}
+            else:
+                node = daily['rows'][0]
+                for _ in range(66): node['deep'] = {}; node = node['deep']
+            rows.append({'wire': bad, 'invalid': True})
+        self.decode_vectors(rows)
+
+    def test_v2_projection_hook_keeps_modes_and_legacy_clients(self):
+        from test_rich_match_modes import api_contract
+        from types import SimpleNamespace
+        module = api_contract()
+        source = daily_fixture()
+        source['profile'].pop('account_profile')
+        for mode in ('standard', 'pure', 'rich', 'cold', 'scourge', 'ruins', 'celestial'):
+            context = {'mode': mode, 'match_session_id': 'fixture-session-001'}
+            legacy = module.project(SimpleNamespace(), {}, source, context)
+            packed = module.project(SimpleNamespace(), CAP_V2, source, context)
+            self.assertEqual(packed[MARKER]['v'], 2)
             self.decode_vectors([{'wire': packed, 'expected': legacy}])
 
 

@@ -25,9 +25,12 @@ CreateHTTPRequestScriptVM=function(method,url)
     return request
 end
 local provider=require('systems/player_profile_providers/http_fishing_provider');provider.init()
-local applied
+local applied,apply_error
 package.loaded['systems/player_profile_service']={get_provider=function()return provider end,
-    apply_snapshot=function(_,snapshot)applies=applies+1;applied=snapshot;return{ok=true}end,
+    apply_snapshot=function(_,snapshot)
+        if apply_error then return{ok=false,error=apply_error}end
+        applies=applies+1;applied=snapshot;return{ok=true}
+    end,
     refresh_player=function(_,reason)
         reads=reads+1;assert(completed==reads,'pending was not released before recovery')
         assert(reason=='http_profile_wire_recovery')
@@ -39,6 +42,7 @@ local adapter=require('systems/archive_http_adapter')
 local function submit(callback)
     adapter.submit(0,{id='fixture-operation',kind='lottery_draw',pool_id='map',count=10},callback,hash,true)
     assert(requests[#requests].body.response_capabilities.archive_profile_refs_v1==true)
+    assert(requests[#requests].body.response_capabilities.archive_profile_refs_v2==true)
     assert(requests[#requests].body.response_capabilities.lottery_committed_profile_v1==true)
 end
 local result
@@ -59,4 +63,32 @@ assert(result.terminal and reads==1 and applies==1 and #requests==3)
 -- Legacy full replies remain valid; unrelated requests carry no new capability.
 provider.fetch_snapshot(account,function()end,function()end)
 assert(requests[4].body.response_capabilities==nil)
-print('HTTP_PROFILE_WIRE_PROVIDER_PASS one-apply/single-read-recovery/no-mutation-retry/stale-world/legacy-scope')
+local function v2(revision)
+    return{ok=true,profile={account_id=account,revision=revision,save={tokens=9},
+        account_profile={account_id=account},progression={},daily_limits={day_key='synthetic-day',
+            rows={{key='daily_test',earned=2,limit=10,remaining=8,capped=0}}}},_http_profile_refs={v=2,m=928}}
+end
+submit(function(value)result=value end)
+requests[5].complete({StatusCode=200,Body=encode(v2(12))})
+assert(result.ok and result.lottery_profile_applied and applies==2 and reads==1 and #requests==5)
+assert(applied.account_profile.save.tokens==9 and applied.account_profile.save~=applied.save)
+assert(applied.daily_limits.by_key.daily_test.remaining==8)
+assert(applied.daily_limits.rows[1]~=applied.daily_limits.by_key.daily_test)
+assert(applied.progression.daily_limits.by_key.daily_test.earned==2)
+-- An older receipt still follows normal profile revision validation after v2 decoding.
+apply_error='snapshot_revision_stale'
+submit(function(value)result=value end)
+requests[6].complete({StatusCode=200,Body=encode(v2(11))})
+assert(result.ok and not result.lottery_profile_applied and applies==2 and applied.revision==12)
+apply_error=nil
+-- A real v2 row failure releases the pending mutation before exactly one read.
+submit(function(value)completed=completed+1;result=value end)
+local broken=v2(13)
+broken.profile.daily_limits.rows[2]=broken.profile.daily_limits.rows[1]
+requests[7].complete({StatusCode=200,Body=encode(broken)})
+assert(not result.ok and result.terminal and reads==2 and applies==2 and #requests==7)
+submit(function(value)result=value end)
+session='fixture-session-003'
+requests[8].complete({StatusCode=200,Body=encode(broken)})
+assert(result.terminal and reads==2 and applies==2 and #requests==8)
+print('HTTP_PROFILE_WIRE_PROVIDER_PASS v1/v2/daily-rebuild/single-read-recovery/no-mutation-retry/stale-revision/stale-world/legacy-scope')

@@ -5,9 +5,15 @@ const root=process.cwd(),source=fs.readFileSync('panorama/src/scripts/custom_gam
 const layout=fs.readFileSync('panorama/src/layout/custom_game/lottery_movie_ab_direct.xml','utf8');
 const movieURI='file://{resources}/videos/custom_game/lottery_cinematic_v1/map.webm';
 const layoutURI='file://{resources}/layout/custom_game/lottery_movie_ab_direct.xml';
+const bufferedLayout=fs.readFileSync('panorama/src/layout/custom_game/lottery_movie_ab_buffered.xml','utf8');
+const bufferedLayoutURI='file://{resources}/layout/custom_game/lottery_movie_ab_buffered.xml';
 assert.match(layout,/<Panel\s[^>]*>[\s\S]*<MoviePanel\s/);
 assert.match(layout,/id="LotteryCinematicMovie"/);assert(layout.includes('src="'+movieURI+'"'));assert(layout.includes('autoplay="onload"'));
-for(const relative of ['scripts/custom_game/lottery_cinematic_v1.js','layout/custom_game/lottery_movie_ab_direct.xml']){
+assert(bufferedLayout.includes('loadbehavior="buffer-async"'));
+assert(bufferedLayout.includes('src="'+movieURI+'"')&&bufferedLayout.includes('autoplay="onload"'));
+assert.match(bufferedLayout,/<Panel\s[^>]*>[\s\S]*<MoviePanel\s/);
+assert(!layout.includes('loadbehavior='),'Original direct control must stay unchanged');
+for(const relative of ['scripts/custom_game/lottery_cinematic_v1.js','layout/custom_game/lottery_movie_ab_direct.xml','layout/custom_game/lottery_movie_ab_buffered.xml']){
  const a=fs.readFileSync(path.join(root,'panorama/src',relative),'utf8').replace(/\r\n/g,'\n');
  const b=fs.readFileSync(path.resolve(root,'../../../content/dota_addons/Survival/panorama',relative),'utf8').replace(/\r\n/g,'\n');
  assert.equal(a,b,'Both repository source mirrors must match');
@@ -23,7 +29,7 @@ function fixture(options={}){
   SetMovie(uri){this.uri=uri;metrics.media.push(uri);if(options.setupFailure)throw Error('synthetic failure')}
   Play(){this.played=true}SetImage(){metrics.images++}
   DeleteAsync(){this.alive=false;this.children.forEach(c=>c.DeleteAsync());if(nodes.get(this.id)===this)nodes.delete(this.id)}
-  BLoadLayout(uri){metrics.layouts++;assert.equal(uri,layoutURI);if(options.layoutFailure)return false;new Panel('MoviePanel',this,'LotteryCinematicMovie').uri=movieURI;return true}
+  BLoadLayout(uri){metrics.layouts++;assert([layoutURI,bufferedLayoutURI].includes(uri));metrics.lastLayout=uri;if(options.layoutFailure)return false;new Panel('MoviePanel',this,'LotteryCinematicMovie').uri=movieURI;return true}
   FindChildTraverse(id){metrics.lookups++;return this.children.find(c=>c.id===id)||null}
  }
  const window=new Panel('Panel',null,'LotteryWindow');window.actuallayoutwidth=1280;window.actuallayoutheight=720;
@@ -38,14 +44,15 @@ function fixture(options={}){
  return {api:load(),load,nodes,jobs,logs,commands,metrics,history,advance};
 }
 const cases=[];
-for(const mode of ['wrapper','direct']){
- const f=fixture();assert.equal(f.commands.filter(c=>c.name.startsWith('lottery_film_ab_')).length,2);
+for(const mode of ['wrapper','direct','buffered']){
+ const f=fixture();assert.equal(f.commands.filter(c=>c.name.startsWith('lottery_film_ab_')).length,3);
  assert(f.api.PreviewPlayerAB(mode));const player=f.nodes.get('LotteryCinematicMovie');assert.equal(player.type,mode==='wrapper'?'Movie':'MoviePanel');assert.equal(player.uri,movieURI);
  const creates=f.metrics.created,lookups=f.metrics.lookups;f.advance(7.2);
  assert.equal(f.metrics.created,creates);assert.equal(f.metrics.lookups,lookups);assert.equal(f.logs.filter(l=>l.includes('stage=sample')).length,6);
  assert.equal(f.metrics.images,0);assert.equal(f.jobs.size,0);assert.equal(player.alive,false);assert(!f.nodes.has('LotteryMovieABHost'));
  assert(f.logs.some(l=>l.includes('stage=complete')&&l.includes('outcome=visual_review_required')));
- assert.equal(f.metrics.classReads,mode==='wrapper'?6:0);assert.equal(f.metrics.lookups,mode==='direct'?1:0);assert(f.metrics.peakJobs<=7);
+ assert.equal(f.metrics.classReads,mode==='wrapper'?6:0);assert.equal(f.metrics.lookups,mode==='wrapper'?0:1);assert(f.metrics.peakJobs<=7);
+ if(mode!=='wrapper')assert.equal(f.metrics.lastLayout,mode==='buffered'?bufferedLayoutURI:layoutURI);
  cases.push({mode,samples:6,native_class_reads:f.metrics.classReads,initial_child_lookup:f.metrics.lookups,peak_timers:f.metrics.peakJobs});
 }
 {
@@ -59,6 +66,10 @@ for(const options of [{setupFailure:true},{layoutFailure:true}]){
  assert(f.logs.some(l=>l.includes('outcome=setup_error')));
 }
 cases.push({case:'setup_failure_cleans_host_and_never_claims_video_success'});
+{
+ const f=fixture({layoutFailure:true});assert.equal(f.api.PreviewPlayerAB('buffered'),false);
+ assert.equal(f.jobs.size,0);assert(!f.nodes.has('LotteryMovieABHost'));assert.equal(f.metrics.images,0);
+}
 {
  const f=fixture();const initial=f.metrics.created;assert.equal(f.api.PreviewPlayerAB('https://example.invalid'),false);assert.equal(f.metrics.created,initial);
  f.nodes.get('LotteryRefreshButton').enabled=false;assert.equal(f.api.PreviewPlayerAB('direct'),false);f.nodes.get('LotteryRefreshButton').enabled=true;

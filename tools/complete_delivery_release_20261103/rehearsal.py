@@ -153,7 +153,11 @@ def expected_log_path(folder):
 def arguments(log, route=None):
     route = _ROUTE if route is None else route
     need(route in LAUNCH_ROUTES, "complete_explicit_launch_route_required")
-    return ["-steam","-novid","-console","-vconport",str(PORT),"-condebug","-con_logfile",str(log),
+    # Explicitly enable the native loopback console. A port alone does not
+    # establish command access when a modal Panorama layer captures the GUI.
+    # This adds one launch token only; diagnostics still verify process/port
+    # ownership and never imply native acceptance or transaction permission.
+    return ["-steam","-novid","-console","-vconsole","-vconport",str(PORT),"-condebug","-con_logfile",str(log),
         "+sv_cheats","0","+survival_archive_http_enabled","1",
         "+net_showmsg","CUserMsg_CustomGameEvent","+net_restrict_showmsg_socket","client"] + (
         ["+dota_launch_custom_game","3824360109","ws4_entry"] if route == "direct" else [])

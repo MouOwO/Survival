@@ -22,6 +22,16 @@ for index,row in ipairs(rows)do
             and value.profile.account_profile.save then
             assert(value.profile.save~=value.profile.account_profile.save,'profile/account share mutable save')
         end
+        local daily=value.profile and value.profile.daily_limits
+        if daily and daily.rows and daily.by_key then
+            for _,entry in ipairs(daily.rows)do
+                if daily.by_key[entry.key]then assert(entry~=daily.by_key[entry.key],'rows/index share mutable row')end
+            end
+            if value.daily_limits then assert(value.daily_limits~=daily,'root/profile share mutable daily map')end
+            if value.profile.progression and value.profile.progression.daily_limits then
+                assert(value.profile.progression.daily_limits~=daily,'progression/profile share mutable daily map')
+            end
+        end
     end
 end
 print('HTTP_PROFILE_WIRE_VECTORS_PASS '..#rows)
