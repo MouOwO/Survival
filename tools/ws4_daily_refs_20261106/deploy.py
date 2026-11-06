@@ -31,7 +31,7 @@ WIRE_TARGET='backend/archive_backend/http_profile_wire.py'
 DECODER='scripts/vscripts/systems/http_profile_wire.lua'
 PROVIDER='scripts/vscripts/systems/player_profile_providers/http_fishing_provider.lua'
 VECTOR='tools/test_http_profile_wire.lua'
-OUT=ROOT/'output/ws4_daily_refs_20261106_v01'
+OUT=ROOT/'output/ws4_daily_refs_20261106_v02'
 
 
 def sha(raw):return hashlib.sha256(raw).hexdigest()

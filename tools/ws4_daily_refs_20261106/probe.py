@@ -24,7 +24,7 @@ def module(name,path):
 def size(value):return len(json.dumps(value,ensure_ascii=False,separators=(',',':')).encode('utf8'))
 
 
-def run(old,new,bundle_hash,decoder_source,vector_runner,lua='/usr/bin/lua5.1'):
+def run(old,new,bundle_hash,decoder_source,vector_runner,lua='/usr/bin/lua'):
     old,new=Path(old),Path(new)
     parent=module('daily_probe_parent',old/WIRE)
     candidate=module('daily_probe_candidate',new/WIRE)

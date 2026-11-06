@@ -80,6 +80,11 @@ class FrozenWatchdog(previous_gate.WatchdogTests):pass
 
 
 class SourceAndProbe(unittest.TestCase):
+    def test_linux_default_matches_verified_server_executable(self):
+        # The real server has /usr/bin/lua. Windows tests pass a separate
+        # executable explicitly, so they must not mask a broken Linux default.
+        self.assertEqual(probe.run.__defaults__, ('/usr/bin/lua',))
+
     def test_source_preserves_exact_v1_logic(self):
         parent=deploy.git_blob(deploy.PARENT_SOURCE,deploy.WIRE_SOURCE)
         current=(ROOT/deploy.WIRE_SOURCE).read_bytes().replace(b'\r\n',b'\n')
