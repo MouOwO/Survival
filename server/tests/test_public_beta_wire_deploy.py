@@ -5,6 +5,7 @@ import importlib.util
 import io
 import json
 import sys
+import tempfile
 from types import SimpleNamespace
 import unittest
 from unittest.mock import Mock, patch
@@ -240,6 +241,91 @@ class ExactMatchModesPatch(unittest.TestCase):
         self.assertIn(deploy.recipe.NEW_BUNDLE.encode(), values['addon/scripts/vscripts/config/generated/archive_http_bundle.lua'])
         self.assertEqual(binding['payload_sha256'], {name: hashlib.sha256(raw).hexdigest() for name, raw in values.items()})
         self.assertTrue(binding['http_timing']['permission_sql_retry_and_connection_policy_unchanged'])
+
+
+class SourceInputsAuditBinding(unittest.TestCase):
+    """Exercise the actual full input path, replacing only Git transport.
+
+    Temporary audit fixtures reproduce the live CRLF supabase source. A
+    source-bound CLI plan is still required after the operator is committed.
+    """
+    revision = 'c' * 40
+    supabase_key = 'backend/fishing_api/supabase.py'
+    supabase_raw_sha = 'fb8279e6a76c0394f1e10585f09e1b862a0e5dd8567382718fa7556086207bf9'
+    supabase_lf_sha = '78f4cbfbcc2a2aa4b72a6c4087f147d0ed871c3222e0b5ffbe6001281151f8c8'
+
+    def setUp(self):
+        self.folder = tempfile.TemporaryDirectory()
+        self.addCleanup(self.folder.cleanup)
+        self.root = Path(self.folder.name)
+        self.audit = self.root / 'audit'
+        self.parent = self.root / 'parent_sources'
+        self.parent.mkdir()
+        source_files = {}
+        for name in ('service.py', 'match_modes.py', 'server.py', 'postgres.py', 'supabase.py'):
+            raw = (deploy.PARENT_SOURCE / name).read_bytes().replace(b'\r\n', b'\n')
+            (self.parent / name).write_bytes(raw)
+            if name == 'service.py':
+                continue
+            key = ('backend/archive_backend/' if name == 'match_modes.py' else 'backend/fishing_api/') + name
+            audited_raw = raw.replace(b'\n', b'\r\n') if name == 'supabase.py' else raw
+            destination = self.audit / key
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_bytes(audited_raw)
+            source_files[key] = {'sha256': deploy.sha(audited_raw)}
+        self.assertEqual(source_files[self.supabase_key]['sha256'], self.supabase_raw_sha)
+        (self.audit / 'audit.json').write_text(json.dumps(dict(
+            release=deploy.recipe.PARENT_RELEASE, manifest_sha256=deploy.recipe.PARENT_MANIFEST,
+            source_files=source_files)), encoding='utf8')
+        self.addon = self.root / 'addon.json'
+        self.addon.write_text(json.dumps(dict(ok=True, release=deploy.recipe.PARENT_RELEASE,
+            addon_root_present=True, execstart_contains_addon_root_override=False,
+            addon_root_resolved='/opt/goufayu-ws4/releases/test-parent/addon')), encoding='utf8')
+        for name, value in (('SOURCE_AUDIT', self.audit), ('PARENT_SOURCE', self.parent), ('ADDON_AUDIT', self.addon)):
+            self.enterContext(patch.object(deploy, name, value))
+        self.git = self.enterContext(patch('subprocess.check_output', side_effect=self.git_blob_transport))
+
+    def git_blob_transport(self, args, **kwargs):
+        self.assertEqual(args[:5], ['git', '--no-replace-objects', '-C', str(ROOT), 'show'])
+        self.assertEqual(len(args), 6)
+        revision, name = args[5].split(':', 1)
+        self.assertEqual(revision, self.revision)
+        self.assertNotIn('..', Path(name).parts)
+        return (ROOT / name).read_bytes().replace(b'\r\n', b'\n')
+
+    def test_full_source_inputs_preserves_audited_raw_and_git_lf_identities(self):
+        values = deploy.source_inputs(self.revision, self.revision)
+        payloads, binding, source_pins, operator_pins = values[:4]
+        evidence = binding['audited_parent_sources'][self.supabase_key]
+        self.assertEqual(evidence, dict(audited_raw_sha256=self.supabase_raw_sha,
+            git_lf_sha256=self.supabase_lf_sha, normalization='crlf_to_lf'))
+        self.assertNotIn(self.supabase_key, payloads)
+        self.assertEqual(len(payloads), 44)
+        self.assertEqual(binding['payload_sha256'], {name: deploy.sha(raw) for name, raw in payloads.items()})
+        self.assertEqual(binding['config_admission'], values[-1])
+        self.assertEqual(set(operator_pins), set(deploy.OPERATOR_FILES))
+        self.assertEqual(len(source_pins), 8)
+        self.assertIn('verify.sql', values[-2])
+
+    def test_source_inputs_rejects_audited_raw_drift_even_if_normalized_equal(self):
+        path = self.audit / self.supabase_key
+        path.write_bytes(path.read_bytes().replace(b'\r\n', b'\n'))
+        with self.assertRaisesRegex(RuntimeError, 'audited_parent_source_raw_mismatch'):
+            deploy.source_inputs(self.revision, self.revision)
+
+    def test_source_inputs_rejects_audit_hash_replaced_with_normalized_hash(self):
+        path = self.audit / 'audit.json'
+        value = json.loads(path.read_bytes())
+        value['source_files'][self.supabase_key]['sha256'] = self.supabase_lf_sha
+        path.write_text(json.dumps(value), encoding='utf8')
+        with self.assertRaisesRegex(RuntimeError, 'audited_parent_source_raw_mismatch'):
+            deploy.source_inputs(self.revision, self.revision)
+
+    def test_source_inputs_rejects_actual_fixture_body_change(self):
+        path = self.parent / 'supabase.py'
+        path.write_bytes(path.read_bytes() + b'\nUNREVIEWED_CHANGE = True\n')
+        with self.assertRaisesRegex(RuntimeError, 'frozen_parent_source_audit_mismatch'):
+            deploy.source_inputs(self.revision, self.revision)
 
 
 class ComposedRemoteBindings(unittest.TestCase):

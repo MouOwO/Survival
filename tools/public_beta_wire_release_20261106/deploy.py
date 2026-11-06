@@ -263,9 +263,19 @@ def source_inputs(source_revision, operator_revision):
          'actual_parent_source_audit_required')
     modes_name = 'backend/archive_backend/match_modes.py'
     modes_sha = audited['source_files'][modes_name]['sha256']
+    parent_source_binding = {}
+    # Once per operator invocation: O(the four source byte lengths), eight
+    # local reads, no runtime polling or extra network/database calls. Retain
+    # the audited raw identity even when Git stores that source with LF.
     for name, key in (('match_modes.py',modes_name),('server.py','backend/fishing_api/server.py'),
                       ('postgres.py','backend/fishing_api/postgres.py'),('supabase.py','backend/fishing_api/supabase.py')):
-        need(sha((PARENT_SOURCE/name).read_bytes())==audited['source_files'][key]['sha256'], 'frozen_parent_source_audit_mismatch')
+        actual_raw = (SOURCE_AUDIT / key).read_bytes()
+        actual_sha = sha(actual_raw)
+        need(actual_sha == audited['source_files'][key]['sha256'], 'audited_parent_source_raw_mismatch')
+        git_lf = (PARENT_SOURCE / name).read_bytes().replace(b'\r\n', b'\n')
+        need(git_lf == actual_raw.replace(b'\r\n', b'\n'), 'frozen_parent_source_audit_mismatch')
+        parent_source_binding[key] = dict(audited_raw_sha256=actual_sha,
+                                         git_lf_sha256=sha(git_lf), normalization='crlf_to_lf')
     paths = json.loads(ADDON_AUDIT.read_bytes())
     need(paths.get('ok') is True and paths.get('release') == recipe.PARENT_RELEASE
          and paths.get('addon_root_present') is True and not paths.get('execstart_contains_addon_root_override'),
@@ -276,6 +286,8 @@ def source_inputs(source_revision, operator_revision):
     configuration = load('joint_exact_config_deploy', ROOT / CONFIG_TOOL)
     config_artifacts, config_binding = configuration.inputs(source_revision, operator_revision)
     binding['config_admission'] = config_binding
+    # Provenance only; the raw audited files are not extra runtime payloads.
+    binding['audited_parent_sources'] = parent_source_binding
     source_pins = {name: sha(recipe.git_blob(source_revision, name)) for name in (
         'server/archive_backend/service.py', 'server/archive_backend/public_beta_gift.py',
         'server/archive_backend/match_modes.py', 'server/archive_backend/http_profile_wire.py',
