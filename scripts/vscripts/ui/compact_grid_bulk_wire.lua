@@ -1,5 +1,5 @@
--- Rare static-grid bitmap only. Separate from the 24-ASCII cw protocol.
--- Header: 0x21, schema/session/epoch/view/base_revision/scope/index/count.
+-- Rare grid bitmap (0x21) or typed lottery receipt (0x22), not a string tunnel.
+-- Header: tag, schema/session/epoch/view/base_revision/scope/index/count.
 local M={EVENT='gb',KEY='d',VERSION=1,VALUE_BUDGET=896,MAX_RAW=16384,MAX_FRAGMENTS=32}
 local alphabet='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'
 local reverse={};for n=1,#alphabet do reverse[alphabet:sub(n,n)]=n-1 end
@@ -35,10 +35,10 @@ end
 local function budget(o)local v=o and o.value_budget or M.VALUE_BUDGET;need(integer(v,64,M.VALUE_BUDGET),'bulk_value_budget_invalid');return v end
 local function binding(b)
  need(type(b)=='table'and type(b.schema_sha256)=='string'and #b.schema_sha256==64 and not b.schema_sha256:find('[^a-f0-9]'),'bulk_schema_binding_required')
- need(integer(b.schema,1,16383)and integer(b.session,1,16383)and integer(b.epoch,1,16383)and b.view==6 and integer(b.base_revision or b.revision,1,2097151),'bulk_binding_invalid')
- return{schema=b.schema,session=b.session,epoch=b.epoch,view=6,base_revision=b.base_revision or b.revision}
+ need(integer(b.schema,1,16383)and integer(b.session,1,16383)and integer(b.epoch,1,16383)and(b.view==6 or integer(b.view,201,204))and integer(b.base_revision or b.revision,1,2097151),'bulk_binding_invalid')
+ return{schema=b.schema,session=b.session,epoch=b.epoch,view=b.view,base_revision=b.base_revision or b.revision}
 end
-local function header(b,scope,index,count)return string.char(33)..uint(b.schema)..uint(b.session)..uint(b.epoch)..uint(6)..uint(b.base_revision)..uint(scope)..uint(index)..uint(count)end
+local function header(b,scope,index,count)return string.char(b.view==6 and 33 or 34)..uint(b.schema)..uint(b.session)..uint(b.epoch)..uint(b.view)..uint(b.base_revision)..uint(scope)..uint(index)..uint(count)end
 local function encode(b,scope,raw,o)
  b=binding(b);need(integer(scope,1,4294967295),'bulk_scope_invalid');need(type(raw)=='string'and #raw>=1 and #raw<=M.MAX_RAW,'bulk_raw_limit')
  local limit=budget(o);local raw_limit=math.floor(limit*3/4);local count,capacity=1
@@ -49,10 +49,10 @@ local function encode(b,scope,raw,o)
 end
 local function decode(packet,o)
  need(type(packet)=='table'and type(packet.d)=='string','bulk_packet_required');for key in pairs(packet)do need(key=='d','bulk_packet_key_unknown')end
- need(#packet.d<=budget(o),'bulk_encoded_budget_exceeded');local raw=unb64(packet.d);need(raw:byte(1)==33,'bulk_tag_invalid')
+ need(#packet.d<=budget(o),'bulk_encoded_budget_exceeded');local raw=unb64(packet.d);local tag=raw:byte(1);need(tag==33 or tag==34,'bulk_tag_invalid')
  local values,at={},2;for n=1,8 do values[n],at=read_uint(raw,at)end
  local h={schema=values[1],session=values[2],epoch=values[3],view=values[4],base_revision=values[5],revision=values[5],scope=values[6],index=values[7],count=values[8]}
- need(integer(h.schema,1,16383)and integer(h.session,1,16383)and integer(h.epoch,1,16383)and h.view==6 and integer(h.base_revision,1,2097151)and integer(h.scope,1,4294967295),'bulk_header_invalid')
+ need(integer(h.schema,1,16383)and integer(h.session,1,16383)and integer(h.epoch,1,16383)and(tag==33 and h.view==6 or tag==34 and integer(h.view,201,204))and integer(h.base_revision,1,2097151)and integer(h.scope,1,4294967295),'bulk_header_invalid')
  need(integer(h.count,1,M.MAX_FRAGMENTS)and integer(h.index,1,h.count),'bulk_fragment_header_invalid')
  local body=raw:sub(at);need(#body>=1 and #body<=M.MAX_RAW,'bulk_fragment_body_invalid');return h,body
 end

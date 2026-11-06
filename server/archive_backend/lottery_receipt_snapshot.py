@@ -7,13 +7,19 @@ import logging
 from time import perf_counter
 
 
-def attach(service, reply, command, requested_hash):
+def attach(service, reply, command, requested_hash, response_capabilities=None):
     if command.get('kind') != 'lottery_draw' or reply.get('ok') is not True:
         return reply
     profile = reply.get('profile')
     if not (reply.get('done') is True or reply.get('terminal') is True):
         return reply
     if not isinstance(profile, dict) or not isinstance(profile.get('save'), dict):
+        return reply
+    # Only the compact consumer explicitly promises to derive its view from
+    # the committed profile already in this receipt. Capability negotiation is
+    # outside the durable command/fingerprint; old callers retain snapshots.
+    if (type(response_capabilities) is dict
+            and response_capabilities.get('lottery_committed_profile_v1') is True):
         return reply
     started=perf_counter()
     try:

@@ -1,4 +1,5 @@
 import copy
+from contextlib import contextmanager
 import subprocess
 import hashlib
 import hmac
@@ -434,8 +435,9 @@ class ArchiveTests(unittest.TestCase):
         self.assertEqual(self.profile['save']['archive']['lottery_state']['pools']['map']['draws'],10)
 
     def _points_draw_fixture(self, quality='ssr', wanted_item=None):
-        # Change only trusted, in-memory draw weights. Real item definitions,
-        # effects, conversion amounts, reducer, worker and commit path remain.
+        # Focused weights get a distinct immutable bundle identity, just like
+        # production. Mutating configs under an existing hash would keep using
+        # that hash's frozen worker cache and make this fixture nondeterministic.
         pool_id='dragon_knight' if quality=='ur' else 'map'
         definitions=self.bundle.tables['lottery_item_definitions']
         memberships=self.bundle.configs['lottery_pool_items']['rows']
@@ -464,7 +466,22 @@ class ArchiveTests(unittest.TestCase):
                 self.assertNotEqual(row['item_id'],'*','Focused fixture needs explicit real pool memberships')
                 row['item_weight']=1 if row['item_id']==item['item_id'] else 0
         ticket=self.bundle.tables['lottery_pool_definitions'][pool_id]['ticket_content_id']
-        return item,pool_id,ticket,patch.object(self.bundle,'configs',configs)
+        return item,pool_id,ticket,self._isolated_config_bundle(configs)
+
+    @contextmanager
+    def _isolated_config_bundle(self, configs):
+        document=json.loads((self.bundle.directory/'bundle.json').read_bytes())
+        document['configs']=configs
+        raw=json.dumps(document,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()
+        digest=hashlib.sha256(raw).hexdigest()
+        with tempfile.TemporaryDirectory(prefix='archive-focused-weights-') as temporary:
+            destination=Path(temporary)/digest
+            shutil.copytree(self.bundle.directory,destination)
+            (destination/'bundle.json').write_bytes(raw)
+            focused=Bundle(destination)
+            with patch.object(self,'bundle',focused),patch.object(self.db,'bundle',focused), \
+                    patch.object(self,'service',ArchiveService(self.app,focused,self.lua)):
+                yield
 
     def _seed_points_draw_profile(self, ticket):
         stats={row['field_id']:row['default_value'] for row in self.bundle.configs['player_gameplay_stats']['rows']}

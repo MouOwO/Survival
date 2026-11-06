@@ -35,7 +35,7 @@ local seed_md5=seed_ok and type(seed)=='table' and seed.config_hash==bundle.hash
     and #seed.catalog_md5==32 and not seed.catalog_md5:find('[^0-9a-f]') and seed.catalog_md5 or nil
 local session=tostring(DoUniqueString and DoUniqueString('lottery_http') or os.time()):gsub('[^%w_.-]','_')
 local pool_ids={map=true,cultivation=true,dragon_knight=true,summer=true}
-local compact_transport,compact_factory,compact_lookup,compact_refresh
+local compact_transport,compact_factory,compact_lookup,compact_refresh,compact_receipt_codec
 local compact_states,compact_failures={},{}
 local function compact_bound(id)
     if not compact_transport then local ok,t=pcall(require,'ui/compact_ui_transport');if ok then compact_transport=t end end
@@ -287,12 +287,12 @@ local function submit(payload,kind)
     else command.read_action=payload.read_action;command.revision=payload.revision end
     local started=type(GetSystemTimeMS)=='function' and GetSystemTimeMS() or nil
     local job={owner=owner,kind=kind,hash=active_hash};busy[id]=job
+    local attempts=0
     local function timing(stage)
         if started and kind=='lottery_draw' then
-            print('[LOTTERY_TIMING] stage='..stage..' elapsed_ms='..tostring(math.max(0,GetSystemTimeMS()-started)))
+            print('[LOTTERY_TIMING] stage='..stage..' elapsed_ms='..tostring(math.max(0,GetSystemTimeMS()-started))..' attempts='..tostring(attempts))
         end
     end
-    local attempts=0
     local function finish(result)
         if busy[id]~=job or not current(id,owner) then return end
         timing('settlement_ack')
@@ -389,7 +389,7 @@ local function submit(payload,kind)
             if not result.ok and not result.terminal and attempts<3 then
                 require('core/scheduler').after(1,attempt,'lottery_retry_'..id)
             else finish(result) end
-        end,job.hash)
+        end,job.hash,kind=="lottery_draw"and payload.compact_token~=nil and payload.compact_token~=0 and compact_bound(id))
     end
     attempt()
     return {pending=true}
@@ -497,7 +497,15 @@ local function compact_setup()
     if not ok then return false end
     local factory,why=require('ui/compact_lottery_projection').new(lookup)
     if not factory then return false,why end
-    compact_factory,compact_lookup=factory,lookup;return true
+    compact_factory,compact_lookup=factory,lookup
+    if lookup.lottery_receipt and lookup.lottery_receipt.wire_version==1 then
+        local loaded,module=pcall(require,'ui/compact_lottery_receipt_wire')
+        if loaded and type(module)=='table'and type(module.Create)=='function'then
+            local built,codec=pcall(module.Create,lookup)
+            if built then compact_receipt_codec=codec end
+        end
+    end
+    return true
 end
 local function compact_catalog_ready()
     return seed_ok and type(seed)=='table'and type(seed.catalog_md5)=='string'
@@ -524,11 +532,37 @@ local function compact_entry(id,profile,replace)
     end
     return entry
 end
-local function compact_publish(id,entry,ops,full)
+local function compact_publish(id,entry,ops,full,receipt)
     for index,pool in ipairs(require('config/lottery_config').pool_order)do local view=200+index
         if compact_transport.is_open(id,view)then
             local selected=full and entry.projection.full_ops(pool.id)or entry.projection.filter(pool.id,ops)
-            if #selected>0 then compact_transport.publish(id,view,selected,{full=full==true,priority=true})end
+            local sent=false
+            if not full and receipt and receipt.pool==pool.id and compact_receipt_codec
+                and compact_transport.bulk_lottery_enabled and compact_transport.bulk_lottery_enabled(id,view)then
+                local binding=compact_transport.bulk_lottery_binding(id,view)
+                if binding then
+                    local state_ops={}
+                    for _,op in ipairs(selected)do
+                        local row=compact_lookup.records[op.record]
+                        if row.kind~='receipt'and row.kind~='result'then state_ops[#state_ops+1]=op end
+                    end
+                    local next_revision=binding.base_revision+1
+                    local encoded,raw=pcall(compact_receipt_codec.Encode,view,next_revision,receipt,state_ops)
+                    if encoded then sent=compact_transport.publish_bulk_lottery(id,view,raw,receipt.token,
+                        {epoch=binding.epoch,base_revision=binding.base_revision,next_revision=next_revision,
+                            on_failure=function()
+                                -- One read-only recovery of the already committed
+                                -- projection. Never repeat the paid command.
+                                if compact_states[id]==entry and compact_transport.is_open(id,view)then
+                                    compact_transport.publish(id,view,entry.projection.full_ops(pool.id),{full=true,priority=true})
+                                end
+                            end})==true end
+                end
+            end
+            -- Projection retains every receipt field for read-only recovery.
+            -- A missing capability, full replacement or queue rejection uses
+            -- the ordinary atomic CW path, never another lottery operation.
+            if not sent and #selected>0 then compact_transport.publish(id,view,selected,{full=full==true,priority=true})end
         end
     end
 end
@@ -545,7 +579,7 @@ compact_refresh=function(id,profile,changes,receipt)
     end
     local cold=compact_states[id]==nil or compact_failures[id]~=nil;compact_failures[id]=nil
     local entry=compact_entry(id,profile,false);if not entry then return nil end
-    local ops,full={},cold
+    local ops,full,successful_receipt={},cold,nil
     if profile then
         if changes and changes.initialize then entry=compact_entry(id,profile,true);if not entry then return nil end;full=true
         else
@@ -556,12 +590,13 @@ compact_refresh=function(id,profile,changes,receipt)
     if receipt and receipt.token~=0 then
         local intent=entry.intents[receipt.token]
         if not intent then return nil,'lottery_intent_unknown'end
-        local result,why=entry.projection.receipt(receipt.token,receipt.response,receipt.applied)
-        if not result then return nil,why end
+        local result,detail=entry.projection.receipt(receipt.token,receipt.response,receipt.applied)
+        if not result then return nil,detail end
+        successful_receipt=detail
         for _,op in ipairs(result)do ops[#ops+1]=op end
         if receipt.response.pending~=true and (receipt.response.ok~=true or receipt.applied)then entry.intents[receipt.token]=nil end
     end
-    compact_publish(id,entry,ops,full);return true
+    compact_publish(id,entry,ops,full,successful_receipt);return true
 end
 function M.compact_open(id,pool)
     if not compact_bound(id) or not pool_ids[pool]then return nil end

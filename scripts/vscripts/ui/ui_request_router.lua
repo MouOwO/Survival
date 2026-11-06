@@ -1519,7 +1519,7 @@ local function register_lottery_requests()
         compact_lottery_transport=transport
         local service=require('systems/lottery_http_service')
         for index,pool in ipairs(require('config/lottery_config').pool_order)do local own=pool.id
-            transport.register_view(200+index,{
+            transport.register_view(200+index,{bulk_lottery=true,
                 open=function(id)if valid_player_id(id,true)then return service.compact_open(id,own)end end,
                 snapshot=function(id)if valid_player_id(id,true)then return service.compact_open(id,own)end end,
                 close=function()return true end,

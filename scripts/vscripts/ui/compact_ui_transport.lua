@@ -29,6 +29,7 @@ function M.new(options)
     local proof=assert(wire.measure_budget(options.budget,50))
     local fields=lookup.field_by_name
     local control=assert(record(lookup,"wire:control"))
+    local lottery_bulk_available=type(lookup.lottery_receipt)=="table"and lookup.lottery_receipt.wire_version==1
     local handlers,players={},{}
     local generation,queued,running=1,false,false
     local budget_started,budget_work,budget_background,budget_cpu=nil,0,0,0
@@ -77,6 +78,19 @@ function M.new(options)
         if not ok then statistics.rejected=statistics.rejected+1 end
         return ok and result
     end
+    local function fail_view(view,reason)
+        -- At most eight queued transactions, once per actual send failure.
+        -- A receipt behind a failed CW predecessor also needs recovery.
+        local failed=view.jobs
+        invalidate(view);view.needs_full=true
+        for _,job in ipairs(failed)do
+            job.failed=reason
+            if job.accepted_returned and job.on_failure and current(job.owner)
+                and view.open and view.epoch==job.epoch then
+                pcall(job.on_failure,reason)
+            end
+        end
+    end
     local function cancel_idle()
         if queued and not running and not has_jobs()then
             queued=false;pcall(options.cancel,"compact_ui_dispatch")
@@ -106,7 +120,7 @@ function M.new(options)
             local owner_current=job.active and current(job.owner)
             if own_generation~=generation then break end
             if job.active and not owner_current then
-                invalidate(job.view);job.view.needs_full=true
+                fail_view(job.view,"owner_not_current")
             elseif job.active then
                 local packet=job.packets[job.next]
                 local sent
@@ -138,7 +152,7 @@ function M.new(options)
                 elseif not sent then
                     -- A failed first job must not retain an inactive queue
                     -- head that strands every later transaction for this view.
-                    invalidate(job.view);job.view.needs_full=true;statistics.rejected=statistics.rejected+1
+                    fail_view(job.view,"native_send_failed");statistics.rejected=statistics.rejected+1
                 else
                     job.next=job.next+1
                     if job.next<=#job.packets then push(job,job.priority)
@@ -167,7 +181,7 @@ function M.new(options)
         running=false
         if not ok and own_generation==generation then
             statistics.rejected=statistics.rejected+1
-            if active_job and active_job.active then invalidate(active_job.view);active_job.view.needs_full=true end
+            if active_job and active_job.active then fail_view(active_job.view,"dispatch_failed")end
             -- An unknown clock/codec/provider error does not spin every frame.
             -- A known failed job is retired; unrelated/replacement jobs can
             -- continue. A clock failure waits for an explicit publish/resync.
@@ -251,6 +265,7 @@ function M.new(options)
         need(type(id)=="number" and id>=2 and id<=16383 and not handlers[id],"unique_compact_view_required")
         need(type(handler)=="table" and type(handler.snapshot)=="function","compact_snapshot_provider_required")
         if handler.bulk_static~=nil then need(id==6 and handler.bulk_static==true,"bulk_static_view_not_allowed")end
+        if handler.bulk_lottery~=nil then need(id%1==0 and id>=201 and id<=204 and handler.bulk_lottery==true,"bulk_lottery_view_not_allowed")end
         if handler.input then
             local prefix=id==4 and "grid"or id==5 and "selected"or id==7 and "production"or nil
             need(prefix~=nil,"typed_input_view_not_allowed")
@@ -320,6 +335,44 @@ function M.new(options)
         view.jobs[#view.jobs+1]=job;if #view.jobs==1 then push(job,false)end
         statistics.transactions=statistics.transactions+1;schedule()
         return {queued=true,frames=#packets,epoch=view.epoch,base_revision=settings.base_revision,metrics=metrics}
+    end
+    function api.bulk_lottery_enabled(id,view_id)
+        local state=state_for(id,false);local view=state and state.views[view_id]
+        return not not(lottery_bulk_available and view and view.open and view.bulk_lottery
+            and not view.needs_full and view.revision>=1 and handlers[view_id]and handlers[view_id].bulk_lottery)
+    end
+    function api.bulk_lottery_binding(id,view_id)
+        if not api.bulk_lottery_enabled(id,view_id)then return nil end
+        local state=state_for(id,false);local view=state.views[view_id]
+        local result=binding(state,view_id,view.epoch);result.revision=view.revision;result.base_revision=view.revision
+        return result
+    end
+    function api.publish_bulk_lottery(id,view_id,raw,scope,settings)
+        settings=settings or{}
+        if not api.bulk_lottery_enabled(id,view_id)then return nil,"bulk_lottery_not_negotiated"end
+        local state=state_for(id,false);local view=state.views[view_id]
+        if settings.epoch~=view.epoch or settings.base_revision~=view.revision
+            or type(settings.next_revision)~="number"or settings.next_revision~=view.revision+1
+            or settings.next_revision>2097151 then return nil,"bulk_lottery_stale_base"end
+        if type(scope)~="number"or scope%1~=0 or scope<1 or scope>16383 then return nil,"bulk_lottery_scope_invalid"end
+        if #view.jobs>=8 then return nil,"bounded_view_queue_requires_full_resync"end
+        local context=binding(state,view_id,view.epoch);context.base_revision=view.revision
+        local packets,metrics=require('ui/compact_grid_bulk_wire').Encode(context,scope,raw)
+        if not packets then return nil,metrics end
+        need(settings.on_complete==nil or type(settings.on_complete)=='function','bulk_completion_callback_invalid')
+        need(settings.on_failure==nil or type(settings.on_failure)=='function','bulk_failure_callback_invalid')
+        -- Reserve exactly one revision after complete validation. Per-view FIFO
+        -- puts both cw and gb behind any prior transaction; no second timer.
+        view.revision=settings.next_revision
+        local job={owner=state,view=view,packets=packets,next=1,priority=true,bulk=true,active=true,
+            epoch=view.epoch,on_complete=settings.on_complete,on_failure=settings.on_failure}
+        view.jobs[#view.jobs+1]=job;if #view.jobs==1 then push(job,true)end
+        statistics.transactions=statistics.transactions+1
+        if not running and not queued then drain()else schedule()end
+        if job.failed then return nil,job.failed end
+        job.accepted_returned=true
+        return true,{queued=true,frames=#packets,epoch=view.epoch,base_revision=settings.base_revision,
+            revision=settings.next_revision,next_revision=settings.next_revision,metrics=metrics}
     end
     function api.publish(id,view_id,ops,settings)
         settings=settings or {};local state=state_for(id,false)
@@ -393,6 +446,7 @@ function M.new(options)
             local allowed=change.field==fields.visible or change.field==fields.known or change.field==fields.action_code
                 or change.field==fields.arg_a or change.field==fields.arg_b or change.field==fields.arg_c or change.field==fields.request_token
                 or header.view==6 and handler.bulk_static and change.field==fields.types
+                or header.view>=201 and header.view<=204 and handler.bulk_lottery and change.field==fields.types
             if not allowed then incoming.abort();return nil,"control_field_not_allowed"end
             values[change.field]=change.value
         end
@@ -410,14 +464,22 @@ function M.new(options)
                 session_token=state.session})
             return result==nil and true or result
         end
-        if values[fields.types]~=nil and values[fields.types]~=0 and values[fields.types]~=1 then incoming.abort();return nil,"bulk_static_capability_invalid"end
+        local capability=values[fields.types]
+        if capability~=nil and capability~=0 and not(header.view==6 and capability==1)
+            and not(header.view>=201 and header.view<=204 and capability==2)then
+            incoming.abort();return nil,"bulk_capability_invalid"
+        end
         incoming.commit(tx)
         if values[fields.visible]==true or values[fields.visible]==1 then
             if header.view==6 then view.bulk_static=handler.bulk_static==true and values[fields.types]==1 end
+            if header.view>=201 and header.view<=204 then
+                view.bulk_lottery=lottery_bulk_available and handler.bulk_lottery==true and capability==2
+            end
             return full_snapshot(state,header.view,true)
         end
         view.open=false
         view.bulk_static=false
+        view.bulk_lottery=false
         -- A closed panel must not continue draining its former full catalogue.
         -- Its next tiny hint or real Open starts a fresh atomic epoch instead.
         invalidate(view);view.revision=0;view.needs_full=false
@@ -548,6 +610,9 @@ function M.queue_depth(...)local value=instance();return value and value.queue_d
 function M.bulk_binding(...)local value=instance();return value and value.bulk_binding(...)or nil end
 function M.bulk_static_enabled(...)local value=instance();return value and value.bulk_static_enabled(...)or false end
 function M.publish_bulk_static(...)local value=instance();if value then return value.publish_bulk_static(...)end;return nil,'compact_runtime_unavailable'end
+function M.bulk_lottery_binding(...)local value=instance();return value and value.bulk_lottery_binding(...)or nil end
+function M.bulk_lottery_enabled(...)local value=instance();return value and value.bulk_lottery_enabled(...)or false end
+function M.publish_bulk_lottery(...)local value=instance();if value then return value.publish_bulk_lottery(...)end;return nil,'compact_runtime_unavailable'end
 function M.disconnect(id)ensure_world();if default then default.disconnect(id);return true end;return false end
 function M.inspect()local value=instance();return value and value.inspect()or{available=false}end
 return M

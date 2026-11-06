@@ -993,6 +993,9 @@ def make_catalog(source, lua, operator=None, atlas_reference=None):
                                      for row in tables["archive_fragment_levels"] if row.get("enabled") is not False]
     auxiliary["lottery_public"] = public
     auxiliary["lottery_config_hash"] = seed["config_hash"]
+    # Part of the schema digest: a client may advertise type 2 only with this
+    # receipt semantic version and the installed codec. Old clients stay CW.
+    auxiliary["lottery_receipt_wire_version"] = 1
     auxiliary["grid"] = grid
     auxiliary["selected"] = selected
     auxiliary["production"] = production
@@ -1187,7 +1190,12 @@ def build(game, content_revision, lua, previous=None, operator=None, atlas_refer
                   fields={row["id"]: row for row in registry["fields"]},
                   field_by_name={row["name"]: row["id"] for row in registry["fields"]},
                    archive_projection=auxiliary["archive_projection"], grid=auxiliary["grid"], selected=auxiliary["selected"],
-                   production=auxiliary["production"], public_beta=auxiliary["public_beta"])
+                   production=auxiliary["production"], public_beta=auxiliary["public_beta"],
+                   lottery_receipt=dict(wire_version=auxiliary["lottery_receipt_wire_version"],
+                       pools=[dict(id=s["selected_pool_id"], items=[i["id"] for i in s["items"]])
+                              for s in auxiliary["lottery_public"]["snapshots"]],
+                       duplicate_points={i["id"]: i.get("duplicate_points", 0)
+                           for s in auxiliary["lottery_public"]["snapshots"] for i in s["items"]}))
     server = ("-- AUTO-GENERATED display wire identities only; no reward rules.\nreturn " + lua_literal(lookup) + "\n").encode()
     manifest = dict(kind="IMMUTABLE_PUBLIC_UI_CATALOG_PROTOTYPE_NOT_CONNECTED", game_revision=game.revision,
                     content_revision=content_revision, schema_sha256=schema_sha, registry_sha256=registry_sha,

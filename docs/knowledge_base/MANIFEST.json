@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "snapshot_date": "2026-11-05",
+  "snapshot_date": "2026-11-06",
   "scope": "Curated project knowledge and historical snapshot; raw chat excluded",
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 34035,
-      "sha256": "e26e2b0c5647c0270392e77f8c9c6f842494993a8e1f4d24246668a67782b2b5"
+      "bytes": 34540,
+      "sha256": "ad483c1aadbfbdcba5c9b84976b3f2d7eb853eb81fc43a1589a4c5645a3276a2"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 47956,
-      "sha256": "5646f09ccc487b33b8ac1e2b88dd56ad4a4841322aa1449ab8aa3627977bda08"
+      "bytes": 48461,
+      "sha256": "f2794d86f42d44dcdb8351ad83fe2b0430e0779907a1e3d8b596922fc92d5342"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -337,6 +337,11 @@
       "path": "evidence/network50_0502_native_followup_20261105.md",
       "bytes": 5047,
       "sha256": "9aabac242a8b202e97fc772ed4047a676971930186b5be78e8b8b4fc7dc9feaa"
+    },
+    {
+      "path": "evidence/network50_0503_native_closeout_20261106.md",
+      "bytes": 4691,
+      "sha256": "e86bc8932670d0cf2dc01f53672316ed25e61824453d46dcd86f2b33d718ce1b"
     },
     {
       "path": "evidence/network50_dev07_native_fps_20261103.md",
@@ -690,8 +695,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 22111,
-      "sha256": "fac98eb6d3dd92ac282a0c421ccc080b9b5a23bf851604114294028606d0150f"
+      "bytes": 22616,
+      "sha256": "b6fcf2577b15a0578a698f3f86463a976c7f999e93422d4fba10b25677494ddc"
     },
     {
       "path": "tools/verify_knowledge.py",

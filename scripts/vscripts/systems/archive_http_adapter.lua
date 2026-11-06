@@ -8,7 +8,7 @@ function M.enabled()
     local p=profiles.get_provider()
     return p and p.archive_enabled and p.archive_enabled() or false
 end
-function M.submit(player_id,command,complete,lottery_hash)
+function M.submit(player_id,command,complete,lottery_hash,committed_profile_only)
     local provider=profiles.get_provider()
     local account=provider and provider.resolve_account_id(player_id)
     if not account then complete({ok=false,error="account_id_unresolved"});return end
@@ -22,18 +22,32 @@ function M.submit(player_id,command,complete,lottery_hash)
         -- authenticated catalog response, never from a Panorama payload.
         config_hash=lottery_hash
     end
-    provider.archive_submit({account_id=account,config_hash=config_hash,command=command},function(result)
+    local payload={account_id=account,config_hash=config_hash,command=command}
+    -- Internal server-side capability only, separate from the durable command.
+    -- Compact lottery consumers use the committed profile and local catalog;
+    -- legacy callers still receive optional full snapshots from the backend.
+    if command.kind=='lottery_draw'and committed_profile_only==true then
+        payload.response_capabilities={lottery_committed_profile_v1=true}
+    end
+    provider.archive_submit(payload,function(result,timing)
         result.lottery_profile_applied=false
         if result.profile then
             if tostring(result.profile.account_id)~=tostring(account) then
                 complete({ok=false,terminal=true,error="account_id_mismatch"});return
             end
-            local applied=ui_context.with(player_id,{source="archive_command",command=command,response=result.response,
-                profile=result.profile.account_profile or result.profile,
-                compact_daily_changes=daily_projection.command_changes(command,result),
-                compact_lottery_changes=lottery_projection.command_changes(command,result)},function()
-                return profiles.apply_snapshot(player_id,result.profile,"archive_"..command.kind)
-            end)
+            local function apply()
+                return ui_context.with(player_id,{source="archive_command",command=command,response=result.response,
+                    profile=result.profile.account_profile or result.profile,
+                    compact_daily_changes=daily_projection.command_changes(command,result),
+                    compact_lottery_changes=lottery_projection.command_changes(command,result)},function()
+                    return profiles.apply_snapshot(player_id,result.profile,"archive_"..command.kind)
+                end)
+            end
+            -- Internal provider argument only; never read timing from the HTTP
+            -- response. Includes synchronous profile-change subscribers.
+            local applied
+            if type(timing)=='table'and type(timing.profile)=='function'then applied=timing.profile(apply)
+            else applied=apply()end
             if not applied.ok and applied.error~="snapshot_revision_stale" then complete(applied);return end
             -- Local marker, never trusted from HTTP: stale receipts cannot become cache bases.
             result.lottery_profile_applied=applied.ok==true

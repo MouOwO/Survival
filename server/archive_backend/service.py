@@ -169,6 +169,7 @@ class ArchiveService:
                 and rule.get("shared_challenge_roll") is True)
 
     def settle(self,profile,command,has_pass,shared_challenge_roll=None):
+        from .command_timing import measure
         shared = (self.shared_challenge_roll(self.bundle)
                   if shared_challenge_roll is None else shared_challenge_roll)
         if command["kind"] == "challenge" and shared:
@@ -180,16 +181,27 @@ class ArchiveService:
         seed=int.from_bytes(hmac.new(self.app.account_id_pepper.encode(),
             scope.encode(),hashlib.sha256).digest()[:4],"big")%2147483646+1
         payload={"profile":profile,"command":command,"has_pass":has_pass,"seed":seed,"server_time":int(time.time())}
-        if not self.slots.acquire(timeout=2): raise TimeoutError("archive_workers_busy")
+        with measure('worker_wait'):
+            if not self.slots.acquire(timeout=2): raise TimeoutError("archive_workers_busy")
         try:
             from .settlement_runner import run
-            completed=run(self.bundle,self.lua,payload)
+            with measure('worker'):
+                completed=run(self.bundle,self.lua,payload)
         finally: self.slots.release()
-        result=object_maps(json.loads(completed.stdout))
+        with measure('worker_decode'):
+            result=object_maps(json.loads(completed.stdout))
         if not isinstance(result,dict): raise ArchiveError("archive_worker_invalid")
         return result
 
     def command(self,payload):
+        from .command_timing import CommandTiming
+        with CommandTiming(payload, FIELDS) as timing:
+            result = self._command(payload)
+            timing.result(result)
+            return result
+
+    def _command(self,payload):
+        from .command_timing import measure
         account=payload.get("account_id")
         if not isinstance(account,str) or not re.fullmatch(r"[0-9]{1,20}",account): raise ArchiveError("account_id_invalid")
         requested_hash = payload.get("config_hash")
@@ -213,7 +225,8 @@ class ArchiveService:
             profile = self.profile({'account_id': account})
             return self.settle(profile, command, False)
         database_id=self.app._database_account_id(account)
-        self.app._ensure_gameplay_stats(database_id)
+        with measure('ensure'):
+            self.app._ensure_gameplay_stats(database_id)
         accepted_challenge=legacy_receipt(self, database_id, original_command, command)
         if accepted_challenge is not None:
             result=self.finish_prepared(database_id,original_command["id"],accepted_challenge)
@@ -234,12 +247,16 @@ class ArchiveService:
                             ('starjoy_points_earned', 'starjoy_points')))
             command['id'] += ':earned:' + str(score)
         fingerprint=hashlib.sha256(json.dumps(command,sort_keys=True,separators=(",",":"),ensure_ascii=False).encode()).hexdigest()
-        prepared=self.app.rpc_client.rpc("archive_prepare",{"p_account":database_id,"p_id":command["id"],
-            "p_hash":requested_hash,"p_fingerprint":fingerprint,"p_command":command})
-        result=self.finish_prepared(database_id,command["id"],prepared)
-        reply=self.app._public_response(result,database_id,account)
+        with measure('prepare'):
+            prepared=self.app.rpc_client.rpc("archive_prepare",{"p_account":database_id,"p_id":command["id"],
+                "p_hash":requested_hash,"p_fingerprint":fingerprint,"p_command":command})
+        with measure('finish'):
+            result=self.finish_prepared(database_id,command["id"],prepared)
+        with measure('public'):
+            reply=self.app._public_response(result,database_id,account)
         from .lottery_receipt_snapshot import attach
-        return attach(self,reply,command,requested_hash)
+        with measure('snapshot'):
+            return attach(self,reply,command,requested_hash,payload.get('response_capabilities'))
 
     def endless_batch(self, payload):
         """Bounded transport batch; durable per-wave receipts remain unchanged."""
@@ -276,6 +293,7 @@ class ArchiveService:
         return {"ok": True, "results": results, "profile": profile}
 
     def finish_prepared(self,account,operation_id,prepared,clear_mode=None):
+        from .command_timing import measure
         if prepared.get("command", {}).get("kind") == "redemption_redeem":
             from .redemption_codes import finish as finish_redemption
             return finish_redemption(self, account, operation_id, prepared)
@@ -390,10 +408,12 @@ class ArchiveService:
             elif command["kind"].startswith("lottery_") or command['kind'] in {'commerce_purchase','benefit_claim'}:
                 rpc="archive_commit_lottery"
                 commit_payload.update(p_inventory=result.get("content_inventory",{}),p_response=result.get("response",{}))
-            committed=self.app.rpc_client.rpc(rpc,commit_payload)
+            with measure('commit'):
+                committed=self.app.rpc_client.rpc(rpc,commit_payload)
             if committed.get("error")!="archive_revision_conflict":
                 return committed
-            prepared=self.app.rpc_client.rpc("archive_resume",{"p_account":account,"p_id":operation_id})
+            with measure('resume'):
+                prepared=self.app.rpc_client.rpc("archive_resume",{"p_account":account,"p_id":operation_id})
         return {"ok":False,"error":"archive_busy_retry"}
 
     def commerce_unique_block(self, profile, product):

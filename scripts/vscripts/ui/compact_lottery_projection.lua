@@ -47,7 +47,7 @@ local function make(L)
    local intents,used={},{}
    local function stage()
     local order,writes={},{}
-    local function put(r,name,value)local f=F[name];need(f,"lottery_field_missing:"..name);local key=r*128+f;if not writes[key]then order[#order+1]=key end;writes[key]={record=r,field=f,value=value}end
+    local function put(r,name,value)local f=F[name];need(f,"lottery_field_missing:"..name);local key=tostring(r)..":"..tostring(f);if not writes[key]then order[#order+1]=key end;writes[key]={record=r,field=f,value=value}end
     local function big(r,name,v)put(r,name,v%BASE);put(r,name.."_hi",math.floor(v/BASE))end
     local function commit()
      local ops={};for _,key in ipairs(order)do local w=writes[key];local row=values[w.record]
@@ -136,23 +136,28 @@ local function make(L)
     return guard(function()
      local intent=intents[token];need(intent,"lottery_intent_unknown");need(type(response)=="table","lottery_receipt_required")
      local success=response.ok==true and applied==true;local pending=response.pending==true or response.ok==true and not applied
-     local put,big,commit=stage();local results=response.results
+     local put,big,commit=stage();local results=response.results;local compact_receipt
      if success then
       need(response.pool_id==intent.pool and response.count==intent.count and type(results)=="table" and #results==intent.count,"lottery_receipt_mismatch")
       -- Validate the entire receipt before staging any resulting field.
-      for _,item in ipairs(results)do
+      for index=1,intent.count do local item=results[index]
        need(type(item)=="table"and all_items[item.id]and pools[intent.pool].allowed[all_items[item.id].record]
         and quality[item.quality]~=nil and item.quality==all_items[item.id].source.quality,"lottery_receipt_item_unknown")
        number(item.owned_count);number(item.converted_points)
        if item.granted_count~=nil then need(integer(item.granted_count,0,4294967295),"lottery_receipt_quantity_invalid")end
        if item.overflow_count~=nil then need(integer(item.overflow_count,0,4294967295),"lottery_receipt_quantity_invalid")end
       end
+      compact_receipt={pool=intent.pool,token=token,count=intent.count,results={},
+       guarantee_quality=quality[response.guarantee_quality or ""]or 0,guarantee_satisfied=response.guarantee_satisfied==true}
+      for _,item in ipairs(results)do compact_receipt.results[#compact_receipt.results+1]={record=all_items[item.id].record,
+       owned_count=number(item.owned_count),duplicate=item.duplicate==true,converted_points=number(item.converted_points),
+       granted_count=item.granted_count,overflow_count=item.overflow_count}end
       for i,item in ipairs(results)do local r=slots[i];put(r,"known",1);put(r,"target_record",all_items[item.id].record);put(r,"reward_count",1);big(r,"owned_count",number(item.owned_count));put(r,"duplicate",item.duplicate==true and 1 or 0);big(r,"converted_points",number(item.converted_points));put(r,"granted_count",item.granted_count);put(r,"overflow_count",item.overflow_count)end
       for i=#results+1,10 do put(slots[i],"known",0)end
      end
      put(receipt_rec,"known",1);put(receipt_rec,"request_token",token);put(receipt_rec,"target_record",pools[intent.pool].record);put(receipt_rec,"count",intent.count);put(receipt_rec,"success",success and 1 or 0);put(receipt_rec,"pending",pending and 1 or 0);put(receipt_rec,"terminal",not pending and 1 or 0)
      put(receipt_rec,"error_code",success and 0 or pending and 7 or errors[response.error]or 1);put(receipt_rec,"quality_code",quality[response.guarantee_quality or""]or 0);put(receipt_rec,"guarantee_satisfied",success and response.guarantee_satisfied==true and 1 or 0)
-     if not pending then intents[token]=nil end;return commit()
+     if not pending then intents[token]=nil end;return commit(),compact_receipt
     end)
    end
    function api.inspect()return {known=known,revision=revision,metrics=metrics}end
