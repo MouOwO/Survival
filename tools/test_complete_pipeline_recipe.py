@@ -23,12 +23,13 @@ PINS = {"game": G, "content": C}
 class RecipeTests(unittest.TestCase):
     def test_prior_candidate_controls_are_rejected_before_any_source_or_package_read(self):
         from complete_delivery_release_20261103 import build_release, production_plan
-        self.assertEqual(r.SEQUENCE,2026110503)
+        self.assertEqual(r.SEQUENCE,2026110602)
         self.assertEqual((build_release.SEQUENCE,production_plan.SEQUENCE),(r.SEQUENCE,r.SEQUENCE))
         self.assertEqual(build_release.REPORT,r.REPORT)
         for previous in ("complete_delivery_release_20261103", "complete_delivery_release_20261103_v02",
                          "complete_delivery_release_20261103_v03", "complete_delivery_release_20261105_v01",
-                         "complete_delivery_release_20261105_v02"):
+                         "complete_delivery_release_20261105_v02", "complete_delivery_release_20261105_v03",
+                         "complete_delivery_release_20261106_v01"):
             with self.subTest(previous=previous), patch.object(r,"context") as context:
                 with self.assertRaisesRegex(ValueError,"fixed_canonical_report_directory_required"):
                     r.main(["--source-revision",G,"--content-source-revision",C,

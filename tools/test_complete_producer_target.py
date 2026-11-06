@@ -76,7 +76,7 @@ class ActualProducerTargetTests(unittest.TestCase):
             m._producer_target_readset_binding("compiler[0]",bad,self.target,{self.key:b"bad"})
 
     def test_new_controls_directory_is_distinct_from_original_signed_controls(self):
-        self.assertEqual(r.REPORT,r.ROOT/"output/complete_delivery_release_20261105_v03")
+        self.assertEqual(r.REPORT,r.ROOT/"output/complete_delivery_release_20261106_v02")
         for previous in ("complete_delivery_release_20261103", "complete_delivery_release_20261103_v02",
                          "complete_delivery_release_20261103_v03", "complete_delivery_release_20261105_v01",
                          "complete_delivery_release_20261105_v02"):
