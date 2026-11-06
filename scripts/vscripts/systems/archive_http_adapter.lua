@@ -30,6 +30,17 @@ function M.submit(player_id,command,complete,lottery_hash,committed_profile_only
         payload.response_capabilities={lottery_committed_profile_v1=true}
     end
     provider.archive_submit(payload,function(result,timing)
+        if result.http_profile_resync==true then
+            -- Release this transaction's pending intent before one ordinary
+            -- authoritative profile read. Never replay a paid command here.
+            complete({ok=false,terminal=true,error='http_profile_wire_invalid'})
+            local setup=require('systems/match_setup_service')
+            if setup.get_session_id()==result.recovery_session
+                and provider.resolve_account_id(player_id)==account then
+                profiles.refresh_player(player_id,'http_profile_wire_recovery')
+            end
+            return
+        end
         result.lottery_profile_applied=false
         if result.profile then
             if tostring(result.profile.account_id)~=tostring(account) then

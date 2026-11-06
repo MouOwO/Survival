@@ -10,7 +10,7 @@ local quality={n=1,r=2,sr=3,ssr=4,ur=5,[""]=0}
 M.error_text={[0]="",[1]="抽奖未完成，请重试",[2]="档案尚未载入",[3]="抽奖券不足",[4]="奖池尚未解锁",
  [5]="操作处理中，请稍后重试",[6]="奖池版本已更新，请重新进入",[7]="到账尚未确认，请稍后查询",
  [8]="奖池配置尚未同步，请稍候"}
-local errors={http_profile_required=2,profile_not_loaded=2,lottery_ticket_insufficient=3,lottery_pool_locked=4,
+local errors={http_profile_required=2,profile_not_loaded=2,http_profile_wire_invalid=7,lottery_ticket_insufficient=3,lottery_pool_locked=4,
  lottery_player_busy=5,archive_busy=5,lottery_config_refresh_required=6,lottery_config_hash_mismatch=6}
 local function need(v,e)if not v then error(e,0)end end
 local function integer(v,min,max)return type(v)=="number" and v==v and v==math.floor(v) and v>=min and v<=max end

@@ -4,6 +4,7 @@ local rules = require("config/generated/fishing_system_rules")
 local mode_test = require("debug/mode_unlock_test")
 local workshop = require("systems/workshop_connection")
 local web_auth = require("systems/player_web_auth")
+local profile_wire = require("systems/http_profile_wire")
 
 local M = {}
 local active_rule = nil
@@ -107,6 +108,12 @@ local function request(path, payload, on_success, on_error)
     if type(session) ~= "string" or #session < 8 then on_error("match_session_missing") return end
     local body = {}
     for key, value in pairs(payload) do body[key] = value end
+    if path=='/v1/archive/command'then
+        local capabilities={}
+        for key,value in pairs(type(body.response_capabilities)=='table'and body.response_capabilities or{})do capabilities[key]=value end
+        capabilities.archive_profile_refs_v1=true
+        body.response_capabilities=capabilities
+    end
     body.match_session_id = session
     if path == "/v1/session/login" then
         -- The durable session keeps the gameplay identity even though advanced
@@ -143,8 +150,22 @@ local function request(path, payload, on_success, on_error)
                 return
             end
             local ok, decoded = pcall(json_decoder.decode, tostring(response.Body or ""))
+            if not ok or type(decoded) ~= "table" then
+                if trace then trace.decoded()end
+                on_error("http_json_invalid") return
+            end
+            if path=='/v1/archive/command'then
+                decoded=profile_wire.decode(decoded)
+                if not decoded then
+                    if trace then trace.decoded()end
+                    -- A malformed representation may follow a successful grant.
+                    -- Do not retry the mutation; the adapter performs one read.
+                    on_success({ok=false,terminal=true,error='http_profile_wire_invalid',
+                        http_profile_resync=true,recovery_session=session})
+                    return
+                end
+            end
             if trace then trace.decoded()end
-            if not ok or type(decoded) ~= "table" then on_error("http_json_invalid") return end
             on_success(decoded)
         end)
     end

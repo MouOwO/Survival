@@ -167,9 +167,10 @@ def install(module=None):
         return project(application, payload, raw, result, login=True)
 
     def project(application, payload, response, match_context, *, login=False):
+        from .http_profile_wire import pack
         if not match_context or not isinstance(match_context.get("mode"), str) or match_context["mode"] not in PARENT_MODES:
             result = original_project(application, payload, response, match_context, login=login)
-            return _daily_projection(application, response, result)
+            return pack(payload, _daily_projection(application, response, result))
         # Original standard projection preserves all existing account bonuses,
         # entitlements and account_profile. Keep gameplay identity as trusted session data.
         result = original_project(application, payload, response,
@@ -178,7 +179,7 @@ def install(module=None):
             view = result if "schema_version" in result else result.get("profile")
             if isinstance(view, dict):
                 view["game_mode"] = match_context["mode"]
-        return _daily_projection(application, response, result)
+        return pack(payload, _daily_projection(application, response, result))
 
     module._validate_context, module.login, module.project = validate_context, login, project
     if original_authenticate is not None:
