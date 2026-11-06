@@ -51,7 +51,8 @@ local function event(count)
     for _=1,count or 1 do bus.emit(events.PLAYER_PROFILE_CHANGED,{player_id=0,revision=1})end
 end
 local function succeed(request)
-    request.done({ok=true,unchanged=true,catalog_md5=seed.catalog_md5,config_hash=bundle.hash})
+    request.done({ok=true,unchanged=true,catalog_md5=seed.catalog_md5,config_hash=bundle.hash},
+        {http_status=200,response_bytes=160})
 end
 local function status()
     local ops=assert(service.compact_open(0,'map'))
@@ -66,71 +67,73 @@ local function status()
     return state
 end
 service.init()
-assert(#requests==1)
-requests[1].failed('player_web_auth_pending')
+assert(#requests==0,'unready startup must not send a catalog HTTP request')
 assert(status().error_code==8,'missing catalog must not misreport an already-loaded account')
 local unauth_traces=#traces
-event(40);assert(#requests==1,'unauthenticated repeated events cannot send catalog requests')
-loaded=true;event(40);assert(#requests==1,'loaded without authentication cannot trigger a request')
-loaded=false;authenticated=true;event(40);assert(#requests==1,'authentication without loaded profile cannot trigger a request')
+event(40);assert(#requests==0,'unauthenticated repeated events cannot send catalog requests')
+loaded=true;event(40);assert(#requests==0,'loaded without authentication cannot trigger a request')
+loaded=false;authenticated=true;event(40);assert(#requests==0,'authentication without loaded profile cannot trigger a request')
 assert(#traces==unauth_traces,'unauthenticated repeated events cannot generate logs')
 loaded=true;event()
-assert(#requests==2,'profile-ready edge must retry immediately without advancing 30 seconds')
+assert(#requests==1,'profile-ready edge must request immediately without advancing 30 seconds')
 local inflight_traces=#traces
-event(100);assert(#requests==2,'ready events coalesce while catalog request is in flight')
+event(100);assert(#requests==1,'ready events coalesce while catalog request is in flight')
 assert(#traces==inflight_traces,'in-flight repeated events cannot generate logs')
-succeed(requests[2]);assert(status().known==1 and status().enabled==1,'normal MD5 handshake restores projection')
+succeed(requests[1]);assert(status().known==1 and status().enabled==1,'normal MD5 handshake restores projection')
 local ready_resolves=resolver_calls
 local ready_traces=#traces
-event(100);assert(#requests==2,'verified catalog makes repeated profile events a network no-op')
+event(100);assert(#requests==1,'verified catalog makes repeated profile events a network no-op')
 assert(resolver_calls==ready_resolves,'verified catalog recovery path does not resolve account again')
 assert(#traces==ready_traces,'verified catalog profile events generate zero logs')
 
 -- A retained response from an old world cannot satisfy or change the new one.
-local old_response=requests[2].done
+local old_response=requests[1].done
 bus.reset();session='synthetic_world_two';authenticated=false;loaded=false;service.init()
-assert(#requests==3)
+assert(#requests==1,'new unready world also sends no catalog HTTP')
 local before_old_reply=#traces
 old_response({ok=true,unchanged=true,catalog_md5=seed.catalog_md5,config_hash=bundle.hash})
 assert(status().known==0,'old-world reply cannot install a catalog in a new world')
 assert(#traces==before_old_reply,'stale reply cannot report ready for the current world')
 authenticated=true;loaded=true;event(25)
-assert(#requests==3,'a real ready edge waits for an already in-flight catalog without duplicate HTTP')
-requests[3].failed('player_web_auth_pending')
-assert(#requests==4,'in-flight startup failure consumes the queued ready edge immediately once')
-event(25);assert(#requests==4)
-succeed(requests[4]);assert(status().known==1)
+assert(#requests==2,'a real ready edge coalesces its in-flight catalog without duplicate HTTP')
+requests[2].failed('player_web_auth_pending')
+event(25);assert(#requests==2,'failed ready requests cannot repeat on every profile event')
+timers.lottery_catalog_poll.callback()
+assert(#requests==3,'the existing bounded retry remains available after real failures')
+succeed(requests[3]);assert(status().known==1)
 
 -- One failed ready recovery does not turn subsequent profile revisions into a
 -- request storm. The old bounded periodic fallback is still independently owned.
 bus.reset();session='synthetic_world_three';authenticated=false;loaded=false;service.init()
-requests[5].failed('player_web_auth_pending')
-authenticated=true;loaded=true;event();assert(#requests==6)
-requests[6].failed('https://secret.invalid/?token=RAW_SECRET account=PRIVATE_ACCOUNT session=PRIVATE_SESSION')
+assert(#requests==3)
+authenticated=true;loaded=true;event();assert(#requests==4)
+requests[4].failed('https://secret.invalid/?token=RAW_SECRET account=PRIVATE_ACCOUNT session=PRIVATE_SESSION',503,45)
 local failed_traces=#traces
-event(100);assert(#requests==6,'failed ready recovery is not automatically replayed per profile event')
+event(100);assert(#requests==4,'failed ready recovery is not automatically replayed per profile event')
 assert(#traces==failed_traces,'failed ready recovery does not log on every repeated profile')
 assert(timers.lottery_catalog_poll.seconds==30,'existing periodic fallback remains unchanged')
+timers.lottery_catalog_poll.callback();assert(#requests==5);succeed(requests[5])
 
 -- The new event trigger must retain the remote-version protection: a server
 -- catalog inconsistent with the pinned seed remains disabled, without a draw.
 bus.reset();session='synthetic_world_four';authenticated=false;loaded=false;service.init()
-requests[7].failed('player_web_auth_pending')
-authenticated=true;loaded=true;event();assert(#requests==8)
+assert(#requests==5)
+authenticated=true;loaded=true;event();assert(#requests==6)
 local mismatch=seed.catalog_md5==string.rep('a',32)and string.rep('b',32)or string.rep('a',32)
-requests[8].done({ok=true,catalog_md5=mismatch,config_hash=bundle.hash,catalog_json='{}'})
+requests[6].done({ok=true,catalog_md5=mismatch,config_hash=bundle.hash,catalog_json='{}'})
 local mismatch_status=status()
 assert(mismatch_status.known==0 and mismatch_status.enabled==0 and mismatch_status.error_code==6,
     'event recovery cannot bypass catalog MD5/version guard')
 local denied=service.compact_draw(0,'map',1,1)
 assert(denied.ok==false and denied.error=='lottery_config_refresh_required')
 assert(snapshot_calls==0 and settlement_calls==0,'catalog recovery is read-only and never fetches player snapshot or draws')
-local stages={startup=true,profile_ready=true,scope_reset=true,ready=true,failure=true}
-local failures={none=true,auth_pending=true,unclassified=true,version_mismatch=true}
+local stages={waiting_profile=true,profile_ready=true,scope_reset=true,ready=true,failure=true}
+local failures={none=true,profile_not_ready=true,auth_pending=true,unclassified=true,version_mismatch=true}
 local have={}
 for _,line in ipairs(traces)do
-    local stage,generation,elapsed,config_ok,md5_ok,failure=line:match('^%[LOTTERY_CATALOG_STATE%] stage=([a-z_]+) generation=(%d+) elapsed_ms=([%-0-9]+) config_match=(%a+) md5_match=(%a+) failure=([a-z_]+)$')
+    local stage,generation,elapsed,config_ok,md5_ok,failure,status,bytes=line:match('^%[LOTTERY_CATALOG_STATE%] stage=([a-z_]+) generation=(%d+) elapsed_ms=([%-0-9]+) config_match=(%a+) md5_match=(%a+) failure=([a-z_]+) http_status=(%d+) response_bytes=(%d+)$')
     assert(stages[stage] and tonumber(generation) and tonumber(elapsed)>=-1 and failures[failure],'telemetry must use a fixed safe schema')
+    assert(tonumber(status)<=599 and tonumber(bytes)<=33554432,'transport metrics must be bounded integers')
     assert((config_ok=='true'or config_ok=='false')and(md5_ok=='true'or md5_ok=='false'))
     assert(not line:find('RAW_SECRET',1,true)and not line:find('PRIVATE_ACCOUNT',1,true)and not line:find('PRIVATE_SESSION',1,true))
     assert(not line:find(bundle.hash,1,true)and not line:find(seed.catalog_md5,1,true),'telemetry cannot disclose hashes')

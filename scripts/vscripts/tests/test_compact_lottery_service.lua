@@ -28,6 +28,8 @@ local scheduled_retries=0
 package.loaded['core/scheduler']={every=function(_,fn)poll=fn end,after=function()scheduled_retries=scheduled_retries+1;error('successful receipt must not wait for a retry timer')end}
 package.loaded['systems/match_setup_service']={get_session_id=function()return session end,get_mode=function()return 'standard'end}
 package.loaded['systems/player_profile_service']={get_account_profile=function(id)profile_reads=profile_reads+1;return copy(profiles[id])end,
+ is_authenticated_for_account=function(id,account)return profiles[id]and profiles[id].account_id==account end,
+ is_loaded_for_account=function(id,account)return profiles[id]and profiles[id].account_id==account and profiles[id].match_session_id==session end,
  get_provider=function()return{resolve_account_id=function(id)return profiles[id].account_id end,
  lottery_catalog=function(_,done)catalog_reply=done end,
  lottery_snapshot=function()http_reads=http_reads+1;error('compact path must not request legacy snapshot')end}end}
@@ -51,6 +53,8 @@ local events=require('core/events');local config=require('config/lottery_config'
 assert(#service.compact_open(0,'map')==3 and profile_reads==0,'unverified catalogue must stay unknown')
 assert(not service.compact_draw(0,'map',1,1).ok and #commands==0)
 assert(backend_hash~=require('config/generated/lottery_catalog_manifest').config_hash,'fixture must exercise different whole-bundle hashes')
+assert(catalog_reply==nil,'catalog waits for actual profile readiness')
+subs[events.PLAYER_PROFILE_CHANGED]({player_id=0,revision=1})
 catalog_reply({ok=true,catalog_md5=public_md5,config_hash=backend_hash,catalog_json='{}'})
 for id=0,3 do local ops=assert(service.compact_open(id,'map'));assert(#ops>50)end
 assert(profile_reads==4 and http_reads==0 and #legacy==0)
@@ -116,6 +120,7 @@ end
 -- Slot/session reuse invalidates callbacks before any presentation publication.
 local stale_index=#commands+1
 assert(service.compact_draw(2,'map',1,5).pending);count=#sent;session='two';profiles[2].match_session_id='two';callbacks[stale_index]({ok=true,lottery_profile_applied=true,profile=copy(profiles[2]),response={ok=true}});assert(#sent==count)
+subs[events.PLAYER_PROFILE_CHANGED]({player_id=2,revision=profiles[2].revision})
 poll();catalog_reply({ok=true,catalog_md5=string.rep('f',32),config_hash=backend_hash,catalog_json='{}'})
 local invalid=assert(service.compact_open(0,'map'));assert(#invalid==3)
 local error_code;for _,op in ipairs(invalid)do if op.field==lookup.field_by_name.error_code then error_code=op.value end end;assert(error_code==6)

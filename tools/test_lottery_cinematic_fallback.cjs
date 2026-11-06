@@ -29,6 +29,7 @@ function fixture(options={}){
  $.CancelScheduled=id=>{assert(jobs.has(id),'Do not repeatedly cancel already-executed timers');metrics.canceled++;jobs.delete(id)};
  $.Msg=(...args)=>messages.push(args.join(''));
  const context={$,GameUI:{CustomUIConfig:()=>cfg},GameEvents:{SendCustomGameEventToServer(){throw Error('Presentation must not draw/grant rewards')}}};
+ cfg.SurvivalLottery={CanPreviewCinematic:()=>true,OpenForCinematicPreview:()=>({Release(){}})};
  if(options.tools!==undefined)context.Game={IsInToolsMode:()=>options.tools,AddCommand:(name,fn)=>metrics.commands.push({name,fn})};
  function load(){vm.runInNewContext(source,context,{filename:'lottery_cinematic_v1.js'});return cfg.LotteryCinematic}
  function advance(seconds){const end=now+seconds;for(;;){const next=[...jobs.values()].filter(j=>j.due<=end).sort((a,b)=>a.due-b.due||a.id-b.id)[0];if(!next)break;now=next.due;jobs.delete(next.id);next.fn()}now=end}

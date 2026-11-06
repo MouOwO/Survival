@@ -33,15 +33,15 @@ function fixture(options={}){
   FindChildTraverse(id){metrics.lookups++;return this.children.find(c=>c.id===id)||null}
  }
  const window=new Panel('Panel',null,'LotteryWindow');window.actuallayoutwidth=1280;window.actuallayoutheight=720;
- new Panel('Button',window,'LotteryRefreshButton');
  const $=name=>nodes.get(name.slice(1));$.CreatePanel=(t,p,id)=>new Panel(t,p,id);
  $.Schedule=(delay,fn)=>{const id=++serial;const job={at:now+delay,fn};jobs.set(id,job);history.push(job);metrics.peakJobs=Math.max(metrics.peakJobs,jobs.size);return id};
  $.CancelScheduled=id=>jobs.delete(id);$.Msg=line=>logs.push(line);
- cfg.SurvivalLottery={Open(){throw Error('AB cannot open/read/draw')},SkipCinematic(){metrics.skip++}};
+ const control={idle:true};
+ cfg.SurvivalLottery={CanPreviewCinematic:()=>control.idle,OpenForCinematicPreview(){control.idle=false;return {Release(){control.idle=true;}};},Open(){throw Error('AB cannot open/read/draw')},SkipCinematic(){metrics.skip++}};
  const context={$,GameUI:{CustomUIConfig:()=>cfg},Game:{IsInToolsMode:()=>false,AddCommand:(name,fn)=>commands.push({name,fn})},GameEvents:{SendCustomGameEventToServer(){throw Error('No server calls')}}};
  function load(){vm.runInNewContext(source,context);return cfg.LotteryCinematic}
  function advance(seconds){const end=now+seconds;for(;;){const next=[...jobs.entries()].filter(([,j])=>j.at<=end).sort((a,b)=>a[1].at-b[1].at)[0];if(!next)break;now=next[1].at;jobs.delete(next[0]);next[1].fn()}now=end}
- return {api:load(),load,nodes,jobs,logs,commands,metrics,history,advance};
+ return {api:load(),load,nodes,jobs,logs,commands,metrics,history,advance,control};
 }
 const cases=[];
 for(const mode of ['wrapper','direct','buffered']){
@@ -72,7 +72,7 @@ cases.push({case:'setup_failure_cleans_host_and_never_claims_video_success'});
 }
 {
  const f=fixture();const initial=f.metrics.created;assert.equal(f.api.PreviewPlayerAB('https://example.invalid'),false);assert.equal(f.metrics.created,initial);
- f.nodes.get('LotteryRefreshButton').enabled=false;assert.equal(f.api.PreviewPlayerAB('direct'),false);f.nodes.get('LotteryRefreshButton').enabled=true;
+ assert(!f.nodes.has('LotteryRefreshButton'));f.control.idle=false;assert.equal(f.api.PreviewPlayerAB('direct'),false);f.control.idle=true;
  f.api.PreviewPlayerAB('direct');const first=f.nodes.get('LotteryCinematicMovie');assert.equal(f.api.PreviewPlayerAB('wrapper'),false);assert.equal(first,f.nodes.get('LotteryCinematicMovie'));
  const stale=f.history.map(x=>x.fn);f.api.Cancel();f.api.PreviewPlayerAB('wrapper');stale.forEach(fn=>fn());assert(f.nodes.get('LotteryCinematicMovie').alive);f.advance(8);
  assert.equal(f.logs.filter(l=>l.includes('stage=complete')).length,1);assert.equal(f.metrics.images,0);cases.push({case:'invalid_busy_reentry_and_stale_generation_safe'});

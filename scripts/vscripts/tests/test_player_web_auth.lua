@@ -45,6 +45,7 @@ package.loaded["systems/player_profile_service"] = {
 package.loaded["systems/match_setup_service"] = {
     get_session_id = function() return session end,
     is_mode_selected = function() return selected_mode end,
+    get_mode = function() return selected_mode and 'standard' or nil end,
 }
 Convars = { GetStr = function() return "legacy_fixture_server_bearer" end }
 CreateHTTPRequestScriptVM = function(method, url)
@@ -77,8 +78,8 @@ local function approved(account)
 end
 web.init(session)
 provider.lottery_catalog({md5="fixture_catalog"}, function() error("no authorization exists") end, failure)
-assert(#requests == 0 and #events == 0 and errors[#errors] == "player_web_auth_pending",
-    "server metadata waits for a real approval without creating another player's flow")
+assert(#requests == 0 and #events == 0 and errors[#errors] == "mode_not_selected",
+    "server metadata waits for durable admission without creating another player's flow")
 local errors_before_start = #errors
 resolve()
 assert(#requests == 1 and requests[1].url == config.base_url .. "/v1/player-auth/start")
@@ -180,24 +181,29 @@ assert(web.authorized_account(session) == "1002")
 resolve("1001"); reply(3, pending())
 clock = 1006; resolve("1001"); reply(4, approved())
 assert(web.authorized_account(session) == "1001", "lowest current PlayerID wins, regardless of approval order")
-provider.lottery_catalog({md5="fixture_catalog"}, function() end, failure)
-assert(#requests == 5 and requests[5].url == config.base_url .. "/v1/lottery/catalog")
-assert(requests[5].body.account_id == "1001" and requests[5].body.match_session_id == session
-    and requests[5].body.md5 == "fixture_catalog")
-assert(requests[5].headers.Authorization == "Bearer " .. approved().access_token)
 selected_mode = true
+provider.fetch_snapshot("1001",function()end,failure)
+assert(#requests==5 and requests[5].url==config.base_url.."/v1/session/login")
+reply(5,{account_id="1001",match_session_id=session,mode="standard"})
+provider.lottery_catalog({md5="fixture_catalog"}, function() end, failure)
+assert(#requests == 6 and requests[6].url == config.base_url .. "/v1/lottery/catalog")
+assert(requests[6].body.account_id == "1001" and requests[6].body.match_session_id == session
+    and requests[6].body.md5 == "fixture_catalog")
+assert(requests[6].headers.Authorization == "Bearer " .. approved().access_token)
 provider.lottery_snapshot({}, function() error("accountless private request must fail") end, failure)
-assert(#requests == 5 and errors[#errors] == "player_web_auth_binding_changed",
+assert(#requests == 6 and errors[#errors] == "player_web_auth_binding_changed",
     "the approved-account fallback is confined to the read-only catalog route")
-selected_mode = false
 players[0].connected = 0
 assert(web.authorized_account(session) == "1002", "a disconnected owner's capability cannot serve metadata")
+provider.fetch_snapshot("1002",function()end,failure)
+assert(#requests==7 and requests[7].url==config.base_url.."/v1/session/login")
+reply(7,{account_id="1002",match_session_id=session,mode="standard"})
 provider.lottery_catalog({md5="fixture_catalog"}, function() end, failure)
-assert(#requests == 6 and requests[6].body.account_id == "1002"
-    and requests[6].headers.Authorization == "Bearer " .. second_approval.access_token)
+assert(#requests == 8 and requests[8].body.account_id == "1002"
+    and requests[8].headers.Authorization == "Bearer " .. second_approval.access_token)
 clock = 20000
 provider.lottery_catalog({md5="fixture_catalog"}, function() error("expired approval") end, failure)
-assert(#requests == 6 and web.authorized_account(session) == nil and errors[#errors] == "player_web_auth_pending")
+assert(#requests == 8 and web.authorized_account(session) == nil and errors[#errors] == "player_web_auth_pending")
 session = "web_auth_metadata_new_match"; web.init(session)
 assert(web.authorized_account(session) == nil and web.authorized_account("web_auth_metadata_match") == nil)
 

@@ -9,7 +9,7 @@ new Panel('Panel',null,'LotteryWindow');new Panel('Panel',nodes.LotteryWindow,'L
 const $=s=>nodes[s.slice(1)];$.CreatePanel=(t,p,id)=>new Panel(t,p,id);$.Schedule=(delay,fn)=>{let j={at:now+delay,fn};jobs.push(j);return j;};$.CancelScheduled=j=>j.cancelled=true;$.Msg=()=>{};
 function advance(seconds){let end=now+seconds;for(;;){jobs.sort((a,b)=>a.at-b.at);let j=jobs[0];if(!j||j.at>end)break;jobs.shift();now=j.at;if(!j.cancelled)j.fn();}now=end;}
 vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/lottery_cinematic_v1.js','utf8'),{$,GameUI:{CustomUIConfig:()=>cfg}});
-const c=cfg.LotteryCinematic;let done=0;
+let c=cfg.LotteryCinematic;let done=0;
 for(const pool of ['map','cultivation','dragon_knight','summer']){
  assert.equal(c.Play(pool,[{quality:'sr'},{quality:'ur'}],()=>done++),true);
  let movie=nodes.LotteryCinematicMovie;assert(movie.source.endsWith('/'+pool+'.webm'));assert(movie.played);assert.equal(movie.repeat,false);assert(movie.volume>0&&movie.volume<=1);
@@ -31,6 +31,8 @@ failPlayback=true;assert.equal(c.Play('map',[],()=>done++),false);advance(8);ass
 assert.equal(c.Highest([{quality:'N'},{quality:'SSR'},{quality:'r'}]),'ssr');
 assert(!fs.readFileSync('panorama/src/scripts/custom_game/lottery_cinematic_v1.js','utf8').includes('SendCustomGameEventToServer'),'cinematics must never submit draws or grants');
 c.Dispose();failPlayback=false;
+assert.equal(c.Play('map',[],()=>done++),false,'a disposed cinema cannot acquire a new surface');
+vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/lottery_cinematic_v1.js','utf8'),{$,GameUI:{CustomUIConfig:()=>cfg}});c=cfg.LotteryCinematic;
 nodes.LotteryMainCanvas.AddClass('LotteryV10');
 const content=new Panel('Panel',nodes.LotteryMainCanvas,'V10LotteryContent');
 const root=nodes.LotteryWindow;

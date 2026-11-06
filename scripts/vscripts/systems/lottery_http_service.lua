@@ -14,7 +14,11 @@ local catalog,active_hash,catalog_loading,catalog_waiters=nil,bundle.hash,false,
 local catalog_serial=0
 local catalog_recovery={attempted=false,waiting=false}
 local catalog_session,catalog_generation,require_expected_hash=nil,0,false
-local catalog_failure={player_web_auth_pending='auth_pending',player_web_auth_expired='auth_expired',
+local catalog_candidates,catalog_candidate_revisions,catalog_owner={},{},nil
+local catalog_failure={mode_not_selected='mode_not_selected',match_profile_not_ready='profile_not_ready',
+    match_session_missing='context_missing',match_session_unavailable='context_unavailable',
+    match_session_invalid='context_invalid',match_mode_locked='mode_locked',
+    http_status_409='context_rejected',player_web_auth_pending='auth_pending',player_web_auth_expired='auth_expired',
     player_web_auth_unavailable='auth_unavailable',player_web_auth_binding_changed='auth_binding_changed',
     player_web_auth_configuration_invalid='auth_configuration',http_request_create_failed='http_create',
     http_json_invalid='http_json',lottery_catalog_provider_required='provider_missing',
@@ -23,19 +27,26 @@ local catalog_failure={player_web_auth_pending='auth_pending',player_web_auth_ex
 local function catalog_clock()
     return type(GetSystemTimeMS)=='function' and GetSystemTimeMS() or nil
 end
-local function catalog_log(stage,started,config_match,md5_match,failure)
+local function catalog_metric(value,maximum)
+    return type(value)=='number' and value==value and value>=0 and value<=maximum
+        and value==math.floor(value) and value or 0
+end
+local function catalog_log(stage,started,config_match,md5_match,failure,metadata)
     local current=catalog_clock()
     local elapsed=started and current and math.floor(math.max(0,current-started)) or -1
+    metadata=type(metadata)=='table' and metadata or {}
     print('[LOTTERY_CATALOG_STATE] stage='..stage..' generation='..catalog_generation
         ..' elapsed_ms='..elapsed..' config_match='..tostring(config_match==true)
-        ..' md5_match='..tostring(md5_match==true)..' failure='..(failure or 'none'))
+        ..' md5_match='..tostring(md5_match==true)..' failure='..(failure or 'none')
+        ..' http_status='..catalog_metric(metadata.http_status,599)
+        ..' response_bytes='..catalog_metric(metadata.response_bytes,33554432))
 end
 local seed_ok,seed=pcall(require,'config/generated/lottery_catalog_manifest')
 local seed_md5=seed_ok and type(seed)=='table' and seed.config_hash==bundle.hash and type(seed.catalog_md5)=='string'
     and #seed.catalog_md5==32 and not seed.catalog_md5:find('[^0-9a-f]') and seed.catalog_md5 or nil
 local session=tostring(DoUniqueString and DoUniqueString('lottery_http') or os.time()):gsub('[^%w_.-]','_')
 local pool_ids={map=true,cultivation=true,dragon_knight=true,summer=true}
-local compact_transport,compact_factory,compact_lookup,compact_refresh,compact_receipt_codec
+local compact_transport,compact_factory,compact_lookup,compact_refresh,compact_receipt_codec,compact_catalog_ready
 local compact_states,compact_failures={},{}
 local function compact_bound(id)
     if not compact_transport then local ok,t=pcall(require,'ui/compact_ui_transport');if ok then compact_transport=t end end
@@ -48,6 +59,7 @@ local function catalog_scope()
         catalog,active_hash,catalog_loading,catalog_waiters=nil,bundle.hash,false,{}
         catalog_serial,require_expected_hash=0,false
         catalog_recovery={attempted=false,waiting=false}
+        catalog_candidates,catalog_candidate_revisions,catalog_owner={},{},nil
         catalog_log('scope_reset')
         caches,versions,loading,waiters,busy={},{},{},{},{}
         owners,epochs,published_epochs,full_required={},{},{},{}
@@ -168,9 +180,51 @@ end
 local function valid_hash(value,length)
     return type(value)=='string' and #value==length and not value:find('[^0-9a-f]')
 end
+-- Index changes only on real profile events. A selected owner is revalidated
+-- in O(1); invalid candidates are retired once, never rescanned every tick.
+local function catalog_owner_ready(id,owner)
+    return owner and same(identity(id),owner)
+        and type(profiles.is_authenticated_for_account)=='function'
+        and type(profiles.is_loaded_for_account)=='function'
+        and profiles.is_authenticated_for_account(id,owner.account)
+        and profiles.is_loaded_for_account(id,owner.account)
+end
+local function catalog_context()
+    if catalog_owner then
+        if catalog_owner_ready(catalog_owner.id,catalog_owner.owner) then return catalog_owner end
+        catalog_candidates[catalog_owner.id]=nil;catalog_candidate_revisions[catalog_owner.id]=nil;catalog_owner=nil
+    end
+    while next(catalog_candidates)~=nil do
+        local id,owner=next(catalog_candidates)
+        if catalog_owner_ready(id,owner) then
+            catalog_owner={id=id,owner=owner};return catalog_owner
+        end
+        catalog_candidates[id]=nil;catalog_candidate_revisions[id]=nil
+    end
+end
+local function catalog_profile_changed(id,payload)
+    local existing=catalog_candidates[id]
+    local revision=payload and payload.revision
+    -- Profile events are internal authoritative notifications. Invalidation
+    -- always uses revision 0; account changes and new revisions are rechecked.
+    if existing and type(revision)=='number' and revision>0 and revision==math.floor(revision)
+        and catalog_candidate_revisions[id]==revision
+        and (payload.account_id==nil or tostring(payload.account_id)==existing.account) then return end
+    local owner=scope(id)
+    if catalog_owner_ready(id,owner) then
+        catalog_candidates[id]=owner;catalog_candidate_revisions[id]=revision
+    else catalog_candidates[id]=nil;catalog_candidate_revisions[id]=nil end
+    if catalog_owner and catalog_owner.id==id then catalog_owner=nil end
+end
 local recover_catalog_after_ready
 local function check_catalog(complete,force_body,stage)
     local match_session=catalog_scope()
+    local context=catalog_context()
+    if not context then
+        if stage then catalog_log('waiting_profile',nil,false,false,'profile_not_ready') end
+        if complete then complete({ok=false,error='match_profile_not_ready'}) end
+        return
+    end
     if complete then catalog_waiters[#catalog_waiters+1]=complete end
     if catalog_loading then return end
     local provider=profiles.get_provider()
@@ -184,9 +238,12 @@ local function check_catalog(complete,force_body,stage)
     local generation=catalog_generation
     local started=catalog_clock()
     if stage then catalog_log(stage,started) end
-    local function done(result)
+    local function done(result,metadata)
         if generation~=catalog_generation or match_session~=catalog_scope() then return end
         catalog_loading=false
+        if not catalog_owner_ready(context.id,context.owner) then
+            result={ok=false,error='match_profile_not_ready'}
+        end
         local accepted=result and result.ok and valid_hash(result.catalog_md5,32) and valid_hash(result.config_hash,64)
         if accepted and result.unchanged then
             accepted=(catalog and catalog.catalog_md5==result.catalog_md5)
@@ -199,7 +256,7 @@ local function check_catalog(complete,force_body,stage)
         local md5_match=result and result.catalog_md5==seed_md5
         local reason=accepted and (not config_match or not md5_match) and 'version_mismatch'
             or not accepted and (catalog_failure[result and result.error] or (result and result.ok and 'catalog_invalid' or 'unclassified'))
-        catalog_log(accepted and not reason and 'ready' or 'failure',started,config_match,md5_match,reason)
+        catalog_log(accepted and not reason and 'ready' or 'failure',started,config_match,md5_match,reason,metadata)
         if accepted then
             local changed=not catalog or catalog.catalog_md5~=result.catalog_md5 or catalog.config_hash~=result.config_hash
             if result.config_hash~=bundle.hash or (catalog and catalog.catalog_md5~=result.catalog_md5)
@@ -235,7 +292,9 @@ local function check_catalog(complete,force_body,stage)
         -- request is still in flight. Retry it once after that request fails.
         if not accepted and catalog_recovery.waiting then recover_catalog_after_ready() end
     end
-    provider.lottery_catalog({md5=not force_body and (catalog and catalog.catalog_md5 or seed_md5) or ''},done,function(error) done({ok=false,error=error}) end)
+    provider.lottery_catalog({account_id=context.owner.account,md5=not force_body and (catalog and catalog.catalog_md5 or seed_md5) or ''},done,function(error,status,bytes)
+        done({ok=false,error=error},{http_status=status,response_bytes=bytes})
+    end)
 end
 recover_catalog_after_ready=function()
     if catalog or catalog_recovery.attempted then return end
@@ -243,16 +302,13 @@ recover_catalog_after_ready=function()
     catalog_recovery.waiting=false;catalog_recovery.attempted=true
     check_catalog(nil,nil,'profile_ready')
 end
-local function recover_catalog_for_profile(id)
+local function recover_catalog_for_profile(id,payload)
     catalog_scope()
-    -- Stable profile events never poll a verified catalog or repeat a failed
-    -- ready-edge recovery. The existing low-frequency refresh remains intact.
+    catalog_profile_changed(id,payload)
+    -- Stable profile events do not repeat a verified/attempted ready-edge read.
+    -- The existing low-frequency refresh still retries genuine HTTP failures.
     if catalog or catalog_recovery.attempted or catalog_recovery.waiting then return end
-    local owner=scope(id)
-    if not owner or type(profiles.is_authenticated_for_account)~='function'
-        or type(profiles.is_loaded_for_account)~='function'
-        or not profiles.is_authenticated_for_account(id,owner.account)
-        or not profiles.is_loaded_for_account(id,owner.account) then return end
+    if not catalog_context() then return end
     recover_catalog_after_ready()
 end
 local function catalog_for(md5,complete)
@@ -462,9 +518,15 @@ function M.init()
     end)
     subscribe(events.PLAYER_PROFILE_CHANGED,function(p)
         if p and p.player_id~=nil then
-            recover_catalog_for_profile(p.player_id)
+            recover_catalog_for_profile(p.player_id,p)
             local job=busy[p.player_id]
             if compact_bound(p.player_id) then
+                -- Pending/invalid public metadata needs only an unknown view;
+                -- do not copy the account before that catalog can use it.
+                if not compact_catalog_ready() then
+                    if compact_refresh then compact_refresh(p.player_id,nil,{headers=true}) end
+                    return
+                end
                 local context=require('ui/compact_profile_context').current(p.player_id)
                 -- The submit completion owns its validated receipt and exact K
                 -- keys. The synchronous profile event must not send it twice.
@@ -507,7 +569,7 @@ local function compact_setup()
     end
     return true
 end
-local function compact_catalog_ready()
+compact_catalog_ready=function()
     return seed_ok and type(seed)=='table'and type(seed.catalog_md5)=='string'
         and catalog and catalog.session_id==catalog_session and catalog.catalog_md5==seed.catalog_md5
 end

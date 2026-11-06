@@ -101,7 +101,7 @@ local function request(path, payload, on_success, on_error)
         on_error("mode_unlock_test_read_only") return
     end
     local setup = require("systems/match_setup_service")
-    if path ~= "/v1/session/authenticate" and path ~= "/v1/lottery/catalog" and not setup.is_mode_selected() then
+    if path ~= "/v1/session/authenticate" and not setup.is_mode_selected() then
         on_error("mode_not_selected") return
     end
     local session = setup.get_session_id()
@@ -126,10 +126,19 @@ local function request(path, payload, on_success, on_error)
         -- an advanced durable session or submit test clears to the backend.
         if mode_test.is_enabled() then body.mode = profile_mode(setup) end
     end
+    if path=="/v1/lottery/catalog" and body.account_id~=nil
+        and logged_in[tostring(body.account_id)]~=session then
+        on_error("match_profile_not_ready") return
+    end
     local function send(url, token)
         if trace then trace.resolved()end
         if setup.get_session_id() ~= session then on_error("match_session_changed") return end
         if token == "" then on_error("fishing_api_token_missing") return end
+        -- A catalog uses the same durable match context as other archive reads.
+        -- This local readiness marker never replaces gateway/backend checks.
+        if path=="/v1/lottery/catalog" and logged_in[tostring(body.account_id)]~=session then
+            on_error("match_profile_not_ready") return
+        end
         local http = CreateHTTPRequestScriptVM("POST", tostring(url) .. path)
         if not http then on_error("http_request_create_failed") return end
         http:SetHTTPRequestHeaderValue("Authorization", "Bearer " .. token)
@@ -143,17 +152,20 @@ local function request(path, payload, on_success, on_error)
         if trace then trace.sent()end
         http:Send(function(response)
             local status = tonumber(response and response.StatusCode) or 0
+            -- Internal transport metadata only; never consume same-named JSON
+            -- fields or re-encode the response to measure its existing bytes.
+            local catalog_bytes=path=="/v1/lottery/catalog" and #tostring(response and response.Body or "") or nil
             if trace then trace.received(#tostring(response and response.Body or ''),status)end
             if status ~= 200 then
                 local parsed, response_body = pcall(json_decoder.decode, tostring(response and response.Body or ""))
                 if trace then trace.decoded()end
-                on_error(workshop.failure(parsed and response_body or nil, "http_status_" .. tostring(status)), status)
+                on_error(workshop.failure(parsed and response_body or nil, "http_status_" .. tostring(status)), status, catalog_bytes)
                 return
             end
             local ok, decoded = pcall(json_decoder.decode, tostring(response.Body or ""))
             if not ok or type(decoded) ~= "table" then
                 if trace then trace.decoded()end
-                on_error("http_json_invalid") return
+                on_error("http_json_invalid",path=="/v1/lottery/catalog" and status or nil,catalog_bytes) return
             end
             if path=='/v1/archive/command'then
                 decoded=profile_wire.decode(decoded)
@@ -167,7 +179,8 @@ local function request(path, payload, on_success, on_error)
                 end
             end
             if trace then trace.decoded()end
-            on_success(decoded)
+            if path=="/v1/lottery/catalog" then on_success(decoded,{http_status=status,response_bytes=catalog_bytes})
+            else on_success(decoded) end
         end)
     end
     if web_auth.enabled() then
@@ -300,8 +313,8 @@ function M.lottery_snapshot(payload, on_success, on_error)
 end
 
 function M.lottery_catalog(payload, on_success, on_error)
-    -- Public display metadata is available during admission. Keep the same
-    -- authenticated HTTP transport; account snapshots remain mode-gated.
+    -- Public metadata still requires this authenticated account's durable
+    -- match context. Call only after a successful profile load in this session.
     request("/v1/lottery/catalog", payload, on_success, on_error)
 end
 

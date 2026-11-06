@@ -6,24 +6,33 @@ package.loaded['systems/match_setup_service']={is_mode_selected=function()return
     get_session_id=function()return 'authenticated_session' end,get_mode=function()return 'standard' end}
 Convars={GetStr=function(_,name)return name=='survival_fishing_api_token' and 'test-token' or '' end}
 local requests={}
+local response_body='{"ok":true}'
 CreateHTTPRequestScriptVM=function(method,url)
     local request={method=method,url=url}
     function request:SetHTTPRequestHeaderValue(name,value)self[name]=value end
     function request:SetHTTPRequestRawPostBody(_,body)self.body=decoder.decode(body)end
     function request:SetHTTPRequestAbsoluteTimeoutMS(value)self.timeout=value end
-    function request:Send(done)requests[#requests+1]=self;done({StatusCode=200,Body='{"ok":true}'})end
+    function request:Send(done)requests[#requests+1]=self;done({StatusCode=200,Body=response_body})end
     return request
 end
 local provider=require('systems/player_profile_providers/http_fishing_provider')
 provider.init()
 local result,error
 provider.lottery_catalog({md5='local'},function(value)result=value end,function(value)error=value end)
-assert(result.ok and not error and #requests==1)
-assert(requests[1].url=='https://example.invalid/v1/lottery/catalog' and requests[1].Authorization=='Bearer test-token')
-assert(requests[1].body.md5=='local' and requests[1].body.match_session_id=='authenticated_session')
+assert(not result and error=='mode_not_selected' and #requests==0)
 provider.lottery_snapshot({},function()assert(false)end,function(value)error=value end)
-assert(error=='mode_not_selected' and #requests==1,'only public metadata bypasses the mode gate')
+assert(error=='mode_not_selected' and #requests==0,'public catalog and private snapshots require a chosen mode')
 selected=true;error=nil
-provider.lottery_snapshot({},function(value)result=value end,function(value)error=value end)
+provider.lottery_catalog({account_id='123',md5='local'},function(value)result=value end,function(value)error=value end)
+assert(error=='match_profile_not_ready' and #requests==0,'chosen mode alone is not a durable session')
+response_body='{"account_id":"123","match_session_id":"authenticated_session","mode":"standard"}'
+provider.fetch_snapshot('123',function(value)result=value end,function(value)error=value end)
+assert(#requests==1 and result.account_id=='123')
+response_body='{"ok":true}';error=nil
+provider.lottery_catalog({account_id='123',md5='local'},function(value)result=value end,function(value)error=value end)
 assert(result.ok and not error and #requests==2)
-print('LOTTERY_CATALOG_PROVIDER_PASS: early-public-metadata/Bearer/session/private-mode-gate')
+assert(requests[2].url=='https://example.invalid/v1/lottery/catalog' and requests[2].Authorization=='Bearer test-token')
+assert(requests[2].body.md5=='local' and requests[2].body.match_session_id=='authenticated_session')
+provider.lottery_snapshot({},function(value)result=value end,function(value)error=value end)
+assert(result.ok and not error and #requests==3)
+print('LOTTERY_CATALOG_PROVIDER_PASS: durable-ready/Bearer/session/private-mode-gate')

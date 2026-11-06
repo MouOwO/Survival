@@ -1,6 +1,7 @@
 package.path='scripts/vscripts/?.lua;'..package.path
 local handlers,subscribers,packets,timers={},{},{},{}
 local catalogs,privates,commands={},{},{}
+local priming=true
 local hash1,hash2=string.rep('a',64),string.rep('b',64)
 local md51,md52=string.rep('c',32),string.rep('d',32)
 local match_session='catalog_room_A'
@@ -12,15 +13,22 @@ package.loaded['core/scheduler']={every=function(_,f,key)timers[key]=f end,after
 package.loaded['systems/match_setup_service']={get_session_id=function()return match_session end,get_mode=function()return 'standard' end}
 local provider={resolve_account_id=function()return '123' end,
     lottery_catalog=function(payload,done)catalogs[#catalogs+1]={payload=payload,done=done}end,
-    lottery_snapshot=function(payload,done)privates[#privates+1]={payload=payload,done=done}end}
-package.loaded['systems/player_profile_service']={get_provider=function()return provider end}
+    lottery_snapshot=function(payload,done)
+        if priming then done({ok=false,error='synthetic_profile_not_ready'});return end
+        privates[#privates+1]={payload=payload,done=done}
+    end}
+package.loaded['systems/player_profile_service']={get_provider=function()return provider end,
+    is_authenticated_for_account=function()return true end,is_loaded_for_account=function()return true end}
 package.loaded['systems/archive_http_adapter']={submit=function(id,command,done,hash)
     commands[#commands+1]={done=done,hash=hash,command=command}
 end}
 local events=require('core/events')
 local service=require('systems/lottery_http_service');service.init()
+assert(#catalogs==0,'startup cannot request a catalog before the durable ready event')
+subscribers[events.PLAYER_PROFILE_CHANGED]({player_id=0,revision=1})
 assert(#catalogs==1 and catalogs[1].payload.md5==md51,'first poll validates the installed manifest without requesting 82KB')
 catalogs[1].done({ok=true,unchanged=true,catalog_md5=md51,config_hash=hash1})
+priming=false
 assert(packets[1].payload.catalog.unchanged and not packets[1].payload.catalog.catalog_json)
 assert(packets[1].payload.catalog.catalog_sequence==1 and packets[1].payload.catalog.session_id==match_session)
 local same,different
@@ -51,6 +59,8 @@ assert(draw.pending and #commands==2 and commands[2].hash==hash2)
 -- Start one old-room catalog check, then join a new room before it completes.
 timers.lottery_catalog_poll();assert(#catalogs==4)
 match_session='catalog_room_B'
+priming=true
+subscribers[events.PLAYER_PROFILE_CHANGED]({player_id=0,revision=1})
 local next_room
 handlers[events.LOTTERY_CATALOG_REQUEST]({md5=md51,complete=function(r)next_room=r end})
 assert(#catalogs==5 and catalogs[5].payload.md5==md51)
@@ -58,6 +68,7 @@ local count=#packets
 catalogs[4].done({ok=true,catalog_md5=md52,config_hash=hash2,catalog_json='old room response'})
 assert(#packets==count and not next_room,'old-room callback cannot publish into or finish new-room waiters')
 catalogs[5].done({ok=true,unchanged=true,catalog_md5=md51,config_hash=hash1})
+priming=false
 assert(next_room.unchanged and next_room.catalog_sequence==1 and next_room.session_id=='catalog_room_B')
 assert(service.active_config_hash()==hash1,'a new room independently validates its own catalog')
 print('LOTTERY_MANIFEST_CACHE_PASS: conditional-first-poll/body-on-demand/old-price-rejection/room-scope/late-reply-isolation')

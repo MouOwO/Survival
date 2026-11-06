@@ -74,6 +74,9 @@ end
 local before_logs=#logs
 provider.archive_submit({account_id=account,command={kind='boss_kill'}},function()end,function()assert(false)end)
 requests[#requests].complete({StatusCode=200,Body='{"ok":true}'})
+provider.fetch_snapshot(account,function()end,function()assert(false)end)
+requests[#requests].complete({StatusCode=200,Body=encode({account_id=account,
+    match_session_id='private-match-DO-NOT-LOG',mode='standard'})})
 provider.lottery_catalog({account_id=account},function()end,function()assert(false)end)
 requests[#requests].complete({StatusCode=200,Body='{"ok":true}'})
 assert(#logs==before_logs)

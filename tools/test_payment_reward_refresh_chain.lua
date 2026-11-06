@@ -7,6 +7,15 @@ local bus,ev=require('core/event_bus'),require('core/events')
 local decoder,encoder=require('core/json_decoder'),require('core/json_encoder')
 local handlers,sent,http,fetches,lottery_reads={},{},{},{},{}
 local accounts={[0]='1200',[1]='1201'}
+-- The production listener resolves its actor from the server entity index.
+-- Keep entity identity stable across binding creation and async callbacks.
+local players={}
+for id in pairs(accounts)do
+ local player={id=id}
+ function player:GetPlayerID()return self.id end
+ function player:IsNull()return false end
+ players[id]=player
+end
 local clock=100
 local setup={get_session_id=function()return 'reward_refresh_session' end,get_mode=function()return 'standard' end,is_mode_selected=function()return true end}
 package.loaded['systems/match_setup_service']=setup
@@ -22,7 +31,8 @@ local provider={init=function()end,resolve_account_id=function(id)return account
  fetch_snapshot=function(account,success,failure)fetches[#fetches+1]={account=account,success=success,failure=failure} end,
  lottery_snapshot=function(payload,done,fail)lottery_reads[#lottery_reads+1]={payload=payload,done=done,fail=fail} end}
 PlayerResource={IsValidPlayerID=function(_,id)return accounts[id]~=nil end,IsFakeClient=function()return false end,
- GetPlayer=function(_,id)return {id=id} end,GetTeam=function()return 2 end}
+ GetPlayer=function(_,id)return players[id] end,GetTeam=function()return 2 end}
+EntIndexToHScript=function(index)return players[index-200]end
 CustomGameEventManager={RegisterListener=function(_,name,fn)handlers[name]=fn end,
  Send_ServerToPlayer=function(_,player,name,value)sent[#sent+1]={id=player.id,name=name,data=value} end}
 Convars={GetStr=function()return 'fixture_transport_token' end}
@@ -67,10 +77,15 @@ local open_result
 bus.request(ev.LOTTERY_SNAPSHOT_REQUEST,{player_id=0,pool_id='summer',prefetch=1,complete=function(r)open_result=r end})
 local old_read=lottery_reads[#lottery_reads]
 local payment=handlers.survival_payment_request
-payment(nil,{PlayerID=0,action='create',sku='video_p001',quantity=7,request_id='purchase_fixture'})
+local sent_before=#sent
+payment(nil,{PlayerID=0,action='create',sku='video_p001',quantity=7,request_id='missing_actor'})
+assert(#http==0 and #sent==sent_before,'payload PlayerID cannot replace a server actor')
+payment(200,{PlayerID=1,action='create',sku='video_p001',quantity=7,request_id='purchase_fixture'})
+assert(#http==1 and http[1].body.account_id==accounts[0],
+ 'the server entity owns the order even when payload PlayerID names another player')
 local order={ok=true,order_id='WX'..string.rep('1',30),sku='video_p001',state='pending',quantity=7}
 http[#http].done({StatusCode=200,Body=encoder.encode(order)})
-payment(nil,{PlayerID=0,action='status',sku='video_p001',request_id='status_fixture'})
+payment(200,{PlayerID=0,action='status',sku='video_p001',request_id='status_fixture'})
 order.state='delivered'
 local before_reply=#sent
 http[#http].done({StatusCode=200,Body=encoder.encode(order)})
@@ -96,7 +111,7 @@ assert(lottery_events[#lottery_events].player_id==0)
 assert(inventory(1).special_lottery_ticket==4 and profiles.get_profile(1).save.gameplay_stats.initial_wood==200)
 -- Repeated successful polling is not another grant or another profile reload.
 local profile_reads,content_events=#fetches,#inventory_events
-payment(nil,{PlayerID=0,action='status',sku='video_p001',request_id='status_duplicate'})
+payment(200,{PlayerID=0,action='status',sku='video_p001',request_id='status_duplicate'})
 http[#http].done({StatusCode=200,Body=encoder.encode(order)})
 assert(#fetches==profile_reads and #inventory_events==content_events and inventory(0).special_lottery_ticket==9)
 assert(#http==3,'Only create/status/status fake transport calls, no gateway')
@@ -109,7 +124,7 @@ local function u_coin(id)
 end
 assert(u_coin(0)==17 and u_coin(1)==23)
 local refreshes_before=#fetches
-payment(nil,{PlayerID=0,action='create',sku='u_coin_recharge',provider='alipay',quantity=999999,request_id='recharge_max'})
+payment(200,{PlayerID=0,action='create',sku='u_coin_recharge',provider='alipay',quantity=999999,request_id='recharge_max'})
 assert(http[#http].body.quantity==999999 and http[#http].body.provider=='alipay')
 local recharge={ok=true,order_id='RC'..string.rep('2',30),sku='u_coin_recharge',product_type='recharge',
  state='delivered',quantity=999999,amount_fen=99999900,recharge_u_coin_per_unit=100,recharge_u_coin_total=99999900,max_quantity=999999}
@@ -123,7 +138,7 @@ assert(sent[#sent].data.state=='delivered' and sent[#sent].data.recharge_u_coin_
 assert(inventory(0).special_lottery_ticket==9 and inventory(0).lottery_monkey_king==1,
  'wallet recharge leaves unrelated inventory intact')
 local after_refresh=#fetches
-payment(nil,{PlayerID=0,action='status',sku='u_coin_recharge',request_id='recharge_duplicate'})
+payment(200,{PlayerID=0,action='status',sku='u_coin_recharge',request_id='recharge_duplicate'})
 http[#http].done({StatusCode=200,Body=encoder.encode(recharge)})
 assert(#fetches==after_refresh and u_coin(0)==99999917 and u_coin(1)==23,
  'duplicate recharge status does not add balance or start another profile load')

@@ -1,16 +1,21 @@
 package.path='scripts/vscripts/?.lua;'..package.path
 local handlers,subscribers,packets,timers={},{},{},{}
 local catalog_calls,private_calls,commands={},{},{}
+local priming=true
 local mode,account='standard','123'
 local hash1,hash2=string.rep('a',64),string.rep('b',64)
 local md51,md52=string.rep('c',32),string.rep('d',32)
 local provider={resolve_account_id=function(id)return id==0 and account or '456' end}
 provider.lottery_catalog=function(payload,done) catalog_calls[#catalog_calls+1]={payload=payload,done=done} end
-provider.lottery_snapshot=function(payload,done) private_calls[#private_calls+1]={payload=payload,done=done} end
+provider.lottery_snapshot=function(payload,done)
+    if priming then done({ok=false,error='synthetic_profile_not_ready'});return end
+    private_calls[#private_calls+1]={payload=payload,done=done}
+end
 package.loaded['core/event_bus']={handle_request=function(k,f)handlers[k]=f end,
     subscribe=function(k,f)subscribers[k]=f end,emit=function(k,p)packets[#packets+1]={event=k,payload=p}end}
 package.loaded['core/scheduler']={every=function(_,f,key)timers[key]=f end,after=function(_,f,key)timers[key]=f end}
-package.loaded['systems/player_profile_service']={get_provider=function()return provider end}
+package.loaded['systems/player_profile_service']={get_provider=function()return provider end,
+    is_authenticated_for_account=function()return true end,is_loaded_for_account=function()return true end}
 package.loaded['systems/match_setup_service']={get_session_id=function()return 'catalog_session' end,get_mode=function()return mode end}
 package.loaded['systems/archive_http_adapter']={submit=function(id,command,done,hash)
     commands[#commands+1]={id=id,command=command,done=done,hash=hash}
@@ -18,8 +23,11 @@ end}
 local events=require('core/events')
 local service=require('systems/lottery_http_service')
 service.init()
-assert(#catalog_calls==1 and timers.lottery_catalog_poll,'catalog sync starts independently of a UI view')
+assert(#catalog_calls==0 and timers.lottery_catalog_poll,'catalog waits for a durable profile, independently of a UI view')
+subscribers[events.PLAYER_PROFILE_CHANGED]({player_id=0,revision=1})
+assert(#catalog_calls==1,'first ready edge starts the catalog request')
 catalog_calls[1].done({ok=true,catalog_md5=md51,config_hash=hash1,catalog_json='{"schema":1,"snapshots":[]}'})
+priming=false
 assert(service.active_config_hash()==hash1)
 assert(packets[1].event==events.LOTTERY_CATALOG_CHANGED and packets[1].payload.catalog.catalog_sequence==1)
 local reply

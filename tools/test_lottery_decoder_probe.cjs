@@ -17,14 +17,14 @@ function fixture(options={}){
   SetImage(){metrics.fallbacks++}
  }
  const root=new Panel('Panel',null,'LotteryWindow');root.actuallayoutwidth=1280;root.actuallayoutheight=720;
- new Panel('Button',root,'LotteryRefreshButton');
  const $=id=>nodes.get(id.slice(1));$.CreatePanel=(type,parent,id)=>new Panel(type,parent,id);
  $.Schedule=(delay,fn)=>{const id=++serial;jobs.set(id,{at:time+delay,fn});metrics.peak=Math.max(metrics.peak,jobs.size);return id};
  $.CancelScheduled=id=>jobs.delete(id);$.Msg=message=>logs.push(message);
- cfg.SurvivalLottery={SkipCinematic(){metrics.skip++},Open(){throw Error('Probe must not open/read/draw')}};
+ const control={idle:true};
+ cfg.SurvivalLottery={CanPreviewCinematic:()=>control.idle,OpenForCinematicPreview(){control.idle=false;return {Release(){control.idle=true;}};},SkipCinematic(){metrics.skip++},Open(){throw Error('Probe must not open/read/draw')}};
  vm.runInNewContext(source,{$,GameUI:{CustomUIConfig:()=>cfg},Game:{IsInToolsMode:()=>false,AddCommand:(name,fn)=>commands.push({name,fn})},GameEvents:{SendCustomGameEventToServer(){throw Error('No server request permitted')}}});
  function advance(seconds){const until=time+seconds;for(;;){const next=[...jobs.entries()].filter(([,v])=>v.at<=until).sort((a,b)=>a[1].at-b[1].at||a[0]-b[0])[0];if(!next)break;time=next[1].at;jobs.delete(next[0]);next[1].fn()}time=until}
- return {api:cfg.LotteryCinematic,nodes,jobs,logs,commands,metrics,advance};
+ return {api:cfg.LotteryCinematic,nodes,jobs,logs,commands,metrics,advance,control};
 }
 {
  const f=fixture({syncFailure:true}),cmd=f.commands.filter(c=>c.name.startsWith('lottery_film_decoder_probe_map_'));
@@ -52,8 +52,8 @@ function fixture(options={}){
  assert.equal(f.metrics.skip,0);assert.equal(f.metrics.fallbacks,0);assert(f.logs.some(x=>x.includes('stage=aborted')));assert(!f.logs.some(x=>x.includes('stage=complete')));
 }
 {
- const f=fixture();f.nodes.get('LotteryRefreshButton').enabled=false;assert.equal(f.api.PreviewDecoderProbe(),false);assert.equal(f.metrics.media.length,0);
- f.nodes.get('LotteryRefreshButton').enabled=true;f.api.Play('summer',[],()=>{});const movie=f.nodes.get('LotteryCinematicMovie');
+ const f=fixture();assert(!f.nodes.has('LotteryRefreshButton'));f.control.idle=false;assert.equal(f.api.PreviewDecoderProbe(),false);assert.equal(f.metrics.media.length,0);
+ f.control.idle=true;f.api.Play('summer',[],()=>{});const movie=f.nodes.get('LotteryCinematicMovie');
  assert.equal(f.api.PreviewDecoderProbe(),false);assert.equal(f.nodes.get('LotteryCinematicMovie'),movie);f.api.Cancel();assert.equal(f.jobs.size,0);
 }
 // Run the existing full cinema regression against the actual byte string, with
