@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 35595,
-      "sha256": "48b1e80e471b8bce92936cb266c2222599bea0ed2d9e7168bfbd2eb86e0d8bda"
+      "bytes": 35617,
+      "sha256": "fc056fa38b14299d7e6c6f7b583297506e5969eddcfd1247f6855b6f4c3a3d5c"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 49516,
-      "sha256": "9530e811d288d89aa9f127baea79a3ebd2539cd41d884344be3b15f32097cb16"
+      "bytes": 49538,
+      "sha256": "4365ec634bfd0247a6cf0f73c1c77f45f1c9c515acece40c30122d62b6593b24"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -350,8 +350,8 @@
     },
     {
       "path": "evidence/network50_0602_beta_wire_followup_20261106.md",
-      "bytes": 6606,
-      "sha256": "0fa63a14c210224ffb409969bd3cd4f41f2d5e4b0fa2c5778d1ed3c507982aa3"
+      "bytes": 7167,
+      "sha256": "a64a42e4804274ac5597213b0d48a919422cf4173c84ab19eea9553946534ba0"
     },
     {
       "path": "evidence/network50_dev07_native_fps_20261103.md",
@@ -705,8 +705,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 23671,
-      "sha256": "8a0192bf32f5d02c97da63f13404ff9c736701fc4ef122d5c6923df528e98ffd"
+      "bytes": 23693,
+      "sha256": "ea815824d36a2d611cd6dec6416aeafd4f49b9d3c708398b07724a67b78d7b5a"
     },
     {
       "path": "tools/verify_knowledge.py",
