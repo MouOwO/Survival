@@ -46,3 +46,5 @@
 支付回归旧 fixture 曾在双 HEAD runtime 上同样失败：它传入空服务端 actor，且每次 GetPlayer 返回不同对象，被现有安全门禁正确拒绝。只修 fixture 的稳定真实实体索引，新增拒绝空 actor 和伪造 PlayerID 的断言，原支付生产源完全未改；修后在双 HEAD 与新源码均通过。原失败证据保留，补充 `payment_fixture_validation.json` SHA256 `2c57b2dab5258ae44d0df1cfa7a6551fa1d629544b1babb45c9fc0e11cf27200`。
 
 预览初始化/主动起止成本 O(1) 状态检查加现有 modal 栈 O(L)，稳定新增零定时器/HTTP；A/B 固定 6 次 O(1) 样本和 1 次清理，最多 7 个计时器。上述均为代码/模拟计数，不是原生 FPS 或实播验收。新编译、签包和普通实测按实际结果另记。
+
+0604 源码和 operator 已实际提交推送：game `bda269713e612207e7737d49aa24ac4577bed2bd`、content `73a290a2ae57cac24e64a16657b3c1405f428f9b`。gen15 官方 154/154 编译通过，累计 65.927972 秒，原始 proof SHA256 `170d94a04a5d1894161dfed2c5dbdc54a13d3149602c41e8d228e0839a7458c1`；186 保护 + 7 override 实际通过，生产回执 `3ca0cf6bc55182b17519beedf78d22eada3ef1a4143dd45aa28bba4a77cbb0ca`，保护报告 `1d97be89dbcbb2d81cb4fb7f491f0a5e82ad8a87b459af6ba77dda6da8cb71b7`。Root 按精确 154 行清单完成导入并逐文件校验，临时编译挂载已退挂；全新 collector/签包/实测/SDK 仍待实际执行。
