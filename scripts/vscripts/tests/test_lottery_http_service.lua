@@ -14,6 +14,8 @@ local command_done
 package.loaded['systems/archive_http_adapter']={submit=function(id,command,done)requests[#requests+1]=command;command_done=done end}
 require('systems/lottery_http_service').init()
 subscribers[events.PLAYER_PROFILE_CHANGED]({player_id=0})
+-- This fixture represents an explicit legacy UI consumer.
+handlers[events.LOTTERY_SNAPSHOT_REQUEST]({player_id=0,pool_id='map'})
 assert(calls==1);pending_http({ok=true,snapshots=snapshots})
 assert(packets[1].snapshot.snapshot_scope=='cache')
 local result=handlers[events.LOTTERY_SNAPSHOT_REQUEST]({player_id=0,pool_id='map'})

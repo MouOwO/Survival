@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "snapshot_date": "2026-11-06",
+  "snapshot_date": "2026-11-07",
   "scope": "Curated project knowledge and historical snapshot; raw chat excluded",
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 35617,
-      "sha256": "fc056fa38b14299d7e6c6f7b583297506e5969eddcfd1247f6855b6f4c3a3d5c"
+      "bytes": 37228,
+      "sha256": "a3427c40c1faf9b957ee46d8c7b55f4bca0179980d2b39b3e1ff0e9fcbe82912"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 49538,
-      "sha256": "4365ec634bfd0247a6cf0f73c1c77f45f1c9c515acece40c30122d62b6593b24"
+      "bytes": 51149,
+      "sha256": "77c2fbc251517ba194da42a8ee37629efb8d161db53f9125839ff9550810e1f1"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -352,6 +352,21 @@
       "path": "evidence/network50_0602_beta_wire_followup_20261106.md",
       "bytes": 7167,
       "sha256": "a64a42e4804274ac5597213b0d48a919422cf4173c84ab19eea9553946534ba0"
+    },
+    {
+      "path": "evidence/network50_0602_native_followup_20261106.md",
+      "bytes": 5207,
+      "sha256": "d65dfb13d8fd654b101f3b6ec20c474530710b288567486186b7a30bba3a22c3"
+    },
+    {
+      "path": "evidence/network50_0603_diagnostics_20261106.md",
+      "bytes": 8046,
+      "sha256": "a2d0e40146079a4e13368f66a1759e9266eb2232417b97dda0f9974372b52c16"
+    },
+    {
+      "path": "evidence/network50_0604_native_followup_20261107.md",
+      "bytes": 8877,
+      "sha256": "a4485caf226a82620aee7b250460ed9e2ec2e93be12a112268ba68f8af2710fd"
     },
     {
       "path": "evidence/network50_dev07_native_fps_20261103.md",
@@ -705,8 +720,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 23693,
-      "sha256": "ea815824d36a2d611cd6dec6416aeafd4f49b9d3c708398b07724a67b78d7b5a"
+      "bytes": 25304,
+      "sha256": "358e1e77ab03a261cef0182136a4330a27f017220ecd7d2e4fdfda9c0b0ea0f2"
     },
     {
       "path": "tools/verify_knowledge.py",

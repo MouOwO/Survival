@@ -8,6 +8,7 @@ local delta=require('core/ui_snapshot_delta')
 local M={}
 local caches,versions,loading,waiters,busy={},{},{},{},{}
 local owners,epochs,published_epochs,full_required={},{},{},{}
+local legacy_clients={}
 local serial,operation,initialized=0,0,false
 local initialized_world
 local catalog,active_hash,catalog_loading,catalog_waiters=nil,bundle.hash,false,{}
@@ -63,6 +64,7 @@ local function catalog_scope()
         catalog_log('scope_reset')
         caches,versions,loading,waiters,busy={},{},{},{},{}
         owners,epochs,published_epochs,full_required={},{},{},{}
+        legacy_clients={}
         compact_states,compact_failures={},{}
     end
     return current_session
@@ -88,6 +90,7 @@ local function scope(id)
         caches[id],versions[id],loading[id],waiters[id],busy[id]=nil,nil,nil,nil,nil
         epochs[id],published_epochs[id],full_required[id]=0,nil,nil
         owners[id]=owner
+        legacy_clients[id]=nil
         compact_states[id]=nil
         compact_failures[id]=nil
     end
@@ -95,6 +98,23 @@ local function scope(id)
 end
 local function current(id,owner)
     return same(owners[id],owner) and same(identity(id),owner)
+end
+-- Unbound means negotiation is pending, not that the client uses the legacy
+-- protocol. Only an explicit private legacy request can start its cache.
+local function enable_legacy(id)
+    local owner=scope(id)
+    if owner and not compact_bound(id) then legacy_clients[id]=owner;return owner end
+    return nil
+end
+local function legacy_active(id)
+    local owner=legacy_clients[id]
+    return owner~=nil and same(owner,scope(id))
+end
+local function retire_legacy(id)
+    if not legacy_clients[id] then return end
+    legacy_clients[id]=nil
+    caches[id],versions[id],loading[id],waiters[id]=nil,nil,nil,nil
+    epochs[id],published_epochs[id],full_required[id]=nil,nil,nil
 end
 local function stamp(snapshot,owner,hash)
     snapshot.account_id=owner.account;snapshot.session_id=owner.session
@@ -132,6 +152,7 @@ local function publish(id,snapshots)
 end
 local fetch
 fetch=function(id,complete,refresh)
+    if compact_bound(id) then retire_legacy(id);return end
     local owner=scope(id)
     if not owner then
         if complete then complete({ok=false,error='http_profile_required'}) end
@@ -147,6 +168,10 @@ fetch=function(id,complete,refresh)
     local function done(result)
         if loading[id]~=job then return end
         if not current(id,owner) then scope(id);return end
+        -- A Hello may finish while the old HTTP read is in flight. Its
+        -- former consumer has retired; do not retry it or call its legacy
+        -- reply callback after compact binding.
+        if compact_bound(id) then retire_legacy(id);return end
         loading[id]=nil
         if job.epoch~=(epochs[id] or 0) or job.hash~=active_hash then fetch(id);return end
         if result.ok then
@@ -258,6 +283,7 @@ local function check_catalog(complete,force_body,stage)
             or not accepted and (catalog_failure[result and result.error] or (result and result.ok and 'catalog_invalid' or 'unclassified'))
         catalog_log(accepted and not reason and 'ready' or 'failure',started,config_match,md5_match,reason,metadata)
         if accepted then
+            local had_catalog=catalog~=nil
             local changed=not catalog or catalog.catalog_md5~=result.catalog_md5 or catalog.config_hash~=result.config_hash
             if result.config_hash~=bundle.hash or (catalog and catalog.catalog_md5~=result.catalog_md5)
                 or (not catalog and seed_md5 and seed_md5~=result.catalog_md5) then require_expected_hash=true end
@@ -280,8 +306,15 @@ local function check_catalog(complete,force_body,stage)
                 local ids={};for id in pairs(owners) do ids[#ids+1]=id end
                 for _,id in ipairs(ids) do
                     if compact_bound(id)then
+                        retire_legacy(id)
                         if compact_refresh then compact_refresh(id,nil,{headers=true})end
-                    else full_required[id]=true;fetch(id,nil,true)end
+                    elseif legacy_active(id)then
+                        full_required[id]=true
+                        -- Initial metadata does not invalidate a same-hash
+                        -- explicit read already in flight. Actual catalog
+                        -- replacements still retire its old epoch.
+                        fetch(id,nil,had_catalog)
+                    end
                 end
             end
         else result={ok=false,error=result and result.error or 'lottery_catalog_invalid'} end
@@ -475,7 +508,7 @@ function M.init()
     end
     request(events.LOTTERY_SNAPSHOT_REQUEST,function(payload)
         local id=payload.player_id
-        local owner=scope(id)
+        local owner=enable_legacy(id)
         if not owner then return {ok=false,error='http_profile_required'} end
         if payload.prefetch==1 then full_required[id]=true end
         if payload.read_action and payload.read_action~='' then return submit(payload,'lottery_read') end
@@ -487,10 +520,10 @@ function M.init()
         end,payload.prefetch==1)
         return {pending=true}
     end)
-    request(events.LOTTERY_DRAW_REQUEST,function(p)return submit(p,'lottery_draw')end)
-    request(events.LOTTERY_EXCHANGE_REQUEST,function(p)return submit(p,'lottery_exchange')end)
+    request(events.LOTTERY_DRAW_REQUEST,function(p)enable_legacy(p.player_id);return submit(p,'lottery_draw')end)
+    request(events.LOTTERY_EXCHANGE_REQUEST,function(p)enable_legacy(p.player_id);return submit(p,'lottery_exchange')end)
     request(events.LOTTERY_READ_ACK_REQUEST,function(p)
-        local owner=scope(p.player_id)
+        local owner=enable_legacy(p.player_id)
         local complete=p.complete
         local function header(result)
             if result and not result.snapshot and current(p.player_id,owner) then
@@ -510,6 +543,7 @@ function M.init()
         catalog_for(tostring(p.md5 or ''),p.complete);return {pending=true}
     end)
     request(events.LOTTERY_CACHE_RESYNC_REQUEST,function(p)
+        if not enable_legacy(p.player_id) then return {ok=false,error='http_profile_required'} end
         full_required[p.player_id]=true
         -- Explicit invalidation (including a completed redemption) must retire
         -- an older in-flight read, not reuse its pre-redemption inventory.
@@ -521,6 +555,7 @@ function M.init()
             recover_catalog_for_profile(p.player_id,p)
             local job=busy[p.player_id]
             if compact_bound(p.player_id) then
+                retire_legacy(p.player_id)
                 -- Pending/invalid public metadata needs only an unknown view;
                 -- do not copy the account before that catalog can use it.
                 if not compact_catalog_ready() then
@@ -542,6 +577,7 @@ function M.init()
                     context and context.compact_lottery_changes or {initialize=true}) end
                 return
             end
+            if not legacy_active(p.player_id) then return end
             if job and job.kind=='lottery_read' and p.reason=='archive_lottery_read' then return end
             fetch(p.player_id,nil,true)
         end
@@ -663,6 +699,7 @@ end
 function M.compact_open(id,pool)
     if not compact_bound(id) or not pool_ids[pool]then return nil end
     scope(id)
+    retire_legacy(id)
     if not compact_catalog_ready()then local ops,code=compact_unknown();compact_failures[id]=code;return ops end
     local entry=compact_entry(id);return entry and entry.projection.full_ops(pool)or nil
 end

@@ -865,10 +865,10 @@ assert(not expected_service.is_ready() and expected_admitted==0,
 expected_roster_ready=true;expected_service.tick()
 assert(expected_service.is_ready() and expected_admitted==1)
 select_mode(expected_service,'standard');assert(#profile_requests==2)
-profile_success(profile_requests[1]);profile_success(profile_requests[2])
-expected_roster_ready=false;expected_service.tick()
+profile_success(profile_requests[1]);expected_roster_ready=false
+profile_success(profile_requests[2]);expected_service.tick()
 assert(not expected_service.is_gameplay_ready() and expected_playable==0,
-    'roster loss after mode profiles finish must still withhold gameplay release')
+    'roster loss before the final profile completes must still withhold gameplay release')
 expected_roster_throws=true;expected_service.tick()
 assert(not expected_service.is_gameplay_ready() and expected_playable==0)
 expected_roster_throws=false;expected_roster_ready=true;expected_service.tick()

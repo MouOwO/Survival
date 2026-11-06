@@ -4,6 +4,8 @@ local M = {}
 local URL = "https://pay.xiaofengnet.com/ws4-web/health"
 local PREFIX = "[WS4-MP-10] "
 local LATCH = "__survival_ws4_mp10_network_probe"
+local OPT_IN = "survival_workshop_network_probe"
+local REGISTERED = "__survival_ws4_mp10_probe_convar_registered"
 local MAX_SAMPLES, MAX_SECONDS, TIMEOUT = 8, 300, 8
 local DELAYS = { 5, 30, 120, 240 }
 local FIELDS = { "event", "api", "sample", "trigger", "elapsed", "phase", "state", "map",
@@ -23,6 +25,24 @@ local function boolean_api(name)
     if ok and value == true then return "true" end
     if ok and value == false then return "false" end
     return "unknown"
+end
+
+-- Diagnostic work must be explicitly requested. Normal production startup
+-- registers one inert default, then returns without a timer, access scan or HTTP.
+-- Match changes do not register the same native convar twice in one Lua VM.
+local function register_opt_in()
+    if rawget(_G, REGISTERED) or boolean_api("IsServer") ~= "true" then return end
+    if Convars and type(Convars.RegisterConvar) == "function" then
+        local ok, accepted = pcall(Convars.RegisterConvar, Convars, OPT_IN, "0",
+            "Opt-in anonymous Workshop transport health diagnostics", 0)
+        if ok and accepted ~= false then rawset(_G, REGISTERED, true) end
+    end
+end
+
+local function requested()
+    if not Convars or type(Convars.GetStr) ~= "function" then return false end
+    local ok, value = pcall(Convars.GetStr, Convars, OPT_IN)
+    return ok and value == "1"
 end
 
 local function permitted()
@@ -117,7 +137,7 @@ end
 local function current(run)
     local now = clock()
     return run.live and rawget(_G, LATCH) == run and context() == run.mode and now ~= nil
-        and now >= run.started and now - run.started < MAX_SECONDS and permitted()
+        and now >= run.started and now - run.started < MAX_SECONDS and requested() and permitted()
 end
 
 local function status_code(response)
@@ -184,7 +204,7 @@ function M.public_status()
     -- Observation only: no admission enforcement, configuration, HTTP, logging
     -- or scheduling from HUD polling. Never carry a result into another map.
     local run = rawget(_G, LATCH)
-    if type(run) ~= "table" or run.mode ~= context() then return "not_run" end
+    if not requested() or type(run) ~= "table" or run.mode ~= context() then return "not_run" end
     local ok, here = pcall(function()
         return type(IsServer) == "function" and IsServer() == true
             and type(IsClient) == "function" and IsClient() == false
@@ -197,7 +217,8 @@ function M.public_status()
 end
 
 function M.activate()
-    if not permitted() then return false end
+    register_opt_in()
+    if not requested() or not permitted() then return false end
     local started, mode = clock(), context()
     if not started or not mode or type(mode.SetContextThink) ~= "function" then return false end
     local previous = rawget(_G, LATCH)

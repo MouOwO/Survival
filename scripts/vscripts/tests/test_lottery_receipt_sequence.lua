@@ -19,6 +19,8 @@ local function snapshot(tickets,owned)
         pools={{id='map',revision='r1'}},items={{id='one',owned_count=owned}}}
 end
 subscribers[events.PLAYER_PROFILE_CHANGED]({player_id=0})
+-- Opt this synthetic consumer into the legacy snapshot protocol.
+handlers[events.LOTTERY_SNAPSHOT_REQUEST]({player_id=0,pool_id='map'})
 reads[1].done({ok=true,config_hash=hash,snapshots={snapshot(5,0)}})
 local first=packets[#packets].payload.snapshot
 local delayed_receipt

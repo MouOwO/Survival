@@ -10,6 +10,7 @@ local native_cloud_roster = require("systems/native_cloud_roster")
 
 local M = {}
 local generation, session_id, started_at = 0, "", 0
+local tick_context
 local initialized, released, gameplay_released = false, false, false
 local load_started, load_start = false, nil
 local entries, callbacks, gameplay_callbacks, listeners = {}, {}, {}, {}
@@ -335,12 +336,20 @@ local function tick_profiles()
                     entry.profile_inflight, entry.profile_waiting_since = true, current
                     entry.profile_pending_since = current
                     entry.profile_attempt = (entry.profile_attempt or 0) + 1
-                    local attempt, epoch = entry.profile_attempt, generation
+                    local attempt, epoch, owner = entry.profile_attempt, generation, entry.account
+                    local completed = false
                     local function complete(reason)
-                        if generation ~= epoch or entries[id] ~= entry or entry.profile_attempt ~= attempt then return end
+                        if completed or generation ~= epoch or entries[id] ~= entry
+                            or entry.profile_attempt ~= attempt or entry.account ~= owner
+                            or account_id(id) ~= owner then return end
+                        completed = true
                         entry.profile_inflight = false
                         entry.profile_error = reason and safe_error(reason) or nil
                         entry.profile_retry_at = now() + options.retry_seconds
+                        -- HTTP callbacks continue while gameplay is paused. Advance
+                        -- this real completion edge without waiting for its thinker.
+                        -- M.tick coalesces synchronous completions after this pass.
+                        M.tick()
                     end
                     local ok, result = pcall(profiles.load_player, id, "match_mode_selected",
                         function() complete(nil) end, function(reason) complete(reason) end)
@@ -369,7 +378,7 @@ local function tick_profiles()
     return options.tick_seconds
 end
 
-function M.tick()
+local function tick_once()
     if not initialized then return nil end
     if gameplay_released then return nil end
     if released then return tick_profiles() end
@@ -447,6 +456,29 @@ function M.tick()
     return options.tick_seconds
 end
 
+function M.tick()
+    if tick_context then
+        tick_context.again = true
+        return options.tick_seconds
+    end
+    local context = { epoch = generation, again = false }
+    tick_context = context
+    local ok, result = pcall(function()
+        local delay
+        repeat
+            context.again = false
+            delay = tick_once()
+            -- All same-pass synchronous profile callbacks share one follow-up
+            -- scan. A completed request cannot schedule another attempt until
+            -- its existing retry deadline; duplicate callbacks are ignored.
+        until not context.again or context.epoch ~= generation or gameplay_released
+        return delay
+    end)
+    if tick_context == context then tick_context = nil end
+    if not ok then error(result, 0) end
+    return result
+end
+
 function M.is_ready() return initialized and released end
 -- The existing Tools authentication/LAN bridges use this query to withhold
 -- credentials until host start. Keep it mapped to Valve's native setup; there
@@ -498,6 +530,7 @@ end
 function M.init(settings)
     settings = settings or {}
     generation = generation + 1
+    tick_context = nil
     local epoch = generation
     if CustomGameEventManager and type(CustomGameEventManager.UnregisterListener) == "function" then
         for _, listener in ipairs(listeners) do pcall(CustomGameEventManager.UnregisterListener, CustomGameEventManager, listener) end

@@ -41,6 +41,9 @@ local function snapshot(tickets)
 end
 subscribers[events.PLAYER_PROFILE_CHANGED]({player_id=0})
 subscribers[events.PLAYER_PROFILE_CHANGED]({player_id=1})
+-- Unknown clients no longer receive unsolicited private legacy snapshots.
+handlers[events.LOTTERY_SNAPSHOT_REQUEST]({player_id=0,pool_id='map'})
+handlers[events.LOTTERY_SNAPSHOT_REQUEST]({player_id=1,pool_id='map'})
 assert(#private_calls==2 and private_calls[1].payload.config_hash==hash1)
 private_calls[1].done({ok=true,config_hash=hash1,snapshots={snapshot(5)}})
 private_calls[2].done({ok=true,config_hash=hash1,snapshots={snapshot(8)}})

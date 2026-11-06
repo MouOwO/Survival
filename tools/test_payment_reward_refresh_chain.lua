@@ -68,8 +68,10 @@ local function inventory(id)
  return bus.request(ev.CONTENT_INVENTORY_GET_REQUEST,{player_id=id}).snapshot.counts
 end
 assert(profiles.apply_snapshot(0,profile(0,1,2,140)).ok)
+bus.request(ev.LOTTERY_SNAPSHOT_REQUEST,{player_id=0,pool_id='summer'})
 lottery_reads[#lottery_reads].done(snapshot(2,0))
 assert(profiles.apply_snapshot(1,profile(1,1,4,200)).ok)
+bus.request(ev.LOTTERY_SNAPSHOT_REQUEST,{player_id=1,pool_id='summer'})
 lottery_reads[#lottery_reads].done(snapshot(4,0))
 assert(inventory(0).special_lottery_ticket==2 and inventory(1).special_lottery_ticket==4)
 -- Begin an older balance read just before the payment is delivered.

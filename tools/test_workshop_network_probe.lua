@@ -13,7 +13,7 @@ local function fixture()
     local state = { now = 100, state = 2, server = true, client = false, map = "template_map", tools = false,
         dedicated = false, logs = {}, requests = {}, callbacks = {}, schedules = 0,
         release = { channel = "production" }, auth = { enabled = true }, access = true, admitted = true,
-        offline = false, cheats = "0", bad_logs = 0,
+        offline = false, cheats = "0", bad_logs = 0, probe_value = "1", registrations = 0,
         session_config = { enabled = false, expected_map = "template_map" },
         access_config = { enabled = true, allowed_steamids = {
             "76561198424163156", "76561198845461206", "76561198104787442", "76561198974301984" } } }
@@ -25,7 +25,12 @@ local function fixture()
     env.IsDedicatedServer, env.IsInToolsMode = function() return state.dedicated end, function() return state.tools end
     env.GetMapName = function() return state.map end
     env.DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP, env.DOTA_GAMERULES_STATE_PRE_GAME, env.DOTA_GAMERULES_STATE_GAME_IN_PROGRESS = 2, 7, 8
-    env.Convars = { GetStr = function(_, name)
+    env.Convars = { RegisterConvar = function(_, name, default, description, flags)
+        check(name == "survival_workshop_network_probe" and default == "0" and flags == 0, "inert diagnostic default only")
+        state.registrations = state.registrations + 1
+        if state.probe_value == nil then state.probe_value = default end
+    end, GetStr = function(_, name)
+        if name == "survival_workshop_network_probe" then return state.probe_value end
         if name == "sv_cheats" then return state.cheats end
         return state.offline and "1" or "0"
     end }
@@ -326,3 +331,36 @@ chunk = assert(loadstring(wrapper)); setfenv(chunk, wrapped); chunk()
 check(not pcall(wrapped.Activate) and table.concat(order, ",") == "old", "old activation failure propagates before any probe")
 for _, item in ipairs(fixtures) do check(item.bad_logs == 0, "every emitted line is safe parseable JSON, including stopped/error paths") end
 print("WORKSHOP_NETWORK_PROBE_PASS checks=" .. checks)
+
+-- New production-default tests: no request, callback, timer or admission scan.
+for _, value in ipairs({"0", "", "true", "01", 1, false}) do
+    local env, state, probe = fixture();state.probe_value=value
+    local require_before=env.require
+    env.require=function(name)error("disabled probe must not load policy or authentication")end
+    check(probe.activate()==false and #state.requests==0 and state.schedules==0 and #state.logs==0,"default or malformed opt-in is inert")
+    check(state.registrations==1,"one inert registration")
+    check(probe.activate()==false and state.registrations==1,"same VM does not register duplicate convar")
+    state.advance(301);check(#state.requests==0,"default has no delayed HTTP")
+end
+do
+    local env,state,probe=fixture();state.probe_value=nil
+    check(probe.activate()==false and state.probe_value=="0" and state.schedules==0,"missing convar registers default-off")
+    state.probe_value="1";check(probe.activate()==true,"explicit request can start later")
+    state.advance(1);check(#state.requests==2,"explicit diagnostic sends original pair")
+    local old_callback=state.callbacks[1];state.probe_value="0"
+    local before=#state.logs;old_callback({StatusCode=200})
+    check(#state.logs==before,"turning opt-in off invalidates pending callback")
+    state.advance(1);check(state.tick==nil and probe.public_status()=="not_run","next bounded tick stops disabled diagnostic")
+    state.advance(301);check(#state.requests==2,"disabling cannot restart or retry")
+end
+do
+    local env,state,probe=fixture();check(probe.activate());state.advance(1)
+    local old_callback,old_tick=state.callbacks[1],state.tick
+    state.host={SetContextThink=function(_,_,callback)state.tick=callback;state.schedules=state.schedules+1 end}
+    check(probe.activate());state.advance(1)
+    local before_logs,before_requests=#state.logs,#state.requests
+    old_callback({StatusCode=200});old_tick()
+    check(#state.logs==before_logs and #state.requests==before_requests,"old world cannot emit callbacks or requests into new generation")
+    check(state.registrations==1,"new world reuses registration while lifecycle remains separate")
+end
+print("EXPLICIT_PROBE_GATE_PASS: default 0 HTTP/0 timers/0 policy reads; explicit original flow; off/reload/context-safe; simulation only")
