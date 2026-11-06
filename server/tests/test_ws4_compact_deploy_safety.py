@@ -116,6 +116,11 @@ class DeploymentSafety(unittest.TestCase):
         self.env['observed'] = lambda: (self.old, {'pid': 0})
         self.assertTrue(self.recover(current=self.old)['ok'])
 
+    def test_unit_replaced_before_daemon_reload_can_recover_when_stopped(self):
+        self.env['observed'] = lambda: (self.old, {'pid': 0})
+        self.assertTrue(self.recover(current=self.old)['ok'])
+        self.assertEqual(self.unit.read_bytes(), self.original_unit)
+
     def test_unrelated_unit_rejected_before_any_service_action(self):
         self.unit.write_bytes(self.target_unit + b'Environment=UNRELATED=1\n')
         self.assert_rejected(self.recover, 'rollback_unrelated_unit_rejected')
@@ -141,6 +146,13 @@ class DeploymentSafety(unittest.TestCase):
 
     def test_automatic_restart_job_never_assumed_drained(self):
         self.assert_rejected(lambda: self.recover(active_state='activating'), 'rollback_restart_job_requires_drain_review')
+        self.assertEqual(self.commands, [])
+
+    def test_healthy_but_deactivating_parent_never_reported_active(self):
+        self.unit.write_bytes(self.original_unit)
+        self.assert_rejected(lambda: self.recover(pid=77,current=self.old,active_state='deactivating'),
+                             'parent_service_transition_requires_recovery')
+        self.env['health'].assert_not_called()
         self.assertEqual(self.commands, [])
 
     def test_parent_start_failure_reports_restored_unit_and_no_success(self):
@@ -210,11 +222,10 @@ class DeploymentSafety(unittest.TestCase):
         (self.records / 'probe.json').write_text(json.dumps(value))
         self.assert_rejected(self.env['validate_probe'], 'probe_binding_changed', self.original)
 
-    def test_remote_and_local_activation_stay_blocked_without_gate(self):
-        self.assertIn("need(MODE!='activate','activation_requires_reviewed_connection_drain_gate')", deploy.REMOTE)
-        with patch.object(deploy, 'source_payloads') as payloads:
-            self.assert_rejected(lambda: deploy.main(['activate']), 'activation_requires_reviewed_connection_drain_gate')
-            payloads.assert_not_called()
+    def test_live_stop_requires_gate_before_any_service_action(self):
+        self.assert_rejected(lambda: self.env['stop_drained'](None, self.new, {'pid': 88}),
+                             'live_rollback_requires_reviewed_connection_drain_gate')
+        self.assertEqual(self.commands, [])
 
 
 if __name__ == '__main__':

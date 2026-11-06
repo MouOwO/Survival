@@ -40,3 +40,17 @@ WS4当前源码摘要已只读核对。正常路径为context、ensure、prepare
 - `backend_draft/ws4_latency_sources_readonly01.json`与`ws4_readonly_rpc_stages01.json`：只读源码与数据库基础耗时。
 
 不得将本报告、离线回放、源码push或后台部署称为已同步游廊。新版本需新的不可变来源、全量待发清单、编译签名、普通客户端证据、SDK成功及官方完整下载逐文件核对。
+
+## 0601 后续实施进度
+
+本轮用户明确将 Git 顺序改为 commit → push。S27 两仓已推送：game `be527d27f939979d803a03cbb8d04423fffc54cd`，content `7b9659fdf6dd07ab49cf4e2fb42127bf19acaae7`。gen10 生成物随后推送为 game `a45afe14465afeca39879400af0cb3ce1b81d1e8`、content `001bfa9973c8d03e70bb9f5773203dec5a35851e`。这两个阶段均不是工坊发布。
+
+gen10 schema 为 `300515d8fb2a8ef1b69dcab39d1699d94003e758aae0a1d3e3263d78295ca076`；7935 条记录、188 个字段及旧 ID 不变。四奖池 214 个实际生成 lookup 样本与 JS 逐字节一致，未用测试 seed 替换实际目录。152 项资源已通过同源官方隔离编译；生产保护、最终包及普通客户端验收另行记录，不能从编译回执推断已发布。
+
+延迟路径独立复核确认正常首次抽奖同步发起，没有固定 1 秒等待；非终态失败才最多两次间隔 1 秒重试，沿用同一幂等标识。真实生产函数首发/重试计数及 HTTP 分段计时测试通过。新的实际分段数据尚未取得，原来 2.4–2.6 秒的主要耗时阶段仍未确定。
+
+WS4 部署工具的精确连接排空、失败恢复和看护补偿已通过 54 项本地测试及独立审查；这不是实际 Linux 防火墙、服务切换或在线延迟的证明。仅改三个后台业务文件，数据库、支付/PWA及规则不在本轮部署范围。来源固定 S27，发布工具另绑定自身提交；实际环境 audit、隔离 probe、激活与验证仍须分别执行。
+
+两次独立视频 LAB 未完成 A/B/C/D 播放。第一次只取得空闲界面；点击被执行工具返回 `rejected by user`。用户再次明确允许继续后，第二次显示/截图请求仍返回同样拒绝；两次客户端均已正常关闭、仅自有目录链接被移除，树外证据保留，没有新增交易。不能把这两次实验记为媒体通过，也不能以替代输入通道绕过拒绝。
+
+上述机器证据位于 `output/complete_delivery_release_20261106_v01`：`source_pins_s27.json`、`source_pins_s28.json`、`gen10_catalog_validation.json`、`gen10_plan_scope_driver_receipt.json` 和 `latency_review`。正式版本仍为0104；本轮新增源、编译资源、后台工具及后续未完成事项应完整保留，不能提前清空待发列表。

@@ -7,13 +7,14 @@ from pathlib import Path
 import argparse,base64,hashlib,importlib.util,json,re,subprocess
 ROOT=Path(__file__).resolve().parents[2]
 TOOL='tools/ws4_compact_receipt_20261106/deploy.py'
+GATE_TOOL='tools/ws4_compact_receipt_20261106/drain_gate.py'
 TRANSPORT=ROOT/'tools/archive_release_20261029/server_deploy.py'
 TRANSPORT_SHA='66413c174fb6fe27d5ae84dc267ceea07366c6f6a855a9406e5ffdaf388b1cc5'
 OUT=ROOT/'output/ws4_compact_receipt_20261106_v01'
 RECIPE='compact-receipt-v1'
 FILES=('service.py','lottery_receipt_snapshot.py','command_timing.py')
-SOURCE='UNFROZEN_SOURCE_COMMIT'
-SOURCE_PINS={'backend/archive_backend/service.py': 'c24442218cbc7cdbe32c163272f3923fe383ad1357582fdc9396a93e2ece9eb7', 'backend/archive_backend/lottery_receipt_snapshot.py': '9f2ae886f7b25faa85b41b49653220f4a0baa1656c78472baf9a959a7fb2eabc', 'backend/archive_backend/command_timing.py': 'cde11e5fcc995bed05a331842f547b3e7bfa718198a219d9a7854431f202274d'}
+SOURCE='be527d27f939979d803a03cbb8d04423fffc54cd'
+SOURCE_PINS={'backend/archive_backend/service.py': 'c24442218cbc7cdbe32c163272f3923fe383ad1357582fdc9396a93e2ece9eb7', 'backend/archive_backend/lottery_receipt_snapshot.py': 'ee93d11829081d0fa78d270943cd22371e2449b395a3eccac9523f924de1a1eb', 'backend/archive_backend/command_timing.py': 'cde11e5fcc995bed05a331842f547b3e7bfa718198a219d9a7854431f202274d'}
 PARENT_RELEASE='20261104-ws4-worker-cache-3f53908aaea0'
 PARENT_MANIFEST='39851557ce5d9c268c2deaa48b4be4697d8e3c04b10a52262566f371882481c2'
 PARENT_SERVICE='1e7a132537459c4436066555b1c58f9e7831d6d1e9b2c374f53f4b68c866c6e1'
@@ -22,8 +23,12 @@ sha=lambda raw:hashlib.sha256(raw).hexdigest()
 REMOTE=r'''
 
 from pathlib import Path,PurePosixPath
-import ast,base64,contextlib,copy,fcntl,hashlib,hmac,json,os,re,shutil,subprocess,sys,time,urllib.request
+import ast,base64,contextlib,copy,fcntl,hashlib,hmac,json,os,re,shutil,signal,subprocess,sys,time,urllib.request
 sha=lambda raw:hashlib.sha256(raw).hexdigest()
+gate_api={'__name__':'immutable_ws4_deployment_gate'}
+exec(compile(GATE_SOURCE,'immutable_ws4_deployment_gate','exec'),gate_api)
+current_gate=None
+control_deadline=None
 base=Path('/opt/goufayu-ws4/releases')
 old=base/'20261104-ws4-worker-cache-3f53908aaea0'
 unit=Path('/etc/systemd/system/goufayu-ws4.service')
@@ -33,10 +38,12 @@ bundle_hash='d573588b64d2ea6d1431c856d52e0515b5ed471cfdf6af4456ff618d0f568488'
 def need(ok,reason):
  if not ok:raise RuntimeError(reason)
 def command(args):
- p=subprocess.run(args,capture_output=True,timeout=60);need(p.returncode==0,'ws4_control_command_failed');return p.stdout.decode().strip()
+ timeout=10 if control_deadline is None else min(10,control_deadline-time.monotonic())
+ need(timeout>0,'ws4_controller_time_budget')
+ p=subprocess.run(args,capture_output=True,timeout=timeout);need(p.returncode==0,'ws4_control_command_failed');return p.stdout.decode().strip()
 def state(name):
- rows=dict(line.split('=',1) for line in command(['systemctl','show',name,'--property=MainPID,WorkingDirectory,ActiveState,SubState']).splitlines() if '=' in line)
- return dict(pid=int(rows.get('MainPID','0')),cwd=rows.get('WorkingDirectory',''),active_state=rows.get('ActiveState',''),sub_state=rows.get('SubState',''))
+ rows=dict(line.split('=',1) for line in command(['systemctl','show',name,'--property=MainPID,WorkingDirectory,ActiveState,SubState,Job']).splitlines() if '=' in line)
+ return dict(pid=int(rows.get('MainPID','0')),cwd=rows.get('WorkingDirectory',''),active_state=rows.get('ActiveState',''),sub_state=rows.get('SubState',''),job=rows.get('Job',''))
 
 def observed():
  s=state('goufayu-ws4.service')
@@ -46,6 +53,18 @@ def observed():
 def active():
  release,s=observed();need(s['pid']>0,'ws4_not_running')
  return release,s['pid']
+def running_stable(s):
+ return s.get('active_state')=='active' and s.get('sub_state')=='running' and s.get('job','') in ('','0')
+def settled_observed():
+ # A surviving systemctl client/job may finish after its controller exits.
+ # Do not infer recovery from a briefly healthy deactivating process.
+ deadline=time.monotonic()+10
+ while True:
+  release,s=observed()
+  if s.get('job','') in ('','0') and (running_stable(s) or
+   (s['pid']==0 and s.get('active_state') in ('inactive','failed'))):return release,s
+  need(time.monotonic()<deadline,'ws4_transition_not_settled')
+  time.sleep(.1)
 def safe(root,name):
  p=PurePosixPath(name);need(not p.is_absolute() and '..' not in p.parts,'manifest_path_invalid')
  target=root/name;need(not target.is_symlink() and target.resolve().is_relative_to(root),'manifest_symlink_invalid');return target
@@ -197,16 +216,26 @@ def health():
  token=values[b'PLAYER_WEB_AUTH_UPSTREAM_BEARER'].decode('ascii')
  approved=json.loads(Path('/etc/goufayu-ws4/pins.json').read_bytes())
  need(approved.get('workshop_id')=='3824360109' and sha(token.encode()) in approved.get('sha256',[]),'existing_internal_upstream_pin_invalid')
- request=urllib.request.Request('http://127.0.0.1:18765/v1/archive/config',data=b'{}',headers={'Authorization':'Bearer '+token,'Content-Type':'application/json'})
- with urllib.request.urlopen(request,timeout=5) as response:value=json.load(response)
+ headers={'Authorization':'Bearer '+token,'Content-Type':'application/json'}
+ if current_gate is None:
+  request=urllib.request.Request('http://127.0.0.1:18765/v1/archive/config',data=b'{}',headers=headers)
+  with urllib.request.urlopen(request,timeout=3) as response:value=json.load(response)
+ else:
+  connection=gate_api['MarkedHealthConnection'](current_gate.marker)
+  try:
+   connection.request('POST','/v1/archive/config',body=b'{}',headers=headers)
+   response=connection.getresponse();need(response.status==200,'ws4_config_probe_http_failed')
+   raw=response.read(1048577);need(len(raw)<=1048576,'ws4_config_probe_size_budget');value=json.loads(raw)
+  finally:connection.close()
  need(value.get('ok') is True and value.get('config_hash')==bundle_hash,'ws4_published_config_unhealthy')
 def start_parent():
  command(['systemctl','daemon-reload']);command(['systemctl','start','goufayu-ws4.service'])
- for i in range(40):
+ deadline=time.monotonic()+12
+ while time.monotonic()<deadline:
   try:health();return
   except Exception:
-   if i==39:raise
    time.sleep(.25)
+ raise RuntimeError('ws4_start_health_deadline')
 def save(name,result):
  result['recipe']=RECIPE
  path=records/(name+'.json');need(not path.exists(),'preserve_remote_receipt')
@@ -218,16 +247,75 @@ def replace_unit(expected,target):
  need(not temp.exists(),'unit_temporary_exists')
  with temp.open('xb') as f:f.write(target);f.flush();os.fsync(f.fileno())
  os.chmod(temp,info.st_mode&0o777);os.chown(temp,info.st_uid,info.st_gid);os.replace(temp,unit)
-def rollback_parent(original,current,service_state,unit_raw):
+def make_gate(original):
+ need(Path(GATE_EXECUTABLE).is_absolute() and re.fullmatch('[a-f0-9]{64}',GATE_EXECUTABLE_SHA or '') is not None,'audited_gate_tool_required')
+ return gate_api['NewConnectionGate'](GATE_EXECUTABLE,GATE_EXECUTABLE_SHA,control_binding(original),records/'gate_intent.json')
+def stop_drained(gate,release,service_state):
+ need(gate is not None,'live_rollback_requires_reviewed_connection_drain_gate')
+ gate.verify()
+ identity=gate_api['process_identity'](service_state['pid'],release/'backend')
+ drain=gate_api['wait_for_drain'](gate,identity)
+ gate.verify();gate_api['process_identity'](identity['pid'],identity['cwd'],identity['start'])
+ latest,latest_state=observed()
+ need(latest==release and latest_state['pid']==service_state['pid'],'drained_service_identity_changed')
+ command(['systemctl','stop','goufayu-ws4.service'])
+ stopped,stopped_state=observed()
+ need(stopped==release and stopped_state['pid']==0,'drained_service_stop_unconfirmed')
+ return drain
+def start_watchdog(original):
+ binding=control_binding(original)
+ context=dict(controller=gate_api['process_identity'](os.getpid()),record=str(records),binding=binding,
+  recovery_source=WATCHDOG_RECOVERY_SOURCE,recovery_sha256=sha(WATCHDOG_RECOVERY_SOURCE.encode()),
+  gate_executable=GATE_EXECUTABLE,gate_executable_sha256=GATE_EXECUTABLE_SHA)
+ source=GATE_SOURCE+'\ntry:\n watchdog_main('+repr(context)+')\nexcept BaseException as error:\n print(json.dumps(dict(ok=False,status="WS4_WATCHDOG_RECOVERY_FAILED",error_type=type(error).__name__)),flush=True)\n raise SystemExit(2)\n'
+ script=records/'gate_watchdog.py';need(not script.exists(),'preserve_previous_gate_watchdog')
+ with script.open('xb') as stream:stream.write(source.encode());stream.flush();os.fsync(stream.fileno())
+ script.chmod(0o600)
+ with (records/'gate_watchdog.log').open('xb') as log:
+  child=subprocess.Popen([sys.executable,'-B',str(script)],cwd=records,stdin=subprocess.DEVNULL,stdout=log,stderr=log,
+   start_new_session=True,close_fds=True)
+ deadline=time.monotonic()+3
+ ready=records/'gate_watchdog.ready.json'
+ while time.monotonic()<deadline:
+  need(child.poll() is None,'gate_watchdog_early_exit')
+  if ready.exists():
+   receipt=json.loads(safe(records,ready.name).read_bytes())
+   need(receipt.get('binding')==binding and receipt.get('controller')==context['controller'],'gate_watchdog_binding_changed')
+   identity=receipt.get('identity',{})
+   need(identity.get('pid')==child.pid and gate_api['same_process'](identity),'gate_watchdog_identity_changed')
+   return dict(identity=identity,script_sha256=sha(source.encode()))
+  time.sleep(.05)
+ raise RuntimeError('gate_watchdog_ready_timeout')
+def finish_watchdog(original,gate):
+ need(not gate.presence(),'gate_watchdog_completion_requires_absence')
+ done=records/'gate_watchdog.done.json'
+ value=dict(binding=control_binding(original),gate_absent=True)
+ if done.exists():need(json.loads(safe(records,done.name).read_bytes())==value,'gate_watchdog_completion_changed')
+ else:gate_api['durable_new'](done,value)
+def gate_cleanup(original,gate,result):
+ try:
+  result['gate_cleanup']=gate.reconcile_remove()
+  finish_watchdog(original,gate)
+ except Exception as error:
+  result['ok']=False;result['gate_cleanup']=dict(absent=False,error_type=type(error).__name__)
+  result['watchdog_recovery_required']=True
+ return result
+def rollback_parent(original,current,service_state,unit_raw,gate=None):
  binding,(original_unit,target_unit)=validate_controls(original)
  need(sha(unit_raw) in (UNIT_SHA,sha(target_unit)),'rollback_unrelated_unit_rejected')
- need((sha(unit_raw)==UNIT_SHA and current==old) or (sha(unit_raw)==sha(target_unit) and current==new),'rollback_unit_lineage_mismatch')
+ # A crash may occur after atomic unit replacement but before daemon-reload.
+ # PID zero permits either exact cached WorkingDirectory with either exact
+ # owned unit. A live process still requires matching unit/process lineage.
+ need(current in (old,new) and (service_state['pid']==0 or
+  (sha(unit_raw)==UNIT_SHA and current==old) or (sha(unit_raw)==sha(target_unit) and current==new)),
+  'rollback_unit_lineage_mismatch')
  if service_state['pid']>0:
-  # A later live rollback needs the same reviewed admission gate as activation.
-  # Do not terminate a possibly running transaction merely to recover a file.
-  need(current==old and sha(unit_raw)==UNIT_SHA,'live_rollback_requires_reviewed_connection_drain_gate')
-  health()
-  return dict(ok=True,status='OWN_WS4_COMPACT_RECEIPT_PARENT_ALREADY_ACTIVE',restored=old.name,binding=binding,database_writes=0)
+  if current==old and sha(unit_raw)==UNIT_SHA:
+   need(running_stable(service_state),'parent_service_transition_requires_recovery')
+   health()
+   return dict(ok=True,status='OWN_WS4_COMPACT_RECEIPT_PARENT_ALREADY_ACTIVE',restored=old.name,binding=binding,database_writes=0)
+  stop_drained(gate,current,service_state)
+  current,service_state=observed()
  need(service_state['active_state'] in ('inactive','failed'),'rollback_restart_job_requires_drain_review')
  command(['systemctl','stop','goufayu-ws4.service'])
  stopped,stopped_state=observed()
@@ -251,14 +339,73 @@ def record_recovery(result):
   result['ok']=False;result['receipt_persisted']=False
   result['receipt_error']='recovery_receipt_write_failed'
  return result
+def recover_control(original,gate):
+ # A watchdog may find a completed healthy candidate after its controller died
+ # before writing the receipt. Preserve it for explicit verify; never call that
+ # interrupted operation a successful deployment.
+ current,service_state=settled_observed();unit_raw=unit.read_bytes()
+ binding,(original_unit,target_unit)=validate_controls(original)
+ try:
+  if current==new and service_state['pid']>0 and running_stable(service_state) and unit_raw==target_unit:
+   try:
+    validate_candidate(original);health()
+    return dict(ok=True,status='INTERRUPTED_CANDIDATE_HEALTHY_REQUIRES_EXPLICIT_VERIFY',binding=binding,
+     release=new.name,api_pid=service_state['pid'],publication_performed=False)
+   except Exception:pass
+  return rollback_parent(original,current,service_state,unit_raw,gate)
+ except Exception as error:
+  return dict(ok=False,status='WS4_RECOVERY_REQUIRES_OPERATOR',error_type=type(error).__name__,binding=binding)
+def activate_candidate(original,current,service_state,unit_raw):
+ global current_gate,control_deadline
+ need(current==old and service_state['pid']>0 and sha(unit_raw)==UNIT_SHA,'activation_parent_drift')
+ validate_probe(original);validate_candidate(original)
+ binding,(original_unit,target_unit)=validate_controls(original)
+ available=gate_api['gate_audit'](service_state['pid'])
+ need(available['executable']==GATE_EXECUTABLE and available['executable_sha256']==GATE_EXECUTABLE_SHA,'audited_gate_tool_changed')
+ gate=make_gate(original);current_gate=gate
+ result=dict(ok=False,status='WS4_COMPACT_ACTIVATION_NOT_COMPLETED',binding=binding)
+ handlers={}
+ def interrupted(signum,frame):raise RuntimeError('ws4_controller_interrupted')
+ try:
+  result['watchdog']=start_watchdog(original)
+  for number in (signal.SIGTERM,signal.SIGHUP,signal.SIGALRM):
+   handlers[number]=signal.signal(number,interrupted)
+  control_deadline=time.monotonic()+gate_api['CONTROLLER_SECONDS']
+  signal.alarm(gate_api['CONTROLLER_SECONDS'])
+  gate.install()
+  result['drain']=stop_drained(gate,current,service_state)
+  gate.verify();need(sha(unit.read_bytes())==UNIT_SHA,'activation_unit_changed_after_drain')
+  replace_unit(UNIT_SHA,target_unit)
+  command(['systemctl','daemon-reload']);command(['systemctl','start','goufayu-ws4.service'])
+  deadline=time.monotonic()+12
+  while True:
+   try:
+    health();live,live_state=observed()
+    need(live==new and live_state['pid']>0 and running_stable(live_state),'candidate_process_not_ready');break
+   except Exception:
+    need(time.monotonic()<deadline,'candidate_health_deadline');time.sleep(.25)
+  need(unit.read_bytes()==target_unit,'candidate_unit_changed')
+  validate_candidate(original);keep_services();gate.verify()
+  result.update(ok=True,status='ACTUAL_WS4_COMPACT_RECEIPT_ACTIVATED',release=new.name,
+   manifest_sha256=sha((new/'release_manifest.json').read_bytes()),payload_sha256=pins,api_pid=live_state['pid'],
+   database_writes=0,env_unchanged=True,original_release_preserved=True)
+ except BaseException as error:
+  signal.alarm(0);control_deadline=time.monotonic()+30
+  result.update(ok=False,status='WS4_COMPACT_ACTIVATION_FAILED',error_type=type(error).__name__)
+  # Before a stop, a busy parent remains untouched. After a partial switch,
+  # recover using external parent controls, not candidate-owned state.
+  try:result['recovery']=recover_control(original,gate)
+  except Exception as recovery_error:result['recovery']=dict(ok=False,error_type=type(recovery_error).__name__)
+ finally:
+  signal.alarm(0);control_deadline=None
+  result=gate_cleanup(original,gate,result)
+  current_gate=None
+  for number,handler in handlers.items():signal.signal(number,handler)
+ return result
 with contextlib.ExitStack() as stack:
  if MODE!='audit':
   for name in sorted(('/var/lock/goufayu_admission_five.lock','/var/lock/goufayu_ws4_worker_cache.lock')):
    lock=stack.enter_context(open(name,'a'));fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
- # Never infer graceful drain from systemctl stop: the current API uses daemon
- # request threads and has no SIGTERM drain handler. Activation remains blocked
- # until a separately reviewed reversible NEW-connection gate is implemented.
- need(MODE!='activate','activation_requires_reviewed_connection_drain_gate')
  original=parent_inventory()
  expected_manifest_digest=expected_manifest
  current,service_state=observed();pid=service_state['pid'];unit_raw=unit.read_bytes()
@@ -271,12 +418,21 @@ with contextlib.ExitStack() as stack:
   result=dict(ok=True,status='READ_ONLY_ACTUAL_WS4_COMPACT_RECEIPT_AUDIT',parent=old.name,parent_manifest_sha256=expected_manifest,
    source_revision=SOURCE,source_sha256=SOURCE_PINS,recipe=RECIPE,parent_full_inventory_verified=True,
    parent_inventory_sha256=sha(canonical(original)),parent_inventory=original,
-   unit_sha256=sha(unit_raw),api_pid=pid,payload_sha256=pins,new_release=new.name,method_binding=method_binding,retained_services=retained,database_writes=0,unit_or_env_changed=False)
+   unit_sha256=sha(unit_raw),api_pid=pid,payload_sha256=pins,new_release=new.name,method_binding=method_binding,
+   gate_environment=gate_api['gate_audit'](pid),retained_services=retained,database_writes=0,unit_or_env_changed=False)
  else:
   need(re.fullmatch('[a-f0-9]{64}',UNIT_SHA or '') is not None,'explicit_parent_unit_sha_required')
   validate_parent_inventory(original)
-  if MODE=='rollback':
-   result=record_recovery(rollback_parent(original,current,service_state,unit_raw))
+  if MODE in ('recover','rollback'):
+   gate=make_gate(original) if MODE=='recover' or (records/'gate_intent.json').exists() else None
+   current_gate=gate
+   try:
+    result=recover_control(original,gate) if MODE=='recover' else rollback_parent(original,current,service_state,unit_raw,gate)
+   except Exception as error:result=dict(ok=False,status='WS4_RECOVERY_REQUIRES_OPERATOR',error_type=type(error).__name__)
+   finally:
+    if gate is not None:result=gate_cleanup(original,gate,result)
+    current_gate=None
+   if MODE=='rollback':result=record_recovery(result)
   elif MODE=='prepare':
    need(current==old and pid>0 and sha(unit_raw)==UNIT_SHA and not new.exists() and not records.exists(),'prepare_parent_drift_or_existing_candidate')
    health()
@@ -302,7 +458,9 @@ with contextlib.ExitStack() as stack:
   else:
    binding,(original_unit,target_unit)=validate_controls(original)
    prepared=validate_candidate(original)
-   if MODE=='probe':
+   if MODE=='activate':
+    result=activate_candidate(original,current,service_state,unit_raw)
+   elif MODE=='probe':
     need(current==old and sha(unit_raw)==UNIT_SHA,'probe_parent_drift')
     sys.path.insert(0,str(new/'backend'))
     from archive_backend.bundle import Bundle
@@ -360,10 +518,14 @@ with contextlib.ExitStack() as stack:
      rpc_calls=0,real_player_data_used=False,database_writes=0,source_files_unchanged=True,
      boundary='Real Linux Lua with isolated in-memory receipts; no PostgreSQL/HTTP/auth/transit latency claim')
    elif MODE=='verify':
-    need(current==new and sha(unit_raw)==sha(target_unit),'active_ws4_lineage_changed');health()
+    need(current==new and running_stable(service_state) and sha(unit_raw)==sha(target_unit),'active_ws4_lineage_changed');health()
     result=dict(ok=True,status='ACTUAL_WS4_COMPACT_RECEIPT_ACTIVE_VERIFIED',release=new.name,manifest_sha256=sha((new/'release_manifest.json').read_bytes()),payload_sha256=pins,api_pid=pid,database_writes=0,env_unchanged=True,original_release_preserved=True)
    else:raise RuntimeError('invalid_ws4_mode')
-  if MODE!='rollback':keep_services();result['retained_services_unchanged']=True;save(MODE,result)
+  if MODE!='rollback':
+   try:keep_services();result['retained_services_unchanged']=True
+   except Exception:result['ok']=False;result['retained_services_unchanged']=False
+   try:save(MODE,result)
+   except Exception:result['ok']=False;result['receipt_persisted']=False
  print(json.dumps(result))
 
 '''
@@ -385,34 +547,40 @@ def plan():
   files=3,remote_actions=0,database_writes=0,
   blockers=['Freeze source commit and operator commit','Review source-bound insertions and verified exact derived digest',
    'Review audit, synthetic probe, unit SHA and full parent inventory before Root executes',
-   'Activation and live rollback require a separately reviewed connection drain gate'],
+   'Review source-bound gate/watchdog and focused compensation tests before controlled activation'],
   preserves=['receipt identity and RNG','SQL/permissions','bundle/configs','payment/PWA','parent release'],
   bounds=dict(log_bytes_per_command=2048,extra_db_calls=0,extra_http_calls=0,idle_work=0))
 
 def main(argv=None):
  parser=argparse.ArgumentParser(description=__doc__)
- parser.add_argument('mode',nargs='?',default='plan',choices=('plan','audit','prepare','probe','activate','verify','rollback'))
+ parser.add_argument('mode',nargs='?',default='plan',choices=('plan','audit','prepare','probe','activate','verify','rollback','recover'))
  parser.add_argument('--source-revision',default=SOURCE);parser.add_argument('--operator-revision');parser.add_argument('--unit-sha256')
  parser.add_argument('--parent-inventory-sha256')
+ parser.add_argument('--gate-executable');parser.add_argument('--gate-executable-sha256')
  args=parser.parse_args(argv)
  if args.mode=='plan':
   print(json.dumps(plan(),sort_keys=True));return 0
- if args.mode=='activate':raise RuntimeError('activation_requires_reviewed_connection_drain_gate')
  if not re.fullmatch('[a-f0-9]{40}',SOURCE) or not re.fullmatch('[a-f0-9]{64}',DERIVED_SERVICE):
   raise RuntimeError('draft_source_and_derived_service_not_frozen')
  report=OUT/(args.mode+'.json')
  if report.exists():raise RuntimeError('preserve_existing_local_receipt')
  payloads=source_payloads(args.source_revision)
+ own=git_blob(args.operator_revision,TOOL)
+ gate_source=git_blob(args.operator_revision,GATE_TOOL)
+ if own!=Path(__file__).read_bytes().replace(b'\r\n',b'\n') or gate_source!=(ROOT/GATE_TOOL).read_bytes().replace(b'\r\n',b'\n'):
+  raise RuntimeError('operator_worktree_drift')
  if args.mode!='audit':
-  own=git_blob(args.operator_revision,TOOL)
-  if own!=Path(__file__).read_bytes().replace(b'\r\n',b'\n'):raise RuntimeError('operator_worktree_drift')
   if not re.fullmatch('[a-f0-9]{64}',args.unit_sha256 or ''):raise RuntimeError('parent_unit_sha256_required')
   if not re.fullmatch('[a-f0-9]{64}',args.parent_inventory_sha256 or ''):raise RuntimeError('parent_inventory_sha256_required')
  if sha(TRANSPORT.read_bytes())!=TRANSPORT_SHA:raise RuntimeError('pinned_transport_changed')
  spec=importlib.util.spec_from_file_location('ws4_compact_receipt_transport',TRANSPORT);transport=importlib.util.module_from_spec(spec);spec.loader.exec_module(transport)
  context=dict(MODE=args.mode,SOURCE=args.source_revision,EXPECTED_SOURCE=SOURCE,SOURCE_PINS=SOURCE_PINS,RECIPE=RECIPE,
   DERIVED_SERVICE=DERIVED_SERVICE,
-  OPERATOR=args.operator_revision,UNIT_SHA=args.unit_sha256,PARENT_INVENTORY_SHA=args.parent_inventory_sha256,PAYLOADS=payloads)
+  OPERATOR=args.operator_revision,UNIT_SHA=args.unit_sha256,PARENT_INVENTORY_SHA=args.parent_inventory_sha256,PAYLOADS=payloads,
+  GATE_SOURCE=gate_source.decode('utf8'),GATE_EXECUTABLE=args.gate_executable,GATE_EXECUTABLE_SHA=args.gate_executable_sha256)
+ recovery_context={**context,'MODE':'recover'}
+ recovery='\n'.join(k+'='+repr(v) for k,v in recovery_context.items())+'\n'+REMOTE
+ context['WATCHDOG_RECOVERY_SOURCE']=recovery
  remote='\n'.join(k+'='+repr(v) for k,v in context.items())+'\n'+REMOTE
  result=transport.remote(remote,timeout=240)
  OUT.mkdir(parents=True,exist_ok=True)
