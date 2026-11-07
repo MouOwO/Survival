@@ -17,6 +17,10 @@ local tree_config = require("config/tree_config")
 local research_lab_abilities = require("config/generated/research_lab_abilities")
 local production_ui = require("ui/production_ui_service")
 local tower_routes = require("config/tower_route_config")
+local altar_travel_actions = {
+    ability_enter_endless_training = "altar_endless_training",
+    ability_enter_shadow_realm = "altar_shadow_realm",
+}
 
 local M = {}
 local synthesis_requests = {}
@@ -1011,6 +1015,10 @@ local function register_ability_cast_request()
         local altar_summon_matches = summon_hero_id ~= nil and unit_valid
             and ability_valid and unit.survival_building_id == "hero_altar"
             and unit:FindAbilityByName(ability_name) == ability
+        local altar_travel_action = altar_travel_actions[ability_name]
+        local altar_travel_matches = altar_travel_action ~= nil and unit_valid
+            and ability_valid and unit.survival_building_id == "hero_altar"
+            and unit:FindAbilityByName(ability_name) == ability
         local challenge_auto_matches = ability_name == "ability_challenge_auto_summon"
             and unit_valid and ability_valid
             and unit.survival_building_id == "building_challenge"
@@ -1223,6 +1231,36 @@ local function register_ability_cast_request()
             end
             print("[SURVIVAL_CAST][SERVER] RESEARCH_DISPATCHED group="
                 .. tostring(research_upgrade.technology_group) .. " ok="
+                .. tostring(direct_result and direct_result.ok == true))
+        elseif altar_travel_action then
+            -- Creature altar orders can be accepted without OnSpellStart.
+            -- Use the same authoritative service as the native ability, once;
+            -- the client cannot choose the action, actor, price or destination.
+            -- Even an invalid matching ability must not fall through to a cast.
+            handled_directly = true
+            direct_result_required = true
+            if not ok or not altar_travel_matches then
+                direct_result = { ok = false, error = "祭坛传送技能不可用" }
+            elseif ability:GetLevel() < 1 or not ability:IsActivated()
+                or ability:IsHidden() or not ability:IsFullyCastable() then
+                direct_result = { ok = false, error = "祭坛传送技能尚未就绪" }
+            else
+                ability:StartCooldown(ability:GetCooldown(ability:GetLevel()))
+                direct_cooldown_started = true
+                direct_result = require("systems/training_room_service").enter(
+                    player_id, altar_travel_action
+                )
+            end
+            if not direct_result or direct_result.ok ~= true then
+                direct_error = direct_result and direct_result.error or "传送失败"
+                event_bus.emit(events.UI_NOTIFICATION, {
+                    player_id = player_id,
+                    message = direct_error,
+                    level = "error",
+                })
+            end
+            print("[SURVIVAL_CAST][SERVER] ALTAR_TRAVEL_DISPATCHED action="
+                .. altar_travel_action .. " ok="
                 .. tostring(direct_result and direct_result.ok == true))
         elseif altar_summon_matches and owner_matches and not passive
             and not is_point_target then

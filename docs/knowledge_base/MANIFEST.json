@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 41488,
-      "sha256": "adaa94719427d3974be28d2e5d7c19edf946124afc37434ecd09dba547adda00"
+      "bytes": 41999,
+      "sha256": "23908a3ae74b656a1b7da0a362a5aed54f0db068fb7232c09e023b15933fb031"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 55132,
-      "sha256": "414328173bd23dc8a9f892bf6bdc5f1e47796a5d1c16bf0535f9c1db6c7e8453"
+      "bytes": 55643,
+      "sha256": "ba3ae44489f73ac755c6ac5649416aa967880a7ddbbdb275e30a8f3c0c0a6266"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 28868,
-      "sha256": "248a3a2a02d69cfbc16f2a2813e745aa43f257a9b6fba2ec648545ada1b88310"
+      "bytes": 29379,
+      "sha256": "f75d83540b367bf457c12b090e4e307afcfff38fd9e858d02a9fb4aa87ebd983"
     },
     {
       "path": "data/completed_work_index.json",
@@ -497,6 +497,11 @@
       "path": "evidence/ruins_stair_walls_20261029.md",
       "bytes": 2441,
       "sha256": "bfed0e7e37fb07f16ba515156a24ab2c23980063f543bdf48ab309469729e6b2"
+    },
+    {
+      "path": "evidence/sanctum_entry_followup_20261107.md",
+      "bytes": 6201,
+      "sha256": "4f03ea2471f83315f14ba86c7dd8804b729a40e229c54d3d4ddfbd05e8055b3e"
     },
     {
       "path": "evidence/scourge_highland_20261029.md",
