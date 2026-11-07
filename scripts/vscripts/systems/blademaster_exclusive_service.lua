@@ -24,8 +24,9 @@ local W_SKILL = "skill_blademaster_agility"
 local R_SKILL = "skill_blademaster_mobility"
 local Q_ABILITY = "ability_survival_blademaster_exclusive"
 local E_ABILITY = "ability_survival_blademaster_swiftness"
-local Q_VISUAL_UNIT = "npc_dota_hero_legion_commander"
+local Q_VISUAL_UNIT = "npc_survival_blademaster_q_visual"
 local Q_VISUAL_ABILITY = "legion_commander_overwhelming_odds"
+local Q_VISUAL_MODIFIER = "modifier_blademaster_q_visual"
 local E_VISUAL_UNIT = "npc_dota_hero_juggernaut"
 local E_VISUAL_ABILITY = "juggernaut_blade_fury"
 
@@ -93,10 +94,30 @@ local function ability(unit, name)
     return valid(unit) and unit:FindAbilityByName(name) or nil
 end
 
-local function remove_visual_caster(unit)
+local function remove_visual_caster(unit, expected)
     if not unit then return end
     local visual = visual_casters[unit]
+    if expected and visual ~= expected then return end
     visual_casters[unit] = nil
+    if visual and visual.q_only then
+        -- A Q carrier is owned before configuration. Cleanup cannot turn a
+        -- cosmetic native exception into a failed gameplay damage transaction.
+        if visual.task then pcall(scheduler.cancel, visual.task) end
+        if visual.cast_task then pcall(scheduler.cancel, visual.cast_task) end
+        local scope_ok, same_world = pcall(function()
+            return GameRules:GetGameModeEntity() == visual.world
+        end)
+        if not scope_ok or not same_world then return end
+        local ok, exists = pcall(valid, unit)
+        if ok and not exists then return end
+        pcall(function() unit.survival_blademaster_visual_caster = nil end)
+        local removed, result = false, nil
+        if type(UTIL_Remove) == "function" then removed, result = pcall(UTIL_Remove, unit) end
+        if not removed or result == false then
+            pcall(function() if unit.RemoveSelf then unit:RemoveSelf() end end)
+        end
+        return
+    end
     if visual and visual.task then scheduler.cancel(visual.task) end
     if visual and visual.cast_task then scheduler.cancel(visual.cast_task) end
     if not valid(unit) then return end
@@ -165,7 +186,15 @@ end
 local function issue_q_visual_order(caster, native, position, player_id)
     -- Current native Overwhelming Odds is NO_TARGET. Older native versions
     -- used a point order; retain that path only when the ability asks for it.
-    local behavior = tonumber(read(native, "GetBehavior"))
+    local production = visual_casters[caster] and visual_casters[caster].q_only
+    local behavior
+    if production then
+        assert(type(native.GetBehavior) == "function", "Q visual behavior API missing")
+        behavior = tonumber(native:GetBehavior())
+        assert(behavior and behavior >= 0 and behavior < math.huge, "Q visual behavior invalid")
+    else
+        behavior = tonumber(read(native, "GetBehavior"))
+    end
     local no_target = tonumber(DOTA_ABILITY_BEHAVIOR_NO_TARGET)
     if behavior and no_target and no_target > 0
         and math.floor(behavior / no_target) % 2 == 1 then
@@ -181,40 +210,74 @@ local function issue_q_visual_order(caster, native, position, player_id)
         local guard = _G.SURVIVAL_REAL_GAME_STRESS_ISOLATION
         local generation = event_bus.get_generation and event_bus.get_generation()
         visual_order_sequence = visual_order_sequence + 1
-        return scheduler.after(0.03, function()
+        local task_id = "blademaster_q_cast:" .. tostring(visual_order_sequence)
+        if visual and visual.q_only then visual.cast_task = task_id end
+        local function submit()
+            if production and (GameRules:GetGameModeEntity() ~= mode
+                or _G.SURVIVAL_REAL_GAME_STRESS_ISOLATION ~= guard
+                or event_bus.get_generation and event_bus.get_generation() ~= generation) then return false end
             if not valid(caster) or not valid(native)
                 or not alive(owner) or GameRules:GetGameModeEntity() ~= mode
                 or _G.SURVIVAL_REAL_GAME_STRESS_ISOLATION ~= guard
-                or event_bus.get_generation and event_bus.get_generation() ~= generation then return end
+                or event_bus.get_generation and event_bus.get_generation() ~= generation then return false end
             local current = event_bus.request(events.HERO_SUMMON_GET_REQUEST, { player_id = player_id })
-            if (current and current.unit) ~= canonical then return end
+            if (current and current.unit) ~= canonical then return false end
             if pooled then
                 if caster.survival_blademaster_q_pool_entry ~= pooled
-                    or pooled.lease ~= lease or pooled.status ~= "busy" then return end
-            elseif not visual or visual_casters[caster] ~= visual then return end
+                    or pooled.lease ~= lease or pooled.status ~= "busy" then return false end
+            elseif not visual or visual_casters[caster] ~= visual then return false end
             if ExecuteOrderFromTable and DOTA_UNIT_ORDER_CAST_NO_TARGET then
-                ExecuteOrderFromTable({
+                return ExecuteOrderFromTable({
                     UnitIndex = caster:entindex(),
                     OrderType = DOTA_UNIT_ORDER_CAST_NO_TARGET,
                     AbilityIndex = native:entindex(),
                     Queue = false,
-                })
+                }) ~= false
             else
-                caster:CastAbilityNoTarget(native, player_id)
+                return caster:CastAbilityNoTarget(native, player_id) ~= false
             end
-        end, "blademaster_q_cast:" .. tostring(visual_order_sequence))
+        end
+        local task = scheduler.after(0.03, function()
+            if visual and visual.q_only then
+                if visual_casters[caster] ~= visual then return end
+                local ok, submitted = pcall(submit)
+                if not ok or not submitted then remove_visual_caster(caster, visual) end
+            else
+                submit() -- Preserve the isolated experimental pool behavior.
+            end
+        end, task_id)
+        if visual and visual.q_only then assert(task, "Q visual cast schedule rejected") end
+        return task
+    end
+    if production then
+        local point = tonumber(DOTA_ABILITY_BEHAVIOR_POINT)
+        assert(point and point > 0 and math.floor(behavior / point) % 2 == 1,
+            "Q visual unsupported native behavior")
     end
     if ExecuteOrderFromTable and DOTA_UNIT_ORDER_CAST_POSITION then
-        ExecuteOrderFromTable({
+        local result = ExecuteOrderFromTable({
             UnitIndex = caster:entindex(),
             OrderType = DOTA_UNIT_ORDER_CAST_POSITION,
             AbilityIndex = native:entindex(),
             Position = position,
             Queue = false,
         })
+        if visual_casters[caster] and visual_casters[caster].q_only then
+            assert(result ~= false, "Q visual point order rejected")
+        end
     else
-        caster:CastAbilityOnPosition(position, native, player_id)
+        local result = caster:CastAbilityOnPosition(position, native, player_id)
+        if visual_casters[caster] and visual_casters[caster].q_only then
+            assert(result ~= false, "Q visual point order rejected")
+        end
     end
+end
+
+local function q_visual_call(object, method, ...)
+    assert(object and type(object[method]) == "function", "Q visual API missing: " .. method)
+    local result = object[method](object, ...)
+    assert(result ~= false, "Q visual API rejected: " .. method)
+    return result
 end
 
 local function q_impact_visual(position, owner, player_id)
@@ -227,28 +290,64 @@ local function q_impact_visual(position, owner, player_id)
         end)
         if ok and played then return pooled end
     end
-    -- Preserve the original native order path and lifetime on admission failure.
-    local caster = create_visual_caster(Q_VISUAL_UNIT, position, owner, false)
-    if not caster then return nil end
-    -- Visual-only heroes must not inherit the Player's autonomous orders or
-    -- acquire a combat target while the native Q order is settling.
+    -- Production uses a transparent creature, never a visible hero fallback.
+    -- Per proc: one carrier and <=2 live deadlines, no polling or pool scan.
+    -- Actual damage remains in replicate_q_damage even if any visual API fails.
+    local caster, visual
     local prepared = pcall(function()
-        if type(caster.SetOwner) == "function" then caster:SetOwner(owner) end
-        if type(caster.SetIdleAcquire) == "function" then caster:SetIdleAcquire(false) end
-        if type(caster.SetAcquisitionRange) == "function" then caster:SetAcquisitionRange(0) end
-        if type(caster.Stop) == "function" then caster:Stop() end
+        if not position or not alive(owner) then return end
+        local world = GameRules:GetGameModeEntity()
+        caster = CreateUnitByName(Q_VISUAL_UNIT, position, false, owner, owner, owner:GetTeamNumber())
+        if not caster then return end
+        visual_order_sequence = visual_order_sequence + 1
+        visual = {owner=owner, player_id=player_id, world=world, q_only=true,
+            task="blademaster_q_visual:" .. tostring(visual_order_sequence)}
+        visual_casters[caster] = visual
+        local function deadline(delay)
+            local token = {}
+            visual.deadline = token
+            assert(scheduler.after(delay, function()
+                if visual.deadline == token then remove_visual_caster(caster, visual) end
+            end, visual.task), "Q visual cleanup schedule rejected")
+        end
+        -- This safety net precedes every fallible unit/ability/hiding method.
+        deadline(1)
+        assert(valid(caster), "Q visual invalid carrier")
+        caster.survival_visual_only = true
+        caster.survival_blademaster_visual_caster = true
+        q_visual_call(caster, "SetControllableByPlayer", player_id, false)
+        q_visual_call(caster, "SetOwner", owner)
+        assert(q_visual_call(caster, "GetOwner") == owner, "Q visual owner binding rejected")
+        q_visual_call(caster, "SetIdleAcquire", false)
+        q_visual_call(caster, "SetAcquisitionRange", 0)
+        q_visual_call(caster, "Stop")
+        q_visual_call(caster, "SetAttackCapability", DOTA_UNIT_CAP_NO_ATTACK)
+        q_visual_call(caster, "SetHullRadius", 0)
+        q_visual_call(caster, "SetDayTimeVisionRange", 0)
+        q_visual_call(caster, "SetNightTimeVisionRange", 0)
+        assert(q_visual_call(caster, "AddNewModifier", caster, nil, Q_VISUAL_MODIFIER, {}), "Q visual modifier missing")
+        local native = q_visual_call(caster, "FindAbilityByName", Q_VISUAL_ABILITY)
+            or q_visual_call(caster, "AddAbility", Q_VISUAL_ABILITY)
+        assert(valid(native), "Q visual native ability missing")
+        q_visual_call(native, "SetLevel", 1)
+        q_visual_call(native, "SetHidden", false)
+        q_visual_call(native, "SetActivated", true)
+        q_visual_call(native, "EndCooldown")
+        local cost = tonumber(q_visual_call(native, "GetManaCost", 0))
+        local mana = tonumber(q_visual_call(caster, "GetMaxMana"))
+        assert(cost and cost >= 0 and cost < math.huge and mana and mana >= cost and mana < math.huge,
+            "Q visual insufficient mana capacity")
+        q_visual_call(caster, "SetMana", mana)
+        assert(tonumber(q_visual_call(caster, "GetMana")) >= cost, "Q visual mana refill rejected")
+        local point = tonumber(q_visual_call(native, "GetCastPoint"))
+        assert(point and point >= 0 and point < math.huge, "Q visual invalid cast point")
+        if point > 0 then deadline(math.max(1, point + 1)) end
+        visual.cast_task = issue_q_visual_order(caster, native, position, player_id)
+        -- Transparent base model and modifier protect even late native setup;
+        -- this additional hide does not rely on asynchronously arriving wearables.
+        q_visual_call(caster, "AddNoDraw")
     end)
-    if not prepared then remove_visual_caster(caster);return nil end
-    local native = native_ability(caster, Q_VISUAL_ABILITY)
-    if not native then
-        remove_visual_caster(caster)
-        return nil
-    end
-    visual_casters[caster].cast_task = issue_q_visual_order(caster, native, position, player_id)
-    hide_unit_and_wearables(caster)
-    visual_casters[caster].task = scheduler.after(math.max(1, native:GetCastPoint() + 1), function()
-        remove_visual_caster(caster)
-    end, "blademaster_q_visual:" .. tostring(caster:entindex()))
+    if not prepared then remove_visual_caster(caster, visual);return nil end
     return caster
 end
 
@@ -295,7 +394,7 @@ local function replicate_q_damage(player_id, attacker, target, final_damage)
     -- Its still-valid corpse supplies the impact point; living nearby enemies
     -- receive the same Q copy as when the primary survives.
     local position = target:GetAbsOrigin()
-    q_impact_visual(position, attacker, player_id)
+    pcall(q_impact_visual, position, attacker, player_id)
     for _, enemy in ipairs(FindUnitsInRadius(
         attacker:GetTeamNumber(), position, nil,
         math.max(1, tonumber(row().q_radius) or 600),

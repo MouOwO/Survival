@@ -669,6 +669,7 @@ function M.precache(context)
     local units = {
         "npc_dota_hero_undying",
         "npc_dota_hero_legion_commander",
+        "npc_survival_blademaster_q_visual",
         "npc_dota_hero_juggernaut",
         "asset_proxy_hero_monkey_king",
         "npc_survival_builder_proxy",

@@ -85,7 +85,7 @@ foreach ($directory in @("panorama\localization", "resource", "resource\localiza
         Check ($localized.Count -eq 1 -and $localized[0].Groups[1].Value.StartsWith("Activates after the " + $englishStages[$i] + " ascension.")) ("ENGLISH_UNLOCK_DESCRIPTION_MISMATCH: " + $token)
         $description = $localized[0].Groups[1].Value
         if ($i -eq 1) {
-            foreach ($term in @("permanent home-defending illusion", "automatically attacks", "attack damage and attack speed", "equipped appearance and effects", "1 second after death", "750%")) {
+            foreach ($term in @("permanent home-defending illusion", "automatically attacks", "attack damage and attack speed", "ten times the hero's current attack damage", "real time", "equipped appearance and effects", "1 second after death", "750%")) {
                 Check ($description.Contains($term)) ("W_ILLUSION_DESCRIPTION_MISSING: " + $term)
             }
             Check (-not $description.Contains("Blade Fury")) "W_INCORRECTLY_DESCRIBES_BLADE_FURY"
@@ -123,15 +123,16 @@ Check (-not $serviceText.Contains("HERO_MAIN_ATTACK_LANDED, q_replicate")) "Q_MA
 Check ($serviceText.Contains("payload.critical ~= true")) "Q_CRITICAL_GATE_MISSING"
 Check ($serviceText.Contains("payload.final_damage")) "Q_FINAL_DAMAGE_PAYLOAD_MISSING"
 Check ($serviceText.Contains("non_recursive = true")) "SECONDARY_DAMAGE_RECURSION_GUARD_MISSING"
-Check ($serviceText.Contains('local Q_VISUAL_UNIT = "npc_dota_hero_legion_commander"')) "Q_VISUAL_UNIT_MISSING"
+Check ($serviceText.Contains('local Q_VISUAL_UNIT = "npc_survival_blademaster_q_visual"')) "Q_NON_HERO_VISUAL_UNIT_MISSING"
 Check ($serviceText.Contains('local Q_VISUAL_ABILITY = "legion_commander_overwhelming_odds"')) "Q_NATIVE_ABILITY_MISSING"
-Check ($serviceText.Contains("create_visual_caster(Q_VISUAL_UNIT")) "Q_VISUAL_CASTER_MISSING"
-Check ($serviceText.Contains("hide_unit_and_wearables(unit)")) "Q_VISUAL_HIDE_MISSING"
+Check ($serviceText.Contains("CreateUnitByName(Q_VISUAL_UNIT")) "Q_VISUAL_CASTER_MISSING"
+Check ($serviceText.Contains('q_visual_call(caster, "AddNoDraw")')) "Q_VISUAL_HIDE_MISSING"
+Check ($serviceText.Contains('local Q_VISUAL_MODIFIER = "modifier_blademaster_q_visual"')) "Q_VISUAL_STATE_GUARD_MISSING"
 Check ($serviceText.Contains("DOTA_UNIT_ORDER_CAST_POSITION")) "Q_POSITION_ORDER_MISSING"
 Check ($serviceText.Contains("AbilityIndex = native:entindex()")) "Q_POSITION_ABILITY_MISSING"
 Check ($gameModeText.Contains('require("systems/blademaster_exclusive_service").init()')) "BLADEMASTER_SERVICE_INIT_MISSING"
 Check ($serviceText.Contains("local position = target:GetAbsOrigin()") -and
-    $serviceText.Contains("q_impact_visual(position, attacker, player_id)")) "Q_VISUAL_TARGET_POSITION_MISSING"
+    $serviceText.Contains("pcall(q_impact_visual, position, attacker, player_id)")) "Q_VISUAL_TARGET_POSITION_OR_DAMAGE_ISOLATION_MISSING"
 Check ($serviceText.Contains("function M.trigger_clone_q(player_id, clone, target, final_damage)")) "W_CLONE_Q_ENTRY_MISSING"
 Check ($serviceText.Contains("prepare_combat_clone(clone, player_id)") -and
     $serviceText.Contains("native:GetAbilityName() ~= Q_ABILITY") -and

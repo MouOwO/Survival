@@ -110,6 +110,10 @@ local modifiers = {
         path = "modifiers/modifier_blademaster_clone",
     },
     {
+        name = "modifier_blademaster_q_visual",
+        path = "modifiers/modifier_blademaster_q_visual",
+    },
+    {
         name = "modifier_weapon_stat_projection",
         path = "modifiers/modifier_weapon_stat_projection",
     },

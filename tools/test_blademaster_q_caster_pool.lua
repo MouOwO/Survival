@@ -1,5 +1,7 @@
 -- Real production service, public events and real scheduler/bus; no native render.
 package.path = "scripts/vscripts/?.lua;" .. package.path
+-- Isolated Lua CLI fixture, not production admission or a native rendering test.
+package.loaded["config/test_access"] = {enabled=false}
 local now, mode, in_tools, server = 0, {}, true, true
 function IsServer() return server end
 function IsInToolsMode() return in_tools end
@@ -19,6 +21,7 @@ local linked = {}
 function LinkLuaModifier(name,path)
     linked[name] = require(path)
 end
+LinkLuaModifier("modifier_blademaster_q_visual", "modifiers/modifier_blademaster_q_visual")
 package.loaded["systems/gameplay_phase_guard"] = {post_clear_frozen=function() return false end}
 package.loaded["systems/hero_cosmetic_service"] = {sync_appearance=function() return true end,clear=function() end}
 package.loaded["systems/hero_summon_attack_rate"] = {apply=function() return 100 end}
@@ -27,19 +30,29 @@ package.loaded["config/armor_balance"] = {from_war3=function(value) return value
 package.loaded["systems/destination_validation_service"] = {validate=function() return true end}
 local bus, events = require("core/event_bus"), require("core/events")
 local scheduler, combat = require("core/scheduler"), require("combat/combat_events")
-local timers, cast_timers, after = {}, {}, scheduler.after
+local timers, cast_timers, visual_timers, after = {}, {}, {}, scheduler.after
 local schedule_cast_throw = false
+local visual_schedule_fault, visual_fixture, visual_fault
 local canceled_tasks, cancel = {}, scheduler.cancel
 scheduler.cancel = function(id)
     canceled_tasks[id]=(canceled_tasks[id] or 0)+1
     return cancel(id)
 end
 scheduler.after = function(delay,callback,id)
+    local kind = id and (id:match("^blademaster_q_visual:") and "cleanup" or id:match("^blademaster_q_cast:") and "cast")
+    local fault = kind and visual_schedule_fault and visual_schedule_fault.kind==kind and visual_schedule_fault
+    if fault and fault.stage=="before" then visual_schedule_fault=nil;error("injected visual scheduler pre-allocation failure") end
     if id and id:match("^blademaster_q_cast:") then
         assert(delay==0.03,"NO_TARGET must wait the actual next-frame cast delay")
         if schedule_cast_throw then schedule_cast_throw=false;error("injected cast schedule allocation failure") end
     end
     local result = after(delay,callback,id)
+    if kind=="cleanup" then visual_timers[#visual_timers+1]={callback=callback,id=result,due=now+delay} end
+    if fault then
+        visual_schedule_fault=nil
+        if fault.stage=="reject" then return false end
+        error("injected visual scheduler post-allocation failure")
+    end
     if id and id:match("^blademaster_q_pool:") then timers[#timers+1] = callback end
     if id and id:match("^blademaster_q_cast:") then
         cast_timers[#cast_timers+1]={callback=callback,id=result,queued_at=now,due=now+delay}
@@ -54,7 +67,7 @@ local next_id, configure_throw, order_throw, hide_throw = 1000, nil, false, fals
 local owner_api_fault, players = nil, {}
 local legacy_prepare_fault
 local function legacy_api_fault(u,method,stage)
-    if u.name~="npc_dota_hero_legion_commander" or not u.survival_blademaster_visual_caster
+    if u.name~="npc_survival_blademaster_q_visual" or not u.survival_blademaster_visual_caster
         or u.survival_blademaster_q_pool_entry then return end
     if stage=="before" then
         u.legacy_prepare_trace=u.legacy_prepare_trace or {}
@@ -68,6 +81,22 @@ local function legacy_api_fault(u,method,stage)
 end
 local native_q_behavior, child_fixture = 134217764, nil
 local submit_q
+local function inject_visual_method(object, method, target)
+    if not visual_fault or visual_fault.method~=method or visual_fault.target~=target then return end
+    local original, fault = object[method], visual_fault
+    if fault.action=="missing" then object[method]=nil;return end
+    object[method]=function(self,...)
+        if not fault.used then
+            fault.used=true
+            if fault.action=="throw" then error("injected Q visual "..target.."."..method) end
+            if fault.action=="after_throw" then original(self,...);error("injected Q visual after "..method) end
+            if fault.action=="false" then return false end
+            if fault.action=="nil" then return nil end
+            return fault.value
+        end
+        return original(self,...)
+    end
+end
 local function has_behavior(value, flag) return value % (flag*2) >= flag end
 local function player_owner(player_id)
     if not players[player_id] then
@@ -152,6 +181,7 @@ local function unit(id,team,player)
     function u:IsChanneling() return self.channeling==true end
     function u:RemoveModifierByName(name) self.modifiers[name]=nil end
     function u:GetMaxMana() return self.max_mana end
+    function u:GetMana() return self.mana end
     function u:GetMaxHealth() return self.max_health or 100 end
     function u:GetHealth() return self.health or 100 end
     function u:SetBaseMaxHealth(value) self.base_health=value end
@@ -181,7 +211,10 @@ local function unit(id,team,player)
         if name=="legion_commander_overwhelming_odds" then
             function a:GetBehavior() return self.behavior end
         end
-        function a:GetCastPoint() return self.name=="legion_commander_overwhelming_odds" and 0 or 0.2 end
+        function a:GetCastPoint()
+            return self.name=="legion_commander_overwhelming_odds" and (visual_fixture and visual_fixture.cast_point or 0) or 0.2
+        end
+        function a:GetManaCost(level) assert(level==0,"new carrier level-one mana cost uses native zero-based level");return 90 end
         function a:GetCastRange() return self.name=="legion_commander_overwhelming_odds" and 0 or 600 end
         function a:EndCooldown()
             if configure_throw=="EndCooldown" then configure_throw=nil;error("injected cooldown failure") end
@@ -190,6 +223,9 @@ local function unit(id,team,player)
         function a:IsCooldownReady() return self.ready end
         function a:GetCooldownTimeRemaining() return self.cooldown or 0 end
         function a:IsInAbilityPhase() return self.phase end
+        if self.name=="npc_survival_blademaster_q_visual" and visual_fault and visual_fault.target=="ability" then
+            inject_visual_method(a,visual_fault.method,"ability")
+        end
         self.abilities=self.abilities or {};self.abilities[name]=a
         return a
     end
@@ -205,6 +241,10 @@ local function unit(id,team,player)
     return u
 end
 function CreateUnitByName(name,position,clear,owner,owner_entity,team)
+    if name=="npc_survival_blademaster_q_visual" and visual_fixture and visual_fixture.create then
+        if visual_fixture.create=="throw" then error("injected creation failure") end
+        return nil
+    end
     next_id=next_id+1
     local u=unit(next_id,team,owner and owner.player or -1)
     u.name,u.position=name,position
@@ -234,6 +274,10 @@ function CreateUnitByName(name,position,clear,owner,owner_entity,team)
         u.children={effects,direct,plain}
     end
     created[#created+1]=u
+    if name=="npc_survival_blademaster_q_visual" then
+        if visual_fixture and visual_fixture.mana then u.max_mana=visual_fixture.mana end
+        if visual_fault and visual_fault.target=="unit" then inject_visual_method(u,visual_fault.method,"unit") end
+    end
     return u
 end
 function UTIL_Remove(u)
@@ -316,11 +360,12 @@ local function fresh()
     bus.reset();scheduler.clear();handlers();service.init()
     now=0;mode={}
     _G.SURVIVAL_REAL_GAME_STRESS_ISOLATION=nil
-    created,removed,casts,deals,timers,cast_timers={},{},{},{},{},{}
+    created,removed,casts,deals,timers,cast_timers,visual_timers={},{},{},{},{},{},{}
     remove_attempts={}
     order_attempts,canceled_tasks={},{}
     canonical_requests=0
     schedule_cast_throw=false
+    visual_schedule_fault,visual_fixture,visual_fault=nil,nil,nil
     e_active,w_active,frozen=false,false,false
     owner_api_fault=nil
     legacy_prepare_fault=nil
@@ -890,4 +935,137 @@ assert(pool.snapshot().total==1,"E caster never enters Q pool")
 bus.emit(events.PLAYER_DISCONNECTED,{player_id=2})
 assert(pool.snapshot().total==0)
 print("CASE E_unchanged_and_disconnect PASS")
+
+-- Production carrier regressions use the same real service/bus/scheduler as
+-- all pool compatibility tests above. No private lifecycle implementation is copied.
+fresh();h=hero();visual_fixture={cast_point=0.3,mana=10000}
+local base_tasks=scheduler.task_count()
+queue_hit(h);damage_count(1)
+local carrier=created[1]
+assert(carrier.name=="npc_survival_blademaster_q_visual" and not carrier.children
+    and carrier.hidden and carrier.mana==10000 and not carrier.controllable
+    and carrier.attack==DOTA_UNIT_CAP_NO_ATTACK and carrier.hull==0
+    and carrier.dayvision==0 and carrier.nightvision==0 and pool.snapshot().total==0)
+local visual_states=carrier.modifiers.modifier_blademaster_q_visual:CheckState()
+for _,name in ipairs({"INVULNERABLE","UNSELECTABLE","NO_HEALTH_BAR","NO_UNIT_COLLISION","NOT_ON_MINIMAP","DISARMED"}) do
+    assert(visual_states[_G["MODIFIER_STATE_"..name]]==true,"visual protection missing "..name)
+end
+for _,name in ipairs({"COMMAND_RESTRICTED","SILENCED","MUTED","ROOTED","OUT_OF_GAME"}) do
+    assert(not visual_states[_G["MODIFIER_STATE_"..name]],"visual modifier must not block native Q "..name)
+end
+assert(#visual_timers==2 and visual_timers[1].id==visual_timers[2].id
+    and visual_timers[1].due==1 and visual_timers[2].due==1.3
+    and scheduler.task_count()==base_tasks+2,"cast point replaces one cleanup task, not a third live task")
+visual_timers[1].callback();assert(not carrier.null and #removed==0,"stale initial safety callback cannot expire final deadline")
+flush_casts();assert(#casts==1 and carrier.mana==9910 and scheduler.task_count()==base_tasks+1)
+advance(1.2);assert(not carrier.null and #removed==0)
+advance(0.08);assert(carrier.null and #removed==1 and scheduler.task_count()==base_tasks)
+visual_timers[1].callback();visual_timers[2].callback();assert(#remove_attempts==1)
+print("CASE production_creature_modifier_mana_03_castpoint_atomic_deadline PASS")
+
+-- Exact old hide_throw reproducer: old implementation left one visible hero
+-- alive after 2s and copied zero damage. New implementation must retire once
+-- and retain both gameplay copies, without submitting the canceled native order.
+fresh();h=hero();hide_throw=true;queue_hit(h);advance(2);damage_count(1)
+assert(#created==1 and created[1].name=="npc_survival_blademaster_q_visual"
+    and created[1].null and #removed==1 and #remove_attempts==1
+    and #casts==0 and #order_attempts==0 and pool.snapshot().total==0)
+print("CASE production_hide_throw_old_boundary_now_removed1_damage_targets2 PASS")
+
+local fault_cases=0
+for _,target in ipairs({"unit","ability"}) do
+    local methods=target=="unit" and {"SetControllableByPlayer","SetOwner","GetOwner","SetIdleAcquire",
+        "SetAcquisitionRange","Stop","SetAttackCapability","SetHullRadius","SetDayTimeVisionRange",
+        "SetNightTimeVisionRange","AddNewModifier","FindAbilityByName","AddAbility","GetMaxMana","SetMana","GetMana","AddNoDraw"}
+        or {"SetLevel","SetHidden","SetActivated","EndCooldown","GetManaCost","GetCastPoint","GetBehavior"}
+    for _,method in ipairs(methods) do
+        for _,action in ipairs({"throw","missing","false"}) do
+            fresh();h=hero();base_tasks=scheduler.task_count()
+            visual_fault={target=target,method=method,action=action}
+            queue_hit(h);damage_count(1)
+            assert(#created==1 and created[1].null and #removed==1 and #remove_attempts==1,
+                "failed production API must retire exact carrier: "..target.."."..method.."/"..action)
+            assert(scheduler.task_count()==base_tasks and #casts==0 and not h.null
+                and created[1].name=="npc_survival_blademaster_q_visual")
+            for _,entry in ipairs(visual_timers) do entry.callback() end
+            for _,entry in ipairs(cast_timers) do entry.callback() end
+            advance(2);damage_count(1)
+            assert(#remove_attempts==1 and #order_attempts==0,"canceled failed carrier cannot cast or remove twice")
+            fault_cases=fault_cases+1
+        end
+    end
+end
+for _,target in ipairs({"unit","ability"}) do
+    fresh();h=hero();visual_fault={target=target,method="IsNull",action="throw"}
+    queue_hit(h);damage_count(1)
+    assert(#created==1 and created[1].null and #removed==1)
+end
+print("CASE production_"..fault_cases.."_API_failures_and_invalid_query_cleanup PASS")
+
+for _,kind in ipairs({"cleanup","cast"}) do
+    for _,stage in ipairs({"before","after","reject"}) do
+        fresh();h=hero();base_tasks=scheduler.task_count();visual_schedule_fault={kind=kind,stage=stage}
+        queue_hit(h);damage_count(1)
+        assert(#created==1 and created[1].null and #removed==1 and scheduler.task_count()==base_tasks)
+        for _,entry in ipairs(visual_timers) do entry.callback() end
+        for _,entry in ipairs(cast_timers) do entry.callback() end
+        advance(2)
+        assert(#remove_attempts==1 and #order_attempts==0,"allocation failures must not leave tasks or cast later")
+    end
+end
+for _,failure in ipairs({"throw","reject"}) do
+    fresh();h=hero();queue_hit(h);damage_count(1)
+    local old_execute=ExecuteOrderFromTable
+    if failure=="throw" then order_throw=true else ExecuteOrderFromTable=function() return false end end
+    flush_casts();ExecuteOrderFromTable=old_execute
+    assert(created[1].null and #removed==1 and #casts==0)
+    advance(2);damage_count(1);assert(#remove_attempts==1)
+end
+print("CASE production_scheduler_allocation_and_async_order_failures_same_damage PASS")
+
+for _,creation in ipairs({"nil","throw"}) do
+    fresh();h=hero();visual_fixture={create=creation};queue_hit(h);damage_count(1)
+    assert(#created==0 and #casts==0,"creation failure cannot fall back to a hero or block gameplay")
+end
+fresh();h=hero();visual_fixture={mana=89};queue_hit(h);damage_count(1)
+assert(created[1].null and #removed==1 and #casts==0,"insufficient mana must fail closed")
+fresh();h=hero();native_q_behavior=0;queue_hit(h);damage_count(1)
+assert(created[1].null and #removed==1 and #casts==0,"unsupported native behavior cannot submit a guessed point order")
+print("CASE production_creation_mana_behavior_failure_no_hero_fallback PASS")
+
+fresh();h=hero();queue_hit(h);damage_count(1)
+local old_visual,old_deadline,old_queued=created[1],visual_timers[1],cast_timers[1]
+bus.emit(events.HERO_REMOVED,{unit=h,player_id=h.player})
+bus.emit(events.HERO_REMOVED,{unit=h,player_id=h.player})
+bus.reset();scheduler.clear();handlers();service.init()
+local successor=hero(201,h.player);queue_hit(successor);damage_count(2)
+local successor_visual=created[2]
+assert(visual_timers[2].id==old_deadline.id,"test must recycle same service task sequence")
+old_deadline.callback();old_queued.callback()
+assert(old_visual.null and not successor_visual.null and #remove_attempts==1 and #order_attempts==0)
+flush_casts();assert(#casts==1 and casts[1].unit==successor_visual)
+advance(1.01);assert(#remove_attempts==2 and successor_visual.null)
+print("CASE production_service_reset_same_sequence_late_callbacks_exact_identity PASS")
+
+fresh();h=hero();queue_hit(h);damage_count(1)
+old_visual,old_deadline,old_queued=created[1],visual_timers[1],cast_timers[1]
+local old_native=old_visual:FindAbilityByName("legion_commander_overwhelming_odds")
+local native_touches=0
+local function forbidden_old_handle() native_touches=native_touches+1;error("old-world native handle touched") end
+old_visual.IsNull,old_native.IsNull,h.IsNull,h.IsAlive=forbidden_old_handle,forbidden_old_handle,forbidden_old_handle,forbidden_old_handle
+mode={};old_queued.callback();old_deadline.callback()
+assert(native_touches==0 and #remove_attempts==0 and #order_attempts==0,"world guard must precede every unit/ability native query")
+-- Return to the owning world solely to clean up this test's synthetic handles.
+old_visual.IsNull=function(self) return self.null==true end;mode=old_visual.world
+print("CASE production_old_world_rejects_before_native_handle_queries PASS")
+
+fresh();h=hero();queue_hit(h);damage_count(1)
+carrier=created[1]
+local original_remove=UTIL_Remove
+UTIL_Remove=function() error("injected primary removal failure") end
+carrier.RemoveSelf=function(self) self.fallback_removals=(self.fallback_removals or 0)+1;original_remove(self) end
+bus.emit(events.HERO_REMOVED,{unit=h,player_id=h.player});UTIL_Remove=original_remove
+assert(carrier.null and carrier.fallback_removals==1 and #removed==1)
+advance(2);assert(carrier.fallback_removals==1 and #remove_attempts==1)
+print("CASE production_primary_remove_failure_uses_owned_RemoveSelf_once PASS")
 print("BLADEMASTER_Q_CASTER_POOL_PASS: full service/public events and real scheduler; default OFF; 40 concurrent queued Q orders; unchanged immediate damage; Player/native child ABI; .03 NO_TARGET Exec; cancel/context/old lease/world guards; native scene/render not simulated")

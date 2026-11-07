@@ -2,6 +2,31 @@
 #base "npc_archive_challenges_units.txt"
 "DOTAUnits"
 {
+    // Q's native visual spell needs a caster, not a visible Legion Commander.
+    // This non-hero carrier has no default hero wearables or combat rewards.
+    "npc_survival_blademaster_q_visual"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/heroes/monkey_king/transform_invisiblebox.vmdl"
+        "ModelScale"             "1.0"
+        "Level"                  "1"
+        "ConsideredHero"         "0"
+        "HasInventory"           "0"
+        "Ability1"               "legion_commander_overwhelming_odds"
+        "HealthBarOffset"        "-1"
+        "StatusHealth"           "1"
+        "StatusMana"             "10000"
+        "StatusManaRegen"        "0"
+        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
+        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
+        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
+        "VisionDaytimeRange"     "0"
+        "VisionNighttimeRange"   "0"
+        "BountyXP"               "0"
+        "BountyGoldMin"          "0"
+        "BountyGoldMax"          "0"
+    }
+
     // ArmorPhysical is always a Dota 2 actual armor value. War3 source armor
     // is divided by 3 before it reaches this engine-facing fallback config.
     "building_wall"

@@ -19,7 +19,8 @@ DOTA_UNIT_CAP_MELEE_ATTACK, DOTA_UNIT_CAP_MOVE_GROUND = 1, 1
 DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_BASIC = 2, 4, 8
 DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_CLOSEST = 16, 0
 DOTA_UNIT_ORDER_ATTACK_TARGET, DOTA_UNIT_ORDER_MOVE_TO_POSITION = 4, 1
-GameRules = { GetGameTime = function() return 0 end }
+local visual_world = {}
+GameRules = { GetGameTime = function() return 0 end, GetGameModeEntity = function() return visual_world end }
 Vector = function(x, y, z) return { x = x, y = y, z = z or 0 } end
 LinkLuaModifier = function(name, path)
     local module = require(path)
@@ -410,7 +411,7 @@ for _, event in ipairs({events.HERO_MAIN_ATTACK_LANDED, events.HERO_MAIN_ATTACK_
 end
 local create_combat_unit = CreateUnitByName
 CreateUnitByName = function(name, position, clear, owner, ...)
-    if name == "npc_dota_hero_legion_commander" then
+    if name == "npc_survival_blademaster_q_visual" then
         q_positions[#q_positions + 1] = position
         return nil -- Native rendering is outside this Lua integration test.
     end
