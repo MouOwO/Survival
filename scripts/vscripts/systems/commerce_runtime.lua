@@ -145,63 +145,81 @@ function M.action(payload)
     publish(id)
     bus.emit(events.UI_NOTIFICATION,{player_id=id,message=ok and '商城技能已生效' or tostring(reason or '操作失败'),level=ok and 'info' or 'error'})
 end
-local function tick()
-    for _,id in ipairs(require('systems/player_context_service').active_player_ids()) do
-        local s=state(id)
-        require('systems/worker_system').refresh_commerce_capacity(id)
-        if not s.immortal_spawned and effects.owned(id,'immortal') then
+local function reconcile_owner(id, periodic)
+    if id==nil or require('systems/player_context_service').is_defeated(id) then return end
+    local s=state(id)
+    -- Entitlement reads are scalar and owner-bound. An unchanged profile event
+    -- cannot repeat native work or scan the player's buildings while paused.
+    local immortal=effects.owned(id,'immortal')
+    local lumber_fury=effects.owned(id,'lumber_fury')
+    local lumberyard=effects.owned(id,'lumberyard')
+    local aura_owned=effects.owned(id,'lottery_immortal_slaying_sword_array')
+    local sovereign=effects.owned(id,'sovereign')
+    local cannon_owned=effects.owned(id,'orbital')
+    local flame_wall=effects.owned(id,'flame_wall')
+    local signature=(immortal and 1 or 0)+(lumber_fury and 2 or 0)+(lumberyard and 4 or 0)
+        +(aura_owned and 8 or 0)+(sovereign and 16 or 0)+(cannon_owned and 32 or 0)+(flame_wall and 64 or 0)
+    if not periodic and s.entitlement_signature==signature then publish(id);return end
+    s.entitlement_signature=signature
+    require('systems/worker_system').refresh_commerce_capacity(id)
+    if not s.immortal_spawned and immortal then
+        if not s.city_lookup_done then
+            s.city_lookup_done=true
             local buildings=bus.request(events.BUILDING_LIST_REQUEST,{player_id=id})
             for _,b in ipairs(buildings and buildings.buildings or {}) do
-                if b.building_id=='main_city' and alive(b.unit) and not b.unit:HasModifier('modifier_building_under_construction') then
-                    s.immortal_spawned=require('systems/worker_system').commerce_spawn_immortal(id,b.unit)
-                    break
-                end
+                if b.building_id=='main_city' and alive(b.unit) then s.city=b.unit;break end
             end
         end
-        if effects.owned(id,'lumberyard') then
-            for _,tech in ipairs({'RS-06','RS-08'}) do
-                if not s.research[tech] then
-                    local r=bus.request(events.RESEARCH_STATE_GET_REQUEST,{player_id=id})
-                    local levels=r and r.levels or {}
-                    local result=bus.request(events.RESEARCH_LEVEL_SET_REQUEST,{player_id=id,tech_id=tech,
-                        level=(tonumber(levels[tech]) or 0)+5,reason='commerce_lumberyard'})
-                    if result and result.ok then s.research[tech]=true end
-                end
+        if alive(s.city) and not s.city:HasModifier('modifier_building_under_construction') then
+            s.immortal_spawned=require('systems/worker_system').commerce_spawn_immortal(id,s.city)
+        end
+    end
+    if lumberyard then
+        for _,tech in ipairs({'RS-06','RS-08'}) do
+            if not s.research[tech] then
+                local r=bus.request(events.RESEARCH_STATE_GET_REQUEST,{player_id=id})
+                local levels=r and r.levels or {}
+                local result=bus.request(events.RESEARCH_LEVEL_SET_REQUEST,{player_id=id,tech_id=tech,
+                    level=(tonumber(levels[tech]) or 0)+5,reason='commerce_lumberyard'})
+                if result and result.ok then s.research[tech]=true end
             end
         end
-        local wall=walls[id]
-        local h=hero(id)
-        local aura_owned=effects.owned(id,'lottery_immortal_slaying_sword_array')
-        if s.aura_hero~=h or not alive(h) or not aura_owned then
-            clear_aura(s)
-            s.aura_hero=h
+    end
+    local wall=walls[id]
+    local h=hero(id)
+    if s.aura_hero~=h or not alive(h) or not aura_owned then
+        clear_aura(s)
+        s.aura_hero=h
+    end
+    if alive(h) and aura_owned and not s.aura then
+        s.aura=ParticleManager:CreateParticle('particles/survival/weapons/weapon_glow.vpcf',PATTACH_ABSORIGIN_FOLLOW,h)
+    end
+    if alive(h) and sovereign and not h.survival_commerce_title then
+        h.survival_commerce_title=true;h.survival_display_name='【统御王印】'..tostring(h.survival_display_name or '')
+    end
+    if s.cannon and (s.cannon:IsNull() or s.cannon_wall~=wall or not alive(wall) or not cannon_owned) then
+        clear_cannon(s)
+    end
+    if alive(wall) and cannon_owned and not s.cannon then
+        local definition=require('config/buildings_config').arrow_tower
+        local cannon=CreateUnitByName(definition.unit_name,wall:GetAbsOrigin(),true,wall,wall,wall:GetTeamNumber())
+        if cannon then
+            cannon.survival_visual_only=true;cannon:SetHullRadius(0);cannon:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
+            cannon:AddNewModifier(cannon,nil,'modifier_invulnerable',{})
+            cannon:AddNewModifier(cannon,nil,'modifier_phased',{})
+            cannon.survival_display_name='轨道炮';s.cannon=cannon;s.cannon_wall=wall
         end
-        if alive(h) and aura_owned and not s.aura then
-            s.aura=ParticleManager:CreateParticle('particles/survival/weapons/weapon_glow.vpcf',PATTACH_ABSORIGIN_FOLLOW,h)
+    end
+    if periodic and alive(wall) and flame_wall and not require('systems/gameplay_phase_guard').post_clear_frozen() then
+        for _,target in ipairs(enemies(wall,800)) do
+            ApplyDamage({victim=target,attacker=wall,damage=target:GetMaxHealth()*.01,damage_type=DAMAGE_TYPE_MAGICAL})
         end
-        if alive(h) and effects.owned(id,'sovereign') and not h.survival_commerce_title then
-            h.survival_commerce_title=true;h.survival_display_name='【统御王印】'..tostring(h.survival_display_name or '')
-        end
-        local cannon_owned=effects.owned(id,'orbital')
-        if s.cannon and (s.cannon:IsNull() or s.cannon_wall~=wall or not alive(wall) or not cannon_owned) then
-            clear_cannon(s)
-        end
-        if alive(wall) and cannon_owned and not s.cannon then
-            local definition=require('config/buildings_config').arrow_tower
-            local cannon=CreateUnitByName(definition.unit_name,wall:GetAbsOrigin(),true,wall,wall,wall:GetTeamNumber())
-            if cannon then
-                cannon.survival_visual_only=true;cannon:SetHullRadius(0);cannon:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
-                cannon:AddNewModifier(cannon,nil,'modifier_invulnerable',{})
-                cannon:AddNewModifier(cannon,nil,'modifier_phased',{})
-                cannon.survival_display_name='轨道炮';s.cannon=cannon;s.cannon_wall=wall
-            end
-        end
-        if alive(wall) and effects.owned(id,'flame_wall') and not require('systems/gameplay_phase_guard').post_clear_frozen() then
-            for _,target in ipairs(enemies(wall,800)) do
-                ApplyDamage({victim=target,attacker=wall,damage=target:GetMaxHealth()*.01,damage_type=DAMAGE_TYPE_MAGICAL})
-            end
-        end
-        publish(id)
+    end
+    publish(id)
+end
+local function tick()
+    for _,id in ipairs(require('systems/player_context_service').active_player_ids()) do
+        reconcile_owner(id,true)
     end
     return true
 end
@@ -216,19 +234,24 @@ function M.init()
     local subscribed_epoch,subscribed_generation=epoch,bus.get_generation()
     local function subscribe(name,callback)
         subscriptions[#subscriptions+1]=bus.subscribe(name,function(p)
-            if epoch==subscribed_epoch and bus.get_generation()==subscribed_generation then callback(p) end
+            if epoch==subscribed_epoch and bus.get_generation()==subscribed_generation and world()==initialized_world then callback(p) end
         end)
     end
     subscribe(events.PLAYER_PROFILE_CHANGED,function(p)
         local id=tonumber(p.player_id)
-        if id then effects.invalidate(id);publish(id) end
+        if id then effects.invalidate(id);reconcile_owner(id,false) end
     end)
     subscribe(hero_teleport_access.CHANGED,function(p)
         local id=tonumber(p.player_id);if id then publish(id) end
     end)
     subscribe(events.TREE_CHANGED,function(p) if p.entindex then trees[tonumber(p.player_id)]=EntIndexToHScript(p.entindex) end end)
     subscribe(events.BUILDING_CREATED,function(p)
-        if p.building_id=='wall' then walls[tonumber(p.player_id)]=p.unit or EntIndexToHScript(p.entindex) end
+        local id=tonumber(p.player_id)
+        if id==nil then return end
+        if p.building_id=='wall' then walls[id]=p.unit or EntIndexToHScript(p.entindex) end
+        if p.building_id=='main_city' then
+            local s=state(id);s.city=p.unit or EntIndexToHScript(p.entindex);s.city_lookup_done=true
+        end
     end)
     subscribe(events.PLAYER_DEFEATED,function(p)
         local id=tonumber(p.player_id);if id then clear_owner(id) end
@@ -240,6 +263,10 @@ function M.init()
     end)
     subscribe(events.BUILDING_DESTROYED,function(p)
         local id=tonumber(p.player_id);local wall=id and walls[id]
+        local s=id and players[id]
+        if p.building_id=='main_city' and s and s.city then
+            if p.unit==s.city or (p.unit==nil and p.entindex~=nil and not s.city:IsNull() and s.city:entindex()==p.entindex) then s.city=nil end
+        end
         if p.building_id~='wall' or not wall then return end
         local matches=p.unit==wall or (p.unit==nil and p.entindex~=nil and not wall:IsNull() and wall:entindex()==p.entindex)
         if matches then walls[id]=nil;clear_cannon(players[id]);cancel('commerce_orbital_'..id) end

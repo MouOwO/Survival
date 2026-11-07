@@ -414,6 +414,222 @@ def lottery_cases(review,process,bounds,text,reader,origin,*,manifest=None,origi
         additional_decoder_probe=extra,_network_response_windows=tuple(response_windows),
         real_player_transaction_performed=True,synthetic_results=False)
 
+# Candidate function text to insert into the existing authenticated native gate.
+# This is not an independent validator or native evidence generator.
+BUFFERED_PRESENTATION_POLICY = "BUFFERED_VIDEO_OR_DIRECT_RESULTS_V1"
+BUFFERED_POLICY_RELEASE = 2026110701
+BUFFERED_BAD_XML = "panorama/layout/custom_game/lottery_movie_bad_media_probe.vxml_c"
+BUFFERED_BAD_MEDIA = "panorama/videos/custom_game/lottery_cinematic_v1/bad_media_probe.webm"
+BUFFERED_BAD_SHA = "4ca876efe74ee477029c49a47a700a127af8847b47c6565de4f392e85b2cc712"
+
+
+def _buffered_index(text, process):
+    """One log scan; an attempt ID may restart in a later world."""
+    index = {}; active = {}; offset = 0
+    pattern = re.compile(r"\[LOTTERY_BUFFERED_PLAYBACK\] stage=([a-z_]+) attempt=(\d+) pool=([a-z_]+) probe=(true|false)([^\r\n]*)")
+    for line in text.splitlines(keepends=True):
+        marker = pattern.search(line)
+        if marker:
+            clock = re.match(r"(\d\d)/(\d\d) (\d\d):(\d\d):(\d\d)", line)
+            need(clock is not None, "buffered_native_timestamp_required")
+            when = datetime(int(process["created_utc"][:4]), *map(int, clock.groups()), tzinfo=timezone(timedelta(hours=8)))
+            stage, attempt, pool, probe, tail = marker.groups()
+            key = (int(attempt), pool, probe == "true")
+            fields = dict(re.findall(r"(?:^| )([a-z_]+)=([^ ]+)", tail))
+            row = dict(stage=stage, time=when, fields=fields, offset=offset+marker.start())
+            if stage == "begin":
+                need(key not in active, "buffered_overlapping_attempt_identity")
+                run = dict(key=key, rows=[row]);index.setdefault(key, []).append(run);active[key] = run
+            else:
+                need(key in active, "buffered_orphan_native_event")
+                active[key]["rows"].append(row)
+                if stage in ("complete", "aborted"):active.pop(key)
+        offset += len(line)
+    return index
+
+
+def _buffered_resource(resources, original, path, *, compiled=True):
+    actual = resources.get(path)
+    need(actual is not None, "buffered_signed_resource_missing:"+path)
+    if compiled:
+        proven = original["compiler"]["outputs"].get(path)
+        need(proven and all(actual.get(key) == proven.get(key) for key in ("bytes", "sha256", "md5")),
+             "buffered_signed_official_compiler_output_required:"+path)
+    return actual
+
+
+def _buffered_case(case, roles, process, bounds, reader, origin, index, *, preview, bad=False):
+    shots = captures(case, roles, process, bounds, reader, origin)
+    visual = case.get("visual_review", {})
+    need(all(visual.get(key) is True for key in ("no_movie_error_visible", "no_secondary_animation", "no_automatic_retry")),
+         "buffered_actual_return_pixels_required")
+    if preview:
+        need(all(visual.get(key) is True for key in ("no_draw_inputs", "returned_to_preview_origin"))
+             and type(case.get("tickets_before")) is int and case["tickets_before"] == case.get("tickets_after")
+             and case.get("actual_draw_inputs") == 0, "buffered_preview_zero_transaction_required")
+    else:
+        need(visual.get("returned_to_lottery_window") is True, "buffered_actual_return_to_lottery_required")
+    attempt = case.get("buffered_attempt")
+    need(type(attempt) is int and 1 <= attempt <= 1000000, "buffered_actual_attempt_required")
+    tolerance = timedelta(seconds=1)
+    candidates = [run for run in index.get((attempt, case["pool"], bad), [])
+                  if shots[0]["end"] <= run["rows"][0]["time"]+tolerance
+                  and run["rows"][0]["time"] <= shots[-1]["end"]]
+    need(len(candidates) == 1, "buffered_unique_same_case_native_lifecycle_required")
+    run = candidates[0];rows = run["rows"];stages = [row["stage"] for row in rows]
+    need(stages[0] == "begin" and stages[-1] == "complete" and "aborted" not in stages
+         and [r["time"] for r in rows] == sorted(r["time"] for r in rows)
+         and bounds[0] <= rows[0]["time"]+tolerance and rows[-1]["time"] <= bounds[1]
+         and rows[-1]["time"] <= shots[-1]["start"]+tolerance,
+         "buffered_native_lifecycle_must_finish_in_capture_window")
+    need(rows[0]["fields"].get("loadbehavior") == "buffer-async"
+         and rows[0]["fields"].get("source") == ("fixed_invalid_media" if bad else "pool_movie"),
+         "buffered_correct_native_media_path_required")
+    presentation = case.get("presentation")
+    native_failure = False
+    if presentation == "movie":
+        need(not bad and stages == ["begin", "initialized", "ended", "complete"]
+             and rows[-1]["fields"].get("outcome") == "native_ended",
+             "buffered_movie_requires_real_initialization_and_end")
+        elapsed = rows[2]["fields"].get("elapsed_ms", "")
+        need(elapsed.isdigit() and 6000 <= int(elapsed) <= 12000, "buffered_actual_movie_end_elapsed_required")
+        need(shots[1]["sha256"] != shots[2]["sha256"] and shots[1]["start"] >= rows[0]["time"]-tolerance
+             and shots[2]["end"] <= rows[2]["time"]+tolerance
+             and all(visual.get(key) is True for key in ("actual_movie_content", "animation_progressed", "theme_matches_pool")),
+             "buffered_actual_movie_frames_required")
+    else:
+        need(presentation == ("preview_return" if preview else "results_direct"), "buffered_direct_return_presentation_required")
+        reason = case.get("failure_reason")
+        need(reason in ("ended_before_initialized", "early_end", "setup_error", "startup_timeout", "completion_timeout"),
+             "buffered_exact_failure_reason_required")
+        need(stages in (["begin", "failure", "complete"], ["begin", "initialized", "failure", "complete"]),
+             "buffered_one_failure_no_retry_lifecycle_required")
+        failure = rows[-2]
+        need(failure["fields"].get("reason") == reason
+             and failure["fields"].get("action") == ("return_to_preview_idle" if preview else "return_to_received_results")
+             and rows[-1]["fields"].get("outcome") == "skipped_"+reason,
+             "buffered_failure_must_return_directly_to_actual_caller")
+        if reason in ("ended_before_initialized", "early_end"):
+            need(failure["fields"].get("event") == "VideoPlayerEnded", "buffered_real_child_ended_evidence_required")
+            if reason == "ended_before_initialized":
+                need("initialized" not in stages and failure["fields"].get("initialized") == "false",
+                     "buffered_end_before_init_required")
+            else:
+                elapsed = failure["fields"].get("elapsed_ms", "")
+                need(stages[1] == "initialized" and failure["fields"].get("initialized") == "true"
+                     and elapsed.isdigit() and 0 <= int(elapsed) < 6000,
+                     "buffered_actual_early_native_end_required")
+            native_failure = True
+        need(rows[-1]["time"]-failure["time"] <= tolerance, "buffered_failure_return_has_no_second_animation")
+    window = {(s["hwnd"], s["width"], s["height"]) for s in shots}
+    need(len(window) == 1, "buffered_one_native_window_required")
+    return dict(shots=shots, movie=presentation == "movie", native_failure=native_failure,
+                safe_return=presentation != "movie" and not native_failure, window=next(iter(window)), run=run)
+
+
+def buffered_lottery_cases(review, process, bounds, text, reader, origin, *, manifest, original_evidence):
+    """0701 policy: real video or immediate real result, never invented fallback."""
+    need(review.get("lottery_presentation_policy") == BUFFERED_PRESENTATION_POLICY
+         and review.get("decoder_probe") is None, "buffered_policy_cannot_use_legacy_wrapper_probe")
+    previews = review.get("lottery_previews", {})
+    need(set(previews) == set(POOLS), "complete_native_four_pool_previews_required")
+    index = _buffered_index(text, process);windows = set();used = set();results = []
+    resources = {row["path"]:row for row in manifest["files"]}
+    def record(out):
+        identity = out["run"]["rows"][0]["offset"]
+        need(identity not in used, "buffered_native_attempt_cannot_be_reused")
+        used.add(identity);windows.add(out["window"]);results.append(out)
+    for pool in POOLS:
+        case = previews[pool]
+        need(case.get("pool") == pool and case.get("mode") == "NO_CONSUMPTION_PREVIEW", "complete_native_pool_preview_required")
+        _buffered_resource(resources, original_evidence, "panorama/layout/custom_game/lottery_movie_"+pool+".vxml_c")
+        _buffered_resource(resources, original_evidence, "panorama/videos/custom_game/lottery_cinematic_v1/"+pool+".webm", compiled=False)
+        roles = ("window_before", "animation_a", "animation_b", "window_after") if case.get("presentation") == "movie" else ("window_before", "window_after")
+        record(_buffered_case(case, roles, process, bounds, reader, origin, index, preview=True))
+    preview_movies = sum(out["movie"] for out in results)
+    preview_returns = len(results)-preview_movies
+    draws = review.get("consecutive_draws", [])
+    need(len(draws) == 3, "complete_native_three_authorized_consecutive_ten_draws_required")
+    requests=set();previous=None;previous_end=None;total=0;response_windows=[];draw_windows=[]
+    ack_matches = list(re.finditer(r"\[SURVIVAL_LOTTERY_UI\] stage=result_received request=([A-Za-z0-9_:-]+)", text))
+    need(len(ack_matches) == 3, "complete_native_unexpected_additional_draw_ack_exceeds_review_scope")
+    acks = {match[1]: (match, ack_matches[i+1].start() if i+1 < len(ack_matches) else len(text)) for i, match in enumerate(ack_matches)}
+    need(len(acks) == 3, "complete_native_exact_actual_draw_ack_missing_or_duplicated")
+    for case in draws:
+        need(case.get("pool") == "map" and case.get("count") == 10 and case.get("ticket_kind") == "ordinary"
+             and case.get("real_player_transaction") is True and case.get("skip_animation") is False,
+             "complete_native_actual_ordinary_map_ten_draw_required")
+        request=case.get("request_id")
+        need(isinstance(request,str) and 1 <= len(request) <= 128 and re.fullmatch("[A-Za-z0-9_:-]+", request)
+             and request not in requests and request in acks, "complete_native_distinct_actual_draw_request_required")
+        requests.add(request)
+        before,after=case.get("tickets_before"),case.get("tickets_after")
+        need(type(before) is int and type(after) is int and before>=10 and after>=0 and before-after==10
+             and (previous is None or before==previous), "complete_native_exact_authorized_ticket_debit_required")
+        total+=before-after;previous=after
+        roles=("window_before","animation_a","animation_b","results","window_after") if case.get("presentation")=="movie" else ("window_before","results","window_after")
+        out=_buffered_case(case,roles,process,bounds,reader,origin,index,preview=False);shots=out["shots"];record(out)
+        need(previous_end is None or previous_end < shots[0]["start"], "complete_native_draws_must_be_observed_consecutively")
+        previous_end=shots[-1]["end"]
+        draw_windows.append((shots[0]["start"],shots[-1]["end"]))
+        need(all(case.get("visual_review",{}).get(key) is True for key in
+             ("ten_actual_rewards_visible","confirm_button_full_width","owned_text_visible_when_applicable")),
+             "complete_native_each_draw_requires_actual_rewards_and_return")
+        ack,next_ack=acks[request];left=ack.start();segment=text[left:next_ack]
+        stamp=_time(text[text.rfind("\n",0,left)+1:left])
+        need(stamp is not None and _engine_clock(shots[0]["start"])-1<=stamp<=_engine_clock(shots[-1]["end"])+1,
+             "complete_native_draw_ack_must_match_its_actual_case")
+        response_windows.append((stamp-1,stamp+1))
+        need(left < out["run"]["rows"][0]["offset"] < out["run"]["rows"][-1]["offset"] < next_ack,
+             "buffered_native_presentation_requires_its_received_draw")
+        need(re.search(r"\[SURVIVAL_LOTTERY_UI\] result_count=10 server_count=10\b",segment)
+             and "[SURVIVAL_LOTTERY_UI] stage=cards_ready count=10" in segment
+             and re.search(r"\[SURVIVAL_LOTTERY_UI\] stage=reveal_ready animated="+("true" if out["movie"] else "(?:true|false)")+r"\b",segment),
+             "complete_native_successful_ten_reward_native_ack_required")
+        need(out["run"]["rows"][-1]["time"] <= shots[-2]["start"]+timedelta(seconds=1),
+             "buffered_results_must_follow_presentation_completion")
+    need(total==30 and set(acks)==requests, "complete_native_authorized_30_ticket_single_window_required")
+    probe=review.get("buffered_failure_probe");extra=None
+    if probe is not None:
+        need(probe.get("mode")=="ZERO_CONSUMPTION_BUFFERED_FAILURE_PROBE" and probe.get("pool")=="map"
+             and probe.get("presentation")=="preview_return" and probe.get("ordinary_client") is True,
+             "buffered_fixed_production_failure_probe_required")
+        _buffered_resource(resources,original_evidence,BUFFERED_BAD_XML)
+        media=_buffered_resource(resources,original_evidence,BUFFERED_BAD_MEDIA,compiled=False)
+        need(media.get("bytes")==59 and media.get("sha256")==BUFFERED_BAD_SHA, "buffered_exact_bad_media_required")
+        out=_buffered_case(probe,("window_before","window_after"),process,bounds,reader,origin,index,preview=True,bad=True)
+        need(out["native_failure"], "buffered_timeout_or_setup_does_not_prove_decoder_failure")
+        need(all(out["shots"][-1]["end"] < start or end < out["shots"][0]["start"] for start,end in draw_windows),
+             "buffered_free_probe_must_be_separate_from_real_draws")
+        record(out)
+        extra=dict(ordinary_tickets_consumed=0,real_draw_case_replacement=False,actual_decoder_returns=1)
+    need(len(windows)==1 and any(out["movie"] for out in results) and any(out["native_failure"] for out in results),
+         "buffered_actual_video_and_actual_production_failure_return_required")
+    return dict(presentation_policy=BUFFERED_PRESENTATION_POLICY,pools=list(POOLS),actual_movie_previews=preview_movies,
+                direct_return_previews=preview_returns,actual_movie_presentations=sum(out["movie"] for out in results),
+                actual_decoder_returns=sum(out["native_failure"] for out in results),
+                safe_timeout_or_setup_returns=sum(out["safe_return"] for out in results),
+                same_pool_consecutive_real_ten_draws=3,ordinary_tickets_consumed=total,
+                additional_buffered_failure_probe=extra,_network_response_windows=tuple(response_windows),
+                real_player_transaction_performed=True,synthetic_results=False)
+
+
+def buffered_review_template(value):
+    """Empty exact branch shapes; no passing flags, IDs, balances or outcomes."""
+    value["lottery_presentation_policy"]=BUFFERED_PRESENTATION_POLICY
+    value["decoder_probe"]=None;value["buffered_failure_probe"]=None
+    for item in list(value["lottery_previews"].values())+value["consecutive_draws"]:
+        item.pop("fallback_reason",None);item.update(buffered_attempt=None,failure_reason=None)
+        visual=item["visual_review"]
+        visual.pop("fallback_animation_content",None);visual.pop("no_movie_error_visible_after_fallback",None)
+        visual.update(dict.fromkeys(("no_movie_error_visible","no_secondary_animation","no_automatic_retry","theme_matches_pool"),False))
+        if item.get("mode")=="NO_CONSUMPTION_PREVIEW":
+            item["actual_draw_inputs"]=None;visual["returned_to_preview_origin"]=False
+    value["direct_return_capture_roles"]={"preview_return":["window_before","window_after"],
+                                         "results_direct":["window_before","results","window_after"]}
+    return value
+
+
 AUTH = "survival_player_web_auth_state"
 STATUSES = {"requesting", "pending", "approved", "failed", "expired"}
 AUTH_KEYS = {"session_id", "player_id", "status", "error", "user_code", "verification_uri", "expires_in",
@@ -1249,7 +1465,8 @@ def _validate_native_release(request,report,manifest,signed,*,official=None):
     need(same_process(request["native_process_generation"],review["process"]),"complete_native_request_generation_differs")
     process,bounds,text=lifecycle(review,origin,report,expected,reader,b,ops,p,official=official,target_manifest=manifest)
     ui=ui_cases(review,process,bounds,reader,origin)
-    lottery=lottery_cases(review,process,bounds,text,reader,origin,manifest=manifest,original_evidence=report["original_evidence"])
+    lottery_policy = buffered_lottery_cases if report["release_sequence"] >= BUFFERED_POLICY_RELEASE else lottery_cases
+    lottery=lottery_policy(review,process,bounds,text,reader,origin,manifest=manifest,original_evidence=report["original_evidence"])
     network=network_summary(text,explicit_snapshot_windows=network_case_windows(review,process,bounds,reader,origin),
                             cold_response_windows=lottery.pop("_network_response_windows"),build_catalog=_load_build_catalog(b,report))
     reader.unchanged()
@@ -1323,7 +1540,7 @@ def review_template(report,report_sha256):
             skip_animation=None,request_id=None,tickets_before=None,tickets_after=None,
             presentation=None,fallback_reason=None)
         value["consecutive_draws"].append(item)
-    return value
+    return buffered_review_template(value) if report["release_sequence"] >= BUFFERED_POLICY_RELEASE else value
 
 def main(argv=None):
     argparse.ArgumentParser(description=__doc__).parse_args(argv)
