@@ -70,6 +70,11 @@ def pending_source_keys(baseline_inventory, head_inventory, *deferrals):
 def _resource(role, path, parent_rows):
     """Return a candidate mapping, not proof of compilation or production fit."""
     suffix = PurePosixPath(path).suffix.lower()
+    # MoviePanel reads raw WebM bytes from the mounted game tree. New files
+    # need the same mapping as movies already present in the signed parent;
+    # the complete collector separately verifies a content mirror byte-for-byte.
+    if role in {'game', 'content'} and path.startswith('panorama/videos/') and path.endswith('.webm'):
+        return path, 'identity'
     if role == 'game':
         if path.startswith('panorama/src/') and suffix == '.svg':
             return str(PurePosixPath(path.replace('panorama/src/', 'panorama/', 1)).with_suffix('.vsvg_c')), 'author'

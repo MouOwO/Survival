@@ -117,3 +117,15 @@ gen13实际226项`source_hashes`不包含`commerce_runtime.lua`，实际catalog 
 0604已正常关闭并完整恢复正式0104。真实恢复回执为`D:/Survival_本地排演/complete_delivery_20261103/complete0604_run01/restored.json`，状态`ORIGINAL0104_COMPLETE_SET_FULLY_RESTORED`，观测UTC为2026-11-06T23:13:23.445727Z。候选和备份保留；无ACF、正式journal或SDK写入。
 
 本轮新增耗券0、SDK调用0。此前30张普通券授权已用完，不能自行再次抽奖。下一候选必须重新验证：暂停期间profile完成能主动打开ready并完成Hello、同客户端第二局不再主动发送旧四包；生产视频四池、失败直接返回真实结果/原界面；真实领取端到端延迟、权益立即生效、适用场景FPS与联机客机账户隔离。先交付本地候选配合用户验收，接受后再执行SDK上传和官方完整下载逐文件一致核对。0604本身不满足完整发布准入。
+
+## 2026-11-07追加：gen16生产编译完成，完整收集尚未收口
+
+**仅本地更新；后台每日上限v2维持，尚未上传游廊。** 本段记录上述阶段之后的实际进展，不覆写此前“尚未编译”等历史状态。0701的编译输入已冻结为game/operator `1cb0809a70fecdc88385f5af4d126fd6f269a73b`、content `d4921dfb0cb9ba236b06b7c7bd95250561cb0519`。160项实际官方资源编译全部成功，编译调用耗时合计68.419956秒，临时编译挂载已移除；186项Lua保护及7个生产override也已完成。该耗时只属于编译调用，不是全流水线、网络响应或游戏帧率。
+
+生产者原始交接为`output/complete_delivery_release_20261107_v01/gen16_producers_handoff.json`，SHA-256 `98fec18ddf638bef26a5a20f87ab6a6ce377a6062911798fda3bd50b52063a8d`。它保留生产者完成时的`imports_performed=false`、`signature_created=false`及原始来源，不回填后续阶段。其后160项编译产物已由根代理实际导入game，提交并推送为 `7a31a7d06265a448e21ae52779564ac06c1dd470`；content仍为上述 `d4921dfb…`，operator生产绑定仍为 `1cb0809a…`。后续导入/推送回执为`output/complete_delivery_release_20261107_v01/final16_commit_push_receipt.json`，明确记录160个文件及`pushed=true`。本次只读核对game HEAD与上游均为`7a31a7d…`，不能把该Git推送称为已上传或已同步游廊。
+
+本追加时完整scope仍有实际阻断：旧资源映射器将新固定59B `panorama/videos/custom_game/lottery_cinematic_v1/bad_media_probe.webm`在game、content两仓都判为unknown。该媒体已经作为明确的运行依赖通过官方编译输入核验；不能为了绕过unknown而静默遗漏、删除它，或复用旧包补齐。`gen16_final_scope_driver_receipt.json`保留`FAILED_PRESERVE_PARTIAL_OUTPUTS`，其中完整范围报告已生成，而后续exact review返回1；映射修正正在进行，尚无修正后完整collector通过、完整签包、普通客户端或SDK成功回执。Lua保护的原生smoke仍待，不能将保护/编译通过替代这些阶段。
+
+下一步仍以用户协作验收的五项为准：交互与服务端响应、抽奖速度与演出、奖励及权益立即生效、游戏画面流畅、同局第二台电脑客机的购买与账户隔离。先交付可运行的本地候选，由用户按正常界面操作、我方记录实际结果；确认后再发布。不要为未覆盖边界继续扩大实验范围，也不要求用户反复操作控制台。客机使用自己的账号和已有游戏资源，核对本人余额/权益与主机、其他玩家相互隔离；本轮没有自动付款或新增花券授权。
+
+失败处理维持用户已经确认的低成本策略：视频失败立即显示本次已收到的真实奖励卡片并启用确认，不补播备用动画、不再走第二段卡片等待、不自动重试或新增领奖请求；免费预览失败只回到原界面。正常影片的结果展示保持原流程。当前代码与联合模拟检查支持这一行为，0701签包中的真实播放、失败返回、即时权益、延迟/FPS及双客户端购买隔离仍需上述协作验收。本追加后台部署0、新耗券0、SDK调用0；正式游廊基线与此前恢复状态不变。

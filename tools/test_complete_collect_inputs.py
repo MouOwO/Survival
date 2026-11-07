@@ -128,4 +128,76 @@ class CollectTests(unittest.TestCase):
                     c._attach_generation(ctx, {}, name, author, ["game:" + name], {"kind": "UNIT_GENERATOR"})
 
 
+class RawMovieIdentityTests(unittest.TestCase):
+    NAME = "panorama/videos/custom_game/lottery_cinematic_v1/bad_media_probe.webm"
+
+    def fixture(self, name=None):
+        name = name or self.NAME; value = case(); raw = b"bounded malformed media fixture"
+        values = {role+":"+name: raw for role in ("game", "content")}
+        for key in values:
+            role, path = key.split(":", 1)
+            fact = {"commit": value["pins"][role], "git_oid": hashlib.sha1(key.encode()).hexdigest(), **m.byte_fingerprint(raw)}
+            value["facts"][key] = fact
+            value["base_inventory"]["rows"].append({"source": {"repo": role, "path": path, "head_oid": fact["git_oid"]},
+                "resource": name, "status": "PENDING_RUNTIME_ADD", "history": []})
+        ctx = SimpleNamespace(pins=value["pins"], trees={role: {name: {}} for role in ("game", "content")},
+                              content=lambda key: values[key], get=lambda key: values[key])
+        return value, ctx, values
+
+    def test_raw_movie_binds_both_sources_and_ships_exact_bytes_once(self):
+        value, ctx, values = self.fixture()
+        c._identity_target(ctx, value["targets"], self.NAME)
+        result = c.assemble(**value)
+        self.assertFalse(result["blockers"])
+        self.assertEqual(result["artifact_bytes"][self.NAME], values["game:"+self.NAME])
+        scope = m.document(result["inputs"]["scope_raw"], result["inputs"]["scope_sha256"])
+        choices = [row for row in scope["decisions"] if row["source_id"].endswith(self.NAME)]
+        self.assertEqual({row["source_id"] for row in choices}, {"game:"+self.NAME, "content:"+self.NAME})
+        self.assertTrue(all(row["action"] == "publish" and row["resource"] == self.NAME for row in choices))
+        self.assertEqual(result["projection"]["added_runtime_paths"].count(self.NAME), 1)
+
+    def test_content_mirror_addition_can_bind_existing_unchanged_game_source(self):
+        value, ctx, _ = self.fixture()
+        value["base_inventory"]["rows"] = [row for row in value["base_inventory"]["rows"]
+            if not (row["source"]["repo"] == "game" and row["source"]["path"] == self.NAME)]
+        c._identity_target(ctx, value["targets"], self.NAME)
+        self.assertFalse(c.assemble(**value)["blockers"])
+
+    def test_mismatched_mirrors_fail_before_creating_any_identity_target(self):
+        value, ctx, values = self.fixture(); values["content:"+self.NAME] += b" changed"
+        with self.assertRaisesRegex(ValueError, "raw_video_game_content_bytes_differ"):
+            c._identity_target(ctx, value["targets"], self.NAME)
+        self.assertNotIn(self.NAME, value["targets"])
+
+    def test_content_only_movie_cannot_invent_an_installed_game_source(self):
+        value, ctx, _ = self.fixture(); ctx.trees["game"] = {}
+        with self.assertRaisesRegex(ValueError, "identity_game_source_required"):
+            c._identity_target(ctx, value["targets"], self.NAME)
+
+    def test_game_only_movie_requires_its_exact_content_mirror(self):
+        value, ctx, _ = self.fixture(); ctx.trees["content"] = {}
+        with self.assertRaisesRegex(ValueError, "raw_video_content_source_required"):
+            c._identity_target(ctx, value["targets"], self.NAME)
+
+    def test_ledger_rejects_raw_mirror_drift_even_if_collector_is_bypassed(self):
+        value, ctx, _ = self.fixture(); c._identity_target(ctx, value["targets"], self.NAME)
+        value["facts"]["content:"+self.NAME].update(m.byte_fingerprint(b"different mirrored media"))
+        with self.assertRaisesRegex(ValueError, "raw_video_mirror_is_not_exact_current_git_bytes"):
+            c.assemble(**value)
+
+    def test_mirror_exception_does_not_apply_to_arbitrary_identity_files(self):
+        name = "scripts/vscripts/extra.lua"; value, _, values = self.fixture(name)
+        value["targets"][name] = {"kind": "identity", "raw": values["game:"+name],
+                                  "sources": ["game:"+name, "content:"+name]}
+        with self.assertRaisesRegex(ValueError, "identity_output_is_not_exact_current_git_bytes"):
+            c.assemble(**value)
+
+    def test_missing_mirror_binding_cannot_be_hidden_as_unmapped_evidence(self):
+        value, ctx, _ = self.fixture(); c._identity_target(ctx, value["targets"], self.NAME)
+        value["targets"][self.NAME]["sources"] = ["game:"+self.NAME]
+        result = c.assemble(**value)
+        self.assertEqual(result["status"], "COMPLETE_COLLECTION_BLOCKED_UNRESOLVED_SOURCES")
+        self.assertTrue(any(row["source_id"] == "content:"+self.NAME for row in result["blockers"]))
+
+
 if __name__ == "__main__": unittest.main()

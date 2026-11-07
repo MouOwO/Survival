@@ -252,6 +252,19 @@ def _target(ctx, targets, name, kind, raw, sources, evidence):
     targets[name] = {"kind": kind, "raw": raw, "sources": sorted(sources), "evidence": [evidence]}
 
 
+def _identity_target(ctx, targets, name):
+    key = "game:" + name
+    ledger.need(name in ctx.trees["game"], "identity_game_source_required:" + name)
+    raw = ctx.content(key); sources = [key]
+    if name.startswith("panorama/videos/") and name.endswith(".webm"):
+        ledger.need(name in ctx.trees["content"], "raw_video_content_source_required:" + name)
+        mirror = "content:" + name
+        ledger.need(ctx.content(mirror) == raw, "raw_video_game_content_bytes_differ:" + name)
+        sources.append(mirror)
+    _target(ctx, targets, name, "identity", raw, sources,
+            {"kind": "EXACT_CURRENT_IMMUTABLE_GIT_BYTES", "source_revision": ctx.pins["game"]})
+
+
 def load_compiler(ctx, spec, targets, originals):
     plan, plan_raw = checked(spec["plan"]); proof, proof_raw = checked(spec["proof"])
     origins = spec["source_revisions"]
@@ -440,9 +453,11 @@ def collect(request):
             source = row["source"]; key = source["repo"] + ":" + source["path"]
             if source.get("head_oid") is not None: ctx.get(key)
             name = row.get("resource")
-            if name and name not in targets and source["repo"] == "game" and source["path"] == name and row["status"] in (
+            identity_source = (source["path"] == name and (source["repo"] == "game" or
+                source["repo"] == "content" and name.startswith("panorama/videos/") and name.endswith(".webm")))
+            if name and name not in targets and identity_source and row["status"] in (
                     "PENDING_RUNTIME_UPDATE", "PENDING_RUNTIME_ADD", "HISTORICAL_REVIEW_REQUIRED_PARENT_BYTES_MATCH"):
-                _target(ctx, targets, name, "identity", ctx.content(key), [key], {"kind": "EXACT_CURRENT_IMMUTABLE_GIT_BYTES", "source_revision": pins["game"]})
+                _identity_target(ctx, targets, name)
         for key in request.get("extra_sources", []): ctx.get(key)
         review, review_raw = checked(request["exact_review"]); scan, scan_raw = checked(request["reference_scan"])
         ledger.need(review.get("kind") == "IMMUTABLE_DATA_UI_EXACT_PATH_REVIEW_NOT_RELEASE_AUTHORITY", "explicit_exact_path_review_required")

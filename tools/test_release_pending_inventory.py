@@ -96,6 +96,34 @@ class QueueTests(unittest.TestCase):
         self.assertEqual(result['rows'][0]['status'], 'UNMAPPED_SOURCE_PENDING')
         self.assertTrue(result['rows'][0]['blocking'])
 
+    def test_new_raw_webm_maps_both_repositories_to_actual_runtime_bytes(self):
+        path = 'panorama/videos/custom_game/lottery_cinematic_v1/bad_media_probe.webm'
+        result = m.classify_inventory(baseline_inventory={'game': {}, 'content': {}},
+            head_inventory={role: {path: entry()} for role in ('game', 'content')},
+            parent_manifest={'files': []},
+            blob_facts={role+':'+path: fact('b'*64, 59) for role in ('game', 'content')})
+        self.assertEqual(len(result['rows']), 2)
+        for row in result['rows']:
+            self.assertEqual(row['resource'], path)
+            self.assertEqual(row['status'], 'PENDING_RUNTIME_ADD')
+            self.assertFalse(row['blocking'])
+        self.assertFalse(result['ready_for_publication'])
+
+    def test_raw_movie_mapping_does_not_admit_other_paths_or_formats(self):
+        for role in ('game', 'content'):
+            for path in ('data/clip.webm', 'panorama/src/videos/clip.webm',
+                         'panorama/videos_extra/clip.webm', 'panorama/videos/clip.mp4'):
+                with self.subTest(role=role, path=path):
+                    self.assertEqual(m._resource(role, path, {}), (None, 'unknown'))
+
+    def test_raw_movie_removal_remains_explicit_for_both_sources(self):
+        path = 'panorama/videos/custom_game/clip.webm'
+        for role in ('game', 'content'):
+            result = classify(path, role=role, current={})
+            self.assertEqual(result['rows'][0]['resource'], path)
+            self.assertEqual(result['rows'][0]['status'], 'RUNTIME_REMOVAL_PENDING')
+            self.assertTrue(result['rows'][0]['blocking'])
+
     def test_production_override_is_not_raw_head_overlay(self):
         result = classify('addoninfo.txt')
         self.assertEqual(result['rows'][0]['status'], 'PRODUCTION_TRANSFORM_REQUIRED')

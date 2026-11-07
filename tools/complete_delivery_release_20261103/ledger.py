@@ -523,7 +523,13 @@ def audit_complete(*, parent_raw, parent_sha256, inventory_raw, inventory_sha256
             need(item.get("sha256") == facts[key]["sha256"] and item.get("git_oid") == facts[key]["git_oid"], "resource_source_hash_or_oid_mismatch")
             inputs[key] = item["sha256"]; input_index.setdefault(key, set()).add(name)
         if kind == "identity":
-            need(set(inputs) == {"game:" + name} and output == fingerprint(facts["game:" + name]), "identity_output_is_not_exact_current_git_bytes")
+            expected_inputs = {"game:" + name}
+            mirror = "content:" + name
+            if name.startswith("panorama/videos/") and name.endswith(".webm"):
+                need(mirror in facts, "raw_video_content_source_required:" + name)
+                expected_inputs.add(mirror)
+                need(output == fingerprint(facts[mirror]), "raw_video_mirror_is_not_exact_current_git_bytes")
+            need(set(inputs) == expected_inputs and output == fingerprint(facts["game:" + name]), "identity_output_is_not_exact_current_git_bytes")
             need(binding.get("receipt_sha256") is None, "identity_must_not_hide_a_transform")
         else:
             proof = receipt(binding.get("receipt_sha256"))
