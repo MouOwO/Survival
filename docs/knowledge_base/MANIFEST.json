@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 37228,
-      "sha256": "a3427c40c1faf9b957ee46d8c7b55f4bca0179980d2b39b3e1ff0e9fcbe82912"
+      "bytes": 39414,
+      "sha256": "c3d206300cc39a4fbf96763b29b5cfad5c45de7b88ab9e10bc1e9d0466f14cdc"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 51149,
-      "sha256": "77c2fbc251517ba194da42a8ee37629efb8d161db53f9125839ff9550810e1f1"
+      "bytes": 53058,
+      "sha256": "9e717782ddaf2508ccdc5e7c0e4f348ac31e8ce045ef0905bfbb7e70d259ea07"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -72,6 +72,16 @@
       "path": "13_art_ui_qa.md",
       "bytes": 11865,
       "sha256": "613a00e1a83302042f3f1d23f8b4653b59937cee9616a214485db2ecfebab896"
+    },
+    {
+      "path": "NEW_CHAT_PROMPT.txt",
+      "bytes": 829,
+      "sha256": "59e6930906e62202d56d95ce3dd7390a7a90a6133c6ac204da10fd62f4fee10d"
+    },
+    {
+      "path": "README.md",
+      "bytes": 26794,
+      "sha256": "00a1f1eed1461f33dbb42fa26f50077083bdb0e1dd91d909458b8f48c0792af6"
     },
     {
       "path": "data/completed_work_index.json",
@@ -242,6 +252,16 @@
       "path": "evidence/fresh_development_stability_20261101.public.json",
       "bytes": 13653,
       "sha256": "fa339e8d740b0529915c442f4cd75a32ed4fe9a98220e7f316e3199ee331ac7d"
+    },
+    {
+      "path": "evidence/fullmatch0702_growth_followup_20261107.md",
+      "bytes": 15193,
+      "sha256": "b3940b71cac8440ca2bc5c4c558bb7e8da776e9b1ef2ae348c77274df75609ed"
+    },
+    {
+      "path": "evidence/fullmatch0703_signed_candidate_20261107.public.json",
+      "bytes": 30111,
+      "sha256": "0224a5bec230a10a868d4552cd033d0fd2cf7c02873246c391303367a45e6871"
     },
     {
       "path": "evidence/hero_teleport_native_20261101.public.json",
@@ -604,6 +624,11 @@
       "sha256": "5c7e6344347122ab9bff108c46a2acec7cd0dba693efc453ff4c40e5f87d02a3"
     },
     {
+      "path": "evidence/welfare_glow_0704_20261107.md",
+      "bytes": 6167,
+      "sha256": "f4ab6c3430fa91592f9f3f5f1bf49aa9ffbf31c404bfb8611a8f740bc880ee5f"
+    },
+    {
       "path": "evidence/workshop_cover_20261101.md",
       "bytes": 3672,
       "sha256": "8fcbe11c9abe4bb4639649666735fb3671b66fc575f311e244c1a64f5aeaf0de"
@@ -664,6 +689,11 @@
       "sha256": "3e9d78ecd41b1e4aaa4335fc0c33fdca621d5e94a98a4d082af5d299d00a2380"
     },
     {
+      "path": "history/20261024/README.md",
+      "bytes": 3523,
+      "sha256": "8fb412555efbff16e4191ae220fb68c521283ef11131c5d4a5c8ad6f8820868b"
+    },
+    {
       "path": "history/20261024/data/commerce_facts.json",
       "bytes": 10585,
       "sha256": "6105f8496427aab2540ee0572bd1e084247114c6b36dc50cec305269c0bf864e"
@@ -704,24 +734,9 @@
       "sha256": "40bd838081c9322b471aa29977d19958932c9cbb87c14d7b54728f9883a86817"
     },
     {
-      "path": "history/20261024/README.md",
-      "bytes": 3523,
-      "sha256": "8fb412555efbff16e4191ae220fb68c521283ef11131c5d4a5c8ad6f8820868b"
-    },
-    {
       "path": "history/README.md",
       "bytes": 449,
       "sha256": "5ebf48f3b52e07d03945ecfb8e7c2883c1905c48a7ed6fb544604525da474bec"
-    },
-    {
-      "path": "NEW_CHAT_PROMPT.txt",
-      "bytes": 829,
-      "sha256": "59e6930906e62202d56d95ce3dd7390a7a90a6133c6ac204da10fd62f4fee10d"
-    },
-    {
-      "path": "README.md",
-      "bytes": 25304,
-      "sha256": "358e1e77ab03a261cef0182136a4330a27f017220ecd7d2e4fdfda9c0b0ea0f2"
     },
     {
       "path": "tools/verify_knowledge.py",
