@@ -12,6 +12,42 @@ local generation = 0
 local compact_factory, compact_players
 local recipients, recipients_by_team = {}, {}
 local legacy_players = {}
+local PASSIVE_INTERVAL = 0.5
+local income_players = {}
+
+local function now()
+    return GameRules and GameRules.GetGameTime and GameRules:GetGameTime() or 0
+end
+
+local function income_key(id) return "ui_passive_income:" .. tostring(id) end
+local function clear_passive(id)
+    local state=income_players[id]
+    if state and state.ticket then
+        state.ticket=nil
+        scheduler.cancel(income_key(id))
+    end
+end
+
+local function retire_income(id)
+    clear_passive(id)
+    income_players[id]=nil
+end
+
+local function income_owner(id)
+    local handle=PlayerResource:GetPlayer(id)
+    if not handle then retire_income(id);return nil end
+    local state=income_players[id]
+    if state and state.handle~=handle then retire_income(id);state=nil end
+    if not state then state={handle=handle};income_players[id]=state end
+    return state
+end
+
+local function begin_projection(id)
+    local state=income_owner(id)
+    -- Reserve the window before any projection/native callback can reenter.
+    -- Even a same-value projection attempt must not allow an unbounded burst.
+    if state then state.last_flush=now() end
+end
 
 local function build(player_id)
     return event_bus.request("ui.projection.build_snapshot", {
@@ -20,7 +56,9 @@ local function build(player_id)
 end
 
 local function compact_full(player_id)
+    clear_passive(player_id)
     if not compact_factory then return nil end
+    begin_projection(player_id)
     local snapshot = build(player_id)
     if not snapshot then return nil end
     local state, operations = compact_factory.initialize(snapshot)
@@ -48,6 +86,9 @@ local function remember_player(player_id)
 end
 
 local function publish_player(player_id)
+    -- Any explicit/urgent update absorbs the latest passive balance and retires
+    -- its trailing callback before it can resend that state.
+    clear_passive(player_id)
     if not remember_player(player_id) then return false end
     -- A negotiated v3 client never also receives the legacy full JSON event.
     if compact.is_bound(player_id) then
@@ -57,6 +98,7 @@ local function publish_player(player_id)
             local operations = compact_full(player_id)
             return operations and compact.publish(player_id, 2, operations, {full=true}) ~= nil
         end
+        begin_projection(player_id)
         local snapshot = build(player_id)
         if not snapshot then return false end
         local operations = state.update(snapshot)
@@ -65,6 +107,7 @@ local function publish_player(player_id)
         return compact.publish(player_id, 2, operations, {priority=true}) ~= nil
     end
     if legacy_players[player_id] ~= PlayerResource:GetPlayer(player_id) then return false end
+    begin_projection(player_id)
     local snapshot = build(player_id)
     if not snapshot then return false end
     sequence = sequence + 1
@@ -77,6 +120,47 @@ local function publish_player(player_id)
         snapshot
     )
     return true
+end
+
+local function publish_after_dispatch(player_id, state)
+    if state.leading then return end
+    state.leading=true
+    local own_generation=generation
+    event_bus.after_dispatch("ui_resource_snapshot:"..tostring(player_id),function()
+        state.leading=nil
+        if own_generation~=generation or income_players[player_id]~=state
+            or PlayerResource:GetPlayer(player_id)~=state.handle then return end
+        dirty_players[player_id]=nil
+        publish_player(player_id)
+    end)
+end
+
+local function resource_dirty(player_id, passive)
+    local state=income_owner(player_id)
+    if not state then return end
+    if compact.is_bound(player_id) then
+        if not compact.is_open(player_id,2) then clear_passive(player_id);return end
+    elseif legacy_players[player_id]~=state.handle then return end
+    if not passive then
+        clear_passive(player_id)
+        publish_after_dispatch(player_id,state)
+        return
+    end
+    local elapsed=state.last_flush and now()-state.last_flush
+    if elapsed==nil or elapsed<0 or elapsed>=PASSIVE_INTERVAL then
+        publish_after_dispatch(player_id,state)
+    elseif not state.ticket and not state.leading then
+        local ticket={};state.ticket=ticket
+        local own_generation=generation
+        -- One fixed trailing deadline per owner; later hits only update the
+        -- projection's cached balance. No idle timer and no scene/player scan.
+        scheduler.after(PASSIVE_INTERVAL-elapsed,function()
+            if own_generation~=generation or income_players[player_id]~=state or state.ticket~=ticket
+                or PlayerResource:GetPlayer(player_id)~=state.handle then return end
+            state.ticket=nil
+            publish_player(player_id)
+        end,income_key(player_id))
+    end
 end
 
 local function flush_dirty()
@@ -98,6 +182,10 @@ local function on_dirty(payload)
         local player_id = tonumber(payload.player_id)
         -- An invalid personal recipient must never fall back to broadcasting.
         if not player_id or not remember_player(player_id) then return end
+        if payload.passive_income==true or payload.immediate_resource==true then
+            resource_dirty(player_id,payload.passive_income==true)
+            return
+        end
         dirty_players[player_id] = true
     elseif payload.team ~= nil then dirty_teams[payload.team] = true
     else dirty_teams.all = true end
@@ -121,6 +209,8 @@ end
 
 function M.init()
     scheduler.cancel("ui_snapshot_flush")
+    for id in pairs(income_players) do clear_passive(id) end
+    income_players={}
     generation = generation + 1
     flush_pending = false
     sequence = 0
@@ -135,7 +225,7 @@ function M.init()
         local lookup = require("config/generated/ui_static_catalog_lookup")
         compact_factory = require("ui/compact_hud_projection").new(lookup)
         compact.register_view(2, {snapshot=compact_full,open=function(id)remember_player(id);return compact_full(id)end,
-            close=function(player_id) compact_players[player_id]=nil end})
+            close=function(player_id) compact_players[player_id]=nil;retire_income(player_id) end})
     else compact_factory = nil end
     event_bus.subscribe(events.UI_DIRTY, on_dirty)
     event_bus.subscribe(events.UI_SNAPSHOT_REQUESTED, on_snapshot_requested)
@@ -148,6 +238,7 @@ function M.init()
     event_bus.subscribe(events.PLAYER_DISCONNECTED, function(payload)
         local id=tonumber(payload and payload.player_id);if not id then return end
         if compact_players then compact_players[id] = nil end
+        retire_income(id)
         local team=recipients[id]
         if team and recipients_by_team[team]then recipients_by_team[team][id]=nil end
         recipients[id],legacy_players[id],dirty_players[id]=nil,nil,nil

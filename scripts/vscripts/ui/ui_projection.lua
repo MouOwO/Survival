@@ -9,14 +9,31 @@ local wave = {}
 local research_unlocked_by_player = {}
 local advanced_research_unlocked_by_player = {}
 local shop_unlocked_by_player = {}
+-- Only routine, server-authored income is eligible for display coalescing.
+-- Spending, refunds, purchases, prizes and unknown reasons remain immediate.
+local passive_income_reasons = {
+    lumberjack_hit=true, hero_tree_hit=true, gold_mine_income=true,
+    gold_mine_critical_income=true, profile_income=true,
+    gameplay_stats_hero_attack_resource=true,
+}
 
 local function mark_dirty(team, player_id)
     event_bus.emit(events.UI_DIRTY, { team = team, player_id = player_id })
 end
 
 local function on_resource_changed(payload)
+    local previous = resource_by_player[payload.player_id]
     resource_by_player[payload.player_id] = payload
-    mark_dirty(payload.team, payload.player_id)
+    local passive = passive_income_reasons[payload.reason] == true and previous ~= nil
+        and type(payload.wood)=="number" and type(previous.wood)=="number" and payload.wood>=previous.wood
+        and type(payload.gold)=="number" and type(previous.gold)=="number" and payload.gold>=previous.gold
+        and payload.population==previous.population and payload.max_population==previous.max_population
+        and payload.debug_mode==previous.debug_mode
+    -- Version/reason changes alone do not change a HUD balance. Preserve the
+    -- freshest authority snapshot without rebuilding/sending an unchanged view.
+    if passive and payload.wood==previous.wood and payload.gold==previous.gold then return end
+    event_bus.emit(events.UI_DIRTY, {team=payload.team, player_id=payload.player_id,
+        passive_income=passive, immediate_resource=not passive})
 end
 
 local function on_building_changed(payload)
