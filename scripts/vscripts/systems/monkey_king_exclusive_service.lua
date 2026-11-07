@@ -468,15 +468,16 @@ local function sync_clone(current, hero, snapshot)
         native_changed = health_modifier ~= nil
     end
     local equipment_attack = tonumber(stats.engine_equipment_attack_bonus) or 0
+    local attack_multiplier = math.max(1, tonumber(runtime().w_clone_attack_multiplier) or 1)
     local critical_damage_pct = math.max(100,
         tonumber(stats.critical_damage_pct) or 200)
         + math.max(0, tonumber(runtime().w_clone_critical_damage_bonus_pct) or 0)
     local minimum, maximum = require("combat/endless_stat_projection").prepare_attack(
         clone,
-        (tonumber(stats.engine_attack_min) or tonumber(stats.attack_min) or 0)
-            + equipment_attack,
-        (tonumber(stats.engine_attack_max) or tonumber(stats.attack_max) or 0)
-            + equipment_attack,
+        ((tonumber(stats.engine_attack_min) or tonumber(stats.attack_min) or 0)
+            + equipment_attack) * attack_multiplier,
+        ((tonumber(stats.engine_attack_max) or tonumber(stats.attack_max) or 0)
+            + equipment_attack) * attack_multiplier,
         critical_damage_pct / 100
     )
     minimum, maximum = math.floor(minimum), math.floor(maximum)
@@ -516,6 +517,8 @@ local function sync_clone(current, hero, snapshot)
     if clone_modifier and clone_modifier.SetCombatSnapshot then
         local clone_stats = {}
         for key, value in pairs(stats) do clone_stats[key] = value end
+        clone_stats.attack_min = (tonumber(stats.attack_min) or 0) * attack_multiplier
+        clone_stats.attack_max = (tonumber(stats.attack_max) or tonumber(stats.attack_min) or 0) * attack_multiplier
         clone_stats.attack_speed = attack_speed
         clone_stats.critical_chance_pct = clone.survival_critical_chance_pct
         clone_stats.critical_damage_pct = clone.survival_critical_damage_pct

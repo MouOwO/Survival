@@ -1,3 +1,5 @@
+-- Explicit offline admission boundary; these tests cover debug consumers, not player authentication.
+package.loaded["core/test_access_policy"]={enabled=function()return false end,allowed=function()return true end}
 -- Real growth manager/event consumers; engine transport and scheduling are controlled.
 package.path = "scripts/vscripts/?.lua;" .. package.path
 local bus,events=require("core/event_bus"),require("core/events")
@@ -13,13 +15,15 @@ package.loaded["core/scheduler"]={
 }
 GameRules={GetGameTime=function() return now end}
 CustomNetTables={SetTableValue=function(_,name,key,value) writes[#writes+1]={name=name,key=key,value=value} end}
-CustomGameEventManager={RegisterListener=function() end}
+local client_listeners={}
+CustomGameEventManager={RegisterListener=function(_,name,fn)client_listeners[name]=fn end}
 PlayerResource={IsValidPlayerID=function(_,id) return id==0 or id==1 end}
 local manager=require("systems/technology_stat_manager")
 local info=require("ui/game_info_service")
 local combat=require("ui/combat_stats_ui_service")
 local function reset()
-    bus.reset();manager.init();info.init();combat.init()
+    bus.reset();manager.init();info.init();combat.init(); IsInToolsMode=function()return true end; for debug_id=0,3 do assert(combat.set_debug_enabled(debug_id,true))end
+    for id=0,1 do client_listeners.ui_game_info_request(nil,{PlayerID=id,open=1})end
     writes={}
 end
 local function hit(id,amount,section)
@@ -50,7 +54,7 @@ for _,row in ipairs(writes) do
     end
 end
 assert(#scopes==280 and scopes[1][1]=="lumberjack" and scopes[1][2]=="attack")
-writes={};hit(0,1,"hero");assert(#writes==2,"hero growth retains its synchronous notification")
+writes={};hit(0,1,"hero");assert(#writes==1,"opted-in hero debug retains synchronous notification; info stays coalesced")
 assert(scopes[#scopes][1]=="hero")
 hit(0,1);local stale={};for _,task in pairs(tasks) do stale[#stale+1]=task.callback end
 reset();assert(next(tasks)==nil)

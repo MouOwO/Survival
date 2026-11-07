@@ -1,4 +1,6 @@
 package.path = "scripts/vscripts/?.lua;scripts/vscripts/?/init.lua;" .. package.path
+-- This process has synthetic players, not the production Steam admission API.
+package.loaded["config/test_access"] = { enabled = false }
 local real_print = print
 print = function(...)
     local line = tostring(select(1, ...))

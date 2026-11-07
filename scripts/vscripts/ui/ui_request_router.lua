@@ -22,10 +22,12 @@ local M = {}
 local synthesis_requests = {}
 local building_snapshot_sequence = 0
 local selected_unit_by_player = {}
+local legacy_selected_clients = {}
 local building_push_coalescer
 local combat_push_coalescer
 local compact_selected,compact_selected_world
 local compact_production,compact_production_world
+local compact_prepared,compact_prepared_world
 local compact_lottery_transport
 local function compact_lottery_bound(id)
     return compact_lottery_transport and compact_lottery_transport.is_bound
@@ -363,7 +365,7 @@ local function hero_ui_snapshot(player_id, entindex, unit)
 end
 
 local function register_selected_unit_stats_request()
-    CustomGameEventManager:RegisterListener("ui_selected_unit_stats_request", function(_, payload)
+    CustomGameEventManager:RegisterListener("ui_selected_unit_stats_request", function(actor_index, payload)
         local player_id = source_player_id(payload)
         if compact_lottery_bound(player_id)then return end
         if not valid_player_id(player_id, true) then return end
@@ -378,6 +380,9 @@ local function register_selected_unit_stats_request()
             })
             return
         end
+        local player=PlayerResource:GetPlayer(player_id)
+        local actor_ok,actor=pcall(EntIndexToHScript,tonumber(actor_index)or-1)
+        if actor_ok and actor==player then legacy_selected_clients[player_id]=player end
         selected_unit_by_player[player_id] = entindex
         -- 英雄的攻击/属性可能还叠加武器成长和专属投影，必须优先使用
         -- hero_combat_stat_service 的权威快照，不能再用引擎临时值覆盖它。
@@ -1677,9 +1682,19 @@ local function on_lottery_changed(payload)
     if player then CustomGameEventManager:Send_ServerToPlayer(player,"ui_lottery_snapshot",payload.snapshot) end
 end
 
+-- Authoritative owner service only; never a client intent.
+function M.route_owner_hero_stats(player_id,source)
+    if not compact_selected or compact_selected_world~=event_bus.get_generation()then return nil end
+    local routed=compact_selected.owner_hero_changed(player_id,source)
+    if routed~=nil then return routed end
+    if legacy_selected_clients[player_id]and PlayerResource:GetPlayer(player_id)==legacy_selected_clients[player_id]then return false end
+    return nil
+end
+
 function M.disconnect(payload)
     local id=tonumber(payload and payload.player_id);if not id then return end
     selected_unit_by_player[id],synthesis_requests[id]=nil,nil
+    legacy_selected_clients[id]=nil
     building_push_coalescer.disconnect(id);combat_push_coalescer.disconnect(id)
 end
 
@@ -1689,6 +1704,7 @@ function M.init()
     synthesis_requests = {}
     building_snapshot_sequence = 0
     selected_unit_by_player = {}
+    legacy_selected_clients = {}
     event_bus.subscribe(events.PLAYER_DISCONNECTED,M.disconnect)
     register_client_diagnostic()
     register_selected_unit_stats_request()
@@ -1740,6 +1756,12 @@ function M.init()
                 end})
             compact_production_world=own_world
         else compact_production.reset()end
+        if compact_prepared_world~=own_world then
+            if compact_prepared then compact_prepared.dispose()end
+            compact_prepared=require('ui/research_prepared_bootstrap').new({transport=compact_lottery_transport,
+                lookup=require('config/generated/ui_static_catalog_lookup'),allowed=function(id)return valid_player_id(id,true)end})
+            compact_prepared_world=own_world
+        else compact_prepared.reset()end
         if compact_selected_world~=own_world then
             if compact_selected then compact_selected.dispose()end
             compact_selected=require('ui/compact_selected_views').new({transport=compact_lottery_transport,

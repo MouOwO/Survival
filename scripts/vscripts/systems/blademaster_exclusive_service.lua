@@ -413,8 +413,9 @@ local function sync_clone_stats(player_id, current, snapshot, initial)
     if snapshot.entindex ~= nil
         and tonumber(snapshot.entindex) ~= hero:entindex() then return end
     local previous = clone.survival_exclusive_combat_stats or {}
-    local attack_min = math.max(1, tonumber(snapshot.attack_min) or 1)
-    local attack_max = math.max(attack_min, tonumber(snapshot.attack_max) or attack_min)
+    local attack_multiplier = math.max(1, tonumber(row().w_clone_attack_multiplier) or 1)
+    local attack_min = math.max(1, tonumber(snapshot.attack_min) or 1) * attack_multiplier
+    local attack_max = math.max(attack_min, (tonumber(snapshot.attack_max) or tonumber(snapshot.attack_min) or 1) * attack_multiplier)
     local max_health = math.max(1, tonumber(snapshot.max_health)
         or tonumber(read(hero, "GetMaxHealth")) or 1)
     local projected = stat_projection.prepare(clone, { attack = attack_max, health = max_health })
@@ -472,6 +473,7 @@ local function sync_clone_stats(player_id, current, snapshot, initial)
         + math.max(0, tonumber(row().w_clone_critical_damage_bonus_pct) or 0)
     local inherited = {}
     for name, value in pairs(snapshot) do inherited[name] = value end
+    inherited.attack_min, inherited.attack_max = attack_min, attack_max
     inherited.attack_speed = attack_speed
     inherited.critical_chance_pct = clone.survival_critical_chance_pct
     inherited.critical_damage_pct = clone.survival_critical_damage_pct

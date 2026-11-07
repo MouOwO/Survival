@@ -1,4 +1,6 @@
 package.path = "scripts/vscripts/?.lua;scripts/vscripts/?/init.lua;" .. package.path
+-- Synthetic four-owner fixture; do not alter the shipped admission config.
+package.loaded["config/test_access"] = { enabled = false }
 local native_print = print
 print = function(...)
     local line = tostring(select(1, ...))

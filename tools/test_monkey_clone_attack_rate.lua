@@ -1,3 +1,5 @@
+-- Synthetic fixture only: production Steam admission configuration is unchanged.
+package.loaded['config/test_access']={enabled=false}
 package.path = "scripts/vscripts/?.lua;" .. package.path
 local bus = require("core/event_bus")
 local events = require("core/events")
@@ -203,7 +205,7 @@ clone.bat=0.1
 near(clone:GetAttacksPerSecond(),10,"legacy mutation still reports ten APS")
 near(clone:FixtureAttackInterval(),0.5,"legacy BAT mutation exposes the animation bound")
 clone.bat=clone.natural_bat
-near(clone.damage_min,30);near(clone.damage_max,40)
+near(clone.damage_min,300);near(clone.damage_max,400)
 near(clone.health,500,"speed synchronization may not heal")
 near(clone.modifiers.modifier_monkey_king_clone.snapshot.attack_speed,10)
 local additions,transmissions,refreshes=clone.modifier_adds,clone.rate_transmissions,clone.rate_refreshes
@@ -244,7 +246,7 @@ assert(clone.stat_bonus_calls==recalculations+1,"one growth event must calculate
 interval(clone,12)
 near(clone.maximum,2000,"growth updates the native health maximum immediately")
 near(clone.health,500,"health growth preserves the damaged clone ratio")
-near(clone.damage_min,60);near(clone.damage_max,80)
+near(clone.damage_min,600);near(clone.damage_max,800)
 unchanged_cost(other,other_cost,"growth stays in the owning player")
 stable_cost=native_cost(clone)
 for _=1,10 do tasks.monkey_clone_sync.callback() end
@@ -264,7 +266,7 @@ assert(clone.modifiers[HEALTH],"polling must restore a missing health projection
 near(clone.health,250,"health projection restoration cannot heal")
 clone.hull=32;clone.damage_min=1;clone.damage_max=2
 tasks.monkey_clone_sync.callback()
-near(clone.hull,0);near(clone.damage_min,30);near(clone.damage_max,40)
+near(clone.hull,0);near(clone.damage_min,300);near(clone.damage_max,400)
 near(clone.health,250,"repairing external native values cannot heal")
 clone.refill_on_stat_bonus=false
 clone.health=500
@@ -380,10 +382,10 @@ local function attack_snapshot(label,engine_min,engine_max,logical_min,logical_m
     assert(clone.modifiers[RATE]==old_rate,"attack synchronization must preserve fixed-rate modifier")
     interval(clone,8)
     interval(other,3)
-    near(other.damage_min,30,"other player native minimum stays isolated")
-    near(other.damage_max,40,"other player native maximum stays isolated")
-    local inherited_min=(engine_min or logical_min)+(equipment_attack or 0)
-    local inherited_max=(engine_max or logical_max)+(equipment_attack or 0)
+    near(other.damage_min,300,"other player native minimum stays isolated")
+    near(other.damage_max,400,"other player native maximum stays isolated")
+    local inherited_min=((engine_min or logical_min)+(equipment_attack or 0))*10
+    local inherited_max=((engine_max or logical_max)+(equipment_attack or 0))*10
     local expected_critical=(math.max(100,snapshot.critical_damage_pct or 200)
         +(tonumber(require("config/generated/monkey_king_exclusive_runtime")
             .by_id.monkey_king_exclusive.w_clone_critical_damage_bonus_pct) or 0))/100
@@ -398,8 +400,10 @@ local function attack_snapshot(label,engine_min,engine_max,logical_min,logical_m
     assert(clone.damage_min<=1e8 and clone.damage_max<=1e8,
         "native attack must stay within the projection cap")
     local clone_snapshot=clone.modifiers.modifier_monkey_king_clone.snapshot
-    near(clone_snapshot.attack_min,logical_min,"logical panel minimum stays authored")
-    near(clone_snapshot.attack_max,logical_max,"logical panel maximum stays authored")
+    near(snapshot.attack_min,logical_min,"source minimum remains unchanged")
+    near(snapshot.attack_max,logical_max,"source maximum remains unchanged")
+    near(clone_snapshot.attack_min,logical_min*10,"logical panel minimum stays authored")
+    near(clone_snapshot.attack_max,logical_max*10,"logical panel maximum stays authored")
     -- The ordinary 30/40 carrier versus 300/400 logical fixture explicitly
     -- protects the existing engine_attack priority instead of redefining it.
     local min_damage=min_expected*scale

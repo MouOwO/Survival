@@ -163,6 +163,12 @@ function M.new(options)
                         local keep={};for _,pending in ipairs(job.view.jobs)do if pending.active then keep[#keep+1]=pending end end
                         job.view.jobs=keep
                         if keep[1]then push(keep[1],keep[1].priority)end
+                        local idle=handlers[job.view.id]and handlers[job.view.id].on_idle
+                        if #keep==0 and idle and current(job.owner)and own_generation==generation
+                            and job.view.open then
+                            local idle_ok=pcall(idle,job.owner.id)
+                            if not idle_ok then job.view.needs_full=true;statistics.rejected=statistics.rejected+1 end
+                        end
                         if job.on_complete and current(job.owner) and own_generation==generation
                             and job.view.open and job.view.epoch==job.epoch then
                             local ok=pcall(job.on_complete)
@@ -264,6 +270,8 @@ function M.new(options)
     function api.register_view(id,handler)
         need(type(id)=="number" and id>=2 and id<=16383 and not handlers[id],"unique_compact_view_required")
         need(type(handler)=="table" and type(handler.snapshot)=="function","compact_snapshot_provider_required")
+        if handler.derive_selected_aliases~=nil then need(id==5 and handler.derive_selected_aliases==true,"selected_alias_view_not_allowed")end
+        if handler.on_idle~=nil then need(id==5 and type(handler.on_idle)=="function","selected_idle_view_not_allowed")end
         if handler.bulk_static~=nil then need(id==6 and handler.bulk_static==true,"bulk_static_view_not_allowed")end
         if handler.bulk_lottery~=nil then need(id%1==0 and id>=201 and id<=204 and handler.bulk_lottery==true,"bulk_lottery_view_not_allowed")end
         if handler.input then
@@ -290,10 +298,22 @@ function M.new(options)
             handler.input_field_ids,handler.input_record_id,handler.input_action_id,handler.allowed_input_actions=
                 allowed,input_id,fields[action_name],actions
         end
+        if handler.background_snapshot~=nil then
+            need(id>=12 and id<=15 and handler.background_snapshot==true
+                and not handler.input and not handler.intent,"readonly_prepared_view_required")
+        end
         handlers[id]=handler;return true
     end
     function api.is_open(id,view)
         local state=state_for(id,false);return not not(state and state.views[view]and state.views[view].open)
+    end
+    function api.owner_stats_mode(id)
+        local state=state_for(id,false)
+        return state and state.owner_stats_mode or "pending"
+    end
+    function api.selected_aliases_enabled(id)
+        local state=state_for(id,false);local view=state and state.views[5]
+        return not not(view and view.open and view.derive_selected_aliases)
     end
     function api.is_bound(id)
         local state=state_for(id,false)
@@ -391,7 +411,7 @@ function M.new(options)
         local view=view_for(state,view_id);view.open=true
         local ops=opening and handler.open and handler.open(state.id)
         if not ops then ops=handler.snapshot(state.id)end
-        return ops and enqueue(state,view,ops,true,true) or nil
+        return ops and enqueue(state,view,ops,true,handler.background_snapshot~=true) or nil
     end
     function api.receive(id,packet)
         if type(packet)~="table"or type(packet.d)~="string"or #packet.d>24 then
@@ -445,6 +465,7 @@ function M.new(options)
             if change.record~=control or change.remove then incoming.abort();return nil,"control_record_required"end
             local allowed=change.field==fields.visible or change.field==fields.known or change.field==fields.action_code
                 or change.field==fields.arg_a or change.field==fields.arg_b or change.field==fields.arg_c or change.field==fields.request_token
+                or header.view==5 and handler.derive_selected_aliases and change.field==fields.types
                 or header.view==6 and handler.bulk_static and change.field==fields.types
                 or header.view>=201 and header.view<=204 and handler.bulk_lottery and change.field==fields.types
             if not allowed then incoming.abort();return nil,"control_field_not_allowed"end
@@ -466,11 +487,17 @@ function M.new(options)
         end
         local capability=values[fields.types]
         if capability~=nil and capability~=0 and not(header.view==6 and capability==1)
-            and not(header.view>=201 and header.view<=204 and capability==2)then
+            and not(header.view>=201 and header.view<=204 and capability==2)
+            and not(header.view==5 and handler.derive_selected_aliases and capability==3)then
             incoming.abort();return nil,"bulk_capability_invalid"
         end
         incoming.commit(tx)
         if values[fields.visible]==true or values[fields.visible]==1 then
+            if header.view==5 then
+                view.derive_selected_aliases=handler.derive_selected_aliases==true and capability==3
+                if view.derive_selected_aliases then state.owner_stats_mode="compact"
+                elseif state.owner_stats_mode~="compact"then state.owner_stats_mode="legacy"end
+            end
             if header.view==6 then view.bulk_static=handler.bulk_static==true and values[fields.types]==1 end
             if header.view>=201 and header.view<=204 then
                 view.bulk_lottery=lottery_bulk_available and handler.bulk_lottery==true and capability==2
@@ -478,6 +505,7 @@ function M.new(options)
             return full_snapshot(state,header.view,true)
         end
         view.open=false
+        view.derive_selected_aliases=false
         view.bulk_static=false
         view.bulk_lottery=false
         -- A closed panel must not continue draining its former full catalogue.
@@ -605,6 +633,8 @@ function M.register_view(id,handler)
 end
 function M.publish(...)local value=instance();if value then return value.publish(...)end;return nil,"compact_runtime_unavailable"end
 function M.is_open(...)local value=instance();return value and value.is_open(...)or false end
+function M.owner_stats_mode(...)local value=instance();return value and value.owner_stats_mode(...)or "pending"end
+function M.selected_aliases_enabled(...)local value=instance();return value and value.selected_aliases_enabled(...)or false end
 function M.is_bound(...)local value=instance();return value and value.is_bound(...)or false end
 function M.queue_depth(...)local value=instance();return value and value.queue_depth(...)or 0 end
 function M.bulk_binding(...)local value=instance();return value and value.bulk_binding(...)or nil end

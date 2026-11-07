@@ -35,6 +35,8 @@ const native=entries.map((entry,i)=>{
 });
 const list={FindChildTraverse:id=>native.find(p=>p.id===id)};
 const cc={selectedUnit:()=>10,Entities:{GetUnitName:()=> 'building_advanced_research_lab',GetAbility:(unit,slot)=>entries[slot].ability},
+ abilityRefreshLookup:{roots:{main:list,query:null},indexes:[]},abilityRootsCache:null,abilitySlotIndexes:[],
+ validPortraitPanel:panel=>!!panel,
  Abilities:{GetAbilityName:ability=>entries.find(e=>e.ability===ability).name,IsHidden:()=>false},
  abilityIndexForSlot:(unit,slot)=>entries[slot].ability,unitAbilityCount:()=>entries.length,
  orderVisibleAbilities:values=>values,abilityRuntime:runtime,maxAbilityEngineSlots:32,

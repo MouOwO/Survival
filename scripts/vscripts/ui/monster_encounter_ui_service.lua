@@ -76,14 +76,6 @@ local function on_encounter_changed(payload)
     )
 end
 
-local function on_reward_granted(payload)
-    send(
-        tonumber(payload.player_id),
-        "ui_monster_reward_granted",
-        payload
-    )
-end
-
 function M.init()
     CustomGameEventManager:RegisterListener(
         "ui_monster_encounter_start_request",
@@ -97,10 +89,8 @@ function M.init()
         events.MONSTER_ENCOUNTER_CHANGED,
         on_encounter_changed
     )
-    event_bus.subscribe(
-        events.MONSTER_REWARD_GRANTED,
-        on_reward_granted
-    )
+    -- Reward settlement remains on the server event bus. The client receives
+    -- the existing UI_NOTIFICATION; no client consumes the internal reward DTO.
 end
 
 return M

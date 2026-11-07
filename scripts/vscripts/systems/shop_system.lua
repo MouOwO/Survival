@@ -729,25 +729,39 @@ local function build_patch(previous, current)
         technology_cooldown_source_group = current.technology_cooldown_source_group,
         technology_cooldown_source_entry = current.technology_cooldown_source_entry,
         technology_cooldown_sequence = current.technology_cooldown_sequence,
-        research = current.research,
-        purchase_cooldowns = current.purchase_cooldowns,
-        shop_stock = current.shop_stock,
     }
+    -- Omitted collections retain the client's previous state. Only changed
+    -- collections are sent; an explicit empty table also clears old state.
+    if not values_equal(previous.research or {}, current.research or {}) then
+        patch.research = current.research or {}
+    end
     if current.hud_wallet ~= 1 and not values_equal(previous.resources or {}, current.resources or {}) then
-        patch.resources = current.resources
+        patch.resources = current.resources or {}
     end
     if not values_equal(previous.purchase_cooldowns or {}, current.purchase_cooldowns or {}) then
-        patch.purchase_cooldowns = current.purchase_cooldowns
+        patch.purchase_cooldowns = current.purchase_cooldowns or {}
     end
     if not values_equal(previous.shop_stock or {}, current.shop_stock or {}) then
-        patch.shop_stock = current.shop_stock
+        patch.shop_stock = current.shop_stock or {}
     end
     if previous.ui_mode ~= current.ui_mode
         or previous.config_version ~= current.config_version
         or not values_equal(previous.categories or {}, current.categories or {}) then
-        patch.categories = current.categories
+        patch.categories = current.categories or {}
     end
-    local changed_any = not values_equal(previous.research, current.research)
+    -- A cooldown or wallet-lane transition can be authoritative without any
+    -- changed entry. Sequence/reason alone are bookkeeping, not a UI change.
+    local root_changed = previous.schema_version ~= current.schema_version
+        or previous.config_version ~= current.config_version
+        or previous.ui_mode ~= current.ui_mode
+        or previous.hud_wallet ~= current.hud_wallet
+        or previous.technology_cooldown_remaining ~= current.technology_cooldown_remaining
+        or previous.technology_cooldown_total ~= current.technology_cooldown_total
+        or previous.technology_cooldown_until ~= current.technology_cooldown_until
+        or previous.technology_cooldown_source_group ~= current.technology_cooldown_source_group
+        or previous.technology_cooldown_source_entry ~= current.technology_cooldown_source_entry
+        or previous.technology_cooldown_sequence ~= current.technology_cooldown_sequence
+    local changed_any = root_changed or patch.research ~= nil
         or patch.resources ~= nil or patch.categories ~= nil
         or patch.purchase_cooldowns ~= nil
         or patch.shop_stock ~= nil
@@ -766,7 +780,9 @@ local function publish_snapshot(player_id, reason, structural)
         remember_wallet_proof(player_id, current, context)
     end
     local previous = state.snapshot_cache_by_player[player_id]
-    local outgoing = previous and build_patch(previous, current) or current
+    local outgoing
+    if previous then outgoing = build_patch(previous, current)
+    else outgoing = current end
     current.full = 1
     if not outgoing then return end
     state.snapshot_cache_by_player[player_id] = current

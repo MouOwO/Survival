@@ -63,10 +63,14 @@ listeners.ui_monster_encounter_query_request(nil,{PlayerID=0,encounter_id='fixtu
 assert(#sends==2 and sends[1].name=='ui_monster_encounter_operation_result'and sends[1].payload.started
     and sends[2].payload.available)
 local encounter={player_id=0,state='complete'};local reward={player_id=0,reward_id='synthetic'}
+local internal_rewards=0
+bus.subscribe(events.MONSTER_REWARD_GRANTED,function(payload)
+    assert(payload==reward,'reward payload changed for internal consumers');internal_rewards=internal_rewards+1
+end)
 bus.emit(events.MONSTER_ENCOUNTER_CHANGED,encounter);bus.emit(events.MONSTER_REWARD_GRANTED,reward)
-assert(#sends==4 and sends[3].name=='ui_monster_encounter_state'and sends[3].payload==encounter
-    and sends[4].name=='ui_monster_reward_granted'and sends[4].payload==reward)
+assert(#sends==3 and sends[3].name=='ui_monster_encounter_state'and sends[3].payload==encounter
+    and internal_rewards==1,'unused reward UI transfer retired while internal reward remains intact')
 local final={player_id=0,reason='reward_applied',all_attributes=42,pending_skill_rewards={}}
 bus.emit(events.HERO_PROGRESSION_CHANGED,final)
-assert(#sends==4 and final.all_attributes==42,'other internal progression shapes remain local and unmodified')
-print('HERO_GROWTH_UI_BRIDGE_PASS: 4193 true growth rewards preserved; zero unused native/UI calls; encounter/reward contracts intact; no online/native/FPS acceptance claimed')
+assert(#sends==3 and final.all_attributes==42,'other internal progression shapes remain local and unmodified')
+print('HERO_GROWTH_UI_BRIDGE_PASS: 4193 true growth rewards preserved; zero unused native/UI calls; encounter UI and internal reward contracts intact; no online/native/FPS acceptance claimed')

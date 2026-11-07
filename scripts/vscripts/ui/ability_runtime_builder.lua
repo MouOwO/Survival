@@ -333,6 +333,30 @@ local function research_effect_value(definition, level)
     return research_config.effect_value(effect, level, true)
 end
 
+local function research_prerequisite(definition,levels,rebirth)
+    local required = definition.prerequisite or {}
+    local prerequisite_met = true
+    if required.tech_id then
+        local prerequisite = research_config.by_id[required.tech_id]
+        prerequisite_met = prerequisite ~= nil
+            and (tonumber(levels[prerequisite.legacy_group]) or 0)
+                >= (tonumber(required.required_level) or 0)
+    end
+    return prerequisite_met and (tonumber(rebirth) or 0)
+        >= (tonumber(required.reincarnation_level) or 0)
+end
+
+-- Same authoritative learning predicate as the native row, without building
+-- descriptions, prices, queues or copying another player's ability state.
+function M.research_learning_state(ability_name,levels,rebirth)
+    local mapping=research_lab_abilities.by_id[ability_name]
+    local definition=mapping and research_config.by_legacy_group[mapping.technology_group]
+    if not definition then return nil end
+    levels=levels or {}
+    return {current_level=tonumber(levels[mapping.technology_group])or 0,
+        prerequisite_met=research_prerequisite(definition,levels,rebirth)and 1 or 0}
+end
+
 local function research_upgrade(ability_name, state, resources)
     local mapping = research_lab_abilities.by_id[ability_name]
     if not mapping then return nil end
@@ -352,17 +376,7 @@ local function research_upgrade(ability_name, state, resources)
     local queue_count = tonumber(transaction.queue_count) or (transaction.researching == 1 and 1 or 0)
     local queue_capacity = tonumber(transaction.capacity) or 7
     local researching = transaction.researching == 1
-    local required = definition.prerequisite or {}
-    local prerequisite_met = true
-    if required.tech_id then
-        local prerequisite = research_config.by_id[required.tech_id]
-        prerequisite_met = prerequisite ~= nil
-            and (tonumber(levels[prerequisite.legacy_group]) or 0)
-                >= (tonumber(required.required_level) or 0)
-    end
-    prerequisite_met = prerequisite_met
-        and (tonumber(state.reincarnation_level) or 0)
-            >= (tonumber(required.reincarnation_level) or 0)
+    local prerequisite_met = research_prerequisite(definition,levels,state.reincarnation_level)
     local description = research_description.sections(definition, current,
         target > maximum and current or target)
     if target > maximum then

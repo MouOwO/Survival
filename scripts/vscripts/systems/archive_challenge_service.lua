@@ -158,6 +158,9 @@ function M.ability_runtime(caster, ability_name)
         runtime.fields = {{label = "解锁条件", value = definition.unlock_text or ("N" .. definition.min_difficulty .. "解锁")}}
         local eligible, reward_reason = reward_eligibility(state, definition)
         if not eligible then
+            -- Available archive challenges hide the normal status footer. Put
+            -- the no-reward condition in the title as well as its exact field.
+            runtime.display_name = runtime.display_name .. "（本次无奖励）"
             runtime.fields[#runtime.fields + 1] = {label = "奖励条件", value = reward_reason}
         end
         runtime.status_text = running and "该挑战进行中" or used and "本局已挑战（每个技能仅限一次）"
@@ -521,6 +524,10 @@ function M.summon(caster, challenge_id, ability)
     state.cooldowns[challenge_id] = now() + definition.cooldown_seconds
     ability:StartCooldown(definition.cooldown_seconds)
     publish(state)
+    local eligible, reward_reason = reward_eligibility(state, definition)
+    if not eligible then
+        notify(state.player_id, definition.display_name .. "：本次挑战不会获得奖励。" .. reward_reason)
+    end
     return true
 end
 local function killed(payload)

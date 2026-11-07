@@ -14,8 +14,22 @@ local portrait_metadata = require("ui/portrait_metadata")
 local M = {}
 
 local debug_state = {}
+local debug_enabled, debug_subscriptions = {}, {}
+local debug_count = 0
 local hero_authority = {}
 local subscriptions = {}
+-- Event-driven presentation only. Combat authority and native modifier
+-- changes remain synchronous for every target; one owner has at most one
+-- 100ms deadline. New events replace its payload without moving the deadline.
+local pending_combat = {}
+local unavailable_players = {}
+local presentation_lifecycle
+local passive_growth = {damage_dealt=true, attack_landed=true,
+    attack_all_attribute_growth=true, star_blessing_attributes_per_second=true}
+local function cancel_combat(player_id)
+    pending_combat[player_id] = nil
+    scheduler.cancel("combat_ui_growth_" .. tostring(player_id))
+end
 
 local function subscribe(event_name, callback)
     subscriptions[#subscriptions + 1] = event_bus.subscribe(event_name, callback)
@@ -147,6 +161,7 @@ local function debug_snapshot(player_id)
 end
 
 local function publish_debug(player_id)
+    if not debug_enabled[player_id] then return end
     CustomNetTables:SetTableValue(
         "survival_combat_debug",
         "player_" .. tostring(player_id),
@@ -156,11 +171,14 @@ end
 
 local function schedule_damage_publish(player_id)
     local state = debug_state[player_id]
-    if not state or state.pending_publish then return end
-    state.pending_publish = true
+    if not debug_enabled[player_id] or not state or state.pending_publish then return end
+    local token, generation = {}, event_bus.get_generation()
+    state.pending_publish = token
     scheduler.after(0.15, function()
         local current = debug_state[player_id]
-        if current then current.pending_publish = false end
+        if current ~= state or current.pending_publish ~= token
+            or generation ~= event_bus.get_generation() or not debug_enabled[player_id] then return end
+        current.pending_publish = nil
         publish_debug(player_id)
     end, "combat_debug_damage_" .. tostring(player_id))
 end
@@ -172,6 +190,7 @@ local function on_hero_summoned(payload)
     -- The combat service can publish the new hero during this same summon
     -- dispatch, before this listener runs. Keep that hero's current snapshot.
     if cached and cached.unit ~= payload.unit then hero_authority[player_id] = nil end
+    if not debug_enabled[player_id] then return end
     debug_state[player_id] = {
         unit = payload.unit,
         entindex = payload.unit and payload.unit:entindex() or -1,
@@ -220,7 +239,7 @@ end
 
 local function on_technology_changed(payload)
     local player_id = tonumber(payload.player_id)
-    if player_id == nil then return end
+    if player_id == nil or not debug_enabled[player_id] then return end
     debug_state[player_id] = debug_state[player_id] or {
         entindex = -1,
         total_damage = 0,
@@ -231,7 +250,7 @@ local function on_technology_changed(payload)
     publish_debug(player_id)
 end
 
-local function publish(payload)
+local function publish_immediate(payload)
     local player_id = tonumber(payload.player_id)
     if player_id == nil or not payload.snapshot then
         return
@@ -251,19 +270,78 @@ local function publish(payload)
     end
     -- Retain the raw service snapshot, never the already projected UI value:
     -- a later temporary-buff event must not multiply a previous slowdown again.
-    hero_authority[player_id] = unit and {snapshot = payload.snapshot, unit = unit} or nil
+    local previous=hero_authority[player_id]
+    local player=PlayerResource and PlayerResource.GetPlayer and PlayerResource:GetPlayer(player_id)
+    local world=event_bus.get_generation()
+    hero_authority[player_id] = unit and {snapshot = payload.snapshot, unit = unit,
+        player=player, world=world,
+        initial_published=previous and previous.unit==unit and previous.player==player and previous.world==world and previous.initial_published or false} or nil
     local projected = combat_stat_projection.for_ui(
         titan_aura_armor.for_ui(
             hero_attack_cadence_projection.for_ui(payload.snapshot, unit), unit)
     )
     portrait_metadata.apply(unit, projected)
+    local router=package.loaded["ui/ui_request_router"]
+    local routed
+    if router and router.route_owner_hero_stats then
+        local previous_success=projected.success
+        projected.success=1
+        routed=router.route_owner_hero_stats(player_id,projected)
+        if routed==true then return end
+        projected.success=previous_success
+    end
+    local authority=hero_authority[player_id]
+    -- Before readiness only the first initial image is useful. A ready modern
+    -- view requests current authority; an explicitly identified old consumer
+    -- retains its original compatibility route.
+    if routed==nil and authority and authority.initial_published then return end
+    if authority then authority.initial_published=true end
     CustomNetTables:SetTableValue(
         "survival_combat_stats",
         "player_" .. tostring(player_id),
         projected
     )
-    -- NetTable is the single regular synchronization path. Selected-unit
-    -- requests still use their direct response event for immediate feedback.
+    -- Initial / legacy compatibility only. Negotiated selected heroes use
+    -- atomic compact deltas; invisible owner heroes need no display traffic.
+end
+
+local function publish(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    local snapshot = payload and payload.snapshot
+    if player_id == nil or not snapshot then return end
+    if unavailable_players[player_id] then return end
+    local cached = hero_authority[player_id]
+    local version = tonumber(snapshot.refresh_version) or 0
+    local reason = tostring(payload.reason or snapshot.reason or "")
+    -- Unknown/structural changes, initial state and new identities stay
+    -- immediate. Only known passive growth from the same live hero is batched.
+    if not passive_growth[reason] or version <= 0 or not cached
+        or tonumber(cached.snapshot.entindex) ~= tonumber(snapshot.entindex)
+        or not cached.unit or cached.unit:IsNull() then
+        cancel_combat(player_id)
+        return publish_immediate(payload)
+    end
+    if version <= (tonumber(cached.snapshot.refresh_version) or 0) then return end
+    cached.snapshot = snapshot
+    local token = pending_combat[player_id]
+    if token and token.authority == cached then token.payload = payload; return end
+    token = {authority=cached, payload=payload, lifecycle=presentation_lifecycle,
+        world=event_bus.get_generation()}
+    pending_combat[player_id] = token
+    scheduler.after(0.1, function()
+        if pending_combat[player_id] ~= token then return end
+        pending_combat[player_id] = nil
+        if token.lifecycle ~= presentation_lifecycle or token.world ~= event_bus.get_generation()
+            or hero_authority[player_id] ~= token.authority then return end
+        local unit = token.authority.unit
+        local entity = tonumber(token.payload.snapshot.entindex)
+        local ok, same = pcall(function()
+            return unit and not unit:IsNull() and EntIndexToHScript(entity) == unit
+                and (not PlayerResource or not PlayerResource.GetPlayer
+                    or PlayerResource:GetPlayer(player_id)==token.authority.player)
+        end)
+        if ok and same then publish_immediate(token.payload) end
+    end, "combat_ui_growth_" .. tostring(player_id))
 end
 
 local function on_unit_combat_stats_changed(payload)
@@ -281,51 +359,26 @@ local function on_unit_combat_stats_changed(payload)
                 if unit.GetPlayerOwnerID and unit:GetPlayerOwnerID() ~= player_id then return false end
                 return true
             end)
-            if ok and current then publish({player_id = player_id, snapshot = cached.snapshot}) end
+            if ok and current then publish({player_id = player_id, snapshot = cached.snapshot, reason = "unit_combat_stats_changed"}) end
         end
     end
 end
 
 local pending_growth = {}
 local function publish_growth_debug(player_id)
-    if pending_growth[player_id] then return end
-    local token = {}
+    if not debug_enabled[player_id] or pending_growth[player_id] then return end
+    local token, generation = {}, event_bus.get_generation()
     pending_growth[player_id] = token
     scheduler.after(0.1, function()
-        if pending_growth[player_id] ~= token then return end
+        if pending_growth[player_id] ~= token or generation ~= event_bus.get_generation() or not debug_enabled[player_id] then return end
         pending_growth[player_id] = nil
         publish_debug(player_id)
     end, "lumberjack_publish_growth_debug_" .. tostring(player_id))
 end
 
-function M.init()
-    for _, subscription in ipairs(subscriptions) do event_bus.unsubscribe(subscription) end
-    subscriptions = {}
-    hero_authority = {}
-    for player_id in pairs(pending_growth) do
-        scheduler.cancel("lumberjack_publish_growth_debug_" .. tostring(player_id))
-    end
-    pending_growth = {}
-    debug_state = {}
-    subscribe(events.HERO_COMBAT_STATS_CHANGED, publish)
-    subscribe(events.UNIT_COMBAT_STATS_CHANGED, on_unit_combat_stats_changed)
-    subscribe(events.HERO_SUMMONED, on_hero_summoned)
-    subscribe(events.HERO_REMOVED, function(payload)
+local function on_technology_stats_changed(payload)
         local player_id = tonumber(payload and payload.player_id)
-        local cached = player_id and hero_authority[player_id]
-        if cached and cached.unit == payload.unit then hero_authority[player_id] = nil end
-        local current = player_id and debug_state[player_id]
-        if not current or current.unit ~= payload.unit then return end
-        debug_state[player_id], pending_growth[player_id] = nil, nil
-        scheduler.cancel("combat_debug_damage_" .. tostring(player_id))
-        scheduler.cancel("lumberjack_publish_growth_debug_" .. tostring(player_id))
-        publish_debug(player_id)
-    end)
-    subscribe(events.COMBAT_DAMAGE_RESOLVED, on_damage)
-    subscribe(events.TECHNOLOGY_CHANGED, on_technology_changed)
-    subscribe(events.TECHNOLOGY_STATS_CHANGED, function(payload)
-        local player_id = tonumber(payload and payload.player_id)
-        if player_id == nil then return end
+        if player_id == nil or not debug_enabled[player_id] then return end
         debug_state[player_id] = debug_state[player_id] or {
             entindex = -1,
             total_damage = 0,
@@ -342,7 +395,89 @@ function M.init()
         else
             publish_debug(player_id)
         end
+end
+
+-- Explicit developer diagnostic only. No client event can opt into this path.
+-- Default ordinary gameplay has no damage/technology debug subscriptions or timers.
+function M.set_debug_enabled(player_id, enabled)
+    player_id=tonumber(player_id)
+    if not player_id or player_id~=math.floor(player_id)or player_id<0 or player_id>3
+        or type(enabled)~="boolean" then return false end
+    if enabled and (type(IsInToolsMode)~="function"or not IsInToolsMode())then return false end
+    if (debug_enabled[player_id]==true)==enabled then return true end
+    if enabled then
+        debug_enabled[player_id]=true;debug_count=debug_count+1
+        if debug_count==1 then
+            for _,entry in ipairs({{events.COMBAT_DAMAGE_RESOLVED,on_damage},
+                {events.TECHNOLOGY_CHANGED,on_technology_changed},
+                {events.TECHNOLOGY_STATS_CHANGED,on_technology_stats_changed}})do
+                debug_subscriptions[#debug_subscriptions+1]=event_bus.subscribe(entry[1],entry[2])
+            end
+        end
+        local cached=hero_authority[player_id]
+        on_hero_summoned({player_id=player_id,unit=cached and cached.unit})
+    else
+        debug_enabled[player_id]=nil;debug_count=debug_count-1
+        pending_growth[player_id]=nil;debug_state[player_id]=nil
+        scheduler.cancel("combat_debug_damage_"..tostring(player_id))
+        scheduler.cancel("lumberjack_publish_growth_debug_"..tostring(player_id))
+        if debug_count==0 then
+            for _,subscription in ipairs(debug_subscriptions)do event_bus.unsubscribe(subscription)end
+            debug_subscriptions={}
+        end
+    end
+    return true
+end
+
+function M.init()
+    for player_id in pairs(debug_enabled)do M.set_debug_enabled(player_id,false)end
+    debug_enabled,debug_subscriptions,debug_count={},{},0
+    for player_id in pairs(pending_combat) do cancel_combat(player_id) end
+    pending_combat, unavailable_players, presentation_lifecycle = {}, {}, {}
+    for _, subscription in ipairs(subscriptions) do event_bus.unsubscribe(subscription) end
+    subscriptions = {}
+    hero_authority = {}
+    for player_id in pairs(pending_growth) do
+        scheduler.cancel("lumberjack_publish_growth_debug_" .. tostring(player_id))
+    end
+    pending_growth = {}
+    debug_state = {}
+    subscribe(events.HERO_COMBAT_STATS_CHANGED, publish)
+    subscribe(events.UNIT_COMBAT_STATS_CHANGED, on_unit_combat_stats_changed)
+    subscribe(events.HERO_SUMMONED, function(payload)
+        local player_id = tonumber(payload and payload.player_id)
+        if player_id ~= nil then cancel_combat(player_id) end
+        on_hero_summoned(payload)
     end)
+    subscribe(events.HERO_READY, function(payload)
+        local player_id = tonumber(payload and payload.player_id)
+        if player_id ~= nil then unavailable_players[player_id] = nil end
+    end)
+    for _, event in ipairs({events.PLAYER_DISCONNECTED, events.PLAYER_DEFEATED}) do
+        subscribe(event, function(payload)
+            local player_id = tonumber(payload and payload.player_id)
+            if player_id == nil then return end
+            cancel_combat(player_id)
+            hero_authority[player_id] = nil
+            unavailable_players[player_id] = true
+            M.set_debug_enabled(player_id,false)
+        end)
+    end
+    subscribe(events.HERO_REMOVED, function(payload)
+        local player_id = tonumber(payload and payload.player_id)
+        local cached = player_id and hero_authority[player_id]
+        if cached and cached.unit == payload.unit then
+            cancel_combat(player_id)
+            hero_authority[player_id] = nil
+        end
+        local current = player_id and debug_state[player_id]
+        if not current or current.unit ~= payload.unit then return end
+        debug_state[player_id], pending_growth[player_id] = nil, nil
+        scheduler.cancel("combat_debug_damage_" .. tostring(player_id))
+        scheduler.cancel("lumberjack_publish_growth_debug_" .. tostring(player_id))
+        publish_debug(player_id)
+    end)
+
 end
 
 return M

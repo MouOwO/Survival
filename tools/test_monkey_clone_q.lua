@@ -1,4 +1,6 @@
 package.path = "scripts/vscripts/?.lua;" .. package.path
+-- Synthetic players have no Steam identity; production admission is unchanged.
+package.loaded["config/test_access"] = { enabled = false }
 -- Exercise the real clone modifier, shared Q service, runtime configuration and
 -- critical-record helper. Only native entities/rendering and the scheduler are
 -- fixtures; this is not a simulation of Dota's attack or particle engine.
@@ -253,7 +255,7 @@ for _,impact in pairs(service._test.impacts()) do
     if impact.attribute_damage==1800000000 then found=true end
 end
 assert(found,"Q must use current logical attributes rather than old clone or projected native values")
-assert(clone.damage_min==100,"fixture separates projected native attack from logical Q attributes")
+assert(clone.damage_min==1000,"VIP clone uses 10x projected native attack while Q retains logical attributes")
 no_roll("wrong player/foreign clone must not borrow another source's Q",function()
     assert(not service.trigger_clone_q(1,clone,target))
     assert(not service.trigger_clone_q(0,other_clone,target))

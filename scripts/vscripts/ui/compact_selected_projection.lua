@@ -6,11 +6,14 @@ local function need(v,e)if not v then error(e,0)end end
 local function guard(fn,...)local ok,a,b=pcall(fn,...);if ok then return a,b end return nil,tostring(a)end
 local function parts(path)local out={}for p in path:gmatch("[^.]+")do out[#out+1]=tonumber(p)or p end return out end
 local function get(value,path)for _,key in ipairs(path)do if type(value)~="table"then return nil end;value=value[key]end return value end
-function M.new(L)return guard(function()
+-- Exact aliases authored by combat_stat_projection.for_ui, never new combat math.
+local derived_aliases={['stat_tooltips.attack.minimum']=true,['stat_tooltips.attack.maximum']=true,
+ ['stat_tooltips.attributes.strength']=true,['stat_tooltips.attributes.agility']=true,['stat_tooltips.attributes.intellect']=true}
+function M.new(L,options)return guard(function()
  local F=L.field_by_name;local root=assert(L.by_key["selected:state"]);local rows={};local zero_records={};local critical,versions={},{}
  for index=1,math.ceil(#layout.numeric_paths/32)do zero_records[index]=assert(L.by_key["selected:zero:"..index]);critical[zero_records[index]]=true end
  for _,kind in ipairs({"number","text"})do for index,path in ipairs(kind=="number"and layout.numeric_paths or layout.text_paths)do
-  local r=assert(L.by_key["selected:metric:"..path],"selected_metric_missing:"..path);rows[#rows+1]={path=path,keys=parts(path),record=r,kind=kind,group=math.floor((index-1)/32)+1,power=2^((index-1)%32)}
+  local r=assert(L.by_key["selected:metric:"..path],"selected_metric_missing:"..path);if not(options and options.derive_aliases and derived_aliases[path])then rows[#rows+1]={path=path,keys=parts(path),record=r,kind=kind,group=math.floor((index-1)/32)+1,power=2^((index-1)%32)}end
   if kind=="text"or not path:find("%.")or path:match("^building_stat_details%.[a-z]+_bonus$")or path:match("^building_stat_details%.[a-z]+_pct$")or path:match("^building_stat_details%.[a-z]+_base$")then critical[r]=true end
   if path=="refresh_version"or path=="refresh_sequence"then versions[r]=true end
  end end
@@ -22,12 +25,17 @@ function M.new(L)return guard(function()
    need(type(entity)=="number"and entity==math.floor(entity)and entity>=0 and entity<=4294967295,"selected_entity_invalid")
    need(type(token)=="number"and token==math.floor(token)and token>=1 and token<=4294967295,"selected_token_invalid")
    local values={};local api={};local visits=0;local unknown_text={}
-   function api.update(source)
+   function api.update(source,next_token)
     return guard(function()
+     -- Same-entity refresh preserves the established baseline. Stage the new
+     -- selection token with the validated delta; an invalid source cannot
+     -- advance identity or partially commit display fields.
+     if next_token~=nil then need(type(next_token)=="number"and next_token==math.floor(next_token)and next_token>token and next_token<=4294967295,"selected_token_invalid")end
+     local write_token=next_token or token
      local writes,zero_masks={},{};unknown_text={};local function put(r,f,value)writes[#writes+1]={record=r,field=f,value=value}end
      local known=type(source)=="table"and source.success==1 and tonumber(source.entindex)==entity
      put(root,F.known,known and 1 or 0);put(root,F.success,known and 1 or 0);put(root,F.error_code,known and 0 or source and source.error_code==2 and 2 or 1)
-     put(root,F.selected_entity,entity);put(root,F.selected_token,token)
+     put(root,F.selected_entity,entity);put(root,F.selected_token,write_token)
      visits=0
      if known then
       local speed=(source.stat_tooltips or{}).attack_speed or{}
@@ -65,6 +73,7 @@ function M.new(L)return guard(function()
      -- its last-sent baseline until a meaningful delta carries the latest one.
      if not meaningful then return{},{fixed_metric_visits=visits,static_catalogue_scans=0}end
      for _,change in ipairs(changed)do values[change.key]=change.write.value~=nil and change.write or nil end
+     token=write_token
      return ops,{fixed_metric_visits=visits,static_catalogue_scans=0}
     end)
    end

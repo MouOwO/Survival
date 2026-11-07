@@ -1,3 +1,4 @@
+local gold_numbers = require("ui/gold_income_numbers")
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local scheduler = require("core/scheduler")
@@ -507,15 +508,8 @@ local function produce_once(state)
     if result and result.ok then
         local player = PlayerResource:GetPlayer(state.player_id)
         if player then
-            CustomGameEventManager:Send_ServerToPlayer(
-                player,
-                "survival_gold_mine_income_number",
-                {
-                    target_entindex = state.unit:entindex(),
-                    amount = math.floor(amount + 0.5),
-                    critical = crit and 1 or 0,
-                }
-            )
+            gold_numbers.send(state.player_id, player, state.unit:entindex(),
+                math.floor(amount + 0.5), crit and 1 or 0)
         end
     end
 end
@@ -541,6 +535,7 @@ schedule_production = function(state, force)
 end
 
 function M.init()
+    gold_numbers.init()
     -- Remove the pre-refactor global production task when Workshop Tools
     -- reloads Lua modules without resetting the scheduler instance.
     scheduler.cancel("gold_mine_production")

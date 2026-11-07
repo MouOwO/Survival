@@ -1,3 +1,5 @@
+-- Explicit offline admission boundary; these tests cover debug consumers, not player authentication.
+package.loaded["core/test_access_policy"]={enabled=function()return false end,allowed=function()return true end}
 package.path = "scripts/vscripts/?.lua;" .. package.path
 local bus = require("core/event_bus")
 local events = require("core/events")
@@ -30,7 +32,7 @@ end)
 bus.handle_request(events.HERO_SKILL_POOL_DRAW_REQUEST, function()
     return {ok=true, candidates={{skill_id="proto_flame_burst"}}}
 end)
-ui.init(); choices.init(); boundary.init()
+ui.init(); IsInToolsMode=function()return true end; for debug_id=0,3 do assert(ui.set_debug_enabled(debug_id,true))end; choices.init(); boundary.init()
 local first, other = unit(101), unit(102)
 hero_by_player[0], hero_by_player[1] = first, other
 bus.emit(events.HERO_SUMMONED,{player_id=0, unit=first})

@@ -1,3 +1,5 @@
+-- Explicit offline admission boundary; these tests cover debug consumers, not player authentication.
+package.loaded["core/test_access_policy"]={enabled=function()return false end,allowed=function()return true end}
 -- Pure Lua A/B verification of the real four-player damage pipeline.
 -- No game process, save writes, network, timing hook or native binding is used.
 package.path='scripts/vscripts/?.lua;'..package.path
@@ -46,7 +48,7 @@ end
 local ids={};for id,d in pairs(weapons.by_id)do if d.series_id=='ice_blade' then ids[#ids+1]=id end end;table.sort(ids);assert(#ids>=4)
 local permanent=require('systems/permanent_reward_effect_service');permanent.init()
 local growth=require('systems/weapon_growth_service');growth.init()
-local ui=require('ui/combat_stats_ui_service');ui.init()
+local ui=require('ui/combat_stats_ui_service');ui.init(); IsInToolsMode=function()return true end; for debug_id=0,3 do assert(ui.set_debug_enabled(debug_id,true))end
 bus.handle_request(ev.RESOURCE_ADD_REQUEST,function(p)local l=ledger[p.player_id];l.wood=l.wood+(p.wood or 0);l.gold=l.gold+(p.gold or 0);return {ok=true}end)
 bus.handle_request(ev.CONTENT_INVENTORY_GET_REQUEST,function()return {ok=true,snapshot={counts={}}}end)
 local emissions=0;bus.subscribe(ev.COMBAT_DAMAGE_RESOLVED,function(p)
@@ -124,6 +126,7 @@ local function read_source(path)
 end
 local source=read_source('scripts/vscripts/modifiers/modifier_weapon_stat_projection.lua')
 local function remove_once(text,chunk)
+ chunk=chunk:gsub('\r\n','\n')
  local first,last=text:find(chunk,1,true)
  assert(first,'Expected owner-filter change absent')
  assert(not text:find(chunk,last+1,true),'Owner-filter change occurs more than once')
@@ -135,15 +138,11 @@ local baseline=arg[1] and read_source(arg[1]) or source
 if not arg[1] then
  baseline=remove_once(baseline,'local player_context = require("systems/player_context_service")\n')
  local first=assert(baseline:find('-- Only a confirmed current owner can prune the old same-team delivery.',1,true))
- local last=assert(baseline:find('function modifier_weapon_stat_projection:OnTakeDamage(params)',first,true))
+ local last=assert(baseline:find('function modifier_weapon_stat_projection:HandleTakeDamage(params)',first,true)or baseline:find('function modifier_weapon_stat_projection:OnTakeDamage(params)',first,true))
  baseline=baseline:sub(1,first-1)..baseline:sub(last)
- baseline=remove_once(baseline,[=[    local receiver = tonumber(self.player_id)
-    if receiver ~= nil and receiver == receiver and receiver >= 0
-        and receiver < math.huge and receiver == math.floor(receiver) then
-        local owner = confirmed_damage_owner(attacker)
-        if owner ~= nil and owner ~= receiver then return end
-    end
-]=])
+ local receiver_start=assert(baseline:find('    local receiver = tonumber(self.player_id)',1,true))
+ local receiver_end=assert(baseline:find('    if attacker == self:GetParent() then',receiver_start,true))
+ baseline=baseline:sub(1,receiver_start-1)..baseline:sub(receiver_end)
 end
 local before,beforeEvents=suite(baseline,false)
 local after,afterEvents=suite(source,true)

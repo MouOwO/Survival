@@ -89,8 +89,14 @@ selected = 21;
 const advanced = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => binding(300 + n, 'ability_research_ars_' + String(n).padStart(2, '0')));
 // Shared-lab owner's public skills are unlocked; viewer data has not arrived yet.
 for (const mapping of advanced) {
-    stable(mapping, true);
-    assert.equal(hud.GetResearchRuntime(mapping.entry.ability, selected, publicRows[mapping.entry.ability]).research_status_code, 'syncing');
+    // Unknown viewer prerequisites use a neutral icon, not a fabricated lock.
+    // The presentation must not make the unresolved action executable.
+    stable(mapping, false);
+    const pending = hud.GetResearchRuntime(mapping.entry.ability, selected, publicRows[mapping.entry.ability]);
+    assert.equal(pending.research_status_code, 'syncing');
+    assert.equal(pending.research_prerequisite_known, 0);
+    assert.equal(pending.available, 0);
+    assert.equal(hud.QueueResearch(mapping.entry.ability, selected), false);
 }
 const privateRows = Object.fromEntries(advanced.map((m, i) => [m.entry.name,
     {prerequisite_met: i % 3 === 0 ? 1 : 0, available: i % 3 === 0 ? 1 : 0}]));

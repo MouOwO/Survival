@@ -1,3 +1,4 @@
+local gold_numbers = require("ui/gold_income_numbers")
 -- Presentation only. Resource settlement never waits for this queue.
 local scheduler = require("core/scheduler")
 local particle_manager = require("core/particle_manager")
@@ -24,10 +25,7 @@ local function show(entry, wood, gold, player)
         particle_manager.show_green_number(entry.worker, wood, player)
     end
     if gold > 0 then
-        CustomGameEventManager:Send_ServerToPlayer(player,
-            "survival_gold_mine_income_number", {
-                target_entindex = entry.entindex, amount = gold, critical = 0,
-            })
+        gold_numbers.send(entry.player_id, player, entry.entindex, gold, 0)
     end
 end
 

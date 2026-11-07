@@ -27,8 +27,8 @@ function fixture(options={}) {
             DeleteAsync(){p.deleteRequests++;if(!options.asyncDelete)p.alive=false;},FindChildTraverse(){counts.treeQueries++;throw Error("recursive_query_forbidden");}};
         return p;
     }
-    function load(owner) {
-        vm.runInNewContext(source, {
+    function load(owner, overriddenSource) {
+        vm.runInNewContext(overriddenSource || source, {
             GameUI:{CustomUIConfig:()=>cfg},
             GameEvents:{Subscribe(name,fn){if(options.failSubscription===name)throw Error("native_subscription_failed");const id=++serial;events.set(id,{name,fn});if(options.onSubscribe)options.onSubscribe(owner,name,fn);return id;},
                 Unsubscribe(id){removed.push(id);events.delete(id);if(options.onUnsubscribe)options.onUnsubscribe(id);},SendCustomGameEventToServer(name,packet){sent.push({name,packet});if(options.onSend)options.onSend(name,packet);}},
@@ -213,6 +213,29 @@ test("stable owner checks are constant for one view versus the entire 33-view ca
     assert.equal(one,400);assert.equal(many,one);assert.equal(t.counts.scheduled,0);assert.equal(t.counts.treeQueries,0);assert.equal(t.sent.length,0);
     Object.assign(costCounts,{views_small:1,views_large:rt.Inspect().views,entry_calls_per_sample:200,small_IsValid:one,large_IsValid:many,
         stable_created_timers:0,stable_sent_packets:0,tree_queries:0,native_measurement:false});
+});
+
+test("capability build upgrade replaces the live previous runtime and negotiates selected aliases",()=>{
+    assert.ok(source.includes('compact_ui_runtime_20261107_hero_alias_session_v11'));
+    const priorSource=source.replace('compact_ui_runtime_20261107_hero_alias_session_v11','compact_ui_runtime_20261107_prepared_slim_v10')
+        .replace('if(view.id===5&&view.desired==="open"&&view.consumer.options.deriveAliases===true)values.types=3;', '');
+    const t=fixture(),owner=t.panel(),old=t.load(owner,priorSource);
+    old.CreateView("selected",{deriveAliases:true}).Open();t.admit();hello().forEach(t.deliver);
+    function capability(rows){
+        const frames=rows.filter(row=>W.PeekHeader(row.packet).view===5);
+        const receiver=W.NewReceiver(schema,{schema:1,schema_sha256:C.sha256,session:900,epoch:1,view:5});let tx;
+        for(const row of frames)tx=receiver.Accept(row.packet);
+        assert.ok(tx&&!tx.pending);return tx.changes.find(op=>op.field===F.types);
+    }
+    assert.equal(capability(t.sent),undefined,"previous implementation does not claim new consumer support");
+    const late=[...t.events.values()].map(row=>row.fn),before=t.sent.length;
+    const fresh=t.load(owner);assert.notEqual(fresh,old);assert.equal(old.Inspect().active,false);
+    assert.equal(t.events.size,2);assert.equal(t.tables.size,1,"exactly one new loading listener");
+    fresh.CreateView("selected",{deriveAliases:true}).Open();hello().forEach(t.deliver);
+    assert.equal(capability(t.sent.slice(before)).value,3,"real new runtime emits the explicit capability");
+    const sent=t.sent.length;late.forEach(fn=>fn({d:"old_callback"}));
+    assert.equal(t.sent.length,sent);assert.equal(t.cfg.SurvivalCompactRuntime,fresh);
+    assert.equal(t.load(t.panel()),fresh,"same new build is deduplicated without another bootstrap");
 });
 
 console.log(JSON.stringify({scope:"PURE_NODE_VM_REGRESSION_NOT_NATIVE_ACCEPTANCE",source:sourcePath,

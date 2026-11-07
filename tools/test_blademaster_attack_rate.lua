@@ -1,3 +1,5 @@
+-- Synthetic fixture only: production Steam admission configuration is unchanged.
+package.loaded['config/test_access']={enabled=false}
 -- Real clone service + shared attack-rate service + native modifier definition.
 -- Verify both fixed-rate properties and the carrier's original animation BAT.
 -- GetAttacksPerSecond alone can report 10 while rewriting BAT to 0.1 leaves
@@ -218,6 +220,10 @@ bus.emit(events.HERO_SKILL_CHANGED, { player_id = 0 })
 local clone0 = assert(created[#created])
 bus.emit(events.HERO_SKILL_CHANGED, { player_id = 1 })
 local clone1 = assert(created[#created])
+near(clone0.damage_min,1120,"VIP clone minimum 10x on creation")
+near(clone0.damage_max,1200,"VIP clone maximum 10x on creation")
+near(clone1.damage_max,1200,"other owner independently gets own 10x")
+near(snapshots[0].attack_max,120,"source snapshot remains unchanged")
 near(clone0:GetAttacksPerSecond(false), 10, "new clone attacks ten times/s despite old snapshot BAT")
 near(clone1:GetAttacksPerSecond(false), 3, "second player inherits only its source")
 native_bat_retained(clone0, "birth")
@@ -306,12 +312,12 @@ bus.emit(events.HERO_COMBAT_STATS_CHANGED, { player_id = 0, snapshot = snapshots
 near(replacement_clone.damage_min, 5e7, "safe native attack min")
 near(replacement_clone.damage_max, 1e8, "safe native attack max")
 near(require("combat/endless_stat_projection").outgoing(replacement_clone,
-    replacement_clone.damage_max, true), 2e12, "one existing damage-filter projection restores huge attack")
+    replacement_clone.damage_max, true), 2e13, "one existing damage-filter projection restores huge attack")
 near(replacement_clone.health, 500, "increased maximum preserves wounded health fraction")
 near(replacement_clone.armor, 12, "clone inherits source effective armor")
 near(replacement_clone:Script_GetAttackRange(), 1100, "native override inherits source range when setter is ineffective")
 near(replacement_clone.move_speed, 600, "clone inherits actual source speed")
-near(replacement_clone.survival_exclusive_stat_snapshot.attack_max, 2e12, "logical damage for HUD")
+near(replacement_clone.survival_exclusive_stat_snapshot.attack_max, 2e13, "logical damage for HUD")
 near(replacement_clone.survival_exclusive_stat_snapshot.intellect, 900, "logical attributes refresh")
 local writes = replacement_clone.damage_writes
 jobs.blademaster_growth()

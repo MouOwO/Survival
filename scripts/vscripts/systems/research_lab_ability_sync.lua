@@ -8,6 +8,13 @@ local M = {}
 
 local rows_by_building = {}
 local managed_by_building = {}
+local projected_rebirth, progression_epoch = {}, {}
+local active_lifecycle
+local function invalidate_progression(player_id)
+    if player_id == nil then return end
+    projected_rebirth[player_id] = nil
+    progression_epoch[player_id] = (progression_epoch[player_id] or 0) + 1
+end
 
 for _, row in ipairs(mappings.rows or {}) do
     if row.enabled ~= false and row.building_id and row.ability_name then
@@ -187,20 +194,53 @@ local function sync_player(player_id, source_entindex, transaction)
 end
 
 function M.init()
+    projected_rebirth, progression_epoch = {}, {}
+    local lifecycle, world = {}, event_bus.get_generation()
+    active_lifecycle = lifecycle
+    local function current()
+        return active_lifecycle == lifecycle and event_bus.get_generation() == world
+    end
     event_bus.subscribe(events.BUILDING_CREATED, function(payload)
+        if not current() then return end
+        if payload and is_research_building(payload.building_id) then
+            invalidate_progression(tonumber(payload.player_id))
+        end
         sync_building(payload, { researching = 0 })
     end)
+    event_bus.subscribe(events.BUILDING_DESTROYED, function(payload)
+        if current() and payload and is_research_building(payload.building_id) then
+            invalidate_progression(tonumber(payload.player_id))
+        end
+    end)
     event_bus.subscribe(events.TECHNOLOGY_RESEARCH_STATE_CHANGED, function(payload)
+        if not current() then return end
         sync_player(payload.player_id, payload.source_entindex, payload)
     end)
     event_bus.subscribe(research_events.LEVEL_CHANGED, function(payload)
+        if not current() then return end
         local player_id = tonumber(payload and payload.player_id)
-        if player_id ~= nil then sync_player(player_id) end
+        if player_id ~= nil then invalidate_progression(player_id); sync_player(player_id) end
     end)
     event_bus.subscribe(events.HERO_PROGRESSION_CHANGED, function(payload)
+        if not current() then return end
         local player_id = tonumber(payload and payload.player_id)
-        if player_id ~= nil then sync_player(player_id) end
+        if player_id == nil then return end
+        local epoch, cached = (progression_epoch[player_id] or 0) + 1, projected_rebirth[player_id]
+        progression_epoch[player_id] = epoch
+        local rank = reincarnation_level(player_id)
+        if not current() then return end
+        if rank == cached and epoch == (progression_epoch[player_id] or 0) then return end
+        sync_player(player_id)
+        local final_rank = reincarnation_level(player_id)
+        if current() and rank == final_rank and epoch == (progression_epoch[player_id] or 0) then
+            projected_rebirth[player_id] = rank
+        end
     end)
+    for _, event in ipairs({events.HERO_READY, events.PLAYER_DISCONNECTED, events.PLAYER_DEFEATED}) do
+        event_bus.subscribe(event, function(payload)
+            if current() then invalidate_progression(tonumber(payload and payload.player_id)) end
+        end)
+    end
 end
 
 return M

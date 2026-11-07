@@ -12,6 +12,7 @@ local compact_execute
 local research_cache, research_generation = {}, {}
 local presentation_versions,building_versions,presentation_cache,building_signatures={},{},{},{}
 local active_lifecycle
+local research_rebirth = {}
 function M.stamp(player_id,entity)
     return tostring(event_bus.get_generation())..':'..tostring(presentation_versions[player_id]or 0)..':'..tostring(building_versions[entity]or 0)
 end
@@ -107,6 +108,12 @@ function M.decorate(player_id, unit, snapshot,compact)
         local progression = event_bus.request(events.HERO_PROGRESSION_GET_REQUEST, {
             player_id = player_id,
         }) or {}
+        -- Only rebirth changes learning requirements; ordinary attack-driven
+        -- attribute growth must not invalidate all research presentation.
+        research_rebirth[player_id] = {
+            owner = PlayerResource:GetPlayer(player_id),
+            level = tonumber(progression.snapshot and progression.snapshot.rebirth_level) or 0,
+        }
         local view = {
             player_id = player_id, team = building.team,
             building_id = id, entindex = entindex,
@@ -138,6 +145,7 @@ end
 function M.init(options)
     compact_execute = nil
     research_cache,research_generation={},{}
+    research_rebirth={}
     presentation_versions,building_versions,presentation_cache,building_signatures={},{},{},{}
     local lifecycle={};active_lifecycle=lifecycle;local world=event_bus.get_generation()
     local function current()return active_lifecycle==lifecycle and event_bus.get_generation()==world end
@@ -196,7 +204,23 @@ function M.init(options)
     end
     event_bus.subscribe(events.TECHNOLOGY_RESEARCH_STATE_CHANGED,refresh_research)
     event_bus.subscribe(research_events.LEVEL_CHANGED,refresh_research)
-    event_bus.subscribe(events.HERO_PROGRESSION_CHANGED,refresh_research)
+    event_bus.subscribe(events.HERO_PROGRESSION_CHANGED,function(payload)
+        if not current()then return end
+        local id=tonumber(payload and payload.player_id)
+        if not id then return end
+        local owner=PlayerResource:GetPlayer(id)
+        if not owner then research_rebirth[id]=nil;return end
+        local level=tonumber(payload.rebirth_level)
+        if level==nil then
+            local response=event_bus.request(events.HERO_PROGRESSION_GET_REQUEST,{player_id=id})or{}
+            level=tonumber(response.snapshot and response.snapshot.rebirth_level)
+        end
+        if level==nil then return end
+        local prior=research_rebirth[id]
+        if prior and prior.owner==owner and prior.level==level then return end
+        research_rebirth[id]={owner=owner,level=level}
+        refresh_research(payload)
+    end)
     event_bus.subscribe(events.PERMANENT_REWARD_EFFECTS_CHANGED,function(payload)
         -- Growth/income ticks share this event. Only a rebuilt cost projection
         -- can change research prices, not each hero attack or wood increment.
@@ -224,7 +248,11 @@ function M.init(options)
     end
     event_bus.subscribe(events.BUILDING_CHANGED,changed_building)
     for _,event in ipairs({events.PLAYER_DEFEATED,events.PLAYER_DISCONNECTED})do
-        event_bus.subscribe(event,function(payload)if current()then invalidate_presentation(payload);refresh(payload)end end)
+        event_bus.subscribe(event,function(payload)if current()then
+            local id=tonumber(payload and payload.player_id)
+            if id then research_rebirth[id]=nil end
+            invalidate_presentation(payload);refresh(payload)
+        end end)
     end
     local function research_request(operation, request_event, payload, capture)
         if not current()then return end

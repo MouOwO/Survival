@@ -1,3 +1,4 @@
+local gold_numbers = require("ui/gold_income_numbers")
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local model_scale = require("visual/model_scale")
@@ -468,15 +469,7 @@ local function on_tree_hit(payload)
         particle_manager.show_green_number(attacker, efficiency, player)
     end
     if payload.source ~= "lumberjack" and player and gold_amount > 0 then
-        CustomGameEventManager:Send_ServerToPlayer(
-            player,
-            "survival_gold_mine_income_number",
-            {
-                target_entindex = attacker:entindex(),
-                amount = gold_amount,
-                critical = 0,
-            }
-        )
+        gold_numbers.send(payload.player_id, player, attacker:entindex(), gold_amount, 0)
     end
 end
 
