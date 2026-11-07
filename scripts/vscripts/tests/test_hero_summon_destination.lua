@@ -1,11 +1,13 @@
 package.path = "scripts/vscripts/?.lua;" .. package.path
+-- Standalone fake players must not depend on the production admission list.
+package.loaded["config/test_access"] = {enabled=false}
 local definitions = {rows = {}}
 package.loaded["config/generated/build_forbidden_regions"] = definitions
 Vector = function(x, y, z) return {x = x, y = y, z = z or 0} end
 DOTA_TEAM_GOODGUYS, DOTA_UNIT_TARGET_TEAM_BOTH = 2, 3
 DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_BUILDING = 1, 2, 4
 DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER = 16, 0
-local queries, ground_calls, navigation_calls, obstacles, listed
+local queries, ground_calls, navigation_calls, grid_queries, obstacles, listed
 local height, traversable, blocked
 Entities = {FindByName = function() error("fixed hero/training-room markers must not determine a summon destination") end}
 GridNav = {
@@ -19,7 +21,7 @@ end
 FindClearSpaceForUnit = function() error("summon resolver must never relocate outside its checked search") end
 FindUnitsInRadius = function(_, position, _, radius, team, kinds, flags)
     queries = queries + 1
-    assert(radius <= 1200 and team == 3 and kinds == 7 and flags == 16,
+    assert(radius <= 1408 and team == 3 and kinds == 7 and flags == 16,
         "bounded query includes hidden invulnerable wall barriers")
     local found = {}
     for _, unit in ipairs(obstacles) do
@@ -30,8 +32,16 @@ FindUnitsInRadius = function(_, position, _, radius, team, kinds, flags)
 end
 local regions = require("systems/forbidden_region_service")
 local validation = require("systems/destination_validation_service")
-local resolver = require("systems/hero_summon_destination")
+local resolver = arg and arg[1] and assert(loadfile(arg[1]))()
+    or require("systems/hero_summon_destination")
 local bus, events = require("core/event_bus"), require("core/events")
+local grid = require("systems/grid_placement_system")
+local geometry = require("core/building_grid_geometry")
+local grid_lookup = grid.is_position_occupied
+grid.is_position_occupied = function(position)
+    grid_queries=grid_queries+1
+    return grid_lookup(position)
+end
 local serial = 0
 local function entity(x, y, z, hull)
     serial = serial + 1
@@ -48,11 +58,11 @@ local function entity(x, y, z, hull)
 end
 local altar, city
 local function reset()
-    queries, ground_calls, navigation_calls, obstacles = 0, 0, 0, {}
+    queries, ground_calls, navigation_calls, grid_queries, obstacles = 0, 0, 0, 0, {}
     altar, city = entity(-4000, 0, 384), entity(2000, 0, 152, 48)
     height = function(p) return p.x < 1000 and 384 or 128 end
     traversable, blocked = function() return true end, function() return false end
-    definitions.rows = {}; regions.init(); bus.reset()
+    definitions.rows = {}; regions.init(); bus.reset(); grid.init()
     listed = {{player_id = 0, building_id = "main_city", unit = city}}
     bus.handle_request(events.BUILDING_LIST_REQUEST, function(payload)
         assert(payload.player_id == 0, "query must be limited to the summoning player")
@@ -68,6 +78,7 @@ assert(city:GetAbsOrigin().z == 152, "grounding must not mutate the city origin"
 assert(info.source == "main_city" and info.distance == 256 and info.grounded and info.attempts == 1)
 assert(queries == 1 and ground_calls == 9 and navigation_calls == 9,
     "center and all eight clearance samples validated once")
+local first_grid_queries=grid_queries
 local before_ground = ground_calls
 local hero = {IsNull = function() return false end, survival_hero_id = "hero_test",
     GetAbsOrigin = function() return position end, SetOrigin = function(_, p) position = p end,
@@ -215,4 +226,94 @@ position, reason, info = resolver.resolve(altar, {}, 0, nil, {allow_without_city
 assert(not position and info.source == "main_city" and info.attempts == 112,
     "if the own city exists, a blocked city never falls back to a distant altar")
 
-print("HERO_SUMMON_DESTINATION_PASS: own live city, bounded clearance, regions/heights/occupancy, explicit early owned anchors and unchanged city-only return")
+-- Use the REAL occupied grid/events, including its minimum footprint and zero
+-- world origin. Native zero-hull entities intentionally do not block movement,
+-- but their registered buildings must still not be chosen as hero landings.
+local function reserve(x,y,index)
+    local payload={grid_x=x,grid_y=y,footprint={x=2,y=2},entindex=index}
+    assert(bus.request(events.GRID_OCCUPY_REQUEST,payload)==true)
+    return payload
+end
+reset()
+local zero_hull_altar=entity(2240,0,128,0)
+zero_hull_altar.survival_hull_radius=0
+zero_hull_altar.survival_is_building=true
+zero_hull_altar.survival_building_id="hero_altar"
+obstacles={zero_hull_altar}
+local gx,gy=geometry.origin(zero_hull_altar:GetAbsOrigin(),{x=2,y=2})
+local occupied_altar=reserve(gx,gy,zero_hull_altar:entindex())
+position,reason,info=resolve()
+assert(position and info.attempts>1 and info.rejected.destination_building_occupied,
+    "a zero-hull altar's occupied footprint rejects the old first landing")
+assert(first_grid_queries>0 and first_grid_queries<=9,"one ordinary landing uses at most nine indexed grid reads")
+assert(queries==1 and grid_queries<=info.attempts*9,"grid checks do not add native radius scans")
+local zero_hull_grid_queries,zero_hull_attempts=grid_queries,info.attempts
+assert(bus.request(events.GRID_RELEASE_REQUEST,occupied_altar)==true)
+position,reason,info=resolve()
+assert(position and position.x==2256 and position.y==0 and info.attempts==1,
+    "destroy/release makes the original landing available immediately, without a cache sweep")
+
+reset();height=function()return 128 end;city.origin=Vector(-286,-10,152)
+reserve(0,0,9000)
+-- Circle center(-30,-10), radius32 intersects corner(0,0), but none of its
+-- eight radial samples enters the positive quadrant. Sampling alone misses it.
+for i=0,7 do
+    local a=i*math.pi/4
+    assert(-30+math.cos(a)*32<0 or -10+math.sin(a)*32<0,"fixture defeats eight-point sampling")
+end
+position,reason,info=resolve()
+assert(position and info.attempts>1 and info.rejected.destination_building_occupied,
+    "exact circle-AABB rejects a building corner between radial samples")
+
+reset();height=function()return 128 end;city.origin=Vector(-288,32,152)
+local touching=reserve(0,0,9001)
+position,reason,info=resolve()
+assert(position and info.attempts>1 and info.rejected.destination_building_occupied,
+    "tangency is conservatively blocked on the left grid boundary")
+city.origin=Vector(-288.01,32,152)
+position,reason,info=resolve()
+assert(position and math.abs(position.x+32.01)<.00001 and info.attempts==1,
+    "a small real gap beyond the boundary is accepted")
+assert(bus.request(events.GRID_RELEASE_REQUEST,touching)==true)
+reserve(-2,-2,9002);city.origin=Vector(-224,-32,152)
+position,reason,info=resolve()
+assert(position and info.attempts>1 and info.rejected.destination_building_occupied,
+    "negative cell coordinates and opposite tangent boundary use the same policy")
+
+reset();height=function()return 128 end;city.origin=Vector(-316,32,152)
+reserve(0,0,9003)
+position,reason,info=resolve()
+assert(position and info.attempts==1 and position.x==-60,"radius32 fits before the building")
+local large_hero=entity(-500,0,128,64)
+position,reason,info=resolver.resolve(altar,{},0,large_hero)
+assert(position and info.attempts>1 and info.rejected.destination_building_occupied,
+    "post-create actual hero radius64 cannot reuse the radius32 gap")
+assert(queries==2,"each explicit resolve uses one bounded native occupancy query")
+
+local max_grid_queries=0
+for _,hull in ipairs({32,64,128,256})do
+    reset();height=function()return 128 end
+    position,reason,info=resolver.resolve(altar,{},0,entity(0,0,128,hull))
+    assert(position and info.attempts==1 and queries==1,"supported actual hull finds bounded empty landing")
+    local bound=hull==32 and 9 or 100
+    assert(grid_queries>0 and grid_queries<=bound,"bounded circle grid lookup count")
+    max_grid_queries=math.max(max_grid_queries,grid_queries)
+end
+for _,hull in ipairs({257,math.huge,0/0,-1})do
+    reset()
+    position,reason,info=resolver.resolve(altar,{},0,entity(0,0,128,hull))
+    assert(not position and info.last_reason=="hero_hull_out_of_bounds"
+        and info.attempts==0 and queries==0 and grid_queries==0,
+        "abnormal hull fails before any unbounded native/grid search")
+end
+
+reset();height=function()return 128 end
+local saved_grid_lookup=grid.is_position_occupied
+grid.is_position_occupied=function()error("fixture unavailable grid")end
+position,reason,info=resolve()
+grid.is_position_occupied=saved_grid_lookup
+assert(not position and info.rejected.occupancy_grid_unavailable==info.attempts,
+    "an unavailable occupancy index cannot silently admit an occupied landing")
+print("HERO_SUMMON_DESTINATION_PASS: original policy plus zero-hull footprint/corner/release/boundary/actual hull; first_grid_queries="
+    ..first_grid_queries.." zero_hull_attempts="..zero_hull_attempts.." zero_hull_grid_queries="..zero_hull_grid_queries
+    .." max_observed_grid_queries="..max_grid_queries.." native_queries_per_resolve=1; real grid/events, native boundary simulated")

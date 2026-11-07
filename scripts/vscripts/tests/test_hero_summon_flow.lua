@@ -25,6 +25,7 @@ class = function(value) return value end
 IsServer = function() return true end
 UF_SUCCESS, UF_FAIL_CUSTOM = 0, 1
 DOTA_UNIT_CAP_NO_ATTACK, DOTA_UNIT_CAP_MOVE_NONE = 0, 0
+DOTA_UNIT_CAP_MOVE_GROUND = 1
 Vector = function(x, y, z) return {x = x, y = y, z = z or 0} end
 
 package.loaded["systems/unit_health_bar_service"] = {
@@ -62,7 +63,13 @@ package.loaded["systems/hero_summon_destination"] = {
         eq(altar, ctx.altar or ctx.builder)
         eq(row, definition)
         eq(player_id, 0)
-        eq(moving_unit, nil)
+        if moving_unit then
+            count("final_resolve")
+            eq(moving_unit, ctx.selected, "final check uses the new native hero")
+            eq(moving_unit.stats_applied, true, "check after actual hero setup")
+            if ctx.final_blocked then return nil, "hero_spawn_blocked" end
+            if ctx.final_destination then return ctx.final_destination, nil end
+        end
         eq(options.allow_without_city, true)
         eq(options.anchor_source, ctx.altar and "hero_altar" or "builder")
         if not ctx.destination then return nil, "hero_spawn_blocked" end
@@ -96,6 +103,10 @@ local function entity(name)
     function unit:RemoveNoDraw() self.hidden = false end
     function unit:SetAttackCapability(value) self.attack_capability = value end
     function unit:SetMoveCapability(value) self.move_capability = value end
+    function unit:RemoveModifierByName(name)
+        if ctx.release_fails then error("engine modifier removal failed") end
+        self.modifiers[name] = nil
+    end
     function unit:SetAbsOrigin(value) self.origin = value end
     function unit:GetAbsOrigin() return self.origin end
     function unit:GetAbilityCount() return 0 end
@@ -122,10 +133,18 @@ PlayerResource = {
             eq(anchor.phase(id), "replacing", "replacement requires a live transaction")
         end
         count("replace")
+        if ctx.reuse_carrier then return ctx.selected end
         -- The engine discards the previous carrier. Keeping it valid would
         -- conceal the original abort-after-replacement retry deadlock.
         ctx.selected.removed = true
         ctx.selected = entity(name)
+        if ctx.inherit_isolation then
+            ctx.selected.modifiers.modifier_survival_placeholder_anchor = {}
+            ctx.selected.modifiers.unrelated_combat_root = {}
+            ctx.selected.move_capability = DOTA_UNIT_CAP_MOVE_NONE
+            ctx.selected.survival_hide_custom_health_bar = true
+            ctx.selected.survival_deleted_hero_placeholder = true
+        end
         return ctx.selected
     end,
 }
@@ -227,7 +246,9 @@ fixture()
 local resolved = ctx.destination
 local success = request()
 eq(success.ok, true)
-eq(calls("resolve"), 1)
+eq(calls("resolve"), 2, "preflight and actual-unit landing check")
+eq(calls("final_resolve"), 1)
+eq(ctx.selected.move_capability, DOTA_UNIT_CAP_MOVE_GROUND)
 eq(calls("marker_reads"), 0, "initialization must not reread the stale marker")
 eq(ctx.teleport_position, resolved, "use the exact validated destination")
 eq(ctx.selected:GetAbsOrigin().z, 384)
@@ -497,4 +518,51 @@ bus.emit(events.BUILDING_CREATED, {player_id = 0, building_id = "hero_altar", un
 ctx.assets_ready = true; ctx.preload.on_ready()
 eq(completed.ok, true); eq(calls("replace"), 1)
 
-print("test_hero_summon_flow: PASS (18 integrated summon, rogue unlock, deletion/retry and native ability scenarios)")
+-- 19. Native replacement callbacks can change occupancy or require a larger
+-- hull: only the second check's safe point can be placed/committed.
+fixture()
+ctx.final_destination = Vector(1500, -500, 384)
+eq(request().ok, true)
+eq(ctx.teleport_position, ctx.final_destination)
+eq(calls("final_resolve"), 1)
+
+-- 20. A failed final check keeps the new carrier isolated and retryable.
+fixture()
+ctx.final_blocked = true
+local final_blocked = request()
+eq(final_blocked.ok, false); eq(final_blocked.error, "hero_spawn_blocked")
+eq(calls("teleport"), 0); eq(calls("cosmetics"), 0)
+eq(anchor.phase(0), "placeholder"); eq(ctx.selected.hidden, true)
+eq(ctx.selected:HasModifier("modifier_survival_placeholder_anchor"), true)
+no_summon_publication()
+
+-- 21. A retry may reuse the isolated same-name native entity.
+local retry_carrier = ctx.selected
+ctx.final_blocked, ctx.reuse_carrier = false, true
+eq(request().ok, true)
+eq(ctx.selected, retry_carrier); eq(ctx.selected:IsNull(), false)
+eq(ctx.selected:HasModifier("modifier_survival_placeholder_anchor"), false)
+eq(ctx.selected.move_capability, DOTA_UNIT_CAP_MOVE_GROUND)
+eq(ctx.selected.survival_hide_custom_health_bar, nil)
+eq(ctx.selected.hidden, false); eq(ctx.selected.controllable, true)
+
+-- 22. Only our isolation is cleared if a new entity inherits modifiers.
+fixture()
+ctx.inherit_isolation = true
+eq(request().ok, true)
+eq(ctx.selected:HasModifier("modifier_survival_placeholder_anchor"), false)
+eq(ctx.selected:HasModifier("unrelated_combat_root"), true)
+eq(ctx.selected.survival_deleted_hero_placeholder, nil)
+eq(ctx.selected.move_capability, DOTA_UNIT_CAP_MOVE_GROUND)
+
+-- 23. Native cleanup failure cannot publish an immobile combat hero.
+fixture()
+ctx.inherit_isolation, ctx.release_fails = true, true
+local release_failed = request()
+eq(release_failed.ok, false)
+eq(release_failed.error, "hero_movement_initialization_failed")
+eq(anchor.phase(0), "placeholder"); eq(ctx.selected.hidden, true)
+eq(calls("stats"), 0); eq(calls("teleport"), 0)
+no_summon_publication()
+
+print("test_hero_summon_flow: PASS (23 integrated summon, landing recheck, movement recovery and native ability scenarios)")

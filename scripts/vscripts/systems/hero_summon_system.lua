@@ -132,7 +132,7 @@ local function abort_unavailable_replacement(player_id, unit)
     return reason
 end
 
-local function initialize_replacement(player_id, team, altar, definition, position)
+local function initialize_replacement(player_id, team, altar, definition)
     local blocked = unavailable_reason(player_id)
     if blocked then return nil, blocked end
     local placeholder, begin_error = hero_anchor_service.begin_replacement(player_id)
@@ -160,6 +160,21 @@ local function initialize_replacement(player_id, team, altar, definition, positi
     -- during that call must not unhide or commit its newly created hero.
     blocked = abort_unavailable_replacement(player_id, unit)
     if blocked then return nil, blocked end
+    -- A failed landing is re-isolated as a placeholder. A same-carrier retry
+    -- must not retain our permanent root or MOVE_NONE if the engine reuses it.
+    -- Only release our own isolation state, never other combat debuffs.
+    local released = pcall(function()
+        if unit:HasModifier("modifier_survival_placeholder_anchor") then
+            unit:RemoveModifierByName("modifier_survival_placeholder_anchor")
+        end
+        if unit.SetMoveCapability then unit:SetMoveCapability(DOTA_UNIT_CAP_MOVE_GROUND) end
+        unit.survival_hide_custom_health_bar = nil
+        unit.survival_deleted_hero_placeholder = nil
+    end)
+    if not released then
+        hero_anchor_service.abort_replacement(player_id, unit)
+        return nil, "hero_movement_initialization_failed"
+    end
     unit:RemoveNoDraw()
     if unit.SetPlayerID then unit:SetPlayerID(player_id) end
     local player = PlayerResource:GetPlayer(player_id)
@@ -187,6 +202,24 @@ local function initialize_replacement(player_id, team, altar, definition, positi
     -- native carrier identity (for example Sven or Undying).
     unit.survival_display_name = definition.display_name
     unit.survival_hero_id = definition.hero_id
+    -- The preflight used the default radius before the native hero existed.
+    -- Recheck actual hull and live building cells after replacement callbacks.
+    -- This runs once per summon, with no timer or unbounded clear-space search.
+    local position, landing_error, landing_info = summon_destination.resolve(
+        altar, definition, player_id, unit, {
+            allow_without_city = true,
+            anchor_source = altar == builder_by_player[player_id] and "builder" or "hero_altar",
+        })
+    print(string.format(
+        "[HeroSummonLanding] player=%s unit=%s attempts=%s last_rejection=%s position=%s",
+        tostring(player_id), tostring(unit:entindex()),
+        tostring(landing_info and landing_info.attempts or "unknown"),
+        tostring(landing_info and landing_info.last_reason or "none"),
+        position and string.format("%.2f,%.2f,%.2f", position.x, position.y, position.z) or "none"))
+    if not position then
+        hero_anchor_service.abort_replacement(player_id, unit)
+        return nil, landing_error or "hero_landing_failed"
+    end
     local moved, move_error = destination_validation.teleport(unit, position, false)
     if not moved then
         hero_anchor_service.abort_replacement(player_id, unit)
@@ -264,9 +297,9 @@ local function validate(player_id, hero_id, debug_bypass)
     if not debug_bypass and not hero_unlocked then
         return nil, nil, hero_unlock_error
     end
-    -- Resolve before replacing the hidden carrier. The exact grounded result
-    -- is also used for placement; do not recompute the old, possibly blocked
-    -- marker after validation. Pending asset loads call validate again.
+    -- Reject an obstructed area before replacing the hidden carrier. The
+    -- final placement rechecks the same live-city policy with the actual hero.
+    -- Pending asset loads call validate again; never use the old map marker.
     local position, destination_error, destination_info =
         summon_destination.resolve(altar, definition, player_id, nil, {
             allow_without_city = true,
@@ -372,7 +405,7 @@ summon = function(payload)
     end
     local player_id = tonumber(payload.player_id)
     local hero_id = tostring(payload.hero_id or "")
-    local altar, definition, error_code, position =
+    local altar, definition, error_code =
         validate(player_id, hero_id, payload.debug_bypass == true)
     if error_code then
         return { ok = false, error = error_code }
@@ -388,8 +421,7 @@ summon = function(payload)
         player_id,
         team,
         altar,
-        definition,
-        position
+        definition
     )
     if not unit then
         replacing_by_player[player_id] = nil

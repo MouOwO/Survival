@@ -3,9 +3,11 @@ local placement = require("config/grid_placement_config")
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local player_context = require("systems/player_context_service")
+local grid = require("systems/grid_placement_system")
 
 local M = {}
 local SEARCH_RADIUS, STEP, HERO_RADIUS, MAX_HEIGHT_DELTA = 640, 64, 32, 64
+local MAX_HERO_RADIUS, MAX_GRID_AXIS = 256, 10
 local NO_DESTINATION = "主城周围没有安全落点，请清理附近障碍后重试"
 local clearance = {}
 for index = 0, 7 do
@@ -96,9 +98,44 @@ local function grounded(position, anchor_height)
     if math.abs(height - anchor_height) > MAX_HEIGHT_DELTA then return nil, "destination_height_mismatch" end
     return position
 end
+local function grid_clear(position, hero_radius)
+    local size = tonumber(placement.cell_size)
+    if not finite(size) or size <= 0 or type(grid.is_position_occupied) ~= "function" then
+        return false, "occupancy_grid_unavailable"
+    end
+    -- This grid is rooted at world zero (floor(x / cell_size)), not at the
+    -- snapped center of an even building footprint. Include touching cells on
+    -- both sides, then test the circle against each cell's exact AABB. Eight
+    -- radial samples alone miss corners between their sampling directions.
+    local min_x = math.ceil((position.x - hero_radius) / size) - 1
+    local max_x = math.floor((position.x + hero_radius) / size)
+    local min_y = math.ceil((position.y - hero_radius) / size) - 1
+    local max_y = math.floor((position.y + hero_radius) / size)
+    if max_x - min_x + 1 > MAX_GRID_AXIS or max_y - min_y + 1 > MAX_GRID_AXIS then
+        return false, "occupancy_grid_span_exceeded"
+    end
+    -- At the normal radius32/cell64: <=9 nearby cells. Even the accepted
+    -- maximum radius256 visits <=100; no scene/building collection is scanned.
+    for x = min_x, max_x do
+        local nearest_x = math.max(x * size, math.min(position.x, (x + 1) * size))
+        for y = min_y, max_y do
+            local nearest_y = math.max(y * size, math.min(position.y, (y + 1) * size))
+            local dx, dy = position.x - nearest_x, position.y - nearest_y
+            if dx * dx + dy * dy <= hero_radius * hero_radius then
+                local ok, occupied = pcall(grid.is_position_occupied,
+                    Vector((x + .5) * size, (y + .5) * size, position.z))
+                if not ok or type(occupied) ~= "boolean" then return false, "occupancy_grid_unavailable" end
+                if occupied then return false, "destination_building_occupied" end
+            end
+        end
+    end
+    return true
+end
 local function candidate(origin, offset, anchor_height, obstacles, hero_radius)
     local position, reason = grounded(Vector(origin.x + offset.x, origin.y + offset.y, origin.z), anchor_height)
     if not position then return nil, reason end
+    local clear, grid_reason = grid_clear(position, hero_radius)
+    if not clear then return nil, grid_reason end
     for _, sample in ipairs(clearance) do
         local edge, edge_reason = grounded(Vector(position.x + sample.x * hero_radius / HERO_RADIUS,
             position.y + sample.y * hero_radius / HERO_RADIUS, position.z), anchor_height)
@@ -143,6 +180,11 @@ function M.resolve(altar, definition, player_id, moving_unit, options)
         if moving_hull == nil and type(moving_unit.GetHullRadius) == "function" then
             local hull_ok, value = pcall(moving_unit.GetHullRadius, moving_unit)
             if hull_ok then moving_hull = tonumber(value) end
+        end
+        if moving_hull ~= nil and (not finite(moving_hull) or moving_hull < 0
+            or moving_hull > MAX_HERO_RADIUS) then
+            rejected("hero_hull_out_of_bounds")
+            return nil, no_destination, metadata
         end
         if finite(moving_hull) and moving_hull > hero_radius then hero_radius = moving_hull end
     end

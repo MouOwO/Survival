@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 41999,
-      "sha256": "23908a3ae74b656a1b7da0a362a5aed54f0db068fb7232c09e023b15933fb031"
+      "bytes": 42540,
+      "sha256": "1752e06ab9bb03df0e96fa947da9e451fce1f3b1a06377a3122b7b6c93edc3ef"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 55643,
-      "sha256": "ba3ae44489f73ac755c6ac5649416aa967880a7ddbbdb275e30a8f3c0c0a6266"
+      "bytes": 56184,
+      "sha256": "e3224cda77d4369a2e2e9851aefa5bd1d18161fc6e8e04ff2e87f79088855cc2"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 29379,
-      "sha256": "f75d83540b367bf457c12b090e4e307afcfff38fd9e858d02a9fb4aa87ebd983"
+      "bytes": 29920,
+      "sha256": "0e81581bfe8e47ced7e7f7bd7c98602333e41b992b4ce1fdf496397474526c3c"
     },
     {
       "path": "data/completed_work_index.json",
@@ -272,6 +272,11 @@
       "path": "evidence/fullmatch0703_signed_candidate_20261107.public.json",
       "bytes": 30111,
       "sha256": "0224a5bec230a10a868d4552cd033d0fd2cf7c02873246c391303367a45e6871"
+    },
+    {
+      "path": "evidence/hero_altar_landing_followup_20261107.md",
+      "bytes": 5912,
+      "sha256": "fc95956b0747d6f4a68d91119fec45c793c5f3a14a355375d365fa4abac7d795"
     },
     {
       "path": "evidence/hero_teleport_native_20261101.public.json",
