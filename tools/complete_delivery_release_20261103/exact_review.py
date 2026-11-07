@@ -1,4 +1,4 @@
-"""Exact immutable standalone-JSON review; never a release authority.
+"""Exact immutable standalone build-input review; never a release authority.
 
 Indexes the two selected Git trees once, batch-reads local blobs, verifies the
 actual catalogue/12-node lineage, and audits direct runtime read sites. No
@@ -29,6 +29,17 @@ JS = 'panorama/src/scripts/custom_game/common/ui_static_catalog.js'
 CONTENT_JS = 'panorama/scripts/custom_game/common/ui_static_catalog.js'
 LUA = 'scripts/vscripts/config/generated/ui_static_catalog_lookup.lua'
 TARGETS = ['panorama/scripts/custom_game/common/ui_static_catalog.vjs_c', LUA]
+CSV_GENERATOR = 'tools/build_configs.py'
+# Reviewed build() call graph for the three contracts below reads only its
+# source adapter and writes only its output adapter; other validators return
+# before I/O for these basenames. Changed generator/new I/O requires re-review.
+CSV_GENERATOR_LF_SHA256 = '5ca74b5a7b0b61bc9140a4941c373f5ca2ae31baac18a2a3cf1d0f4ad3dc5efd'
+# These are reviewed generator contracts, not directory exclusions. Each input
+# must reproduce its entire immutable Lua output using the real generator.
+CSV_OUTPUTS = {
+    'data/csv/英雄系统/'+name+'.csv': 'scripts/vscripts/config/generated/'+name+'.lua'
+    for name in ('blademaster_exclusive_runtime', 'hero_skill_definitions', 'monkey_king_exclusive_runtime')
+}
 EVIDENCE = {
  'data/ui/network50_dev05_evidence_20261103.json': ('status', 'LOCAL_TOOLS_NATIVE_PARTIAL_EVIDENCE_NOT_FPS_OR_WORKSHOP_ACCEPTANCE'),
  'data/ui/network50_dev06_fps_reclassification_20261103.json': ('status', 'RECLASSIFIED_INVALID_GAMEPLAY_CAPTURE_ORIGINAL_RETAINED'),
@@ -69,7 +80,7 @@ def read_sites(text, paths, language='js'):
         line_number += text.count('\n', position, match.start()); position = match.start()
         kind, token = match.lastgroup, match.group()
         if kind == 'comment': continue
-        if kind in ('string', 'long') and ('data/ui' in token or 'data\\\\ui' in token): namespace = True
+        if kind in ('string', 'long') and any(p in token for p in ('data/ui', 'data\\\\ui', 'data/csv', 'data\\\\csv')): namespace = True
         window.append((kind, token, line_number))
         if len(window) > 4: window.pop(0)
         if len(window) != 4: continue
@@ -80,7 +91,7 @@ def read_sites(text, paths, language='js'):
         value = arg[1:-1].replace('\\\\', '/') if argkind == 'string' else ''
         direct = static and (value in literal_paths or Path(value).name in basenames)
         sites.append({'api': name, 'line': line, 'literal_first_argument': static,
-                      'candidate_json_read': bool(direct), 'uncertain_data_ui_read': 'data/ui' in value,
+                      'candidate_json_read': bool(direct), 'uncertain_data_ui_read': any(p in value for p in ('data/ui', 'data/csv')),
                       '_dynamic': not static})
     for site in sites:
         site['uncertain_data_ui_read'] = bool(site['uncertain_data_ui_read'] or (site.pop('_dynamic') and namespace))
@@ -188,6 +199,58 @@ def validate_lottery_seed(raw, manifest, data):
             'probabilities_or_rewards_modified_by_review': False}
 
 
+def validate_csv_build_inputs(blobs, pins):
+    """Execute the selected immutable generator with memory-only path adapters.
+
+    No handwritten CSV-to-Lua serializer and no working-tree import. Calling
+    build(), rather than main(), cannot rebuild unrelated tables/tooltip files.
+    Cost is one generator load plus O(total selected CSV/output bytes), once.
+    """
+    paths = sorted(set(blobs) & set(CSV_OUTPUTS))
+    if not paths: return {}
+    generator = blobs[CSV_GENERATOR]
+    need(generator == blobs['operator:'+CSV_GENERATOR], 'csv_generator_source_operator_bytes_differ')
+    need(sha(generator.replace(b'\r\n', b'\n')) == CSV_GENERATOR_LF_SHA256, 'csv_generator_readset_not_reviewed')
+    namespace = {'__name__': '_immutable_exact_csv_generator', '__file__': str(ROOT/CSV_GENERATOR)}
+    exec(compile(generator, CSV_GENERATOR, 'exec'), namespace)
+    build = namespace.get('build'); need(callable(build), 'csv_generator_build_entry_missing')
+
+    class Input:
+        def __init__(self, path, raw): self.name, self.raw, self.reads = Path(path).name, raw, 0
+        def read_bytes(self):
+            self.reads += 1
+            need(self.reads == 1, 'csv_generator_input_read_contract_changed')
+            return self.raw
+        def __str__(self): return self.name
+
+    class Output:
+        def __init__(self): self.raw = None
+        def write_text(self, text, *, encoding, newline):
+            need(self.raw is None and encoding == 'utf-8' and newline == '\n', 'csv_generator_output_contract_changed')
+            self.raw = text.encode('utf8'); return len(text)
+
+    checks = {}
+    for path in paths:
+        source = Input(path, blobs[path]); output = Output(); build(source, output)
+        target = CSV_OUTPUTS[path]
+        need(source.reads == 1 and output.raw is not None and output.raw == blobs[target], 'csv_generated_lua_bytes_differ:'+path)
+        checks[path] = {
+            'generator_path': CSV_GENERATOR, 'generator_entry': 'build',
+            'generator_source_revision': pins['game'], 'generator_operator_revision': pins['operator'],
+            'generator_sha256': sha(generator), 'input_sha256': sha(blobs[path]),
+            'reviewed_generator_lf_sha256': CSV_GENERATOR_LF_SHA256,
+            'complete_readset': [{'repo': 'game', 'path': path, 'sha256': sha(blobs[path])},
+                                 {'repo': 'game', 'path': CSV_GENERATOR, 'sha256': sha(generator)}],
+            'generated_lua_path': target, 'generated_lua_source_revision': pins['game'],
+            'generated_lua_sha256': sha(output.raw), 'generated_lua_bytes': len(output.raw),
+            'complete_generated_bytes_equal': True, 'all_emitted_values_equal': True,
+            'working_tree_generator_used': False, 'runtime_files_written': 0,
+            'csv_read_count': source.reads, 'other_csv_or_template_reads': 0,
+            'derived_unified_tooltip_rebuilt': False,
+        }
+    return checks
+
+
 def make_reviews(scope, scope_sha256, pins, blobs, facts, scan, scan_sha256):
     need(scope.get('observed_commits') == {k: pins[k] for k in ('game', 'content')}, 'scope_source_revisions_mismatch')
     rows = [r for r in scope['decisions'] if r['inventory_status'] == 'UNMAPPED_SOURCE_PENDING']
@@ -195,16 +258,22 @@ def make_reviews(scope, scope_sha256, pins, blobs, facts, scan, scan_sha256):
     manifest = json.loads(blobs[MANIFEST]); histories = {p for p in manifest['source_hashes'] if p.startswith('data/ui/registry_history/')}
     expected = {ATLAS, MANIFEST, REGISTRY, *EVIDENCE, *histories}
     if LOTTERY_SEED in paths: expected.add(LOTTERY_SEED)
+    expected.update(paths & set(CSV_OUTPUTS))
     need(len(rows) == len(paths) == len(expected) and paths == expected,
          'unmapped_set_not_exact_reviewed_paths')
     checks = validate_catalog(blobs)
+    csv_checks = validate_csv_build_inputs(blobs, pins)
     need(not scan['runtime_read_blockers'], 'runtime_reference_or_loader_requires_manual_review')
     reviews = []
     for row in sorted(rows, key=lambda r: r['source']['path']):
         path = row['source']['path']; key = 'game:'+path; raw = blobs[path]; fact = facts[key]
         need(row['source']['repo'] == 'game' and fact['git_oid'] == row['source']['head_oid'] and fact['sha256'] == row['candidate']['sha256'] == sha(raw), 'scope_git_source_fact_mismatch:'+path)
-        value = json.loads(raw); extra = {}
-        if path in EVIDENCE:
+        value = json.loads(raw) if path not in CSV_OUTPUTS else None; extra = {}
+        if path in CSV_OUTPUTS:
+            classification = 'EXACT_CSV_BUILD_INPUT_REPRODUCED_BY_IMMUTABLE_GENERATOR'
+            reason = 'Executed the exact selected Git generator build() in memory on this immutable CSV and verified the entire generated Lua byte-for-byte, including every emitted value. The CSV is a build input; its generated Lua still requires the separate production/protection binding. No directory or filename alone grants exclusion.'
+            targets = [CSV_OUTPUTS[path]]; extra = csv_checks[path]
+        elif path in EVIDENCE:
             field, expected = EVIDENCE[path]
             need(value.get(field) == expected, 'evidence_exact_semantic_type_mismatch:'+path)
             if path.endswith('dev06_fps_reclassification_20261103.json'): need(value.get('corrected_valid') is False, 'invalid_fps_reclassified_as_pass')
@@ -284,9 +353,10 @@ def reference_scan(sources, paths):
     patterns = sorted(set(paths) | {Path(p).name for p in paths})
     refs, blockers, scan = {}, [], []
     allowed_metadata = {('game', JS), ('game', LUA), ('content', CONTENT_JS)}
+    allowed_metadata.update(('game', CSV_OUTPUTS[p]) for p in paths if p in CSV_OUTPUTS)
     for role in ('game', 'content'):
         matched = set(sources.grep(role, patterns))
-        api = set(sources.grep(role, [r'LoadKeyValues|LoadKVFile|LoadFile|loadfile|dofile|readFile|read_text|read_bytes|io\.open|AsyncWebRequest|data/ui'], False))
+        api = set(sources.grep(role, [r'LoadKeyValues|LoadKVFile|LoadFile|loadfile|dofile|readFile|read_text|read_bytes|io\.open|AsyncWebRequest|data[/\\]+(ui|csv)'], False))
         runtime_api_sites = 0
         for path in sorted(matched | {p for p in api if runtime_path(role, p)}):
             raw = sources.get(role, path); text = raw.decode('utf-8-sig'); key = role+':'+path
@@ -336,6 +406,11 @@ def main():
         rows = [r for r in scope['decisions'] if r['inventory_status'] == 'UNMAPPED_SOURCE_PENDING']
         paths = {r['source']['path'] for r in rows}; blobs = {path: sources.get('game', path) for path in sorted(paths)}
         for path in (JS, LUA): blobs[path] = sources.get('game', path)
+        csv_paths = paths & set(CSV_OUTPUTS)
+        if csv_paths:
+            blobs[CSV_GENERATOR] = sources.get('game', CSV_GENERATOR)
+            blobs['operator:'+CSV_GENERATOR] = compiler.run_git(ROOT, 'show', pins['operator']+':'+CSV_GENERATOR)
+            for path in sorted(csv_paths): blobs[CSV_OUTPUTS[path]] = sources.get('game', CSV_OUTPUTS[path])
         blobs['content:'+CONTENT_JS] = sources.get('content', CONTENT_JS)
         scan = reference_scan(sources, paths); scan['operator_binding'] = {'revision': pins['operator'], 'tools': operator, 'committed': committed}
         scan_raw = canonical(scan)
