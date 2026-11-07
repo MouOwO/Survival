@@ -82,7 +82,7 @@ function queryFixture(withQuery){
 // by a later real query/selection event, without adding perpetual missing probes.
 const late=queryFixture(false);
 late.f.api.beginNameTransition('initial_missing_query');
-for(const id of [...late.f.jobs.keys()])late.f.run(id);
+for(let retry=0;late.f.jobs.size&&retry<8;retry++)late.f.run([...late.f.jobs.keys()][0]);
 assert.equal(late.f.jobs.size,0,'the original bounded retry window has ended');
 const lateQuery=late.addQuery();
 for(let i=0;i<10;i++)late.f.api.refreshHotkeys(false);
@@ -90,7 +90,7 @@ assert.equal(lateQuery.native.values.opacity,'0.35','regular polling does not en
 assert.equal(lateQuery.label.text,'STALE');
 late.f.api.selectionEvent('query_unit_event',{PlayerID:0});
 assert(late.f.jobs.size>0,'a new query event starts the existing bounded recovery window');
-for(const id of [...late.f.jobs.keys()])late.f.run(id);
+for(let retry=0;late.f.jobs.size&&retry<8;retry++)late.f.run([...late.f.jobs.keys()][0]);
 assert.equal(lateQuery.native.values.opacity,'0');assert.equal(lateQuery.label.text,'');
 assert.equal(lateQuery.label.values.visibility,'collapse');
 assert.equal(late.main.panel.FindChildTraverse('SurvivalAbilityHotkey').text,'Q','query recovery preserves main-tree binding');

@@ -14,6 +14,8 @@ function fixture(){
  t.advance=n=>now+=n;
  t.ready=p=>{p.scene.AddClass('SceneLoaded');p.scene.parent.FindChildTraverse('Background').ImageLoaded()};
  t.renderer=t.cfg.SurvivalMonsterPortraitRenderer;
+ t.admit=asset=>{let value=t.renderer.Prepare(t.overlay,asset);if(value&&value.pending){now+=100;
+  for(const [id,job] of [...t.jobs])if(job.delay===.1)t.run(id);value=t.renderer.Prepare(t.overlay,asset);}return value;};
  t.asset=Object.keys(t.cfg.SurvivalMonsterPortraitScenes).find(a=>a.startsWith('monster_boss_rebirth_04_'));
  t.snap=(id,asset=t.asset,version=1)=>({entindex:id,refresh_version:version,model_asset_id:asset,
   portrait_unit_name:t.cfg.SurvivalMonsterPortraitScenes[asset]?.unit||''});
@@ -31,7 +33,7 @@ cold.api.updateSnapshot(cold.snap(8));
 assert.equal(cold.overlay.values.visibility,'visible','cold scene must never restore the undecorated native body');
 assert.equal(cold.overlay.FindChildTraverse('SurvivalPortraitTransitionBackground0').image,
  cold.cfg.SurvivalMonsterPortraitScenes[asset].background,'pending scene uses its matching background');
-const loading=cold.renderer.Prepare(cold.overlay,asset);cold.ready(loading);
+const loading=cold.admit(asset);cold.ready(loading);
 cold.api.updateSnapshot(cold.snap(8,asset,2));
 assert.equal(cold.api.portraitState().mode,'monster_scene');
 assert.equal(cold.overlay.values.visibility,'visible');
@@ -48,7 +50,7 @@ assert.equal(cold.api.portraitState().acceptedVersion,2);
 assert.equal(cold.api.portraitState().scene,loading.scene);
 
 const warm=fixture(),hero='hero_permanent_hero_blademaster';
-for(const id of [warm.asset,hero]){const p=warm.renderer.Prepare(warm.overlay,id);warm.ready(p)}
+for(const id of [warm.asset,hero]){const p=warm.admit(id);warm.ready(p)}
 warm.select(8,'npc_survival_named_rebirth_boss_04');warm.api.updateSnapshot(warm.snap(8));
 const created=warm.renderer.Inspect().created;
 warm.select(9,'npc_dota_hero_juggernaut');warm.runtime.player_0=warm.snap(9,hero);
@@ -69,6 +71,6 @@ const unsupported=fixture();unsupported.select(11,'building_unknown');unsupporte
 unsupported.api.updateSnapshot({entindex:11,refresh_version:1,model_asset_id:'unknown'});
 assert.equal(unsupported.overlay.values.visibility,'collapse','authoritative unsupported units restore native immediately');
 const failed=fixture();failed.select(12,'npc_survival_named_rebirth_boss_04');failed.api.updateSnapshot(failed.snap(12));
-assert.equal(failed.overlay.values.visibility,'visible');failed.advance(10001);failed.api.portraitUpdate(failed.snap(12));
+assert.equal(failed.overlay.values.visibility,'visible');failed.admit(failed.asset);failed.advance(10001);failed.api.portraitUpdate(failed.snap(12));
 assert.equal(failed.overlay.values.visibility,'collapse','failed scene loading restores native instead of a permanent blank');
 console.log('PORTRAIT_SELECTION_TRANSITION_PASS: synchronous warm selection, cold cover, early metadata retention, stale/remote/multiselect isolation and bounded native fallback');

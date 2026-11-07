@@ -11,6 +11,10 @@ function fixture(){
  const ctx={$:t.panorama,GameUI:{CustomUIConfig:()=>t.cfg},Date:{now:()=>now}};
  vm.runInNewContext(catalog,ctx);vm.runInNewContext(renderer,ctx);
  t.reload=()=>vm.runInNewContext(renderer,ctx);t.advance=n=>now+=n;
+ // Legacy scene correctness cases wait for the declared cold admission; the
+ // dedicated admission regression checks fast intermediate selections.
+ t.admit=(asset,parent=t.overlay)=>{const r=t.cfg.SurvivalMonsterPortraitRenderer;let value=r.Prepare(parent,asset);
+  if(value&&value.pending){now+=100;for(const [id,job] of [...t.jobs])if(job.delay===.1)t.run(id);value=r.Prepare(parent,asset);}return value;};
  t.ready=scene=>{scene.AddClass('SceneLoaded');scene.parent.FindChildTraverse('Background').ImageLoaded()};
  return t;
 }
@@ -23,7 +27,7 @@ assert.equal(r.ResolveAsset('', '', 'npc_survival_wave_named_humanoid_white_mele
 assert.equal(r.ResolveAsset('', 'models/heroes/undying/undying.vmdl_c'), 'monster_undying');
 assert.equal(r.ResolveAsset('', 'models/unknown.vmdl', 'npc_survival_wave_named_humanoid_white_melee'),'','an explicit different model must reject the named-wave alias');
 assert.equal(r.ResolveAsset('', '', 'npc_survival_wave_monster'),'','shared generic identities cannot guess an outfit');
-const asset=assets[0],entry=r.Prepare(t.overlay,asset);
+const asset=assets[0],entry=t.admit(asset);
 assert.equal(entry.ready,false);assert.equal(entry.scene.parent.values.visibility,'visible','loading scenes must render before SceneLoaded');
 assert.equal(entry.scene.attributes.drawbackground,'true');assert.equal(entry.scene.attributes.map,t.cfg.SurvivalMonsterPortraitScenes[asset].map);
 t.ready(entry.scene);assert.equal(r.Prepare(t.overlay,asset).ready,true);
@@ -31,12 +35,12 @@ for(let i=0;i<300;i++){t.advance(100);assert.equal(r.Prepare(t.overlay,asset).sc
 assert.equal(t.metrics.created.filter(x=>x.type==='DOTAScenePanel').length,1,'stable identity must reuse its map');
 r.Hide();assert.equal(entry.scene.parent.values.visibility,'collapse');
 r.Prepare(t.overlay,asset);assert.equal(entry.scene.parent.values.visibility,'visible');
-for(const id of assets){t.advance(100);const v=r.Prepare(t.overlay,id);assert(v);t.ready(v.scene);assert.equal(r.Prepare(t.overlay,id).ready,true);assert(r.Inspect().cached<=4)}
+for(const id of assets){t.advance(100);const v=t.admit(id);assert(v);t.ready(v.scene);assert.equal(r.Prepare(t.overlay,id).ready,true);assert(r.Inspect().cached<=4)}
 assert.equal(t.metrics.setUnit.length,0,'world component maps must never be replaced by naked SetUnit heroes');
 const last=r.Prepare(t.overlay,assets.at(-1));
 const nextParent=new t.Panel('RebuiltOverlay',t.context);assert.equal(r.Prepare(nextParent,assets.at(-1)).scene,last.scene,'ready scenes reparent without reloading the world');
 const slowFixture=fixture(),slowRenderer=slowFixture.cfg.SurvivalMonsterPortraitRenderer;
-const slow=slowRenderer.Prepare(slowFixture.overlay,assets[0]);slowFixture.advance(10001);assert.equal(slowRenderer.Prepare(slowFixture.overlay,assets[0]),null);assert.equal(slow.scene.parent.alive,false);assert.equal(slowRenderer.Prepare(slowFixture.overlay,assets[0]),null,'failed resources must not retry within the same selection epoch');
+const slow=slowFixture.admit(assets[0]);slowFixture.advance(10001);assert.equal(slowRenderer.Prepare(slowFixture.overlay,assets[0]),null);assert.equal(slow.scene.parent.alive,false);assert.equal(slowRenderer.Prepare(slowFixture.overlay,assets[0]),null,'failed resources must not retry within the same selection epoch');
 assert.equal(r.Prepare(nextParent,'__proto__'),null);assert.equal(r.HasAsset('constructor'),false);
 const broken=new t.Panel('Released',t.context);broken.alive='throw';assert.doesNotThrow(()=>r.Prepare(broken,assets[2]));
 t.reload();assert.equal(r.Inspect().cached,0);assert.equal(r.Prepare(nextParent,assets[1]),null,'old owner cannot recreate resources after reload');
@@ -48,7 +52,7 @@ let version=0;
 for(const id of [...rebirth,...assets.filter(a=>!rebirth.includes(a))]){
  const spec=c.cfg.SurvivalMonsterPortraitScenes[id];c.select(8,'npc_survival_wave_monster');
  const snap={entindex:8,refresh_version:++version,model_asset_id:id,portrait_unit_name:spec.unit};
- const warmed=cr.Prepare(c.overlay,id);c.ready(warmed.scene);
+ const warmed=c.admit(id);c.ready(warmed.scene);
  c.api.updateSnapshot(snap);const state=c.api.portraitState();assert.equal(state.mode,'monster_scene',id);assert(state.scene);
  assert.equal(state.scene.values.transform,'scale3d(1, 1, 1)','official camera must not receive tower enlargement');
  c.ready(state.scene);for(let n=0;n<4;n++)c.api.updateSnapshot({...snap,refresh_version:++version});
@@ -60,7 +64,7 @@ assert.equal(c.metrics.setUnit.length,0);
 const old=c.api.portraitState().snapshot;c.select(7,'npc_dota_hero_juggernaut');c.api.portraitTransition('pending_hero');assert.equal(c.api.portraitState().scene.parent.values.visibility,'collapse');
 c.api.updateSnapshot({entindex:7,refresh_version:++version,model_asset_id:'hero_permanent_hero_blademaster',portrait_unit_name:'npc_dota_hero_juggernaut'});
 // A hero evicted from the four-world pool returns through the same cold cover.
-const heroReady=cr.Prepare(c.overlay,'hero_permanent_hero_blademaster');c.ready(heroReady.scene);
+const heroReady=c.admit('hero_permanent_hero_blademaster');c.ready(heroReady.scene);
 c.api.updateSnapshot({entindex:7,refresh_version:++version,model_asset_id:'hero_permanent_hero_blademaster',portrait_unit_name:'npc_dota_hero_juggernaut'});
 assert.equal(c.api.portraitState().mode,'monster_scene');assert.equal(c.metrics.setUnit.length,0,'owned Juggernaut uses its exact decorated world scene');
 c.api.updateSnapshot({...old,refresh_version:++version});assert.equal(c.api.portraitState().entity,7,'late monster snapshot cannot replace player hero');
@@ -70,7 +74,7 @@ const w=fixture(),wr=w.cfg.SurvivalMonsterPortraitRenderer;
 wr.Prewarm(w.nativeHost());
 assert.equal(wr.Inspect().created,0);assert.equal(wr.Inspect().queued,0);
 assert.equal(w.jobs.size,0,'an idle anchor must not schedule catalog polling');
-wr.Prewarm(w.nativeHost(),asset);w.run([...w.jobs.keys()][0]);
+wr.Prewarm(w.nativeHost(),asset);w.advance(100);w.run([...w.jobs.keys()][0]);
 const pending=wr.Prepare(w.overlay,asset);w.ready(pending.scene);assert(wr.Prepare(w.overlay,asset).ready);
 const warmStage=w.nativeHost().FindChildTraverse('SurvivalPortraitPrewarm'),stageParent=warmStage.GetParent();
 wr.Prewarm(warmStage);assert.equal(warmStage.GetParent(),stageParent,'reject a stage/child parenting cycle');
@@ -80,10 +84,10 @@ wr.Shutdown();
 // A click overtakes an explicitly requested warmup. Paused old requests must
 // not refill the cache after selection moved on.
 const p=fixture(),pr=p.cfg.SurvivalMonsterPortraitRenderer;
-pr.Prewarm(p.nativeHost(),asset);p.run([...p.jobs.keys()][0]);
+pr.Prewarm(p.nativeHost(),asset);p.advance(100);p.run([...p.jobs.keys()][0]);
 const firstWarm=pr.Inspect().warming;
 const selected=assets.find(a=>a!==firstWarm&&p.cfg.SurvivalMonsterPortraitScenes[a].map!==p.cfg.SurvivalMonsterPortraitScenes[firstWarm].map);
-const priority=pr.Prepare(p.overlay,selected);pr.Hide();
+const priority=p.admit(selected);pr.Hide();
 assert.equal(pr.Inspect().warming,selected);
 assert.equal(priority.scene.parent.values.visibility,'visible','pending selected scene renders behind the opaque transition cover');
 assert.equal(pr.Inspect().queued,0,'preemption does not enqueue old catalog work');

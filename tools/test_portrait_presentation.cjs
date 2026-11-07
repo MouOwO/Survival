@@ -50,7 +50,10 @@ const layout=fs.readFileSync('panorama/src/layout/custom_game/survival_hud.xml',
 assert(layout.indexOf('portrait_presentation.js')<layout.indexOf('topnav_remaining_5d5c1152eb.js'));
 for(const file of ['topnav_remaining_5d5c1152eb.js','handoff_hud.js']){
  const src=fs.readFileSync('panorama/src/scripts/custom_game/'+file,'utf8');
- assert(src.slice(src.indexOf('function refreshNow()')).includes('SurvivalPortraitPresentation.Refresh'));
+ const scoped=src.indexOf('function refreshNowScoped()'),start=scoped>=0?scoped:src.indexOf('function refreshNow()');
+ const end=src.indexOf('function tick()',start);assert(start>=0&&end>start,'complete refresh and wrapper exist');
+ const refresh=src.slice(start,end);assert(refresh.includes('SurvivalPortraitPresentation.Refresh'));
+ if(scoped>=0){assert(refresh.includes('combat.WithAbilitySnapshot(refreshNowScoped)'));assert(refresh.includes('return refreshNowScoped()'));}
 }
 console.log('PORTRAIT_PRESENTATION_PASS: old-size blur and native XP/badges removed; native/custom 3D, gold frame, level and multiselect preserved; state rewrites and HUD rebuild covered');
 

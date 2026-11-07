@@ -38,7 +38,7 @@ const f=fixture();f.t.api.refreshHotkeys(false);
 assert.equal(f.key(0),'Q');assert.equal(f.key(1),'','passive key remains hidden');
 const initial=f.clearCount(),initialReads=f.abilityReads();
 for(let i=0;i<20;i++){f.t.api.refreshVitalsTick();f.t.api.refreshAbilities();}
-assert.equal(f.clearCount(),initial,'stable .25s/1s recovery checks never clear and rebind all native slots');
+assert.equal(f.clearCount(),initial,'stable vitals and 100ms ability checks never clear and rebind all native slots');
 assert(f.abilityReads()>initialReads,'ability handles are read again instead of cached across ticks');
 assert.equal(f.t.jobs.size,40,'keep each original timer chain; no new polling');
 assert.equal(f.requests.length,0,'stable hotkey timers do not add a server request');
@@ -47,7 +47,7 @@ const stable=f.clearCount();
 
 // Runtime state still changes on a cache hit, without clearing correct keys.
 f.t.runtime[100]={ability_entindex:100,owner_entindex:7,available:0,status_text:'locked'};
-f.t.api.refreshVitalsTick();assert.equal(f.panels[0].classes.DOTADisabled,true);
+f.t.api.refreshAbilities();assert.equal(f.panels[0].classes.DOTADisabled,true);
 f.t.runtime[100].available=1;f.t.api.refreshAbilities();assert.equal(f.panels[0].classes.DOTADisabled,false);
 assert.equal(f.clearCount(),stable,'runtime state alone does not require hotkey rebinding');
 
@@ -62,7 +62,7 @@ for(const opacity of ['0', '0.0', ' 0.000 ', '-0']){
  nativeKey.values.opacity=opacity;const before=f.clearCount();f.t.api.refreshHotkeys(false);
  assert.equal(f.clearCount(),before,'numeric zero remains a valid suppressed native key: '+opacity);
 }
-nativeKey.hittest=true;let before=f.clearCount();f.t.api.refreshVitalsTick();
+nativeKey.hittest=true;let before=f.clearCount();f.t.api.refreshAbilities();
 assert(f.clearCount()>before);assert.equal(nativeKey.hittest,false,'interaction drift also invalidates');
 
 // A same-ID replacement invalidates live labels/anchors despite a matching
@@ -73,28 +73,28 @@ before=f.clearCount();f.t.api.refreshHotkeys(false);assert(f.clearCount()>before
 assert.equal(f.key(0),'Q');assert.strictEqual(replacement.FindChildTraverse('SurvivalAbilityHotkey').GetParent(),replacement.FindChildTraverse('AbilityButton'));
 replacement.FindChildTraverse('SurvivalAbilityHotkey').SetParent(replacement);
 before=f.clearCount();f.t.api.refreshAbilities();assert(f.clearCount()>before,'reparented label must recover its button anchor');
-f.replaceAbilities();f.t.api.refreshVitalsTick();assert.equal(f.panels.length,0,'a rebuilt empty native HUD must remain pending');
+f.replaceAbilities();f.t.api.refreshAbilities();assert.equal(f.panels.length,0,'a rebuilt empty native HUD must remain pending');
 f.mount(0);f.mount(1);before=f.clearCount();f.t.api.refreshAbilities();assert(f.clearCount()>before);
 assert.equal(f.key(0),'Q');assert.equal(f.key(1),'','new native abilities root is recovered without reviving a passive key');
 
 // Selection/learning/removal still changes the binding; native child arrival
 // later than selection remains pending until a subsequent recovery succeeds.
 f.t.select(8,'npc_dota_hero_test');f.slots.set(8,[102]);f.names.set(102,'mock_next');f.metadata(8);
-f.panels[1].values.visibility='collapse';f.t.api.refreshVitalsTick();assert.equal(f.key(0),'Q');
+f.panels[1].values.visibility='collapse';f.t.api.refreshAbilities();assert.equal(f.key(0),'Q');
 f.slots.set(8,[102,103]);f.names.set(103,'mock_learned');f.metadata(8);
 f.panels[1].values.visibility='collapse';f.t.api.refreshHotkeys(false);
 assert.equal(f.key(0),'','incomplete native layout clears stale keys while retry stays pending');
 f.panels[1].values.visibility='visible';f.t.api.refreshAbilities();assert.equal(f.key(1),'W','late native child/layout recovers learned ability key');
-f.slots.set(8,[102]);f.metadata(8);f.panels[1].values.visibility='collapse';f.t.api.refreshVitalsTick();assert.equal(f.key(1),'','removed ability clears old key');
+f.slots.set(8,[102]);f.metadata(8);f.panels[1].values.visibility='collapse';f.t.api.refreshAbilities();assert.equal(f.key(1),'','removed ability clears old key');
 f.slots.set(8,[]);f.metadata(8);f.panels[0].values.visibility='collapse';f.t.api.refreshAbilities();
-assert.equal(f.key(0),'');before=f.clearCount();f.t.api.refreshVitalsTick();assert.equal(f.clearCount(),before,'stable zero-ability selection does not rebind');
-f.t.select(-1);f.t.api.refreshVitalsTick();before=f.clearCount();f.t.api.refreshAbilities();assert.equal(f.clearCount(),before,'stable invalid selection also stays cleared');
+assert.equal(f.key(0),'');before=f.clearCount();f.t.api.refreshAbilities();assert.equal(f.clearCount(),before,'stable zero-ability selection does not rebind');
+f.t.select(-1);f.t.api.refreshAbilities();before=f.clearCount();f.t.api.refreshAbilities();assert.equal(f.clearCount(),before,'stable invalid selection also stays cleared');
 
 // Research slot metadata changes the key even though handles/order stay fixed.
 const r=fixture();r.slots.set(7,[100]);r.names.set(100,'ability_research_fixture');r.metadata(7);r.panels[1].values.visibility='collapse';
 r.t.runtime[100]={ability_entindex:100,owner_entindex:7,research_slot_order:1,research_building_id:'building_research_lab'};
 r.t.api.refreshHotkeys(false);assert.equal(r.key(0),'Q');
-r.t.runtime[100].research_slot_order=2;r.t.api.refreshVitalsTick();assert.equal(r.key(0),'W');
+r.t.runtime[100].research_slot_order=2;r.t.api.refreshAbilities();assert.equal(r.key(0),'W');
 r.passive.add(100);r.t.api.refreshAbilities();assert.equal(r.key(0),'','active to passive clears key');
 r.passive.delete(100);r.t.api.refreshAbilities();assert.equal(r.key(0),'W','passive to active restores runtime slot key');
 

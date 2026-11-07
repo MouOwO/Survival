@@ -36,6 +36,7 @@ function fixture(code) {
       assert.equal(table, 'survival_ability_runtime');
       assert.equal(key, `unit:${state.unit}`);state.countQueries++;return state.metadata;
     }},
+    abilityRefreshLookup: null,
     utilityHotkeys: {ability_utility_late: 'F2', ability_utility_first: 'G'},
     utilityDisplayOrder: {ability_utility_late: 20, ability_utility_first: 10},
     standardAbilityHotkeys: ['Q', 'W', 'E', 'R', 'T', 'Y'], builderHotkeysBySlotOrder: [],

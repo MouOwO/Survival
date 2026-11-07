@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 39414,
-      "sha256": "c3d206300cc39a4fbf96763b29b5cfad5c45de7b88ab9e10bc1e9d0466f14cdc"
+      "bytes": 39897,
+      "sha256": "548a2a06eb6b72b85cc704ec03bffc1336eb2c862f1ed2517c623a999d84d6dd"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 53058,
-      "sha256": "9e717782ddaf2508ccdc5e7c0e4f348ac31e8ce045ef0905bfbb7e70d259ea07"
+      "bytes": 53541,
+      "sha256": "3dad3df7e16993f4e032778bba7f2ee5da6a8da1436148cd15fa74554a6eb49c"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 26794,
-      "sha256": "00a1f1eed1461f33dbb42fa26f50077083bdb0e1dd91d909458b8f48c0792af6"
+      "bytes": 27277,
+      "sha256": "773971d726401031416bc6bc80879562c8f79a19591a2cfb4d4bdb0b1af9614c"
     },
     {
       "path": "data/completed_work_index.json",
@@ -492,6 +492,11 @@
       "path": "evidence/scourge_highland_20261029.md",
       "bytes": 4444,
       "sha256": "b9a922eae4934e4694953d470b269ca38811bb8ba224114f66bd6ee649cfe82a"
+    },
+    {
+      "path": "evidence/selection_stutter_followup_20261107.md",
+      "bytes": 6014,
+      "sha256": "f62d8d85b1bd18d19bcd65d035f42695f9eb8e3b5c95b95b01fb259497453555"
     },
     {
       "path": "evidence/shared_boss_release_pipeline_20261101.md",

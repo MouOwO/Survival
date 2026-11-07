@@ -4,7 +4,7 @@ const start=source.indexOf('    function nativeAbilityEntries(unit) {');
 const code=source.slice(start,source.indexOf('    function refreshInventory()',start));
 let name='',abilities=[];
 const env={Entities:{GetUnitName:()=>name,GetAbility:(unit,slot)=>slot},Abilities:{GetAbilityName:i=>abilities[i].name,IsHidden:i=>!!abilities[i].hidden},
- unitAbilityCount:()=>abilities.length,orderVisibleAbilities:entries=>entries,abilityRuntime:()=>({})};
+ abilityRefreshLookup:null,unitAbilityCount:()=>abilities.length,orderVisibleAbilities:entries=>entries,abilityRuntime:()=>({})};
 vm.createContext(env);vm.runInContext(code,env);
 function visible(unit,list){name=unit;abilities=list.map(value=>typeof value==='string'?{name:value}:value);return Array.from(env.visibleAbilityEntries(1),e=>e.name);}
 assert.deepEqual(visible('npc_survival_repairer',['passive_repair','ability_repairer_suicide']),['ability_repairer_suicide']);

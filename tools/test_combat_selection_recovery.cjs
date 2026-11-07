@@ -229,14 +229,14 @@ function setup() {
 for (const method of ['refresh', 'refreshAbilities']) {
     const t = setup();
     t.api[method](false);
-    assert.equal(t.metrics.searches, 128, `${method}: duplicate mapping scan`);
+    assert.equal(t.metrics.searches, 0, `${method}: native child index must avoid fixed 64-slot searches`);
     t.assertKeys(['Q']);
 }
 {
     const t = setup();
     t.mount(0);
     t.api.refresh(false);
-    assert.equal(t.metrics.searches, 128, 'incomplete mapping should be reused until the next check');
+    assert.equal(t.metrics.searches, 0, 'empty native index must not trigger fixed slot probes');
 }
 
 // Native nodes can arrive after selection or be destroyed and replaced after
@@ -269,7 +269,7 @@ for (const replaceContainer of [false, true]) {
     t.api.select('selected_unit_event', { PlayerID: 0 });
     t.runUntil(0.21);
     t.mount(1);
-    t.api.vitals();
+    t.api.refreshAbilities();
     t.assertKeys(['Q']);
     t.key(0).text = '';
     t.api.select('selected_unit_event', { PlayerID: 0 });
@@ -277,8 +277,8 @@ for (const replaceContainer of [false, true]) {
     t.assertKeys(['Q']);
 }
 
-// An event arriving after the first check must retain a full late-HUD window;
-// coalescing must not truncate its recovery at the previous event's deadline.
+// Duplicate identity events share the complete original retry window. Native
+// children arriving after it still recover through the sole 100ms ability task.
 {
     const t = setup();
     t.mount(0);
@@ -286,9 +286,11 @@ for (const replaceContainer of [false, true]) {
     t.runUntil(0.19);
     t.api.select('query_unit_event', { PlayerID: 0 });
     t.runUntil(0.3);
+    assert.equal(t.jobs.size, 0, 'same identity must not extend or duplicate the retry chain');
     t.mount(1);
-    t.runUntil(0.4);
+    t.api.refreshAbilities();
     t.assertKeys(['Q']);
+    t.api.shutdown('finished_late_recovery');
     assert.equal(t.jobs.size, 0);
 }
 
@@ -328,7 +330,7 @@ for (const replaceContainer of [false, true]) {
     t.api.refresh(false);
     t.assertKeys(Array(8).fill(''));
     t.native(0).style.opacity = '1';
-    t.api.vitals();
+    t.api.refreshAbilities();
     t.assertKeys(Array(8).fill(''));
 }
 for (const example of [

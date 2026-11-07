@@ -75,7 +75,7 @@ function fixture(code) {
         SurvivalProductionHUD: {Refresh() { counters.production++; return 0; }}};
     const initial = {sequence: 1, resources: {wood: 100, gold: 50, population: 1, max_population: 20}, wave: {alive: 0, alive_limit: 90, current_wave: 1, total_waves: 30, timer: 10, status: 'countdown', countdown_deadline: 100}};
     const env = vm.createContext({
-        cfg, state, counters, runtimeCalls, utilityHotkeys: {}, utilityDisplayOrder: {},
+        cfg, state, counters, runtimeCalls, abilityRefreshLookup: null, utilityHotkeys: {}, utilityDisplayOrder: {},
         unitAbilityCount: unit => (counters.enumerations++, state.failReader ? (() => { throw Error('native reader unavailable'); })() : (state.counts[unit] || 0)),
         isPassiveAbility: ability => !!state.runtime[ability]?.passive,
         abilityRuntime: ability => ({...(state.runtime[ability] || {}), completed: state.completed.has(ability) ? 1 : 0}),
@@ -130,7 +130,20 @@ function run(code) {
     return {f,stable,stages};
 }
 const old = run(before), updated = run(source);
-assert.deepEqual(updated.stages,old.stages,'complete scripts preserve geometry/identity, native CD, runtime/level/prerequisite/completion, selection/viewport/panel failure recovery/reload');
+// The old source paints the explicit selection twice (synchronously and on its
+// next-frame notification). The current source intentionally paints it once.
+// Remove exactly that proven duplicate pair for the comparison; do not broadly
+// deduplicate runtime observations or stop checking their ordering/values.
+const coalescedOldStages = old.stages.map((stage, index) => {
+    if (index < 4) return stage;
+    assert.equal(stage.production, updated.stages[index].production + 1, 'one redundant selection paint is removed');
+    const runtime = stage.runtime.slice(), first = runtime.findIndex(row => row.unit === 19);
+    assert(first >= 0 && runtime[first].ability === 201 && runtime[first + 1].ability === 202);
+    assert.deepEqual(runtime.slice(first, first + 2), runtime.slice(first + 2, first + 4), 'removed selection paint must be an exact repeated pair');
+    runtime.splice(first, 2);
+    return {...stage, production: stage.production - 1, runtime};
+});
+assert.deepEqual(updated.stages,coalescedOldStages,'complete scripts preserve geometry/identity, native CD, runtime/level/prerequisite/completion, selection/viewport/panel failure recovery/reload after exactly one coalesced duplicate');
 assert.deepEqual(updated.stages[1].hud.abilities,['ability_301','ability_302','ability_303','ability_304']);
 assert.deepEqual(updated.stages[2].hud.abilities,['ability_301','ability_304'],'hidden and newly completed abilities affect layout on the next normal tick');
 assert.equal(updated.stages[3].hud.hp,'40 / 100','health updates between structural events');

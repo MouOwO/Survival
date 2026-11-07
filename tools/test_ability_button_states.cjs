@@ -10,16 +10,24 @@ const entries=[{ability:100,name:'mock_active',slot:0},{ability:101,name:'mock_p
 function ordered(){return t.api.orderVisibleAbilities(entries.map(e=>({...e})))}
 let order=ordered();assert.equal(t.api.hotkeyForAbilityEntry(order[0],''),'Q');
 assert.equal(t.api.hotkeyForAbilityEntry(order[1],''),'');assert.equal(t.api.hotkeyForAbilityEntry(order[2],''),'W');
-let mirrors={};t.cfg.HandoffStyleHotkey=(label,slot)=>mirrors[slot.id]=label.text;
+let mirrors={};t.cfg.HandoffStyleHotkey=(label,slot)=>mirrors[slot.id]={slot,text:label.text};
 // Use the real loaded HUD's clearing hook, including its cache deletion.
 for(const file of ['topnav_remaining_5d5c1152eb.js','handoff_hud.js']){
  const source=fs.readFileSync('panorama/src/scripts/custom_game/'+file,'utf8');
- const hook=source.match(/    cfg\.HandoffClearHotkey=function\(slot\)\{[^\n]+/)[0];
- vm.runInNewContext(hook,{cfg:t.cfg,keyBindings:mirrors});
+ const start=source.indexOf('    cfg.HandoffClearHotkey=function(slot){');assert(start>=0,'actual clearing hook exists');
+ let depth=0,end=-1;
+ for(let i=source.indexOf('{',start);i<source.length;i++){
+  if(source[i]==='{')depth++;
+  if(source[i]==='}'&&--depth===0){end=i+1;break;}
+ }
+ assert(end>start&&source[end]===';','complete actual clearing function is extracted');
+ const hook=source.slice(start,end+1);
+ vm.runInNewContext(hook,{cfg:t.cfg,keyBindings:mirrors,skillPanels:[native],nodes:{},
+  valid:p=>!!p,mirrorKeys:()=>{}});
  const active={...order[0]},passive={...order[1]};
  const mapping=entry=>[{entry,panel:native,anchor,nodeIndex:0}];
  assert(t.api.refreshOfficialUtilityHotkeys([active],mapping(active)));
- assert.equal(mirrors.Ability0,'Q');assert.equal(hotkey.values.opacity,'0');
+ assert.equal(mirrors.Ability0.text,'Q');assert.equal(hotkey.values.opacity,'0');
  assert(t.api.refreshOfficialUtilityHotkeys([passive],mapping(passive)));
  assert.equal(native.FindChildTraverse('SurvivalAbilityHotkey').values.visibility,'collapse');
  assert.equal(hotkey.values.opacity,'0','native passive key must stay hidden');

@@ -49,7 +49,11 @@ f.env.style(p,{width:'117px'});assert.equal(p.values.width,'117px','desired chan
 p.values.width='116.0px';f.env.style(p,{width:'116px'});const parseCount=f.counters.parses;f.env.generation++;f.env.style(p,{width:'116px'});assert.equal(f.counters.parses,parseCount+2,'reload invalidates panel-local proof');
 const replacement=f.panel('Ability0',{width:'0.0px'});f.env.style(replacement,{width:'116px'});assert.equal(replacement.values.width,'116px','same ID new panel cannot inherit proof');
 const failed=f.panel('unreadable',{height:undefined});f.reset();for(let i=0;i<100;i++){failed.values.height=undefined;f.env.style(failed,{height:'10px'});}assert.equal(f.counters.reads,100);assert.equal(f.counters.writes,100);assert.equal(f.counters.parses,2,'failed pair may avoid reparsing but never avoids setters');
-const error={name:'sentinel'};failed.throwKey='height';failed.failure=error;assert.throws(()=>f.env.style(failed,{height:'12px'}),e=>e===error);failed.alive=false;f.reset();f.env.style(failed,{height:'12px'});assert.equal(f.counters.reads,0);assert.equal(f.counters.writes,0);
+const error={name:'sentinel'};failed.throwKey='height';failed.failure=error;
+assert.throws(()=>f.env.style(failed,{height:'12px'}),e=>e.message==='style_write panel=unreadable property=height value=12px error='+String(error),'failed native setter retains exact panel/property/value and original failure text');
+assert.equal(f.counters.writes,100,'failed setter must not be counted as a successful write');
+assert.equal(failed.values.height,'10px','failed setter does not change the last native value');
+failed.alive=false;f.reset();f.env.style(failed,{height:'12px'});assert.equal(f.counters.reads,0);assert.equal(f.counters.writes,0);
 // Tools probe must execute exactly the same production decision and ordering.
 function sequence(f,fn){const p=f.panel('Ability0',{width:'116.0px',height:'34.0px',minHeight:'34.0px',position:'0.0px 0px 0px',padding:'0px 0px 0px 0px',opacity:'0.0',transform:'scale3d(1,1,1)',horizontalAlign:undefined});const values={width:'116px',height:'34px',minHeight:'34px',position:'0px 0px 0px',padding:'0px',opacity:'0',transform:'none',horizontalAlign:'left'};f.reset();fn(p,values);fn(p,values);p.values.minHeight='0.0px';fn(p,values);return {trace:f.trace,reads:f.counters.reads,writes:f.counters.writes,values:p.values};}
 const off=fixture(),on=fixture(),wrapped=on.env.probeStyle(on.env.style,1);assert.deepEqual(sequence(off,off.env.style),sequence(on,wrapped));

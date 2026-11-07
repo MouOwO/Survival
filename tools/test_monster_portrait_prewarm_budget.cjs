@@ -38,7 +38,11 @@ function fixture(extra=0){
  const scenes=()=>t.metrics.created.filter(p=>p.type==='DOTAScenePanel'&&p.panel.alive).map(p=>p.panel);
  const ready=value=>{const scene=value.scene||value;scene.AddClass('SceneLoaded');scene.parent.FindChildTraverse('Background').ImageLoaded();};
  const advance=ms=>now+=ms;
- const tick=()=>{now+=50;const id=[...t.jobs.keys()][0];assert(id!==undefined);t.run(id);};
+ const tick=()=>{const id=[...t.jobs.keys()][0];assert(id!==undefined);now+=t.jobs.get(id).delay*1000;t.run(id);};
+ // Existing residency/failure cases explicitly wait for the new cold gate.
+ // test_portrait_cold_admission covers intermediate pending states separately.
+ const admitQueued=()=>{now+=100;for(const [id,job] of [...t.jobs])if(job.delay===.1)t.run(id);};
+ const load=(asset,parent=t.overlay)=>{let value=r.Prepare(parent,asset);if(value&&value.pending){admitQueued();value=r.Prepare(parent,asset);}return value;};
  const event=(name='dota_player_update_selected_unit',player=0)=>{
   for(const item of [...events.values()])if(item.name===name)item.callback({PlayerID:player});
  };
@@ -54,7 +58,7 @@ function fixture(extra=0){
  }
  const unique=[];for(const asset of Object.keys(t.cfg.SurvivalMonsterPortraitScenes))
   if(!unique.some(other=>t.cfg.SurvivalMonsterPortraitScenes[other].map===t.cfg.SurvivalMonsterPortraitScenes[asset].map))unique.push(asset);
- return {t,r,counts,events,unsubscribed,scenes,ready,advance,tick,event,sane,unique,originCalls:()=>originCalls};
+ return {t,r,counts,events,unsubscribed,scenes,ready,advance,tick,admitQueued,load,event,sane,unique,originCalls:()=>originCalls};
 }
 
 const f=fixture(),{t,r}=f;
@@ -69,13 +73,13 @@ r.Hide();assert.equal(cold.scene.parent.values.visibility,'visible','selected lo
 f.ready(cold);const mounted=r.Prepare(t.overlay,first);assert(mounted.ready&&!mounted.presentable);
 f.advance(99);assert(!r.Prepare(t.overlay,first).presentable);f.advance(1);assert(r.Prepare(t.overlay,first).presentable);
 while(t.jobs.size)f.tick();assert.equal(r.Inspect().created,1);
-for(const asset of f.unique.slice(1,4)){const value=r.Prepare(t.overlay,asset);f.ready(value);r.Prepare(t.overlay,asset);}
+for(const asset of f.unique.slice(1,4)){const value=f.load(asset);f.ready(value);r.Prepare(t.overlay,asset);}
 assert.equal(r.Inspect().cached,4);
 const retained=r.Prepare(t.overlay,first).scene;
-const second=r.Prepare(t.overlay,f.unique[4]);f.ready(second);r.Prepare(t.overlay,f.unique[4]);
+const second=f.load(f.unique[4]);f.ready(second);r.Prepare(t.overlay,f.unique[4]);
 assert.equal(r.Inspect().evictions,1);
 assert.equal(r.Prepare(t.overlay,first).scene,retained,'touch updates LRU and preserves recent world');
-const replaced=r.Prepare(t.overlay,f.unique[1]);assert(!replaced.ready,'least recent unprotected world was evicted');
+const replaced=f.load(f.unique[1]);assert(!replaced.ready,'least recent unprotected world was evicted');
 f.ready(replaced);r.Prepare(t.overlay,f.unique[1]);
 
 // Rapid explicit prewarm has a one-item pending queue, not a second catalog.
@@ -84,7 +88,7 @@ for(const asset of q.unique)q.r.Prewarm(q.t.nativeHost(),asset);
 assert.equal(q.r.Inspect().queued,1);assert.equal(q.r.Inspect().created,0);
 q.tick();assert.equal(q.r.Inspect().warming,q.unique.at(-1));
 const paused=q.r.Inspect().warming;
-const priority=q.r.Prepare(q.t.overlay,q.unique[0]);assert(priority&&!priority.ready);
+const priority=q.load(q.unique[0]);assert(priority&&!priority.ready);
 assert.equal(q.r.Inspect().warming,q.unique[0]);assert.equal(q.r.Inspect().queued,0);
 q.r.Hide();assert.equal(priority.scene.parent.values.visibility,'visible');q.ready(priority);q.r.Prepare(q.t.overlay,q.unique[0]);
 while(q.t.jobs.size)q.tick();assert.equal(q.r.Inspect().warming,'');
@@ -94,13 +98,13 @@ assert.notEqual(paused,q.unique[0]);
 // A later ready selection cancels a queued obsolete request. During eviction,
 // both the displayed world and one in-flight load are protected.
 const protect=fixture();protect.r.Prewarm(protect.t.nativeHost());
-for(const id of protect.unique.slice(0,4)){const value=protect.r.Prepare(protect.t.overlay,id);protect.ready(value);protect.r.Prepare(protect.t.overlay,id);}
+for(const id of protect.unique.slice(0,4)){const value=protect.load(id);protect.ready(value);protect.r.Prepare(protect.t.overlay,id);}
 const display=protect.r.Prepare(protect.t.overlay,protect.unique[3]).scene;
 protect.r.Prewarm(protect.t.nativeHost(),protect.unique[4]);assert.equal(protect.r.Inspect().queued,1);
 protect.r.Prewarm(protect.t.nativeHost(),protect.unique[3]);assert.equal(protect.r.Inspect().queued,0);
-protect.r.Prewarm(protect.t.nativeHost(),protect.unique[4]);protect.tick();
+protect.r.Prewarm(protect.t.nativeHost(),protect.unique[4]);protect.admitQueued();
 const inFlight=protect.scenes().find(scene=>scene.attributes.map===protect.t.cfg.SurvivalMonsterPortraitScenes[protect.unique[4]].map);
-const urgent=protect.r.Prepare(protect.t.overlay,protect.unique[5]);assert(urgent);
+const urgent=protect.load(protect.unique[5]);assert(urgent);
 assert(display.alive&&inFlight.alive,'current and warming survive the allocation eviction');
 protect.ready(urgent);protect.r.Prepare(protect.t.overlay,protect.unique[5]);
 protect.r.Prewarm(protect.t.nativeHost(),protect.unique[6]);protect.event();
@@ -109,35 +113,35 @@ assert.equal(protect.r.Inspect().queued,0,'new real selection invalidates obsole
 // Every real identity still resolves to its complete configured background map.
 const all=fixture();let visited=0;
 for(const asset of Object.keys(all.t.cfg.SurvivalMonsterPortraitScenes)){
- const spec=all.t.cfg.SurvivalMonsterPortraitScenes[asset],value=all.r.Prepare(all.t.overlay,asset);assert(value);
+ const spec=all.t.cfg.SurvivalMonsterPortraitScenes[asset],value=all.load(asset);assert(value);
  assert.equal(value.scene.attributes.map,spec.map);all.ready(value);assert(all.r.Prepare(all.t.overlay,asset).ready);visited++;
 }
 assert.equal(visited,197);assert.equal(all.r.Inspect().cached,4);assert.equal(all.t.metrics.setUnit.length,0);
 const bane='monster_boss_rebirth_05_lucid_torment',baneSpec=all.t.cfg.SurvivalMonsterPortraitScenes[bane];
 assert.equal(baneSpec.components,4);assert.equal(baneSpec.map,'portraits/monster_326b73b164e21d7f1a07_v1');
-const baneAgain=all.r.Prepare(all.t.overlay,bane);assert.equal(baneAgain.scene.attributes.map,baneSpec.map);
+const baneAgain=all.load(bane);assert.equal(baneAgain.scene.attributes.map,baneSpec.map);
 all.ready(baneAgain);assert(all.r.Prepare(all.t.overlay,bane).ready);
 
 // Failed loads cannot retry on timer/Prepare ticks, even after long elapsed time.
 // New local selection and explicit Retry each permit one new bounded attempt.
 const retry=fixture(),asset=retry.unique[0];retry.r.Prewarm(retry.t.nativeHost());
-let attempt=retry.r.Prepare(retry.t.overlay,asset);retry.advance(10001);assert.equal(retry.r.Prepare(retry.t.overlay,asset),null);
+let attempt=retry.load(asset);retry.advance(10001);assert.equal(retry.r.Prepare(retry.t.overlay,asset),null);
 assert.equal(retry.r.Inspect().failures,1);assert.equal(retry.r.Inspect().created,1);
 retry.event('dota_player_update_selected_unit',1);retry.advance(100000);
 for(let i=0;i<100;i++)assert.equal(retry.r.Prepare(retry.t.overlay,asset),null);
 while(retry.t.jobs.size)retry.tick();assert.equal(retry.r.Inspect().created,1,'remote selections and idle ticks do not retry');
-retry.event();attempt=retry.r.Prepare(retry.t.overlay,asset);assert(attempt);assert.equal(retry.r.Inspect().created,2);
+retry.event();attempt=retry.load(asset);assert(attempt);assert.equal(retry.r.Inspect().created,2);
 retry.advance(10001);assert.equal(retry.r.Prepare(retry.t.overlay,asset),null);
 retry.event('dota_player_update_query_unit');retry.advance(9999);assert.equal(retry.r.Prepare(retry.t.overlay,asset),null);
-retry.advance(1);attempt=retry.r.Prepare(retry.t.overlay,asset);assert(attempt);assert.equal(retry.r.Inspect().created,3);
+retry.advance(1);attempt=retry.load(asset);assert(attempt);assert.equal(retry.r.Inspect().created,3);
 retry.advance(10001);assert.equal(retry.r.Prepare(retry.t.overlay,asset),null);
 assert(retry.r.Retry(asset));retry.advance(29999);assert.equal(retry.r.Prepare(retry.t.overlay,asset),null);
-retry.advance(1);attempt=retry.r.Prepare(retry.t.overlay,asset);assert(attempt);assert.equal(retry.r.Inspect().created,4);
+retry.advance(1);attempt=retry.load(asset);assert(attempt);assert.equal(retry.r.Inspect().created,4);
 retry.ready(attempt);assert(retry.r.Prepare(retry.t.overlay,asset).ready);assert(!retry.r.Retry(asset),'success clears failure state');
 assert.equal(retry.r.Inspect().retries,3);
 
 // Initial 2-second backoff is also mandatory after a new real selection.
-const fast=fixture();let initial=fast.r.Prepare(fast.t.overlay,fast.unique[0]);fast.advance(10001);
+const fast=fixture();let initial=fast.load(fast.unique[0]);fast.advance(10001);
 assert.equal(fast.r.Prepare(fast.t.overlay,fast.unique[0]),null);fast.event();fast.advance(1999);
 assert.equal(fast.r.Prepare(fast.t.overlay,fast.unique[0]),null);fast.advance(1);assert(fast.r.Prepare(fast.t.overlay,fast.unique[0]));
 
@@ -152,7 +156,7 @@ assert.equal(ahead.r.Inspect().created,1);assert.equal(ahead.t.jobs.size,0,'unch
 // Compare real production function counts with 197 vs1970 catalog identities.
 function steady(extra){
  const sample=fixture(extra);sample.r.Prewarm(sample.t.nativeHost());
- for(const id of sample.unique.slice(0,4)){const p=sample.r.Prepare(sample.t.overlay,id);sample.ready(p);sample.r.Prepare(sample.t.overlay,id);}
+ for(const id of sample.unique.slice(0,4)){const p=sample.load(id);sample.ready(p);sample.r.Prepare(sample.t.overlay,id);}
  const id=sample.unique[3];sample.advance(100);sample.r.Prepare(sample.t.overlay,id);
  const before={...sample.counts},created=sample.r.Inspect().created;
  for(let i=0;i<300;i++){sample.advance(100);sample.r.Prewarm(sample.t.nativeHost(),id);sample.r.Prepare(sample.t.overlay,id);}
