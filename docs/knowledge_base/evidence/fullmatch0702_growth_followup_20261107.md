@@ -67,3 +67,11 @@ WS4 当前玩家身份经原生进程记录与实际服务端映射匹配，仅�
 用户结束游戏后通过 canonical rehearsal close 正常退出 PID 26372；keeper 同步结束，无强杀。canonical restore exit 0，`ORIGINAL0104_COMPLETE_SET_FULLY_RESTORED`，完整五包与旧 Steam manifest 保持，备份和 0702 证据保留。回执位于树外 `D:/Survival_本地排演/complete_delivery_20261103/complete0702_user02/restored.json`。
 
 接下来冻结双仓来源，准备独立 `2026110703`。需要新 catalog18、source18 官方编译/保护及 final18 完整来源清单、签名和新版普通客户端验收。之后才能走 SDK 上传及官方完整下载逐文件比对。当前 SDK 0、新官方下载 0、新自动消耗券 0；旧 30 券授权已用完，不能沿用。不得将源码合并、独立计数测试或 0702 旧视频证据当成新版本已发布/已验收。0703 operator 的版本/authority 摘要更新已通过 47 项检查；真正 Git 来源绑定检查在提交后运行。
+
+## 双仓冻结与 catalog18 构建修复
+
+本轮运行修复实际提交并推送：game/dev `0eff8b42e41c5f016c1e9ded891b3d12232e5f7e`、content/master `86d72aedd973ce44e5a4468889923334ce6124f7`，两个远端 HEAD 已核对。4 项 ActualGitPinIntegrationTests 通过，原有5项无关改动保留未暂存。首次 catalog18 来源记录保留在 `output/complete_delivery_release_20261107_v03/source_pins_catalog18.json`。
+
+严格 Git 目录生成在生产展示 seed 执行阶段失败，尚未创建输出目录。原因是抽取的纯函数区段新增 `M.research_learning_state` 定义，而种子隔离环境没有 `M`；不是生产奖励或研究规则错误。最小修复只增加该隔离环境的私有 `M = {}`，不加载服务或玩家状态。正/反真实 Lua 回归2项通过；新运行源码+明确标为 TEST_ONLY 的候选 seed 与旧不可变运行源码+旧seed的10个输出部分逐值相同，包括19项研究、420级配置、8项训练和全部状态/错误文案。原失败及等价证据保留在 `output/catalog18_production_seed_diagnosis/`。
+
+修复后的正式生成必须引用新的已提交 operator，不把候选覆盖验证冒充旧提交构建。新尝试来源/输出单独保存为 catalog18_attempt02；此处仍无新编译、签名、实机或发布通过结论。

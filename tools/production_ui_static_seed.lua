@@ -28,6 +28,10 @@ local builder = raw[source_paths[1]]
 local check = assert(builder:match("(local function with_cast_resource_check.-)local function value_delta"), "production_resource_check_boundary_changed")
 local upgrade = assert(builder:match("(local function research_effect_value.-)local function with_upgrade_quote"), "production_research_boundary_changed")
 local public_env = {
+    -- The reviewed slice may define pure exported helpers alongside its local
+    -- projection functions. Keep those definitions in a private empty module;
+    -- no runtime service, player API or additional source is loaded.
+    M = {},
     tonumber=tonumber, tostring=tostring, type=type, math=math,
     research_config=config, research_description=description,
     research_lab_abilities=mappings, research_cost_service=cost_service,
