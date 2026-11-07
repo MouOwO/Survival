@@ -20,7 +20,7 @@ sys.path.insert(0,str(ROOT/'tools'))
 import release_pending_inventory as pending
 import protect_runtime_lua as protection
 
-SEQUENCE=2026110703
+SEQUENCE=2026110704
 PROMETHEUS=Path('D:/Survival_安全工具/prometheus')
 OVERRIDES=(
     'addoninfo.txt',
