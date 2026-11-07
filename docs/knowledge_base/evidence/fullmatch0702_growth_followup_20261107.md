@@ -85,3 +85,11 @@ WS4 当前玩家身份经原生进程记录与实际服务端映射匹配，仅�
 最终清单第一次严格检查拦住3个新变化的英雄CSV：`blademaster_exclusive_runtime.csv`、`hero_skill_definitions.csv`、`monkey_king_exclusive_runtime.csv`。这是构建输入到运行Lua的映射缺失，不能直接忽略CSV。补充工具只执行声明Git中的真实 `tools/build_configs.py::build()`，以内存输入/输出逐字节重现3个运行模块；固定已审生成器摘要，不读工作区输入，未知CSV、生成器变化、Lua不匹配和运行代码直接读取CSV均阻断。对应Lua仍必须拥有单独生产/保护绑定。24项精确审阅、17项collector测试通过；独立复核补齐正/反斜线CSV动态加载预筛；真实原来源诊断25路径/0读取阻断，仅诊断证明，正式必须提交新operator后使用 final18_attempt02。旧失败清单/回执不覆盖，164编译及186保护的原来源不重写、不重建。
 
 用户最新澄清以“英雄物品栏里的深渊审判物品tooltip”为准，之前状态栏描述被替代。冻结修复位置正确，真实服务端发布到JS字段渲染11等级357项检查通过，“范围光环”全文为“1秒/次，对200范围敌人造成全属性×5伤害”；实际像素换行仍待新普通客户端验收。当前无新签包/安装/SDK/官方下载，后台未改。
+
+## 0703完整签包完成，待用户实机
+
+后续真实最终来源 game/operator `bee512716d2e56becb31dab9a9736adea19cc5d1`、content `386388efa5ce24c114139dd8032fa3a10170ada7`，双仓已push；final18_attempt02严格范围审阅25路径通过。619项来源（含242历史）全部有处置，470运行绑定及7删除项通过，3CSV到必需保护Lua的映射独立验证通过。原164官方编译及186保护的producer仍为source18，不重写为最终提交。
+
+首次collector调用错误使用相对报告路径，被`absolute_non_root_path_required`拒绝，三输出目录均未创建；保留`collector_relative_path_failure.json`后显式改用绝对路径执行成功。完整未签名包7049文件/3,806,475,087字节，blockers为空，全量父包及目标字节核验通过。canonical plan、prepare、build/sign均exit0；5个签包文件，424变化运行资源，7删除项。包回执 `output/complete_delivery_release_20261107_v03/package.json` SHA `6b5a77f04230f968be3a2ba1c857ec02315b024cb93fe5ef999dd984198de5ba`，签名manifest `273cc493b0612dbe2cefa0834a8b03cebd11e0e556a2ac369bab019da5e4292b`，content `668146de3ee08e760efcc077d8e64dcd29443db8cde1a305b175e77f5f037b69`。[可提交的阶段事实](fullmatch0703_signed_candidate_20261107.public.json)。
+
+目前0703未安装、无新native/FPS验收、SDK0、官方新下载0；正式0104保持，WS4后台本轮未部署。已询问用户是否现在开始新一局，等其准备好后再stage/launch；不要提前开局导致建墙超时。只读监测方案及命令见ignored `native_user_acceptance_handoff.json`。FPS主测量与短段net_showmsg分开，同一固定签包可以后续复用，不因等待用户重新构建。严格发布门禁还需新普通客户端证据；此前30普通券自动授权已用完，不能自动重抽。只读查账显示祥瑞实际到账后用掉，二次元仍按原条件，88KB共享支付目录继续另案。
