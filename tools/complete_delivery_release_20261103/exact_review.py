@@ -30,7 +30,7 @@ CONTENT_JS = 'panorama/scripts/custom_game/common/ui_static_catalog.js'
 LUA = 'scripts/vscripts/config/generated/ui_static_catalog_lookup.lua'
 TARGETS = ['panorama/scripts/custom_game/common/ui_static_catalog.vjs_c', LUA]
 CSV_GENERATOR = 'tools/build_configs.py'
-# Reviewed build() call graph for the three contracts below reads only its
+# Reviewed build() call graph for the five contracts below reads only its
 # source adapter and writes only its output adapter; other validators return
 # before I/O for these basenames. Changed generator/new I/O requires re-review.
 CSV_GENERATOR_LF_SHA256 = '5ca74b5a7b0b61bc9140a4941c373f5ca2ae31baac18a2a3cf1d0f4ad3dc5efd'
@@ -40,6 +40,10 @@ CSV_OUTPUTS = {
     'data/csv/英雄系统/'+name+'.csv': 'scripts/vscripts/config/generated/'+name+'.lua'
     for name in ('blademaster_exclusive_runtime', 'hero_skill_definitions', 'monkey_king_exclusive_runtime')
 }
+CSV_OUTPUTS.update({
+    'data/csv/公共规则/tooltip_definitions.csv': 'scripts/vscripts/config/generated/tooltip_definitions.lua',
+    'data/csv/挑战与奖励系统/challenge_definitions.csv': 'scripts/vscripts/config/generated/challenge_definitions.lua',
+})
 EVIDENCE = {
  'data/ui/network50_dev05_evidence_20261103.json': ('status', 'LOCAL_TOOLS_NATIVE_PARTIAL_EVIDENCE_NOT_FPS_OR_WORKSHOP_ACCEPTANCE'),
  'data/ui/network50_dev06_fps_reclassification_20261103.json': ('status', 'RECLASSIFIED_INVALID_GAMEPLAY_CAPTURE_ORIGINAL_RETAINED'),

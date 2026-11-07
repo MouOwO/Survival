@@ -1,6 +1,5 @@
 """Entry boundaries: never start a cloud helper offline or replace a live game."""
 import importlib.util
-import hashlib
 import io
 import json
 from contextlib import redirect_stderr, redirect_stdout
@@ -9,7 +8,7 @@ import stat
 import tempfile
 from types import SimpleNamespace
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 spec = importlib.util.spec_from_file_location("developer_test_entry", Path(__file__).with_name("test_entry.py"))
 entry = importlib.util.module_from_spec(spec)
@@ -75,11 +74,12 @@ class TestEntryBoundaryTest(unittest.TestCase):
         self.assertIn("本工具不会自动移动或删除文件", errors.getvalue())
 
     def test_online_check_does_not_traverse_offline_lab_namespace(self):
+        signed = Mock()
+        signed.check.return_value = {"status": "SIGNED_ONLINE_ENTRY_CHECKED"}
         with patch.object(entry, "guard_addon_vpk_labs", side_effect=AssertionError("Offline guard only")), \
-                patch.object(Path, "is_file", return_value=True), \
-                patch.object(Path, "read_bytes", return_value=b"enabled = true"), \
-                patch.object(entry, "check_online_policy"):
-            self.assertEqual(entry.check("online")["status"], "ENTRY_CHECKED")
+                patch.object(entry, "load_online", return_value=signed):
+            self.assertEqual(entry.check("online")["status"], "SIGNED_ONLINE_ENTRY_CHECKED")
+        signed.check.assert_called_once_with()
 
     def test_regular_launch_arguments_keep_their_mode_and_port(self):
         args = entry.launch_arguments("offline", Path("normal.log"))
@@ -87,10 +87,8 @@ class TestEntryBoundaryTest(unittest.TestCase):
         self.assertEqual(args[args.index("+survival_archive_http_enabled") + 1], "0")
         self.assertEqual(args.count("+survival_archive_http_enabled"), 1)
         self.assertEqual(args[args.index("-vconport") + 1], "29006")
-        online = entry.launch_arguments("online", Path("online.log"))
-        self.assertEqual(online[online.index("-vconport") + 1], "29005")
-        self.assertNotIn("+survival_offline_logic_test", online)
-        self.assertNotIn("+survival_archive_http_enabled", online)
+        with self.assertRaisesRegex(RuntimeError, "online_requires_canonical_launcher"):
+            entry.launch_arguments("online", Path("online.log"))
 
     def test_offline_launcher_preserves_live_game_and_never_contacts_cloud(self):
         with patch.object(entry, "check", return_value={"ok": True}), \
@@ -115,10 +113,19 @@ class TestEntryBoundaryTest(unittest.TestCase):
             self.assertEqual(args[args.index("+survival_archive_http_enabled") + 1], "0")
             self.assertEqual(args.count("+survival_archive_http_enabled"), 1)
             self.assertEqual(args[args.index("+sv_cheats") + 1], "1")
-            self.assertNotIn(entry.ONLINE_ADDON, args)
+            self.assertNotIn("svt_w24", args)
+
+    def signed(self):
+        signed = Mock()
+        signed.prepare.return_value = {"summary": {"ok": True, "game_started": False,
+                                                   "status": "SIGNED_ONLINE_ENTRY_CHECKED"}}
+        signed.run_prepared.return_value = {"ok": True, "status": "SIGNED_ONLINE_EXITED_ORIGINAL_RESTORED"}
+        return signed
 
     def test_live_game_is_preserved_before_any_helper_or_launch(self):
+        signed = self.signed()
         with patch.object(entry, "check", return_value={"ok": True}), \
+                patch.object(entry, "load_online", return_value=signed), \
                 patch.object(entry, "process_inventory", return_value={"steam_running": True, "dota_pids": [456]}), \
                 patch.object(entry, "ensure_relay") as relay, patch.object(entry.subprocess, "Popen") as launch:
             for mode in ("offline", "online"):
@@ -126,111 +133,83 @@ class TestEntryBoundaryTest(unittest.TestCase):
                     entry.run(mode)
             relay.assert_not_called()
             launch.assert_not_called()
+            signed.run_prepared.assert_not_called()
 
     def test_failed_relay_never_launches_online_or_falls_back_offline(self):
-        with patch.object(entry, "check", return_value={"ok": True}), \
+        signed = self.signed()
+        with patch.object(entry, "load_online", return_value=signed), \
                 patch.object(entry, "process_inventory", return_value={"steam_running": True, "dota_pids": []}), \
                 patch.object(entry, "ensure_relay", side_effect=RuntimeError("steam_test_relay_identity_invalid")), \
                 patch.object(entry.subprocess, "Popen") as launch:
             with self.assertRaisesRegex(RuntimeError, "steam_test_relay_identity_invalid"):
                 entry.run("online")
+            signed.run_prepared.assert_not_called()
             launch.assert_not_called()
 
-    def test_online_uses_only_verified_online_addon_without_offline_flag(self):
-        with tempfile.TemporaryDirectory() as directory, patch.object(entry, "RUNTIME", Path(directory)), \
-                patch.object(entry, "check", return_value={"ok": True}), \
-                patch.object(entry, "process_inventory", return_value={"steam_running": True, "dota_pids": []}), \
-                patch.object(entry, "ensure_relay", return_value={"running": True, "started": False}), \
-                patch.object(entry.subprocess, "Popen", return_value=SimpleNamespace(pid=1234)) as launch:
-            entry.run("online")
-            args = launch.call_args.args[0]
-            self.assertEqual(args[args.index("-addon") + 1], entry.ONLINE_ADDON)
-            self.assertNotIn("+survival_offline_logic_test", args)
-            self.assertNotIn("+survival_archive_http_enabled", args)
-            self.assertEqual(args[args.index("+sv_cheats") + 1], "0")
-            self.assertEqual(args.count("+sv_cheats"), 1)
+    def test_online_delegates_only_after_authentication_and_relay(self):
+        signed, order = self.signed(), []
+        signed.prepare.side_effect = lambda: order.append("verify") or {"summary": {"ok": True}}
+        signed.run_prepared.side_effect = lambda prepared: order.append("canonical") or prepared["summary"]
+        with patch.object(entry, "load_online", return_value=signed), \
+                patch.object(entry, "process_inventory", side_effect=lambda: order.append("process") or
+                             {"steam_running": True, "dota_pids": []}), \
+                patch.object(entry, "ensure_relay", side_effect=lambda: order.append("relay") or {"running": True}), \
+                patch.object(entry.subprocess, "Popen", side_effect=AssertionError("No independent Dota launch")), \
+                patch.object(entry, "launch_arguments", side_effect=AssertionError("No Tools/legacy argv")):
+            result = entry.run("online")
+        self.assertEqual(order, ["verify", "process", "relay", "canonical"])
+        self.assertEqual(result["steam_transport"], {"running": True})
+        signed.prepare.assert_called_once_with()
 
     def test_check_only_does_not_read_processes_or_start_helpers(self):
-        with patch.object(entry, "check", return_value={"ok": True}), \
+        signed = self.signed()
+        with patch.object(entry, "load_online", return_value=signed), \
                 patch.object(entry, "process_inventory") as inventory, \
                 patch.object(entry, "ensure_relay") as relay, patch.object(entry.subprocess, "Popen") as launch:
-            entry.run("online", check_only=True)
-            inventory.assert_not_called()
-            relay.assert_not_called()
-            launch.assert_not_called()
+            result = entry.run("online", check_only=True)
+        self.assertFalse(result["game_started"])
+        inventory.assert_not_called()
+        relay.assert_not_called()
+        launch.assert_not_called()
+        signed.run_prepared.assert_not_called()
 
-    def test_stale_or_modified_online_policy_is_rejected_before_launch(self):
-        with tempfile.TemporaryDirectory() as directory:
-            addon = Path(directory)
-            policy = addon / "scripts/vscripts/core/release_policy.lua"
-            profile = addon / "scripts/vscripts/config/release_profile.lua"
-            policy.parent.mkdir(parents=True)
-            profile.parent.mkdir(parents=True)
-            policy.write_bytes(b"protected online gate")
-            profile.write_bytes(b'return { channel = "production" }')
-            manifest = addon / "_online_policy_install.json"
-            manifest.write_text(json.dumps({"content_sha256": "new_release"}), encoding="utf-8")
-            receipt = addon / "policy_record.json"
-            record = {"online_cheats_allowed": False, "candidate": {
-                "content_sha256": "new_release",
-                "runtime_policy_sha256": hashlib.sha256(policy.read_bytes()).hexdigest(),
-                "release_profile_sha256": hashlib.sha256(profile.read_bytes()).hexdigest()}}
-            receipt.write_text(json.dumps(record), encoding="utf-8")
-            with patch.object(entry, "ONLINE_POLICY_RECORD", receipt), \
-                    patch.object(entry, "PAYMENT_HELPER_RECORD", addon / "no_helper.json"):
-                entry.check_online_policy(addon)
-                manifest.write_text(json.dumps({"content_sha256": "old_release"}), encoding="utf-8")
-                with self.assertRaisesRegex(RuntimeError, "online_release_policy_outdated"):
-                    entry.check_online_policy(addon)
-                manifest.write_text(json.dumps({"content_sha256": "new_release"}), encoding="utf-8")
-                policy.write_bytes(b"old or modified gate")
-                with self.assertRaisesRegex(RuntimeError, "online_cheat_policy_bytes_changed"):
-                    entry.check_online_policy(addon)
-                policy.write_bytes(b"protected online gate")
-                profile.write_bytes(b'return { channel = "development" }')
-                with self.assertRaisesRegex(RuntimeError, "online_release_profile_changed"):
-                    entry.check_online_policy(addon)
-                record["online_cheats_allowed"] = True
-                receipt.write_text(json.dumps(record), encoding="utf-8")
-                with self.assertRaisesRegex(RuntimeError, "online_cheat_policy_not_verified"):
-                    entry.check_online_policy(addon)
+    def test_missing_steam_preserves_install_and_never_starts_relay(self):
+        signed = self.signed()
+        with patch.object(entry, "load_online", return_value=signed), \
+                patch.object(entry, "process_inventory", return_value={"steam_running": False, "dota_pids": []}), \
+                patch.object(entry, "ensure_relay") as relay:
+            with self.assertRaisesRegex(RuntimeError, "steam_not_running"):
+                entry.run("online")
+        relay.assert_not_called()
+        signed.run_prepared.assert_not_called()
 
-    def test_verified_payment_helper_pins_cannot_enable_cheats_or_stale_installs(self):
-        with tempfile.TemporaryDirectory() as directory:
-            addon = Path(directory)
-            hashes = {}
-            for name in entry.PAYMENT_HELPER_PINS:
-                path = addon / name
-                path.parent.mkdir(parents=True, exist_ok=True)
-                path.write_bytes(("reviewed:" + name).encode())
-                hashes[name] = hashlib.sha256(path.read_bytes()).hexdigest()
-            installation = {"content_sha256": "helper_release", "release_sequence": 2026102701,
-                            "signature_valid": True, "online_cheats_allowed": False,
-                            "full_after_verification": True}
-            marker = addon / "_online_policy_install.json"
-            marker.write_text(json.dumps(installation), encoding="utf-8")
-            record = {"kind": "VERIFIED_WS4_PAYMENT_HELPER", "enabled": True,
-                      "online_cheats_allowed": False, "cloud_login_required": True,
-                      "candidate": {"content_sha256": "helper_release", "release_sequence": 2026102701,
-                                    "runtime_hashes": hashes}}
-            receipt = addon / "helper.json"
-            receipt.write_text(json.dumps(record), encoding="utf-8")
-            with patch.object(entry, "PAYMENT_HELPER_RECORD", receipt), \
-                    patch.object(entry, "ONLINE_POLICY_RECORD", addon / "missing_legacy.json"):
-                entry.check_online_policy(addon)
-                marker.write_text(json.dumps({**installation, "signature_valid": False}), encoding="utf-8")
-                with self.assertRaisesRegex(RuntimeError, "online_payment_helper_outdated"):
-                    entry.check_online_policy(addon)
-                marker.write_text(json.dumps(installation), encoding="utf-8")
-                record["online_cheats_allowed"] = True
-                receipt.write_text(json.dumps(record), encoding="utf-8")
-                with self.assertRaisesRegex(RuntimeError, "payment_helper_record_invalid"):
-                    entry.check_online_policy(addon)
-                record["online_cheats_allowed"] = False
-                receipt.write_text(json.dumps(record), encoding="utf-8")
-                (addon / "scripts/vscripts/systems/payment_service.lua").write_bytes(b"stale service")
-                with self.assertRaisesRegex(RuntimeError, "online_payment_helper_bytes_changed"):
-                    entry.check_online_policy(addon)
+    def test_invalid_candidate_refuses_before_any_cloud_or_process(self):
+        signed = self.signed()
+        signed.prepare.side_effect = RuntimeError("online_expected_newest_mismatch")
+        with patch.object(entry, "load_online", return_value=signed), \
+                patch.object(entry, "process_inventory") as inventory, patch.object(entry, "ensure_relay") as relay:
+            with self.assertRaisesRegex(RuntimeError, "online_expected_newest_mismatch"):
+                entry.run("online")
+        inventory.assert_not_called()
+        relay.assert_not_called()
+        signed.run_prepared.assert_not_called()
+
+    def test_existing_relay_identity_failure_does_not_replace_live_helper(self):
+        relay = Mock()
+        relay.RECEIPT.exists.return_value = True
+        relay.RECEIPT.read_text.return_value = json.dumps({"pid": 12, "owner": "expected"})
+        relay.process_identity.return_value = {"pid": 12, "owner": "different"}
+        with patch.object(entry, "load_relay", return_value=relay):
+            with self.assertRaisesRegex(RuntimeError, "steam_test_relay_identity_invalid"):
+                entry.ensure_relay()
+        relay.start.assert_not_called()
+        relay.stop.assert_not_called()
+
+    def test_wrapper_streams_keeper_and_does_not_return_early(self):
+        script = Path(__file__).with_name("launch_test.ps1").read_text(encoding="utf-8")
+        self.assertIn("& $python @entryArguments", script)
+        self.assertNotIn("$reply=", script)
+        self.assertIn("keep this window open", script.lower())
 
 
 if __name__ == "__main__":

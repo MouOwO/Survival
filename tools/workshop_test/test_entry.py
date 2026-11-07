@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
-import hashlib
 import importlib.util
 import json
 import os
@@ -16,15 +15,6 @@ import time
 ROOT = Path(__file__).resolve().parents[2]
 GAME = ROOT.parents[1]
 RUNTIME = ROOT / "output/test_entry_runtime"
-ONLINE_ADDON = "svt_w24"
-ONLINE_POLICY_RECORD = ROOT / "publishing/workshop/online_cheat_policy_20261025.json"
-PAYMENT_HELPER_RECORD = ROOT / "publishing/workshop/payment_helper_20261027.json"
-PAYMENT_HELPER_PINS = frozenset((
-    "scripts/vscripts/core/release_policy.lua", "scripts/vscripts/config/release_profile.lua",
-    "scripts/vscripts/config/player_web_auth.lua", "scripts/vscripts/config/session_multiplayer_test.lua",
-    "scripts/vscripts/config/commerce_payment_access.lua", "scripts/vscripts/core/commerce_release_policy.lua",
-    "scripts/vscripts/systems/payment_service.lua", "scripts/vscripts/systems/player_web_auth.lua",
-))
 ADDON_VPK_LAB_ROOTS = (
     "output/portrait_resolution_release_20261102/peer_full_roundtrip_20261102",
     "output/shared_boss_portrait_release_20261101/peer_full_roundtrip_20261102",
@@ -96,6 +86,13 @@ def load_relay():
     return module
 
 
+def load_online():
+    spec = importlib.util.spec_from_file_location("test_entry_signed_online", Path(__file__).with_name("online_signed_entry.py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def ensure_relay():
     relay = load_relay()
     if relay.RECEIPT.exists():
@@ -129,78 +126,33 @@ def process_inventory():
 
 
 def launch_arguments(mode, log):
-    need(mode in ("offline", "online"), "test_mode_invalid")
-    addon = ROOT.name if mode == "offline" else ONLINE_ADDON
-    result = ["-steam", "-tools", "-noassetbrowser", "-addon", addon, "-dev", "-novid",
-              "-vconport", "29006" if mode == "offline" else "29005",
-              "-condebug", "-con_logfile", str(log), "+sv_cheats", "1" if mode == "offline" else "0",
-              "+host_timescale", "1"]
-    if mode == "offline":
-        # Keep HTTP explicitly disabled alongside the session-memory provider.
-        result.extend(("+survival_offline_logic_test", "1", "+survival_archive_http_enabled", "0"))
-    result.extend(("+dota_launch_custom_game", addon, "template_map"))
-    return result
-
-
-def check_online_policy(addon):
-    """Refuse a stale online copy that predates the reviewed server cheat gate."""
-    if PAYMENT_HELPER_RECORD.is_file():
-        record = json.loads(PAYMENT_HELPER_RECORD.read_text(encoding="utf-8"))
-        if record.get("enabled") is True:
-            need(record.get("kind") == "VERIFIED_WS4_PAYMENT_HELPER"
-                 and record.get("online_cheats_allowed") is False
-                 and record.get("cloud_login_required") is True, "payment_helper_record_invalid")
-            candidate = record["candidate"]
-            installation = json.loads((addon / "_online_policy_install.json").read_text(encoding="utf-8"))
-            need(installation.get("content_sha256") == candidate["content_sha256"]
-                 and installation.get("release_sequence") == candidate["release_sequence"]
-                 and installation.get("signature_valid") is True
-                 and installation.get("online_cheats_allowed") is False
-                 and installation.get("full_after_verification") is True, "online_payment_helper_outdated")
-            hashes = candidate.get("runtime_hashes")
-            need(isinstance(hashes, dict) and set(hashes) == PAYMENT_HELPER_PINS, "payment_helper_pins_invalid")
-            for name, expected in hashes.items():
-                need(hashlib.sha256((addon / name).read_bytes()).hexdigest() == expected,
-                     "online_payment_helper_bytes_changed")
-            return
-    record = json.loads(ONLINE_POLICY_RECORD.read_text(encoding="utf-8"))
-    need(record.get("online_cheats_allowed") is False, "online_cheat_policy_not_verified")
-    candidate = record["candidate"]
-    installation = json.loads((addon / "_online_policy_install.json").read_text(encoding="utf-8"))
-    need(installation.get("content_sha256") == candidate["content_sha256"], "online_release_policy_outdated")
-    policy = addon / "scripts/vscripts/core/release_policy.lua"
-    need(hashlib.sha256(policy.read_bytes()).hexdigest() == candidate["runtime_policy_sha256"],
-         "online_cheat_policy_bytes_changed")
-    profile = (addon / "scripts/vscripts/config/release_profile.lua").read_bytes()
-    need(hashlib.sha256(profile).hexdigest() == candidate["release_profile_sha256"],
-         "online_release_profile_changed")
+    need(mode == "offline", "online_requires_canonical_launcher")
+    return ["-steam", "-tools", "-noassetbrowser", "-addon", ROOT.name, "-dev", "-novid",
+            "-vconport", "29006", "-condebug", "-con_logfile", str(log), "+sv_cheats", "1",
+            "+host_timescale", "1", "+survival_offline_logic_test", "1",
+            "+survival_archive_http_enabled", "0", "+dota_launch_custom_game", ROOT.name, "template_map"]
 
 
 def check(mode):
     need(mode in ("offline", "online"), "test_mode_invalid")
-    if mode == "offline":
-        guard_addon_vpk_labs()
+    if mode == "online":
+        return load_online().check()
+    guard_addon_vpk_labs()
     need((GAME / "bin/win64/dota2.exe").is_file(), "dota_executable_missing")
-    addon = ROOT if mode == "offline" else ROOT.parent / ONLINE_ADDON
-    need((addon / "maps/template_map.vpk").is_file(), "test_map_missing")
-    if mode == "offline":
-        need((addon / "scripts/vscripts/debug/offline_logic_test.lua").is_file(), "offline_test_code_missing")
-        need(b'channel = "development"' in (addon / "scripts/vscripts/config/release_profile.lua").read_bytes(),
-             "offline_requires_development")
-    else:
-        config = (addon / "scripts/vscripts/config/player_web_auth.lua").read_bytes()
-        need(b"enabled = true" in config, "online_web_auth_not_enabled")
-        need((ROOT / "publishing/workshop/player_web_auth_20261024.json").is_file(), "online_release_record_missing")
-        check_online_policy(addon)
-    return {"ok": True, "mode": mode, "addon": addon.name,
-            "status": "ENTRY_CHECKED", "cloud_login_required": mode == "online",
-            "cheats_allowed": mode == "offline",
-            "offline_storage": "session_memory" if mode == "offline" else None,
-            "game_started": False}
+    need((ROOT / "maps/template_map.vpk").is_file(), "test_map_missing")
+    need((ROOT / "scripts/vscripts/debug/offline_logic_test.lua").is_file(), "offline_test_code_missing")
+    need(b'channel = "development"' in (ROOT / "scripts/vscripts/config/release_profile.lua").read_bytes(),
+         "offline_requires_development")
+    return {"ok": True, "mode": mode, "addon": ROOT.name,
+            "status": "ENTRY_CHECKED", "cloud_login_required": False, "cheats_allowed": True,
+            "offline_storage": "session_memory", "game_started": False}
 
 
 def run(mode, *, check_only=False):
-    result = check(mode)
+    need(mode in ("offline", "online"), "test_mode_invalid")
+    online = load_online() if mode == "online" else None
+    prepared = online.prepare() if online else None
+    result = prepared["summary"] if online else check(mode)
     if check_only:
         return result
     inventory = process_inventory()
@@ -208,8 +160,11 @@ def run(mode, *, check_only=False):
     need(inventory.get("steam_running") is True, "steam_not_running")
     # The owner PC provides temporary Steam egress until a cloud egress node
     # replaces it. This never runs for the offline logic arena.
-    if mode == "online":
+    if online:
         result["steam_transport"] = ensure_relay()
+        # This call keeps the CMD alive until the canonical keeper observes the
+        # exact owned game's exit and the original installation is restored.
+        return online.run_prepared(prepared)
     RUNTIME.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_%f")
     log = RUNTIME / (mode + "_" + stamp + ".log")

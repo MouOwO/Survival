@@ -1,6 +1,7 @@
 """Pure exact-review rejection/semantics tests; no repo writes or SDK."""
 from pathlib import Path
 import copy,hashlib,importlib.util,json,subprocess,unittest
+from unittest.mock import patch
 
 SPEC=importlib.util.spec_from_file_location('exact_review',Path(__file__).parent/'complete_delivery_release_20261103/exact_review.py')
 m=importlib.util.module_from_spec(SPEC);SPEC.loader.exec_module(m)
@@ -109,7 +110,7 @@ class CsvBuildInputReviewTests(unittest.TestCase):
         cls.blobs['operator:'+m.CSV_GENERATOR] = cls.blobs[m.CSV_GENERATOR]
         cls.pins = {'game':cls.revision,'content':'b'*40,'operator':cls.revision}
 
-    def test_real_three_immutable_csvs_reproduce_all_runtime_bytes(self):
+    def test_real_five_immutable_csvs_reproduce_all_runtime_bytes(self):
         result = m.validate_csv_build_inputs(self.blobs,self.pins)
         self.assertEqual(set(result),set(m.CSV_OUTPUTS))
         for path, checks in result.items():
@@ -119,6 +120,27 @@ class CsvBuildInputReviewTests(unittest.TestCase):
             self.assertEqual(checks['other_csv_or_template_reads'],0)
             self.assertEqual(checks['runtime_files_written'],0)
             self.assertFalse(checks['derived_unified_tooltip_rebuilt'])
+
+    def test_challenge_and_tooltip_use_only_bound_memory_adapters(self):
+        paths = {
+            'data/csv/公共规则/tooltip_definitions.csv': 'scripts/vscripts/config/generated/tooltip_definitions.lua',
+            'data/csv/挑战与奖励系统/challenge_definitions.csv': 'scripts/vscripts/config/generated/challenge_definitions.lua',
+        }
+        self.assertTrue(paths.items() <= m.CSV_OUTPUTS.items())
+        blobs = {key:self.blobs[key] for key in (m.CSV_GENERATOR, 'operator:'+m.CSV_GENERATOR, *paths, *paths.values())}
+        # The pinned real build() must use only the supplied CSV/output adapters,
+        # never a working-tree CSV/template or an on-disk generated destination.
+        with patch('builtins.open', side_effect=AssertionError('unexpected file I/O')), \
+             patch.object(Path, 'read_bytes', side_effect=AssertionError('unexpected Path read')), \
+             patch.object(Path, 'write_text', side_effect=AssertionError('unexpected Path write')):
+            checks = m.validate_csv_build_inputs(blobs,self.pins)
+        self.assertEqual(set(checks),set(paths))
+        for path in paths:
+            self.assertEqual(checks[path]['csv_read_count'],1)
+            self.assertEqual(checks[path]['other_csv_or_template_reads'],0)
+            self.assertTrue(checks[path]['complete_generated_bytes_equal'])
+            missing=dict(blobs);missing.pop(paths[path])
+            with self.assertRaises(KeyError):m.validate_csv_build_inputs(missing,self.pins)
 
     def test_any_generated_value_or_byte_drift_blocks(self):
         for path,target in m.CSV_OUTPUTS.items():
@@ -192,7 +214,7 @@ class CsvBuildInputReviewTests(unittest.TestCase):
         scan={'runtime_read_blockers':[],'references':{}}
         review=m.make_reviews(scope,'a'*64,self.pins,blobs,facts,scan,'b'*64)
         csv_reviews={r['source_id'][5:]:r for r in review['reviews'] if r['source_id'][5:] in m.CSV_OUTPUTS}
-        self.assertEqual(len(csv_reviews),3)
+        self.assertEqual(len(csv_reviews),5)
         for path,row in csv_reviews.items():
             self.assertEqual(row['runtime_targets_requiring_separate_generator_or_compiler_binding'],[m.CSV_OUTPUTS[path]])
             self.assertFalse(row['standalone_runtime_file_required'])
