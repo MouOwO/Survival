@@ -787,7 +787,7 @@ end
 
 local block_session
 
-local function complete_session(session)
+local function complete_session(session, material_settled)
     if session.status == "completed" then return end
     session.status = "completed"
     local reward_result = { ok = true, handled_by = "challenge_material" }
@@ -837,6 +837,19 @@ local function complete_session(session)
                 reward_result = reward_result or {},
                 material_pending = true,
             })
+            return
+        end
+        if session.challenge.completion_teleport_policy == "return_home" then
+            -- The shared arena replenishes its own boss independently. This
+            -- personal victory ends here; only a new explicit entry may attach
+            -- this player to the next layer and make them eligible for rewards.
+            -- Preserve the existing paid entry's free progression without
+            -- leaving an active/background participant in the next boss slot.
+            -- This qualification is never sourced from a client request.
+            session.resume_without_charge = material_settled == true
+                and tonumber(session.display_stage) ~= nil
+                and abyss_stage >= tonumber(session.display_stage)
+            publish(session, "completed", { reward_result = reward_result or {} })
             return
         end
         local list = members_for(session.encounter_id)
@@ -899,6 +912,10 @@ function M.query(encounter_id, player_id)
     return {
         ok = true,
         active = session ~= nil and session.status ~= "completed",
+        resume_without_charge = session ~= nil and session.status == "completed"
+            and session.challenge.challenge_id == "challenge_11"
+            and session.challenge.completion_teleport_policy == "return_home"
+            and session.resume_without_charge == true,
         stage = session and (session.display_stage or session.stage) or 0,
         status = session and session.status or "inactive",
         total_members = session
@@ -1270,6 +1287,20 @@ local function schedule_maintain_respawn(session, member)
     return arm()
 end
 
+local function return_completed_ten_sin_hero(session, hero)
+    if not hero or get_session(session.player_id, session.encounter_id) ~= session
+        or foreground_encounter_by_player[session.player_id] ~= session.encounter_id
+        or not alive(hero) then return end
+    local summoned = event_bus.request(events.HERO_SUMMON_GET_REQUEST, {
+        player_id = session.player_id,
+    })
+    if summoned and summoned.ok == true and summoned.unit == hero then
+        -- Own-city validation/camera are centralized in return_unit.
+        -- A native return failure must not abort other shared winners.
+        pcall(hero_return_home.return_unit, hero, session.player_id)
+    end
+end
+
 local function killed_for_session(payload, meta, session)
     local victim = payload.victim
     local entindex = victim:entindex()
@@ -1280,6 +1311,20 @@ local function killed_for_session(payload, meta, session)
     session.killed_members = session.killed_members + 1
 
     local authorized_kill = owner_killed(meta, payload.attacker)
+    local challenge_id = session.challenge.challenge_id
+    local return_hero, material_settled
+    if authorized_kill and challenge_id == "challenge_11"
+        and session.challenge.completion_teleport_policy == "return_home"
+        and foreground_encounter_by_player[session.player_id] == session.encounter_id then
+        -- Capture before reward callbacks can replace the hero or change rooms.
+        -- Only the registered formal hero is eligible, never a selected clone.
+        local summoned = event_bus.request(events.HERO_SUMMON_GET_REQUEST, {
+            player_id = session.player_id,
+        })
+        if summoned and summoned.ok == true and alive(summoned.unit) then
+            return_hero = summoned.unit
+        end
+    end
     if authorized_kill then
         session.completion_drop_position = victim:GetAbsOrigin()
     end
@@ -1295,7 +1340,6 @@ local function killed_for_session(payload, meta, session)
         })
     end
 
-    local challenge_id = session.challenge.challenge_id
     if authorized_kill and challenge_id == molten_core_rules.challenge_id then
         session.molten_core_kill_serial =
             (tonumber(session.molten_core_kill_serial) or 0) + 1
@@ -1355,6 +1399,9 @@ local function killed_for_session(payload, meta, session)
                 authoritative = true,
             }
         )
+        -- Failed synthesis can retain a ground material. Keep that hero here
+        -- to pick it up; neither returning nor retrying may issue another reward.
+        material_settled = drop_result and drop_result.ok == true
         if drop_result and (drop_result.ok or drop_result.material_retained) then
             abyss_cleared_stage_by_player[meta.player_id] = math.max(
                 tonumber(abyss_cleared_stage_by_player[meta.player_id]) or -1,
@@ -1380,13 +1427,16 @@ local function killed_for_session(payload, meta, session)
     end
 
     if session.spawn_mode == "simultaneous" then
-        if session.monster_count == 0 then complete_session(session)
+        if session.monster_count == 0 then
+            complete_session(session, material_settled)
+            return_completed_ten_sin_hero(session, material_settled and return_hero)
         else publish(session, "active") end
         return
     end
 
     if session.stage >= #session.members then
-        complete_session(session)
+        complete_session(session, material_settled)
+        return_completed_ten_sin_hero(session, material_settled and return_hero)
         return
     end
 

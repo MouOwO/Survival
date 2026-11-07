@@ -3,6 +3,8 @@
 package.path = "scripts/vscripts/?.lua;" .. package.path
 local clock, serial, creates, removed, native_queries, force_writes = 0, 0, 0, 0, 0, 0
 local teleport_ok = true
+local teleport_calls, home_attempts = 0, {}
+local home_mode, material_mode, material_hook, summon_ok = "ok", "legacy_fixture", nil, true
 local units, heroes, stages, defeated, drops, rewards, emitted = {}, {}, {}, {}, {}, {}, {}
 local subscriptions, requests = {}, {}
 local vector = {}
@@ -88,19 +90,22 @@ end
 function bus.after_dispatch(_,callback) callback() end
 package.loaded["core/event_bus"]=bus
 package.loaded["systems/player_context_service"]={is_defeated=function(p) return defeated[p] == true end}
-package.loaded["config/generated/weapon_definitions"]={rows={
-    {content_id="abyss0",series_id="legend_abyss",stage=0},
-    {content_id="abyss1",series_id="legend_abyss",stage=1},
-    {content_id="abyss2",series_id="legend_abyss",stage=2},
-}}
+local weapon_rows={}
+for stage=0,10 do weapon_rows[#weapon_rows+1]={content_id="abyss"..stage,series_id="legend_abyss",stage=stage} end
+package.loaded["config/generated/weapon_definitions"]={rows=weapon_rows}
 requests[events.CONTENT_INVENTORY_GET_REQUEST]=function(p)
     local counts={};if stages[p.player_id] ~= nil then counts["abyss"..stages[p.player_id]]=1 end
     return {ok=true,snapshot={counts=counts}}
 end
-requests[events.HERO_SUMMON_GET_REQUEST]=function(p) return {ok=true,unit=heroes[p.player_id]} end
+requests[events.HERO_SUMMON_GET_REQUEST]=function(p) return {ok=summon_ok,unit=heroes[p.player_id]} end
 requests[events.WAVE_STATE_GET_REQUEST]=function() return {ok=true,difficulty_id="N1",game_mode="standard"} end
 requests[events.CHALLENGE_MATERIAL_DROP_REQUEST]=function(p)
-    drops[#drops+1]=p;return {ok=true,material_retained=true}
+    drops[#drops+1]=p
+    if material_hook then material_hook(p) end
+    if material_mode=="retained" then return {ok=false,material_retained=true,error="fixture_synthesis_failed"} end
+    if material_mode=="failed" then return {ok=false,error="fixture_material_create_failed"} end
+    if material_mode=="success" then stages[p.player_id]=p.required_stage+1;return {ok=true} end
+    return {ok=true,material_retained=true}
 end
 requests[events.CHALLENGE_EQUIPMENT_REWARD_REQUEST]=function(p)
     rewards[#rewards+1]=p;return {ok=true}
@@ -115,8 +120,16 @@ package.loaded["systems/wave_monster_collision"]={profile=function() return {} e
 package.loaded["systems/challenge_monster_visual_service"]={apply=function() end,clear=function() end,on_death=function() end}
 package.loaded["systems/monster_hero_visual_service"]={apply=function() return true end,clear=function() end,on_death=function() end}
 package.loaded["systems/destination_validation_service"]={validate=function() return true end,
-    teleport=function() return teleport_ok,teleport_ok and nil or "fixture_destination_rejected" end}
-package.loaded["systems/hero_return_home_service"]={return_unit=function() return true end}
+    teleport=function() teleport_calls=teleport_calls+1;return teleport_ok,teleport_ok and nil or "fixture_destination_rejected" end}
+package.loaded["systems/hero_return_home_service"]={return_unit=function(hero,player)
+    assert(hero==heroes[player] and hero:IsAlive(),"only the current living formal hero may reach the home boundary")
+    home_attempts[#home_attempts+1]={hero=hero,player_id=player,stage=stages[player]}
+    if home_mode=="throw" then error("fixture native home failure") end
+    if home_mode=="reject" then return {ok=false,error="fixture_home_destination_blocked"} end
+    hero.position=Vector(-10000-player*1000,0,0)
+    bus.emit(events.HERO_RETURNED_HOME,{player_id=player,hero=hero})
+    return {ok=true}
+end}
 local scheduler=require("core/scheduler")
 local shared=require("systems/shared_challenge_boss_registry")
 local members=require("config/generated/encounter_members")
@@ -310,3 +323,150 @@ assert(creates==after_reset,"old world and old life callbacks are both invalidat
 print("SHARED_CHALLENGE_BOSSES_PASS: four players/ten previews, mixed eligible stages, personal drops, late entry, "
     .."1s single respawn, reused entity index, replacement/defeat/reconnect, three singleton arenas, AI constant target, "
     .."296 private mobs, failed entry withdrawal, partial native-create rollback, reentry, old callbacks and reset")
+
+-- Foreground victory-to-home uses the real service and shared registry. The
+-- return boundary above is a spy; own-city/native movement has its own suite.
+local authored=require("config/generated/challenge_definitions").by_id.challenge_11
+assert(authored.completion_teleport_policy=="return_home","ten sins must not use the next-stage automatic teleport policy")
+local function fresh_return()
+    subscriptions={};service.init();scheduler.clear()
+    clock=clock+10;drops,rewards,home_attempts={},{},{}
+    teleport_calls=0;teleport_ok=true;home_mode="ok";material_mode="success";material_hook=nil;summon_ok=true
+    heroes,stages,defeated={},{},{}
+    for p=0,3 do heroes[p]=entity(10000+serial*4+p,p);stages[p]=0 end
+    bus.emit(events.HERO_READY,{player_id=0,team=2})
+end
+local function enter(p)
+    return service.start({player_id=p,team=2,encounter_id="encounter_challenge_11",teleport_hero=true})
+end
+local function front(p,encounter)
+    bus.emit(events.MONSTER_ENCOUNTER_CHANGED,{player_id=p,status="active",foreground_entry=true,
+        encounter={encounter_id=encounter}})
+end
+local function check_return_owner_set(...)
+    local expected={};for _,p in ipairs({...}) do expected[p]=true end
+    for _,attempt in ipairs(home_attempts) do
+        assert(expected[attempt.player_id],"wrong/nonparticipant player returned")
+        expected[attempt.player_id]=nil
+    end
+    assert(next(expected)==nil,"eligible foreground winner did not return")
+end
+
+for stage=0,9 do
+    fresh_return();stages[0]=stage;assert(enter(0).ok)
+    local boss=slot_for(string.format("boss_ten_sin_%02d",stage+1)).unit
+    kill(boss,heroes[0]);check_return_owner_set(0)
+    assert(#drops==1 and drops[1].required_stage==stage and stages[0]==stage+1
+        and home_attempts[1].stage==stage+1 and #rewards==0,
+        "material success must precede exactly one home attempt for every layer")
+    local q=service.query("encounter_challenge_11",0)
+    assert(q.status=="completed")
+    assert(q.active==false and q.resume_without_charge==(stage<9),
+        "settled lower layers retain free manual continuation, while +10 remains closed")
+    local callbacks=scheduler.task_count()
+    assert(callbacks==1,"only the existing global boss vacancy task is allowed; no personal auto-reentry")
+    bus.emit(events.ENGINE_ENTITY_KILLED,{victim=boss,attacker=heroes[0]})
+    clock=clock+1;scheduler.think()
+    assert(#home_attempts==1 and #drops==1 and teleport_calls==1,
+        "duplicate death/respawn cannot issue another reward, home call or entry teleport")
+end
+print("TEN_SINS_HOME ten_layers_including_plus10_once_after_material_no_extra_timers PASS")
+
+fresh_return();assert(enter(0).ok and enter(1).ok);stages[2]=1;assert(enter(2).ok)
+local peer_stage=slot_for("boss_ten_sin_02").unit
+kill(slot_for("boss_ten_sin_01").unit,heroes[1]);check_return_owner_set(0,1)
+assert(#drops==2 and peer_stage:IsAlive() and service.query("encounter_challenge_11",2).alive==1
+    and stages[3]==0 and #rewards==0,"other layers and nonparticipants are unaffected")
+clock=clock+1;scheduler.think();assert(teleport_calls==3 and #home_attempts==2 and #drops==2)
+print("TEN_SINS_HOME shared_winners_only_other_stage_and_nonparticipant_untouched PASS")
+
+fresh_return();assert(enter(0).ok)
+assert(service.query("encounter_challenge_11",0).resume_without_charge==false
+    and service.query("encounter_challenge_11",3).resume_without_charge==false
+    and service.query("encounter_challenge_05",0).resume_without_charge==false,
+    "active sessions, never-entered players and other encounters have no completed continuation qualification")
+kill(slot_for("boss_ten_sin_01").unit,heroes[0])
+clock=clock+1;scheduler.think()
+local next_slot=slot_for("boss_ten_sin_02")
+assert(next(next_slot.participants)==nil and service.query("encounter_challenge_11",0).status=="completed",
+    "a completed winner must not attach to the next shared boss after the old respawn delay")
+assert(service.query("encounter_challenge_11",0).resume_without_charge==true)
+teleport_ok=false
+assert(not enter(0).ok,"the failed-entry fixture must reject its native teleport")
+teleport_ok=true
+assert(service.query("encounter_challenge_11",0).resume_without_charge==true
+    and service.query("encounter_challenge_11",0).active==false and next(next_slot.participants)==nil,
+    "failed explicit entry retains free qualification without attaching to the boss")
+stages[1]=1;assert(enter(1).ok)
+kill(next_slot.unit,heroes[1])
+assert(#drops==2 and drops[2].player_id==1 and stages[0]==1 and #home_attempts==2,
+    "teammate killing the next layer cannot award or return the previous completed winner")
+clock=clock+1;scheduler.think()
+assert(enter(0).ok,"explicit entry can enroll the completed winner in the next eligible layer")
+assert(service.query("encounter_challenge_11",0).active==true
+    and service.query("encounter_challenge_11",0).resume_without_charge==false,
+    "successful explicit entry consumes the completed continuation by replacing its session")
+local enrolled=false
+for session in pairs(slot_for("boss_ten_sin_02").participants) do enrolled=enrolled or session.player_id==0 end
+assert(enrolled)
+kill(slot_for("boss_ten_sin_02").unit,heroes[0])
+assert(#drops==3 and drops[3].player_id==0 and stages[0]==2 and #home_attempts==3)
+print("TEN_SINS_HOME no_next_layer_auto_subscription_or_reward_until_explicit_entry PASS")
+
+for _,change in ipairs({"left_before_death","other_room_before_death","dead_before_death","left_during_reward",
+    "other_room_during_reward","death_during_reward","replacement_during_reward","unregistered_during_reward","session_cancelled_during_reward"}) do
+    fresh_return();assert(enter(0).ok)
+    if change=="left_before_death" then bus.emit(events.HERO_RETURNED_HOME,{player_id=0,hero=heroes[0]})
+    elseif change=="other_room_before_death" then front(0,"encounter_challenge_05")
+    elseif change=="dead_before_death" then heroes[0].live=false
+    else material_hook=function(p)
+        if change=="left_during_reward" then bus.emit(events.HERO_RETURNED_HOME,{player_id=0,hero=heroes[0]})
+        elseif change=="other_room_during_reward" then front(0,"encounter_challenge_05")
+        elseif change=="death_during_reward" then heroes[0].live=false
+        elseif change=="replacement_during_reward" then heroes[0]=entity(90000,0);bus.emit(events.HERO_SUMMONED,{player_id=0,team=2})
+        elseif change=="unregistered_during_reward" then summon_ok=false
+        else defeated[0]=true;bus.emit(events.PLAYER_DISCONNECTED,{player_id=0,defeat_cleanup=true}) end
+    end end
+    kill(slot_for("boss_ten_sin_01").unit,heroes[1])
+    assert(#drops==1 and #home_attempts==0,"stale/nonforeground/dead hero must not be pulled home: "..change)
+end
+fresh_return();assert(enter(0).ok);summon_ok=false
+kill(slot_for("boss_ten_sin_01").unit,heroes[1]);assert(#home_attempts==0 and #drops==1)
+fresh_return();assert(enter(0).ok);heroes[0]=entity(90001,0);bus.emit(events.HERO_SUMMONED,{player_id=0,team=2})
+kill(slot_for("boss_ten_sin_01").unit,heroes[1]);check_return_owner_set(0)
+assert(home_attempts[1].hero==heroes[0],"replacement registered before victory is the current participant")
+fresh_return();assert(enter(0).ok)
+kill(slot_for("boss_ten_sin_01").unit,entity(90002,99)) -- Same-team remains authorized under existing rules.
+check_return_owner_set(0)
+fresh_return();assert(enter(0).ok)
+local hostile=entity(90003,99);hostile.GetTeamNumber=function() return 3 end
+kill(slot_for("boss_ten_sin_01").unit,hostile)
+assert(#home_attempts==0 and #drops==0,"unauthorized hostile kill must neither settle a material nor return a hero")
+print("TEN_SINS_HOME foreground_formal_identity_death_replacement_and_cancel_boundaries PASS")
+
+for _,failure in ipairs({"failed","retained"}) do
+    fresh_return();assert(enter(0).ok);material_mode=failure
+    local boss=slot_for("boss_ten_sin_01").unit
+    kill(boss,heroes[0]);assert(#home_attempts==0 and #drops==1 and stages[0]==0)
+    assert(service.query("encounter_challenge_11",0).resume_without_charge==false,
+        "failed or retained material cannot create free next-stage eligibility")
+    if failure=="retained" then assert(not enter(0).ok,"retained material still owns the existing stage lock") end
+    bus.emit(events.ENGINE_ENTITY_KILLED,{victim=boss,attacker=heroes[0]})
+    clock=clock+1;scheduler.think()
+    assert(#home_attempts==0 and #drops==1 and teleport_calls==1,
+        "failed synthesis preserves location/material and does not grant twice or teleport on respawn")
+end
+for _,failure in ipairs({"reject","throw"}) do
+    fresh_return();assert(enter(0).ok and enter(1).ok);home_mode=failure
+    local boss=slot_for("boss_ten_sin_01").unit
+    kill(boss,heroes[1]);check_return_owner_set(0,1)
+    assert(#drops==2 and stages[0]==1 and stages[1]==1,"one failed home native call cannot abort another winner's reward")
+    assert(service.query("encounter_challenge_11",0).resume_without_charge==true
+        and service.query("encounter_challenge_11",1).resume_without_charge==true,
+        "native home failure must preserve both successfully settled winners' free manual continuation")
+    bus.emit(events.ENGINE_ENTITY_KILLED,{victim=boss,attacker=heroes[1]})
+    clock=clock+1;scheduler.think()
+    assert(#home_attempts==2 and #drops==2 and teleport_calls==2,
+        "failed home does not retry rewards/teleport or auto-pull back into next layer")
+end
+print("TEN_SINS_HOME synthesis_retained_and_home_failure_no_extra_reward_or_reentry PASS")

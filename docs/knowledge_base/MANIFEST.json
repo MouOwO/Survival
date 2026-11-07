@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 40432,
-      "sha256": "8d6807c5ca85a04b43595485ed47c3912ac64b82d2ca98d41de3e5510c68ae8f"
+      "bytes": 40945,
+      "sha256": "8d88473edf3667d5a1b0971eb4878aeebc3df907c37171d4233d341740f2181d"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 54076,
-      "sha256": "3997054b622dd34304087512180203daaf608a3e5f0c3842f4997fd896953de2"
+      "bytes": 54589,
+      "sha256": "9669bc5db502f7ffd5e3f52264a2a1ef879f59dbf8c8a71bc47987477cf29157"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 27812,
-      "sha256": "ea368179850c6e73eafba4682121323ab5e33e65383e89b1fa2db0ed026b2b55"
+      "bytes": 28325,
+      "sha256": "8a7cc29d2ff3b1ac35dc9cb7c6e602592ab24f96b31d4df4a6f19b94ed432f48"
     },
     {
       "path": "data/completed_work_index.json",
@@ -602,6 +602,11 @@
       "path": "evidence/teammate_builder_portrait_20261031.md",
       "bytes": 4136,
       "sha256": "b44dd0dac820a7add7a0909c664e009dab51ac3643d7224712c25dd76f82672a"
+    },
+    {
+      "path": "evidence/ten_sin_return_followup_20261107.md",
+      "bytes": 5804,
+      "sha256": "9b0a5add3b8813cedd742afacb5df0c48d84758a1cccc80c3476db05d65ad01c"
     },
     {
       "path": "evidence/ten_sin_startup_20261028.md",

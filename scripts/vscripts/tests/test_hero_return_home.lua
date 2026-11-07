@@ -1,5 +1,8 @@
 -- Real own-city resolver, forbidden regions, destination validation and owner
 -- context. Only engine entities/terrain/transport are simulated.
+-- Fake player IDs in this offline process do not represent Workshop accounts.
+-- Keep the production Steam admission configuration unchanged.
+package.loaded["config/test_access"] = {enabled=false}
 package.path = "scripts/vscripts/?.lua;" .. package.path
 local region_config = { rows = {} }
 package.loaded["config/generated/build_forbidden_regions"] = region_config

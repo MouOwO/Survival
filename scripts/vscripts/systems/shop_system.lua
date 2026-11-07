@@ -378,6 +378,13 @@ local function merge_technology_levels(player_id, incoming)
     end
     return levels
 end
+local function challenge_can_resume_without_charge(current, encounter_id)
+    -- Only the queried server session can authorize a completed ten-sin
+    -- continuation. Never accept the similarly named client payload field.
+    return current and current.ok == true and (current.active == true
+        or (encounter_id == "encounter_challenge_11"
+            and current.resume_without_charge == true))
+end
 local function active_challenge_encounters(player_id)
     local result = {}
     for _, definitions in ipairs({ challenge_definitions, rebirth_challenges }) do
@@ -391,7 +398,7 @@ local function active_challenge_encounters(player_id)
                         encounter_id = encounter_id,
                     }
                 )
-                if current and current.ok and current.active then
+                if challenge_can_resume_without_charge(current, encounter_id) then
                     result[encounter_id] = true
                 end
             end
@@ -1036,7 +1043,7 @@ local function purchase(payload)
                 encounter_id = entry.encounter_id,
             }
         )
-        if current and current.ok and current.active then
+        if challenge_can_resume_without_charge(current, entry.encounter_id) then
             local resumed = grant_service.grant(player_id, team, entry, state)
             return resumed and resumed.ok and {
                 ok = true,
