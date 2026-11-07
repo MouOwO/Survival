@@ -18,7 +18,7 @@
     "lobby"
   ],
   "manual_attach_adopt_allowed": false,
-  "release_sequence": 2026110701,
+  "release_sequence": 2026110702,
   "scope": "ALL_CURRENT_AND_HISTORICAL_RUNTIME_CHANGES_AND_DELETIONS",
   "source_anchor_is_full_published_tree": false,
   "historical_deferred_policy": "EXPLICIT_COMPLETE_LEDGER_COVERAGE_REQUIRED",
@@ -31,7 +31,7 @@
     ]
   },
   "recipe_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/complete_delivery_release_20261103/pipeline_recipe.py",
-  "recipe_sha256": "51450ee01a6dd29cc5f4d77ce377bb59f2951fb4d4714887e97c59f36a3b74db",
+  "recipe_sha256": "843b60cd461704e6635f54a6d45e45b67c6abc6d97c4b9511f3dc4a949f03ada",
   "validator_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/complete_delivery_release_20261103/publication_validator.py",
   "validator_sha256": "03c59bfbd29280baac4f3a0883e0beb98b4f16d868881e335205020c366676cd",
   "rehearsal_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/complete_delivery_release_20261103/rehearsal.py",
@@ -42,5 +42,5 @@
   "native_admission_sha256": "ac8b8b4147f08e3a55e6ba691bad5f09c27be857e803a1cdb3b5c1554de915c8",
   "baseline_completion_path": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/tools/complete_delivery_release_20261103/complete_baseline.py",
   "baseline_completion_sha256": "f3c20e0ff6737205176750b9015f8f716e08da60a3f6e19a696212e65bb76c7e",
-  "report_directory": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/output/complete_delivery_release_20261107_v01"
+  "report_directory": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival/output/complete_delivery_release_20261107_v02"
 }
