@@ -75,6 +75,12 @@ function modifier_blademaster_clone:OnAttackRecord(params)
     local key = tostring(params.record)
     if self.records[key] then return end
     local is_secondary = secondary(params, parent)
+    if not is_secondary then
+        local service = package.loaded["systems/blademaster_exclusive_service"]
+        if service and service.on_clone_attack then
+            service.on_clone_attack(self.player_id, parent, params.target)
+        end
+    end
     local multiplier = 0
     if not is_secondary then
         multiplier = modifier_weapon_stat_projection.RollCriticalAttackRecord(

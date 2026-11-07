@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 40945,
-      "sha256": "8d88473edf3667d5a1b0971eb4878aeebc3df907c37171d4233d341740f2181d"
+      "bytes": 41488,
+      "sha256": "adaa94719427d3974be28d2e5d7c19edf946124afc37434ecd09dba547adda00"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 54589,
-      "sha256": "9669bc5db502f7ffd5e3f52264a2a1ef879f59dbf8c8a71bc47987477cf29157"
+      "bytes": 55132,
+      "sha256": "414328173bd23dc8a9f892bf6bdc5f1e47796a5d1c16bf0535f9c1db6c7e8453"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 28325,
-      "sha256": "8a7cc29d2ff3b1ac35dc9cb7c6e602592ab24f96b31d4df4a6f19b94ed432f48"
+      "bytes": 28868,
+      "sha256": "248a3a2a02d69cfbc16f2a2813e745aa43f257a9b6fba2ec648545ada1b88310"
     },
     {
       "path": "data/completed_work_index.json",
@@ -167,6 +167,11 @@
       "path": "evidence/archive_video_challenges_20261029.md",
       "bytes": 9362,
       "sha256": "7d6f8d6d46f4e6d2512f64c29c73d8aa6e5c4b6be3bb4c7376487bef227e0c00"
+    },
+    {
+      "path": "evidence/blademaster_manual_guard_followup_20261107.md",
+      "bytes": 5937,
+      "sha256": "5910929883225fa27295f88d2ec21b86e86819314b04588354518a1ab39fbe52"
     },
     {
       "path": "evidence/blademaster_portrait_match_20261030.md",

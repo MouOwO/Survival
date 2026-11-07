@@ -608,7 +608,8 @@ local function on_cosmetics_changed(payload)
     sync_clone_appearance(current)
 end
 
-local function guard_point(player_id, current)
+local function spawn_guard_point(player_id, current)
+    if current.guard_position then return current.guard_position end
     local fallback = current.guard_origin
     local wall = wall_by_player[player_id]
     if not alive(wall) or not fallback then return fallback end
@@ -622,13 +623,88 @@ local function guard_point(player_id, current)
     return fallback
 end
 
+local function copy_position(position)
+    return Vector(position.x, position.y, position.z)
+end
+
+-- Called only after the global order filter has accepted the entire selection.
+-- O(K) selected handles, one player-state lookup; no scene scan or new timer.
+function M.on_player_order(keys, units, issuer)
+    issuer = tonumber(issuer)
+    local current = issuer and issuer >= 0 and states[issuer]
+    if not current or not alive(current.clone) then return end
+    local kind = tonumber(keys.order_type)
+    local move = kind == DOTA_UNIT_ORDER_MOVE_TO_POSITION
+    local hold = kind == DOTA_UNIT_ORDER_HOLD_POSITION
+    local stop = kind == DOTA_UNIT_ORDER_STOP
+    if not kind or not (move or hold or stop or kind == DOTA_UNIT_ORDER_ATTACK_MOVE
+        or kind == DOTA_UNIT_ORDER_MOVE_TO_TARGET or kind == DOTA_UNIT_ORDER_ATTACK_TARGET
+        or kind == DOTA_UNIT_ORDER_PATROL) then return end
+    for _, unit in ipairs(units) do
+        if unit == current.clone and tonumber(read(unit, "GetPlayerOwnerID")) == issuer then
+            local queued = keys.queue == true or tonumber(keys.queue) == 1
+            local frame = type(GetFrameCount) == "function" and GetFrameCount() or nil
+            current.guard_target, current.guard_returning = nil, nil
+            if stop and not queued then
+                current.guard_position = copy_position(unit:GetAbsOrigin())
+                current.manual_order = nil
+            else
+                current.manual_order = {
+                    hold = hold, queued = queued, move = move,
+                    position = move and Vector(tonumber(keys.position_x) or 0,
+                        tonumber(keys.position_y) or 0, tonumber(keys.position_z) or 0) or nil,
+                }
+            end
+            -- The native order is applied after this filter returns. Never
+            -- treat its pre-application IsIdle value as movement completion.
+            current.manual_order_frame = frame
+            return
+        end
+    end
+end
+
+-- A native auto-attack can start and finish between guard ticks. The existing
+-- primary attack-record callback supplies a live parent; this indexed callback
+-- adds no native query, scan, timer or network send on the attack hot path.
+function M.on_clone_attack(player_id, unit, target)
+    local current = states[tonumber(player_id)]
+    local manual = current and current.manual_order
+    if not current or current.clone ~= unit then return end
+    if manual then
+        if not manual.move or manual.queued then return end
+        current.guard_position = copy_position(manual.position)
+        current.manual_order = nil
+    end
+    current.guard_target, current.guard_returning = target, nil
+end
+
 local function guard_clone(player_id, current)
     if phase_guard.post_clear_frozen() or not current or not alive(current.clone) then return end
     local clone = current.clone
-    local point = guard_point(player_id, current)
-    if not point or not ExecuteOrderFromTable or not FindUnitsInRadius then return end
     if read(clone, "IsChanneling") or read(clone, "IsStunned")
         or read(clone, "IsCommandRestricted") then return end
+    if current.manual_order_frame and type(GetFrameCount) == "function"
+        and current.manual_order_frame == GetFrameCount() then return end
+    local manual = current.manual_order
+    if manual then
+        if manual.hold then return end
+        local position = clone:GetAbsOrigin()
+        local idle = read(clone, "IsIdle") == true
+        local reached = manual.move and not manual.queued
+            and distance_squared(position, manual.position) <= 64 * 64
+        -- A plain move may finish and auto-acquire before the next 1Hz tick.
+        -- Keep that move's destination as the return point rather than waiting
+        -- until combat finishes and accidentally anchoring at the chase end.
+        local native_target = manual.move and not manual.queued and read(clone, "GetAttackTarget")
+        local auto_acquired = alive(native_target)
+        if not idle and not reached and not auto_acquired then return end
+        current.guard_position = copy_position(auto_acquired and manual.position or position)
+        current.guard_target = auto_acquired and native_target or nil
+        current.manual_order = nil
+        return
+    end
+    local point = current.guard_position
+    if not point or not ExecuteOrderFromTable or not FindUnitsInRadius then return end
     local range = tonumber(clone.survival_attack_range) or 800
     local leash = math.max(1000, range + 200)
     local origin = clone:GetAbsOrigin()
@@ -663,9 +739,14 @@ local function guard_clone(player_id, current)
     end
     local had_target = current.guard_target ~= nil or read(clone, "GetAttackTarget") ~= nil
     current.guard_target = nil
-    if distance_squared(origin, point) <= 192 * 192 then
+    if distance_squared(origin, point) <= 64 * 64 then
         if had_target and clone.Stop then clone:Stop() end
         current.guard_returning = nil
+        return
+    end
+    -- Only an automatic pursuit has a return leg. A scripted relocation or
+    -- external displacement must not invent another order back to the wall.
+    if not had_target and not current.guard_returning then
         return
     end
     if current.guard_returning and distance_squared(current.guard_returning, point) < 16 * 16
@@ -731,8 +812,8 @@ create_clone = function(player_id)
         for _, building in ipairs(buildings and buildings.buildings or {}) do on_building(building) end
     end
     current.guard_origin = current.guard_origin or hero:GetAbsOrigin()
-    local position = guard_point(player_id, current)
-    if RandomVector then
+    local position = spawn_guard_point(player_id, current)
+    if not current.guard_position and RandomVector then
         local offset = RandomVector(128)
         local candidate = Vector(position.x + offset.x, position.y + offset.y, position.z)
         if destination_validation.validate(candidate, hero) then position = candidate end
@@ -752,10 +833,12 @@ create_clone = function(player_id)
     current.owned_clones[clone] = clone:entindex()
     current.clone_respawning = false
     current.guard_target, current.guard_returning = nil, nil
+    current.manual_order, current.manual_order_frame = nil, nil
     sync_clone_stats(player_id, current, nil, true)
     if not alive(clone) or states[player_id] ~= current then return nil end
     sync_clone_appearance(current)
     if FindClearSpaceForUnit then FindClearSpaceForUnit(clone, position, true) end
+    current.guard_position = current.guard_position or copy_position(clone:GetAbsOrigin())
     guard_clone(player_id, current)
     event_bus.emit(events.HERO_CLONE_CREATED, {
         unit = clone, player_id = player_id, team = clone:GetTeamNumber(),

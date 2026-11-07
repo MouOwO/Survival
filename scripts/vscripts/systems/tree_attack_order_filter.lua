@@ -24,6 +24,17 @@ local function ordered_units(keys)
     return result
 end
 
+local function accept_order(keys, units, issuer)
+    -- Notify only after all units pass the same ownership/region/target gates.
+    -- Lua/engine AI orders must never replace a player's chosen guard point.
+    local clones = issuer and issuer >= 0
+        and package.loaded["systems/blademaster_exclusive_service"]
+    if type(clones) == "table" and clones.on_player_order then
+        clones.on_player_order(keys, units, issuer)
+    end
+    return true
+end
+
 local function filter(_, keys)
     local loading = package.loaded["systems/startup_loading_service"]
     if loading and not loading.is_ready() then return false end
@@ -59,9 +70,11 @@ local function filter(_, keys)
                 if not allowed then return false end
             end
         end
-        return true
+        return accept_order(keys, units, issuer)
     end
-    if order_type ~= tonumber(DOTA_UNIT_ORDER_ATTACK_TARGET) then return true end
+    if order_type ~= tonumber(DOTA_UNIT_ORDER_ATTACK_TARGET) then
+        return accept_order(keys, units, issuer)
+    end
     local target = entity(keys.entindex_target)
     local target_is_tree = tree_damage_rules.is_tree(target)
     for _, unit in ipairs(units) do
@@ -87,7 +100,7 @@ local function filter(_, keys)
             end
         end
     end
-    return true
+    return accept_order(keys, units, issuer)
 end
 
 function M.register()
