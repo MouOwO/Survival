@@ -1,6 +1,7 @@
 """Pure complete assembly plus small real unsigned files; no SDK/key/network/Git writes."""
 from copy import deepcopy
 import hashlib
+import json
 from pathlib import Path
 import sys
 import tempfile
@@ -198,6 +199,138 @@ class RawMovieIdentityTests(unittest.TestCase):
         result = c.assemble(**value)
         self.assertEqual(result["status"], "COMPLETE_COLLECTION_BLOCKED_UNRESOLVED_SOURCES")
         self.assertTrue(any(row["source_id"] == "content:"+self.NAME for row in result["blockers"]))
+
+
+class CatalogRegistryInputTests(unittest.TestCase):
+    def fixture(self, unchanged=False):
+        import build_ui_static_catalog as cat
+        records = {}
+        registries = []
+        previous = None
+        for n in range(3):
+            key = "fixture:" + str(n)
+            records[key] = {"key": key, "domain": "fixture", "kind": "fixture", "business_id": str(n)}
+            previous = cat.update_registry(records, previous)
+            registries.append(previous)
+        previous_raw = cat.canonical(registries[1])
+        current_raw = previous_raw if unchanged else cat.canonical(registries[2])
+        values = {"game:" + cat.REGISTRY_PATH: current_raw, "game:data/csv/source.csv": b"unchanged input"}
+        for value in registries[:2 if unchanged else 3]:
+            raw = cat.canonical(value)
+            values["game:data/ui/registry_history/" + m.sha(raw) + ".json"] = raw
+        manifest = {"source_hashes": {cat.REGISTRY_PATH: m.sha(previous_raw), "data/csv/source.csv": m.sha(b"unchanged input")},
+                    "registry_sha256": m.sha(current_raw)}
+        ctx = SimpleNamespace(pins={"game": "a" * 40}, content=lambda key: values[key])
+        return cat, ctx, manifest, previous_raw, current_raw, values, registries
+
+    def test_exact_direct_successor_binds_original_input_to_selected_history(self):
+        cat, ctx, manifest, previous, current, values, registries = self.fixture()
+        sources, proofs = c._catalog_sources(ctx, cat, manifest, previous, current)
+        self.assertEqual(len(proofs), 1)
+        proof = proofs[0]
+        self.assertEqual(proof["original_path"], cat.REGISTRY_PATH)
+        self.assertEqual(proof["original_input_sha256"], m.sha(previous))
+        self.assertEqual(values[proof["equivalent_selected_source_id"]], previous)
+        self.assertEqual((proof["original_generation"], proof["selected_generation"]), (2, 3))
+        self.assertEqual(len(proof["verified_history_sources"]), 3)
+        self.assertEqual(set(sources), set(values))
+        self.assertEqual(proof["selected_registry_output_sha256"], m.sha(current))
+
+    def test_unchanged_registry_preserves_original_exact_input_without_rebinding(self):
+        cat, ctx, manifest, previous, current, _, _ = self.fixture(unchanged=True)
+        sources, proofs = c._catalog_sources(ctx, cat, manifest, previous, current)
+        self.assertFalse(proofs)
+        self.assertEqual(sources, sorted("game:" + name for name in manifest["source_hashes"]))
+
+    def test_other_input_drift_never_uses_a_history_alias(self):
+        cat, ctx, manifest, previous, current, values, _ = self.fixture()
+        values["game:data/csv/source.csv"] += b" changed"
+        with self.assertRaisesRegex(ValueError, "catalog_input_changed_since_original_generation:data/csv/source.csv"):
+            c._catalog_sources(ctx, cat, manifest, previous, current)
+
+    def test_declared_registry_input_must_be_actual_original_bytes(self):
+        cat, ctx, manifest, previous, current, _, _ = self.fixture()
+        manifest["source_hashes"][cat.REGISTRY_PATH] = "0" * 64
+        with self.assertRaisesRegex(ValueError, "original_input_mismatch"):
+            c._catalog_sources(ctx, cat, manifest, previous, current)
+
+    def test_parent_history_must_exist_and_match_every_original_byte(self):
+        for mode in ("missing", "whitespace", "changed"):
+            with self.subTest(mode=mode):
+                cat, ctx, manifest, previous, current, values, _ = self.fixture()
+                key = "game:data/ui/registry_history/" + m.sha(previous) + ".json"
+                if mode == "missing": del values[key]
+                elif mode == "whitespace": values[key] += b" "
+                else: values[key] = current
+                with self.assertRaises((KeyError, ValueError)):
+                    c._catalog_sources(ctx, cat, manifest, previous, current)
+
+    def test_selected_registry_and_manifest_must_be_replayed_output(self):
+        for mode in ("selected", "manifest"):
+            with self.subTest(mode=mode):
+                cat, ctx, manifest, previous, current, values, _ = self.fixture()
+                if mode == "selected": values["game:" + cat.REGISTRY_PATH] = current + b" "
+                else: manifest["registry_sha256"] = "0" * 64
+                with self.assertRaisesRegex(ValueError, "output_mismatch"):
+                    c._catalog_sources(ctx, cat, manifest, previous, current)
+
+    def test_only_one_generation_and_exact_parent_are_accepted(self):
+        for mode in ("grandparent", "generation_jump", "bool_generation"):
+            with self.subTest(mode=mode):
+                cat, ctx, manifest, previous, current, values, registries = self.fixture()
+                value = json.loads(current)
+                if mode == "grandparent": value["parent_sha256"] = m.sha(cat.canonical(registries[0]))
+                elif mode == "generation_jump": value["generation"] += 1
+                else: value["generation"] = True
+                current = cat.canonical(value)
+                values["game:" + cat.REGISTRY_PATH] = current
+                manifest["registry_sha256"] = m.sha(current)
+                with self.assertRaisesRegex(ValueError, "not_direct_successor"):
+                    c._catalog_sources(ctx, cat, manifest, previous, current)
+
+    def test_entire_selected_parent_chain_including_self_remains_required(self):
+        for mode in ("missing_self", "missing_ancestor", "modified_ancestor", "reassigned_id"):
+            with self.subTest(mode=mode):
+                cat, ctx, manifest, previous, current, values, registries = self.fixture()
+                first_key = "game:data/ui/registry_history/" + m.sha(cat.canonical(registries[0])) + ".json"
+                if mode == "missing_self": del values["game:data/ui/registry_history/" + m.sha(current) + ".json"]
+                elif mode == "missing_ancestor": del values[first_key]
+                elif mode == "modified_ancestor": values[first_key] = previous
+                else:
+                    value = json.loads(current); value["records"][0]["key"] = "fixture:reassigned"
+                    current = cat.canonical(value)
+                    values["game:" + cat.REGISTRY_PATH] = current
+                    values["game:data/ui/registry_history/" + m.sha(current) + ".json"] = current
+                    manifest["registry_sha256"] = m.sha(current)
+                with self.assertRaises((KeyError, ValueError)):
+                    c._catalog_sources(ctx, cat, manifest, previous, current)
+
+    def test_all_four_actual_outputs_are_checked_before_any_rebinding(self):
+        cat, ctx, manifest, previous, current, values, _ = self.fixture()
+        origins = {role: "b" * 40 for role in ("game", "content", "operator", "atlas_reference")}
+        manifest.update(source_revisions=origins, operator_hashes={}, schema_sha256="d" * 64)
+        manifest_raw = m.canonical(manifest)
+        output = {cat.MANIFEST_PATH: manifest_raw, cat.REGISTRY_PATH: current,
+                  cat.CATALOG_PATH: b"actual catalog", cat.LOOKUP_PATH: b"actual lookup"}
+        values.update({"game:" + key: raw for key, raw in output.items()})
+        original = {cat.REGISTRY_PATH: previous, "data/csv/source.csv": b"unchanged input"}
+        ctx.operator_blob = lambda revision, name: Path(cat.__file__).read_bytes() if name == "tools/build_ui_static_catalog.py" else original[name]
+        spec = {"manifest": {"sha256": m.sha(manifest_raw)}, "source_revisions": origins,
+                "previous_registry_sha256": m.sha(previous), "lua": "unused-pure-fixture"}
+        with patch.object(c, "checked", return_value=(manifest, manifest_raw)), \
+             patch.object(cat, "GitSource", return_value=SimpleNamespace(read=lambda path: original[path])), \
+             patch.object(cat, "build", return_value=(output, json.loads(current))), \
+             patch.object(c, "_catalog_sources", wraps=c._catalog_sources) as bind, \
+             patch.object(c, "_attach_generation") as attach:
+            values["game:" + cat.CATALOG_PATH] += b" changed"
+            with self.assertRaisesRegex(ValueError, "generated_catalog_target_not_exact_current_git"):
+                c.load_catalog(ctx, spec, {}, [])
+            bind.assert_not_called(); attach.assert_not_called()
+            values["game:" + cat.CATALOG_PATH] = output[cat.CATALOG_PATH]
+            proofs = []; c.load_catalog(ctx, spec, {}, proofs)
+            self.assertEqual(attach.call_count, 2)
+            self.assertTrue(proofs[0]["all_four_outputs_exact"])
+            self.assertEqual(len(proofs[0]["registry_input_rebindings"]), 1)
 
 
 if __name__ == "__main__": unittest.main()

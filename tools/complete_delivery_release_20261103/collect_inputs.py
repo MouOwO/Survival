@@ -400,6 +400,52 @@ def load_item_generator(ctx, spec, targets, originals):
     for name, value in outputs.items(): _attach_generation(ctx, targets, name, value, list(sources), evidence)
 
 
+def _catalog_sources(ctx, cat, manifest, previous_raw, registry_raw):
+    """Bind original inputs; only the replayed registry may advance one generation."""
+    sources, rebindings = [], []
+    for name, expected in manifest["source_hashes"].items():
+        key = "game:" + name
+        selected_raw = ctx.content(key)
+        if ledger.sha(selected_raw) == expected:
+            sources.append(key)
+            continue
+        ledger.need(name == cat.REGISTRY_PATH, "catalog_input_changed_since_original_generation:" + name)
+        ledger.need(ledger.sha(previous_raw) == expected, "catalog_registry_rebinding_original_input_mismatch")
+        ledger.need(selected_raw == registry_raw and ledger.sha(registry_raw) == manifest["registry_sha256"],
+                    "catalog_registry_rebinding_output_mismatch")
+        previous, current = json.loads(previous_raw), json.loads(registry_raw)
+        ledger.need(cat.canonical(previous) == previous_raw and cat.canonical(current) == registry_raw,
+                    "catalog_registry_rebinding_noncanonical_bytes")
+        ledger.need(type(previous.get("generation")) is int and type(current.get("generation")) is int
+                    and current["generation"] == previous["generation"] + 1
+                    and current.get("parent_sha256") == expected,
+                    "catalog_registry_rebinding_not_direct_successor")
+        history_key = "game:data/ui/registry_history/" + ledger.digest(expected) + ".json"
+        ledger.need(ctx.content(history_key) == previous_raw, "catalog_registry_rebinding_history_not_exact_input")
+        history_sources = {}
+
+        class SelectedHistory:
+            def read(self, path):
+                raw = ctx.content("game:" + path)
+                ledger.need(raw == cat.canonical(json.loads(raw)), "catalog_registry_rebinding_history_noncanonical")
+                history_sources["game:" + path] = ledger.sha(raw)
+                return raw
+
+        # Includes the selected output's self node, the exact old input node,
+        # and every ancestor. ID meanings and generation links remain fixed.
+        cat.registry_history_git(current, SelectedHistory())
+        sources.extend([key, *history_sources])
+        rebindings.append({"original_path": name, "original_input_sha256": expected,
+                           "equivalent_selected_source_id": history_key,
+                           "equivalent_selected_sha256": ledger.sha(previous_raw),
+                           "selected_source_revision": ctx.pins["game"],
+                           "selected_registry_output_source_id": key,
+                           "selected_registry_output_sha256": ledger.sha(registry_raw),
+                           "original_generation": previous["generation"], "selected_generation": current["generation"],
+                           "verified_history_sources": dict(sorted(history_sources.items()))})
+    return sorted(set(sources)), rebindings
+
+
 def load_catalog(ctx, spec, targets, originals):
     """Replay the immutable generator with its original previous registry and atlas reference."""
     manifest, manifest_raw = checked(spec["manifest"]); origins = manifest["source_revisions"]
@@ -434,19 +480,19 @@ def load_catalog(ctx, spec, targets, originals):
         raise ValueError("catalog_original_replay_or_id_history_mismatch:registry=" + str(rebuilt_registry == registry)
                          + ",manifest_fields=" + ",".join(fields) + ";source_extra=" + ",".join(extra)
                          + ";source_missing=" + ",".join(missing) + ";source_changed=" + ",".join(changed))
-    sources = []
-    for name, expected in manifest["source_hashes"].items():
-        key = "game:" + name
-        ledger.need(ledger.sha(ctx.content(key)) == expected, "catalog_input_changed_since_original_generation:" + name)
-        sources.append(key)
+    ledger.need(set(outputs) == {cat.MANIFEST_PATH, cat.REGISTRY_PATH, cat.LOOKUP_PATH, cat.CATALOG_PATH},
+                "catalog_exact_four_outputs_required")
+    for name, value in outputs.items():
+        ledger.need(ctx.content("game:" + name) == value, "generated_catalog_target_not_exact_current_git:" + name)
+    sources, registry_rebindings = _catalog_sources(ctx, cat, manifest, previous_raw, registry_raw)
     for name, expected in manifest["operator_hashes"].items():
         ledger.need(ledger.sha(ctx.operator_blob(origins["operator"], name)) == expected, "catalog_original_operator_input_mismatch")
     evidence = {"kind": "IMMUTABLE_PUBLIC_UI_CATALOG_REPLAY", "sha256": spec["manifest"]["sha256"],
                 "source_revisions": origins, "registry_sha256": manifest["registry_sha256"], "schema_sha256": manifest["schema_sha256"],
-                "previous_registry_sha256": parent_sha, "all_four_outputs_exact": True}
+                "previous_registry_sha256": parent_sha, "all_four_outputs_exact": True,
+                "registry_input_rebindings": registry_rebindings}
     originals.append(evidence)
     for name, value in outputs.items():
-        ledger.need(ctx.content("game:" + name) == value, "generated_catalog_target_not_exact_current_git:" + name)
         if name in (cat.LOOKUP_PATH, cat.CATALOG_PATH): _attach_generation(ctx, targets, name, value, sources, evidence)
 
 
