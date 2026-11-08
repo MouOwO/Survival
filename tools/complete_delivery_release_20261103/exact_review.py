@@ -449,7 +449,7 @@ class Sources:
                                    'sha256': result['content']['sha256'], 'bytes': len(result['raw'])}
         return result['raw']
     def grep(self, role, patterns, fixed=True):
-        argv = ['git', '--no-replace-objects', '-c', 'safe.directory='+self.roots[role].as_posix(), '-C', str(self.roots[role]), 'grep', '-l', '-I', '-F' if fixed else '-E']
+        argv = ['git', '--no-replace-objects', '-c', 'safe.directory='+self.roots[role].as_posix(), '-C', str(self.roots[role]), 'grep', '-l', '-z', '-I', '-F' if fixed else '-E']
         for pattern in patterns: argv += ['-e', pattern]
         argv += [self.pins[role], '--', 'tools', 'docs', 'scripts', 'panorama', 'data', 'cfg', 'resource']
         done = subprocess.run(argv, capture_output=True, timeout=60)
@@ -457,7 +457,8 @@ class Sources:
         self.counts['git_reference_searches'] += 1
         prefix = self.pins[role]+':'
         names = []
-        for line in done.stdout.decode('utf8').splitlines():
+        for line in done.stdout.decode('utf8').split('\0'):
+            if not line: continue
             need(line.startswith(prefix), 'reference_search_wrong_revision'); names.append(line[len(prefix):])
         return names
     def close(self): self.reader.close()
@@ -469,7 +470,8 @@ def reference_scan(sources, paths):
     # archive_challenge_definitions.csv is not challenge_definitions.csv.
     # Keep exact standalone mentions blocking, including comments; executable
     # reads and computed data namespaces are independently checked below.
-    mentions = {p: re.compile(r'(?<![\w.-])(?:'+re.escape(p)+'|'+re.escape(Path(p).name)+r')(?![\w.-])') for p in paths}
+    mentions = {p: re.compile(r'(?<![\w.-])(?:'+re.escape(p)+
+                ('' if p == KEEPER_MANIFEST else '|'+re.escape(Path(p).name))+r')(?![\w.-])') for p in paths}
     refs, blockers, scan = {}, [], []
     allowed_metadata = {('game', JS), ('game', LUA), ('content', CONTENT_JS)}
     allowed_metadata.update(('game', CSV_OUTPUTS[p]) for p in paths if p in CSV_OUTPUTS)
@@ -486,7 +488,17 @@ def reference_scan(sources, paths):
             bad = [s for s in sites if s['candidate_json_read'] or s['uncertain_data_ui_read']]
             if bad: blockers.append({'source_id': key, 'reason': 'RUNTIME_JSON_READ_OR_UNCERTAIN_NAMESPACE', 'sites': bad})
             if hits and runtime_path(role, path) and (role, path) not in allowed_metadata:
-                blockers.append({'source_id': key, 'reason': 'UNREVIEWED_RUNTIME_REFERENCE', 'paths': sorted(hits)})
+                unreviewed = set(hits)
+                for resource, author in KEEPER_AUTHORS.items():
+                    if author not in unreviewed or author in text: continue
+                    # Native logical particle names resolve the separately
+                    # compiled resource. A source path or raw loader still
+                    # blocks; this does not allow arbitrary art references.
+                    logical = resource[:-2]
+                    remainder = text.replace('"'+logical+'"', '').replace("'"+logical+"'", '')
+                    if not mentions[author].search(remainder): unreviewed.remove(author)
+                if unreviewed:
+                    blockers.append({'source_id': key, 'reason': 'UNREVIEWED_RUNTIME_REFERENCE', 'paths': sorted(unreviewed)})
             if hits:
                 refs[key] = {**sources.facts[key], 'source_revision': sources.pins[role], 'matches': hits,
                              'reference_role': 'GENERATED_PROVENANCE_METADATA_NOT_FILE_READ' if (role, path) in allowed_metadata else

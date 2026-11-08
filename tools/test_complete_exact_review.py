@@ -425,6 +425,28 @@ class LocalizationMappingReviewTests(unittest.TestCase):
 
 
 class KeeperParticleBuildInputTests(unittest.TestCase):
+    def test_immutable_grep_keeps_unicode_paths_with_null_delimiters(self):
+        source = object.__new__(m.Sources)
+        source.roots = {'game': m.ROOT};source.pins = {'game': 'a'*40};source.counts = m.Counter()
+        name = 'data/csv/英雄系统/hero_attack_projectiles.csv'
+        result = subprocess.CompletedProcess([], 0, (source.pins['game']+':'+name+'\0').encode(), b'')
+        with patch.object(m.subprocess, 'run', return_value=result) as run:
+            self.assertEqual(source.grep('game', ['hero_attack_projectiles']), [name])
+            self.assertIn('-z', run.call_args.args[0])
+
+    def test_native_logical_reference_passes_but_raw_source_or_loader_blocks(self):
+        resource, author = next(iter(m.KEEPER_AUTHORS.items()))
+        for text, blocked in [('"particle" "'+resource[:-2]+'"', False),
+                              ('"particle" "'+author+'"', True),
+                              ('local f=io.open("'+resource[:-2]+'")', True)]:
+            class Sources:
+                pins = {'game':'a'*40, 'content':'b'*40}
+                facts = {'game:scripts/vscripts/a.lua': {'git_oid':'1'*40,'sha256':m.sha(text.encode())}}
+                def grep(self, role, patterns, fixed=True):return ['scripts/vscripts/a.lua'] if role == 'game' else []
+                def get(self, role, path):return text.encode()
+            scan = m.reference_scan(Sources(), {author})
+            self.assertEqual(bool(scan['runtime_read_blockers']), blocked)
+
     def setUp(self):
         self.blobs = {m.KEEPER_MANIFEST: (m.ROOT / m.KEEPER_MANIFEST).read_bytes()}
         for resource, author in m.KEEPER_AUTHORS.items():
