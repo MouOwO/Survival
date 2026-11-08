@@ -25,6 +25,8 @@ game：`D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival`�
 
 2026-11-08新增生成产物台账：候选、编译、签包、排演或恢复备份生成后，用 `tools/release_storage_ledger.py record --receipt` 登记真实回执；需要盘点时显式 `refresh`，报告放树外 `D:/Survival_清理记录`。按当前引用保留，不能按日期删除；硬链接占用不等于可回收空间。见[本次实际盘点、记录路径和成本](evidence/storage_ledger_20261108.md)。
 
+2026-11-08用户批准后，已裁减16轮闭合排演的160个重复VPK，D盘净空闲增加约113.17GiB；全部canonical完整包、最新回滚、未收口事务及原始控制仍保留。旧恢复回执不改，副本删除事实单独记录；后续从canonical新建排演。见[实际删除、映射、失败记录与后验](evidence/duplicate_rehearsal_cleanup_20261108.md)。
+
 检查两仓分支/上游/未提交改动/未推送提交/历史stash，使用唯一说明保存修改；记录自己的stash对象，pull按现有策略，pop仅自己创建的stash；冲突先核对原数据。同步后只暂存本任务，源码/编译产物配套审查，commit、push并核对远端HEAD。没有改动的仓库不空提交。不能reset丢数据、强推、清空历史stash或把别人的修改打包提交。
 
 本知识整理前，game有原102项编译美术、UI、粒子、缓存/bundle改动；content工作区干净。这些是明确保留的既有工作，不属于知识库提交。地图源码按content现有LFS；game主地图VPK沿用binary属性，不能自行改变.gitattributes。
