@@ -300,7 +300,7 @@ class CsvBuildInputReviewTests(unittest.TestCase):
         scan={'runtime_read_blockers':[],'references':{}}
         review=m.make_reviews(scope,'a'*64,self.pins,blobs,facts,scan,'b'*64)
         csv_reviews={r['source_id'][5:]:r for r in review['reviews'] if r['source_id'][5:] in m.CSV_OUTPUTS}
-        self.assertEqual(len(csv_reviews),5)
+        self.assertEqual(len(csv_reviews),len(m.CSV_OUTPUTS))
         for path,row in csv_reviews.items():
             self.assertEqual(row['runtime_targets_requiring_separate_generator_or_compiler_binding'],[m.CSV_OUTPUTS[path]])
             self.assertFalse(row['standalone_runtime_file_required'])
@@ -422,6 +422,27 @@ class LocalizationMappingReviewTests(unittest.TestCase):
         value['review']['runtime_mapping_reviews']=[mapping]
         result=c.assemble(**value)
         self.assertTrue(any(row['source_id']==key for row in result['blockers']))
+
+
+class KeeperParticleBuildInputTests(unittest.TestCase):
+    def setUp(self):
+        self.blobs = {m.KEEPER_MANIFEST: (m.ROOT / m.KEEPER_MANIFEST).read_bytes()}
+        for resource, author in m.KEEPER_AUTHORS.items():
+            self.blobs[author] = (m.ROOT / author).read_bytes()
+            self.blobs['content:' + resource[:-2]] = (m.pending.CONTENT / resource[:-2]).read_bytes()
+
+    def test_exact_authors_require_both_compiled_outputs_without_visual_claim(self):
+        checks = m.validate_keeper_build_inputs(self.blobs)
+        self.assertEqual({v['required_compiled_resource'] for v in checks.values()}, set(m.KEEPER_AUTHORS))
+        self.assertTrue(all(v['native_visual_acceptance'] is False for v in checks.values()))
+
+    def test_changed_content_or_manifest_source_hash_is_rejected(self):
+        source = 'content:' + next(iter(m.KEEPER_AUTHORS))[:-2]
+        bad = dict(self.blobs); bad[source] += b'\n'
+        with self.assertRaisesRegex(ValueError, 'dual_author_mismatch'):m.validate_keeper_build_inputs(bad)
+        manifest = json.loads(self.blobs[m.KEEPER_MANIFEST]);manifest['outputs'][0]['source_sha256'] = '0' * 64
+        bad = dict(self.blobs);bad[m.KEEPER_MANIFEST] = json.dumps(manifest).encode()
+        with self.assertRaisesRegex(ValueError, 'dual_author_mismatch'):m.validate_keeper_build_inputs(bad)
 
 
 if __name__=='__main__':unittest.main()

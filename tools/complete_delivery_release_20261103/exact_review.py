@@ -45,7 +45,13 @@ CSV_OUTPUTS = {
 CSV_OUTPUTS.update({
     'data/csv/公共规则/tooltip_definitions.csv': 'scripts/vscripts/config/generated/tooltip_definitions.lua',
     'data/csv/挑战与奖励系统/challenge_definitions.csv': 'scripts/vscripts/config/generated/challenge_definitions.lua',
+    'data/csv/英雄系统/hero_attack_projectiles.csv': 'scripts/vscripts/config/generated/hero_attack_projectiles.lua',
+    'data/csv/资源系统/asset_catalog.csv': 'scripts/vscripts/config/generated/asset_catalog.lua',
+    'data/csv/商店系统/altar_actions.csv': 'scripts/vscripts/config/generated/altar_actions.lua',
 })
+KEEPER_MANIFEST = 'art/effects/keeper_attack/manifest.json'
+KEEPER_AUTHORS = compiler.KEEPER_PARTICLES
+KEEPER_INPUTS = {KEEPER_MANIFEST, *KEEPER_AUTHORS.values()}
 EVIDENCE = {
  'data/ui/network50_dev05_evidence_20261103.json': ('status', 'LOCAL_TOOLS_NATIVE_PARTIAL_EVIDENCE_NOT_FPS_OR_WORKSHOP_ACCEPTANCE'),
  'data/ui/network50_dev06_fps_reclassification_20261103.json': ('status', 'RECLASSIFIED_INVALID_GAMEPLAY_CAPTURE_ORIGINAL_RETAINED'),
@@ -284,7 +290,34 @@ def load_review_blobs(sources, rows, pins):
         blobs['operator:'+CSV_GENERATOR] = compiler.run_git(ROOT, 'show', pins['operator']+':'+CSV_GENERATOR)
         for path in sorted(csv_paths): blobs[CSV_OUTPUTS[path]] = sources.get('game', CSV_OUTPUTS[path])
     blobs['content:'+CONTENT_JS] = sources.get('content', CONTENT_JS)
+    if set(blobs) & KEEPER_INPUTS:
+        for resource, author in KEEPER_AUTHORS.items():
+            blobs[author] = sources.get('game', author)
+            blobs['content:' + resource[:-2]] = sources.get('content', resource[:-2])
+        blobs[KEEPER_MANIFEST] = sources.get('game', KEEPER_MANIFEST)
     return blobs
+
+
+def validate_keeper_build_inputs(blobs):
+    """Bind these two exact authored particles; official compile remains required."""
+    manifest = json.loads(blobs[KEEPER_MANIFEST])
+    rows = manifest.get('outputs', [])
+    expected = {resource[:-2]: author for resource, author in KEEPER_AUTHORS.items()}
+    need(manifest.get('format') == 1 and len(rows) == len(expected)
+         and {row.get('resource') for row in rows} == set(expected)
+         and manifest.get('root') == 'particles/survival/heroes/keeper/keeper_of_the_light_base_attack.vpcf',
+         'keeper_exact_particle_manifest_required')
+    checks = {}
+    for row in rows:
+        source = row['resource']; author = expected[source]; raw = blobs[author]
+        need(raw == blobs['content:' + source] and sha(raw) == row.get('source_sha256')
+             and row.get('native_resource') == 'particles/units/heroes/hero_keeper_of_the_light/' + Path(source).name
+             and re.fullmatch('[0-9a-f]{64}', row.get('native_data_sha256', '')),
+             'keeper_particle_manifest_or_dual_author_mismatch')
+        checks[author] = {'source_sha256': sha(raw), 'content_source': source,
+                          'required_compiled_resource': source + '_c',
+                          'native_visual_acceptance': False}
+    return checks
 
 
 def runtime_mapping_reviews(rows, pins, blobs, facts):
@@ -332,20 +365,27 @@ def make_reviews(scope, scope_sha256, pins, blobs, facts, scan, scan_sha256):
     expected = {ATLAS, MANIFEST, REGISTRY, *EVIDENCE, *histories}
     if LOTTERY_SEED in paths: expected.add(LOTTERY_SEED)
     expected.update(paths & set(CSV_OUTPUTS))
+    expected.update(paths & KEEPER_INPUTS)
     need(len(rows) == len(paths) == len(expected) and paths == expected,
          'unmapped_set_not_exact_reviewed_paths')
     checks = validate_catalog(blobs)
     csv_checks = validate_csv_build_inputs(blobs, pins)
+    keeper_checks = validate_keeper_build_inputs(blobs) if paths & KEEPER_INPUTS else {}
     need(not scan['runtime_read_blockers'], 'runtime_reference_or_loader_requires_manual_review')
     reviews = []
     for row in sorted(rows, key=lambda r: r['source']['path']):
         path = row['source']['path']; key = 'game:'+path; raw = blobs[path]; fact = facts[key]
         need(row['source']['repo'] == 'game' and fact['git_oid'] == row['source']['head_oid'] and fact['sha256'] == row['candidate']['sha256'] == sha(raw), 'scope_git_source_fact_mismatch:'+path)
-        value = json.loads(raw) if path not in CSV_OUTPUTS else None; extra = {}
+        value = json.loads(raw) if path not in CSV_OUTPUTS and path not in KEEPER_AUTHORS.values() else None; extra = {}
         if path in CSV_OUTPUTS:
             classification = 'EXACT_CSV_BUILD_INPUT_REPRODUCED_BY_IMMUTABLE_GENERATOR'
             reason = 'Executed the exact selected Git generator build() in memory on this immutable CSV and verified the entire generated Lua byte-for-byte, including every emitted value. The CSV is a build input; its generated Lua still requires the separate production/protection binding. No directory or filename alone grants exclusion.'
             targets = [CSV_OUTPUTS[path]]; extra = csv_checks[path]
+        elif path in KEEPER_INPUTS:
+            classification = 'EXACT_PARTICLE_BUILD_INPUT_REQUIRING_OFFICIAL_COMPILER_BINDING'
+            reason = 'Verified the two exact manifest resources, immutable game/content author bytes and source hashes. These source/provenance files remain in Git; each resulting particle requires a separate original official compiler receipt. This is not native appearance acceptance.'
+            targets = sorted(KEEPER_AUTHORS) if path == KEEPER_MANIFEST else [keeper_checks[path]['required_compiled_resource']]
+            extra = keeper_checks if path == KEEPER_MANIFEST else keeper_checks[path]
         elif path in EVIDENCE:
             field, expected = EVIDENCE[path]
             need(value.get(field) == expected, 'evidence_exact_semantic_type_mismatch:'+path)
