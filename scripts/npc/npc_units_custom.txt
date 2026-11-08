@@ -1402,7 +1402,7 @@
             "model" "models/heroes/keeper_of_the_light/kotl_hood.vmdl"
             "model" "models/heroes/keeper_of_the_light/kotl_skirt.vmdl"
             "model" "models/heroes/keeper_of_the_light/kotl_horse_accesories.vmdl"
-            "particle" "particles/units/heroes/hero_keeper_of_the_light/keeper_of_the_light_base_attack.vpcf"
+            "particle" "particles/survival/heroes/keeper/keeper_of_the_light_base_attack.vpcf"
             "particle" "particles/units/heroes/hero_keeper_of_the_light/keeper_of_the_light_blinding_light_aoe.vpcf"
         }
     }

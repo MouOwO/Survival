@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "root": "particles/survival/heroes/keeper/keeper_of_the_light_base_attack.vpcf",
+  "outputs": [
+    {
+      "resource": "particles/survival/heroes/keeper/keeper_of_the_light_base_attack.vpcf",
+      "native_resource": "particles/units/heroes/hero_keeper_of_the_light/keeper_of_the_light_base_attack.vpcf",
+      "native_data_sha256": "917ad846ec4b7e6968479404f4e084f59578c09af97ba9de4f7da5e7ce8342fe",
+      "source_sha256": "0b7dcb4a594a1c36b3d729351533d24caf29461c82569cba9cd7df09e0415c75"
+    },
+    {
+      "resource": "particles/survival/heroes/keeper/keeper_base_attack.vpcf",
+      "native_resource": "particles/units/heroes/hero_keeper_of_the_light/keeper_base_attack.vpcf",
+      "native_data_sha256": "950e06f10b6a0a807aa47f82b3694e78ea20f5d0fdd91e9dad839cc85a4c9ee6",
+      "source_sha256": "0e1b665c75485fa7c51ea0227f77216a574d955c7020d4da7d04686661fc9462"
+    }
+  ],
+  "transformation": "Wrapper child redirected; movement attraction 9999 -> 1000000, CP1 target and CP2 speed cap preserved; every other native source field unchanged",
+  "gameplay": "No attack speed, projectile speed, range, damage, targeting, timers or networking changes",
+  "validation_limit": "Source and compiled DATA checks do not prove native appearance or FPS"
+}
