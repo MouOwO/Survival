@@ -26,6 +26,51 @@ LAB_ERROR_MESSAGES = {
     "addon_lab_scan_failed": "无法安全检查 VPK 实验目录，已阻止离线启动；请检查目录权限并保留全部备份。",
     "addon_lab_scan_limit": "VPK 实验目录超过检查预算，已阻止离线启动；请将整个实验目录迁移到插件目录之外并保留备份。",
 }
+ENTRY_ERROR_MESSAGES = {
+    **LAB_ERROR_MESSAGES,
+    "dirty_or_unclassified_runtime_source": "本地有未完成的运行文件改动，已停止启动以保护签名验收包。这不是网络错误；请先处理运行改动或生成与改动一致的新验收包。",
+    "test_entry_access_denied": "无法访问验收所需文件，已停止启动。请检查文件权限或占用情况。",
+    "test_entry_required_file_missing": "验收所需文件缺失，已停止启动。请核对验收包和入口文件是否完整。",
+}
+# Only declared, fixed diagnostics may cross the CLI boundary. In particular,
+# an identifier-shaped exception value can still be a token, not an error code.
+PUBLIC_RUNTIME_ERRORS = frozenset(LAB_ERROR_MESSAGES) | frozenset({
+    "dota_already_running", "dota_executable_missing", "game_process_check_failed",
+    "offline_requires_development", "offline_test_code_missing",
+    "online_requires_canonical_launcher", "steam_not_running",
+    "steam_test_relay_identity_invalid", "steam_test_relay_start_failed",
+    "test_map_missing", "test_mode_invalid", "windows_required",
+    "online_authority_changed_before_launch", "online_authority_not_expected_newest",
+    "online_binding_changed_before_launch", "online_binding_contract_invalid",
+    "online_candidate_hash_invalid", "online_canonical_report_directory_mismatch",
+    "online_expected_newest_invalid", "online_expected_newest_mismatch",
+    "online_fixed_report_directory_required", "online_immutable_sources_required",
+    "online_keeper_exit_failed_preserve_transaction", "online_keeper_failed_preserve_transaction",
+    "online_normal_exit_receipt_required", "online_package_binding_invalid",
+    "online_production_auth_policy_unverified", "online_release_sequence_invalid",
+    "online_restore_not_complete", "online_signed_candidate_required",
+    "online_signed_package_not_current_binding", "online_stage_not_complete",
+    "online_workshop_mismatch", "pinned_ssh_client_missing", "relay_pinned_known_hosts_invalid",
+    "relay_process_access_failed", "relay_process_command_unavailable",
+    "relay_process_identity_changed", "relay_process_identity_unavailable",
+    "relay_process_is_not_owned_forward", "relay_process_is_not_ssh", "relay_process_not_found",
+    "relay_receipt_exists_review_before_start", "relay_receipt_invalid", "relay_ssh_start_failed",
+    "relay_stop_failed", "relay_stop_not_confirmed", "relay_windows_process_required",
+})
+
+
+def public_error_code(error):
+    """Classify once on CLI failure without returning exception text or paths."""
+    if isinstance(error, PermissionError):
+        return "test_entry_access_denied"
+    if isinstance(error, FileNotFoundError):
+        return "test_entry_required_file_missing"
+    if error.args == ("dirty_or_unclassified_runtime_source",) and isinstance(error, ValueError):
+        return "dirty_or_unclassified_runtime_source"
+    if (isinstance(error, RuntimeError) and len(error.args) == 1
+            and type(error.args[0]) is str and error.args[0] in PUBLIC_RUNTIME_ERRORS):
+        return error.args[0]
+    return "test_entry_failed"
 
 
 def need(value, code):
@@ -184,12 +229,10 @@ def main():
     try:
         result = run(args.mode, check_only=args.check)
     except (RuntimeError, OSError, ValueError, KeyError) as error:
-        code = str(error) if isinstance(error, RuntimeError) else "test_entry_failed"
-        if not code.replace("_", "").isalnum() or len(code) > 80:
-            code = "test_entry_failed"
+        code = public_error_code(error)
         result = {"ok": False, "error": code, "mode": args.mode}
-        if code in LAB_ERROR_MESSAGES:
-            result["message"] = LAB_ERROR_MESSAGES[code]
+        if code in ENTRY_ERROR_MESSAGES:
+            result["message"] = ENTRY_ERROR_MESSAGES[code]
             print(result["message"], file=sys.stderr)
     print(json.dumps(result, ensure_ascii=True))
     return 0 if result["ok"] else 1

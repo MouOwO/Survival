@@ -1,4 +1,5 @@
 """Entry boundaries: never start a cloud helper offline or replace a live game."""
+import ast
 import importlib.util
 import io
 import json
@@ -72,6 +73,82 @@ class TestEntryBoundaryTest(unittest.TestCase):
         self.assertEqual(result["error"], "addon_lab_vpk_detected")
         self.assertIn("插件目录之外", result["message"])
         self.assertIn("本工具不会自动移动或删除文件", errors.getvalue())
+
+    def test_dirty_runtime_guard_is_explained_without_bypassing_preparation(self):
+        signed = self.signed()
+        signed.prepare.side_effect = ValueError("dirty_or_unclassified_runtime_source")
+        with patch.object(entry.sys, "argv", ["test_entry.py", "online", "--check"]), \
+                patch.object(entry, "load_online", return_value=signed), \
+                patch.object(entry, "process_inventory") as inventory, \
+                patch.object(entry, "ensure_relay") as relay, patch.object(entry.subprocess, "Popen") as launch, \
+                redirect_stdout(io.StringIO()) as output, redirect_stderr(io.StringIO()) as errors:
+            self.assertEqual(entry.main(), 1)
+        result = json.loads(output.getvalue())
+        self.assertEqual(result["error"], "dirty_or_unclassified_runtime_source")
+        self.assertIn("未完成的运行文件改动", result["message"])
+        self.assertIn("保护签名验收包", errors.getvalue())
+        self.assertIn("不是网络错误", result["message"])
+        signed.prepare.assert_called_once_with()
+        inventory.assert_not_called()
+        relay.assert_not_called()
+        launch.assert_not_called()
+        signed.run_prepared.assert_not_called()
+
+    def test_file_errors_report_only_fixed_codes_not_sensitive_filenames(self):
+        secret = "private_token_ABC123"
+        filename = "C:/private/" + secret + "/binding.json"
+        cases = (
+            (PermissionError(13, secret, filename), "test_entry_access_denied"),
+            (FileNotFoundError(2, secret, filename), "test_entry_required_file_missing"),
+        )
+        for error, code in cases:
+            with self.subTest(code=code), \
+                    patch.object(entry.sys, "argv", ["test_entry.py", "online", "--check"]), \
+                    patch.object(entry, "run", side_effect=error), \
+                    redirect_stdout(io.StringIO()) as output, redirect_stderr(io.StringIO()) as errors:
+                self.assertEqual(entry.main(), 1)
+            self.assertEqual(json.loads(output.getvalue())["error"], code)
+            self.assertNotIn(secret, output.getvalue() + errors.getvalue())
+            self.assertNotIn(filename, output.getvalue() + errors.getvalue())
+
+    def test_unknown_exception_values_tokens_and_urls_are_not_diagnostics(self):
+        secrets = (
+            "private_token_ABC123",
+            "https://private.invalid/auth?token=ABC123",
+            "dirty_or_unclassified_runtime_source:C:/private/ABC123",
+        )
+        for kind in (ValueError, RuntimeError, OSError, KeyError):
+            for secret in secrets:
+                with self.subTest(kind=kind.__name__, secret=secret), \
+                        patch.object(entry.sys, "argv", ["test_entry.py", "online", "--check"]), \
+                        patch.object(entry, "run", side_effect=kind(secret)), \
+                        redirect_stdout(io.StringIO()) as output, redirect_stderr(io.StringIO()) as errors:
+                    self.assertEqual(entry.main(), 1)
+                self.assertEqual(json.loads(output.getvalue()),
+                                 {"ok": False, "error": "test_entry_failed", "mode": "online"})
+                self.assertEqual(errors.getvalue(), "")
+                self.assertNotIn(secret, output.getvalue())
+
+    def test_existing_declared_runtime_diagnostics_are_preserved(self):
+        declared = set()
+        for name in ("test_entry.py", "online_signed_entry.py", "steam_tls_relay.py"):
+            tree = ast.parse(Path(__file__).with_name(name).read_text(encoding="utf-8"))
+            for node in ast.walk(tree):
+                if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Name):
+                    continue
+                index = 1 if node.func.id == "need" else 0 if node.func.id == "RuntimeError" else None
+                if index is not None and len(node.args) > index:
+                    value = node.args[index]
+                    if isinstance(value, ast.Constant) and type(value.value) is str:
+                        declared.add(value.value)
+        self.assertGreater(len(declared), 40, "Check the real entry, relay and online declarations")
+        self.assertFalse(declared - entry.PUBLIC_RUNTIME_ERRORS)
+        for code in declared:
+            with self.subTest(code=code):
+                self.assertEqual(entry.public_error_code(RuntimeError(code)), code)
+        # A canonical code is recognized only for the confirmed exception type.
+        self.assertEqual(entry.public_error_code(RuntimeError("dirty_or_unclassified_runtime_source")),
+                         "test_entry_failed")
 
     def test_online_check_does_not_traverse_offline_lab_namespace(self):
         signed = Mock()
