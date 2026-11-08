@@ -246,7 +246,10 @@ def collect_verified(auth, builder, request, receipt_path, *, full):
     auth = checked_authority(auth)
     expected = guard.checked_sha(request.get("report_sha256"))
     report, manifest, signed = builder.load_package(expected, full=full)
-    builder.verify_operator_paths({TOOL: LOADED_LF_SHA256}, report["operator_revision"])
+    from complete_delivery_release_20261103 import publication_validator as publication
+    online_test = request.get("publication_mode") == publication.ONLINE_TEST_MODE
+    policy_operator = publication.publication_operator(request, report) if online_test else report["operator_revision"]
+    builder.verify_operator_paths({TOOL: LOADED_LF_SHA256}, policy_operator)
     ctx = builder.context(report["operator_revision"])
     path = guard.regular(receipt_path)
     need(path.resolve().is_relative_to((builder.REPORT / "download_evidence").resolve())
@@ -254,8 +257,6 @@ def collect_verified(auth, builder, request, receipt_path, *, full):
     receipt, receipt_raw = read(path)
     journal, journal_raw, state, state_raw = current_head(auth, report, expected, request)
     verified_delivery(report, manifest, expected, journal, sha(journal_raw), receipt)
-    from complete_delivery_release_20261103 import publication_validator as publication
-    online_test = request.get("publication_mode") == publication.ONLINE_TEST_MODE
     official_snapshots = {}
     if online_test:
         native_summary = publication.online_test_admission(request, report)

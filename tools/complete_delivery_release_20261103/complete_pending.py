@@ -19,8 +19,11 @@ def inventory():
     from complete_delivery_release_20261103 import complete_baseline as baseline
     from complete_delivery_release_20261103 import pipeline_recipe as recipe
     checkpoint, manifest, cursor = baseline.load_active()
-    recipe.verify_operator_paths({TOOL: LOADED_LF_SHA256},
-        checkpoint["complete_delivery"]["package_operator_revision"])
+    evidence = checkpoint["complete_delivery"]
+    policy_operator = (evidence["publication_operator_revision"]
+        if evidence.get("publication_mode") == "EXPLICIT_UNLISTED_ONLINE_TEST_NATIVE_PENDING"
+        else evidence["package_operator_revision"])
+    recipe.verify_operator_paths({TOOL: LOADED_LF_SHA256}, policy_operator)
     counts = Counter(); trees, commits, dirty = {}, {}, []
     roots = {"game": ROOT, "content": pending.CONTENT}
     for role, root in roots.items():
