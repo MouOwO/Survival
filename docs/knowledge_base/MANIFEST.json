@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 46974,
-      "sha256": "0937061d62bed6d0290a6f332147114ecc27ed8f1aedc1470f4893d3b1fd9be9"
+      "bytes": 47462,
+      "sha256": "3dc2f9c59b0282ebdc11e14f70520102d605bf2959b57b2e8e3dc7b710b1f543"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -697,6 +697,11 @@
       "path": "evidence/wave_overflow_grace_20261030.md",
       "bytes": 2548,
       "sha256": "5c7e6344347122ab9bff108c46a2acec7cd0dba693efc453ff4c40e5f87d02a3"
+    },
+    {
+      "path": "evidence/weapon_growth_chinese_name_20261108.md",
+      "bytes": 2824,
+      "sha256": "7843d38ef735f41aac82f2694fe5d87f9f8607ec2c38f703f840a45667c52347"
     },
     {
       "path": "evidence/welfare_glow_0704_20261107.md",

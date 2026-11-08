@@ -167,9 +167,13 @@ local function upgrade_if_ready(player_id, current, definition)
         current.stage_attack_count = current.stage_attack_count + target
         return false
     end
+    local next_name = (weapons.by_id[next_id] or {}).display_name
+    if type(next_name) ~= "string" or next_name == "" then
+        next_name = "新武器"
+    end
     event_bus.emit(events.UI_NOTIFICATION, {
         player_id = player_id,
-        message = "武器成长完成：" .. next_id,
+        message = "武器成长完成：" .. next_name,
         level = "info",
     })
     return true
