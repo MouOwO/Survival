@@ -787,7 +787,23 @@ end
 
 local block_session
 
-local function complete_session(session, material_settled)
+local function current_ten_sin_hero(session, expected)
+    if get_session(session.player_id, session.encounter_id) ~= session
+        or not session.teleport_hero
+        or foreground_encounter_by_player[session.player_id] ~= session.encounter_id then
+        return nil
+    end
+    local summoned = event_bus.request(events.HERO_SUMMON_GET_REQUEST, {
+        player_id = session.player_id,
+    })
+    if summoned and summoned.ok == true and alive(summoned.unit)
+        and (not expected or summoned.unit == expected) then
+        return summoned.unit
+    end
+    return nil
+end
+
+local function complete_session(session, material_settled, completion_hero)
     if session.status == "completed" then return end
     session.status = "completed"
     local reward_result = { ok = true, handled_by = "challenge_material" }
@@ -816,6 +832,8 @@ local function complete_session(session, material_settled)
         tonumber(session.challenge.completion_limit) or 10
     )
     if repeatable and session.challenge.challenge_id == "challenge_11" then
+        session.resume_without_charge = false
+        session.ten_sin_series_completed = false
         local abyss_stage, inventory_error = owned_series_stage(
             session.player_id,
             "legend_abyss"
@@ -825,6 +843,9 @@ local function complete_session(session, material_settled)
             return
         end
         if abyss_stage == nil or abyss_stage >= completion_limit then
+            session.ten_sin_series_completed = material_settled == true
+                and abyss_stage ~= nil and abyss_stage >= completion_limit
+                and (tonumber(session.display_stage) or 0) >= completion_limit
             publish(session, "completed", {
                 reward_result = reward_result or {},
                 entrance_closed = abyss_stage ~= nil,
@@ -839,20 +860,19 @@ local function complete_session(session, material_settled)
             })
             return
         end
-        if session.challenge.completion_teleport_policy == "return_home" then
-            -- The shared arena replenishes its own boss independently. This
-            -- personal victory ends here; only a new explicit entry may attach
-            -- this player to the next layer and make them eligible for rewards.
-            -- Preserve the existing paid entry's free progression without
-            -- leaving an active/background participant in the next boss slot.
-            -- This qualification is never sourced from a client request.
-            session.resume_without_charge = material_settled == true
-                and tonumber(session.display_stage) ~= nil
-                and abyss_stage >= tonumber(session.display_stage)
+        -- Keep the paid entry's continuation if the player leaves, dies or the
+        -- next destination fails. Only settled material can grant this server-
+        -- owned qualification; the normal active chain never charges again.
+        session.resume_without_charge = material_settled == true
+            and tonumber(session.display_stage) ~= nil
+            and abyss_stage >= tonumber(session.display_stage)
+        if session.challenge.completion_teleport_policy == "return_home"
+            or material_settled ~= true or not completion_hero
+            or not current_ten_sin_hero(session, completion_hero) then
             publish(session, "completed", { reward_result = reward_result or {} })
             return
         end
-        local list = members_for(session.encounter_id)
+        local list = session.progression_members or members_for(session.encounter_id)
         local target_member = list[abyss_stage + 1]
         if not target_member then
             block_session(session, "abyss_stage_member_missing")
@@ -882,6 +902,14 @@ local function complete_session(session, material_settled)
         if get_session(session.player_id, session.encounter_id) ~= session
             or session.status ~= "waiting_respawn"
             or session.generation ~= scheduled_generation then
+            return
+        end
+        -- O(1) identity/foreground checks before subscribing to the next shared
+        -- boss. A departed/replaced hero must not earn its rewards from home.
+        if session.challenge.challenge_id == "challenge_11"
+            and not current_ten_sin_hero(session, completion_hero) then
+            session.status = "completed"
+            publish(session, "completed")
             return
         end
         session.killed_members = 0
@@ -914,7 +942,6 @@ function M.query(encounter_id, player_id)
         active = session ~= nil and session.status ~= "completed",
         resume_without_charge = session ~= nil and session.status == "completed"
             and session.challenge.challenge_id == "challenge_11"
-            and session.challenge.completion_teleport_policy == "return_home"
             and session.resume_without_charge == true,
         stage = session and (session.display_stage or session.stage) or 0,
         status = session and session.status or "inactive",
@@ -988,6 +1015,7 @@ function M.start(payload)
 
     local list = members_for(encounter_id)
     if #list == 0 then return { ok = false, error = "challenge_members_missing" } end
+    local progression_members = challenge.challenge_id == "challenge_11" and list or nil
     local display_stage = 1
     local display_total_members = #list
     if challenge.challenge_id == "challenge_11" then
@@ -1037,6 +1065,7 @@ function M.start(payload)
         difficulty_id = difficulty_id,
         game_mode = mode_id,
         members = list,
+        progression_members = progression_members,
         stage = 1,
         display_stage = display_stage,
         display_total_members = display_total_members,
@@ -1100,8 +1129,12 @@ local function owner_killed(meta, attacker)
 end
 
 block_session = function(session, error_message)
-    session.status = "blocked"
-    publish(session, "blocked", { error = error_message })
+    -- A paid ten-sins chain that already settled its preceding layer may be
+    -- retried explicitly after a failed next spawn/teleport, without charging
+    -- again or leaving an unattached "active" session in an empty arena.
+    session.status = session.challenge.challenge_id == "challenge_11"
+        and session.resume_without_charge == true and "completed" or "blocked"
+    publish(session, session.status, { error = error_message })
     event_bus.emit(events.UI_NOTIFICATION, {
         player_id = session.player_id,
         message = error_message or "下一只挑战怪物无法生成",
@@ -1288,13 +1321,11 @@ local function schedule_maintain_respawn(session, member)
 end
 
 local function return_completed_ten_sin_hero(session, hero)
-    if not hero or get_session(session.player_id, session.encounter_id) ~= session
-        or foreground_encounter_by_player[session.player_id] ~= session.encounter_id
-        or not alive(hero) then return end
-    local summoned = event_bus.request(events.HERO_SUMMON_GET_REQUEST, {
-        player_id = session.player_id,
-    })
-    if summoned and summoned.ok == true and summoned.unit == hero then
+    if not hero or (session.challenge.completion_teleport_policy ~= "return_home"
+        and (session.status ~= "completed" or not session.ten_sin_series_completed)) then
+        return
+    end
+    if current_ten_sin_hero(session, hero) then
         -- Own-city validation/camera are centralized in return_unit.
         -- A native return failure must not abort other shared winners.
         pcall(hero_return_home.return_unit, hero, session.player_id)
@@ -1314,16 +1345,12 @@ local function killed_for_session(payload, meta, session)
     local challenge_id = session.challenge.challenge_id
     local return_hero, material_settled
     if authorized_kill and challenge_id == "challenge_11"
-        and session.challenge.completion_teleport_policy == "return_home"
+        and (session.challenge.completion_teleport_policy == "return_home"
+            or session.challenge.completion_teleport_policy == "reset_to_stage_entry")
         and foreground_encounter_by_player[session.player_id] == session.encounter_id then
         -- Capture before reward callbacks can replace the hero or change rooms.
         -- Only the registered formal hero is eligible, never a selected clone.
-        local summoned = event_bus.request(events.HERO_SUMMON_GET_REQUEST, {
-            player_id = session.player_id,
-        })
-        if summoned and summoned.ok == true and alive(summoned.unit) then
-            return_hero = summoned.unit
-        end
+        return_hero = current_ten_sin_hero(session)
     end
     if authorized_kill then
         session.completion_drop_position = victim:GetAbsOrigin()
@@ -1428,14 +1455,14 @@ local function killed_for_session(payload, meta, session)
 
     if session.spawn_mode == "simultaneous" then
         if session.monster_count == 0 then
-            complete_session(session, material_settled)
+            complete_session(session, material_settled, return_hero)
             return_completed_ten_sin_hero(session, material_settled and return_hero)
         else publish(session, "active") end
         return
     end
 
     if session.stage >= #session.members then
-        complete_session(session, material_settled)
+        complete_session(session, material_settled, return_hero)
         return_completed_ten_sin_hero(session, material_settled and return_hero)
         return
     end

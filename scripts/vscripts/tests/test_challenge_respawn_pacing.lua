@@ -18,6 +18,7 @@ local first=assert(source:find("local function complete_session",1,true))
 local last=assert(source:find("function M.handles",first,true))
 local pending, activated, teleported, session = nil,0,0,nil
 local foreground={}
+local formal_hero={}
 local env=setmetatable({
  scheduler={after=function(delay,fn)assert(delay==1);pending=fn end},
  owned_series_stage=function()return 1 end,
@@ -28,6 +29,7 @@ local env=setmetatable({
  get_session=function()return session end,
  fill_initial=function()activated=activated+1;return true end,
  foreground_encounter_by_player=foreground,
+ current_ten_sin_hero=function(_,expected)return foreground[0] and expected or nil end,
  teleport_to_current=function()teleported=teleported+1;return true end,
  block_session=function(_,err)error(err)end,
 },{__index=_G})
@@ -42,23 +44,24 @@ local function fresh(policy)
   repeatable=true,respawn_seconds=1,completion_limit=10,completion_teleport_policy=policy or "reset_to_stage_entry"}}
  foreground[0]=session.encounter_id
 end
-fresh();complete(session)
+fresh();complete(session,true,formal_hero)
 assert(session.status=="waiting_respawn" and activated==0 and teleported==0)
 pending();assert(session.status=="active" and activated==1 and teleported==1)
-fresh();complete(session);session.status="cancelled";pending();assert(activated==1)
-fresh();complete(session);session.generation="replaced";pending();assert(activated==1)
+fresh();complete(session,true,formal_hero);session.status="cancelled";pending();assert(activated==1)
+fresh();complete(session,true,formal_hero);session.generation="replaced";pending();assert(activated==1)
 local authored_policy=require("config/generated/challenge_definitions").by_id.challenge_11.completion_teleport_policy
-assert(authored_policy=="return_home")
-fresh(authored_policy);complete(session,true)
+assert(authored_policy=="reset_to_stage_entry")
+fresh("return_home");complete(session,true)
 assert(session.status=="completed" and pending==nil and activated==1 and teleported==1,
  "return-home policy ends the personal session: no timer, auto-attachment or next-layer reward eligibility even if home fails")
 assert(session.resume_without_charge==true,"a settled lower layer retains free explicit next-layer entry")
-fresh(authored_policy);complete(session,false)
+fresh("return_home");complete(session,false)
 assert(session.status=="completed" and pending==nil and session.resume_without_charge==false,
  "inventory stage alone cannot create free continuation after an unconfirmed material transaction")
-fresh();complete(session);foreground[0]=nil;pending()
-assert(activated==2 and teleported==1,"original reset policy still rejects a hero that left the foreground room")
-print("CHALLENGE_RESPAWN_PACING_PASS: 1s respawn, real policy predicate, reset teleport unchanged, ten-sins return never reenters, cancellation/generation guards")
+fresh(authored_policy);complete(session,true,formal_hero);foreground[0]=nil;pending()
+assert(activated==1 and teleported==1 and session.status=="completed" and session.resume_without_charge,
+ "ten-sins continuation cannot subscribe or teleport a hero that left, and retains free explicit continuation")
+print("CHALLENGE_RESPAWN_PACING_PASS: 1s respawn, authored continuous chain, explicit legacy return policy, cancellation/generation/foreground guards")
 
 local encounters = require("config/generated/monster_encounters")
 local practice_count = 0
