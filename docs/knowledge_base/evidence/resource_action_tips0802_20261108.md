@@ -47,3 +47,11 @@
 注册表是否换代取决于实际 records/fields/enums：允许输出第13代且完整字节与源输入一致，或真实第14代且父13摘要/全链正确；同代变字节、跳代、缺失/多余历史节点均拒绝。没有为“新版本”强造新代。新 inspector/控制13项纯回归通过；实际 Git 工具闭包检查须在提交后再运行。
 
 正式待发仍以实际签名0104为父，包含全部历史未发布项及删除项；不能只发布本次几份 UI 文件。新的源码、编译、保护、完整收集、签包、入口检查和原生验收各阶段另据真实回执追加。原五项无关文件继续保留，不混入本轮提交或运行包。
+
+## catalog22 实际生成与精确导入
+
+真实目录生产来源为 game/operator `7f9efe9553db7853d4a26d8196df6ad87143b033`、content `385a2cd2b9fe42e60dc194233af22f2d30137f22`，双仓已提交推送，25 项实际 Git 工具绑定回归全通过。新 manifest SHA256 `e0ed5f4c442bf0cc7e9655103d0b732827da25026f2a0436d16579aad86d2a9b`，真实读集227 source/5 operator/1 binary；原 atlas 来源保留。
+
+实际 registry 保持13，完整字节及所有历史节点未变，SHA256 `fbc489aef4f7ea16da4c121f907d68fbdab114eac6b21e569869271d89ea1fce`。7941 records/188 fields/全部 enum ID 完全相同；definitions 逐值相同，auxiliary 只有6个已核实的来源 revision 字段改变，其他业务结构和值不变。来源/readset 与这些 revision 更新使 schema SHA256 成为 `cfd97a4783f97c8fac4d87a55f9660370ebae19938867758e7b1aea0b4f9d683`，不是价格、概率或奖励变化。
+
+独立只读 Git/全输出审核通过后，严格核18项目标的原/新字节，只导入4项真实变化：game manifest、catalogJS、lookupLua 以及 content 同一 JS；其余13代 registry/history 原件不写入。计划 SHA256 `f25b1ec20635cef06d4ad571374a15416c7b9d6b419a8a6f78c9202fec7af6ca`，导入回执 `output/complete_delivery_release_20261108_v02/catalog22_import_receipt01.json` SHA256 `76c35c254e7846cb50f3d3c5a25ad4d728547e2fdb91d7f5422b58379526ff42`。后续编译/保护必须绑定这次导入后的真实 source22；不得把7f生产来源重标为后续提交。
