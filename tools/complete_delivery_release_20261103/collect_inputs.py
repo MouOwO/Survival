@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools"))
 import release_pending_inventory as pending
 import release_compile_scope as compiler
-from complete_delivery_release_20261103 import build_release as build, ledger
+from complete_delivery_release_20261103 import build_release as build, ledger, localization_projection
 
 TOOL = "tools/complete_delivery_release_20261103/collect_inputs.py"
 LOADED_SHA = hashlib.sha256(Path(__file__).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
@@ -31,7 +31,7 @@ def loaded_dependencies():
     result = {}
     for module, field in ((pending, "EXECUTED_SOURCE_LF_SHA256"), (compiler, "EXECUTED_TOOL_LF_SHA256"),
                           (compiler.inventory, "EXECUTED_SOURCE_LF_SHA256"), (build, "EXECUTED_SOURCE_LF_SHA256"),
-                          (ledger, "EXECUTED_SOURCE_LF_SHA256")):
+                          (ledger, "EXECUTED_SOURCE_LF_SHA256"), (localization_projection, "EXECUTED_SOURCE_LF_SHA256")):
         path = build._plain(module.__file__, directory=False)
         ledger.need(path.is_relative_to(ROOT), "collector_dependency_outside_operator_tree")
         raw = path.read_bytes(); actual = ledger.sha(raw.replace(b"\r\n", b"\n"))
@@ -169,6 +169,8 @@ def assemble(*, pins, parent_raw, parent_sha256, base_inventory, facts, targets,
                           "original_evidence": deepcopy(target.get("evidence", [])),
                           "original_receipts": [{"kind": v["kind"], "original_receipt_sha256": v["sha256"],
                               "original_source_revisions": v["source_revisions"]} for v in target.get("evidence", []) if "sha256" in v]}
+        if kind == "localization_projection":
+            bindings[name]["localization_projection"] = deepcopy(target["localization_projection"])
         artifacts[name] = raw
         own = "game:" + name
         # Include true output rebuilds even when the source OID never changed.
@@ -187,7 +189,9 @@ def assemble(*, pins, parent_raw, parent_sha256, base_inventory, facts, targets,
                                            "source_oid_unchanged_does_not_imply_published_output": True}
     normalized = {"kind": "COMPLETE_RUNTIME_BINDING_RECEIPT", "source_revisions": pins.copy(),
                   "bindings": {name: {"kind": row["kind"], "inputs": {v["source_id"]: v["sha256"] for v in row["inputs"]}, "output": row["output"],
-                      "original_receipts": row["original_receipts"]} for name, row in bindings.items() if row["kind"] != "identity"},
+                      "original_receipts": row["original_receipts"],
+                      **({"localization_projection": row["localization_projection"]} if row["kind"] == "localization_projection" else {})}
+                      for name, row in bindings.items() if row["kind"] != "identity"},
                   "original_receipts": list(originals), "declaration_is_not_package_authority": True}
     raw = ledger.canonical(normalized); receipts = {ledger.sha(raw): raw}
     for row in bindings.values():
@@ -263,6 +267,14 @@ def _identity_target(ctx, targets, name):
         sources.append(mirror)
     _target(ctx, targets, name, "identity", raw, sources,
             {"kind": "EXACT_CURRENT_IMMUTABLE_GIT_BYTES", "source_revision": ctx.pins["game"]})
+
+
+def _localization_target(ctx, targets, name):
+    game, content = "game:" + name, "content:" + name
+    proof = localization_projection.verify_projection(name, ctx.content(content), ctx.content(game))
+    _target(ctx, targets, name, "localization_projection", ctx.content(game), [game, content],
+            {"kind": localization_projection.KIND, "proof_sha256": ledger.sha(ledger.canonical(proof))})
+    targets[name]["localization_projection"] = proof
 
 
 def load_compiler(ctx, spec, targets, originals):
@@ -449,6 +461,11 @@ def collect(request):
         load_production(ctx, request["production"], targets, originals)
         load_item_generator(ctx, request["item_generator"], targets, originals)
         load_catalog(ctx, request["catalog"], targets, originals)
+        for row in base["rows"]:
+            source = row["source"]
+            if (source["repo"] == "content" and source["path"] in localization_projection.PATHS
+                    and source.get("head_oid") is not None and row["status"] != "PARENT_BYTES_MATCH"):
+                _localization_target(ctx, targets, source["path"])
         for row in base["rows"]:
             source = row["source"]; key = source["repo"] + ":" + source["path"]
             if source.get("head_oid") is not None: ctx.get(key)

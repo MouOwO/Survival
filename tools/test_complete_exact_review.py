@@ -40,6 +40,45 @@ class ExactReviewTests(unittest.TestCase):
     def test_same_prefix_extra_node_is_not_ignored(self):
         raw,manifest,history=chain();history['data/ui/registry_history/not-declared.json']=b'{}'
         with self.assertRaisesRegex(ValueError,'history_exact'):m.validate_lineage(raw,manifest,history)
+    def test_new_generated_history_node_is_exact_current_output_only(self):
+        raw,manifest,history=chain();current='data/ui/registry_history/'+m.sha(raw)+'.json'
+        manifest['source_hashes'].pop(current)
+        checks=m.validate_lineage(raw,manifest,history)
+        self.assertTrue(checks['current_history_is_generated_output'])
+        self.assertEqual(checks['declared_input_history_nodes'],1)
+        self.assertEqual(checks['nodes_parsed'],2)
+        for change in ('missing_current','extra_node','wrong_current_bytes','missing_parent'):
+            with self.subTest(change=change):
+                bad=dict(history)
+                if change=='missing_current':bad.pop(current)
+                elif change=='extra_node':bad['data/ui/registry_history/'+'0'*64+'.json']=b'{}'
+                elif change=='wrong_current_bytes':bad[current]+=b' '
+                else:bad.pop(next(p for p in bad if p!=current))
+                with self.assertRaises(ValueError):m.validate_lineage(raw,manifest,bad)
+    def test_twelve_node_input_compatibility_and_thirteenth_output_gap_rejection(self):
+        raw,manifest,history=chain();node=json.loads(raw)
+        for generation in range(3,14):
+            node=copy.deepcopy(node);node.update(generation=generation,parent_sha256=m.sha(raw))
+            raw=m.canonical(node);history['data/ui/registry_history/'+m.sha(raw)+'.json']=raw
+        current='data/ui/registry_history/'+m.sha(raw)+'.json'
+        prior={p:v for p,v in history.items() if p!=current}
+        old_raw=history['data/ui/registry_history/'+node['parent_sha256']+'.json']
+        old_manifest={'registry_sha256':m.sha(old_raw),'source_hashes':{p:m.sha(v)for p,v in prior.items()}}
+        old=m.validate_lineage(old_raw,old_manifest,prior)
+        self.assertEqual(old['nodes_parsed'],12)
+        self.assertFalse(old['current_history_is_generated_output'])
+        new_manifest={'registry_sha256':m.sha(raw),'source_hashes':old_manifest['source_hashes']}
+        self.assertEqual(m.validate_lineage(raw,new_manifest,history)['nodes_parsed'],13)
+        for change in ('generation_gap','skip_parent','missing_parent'):
+            with self.subTest(change=change):
+                bad_node=copy.deepcopy(node)
+                if change=='generation_gap':bad_node['generation']=14
+                elif change=='skip_parent':bad_node['parent_sha256']=json.loads(old_raw)['parent_sha256']
+                else:bad_node['parent_sha256']='0'*64
+                bad_raw=m.canonical(bad_node);bad_hist=dict(prior)
+                bad_hist['data/ui/registry_history/'+m.sha(bad_raw)+'.json']=bad_raw
+                bad_manifest=dict(new_manifest,registry_sha256=m.sha(bad_raw))
+                with self.assertRaises(ValueError):m.validate_lineage(bad_raw,bad_manifest,bad_hist)
     def test_sha_named_history_content_cannot_be_relabelled(self):
         raw,manifest,history=chain();name=next(iter(history));history[name]+=b' '
         with self.assertRaisesRegex(ValueError,'filename_or_manifest_sha'):m.validate_lineage(raw,manifest,history)
@@ -109,6 +148,26 @@ class CsvBuildInputReviewTests(unittest.TestCase):
         cls.blobs = {path: blob(path) for path in [m.CSV_GENERATOR,*m.CSV_OUTPUTS,*m.CSV_OUTPUTS.values()]}
         cls.blobs['operator:'+m.CSV_GENERATOR] = cls.blobs[m.CSV_GENERATOR]
         cls.pins = {'game':cls.revision,'content':'b'*40,'operator':cls.revision}
+
+    def test_actual_catalog_output_chain_and_input_registry_relation(self):
+        manifest=json.loads(self.blob(m.MANIFEST))
+        paths={m.MANIFEST,m.REGISTRY,m.ATLAS,m.JS,m.LUA,
+               *(p for p in manifest['source_hashes']if p.startswith('data/ui/registry_history/')),
+               'data/ui/registry_history/'+manifest['registry_sha256']+'.json'}
+        blobs={p:self.blob(p)for p in paths};blobs['content:'+m.CONTENT_JS]=blobs[m.JS]
+        registry=json.loads(blobs[m.REGISTRY])
+        checks=m.validate_catalog(blobs)
+        self.assertEqual(checks['nodes_parsed'],registry['generation'])
+        self.assertGreaterEqual(checks['nodes_parsed'],12)
+        # A skipped ancestor or arbitrary SHA cannot stand in for the direct
+        # source registry, even though the complete output chain is still valid.
+        parent=json.loads(blobs['data/ui/registry_history/'+registry['parent_sha256']+'.json'])
+        for wrong in ('0'*64,parent['parent_sha256']):
+            with self.subTest(wrong=wrong):
+                changed=copy.deepcopy(manifest);changed['source_hashes'][m.REGISTRY]=wrong
+                bad=dict(blobs);bad[m.MANIFEST]=m.canonical(changed)
+                with self.assertRaisesRegex(ValueError,'input_registry_not_current_or_direct_parent'):
+                    m.validate_catalog(bad)
 
     def test_real_five_immutable_csvs_reproduce_all_runtime_bytes(self):
         result = m.validate_csv_build_inputs(self.blobs,self.pins)
@@ -199,10 +258,37 @@ class CsvBuildInputReviewTests(unittest.TestCase):
             self.assertEqual(len(scan['runtime_read_blockers']),1)
             self.assertEqual(scan['runtime_read_blockers'][0]['reason'],'RUNTIME_JSON_READ_OR_UNCERTAIN_NAMESPACE')
 
+    def test_reference_scan_matches_whole_filenames_not_generated_siblings(self):
+        candidate='data/csv/挑战与奖励系统/challenge_definitions.csv'
+        source_path='scripts/vscripts/config/generated/other.lua'
+        samples=(
+            ('-- Source: archive_challenge_definitions.csv',False),
+            ('-- Source: building_challenge_definitions.csv',False),
+            ('-- Source: challenge_definitions.csv.backup',False),
+            ('-- Source: challenge_definitions.csv',True),
+            ('-- Source: '+candidate,True),
+            ('local f=io.open("challenge_definitions.csv")',True),
+            ('local f=io.open("'+candidate+'")',True),
+            ('local dir="data/csv/"; require(dir .. file)',True),
+        )
+        for text,blocked in samples:
+            with self.subTest(text=text):
+                class Sources:
+                    pins={'game':'a'*40,'content':'b'*40}
+                    facts={'game:'+source_path:{'git_oid':'1'*40,'sha256':m.sha(text.encode())}}
+                    def grep(self,role,patterns,fixed=True):
+                        if role != 'game':return []
+                        return [source_path] if any(p in text if fixed else m.re.search(p,text) for p in patterns) else []
+                    def get(self,role,path):return text.encode()
+                scan=m.reference_scan(Sources(),{candidate})
+                self.assertEqual(bool(scan['runtime_read_blockers']),blocked)
+                if not blocked:self.assertEqual(scan['references'],{})
+
     def test_full_review_keeps_csv_runtime_targets_and_rejects_unknown_csv(self):
         blobs=dict(self.blobs);manifest=json.loads(self.blob(m.MANIFEST))
         paths={m.ATLAS,m.MANIFEST,m.REGISTRY,*m.EVIDENCE,
                *(p for p in manifest['source_hashes'] if p.startswith('data/ui/registry_history/')),
+               'data/ui/registry_history/'+manifest['registry_sha256']+'.json',
                *m.CSV_OUTPUTS}
         for path in paths|{m.JS,m.LUA}:blobs[path]=self.blob(path)
         blobs['content:'+m.CONTENT_JS]=blobs[m.JS]
@@ -240,5 +326,102 @@ class CsvBuildInputReviewTests(unittest.TestCase):
         value['targets'].pop(required)
         blocked=c.assemble(**value)
         self.assertTrue(any(r['source_id']==new for r in blocked['blockers']))
+
+class LocalizationMappingReviewTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        # Immutable production inputs, not copied values or mocked localization
+        # proof. This also exercises the actual generation-13 catalog lineage.
+        cls.pins={role:m.compiler.run_git(root,'rev-parse','HEAD').decode().strip()
+                  for role,root in (('game',m.ROOT),('content',m.pending.CONTENT))}
+        cls.pins['operator']=cls.pins['game']
+        sources=m.Sources(cls.pins)
+        try:
+            manifest=json.loads(sources.get('game',m.MANIFEST))
+            paths={m.ATLAS,m.MANIFEST,m.REGISTRY,m.LOTTERY_SEED,*m.EVIDENCE,*m.CSV_OUTPUTS,
+                   *(p for p in manifest['source_hashes']if p.startswith('data/ui/registry_history/')),
+                   'data/ui/registry_history/'+manifest['registry_sha256']+'.json'}
+            rows=[]
+            for role,path in [('game',p)for p in sorted(paths)]+[('content',p)for p in sorted(m.localization.PATHS)]:
+                raw=sources.get(role,path);fact=sources.facts[role+':'+path]
+                rows.append({'inventory_status':'UNMAPPED_SOURCE_PENDING',
+                    'source':{'repo':role,'path':path,'head_oid':fact['git_oid']},
+                    'candidate':{'sha256':m.sha(raw)}})
+            with patch.object(sources,'get',wraps=sources.get)as getter:
+                cls.blobs=m.load_review_blobs(sources,rows,cls.pins)
+                cls.get_calls=[tuple(call.args)for call in getter.call_args_list]
+            cls.facts=copy.deepcopy(sources.facts)
+            cls.scope={'observed_commits':{k:cls.pins[k]for k in ('game','content')},'decisions':rows}
+        finally:sources.close()
+
+    def review(self,scope=None,blobs=None,facts=None):
+        return m.make_reviews(scope or self.scope,'a'*64,self.pins,blobs or self.blobs,
+                              facts or self.facts,{'runtime_read_blockers':[],'references':{}},'b'*64)
+
+    def test_real_six_pairs_are_runtime_projections_not_non_runtime_exclusions(self):
+        result=self.review();rows=result['runtime_mapping_reviews']
+        self.assertEqual(len(rows),6)
+        self.assertEqual(result['scope']['actual_unmapped_count'],len(self.scope['decisions']))
+        self.assertEqual(result['scope']['typed_runtime_mapping_count'],6)
+        self.assertEqual(result['scope']['standalone_review_count'],len(result['reviews']))
+        excluded={r['source_id']for r in result['reviews']}
+        for row in rows:
+            path=row['resource'];self.assertNotIn(row['source_id'],excluded)
+            self.assertEqual(row['kind'],'localization_projection')
+            self.assertTrue(row['standalone_runtime_file_required'])
+            self.assertFalse(row['non_runtime_exclusion']);self.assertFalse(row['authority_granted'])
+            self.assertEqual(row['runtime_targets_requiring_separate_generator_or_compiler_binding'],[path])
+            self.assertEqual(row['localization_projection'],m.localization.verify_projection(path,self.blobs['content:'+path],self.blobs[path]))
+            self.assertIn(('content',path),self.get_calls)
+            self.assertIn(('game',path),self.get_calls)
+            self.assertEqual(row['sources']['content:'+path]['source_revision'],self.pins['content'])
+            self.assertEqual(row['sources']['game:'+path]['source_revision'],self.pins['game'])
+        history=[r for r in result['reviews']if r['source_id'].startswith('game:data/ui/registry_history/')]
+        self.assertEqual(len(history),json.loads(self.blobs[m.REGISTRY])['generation'])
+
+    def test_source_swaps_extra_bytes_and_missing_counterpart_block_before_exclusion(self):
+        path='panorama/localization/addon_english.txt'
+        self.assertNotEqual(self.blobs[path],self.blobs['content:'+path])
+        for change in ('source_swap','extra_content_bytes','extra_game_bytes','missing_game'):
+            with self.subTest(change=change):
+                bad=dict(self.blobs)
+                if change=='source_swap':bad['content:'+path]=bad[path]
+                elif change=='extra_content_bytes':bad['content:'+path]+=b'\n'
+                elif change=='extra_game_bytes':bad[path]+=b'\n'
+                else:bad.pop(path)
+                with self.assertRaises((ValueError,KeyError)):self.review(blobs=bad)
+
+    def test_projection_requires_actual_scope_oid_digest_and_dual_revision(self):
+        path=next(iter(sorted(m.localization.PATHS)));key='content:'+path
+        for change in ('scope_oid','scope_sha','content_revision','game_revision','duplicate'):
+            with self.subTest(change=change):
+                scope=copy.deepcopy(self.scope);facts=copy.deepcopy(self.facts)
+                row=next(r for r in scope['decisions']if r['source']['repo']=='content'and r['source']['path']==path)
+                if change=='scope_oid':row['source']['head_oid']='0'*40
+                elif change=='scope_sha':row['candidate']['sha256']='0'*64
+                elif change=='duplicate':scope['decisions'].append(copy.deepcopy(row))
+                else:facts[('content:'if change=='content_revision'else'game:')+path]['source_revision']='0'*40
+                with self.assertRaises(ValueError):self.review(scope=scope,facts=facts)
+
+    def test_unknown_localization_path_and_missing_history_are_not_hidden(self):
+        scope=copy.deepcopy(self.scope)
+        scope['decisions'].append({'inventory_status':'UNMAPPED_SOURCE_PENDING',
+            'source':{'repo':'content','path':'panorama/localization/addon_unreviewed.txt'}})
+        with self.assertRaisesRegex(ValueError,'unmapped_set_not_exact_reviewed_paths'):self.review(scope=scope)
+        blobs=dict(self.blobs);current=json.loads(blobs[m.MANIFEST])['registry_sha256']
+        blobs.pop('data/ui/registry_history/'+current+'.json')
+        with self.assertRaisesRegex(ValueError,'history_exact'):self.review(blobs=blobs)
+
+    def test_runtime_review_alone_cannot_authorize_missing_collector_target(self):
+        from test_complete_collect_inputs import case,c
+        value=case();mapping=self.review()['runtime_mapping_reviews'][0]
+        key=mapping['source_id'];path=mapping['resource']
+        value['base_inventory']['rows'].append({'source':{'repo':'content','path':path,'head_oid':mapping['git_oid']},
+            'resource':path,'status':'UNMAPPED_SOURCE_PENDING','history':[],'blocking':True})
+        value['facts'][key]={'git_oid':mapping['git_oid'],'sha256':mapping['sha256'],'bytes':mapping['bytes']}
+        value['review']['runtime_mapping_reviews']=[mapping]
+        result=c.assemble(**value)
+        self.assertTrue(any(row['source_id']==key for row in result['blockers']))
+
 
 if __name__=='__main__':unittest.main()

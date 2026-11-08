@@ -159,7 +159,7 @@ def arguments(log, route=None):
     # ownership and never imply native acceptance or transaction permission.
     return ["-steam","-novid","-console","-vconsole","-vconport",str(PORT),"-condebug","-con_logfile",str(log),
         "+sv_cheats","0","+survival_archive_http_enabled","1",
-        "+net_showmsg","CUserMsg_CustomGameEvent","+net_restrict_showmsg_socket","client"] + (
+        "+net_showmsg","0"] + (
         ["+dota_launch_custom_game","3824360109","ws4_entry"] if route == "direct" else [])
 
 def fixed_paths():

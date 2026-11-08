@@ -341,8 +341,8 @@ class StaticPlanTests(unittest.TestCase):
                     ("-tools","-addon","+survival_offline_logic_test")))
                 self.assertEqual(arguments[arguments.index("+sv_cheats")+1],"0")
                 self.assertEqual(arguments[arguments.index("+survival_archive_http_enabled")+1],"1")
-                self.assertEqual(arguments[arguments.index("+net_showmsg")+1],"CUserMsg_CustomGameEvent")
-                self.assertEqual(arguments[arguments.index("+net_restrict_showmsg_socket")+1],"client")
+                self.assertEqual(arguments[arguments.index("+net_showmsg")+1],"0")
+                self.assertNotIn("+net_restrict_showmsg_socket", arguments)
                 self.assertEqual(arguments[arguments.index("-con_logfile")+1],str(log))
                 self.assertEqual("+dota_launch_custom_game" in arguments,route=="direct")
     def test_launch_arguments_reject_custom_routes_and_do_not_query_native_state(self):

@@ -12,11 +12,12 @@ import json
 import re
 import struct
 from pathlib import Path, PurePosixPath
+from complete_delivery_release_20261103 import localization_projection
 
 EXECUTED_SOURCE_LF_SHA256 = hashlib.sha256(Path(__file__).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
 
 MAX_DOCUMENT = 32 * 1024 * 1024
-KINDS = frozenset(("identity", "compiled", "generated", "protected", "production_override"))
+KINDS = frozenset(("identity", "compiled", "generated", "protected", "production_override", "localization_projection"))
 RUNTIME_ROOTS = frozenset(("scripts", "panorama", "maps", "materials", "models", "particles", "resource", "sounds", "soundevents", "cfg"))
 REMOVED = frozenset(("RUNTIME_REMOVAL_PENDING", "SOURCE_REMOVED_REQUIRES_RUNTIME_DECISION"))
 STATUSES = REMOVED | frozenset(("PARENT_BYTES_MATCH", "HISTORICAL_REVIEW_REQUIRED_PARENT_BYTES_MATCH", "PENDING_RUNTIME_UPDATE",
@@ -536,6 +537,9 @@ def audit_complete(*, parent_raw, parent_sha256, inventory_raw, inventory_sha256
             need(proof.get("kind") == "COMPLETE_RUNTIME_BINDING_RECEIPT" and proof.get("source_revisions") == pins, "binding_receipt_source_or_schema_mismatch")
             entry = proof.get("bindings", {}).get(name, {})
             need(entry.get("kind") == kind and entry.get("inputs") == inputs and entry.get("output") == output, "typed_binding_receipt_output_or_inputs_mismatch")
+            if kind == "localization_projection":
+                localization_projection.validate_metadata(name, entry.get("localization_projection"), inputs, output,
+                    {key: fingerprint(facts[key]) for key in inputs})
         bindings[name] = {"resource": name, "kind": kind, "inputs": inputs, "output": output,
                           "receipt_sha256": binding.get("receipt_sha256")}
         cases.add(name.casefold())

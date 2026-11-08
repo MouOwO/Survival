@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))
 import release_pending_inventory as pending
 import release_compile_scope as compiler
+from complete_delivery_release_20261103 import localization_projection as localization
 
 TOOL = 'tools/complete_delivery_release_20261103/exact_review.py'
 EXECUTED_SHA = hashlib.sha256(Path(__file__).read_bytes().replace(b'\r\n', b'\n')).hexdigest()
@@ -30,6 +31,7 @@ CONTENT_JS = 'panorama/scripts/custom_game/common/ui_static_catalog.js'
 LUA = 'scripts/vscripts/config/generated/ui_static_catalog_lookup.lua'
 TARGETS = ['panorama/scripts/custom_game/common/ui_static_catalog.vjs_c', LUA]
 CSV_GENERATOR = 'tools/build_configs.py'
+LOCALIZATION_TOOL = 'tools/complete_delivery_release_20261103/localization_projection.py'
 # Reviewed build() call graph for the five contracts below reads only its
 # source adapter and writes only its output adapter; other validators return
 # before I/O for these basenames. Changed generator/new I/O requires re-review.
@@ -114,16 +116,21 @@ def validate_registry(document):
 
 
 def validate_lineage(registry_raw, manifest, histories):
-    """All declared nodes are parsed, SHA-named and in the exact parent chain."""
+    """Declared input nodes plus the exact generated node form one full chain."""
     registry = json.loads(registry_raw); validate_registry(registry)
     current = sha(registry_raw)
     need(manifest.get('registry_sha256') == current, 'registry_manifest_sha_mismatch')
     declared = {p: v for p, v in manifest.get('source_hashes', {}).items() if p.startswith('data/ui/registry_history/')}
-    need(set(declared) == set(histories), 'history_exact_declared_set_required')
+    # A generation-changing build reads its parent registry/history, then emits
+    # the new node. That output cannot appear among its own input read hashes.
+    # Admit exactly that SHA-named node, never another undeclared history file.
+    current_path = 'data/ui/registry_history/'+current+'.json'
+    need(set(declared) | {current_path} == set(histories), 'history_exact_declared_set_required')
     nodes = {}
     for path, raw in histories.items():
         digest = sha(raw)
-        need(path == 'data/ui/registry_history/'+digest+'.json' and declared[path] == digest, 'history_filename_or_manifest_sha_mismatch')
+        expected = declared.get(path, current if path == current_path else None)
+        need(path == 'data/ui/registry_history/'+digest+'.json' and expected == digest, 'history_filename_or_manifest_sha_mismatch')
         node = json.loads(raw); validate_registry(node); nodes[digest] = node
     seen, cursor, child = set(), current, None
     while cursor is not None:
@@ -148,6 +155,7 @@ def validate_lineage(registry_raw, manifest, histories):
     need(nodes[current] == registry, 'current_registry_history_node_differs')
     return {'generation': registry['generation'], 'nodes_parsed': len(seen), 'records': len(registry['records']),
             'fields': len(registry['fields']), 'registry_sha256': current, 'exact_parent_chain': True,
+            'declared_input_history_nodes': len(declared), 'current_history_is_generated_output': current_path not in declared,
             'append_only_identities_verified': True}
 
 
@@ -155,8 +163,12 @@ def validate_catalog(blobs):
     manifest = json.loads(blobs[MANIFEST]); registry = json.loads(blobs[REGISTRY])
     histories = {p: raw for p, raw in blobs.items() if p.startswith('data/ui/registry_history/')}
     checks = validate_lineage(blobs[REGISTRY], manifest, histories)
-    need(checks['generation'] == 12 and checks['nodes_parsed'] == 12, 'review_requires_exact_twelve_history_nodes')
-    for path in (REGISTRY, ATLAS): need(manifest['source_hashes'].get(path) == sha(blobs[path]), 'catalog_input_sha_mismatch:'+path)
+    input_registry = manifest['source_hashes'].get(REGISTRY)
+    need(input_registry in {checks['registry_sha256'], registry.get('parent_sha256')}
+         and isinstance(input_registry, str)
+         and manifest['source_hashes'].get('data/ui/registry_history/'+input_registry+'.json') == input_registry,
+         'catalog_input_registry_not_current_or_direct_parent')
+    need(manifest['source_hashes'].get(ATLAS) == sha(blobs[ATLAS]), 'catalog_input_sha_mismatch:'+ATLAS)
     for path in (JS, LUA, REGISTRY): need(manifest['outputs'].get(path) == sha(blobs[path]), 'catalog_output_sha_mismatch:'+path)
     need(blobs['content:'+CONTENT_JS] == blobs[JS], 'catalog_content_mirror_differs')
     text = blobs[JS].decode('utf8'); start = re.search(r'var data\s*=\s*', text)
@@ -255,11 +267,68 @@ def validate_csv_build_inputs(blobs, pins):
     return checks
 
 
+def load_review_blobs(sources, rows, pins):
+    """Read the declared repository, including both immutable localization inputs."""
+    blobs = {}
+    for row in rows:
+        role, path = row['source']['repo'], row['source']['path']
+        need(role in ('game', 'content'), 'review_source_repository_invalid')
+        key = path if role == 'game' else role+':'+path
+        blobs[key] = sources.get(role, path)
+        if role == 'content' and path in localization.PATHS:
+            blobs[path] = sources.get('game', path)
+    for path in (JS, LUA): blobs[path] = sources.get('game', path)
+    csv_paths = {r['source']['path'] for r in rows if r['source']['repo'] == 'game'} & set(CSV_OUTPUTS)
+    if csv_paths:
+        blobs[CSV_GENERATOR] = sources.get('game', CSV_GENERATOR)
+        blobs['operator:'+CSV_GENERATOR] = compiler.run_git(ROOT, 'show', pins['operator']+':'+CSV_GENERATOR)
+        for path in sorted(csv_paths): blobs[CSV_OUTPUTS[path]] = sources.get('game', CSV_OUTPUTS[path])
+    blobs['content:'+CONTENT_JS] = sources.get('content', CONTENT_JS)
+    return blobs
+
+
+def runtime_mapping_reviews(rows, pins, blobs, facts):
+    """Only a verified typed runtime projection can leave the standalone audit."""
+    result, seen = [], set()
+    for row in rows:
+        source = row['source']; path = source['path']
+        if source.get('repo') != 'content' or path not in localization.PATHS: continue
+        key = 'content:'+path
+        need(key not in seen, 'duplicate_runtime_projection_source')
+        seen.add(key)
+        content, game = blobs[key], blobs[path]
+        proof = localization.verify_projection(path, content, game)
+        inputs = {}
+        for role, raw in (('content', content), ('game', game)):
+            fact = facts[role+':'+path]
+            need(fact.get('source_revision') == pins[role]
+                 and isinstance(fact.get('git_oid'), str) and re.fullmatch('[0-9a-f]{40}', fact['git_oid'])
+                 and fact.get('sha256') == sha(raw) and fact.get('bytes') == len(raw),
+                 'runtime_projection_git_source_fact_mismatch:'+role+':'+path)
+            inputs[role+':'+path] = dict(source_revision=pins[role], **{k:fact[k] for k in ('git_oid','sha256','bytes')})
+        need(facts[key]['git_oid'] == source.get('head_oid')
+             and facts[key]['sha256'] == row['candidate']['sha256'], 'runtime_projection_scope_source_mismatch:'+key)
+        result.append({'source_id':key, 'source_revision':pins['content'],
+                       'git_oid':facts[key]['git_oid'], 'sha256':sha(content), 'bytes':len(content),
+                       'kind':'localization_projection', 'resource':path, 'sources':inputs,
+                       'localization_projection':proof,
+                       'standalone_runtime_file_required':True, 'non_runtime_exclusion':False,
+                       'authority_granted':False, 'scope_action_proposal':'typed_runtime_projection_required',
+                       'runtime_targets_requiring_separate_generator_or_compiler_binding':[path]})
+    return sorted(result, key=lambda row:row['source_id'])
+
+
 def make_reviews(scope, scope_sha256, pins, blobs, facts, scan, scan_sha256):
     need(scope.get('observed_commits') == {k: pins[k] for k in ('game', 'content')}, 'scope_source_revisions_mismatch')
-    rows = [r for r in scope['decisions'] if r['inventory_status'] == 'UNMAPPED_SOURCE_PENDING']
+    all_rows = [r for r in scope['decisions'] if r['inventory_status'] == 'UNMAPPED_SOURCE_PENDING']
+    mappings = runtime_mapping_reviews(all_rows, pins, blobs, facts)
+    mapped = {row['source_id'] for row in mappings}
+    rows = [row for row in all_rows if row['source'].get('repo','')+':'+row['source']['path'] not in mapped]
     paths = {r['source']['path'] for r in rows}
     manifest = json.loads(blobs[MANIFEST]); histories = {p for p in manifest['source_hashes'] if p.startswith('data/ui/registry_history/')}
+    current = manifest.get('registry_sha256')
+    if isinstance(current, str) and re.fullmatch('[a-f0-9]{64}', current):
+        histories.add('data/ui/registry_history/'+current+'.json')
     expected = {ATLAS, MANIFEST, REGISTRY, *EVIDENCE, *histories}
     if LOTTERY_SEED in paths: expected.add(LOTTERY_SEED)
     expected.update(paths & set(CSV_OUTPUTS))
@@ -298,11 +367,11 @@ def make_reviews(scope, scope_sha256, pins, blobs, facts, scan, scan_sha256):
             extra = checks
         elif path == MANIFEST:
             classification = 'EXACT_GENERATOR_SOURCE_OUTPUT_MANIFEST_NOT_RUNTIME_FILE'
-            reason = 'Parsed manifest pins exact current registry, all twelve concrete history nodes, atlas and generated JS/Lua source bytes. It is build provenance rather than a runtime JSON loader; generated targets remain separately required.'
+            reason = 'Parsed manifest pins the exact current output registry, its complete concrete input/output history chain, atlas and generated JS/Lua source bytes. It is build provenance rather than a runtime JSON loader; generated targets remain separately required.'
             targets = TARGETS; extra = checks
         else:
             classification = 'EXACT_APPEND_ONLY_REGISTRY_OR_HISTORY_BUILD_INPUT_NOT_RUNTIME_FILE'
-            reason = 'Parsed and SHA-verified this concrete node in the exact twelve-generation parent chain, including append-only record/field semantics. Verified current generated IDs and schema against the catalogue. No history-directory prefix is ignored; generated targets remain separately required.'
+            reason = 'Parsed and SHA-verified this concrete node in the complete exact parent chain, including append-only record/field semantics. The sole possible new output node is bound to the current registry SHA. Verified current generated IDs and schema against the catalogue. No history-directory prefix is ignored; generated targets remain separately required.'
             targets = TARGETS; extra = {**checks, 'this_node_generation': value['generation']}
         refs = []
         for refkey, source in scan['references'].items():
@@ -314,8 +383,9 @@ def make_reviews(scope, scope_sha256, pins, blobs, facts, scan, scan_sha256):
                         'semantic_or_build_dependency': bool(targets), 'runtime_targets_requiring_separate_generator_or_compiler_binding': targets})
     return {'schema': 1, 'kind': 'IMMUTABLE_DATA_UI_EXACT_PATH_REVIEW_NOT_RELEASE_AUTHORITY', 'source_revisions': pins,
             'inventory_sha256': scope_sha256, 'input_scope_sha256': scope_sha256, 'reference_scan_sha256': scan_sha256,
-            'scope': {'actual_unmapped_count': len(rows), 'exact_paths': sorted(paths), 'directory_prefix_exclusions': False},
-            'reviews': reviews, 'publication_ready': False,
+            'scope': {'actual_unmapped_count': len(all_rows), 'standalone_review_count':len(rows),
+                      'typed_runtime_mapping_count':len(mappings), 'exact_paths': sorted(paths), 'directory_prefix_exclusions': False},
+            'reviews': reviews, 'runtime_mapping_reviews':mappings, 'publication_ready': False,
             'limits': ['Exact-path immutable static audit, not a dynamic runtime file-access trace.',
                        'Direct loader calls and data/ui-dependent dynamic loader sites are checked; arbitrary computed external paths are not proven absent.',
                        'Unknown matched runtime references/read sites block instead of becoming automatic exclusions.',
@@ -355,6 +425,11 @@ class Sources:
 
 def reference_scan(sources, paths):
     patterns = sorted(set(paths) | {Path(p).name for p in paths})
+    # Git grep is a broad index only. A different filename such as
+    # archive_challenge_definitions.csv is not challenge_definitions.csv.
+    # Keep exact standalone mentions blocking, including comments; executable
+    # reads and computed data namespaces are independently checked below.
+    mentions = {p: re.compile(r'(?<![\w.-])(?:'+re.escape(p)+'|'+re.escape(Path(p).name)+r')(?![\w.-])') for p in paths}
     refs, blockers, scan = {}, [], []
     allowed_metadata = {('game', JS), ('game', LUA), ('content', CONTENT_JS)}
     allowed_metadata.update(('game', CSV_OUTPUTS[p]) for p in paths if p in CSV_OUTPUTS)
@@ -364,7 +439,7 @@ def reference_scan(sources, paths):
         runtime_api_sites = 0
         for path in sorted(matched | {p for p in api if runtime_path(role, p)}):
             raw = sources.get(role, path); text = raw.decode('utf-8-sig'); key = role+':'+path
-            hits = {candidate: [n for n, line in enumerate(text.split('\n'), 1) if candidate in line or Path(candidate).name in line] for candidate in paths}
+            hits = {candidate: [n for n, line in enumerate(text.split('\n'), 1) if mentions[candidate].search(line)] for candidate in paths}
             hits = {p: lines for p, lines in hits.items() if lines}
             sites = read_sites(text, paths, 'lua' if path.endswith('.lua') else 'js') if runtime_path(role, path) else []
             runtime_api_sites += len(sites)
@@ -397,10 +472,11 @@ def main():
     scope = json.loads(scope_raw); sources = Sources(pins)
     try:
         operator = {}
-        for path in (TOOL, 'tools/release_pending_inventory.py', 'tools/release_compile_scope.py'):
+        for path in (TOOL, 'tools/release_pending_inventory.py', 'tools/release_compile_scope.py', LOCALIZATION_TOOL):
             actual = (ROOT/path).read_bytes().replace(b'\r\n', b'\n')
             loaded = {TOOL: EXECUTED_SHA, 'tools/release_pending_inventory.py': pending.EXECUTED_SOURCE_LF_SHA256,
-                      'tools/release_compile_scope.py': compiler.EXECUTED_TOOL_LF_SHA256}[path]
+                      'tools/release_compile_scope.py': compiler.EXECUTED_TOOL_LF_SHA256,
+                      LOCALIZATION_TOOL: localization.EXECUTED_SOURCE_LF_SHA256}[path]
             need(sha(actual) == loaded, 'review_tool_or_dependency_changed_after_import')
             try: declared = compiler.run_git(ROOT, 'show', pins['operator']+':'+path).replace(b'\r\n', b'\n')
             except ValueError: declared = None
@@ -408,15 +484,12 @@ def main():
         committed = all(v['matches_operator_commit'] for v in operator.values())
         need(committed or args.diagnostic_uncommitted_tool, 'review_tool_not_in_exact_operator_commit')
         rows = [r for r in scope['decisions'] if r['inventory_status'] == 'UNMAPPED_SOURCE_PENDING']
-        paths = {r['source']['path'] for r in rows}; blobs = {path: sources.get('game', path) for path in sorted(paths)}
-        for path in (JS, LUA): blobs[path] = sources.get('game', path)
-        csv_paths = paths & set(CSV_OUTPUTS)
-        if csv_paths:
-            blobs[CSV_GENERATOR] = sources.get('game', CSV_GENERATOR)
-            blobs['operator:'+CSV_GENERATOR] = compiler.run_git(ROOT, 'show', pins['operator']+':'+CSV_GENERATOR)
-            for path in sorted(csv_paths): blobs[CSV_OUTPUTS[path]] = sources.get('game', CSV_OUTPUTS[path])
-        blobs['content:'+CONTENT_JS] = sources.get('content', CONTENT_JS)
+        blobs = load_review_blobs(sources, rows, pins)
+        mappings = runtime_mapping_reviews(rows, pins, blobs, sources.facts)
+        mapped = {row['source_id'] for row in mappings}
+        paths = {r['source']['path'] for r in rows if r['source']['repo']+':'+r['source']['path'] not in mapped}
         scan = reference_scan(sources, paths); scan['operator_binding'] = {'revision': pins['operator'], 'tools': operator, 'committed': committed}
+        scan['typed_runtime_mapping_source_ids'] = sorted(mapped)
         scan_raw = canonical(scan)
         review = make_reviews(scope, sha(scope_raw), pins, blobs, sources.facts, scan, sha(scan_raw))
         review['operator_binding'] = scan['operator_binding']; review['diagnostic_only_uncommitted_tool'] = not committed

@@ -23,7 +23,7 @@ import cryptography
 TOOLS = Path(__file__).resolve().parents[1]
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
-from complete_delivery_release_20261103 import build_release, ledger, production
+from complete_delivery_release_20261103 import build_release, ledger, production, localization_projection
 import release_pending_inventory as pending
 
 ROOT = TOOLS.parent
@@ -66,6 +66,7 @@ def _lf(raw):
 def _loaded_paths():
     return sorted({TOOL, "tools/complete_delivery_release_20261103/build_release.py",
                    "tools/complete_delivery_release_20261103/ledger.py",
+                   "tools/complete_delivery_release_20261103/localization_projection.py",
                    "tools/complete_delivery_release_20261103/production.py",
                    "tools/release_pending_inventory.py", "tools/build_runtime_release.py",
                    "tools/protect_runtime_lua.py", "tools/arcade_cleanup_20261027/incremental_vpk.py",
@@ -83,6 +84,7 @@ for _name, _loaded in FRESH_EXECUTED_LF_SHA256.items():
 for _name, _module in (("tools/complete_delivery_release_20261103/production.py", production),
                        ("tools/complete_delivery_release_20261103/build_release.py", build_release),
                        ("tools/complete_delivery_release_20261103/ledger.py", ledger),
+                       ("tools/complete_delivery_release_20261103/localization_projection.py", localization_projection),
                        ("tools/release_pending_inventory.py", pending),
                        ("tools/protect_runtime_lua.py", production.protection),
                        ("tools/build_runtime_release.py", pack.runtime)):
@@ -514,6 +516,29 @@ def _producer_target_readset_binding(label, kwargs, pins, source_raw):
             "git_revisions_relabelled": False, "producer_outputs_recreated": False}
 
 
+def _verify_localization_projection(binding, *, pins, source_raw, binding_receipts):
+    """Recompute the exact dual-source projection; a collector claim is insufficient."""
+    name = binding["resource"]
+    need(name in localization_projection.PATHS and binding.get("kind") == "localization_projection",
+         "unreviewed_localization_projection_binding")
+    keys = {"game:" + name, "content:" + name}
+    need(isinstance(source_raw, dict) and keys <= set(source_raw)
+         and isinstance(binding_receipts, dict), "localization_actual_sources_and_receipt_required")
+    actual = localization_projection.verify_projection(name, source_raw["content:" + name], source_raw["game:" + name])
+    pin = ledger.digest(binding.get("receipt_sha256"))
+    need(pin in binding_receipts, "localization_original_binding_receipt_missing")
+    receipt = ledger.document(binding_receipts[pin], pin)
+    need(receipt.get("kind") == "COMPLETE_RUNTIME_BINDING_RECEIPT" and receipt.get("source_revisions") == pins,
+         "localization_binding_receipt_identity_changed")
+    entry = receipt.get("bindings", {}).get(name, {})
+    inputs = {key: ledger.sha(source_raw[key]) for key in keys}
+    output = ledger.byte_fingerprint(source_raw["game:" + name])
+    need(entry.get("kind") == "localization_projection" and entry.get("inputs") == inputs
+         and binding.get("inputs") == inputs and entry.get("output") == binding.get("output") == output
+         and entry.get("localization_projection") == actual, "localization_proof_not_exact_actual_source_projection")
+    return actual
+
+
 def verify_original_evidence(evidence, pins, manifest, bindings, *, parent_raw=None, parent_sha256=None,
                              parent_root=None, source_raw=None, binding_receipts=None):
     """Consume original compiler/protection/generator receipts and real bytes."""
@@ -567,8 +592,14 @@ def verify_original_evidence(evidence, pins, manifest, bindings, *, parent_raw=N
              "compiled_output_not_committed_target_git_resource:" + name)
         target_compiled[name] = {"target_commit": pins["game"], "output": output}
     signed_parent = None; rebinds = {}
+    localized = {}
     for binding in bindings:
         name, kind = binding["resource"], binding["kind"]
+        if kind == "localization_projection":
+            localized[name] = _verify_localization_projection(binding, pins=pins, source_raw=source_raw,
+                binding_receipts=binding_receipts)
+            need(rows.get(name) == localized[name]["output"], "localization_output_missing_from_complete_manifest")
+            continue
         if kind == "compiled" and name not in compiled:
             if signed_parent is None:
                 signed_parent = _signed_rebind_parent(parent_raw, parent_sha256, parent_root)
@@ -590,6 +621,8 @@ def verify_original_evidence(evidence, pins, manifest, bindings, *, parent_raw=N
         answers["producer_target_bindings"] = producer_target_bindings
     if target_compiled:
         answers["target_git_compiled_outputs"] = target_compiled
+    if localized:
+        answers["localization_projection"] = localized
     return answers
 
 
