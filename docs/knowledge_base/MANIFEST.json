@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "snapshot_date": "2026-11-07",
+  "snapshot_date": "2026-11-08",
   "scope": "Curated project knowledge and historical snapshot; raw chat excluded",
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 42540,
-      "sha256": "1752e06ab9bb03df0e96fa947da9e451fce1f3b1a06377a3122b7b6c93edc3ef"
+      "bytes": 43328,
+      "sha256": "a2ecfab092712419756232d8283ff5c709b877e73e40aa967f518f6a4ccee2bf"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 56184,
-      "sha256": "e3224cda77d4369a2e2e9851aefa5bd1d18161fc6e8e04ff2e87f79088855cc2"
+      "bytes": 56972,
+      "sha256": "f78c86f7a3d399fc5de29cb0af698888073d18dbfa9b1a03745dade8e3892b16"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 29920,
-      "sha256": "0e81581bfe8e47ced7e7f7bd7c98602333e41b992b4ce1fdf496397474526c3c"
+      "bytes": 30708,
+      "sha256": "1e180a4dce40b04b497a6a3a9463c1503bdf8f6de6a6fd8f62f4b9b975797082"
     },
     {
       "path": "data/completed_work_index.json",
@@ -447,6 +447,11 @@
       "path": "evidence/onboarding_removed_20261030.md",
       "bytes": 3562,
       "sha256": "abbe3e6910e7cebc3322bcdcc7db0a44018e9cf1901cd3d43b8d16425dd8d97f"
+    },
+    {
+      "path": "evidence/online0705_and_local_tools_20261108.md",
+      "bytes": 8827,
+      "sha256": "27dd8f95eee722cc7c2bdc13af27fa95f106e1d5ede2944c43e35138543a441a"
     },
     {
       "path": "evidence/portrait_resolution_guard_20261102.md",
