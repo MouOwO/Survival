@@ -1,6 +1,6 @@
 # 0802｜资源不足、训练失败与商店售罄 tip（2026-11-08）
 
-仅本地更新，功能源码及回归已收口，0802 的实际目录生成、官方编译、生产转换、签名与新原生视觉仍待后续回执。后台保持 `20261106-ws4-daily-refs-ed532ea60d2b`，正式游廊仍 `3824360109` / `2026110104`，Steam manifest `7025356658517360342`。0801 签包、绑定和真实回执保留，不把源码或测试称为游廊同步。
+仅本地更新，功能源码、回归、目录生成、官方编译、生产转换与0802完整签包已完成；新的游戏内视觉、联机、FPS与正式发布仍待。后台保持 `20261106-ws4-daily-refs-ed532ea60d2b`，正式游廊仍 `3824360109` / `2026110104`，Steam manifest `7025356658517360342`。0801 签包、绑定和真实回执保留，不把源码或测试称为游廊同步。
 
 用户要求：农场 W 和其他技能、训练在木材/金币不足时均提示；购买英雄物品失败或售罄用 tip，不在商店底部留下失败文字。资源、价格、库存、训练接受条件、扣款/退款和奖励规则不变。本轮没有后台部署、游戏操作、自动购买或抽奖。
 
@@ -55,3 +55,17 @@
 实际 registry 保持13，完整字节及所有历史节点未变，SHA256 `fbc489aef4f7ea16da4c121f907d68fbdab114eac6b21e569869271d89ea1fce`。7941 records/188 fields/全部 enum ID 完全相同；definitions 逐值相同，auxiliary 只有6个已核实的来源 revision 字段改变，其他业务结构和值不变。来源/readset 与这些 revision 更新使 schema SHA256 成为 `cfd97a4783f97c8fac4d87a55f9660370ebae19938867758e7b1aea0b4f9d683`，不是价格、概率或奖励变化。
 
 独立只读 Git/全输出审核通过后，严格核18项目标的原/新字节，只导入4项真实变化：game manifest、catalogJS、lookupLua 以及 content 同一 JS；其余13代 registry/history 原件不写入。计划 SHA256 `f25b1ec20635cef06d4ad571374a15416c7b9d6b419a8a6f78c9202fec7af6ca`，导入回执 `output/complete_delivery_release_20261108_v02/catalog22_import_receipt01.json` SHA256 `76c35c254e7846cb50f3d3c5a25ad4d728547e2fdb91d7f5422b58379526ff42`。后续编译/保护必须绑定这次导入后的真实 source22；不得把7f生产来源重标为后续提交。
+
+## gen22 完整构建与0802签包
+
+catalog22 精确导入后，真实 source22 为 game/operator `5159ba40dc1f31657f51a326d0dea47b506f2802`、content `c5baf452920276ff41051bbb8ede4970c62ff12d`。实际170项官方编译、796输入及最终产物重哈希通过；临时挂载已移除，宣传封面继续最后执行。生产22实际853份输入、186保护产物与7覆盖的全字节、工具/二进制/依赖、业务值、随机数和语法核验通过。本轮4份Lua按原策略均为plain identity，不冒称受保护模块。
+
+独立核每份真实产物、作者Git字节与旧目标后，严格导入170项官方编译产物；提交并推送的最终运行与operator来源为 game `c94fb6b9de8e35723bf62ff72692394d0a6c44f9` / `dev`，content `c5baf452920276ff41051bbb8ede4970c62ff12d` / `master`。catalog原7f9/385a、编译与生产原5159/c5ba标签保留，不重标为最终提交。
+
+完整collector相对真实正式0104核657项待发来源，全部覆盖，包含242项历史未发布来源，unknown/deferred均0；7050资源，3,811,256,522字节，140新增、439变化、7删除。删除的旧onboarding资源在最终集合确实缺失。无未编译或未知运行转换；本轮和历史改动未按固定小名单漏发。
+
+Root实际执行统一 `tools/release_pipeline.py` 的plan→prepare→build，三阶段均exit0；签名前原正式父包验签与完整收集门禁通过。新目录为树外 `D:/Survival_工坊输出/2026110802_network50_complete_v01` 及对应候选overlay/trusted/view，旧0801与原0104保持。实际签名报告 `output/complete_delivery_release_20261108_v02/package.json` SHA256 `7a31b950cc4c20624438e9e877087ea69acd0bbc14358b9df5b69f3fb82ec739`，状态 `BUILT_SIGNED_COMPLETE_CANDIDATE_PENDING_NATIVE_ADMISSION`；signed manifest `5ac731fed88c98c0e0e06e50150a6f180daefda652d389785060ee13b7aebb94`，content `d6b98da375f7ecacbc1e3d446d56441f42dde4b3d8392195dc779ecc120fd612`。VPK v2、4数据分卷及索引，7050资源的CRC/MD5/双摘要和全包验证通过。
+
+独立全包审查已实际PASS，34.934秒；5文件集合精确、4分卷连续且无旧包，7050资源逐字节CRC32/MD5/SHA256重核通过，全部170编译及本轮4Lua/5JS真实payload与不可变作者一致，7删除均不在包内。回执为树外 `D:/Survival_本地工具/runs/20261108_release_audit/0802/signed0802_full_audit01.json`，SHA256 `af2251bc332986deaabc4db95e52cdb92f63caded9066db626c76029dc1c657c`。同一CMD调用链的实际PowerShell CheckOnly结果以 `D:/Survival_本地工具/runs/20261108_online0802/launcher_check01.receipt.json` 为准。文档提交先于0802绑定切换；入口只在独立签包核验通过后选中新候选。CheckOnly不启动游戏、安装或消费。
+
+本轮SDK调用0、后台更改0、自动购买/抽奖0，新0802尚未游戏内验收。待发任务仍保留：农场W/训练/商店真实失败tip与重复点击视觉、原生/多人/FPS及累计演出准入、原游廊SDK成功回执、官方完整下载逐文件核验。缺新版本原生准入，不能上传或称为“已同步游廊”；正式仍0104/manifest `7025356658517360342`。两仓源码和编译已push，原5项无关工作区文件保持原rawSHA且未加入提交。
