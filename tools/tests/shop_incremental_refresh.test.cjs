@@ -303,7 +303,7 @@ test('wallet-only full and delta snapshots update the resource text without rebu
     assert.equal(h.cfg.SurvivalShopTooltip.Inspect().purchaseEnabled, false, 'server affordability changes reach the open tooltip');
     const before = purchaseRequests(h).length; h.cfg.SurvivalShop.PurchaseEntry('sword');
     assert.equal(purchaseRequests(h).length, before);
-    assert.match(h.nodes.get('ShopStatus').text, /金币不足/);
+    assert.equal(h.nodes.get('ShopStatus').text, ''); assert(!h.nodes.get('ShopStatus').BHasClass('error'));
 });
 
 test('stock and repeat-purchase availability update existing cards in full and delta snapshots', () => {
@@ -392,7 +392,7 @@ test('prerequisites, research queue routing and purchase rejection remain live',
     assert.equal(purchaseRequests(h).at(-1).payload.source_entindex, 123);
     h.cfg.SurvivalShop.PurchaseEntry('attack'); assert.equal(purchaseRequests(h).length, 1, 'duplicate in-flight research stays blocked');
     h.emit('ui_operation_result', {operation: 'shop_purchase', success: 0, error: '队列已满'});
-    assert.match(h.nodes.get('ShopStatus').text, /队列已满/); assert(h.nodes.get('ShopStatus').BHasClass('error'));
+    assert.equal(h.nodes.get('ShopStatus').text, ''); assert(!h.nodes.get('ShopStatus').BHasClass('error'));
     h.cfg.SurvivalShop.PurchaseEntry('attack'); assert.equal(purchaseRequests(h).length, 2, 'a rejection releases the pending guard immediately');
     h.emit('ui_operation_result', {operation: 'shop_purchase', success: 1});
     h.cfg.SurvivalShop.OpenResearch(456);

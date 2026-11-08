@@ -635,6 +635,22 @@ local function register_shop_purchase_request()
             request_id = payload.request_id,
             source_entindex = tonumber(payload.source_entindex),
         })
+        -- Local preflight and stock rejections do not notify in the service;
+        -- spend/research failures already do. Keep one server-owned tip, with
+        -- an internal flag only: neither request nor receipt gains a field.
+        if not (result and result.ok) and not (result and result.error_notified == true) then
+            local message = result and (result.error or result.error_code) or "购买失败"
+            if message == "shop_stock_empty" or message == "stock_empty" then
+                message = "该商品已售罄"
+            elseif message == "purchase_limit_reached" then
+                message = "已达到购买上限"
+            end
+            event_bus.emit(events.UI_NOTIFICATION, {
+                player_id = player_id, audience = "player",
+                message = message, level = "error",
+            })
+            if result then result.error_notified = true end
+        end
         local encounter_started = result and result.ok
             and result.grant_result
             and tostring(result.grant_result.encounter_id or "") ~= ""
@@ -1473,6 +1489,8 @@ local resource_failure_messages = {
     insufficient_wood = "木材不足",
     insufficient_gold = "金币不足",
     insufficient_population = "人口不足",
+    inventory_full = "背包已满",
+    shop_entry_invalid = "商品信息已更新，请重新打开商店",
     population_limit = "人口不足",
     population_limit_reached = "人口不足",
     training_queue_full = "训练队列已满",

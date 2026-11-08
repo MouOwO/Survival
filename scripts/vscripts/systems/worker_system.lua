@@ -828,7 +828,15 @@ local function train_worker_one(payload)
             population = 0,
             reason = "train:" .. training_id,
         })
-        if not spend or not spend.ok then return spend end
+        if not spend or not spend.ok then
+            -- The farm's native W has no production-panel receipt consumer.
+            -- Report this rejected click just like ordinary worker training;
+            -- neither population progression nor resources change on failure.
+            if payload.source ~= "main_city_training_ui" then
+                notify(city_state.player_id, spend and spend.error or "resource_error", "error")
+            end
+            return spend
+        end
         local completed_state = record_population_training_success(team, training_id)
         event_bus.request(events.RESOURCE_ADD_REQUEST, {
             player_id = city_state.player_id,
@@ -897,7 +905,11 @@ local function train_worker_one(payload)
         reason = "train:" .. training_id,
     })
     if not spend or not spend.ok then
-        notify(city_state.player_id, spend and spend.error or "resource_error", "error")
+        -- The authenticated production endpoint owns its failure notice.
+        -- Direct native casts and other sources keep their existing notice.
+        if payload.source ~= "main_city_training_ui" then
+            notify(city_state.player_id, spend and spend.error or "resource_error", "error")
+        end
         return spend
     end
 

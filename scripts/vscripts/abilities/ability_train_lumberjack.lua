@@ -16,7 +16,16 @@ function M:OnSpellStart()
         training_id = "train_lumberjack_auto",
         source_ability = self,
     })
-    if not result or not result.ok then self:EndCooldown() end
+    if not result or not result.ok then
+        self:EndCooldown()
+        -- Native casts do not receive the production UI's failure receipt.
+        -- Queue admission itself stays silent, including automatic retries.
+        event_bus.emit(events.UI_NOTIFICATION, {
+            player_id = self:GetCaster():GetPlayerOwnerID(),
+            message = result and result.error or "resource_error",
+            level = "error",
+        })
+    end
 end
 
 _G.ability_train_lumberjack = M

@@ -1162,7 +1162,8 @@ local function purchase(payload)
             local failure = started and started.error_code
                 or "resource_commit_failed"
             if not silent_notification then notify(player_id, failure, "error") end
-            return { ok = false, error = failure, research_result = started }
+            return { ok = false, error = failure, research_result = started,
+                error_notified = not silent_notification }
         end
         lane.sequence = lane.sequence + 1
         local research_sequence = lane.sequence
@@ -1290,14 +1291,16 @@ local function purchase(payload)
         }
     )
     if not spend or not spend.ok then
+        local failure = spend or { ok = false, error = "resource_error" }
         if not silent_notification then
             notify(
                 player_id,
                 spend and spend.error or "购买失败",
                 "error"
             )
+            failure.error_notified = true
         end
-        return spend or { ok = false, error = "resource_error" }
+        return failure
     end
     local granted = grant_service.grant(
         player_id,
@@ -1307,14 +1310,16 @@ local function purchase(payload)
     )
     if not granted or not granted.ok then
         grant_service.refund(player_id, team, entry)
+        local failure = granted or { ok = false, error = "grant_failed" }
         if not silent_notification then
             notify(
                 player_id,
                 granted and granted.error or "发放失败",
                 "error"
             )
+            failure.error_notified = true
         end
-        return granted or { ok = false, error = "grant_failed" }
+        return failure
     end
     state.purchased_count[player_id] =
         state.purchased_count[player_id] or {}

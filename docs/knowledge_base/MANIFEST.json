@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 43978,
-      "sha256": "db7c92621c62837ef29e00556eb807ab71dfb17a0b62cc9f6eb6b10f71d6b494"
+      "bytes": 44539,
+      "sha256": "c26b577768c0fc4ee35d8e25e4889d29e025d66a3a6c7d4428b64ba41d392fb1"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 57622,
-      "sha256": "345be9c5e1e4b5bed3a34f346ff8192ee663e8d81666c5f0a9a737598f00ead3"
+      "bytes": 58183,
+      "sha256": "b50a91d8f020e369b5266ec6a6a59ed8c57ef43507ebb499fa28ba824c176ee4"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 31358,
-      "sha256": "f6b425a737bb9764877add586e18c52da42e4f647e37d9d4aa9182e2715256e1"
+      "bytes": 31919,
+      "sha256": "cc684c446e8ec9156f211d5c32511a5f4d5fef2afd772c18643861228094b2f6"
     },
     {
       "path": "data/completed_work_index.json",
@@ -482,6 +482,11 @@
       "path": "evidence/redemption_codes_20261029.md",
       "bytes": 4332,
       "sha256": "9b6f75a1a18649b17277d47f7f32296ad3b774fc19711de3034f12184b301138"
+    },
+    {
+      "path": "evidence/resource_action_tips0802_20261108.md",
+      "bytes": 6930,
+      "sha256": "fe54af4db587a0559a1ff56ab8938d158b6a446c215536cc51c3a4f7759b095d"
     },
     {
       "path": "evidence/rich_rebirth_balance_20261028.md",
