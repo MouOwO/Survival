@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 43980,
-      "sha256": "a4d3516987cd0ed938e586a462f33058dfa86520415f6e2e2d378161ada3c01d"
+      "bytes": 43978,
+      "sha256": "db7c92621c62837ef29e00556eb807ab71dfb17a0b62cc9f6eb6b10f71d6b494"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 57624,
-      "sha256": "e4834f0dcd37f65934ebe86621f4bfdd42277ad7d87763e4735b88bd7aeec238"
+      "bytes": 57622,
+      "sha256": "345be9c5e1e4b5bed3a34f346ff8192ee663e8d81666c5f0a9a737598f00ead3"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 31360,
-      "sha256": "e28d0a5b167575a61464ba1adcd0544f4878cb07eb3bfe863a9edb68d9303114"
+      "bytes": 31358,
+      "sha256": "f6b425a737bb9764877add586e18c52da42e4f647e37d9d4aa9182e2715256e1"
     },
     {
       "path": "data/completed_work_index.json",
@@ -640,8 +640,8 @@
     },
     {
       "path": "evidence/tooltip_skill_cover0801_20261108.md",
-      "bytes": 9888,
-      "sha256": "e1aecd32d67ccdec5d38a9a6ae28f89d35e4b824f11f17ca1a8529146de771c2"
+      "bytes": 13337,
+      "sha256": "bcfc397be2d46ff73df8641a0680235971bdfa217f218b8a0e2bff0555975d19"
     },
     {
       "path": "evidence/ui_layout_20261028.public.json",

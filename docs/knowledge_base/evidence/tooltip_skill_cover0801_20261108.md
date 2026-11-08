@@ -1,6 +1,6 @@
 # 0801｜物品提示、锁定技能及进入游戏封面（2026-11-08）
 
-仅本地更新，后台保持 `20261106-ws4-daily-refs-ed532ea60d2b`。新运行源码已应用、纯回归及独立审阅通过；0801 的官方编译、完整签名、新版普通客户端及游廊发布仍待后续实际回执。正式仍 `3824360109` / `2026110104`，Steam manifest `7025356658517360342`。不能把本轮源码或 Git push 称为已同步游廊。
+仅本地更新，后台保持 `20261106-ws4-daily-refs-ed532ea60d2b`。0801 的官方编译、生产转换、完整签名及独立整包核验已通过；新版普通客户端视觉、联机及游廊发布仍待实际验收。正式仍 `3824360109` / `2026110104`，Steam manifest `7025356658517360342`。不能把签包、Git push 或入口只读检查称为已同步游廊。
 
 ## 0705 启动失败的实际原因和恢复
 
@@ -58,3 +58,17 @@
 编译工具修复只将这一个明确的封面目标排在最后实际执行，其他资源相对顺序保持；证明结果仍恢复为原计划顺序。所有命令完成后再逐产物验证大小/SHA256/MD5，任何后续覆盖或删除都会阻止写成功 proof。8 项实际调用 compile_plan 的隔离回归及独立审阅通过，不能代替新官方编译。额外成本仅一次构建 O(N) 排序分区及 O(全部编译产物字节) 读取，不进入游戏循环。
 
 下一次使用新 operator 提交和独立 gen21a3 计划、编译目录、proof 及生产目录；为保持既有简单合约，production 实际重新生成，不重标旧 production21。新 source21a3/final21a3 控制保留全部真实来源，catalog20 继续原来源和完整读集核验。此前把 tooltip 的 JS 误写为 XML 的控制遗漏清单也已在新 attempt 中纠正，旧失败控制/回执不覆盖。
+
+## gen21a3 已完整签包并独立核验
+
+新的编译/生产来源为 game/operator `ef9b067cc5493bf3c9dc420079ee416e8abc6e64`、content `24f26689e60d0fb2f48fe9c410ae5e1f8be0ce14`；170 项最终产物实际回读全部一致，66 项 JS DATA 与不可变编译输入精确相等，796 项输入/782 项 game 作者绑定通过。封面最后生成，实际为 1672×941、BGRA8888、6,295,572 字节，SHA256 `cb2300db682679aab955ae22488144590cc86ef970951a9723f53a603cb2448e`。所有临时挂载清理。production21a3 实际重新生成 853 plain/186 protected/7 override，报告 SHA256 `fc8933ac7e23c187bfe018c193bfa0f2adc2e7333dd9f16671febb604881c7c0`，保护报告 `81398db78fb461010c42bb6f1d7f86e9cd3890f9320a83bf7ed291e184a002e1`；旧 f9 production21 原字节保留。
+
+170 项产物已精确导入并提交推送，最终运行与 package operator 为 game `0394b54772d6f0df1a710ca11673692c433e06a7`，content 仍 `24f26689e60d0fb2f48fe9c410ae5e1f8be0ce14`。catalog20 原生成来源、itemgen5 原来源，以及 ef9 编译/生产来源均未重标。源码及完整 pending 收集 656/656，历史 242 项全部覆盖，延期/未知均 0；最终7050资源、3,811,396,298字节、438项变化和7项删除。
+
+canonical plan → prepare → build 三阶段实际 exit 0。包回执 `output/complete_delivery_release_20261108_v01/package.json` SHA256 `b23f0bb24487bd89f06bda3a67896a346169aae3451f18f0f5cae7e5ba673797`；签名资源 manifest SHA256 `048026a57830ecab12f0f5a3ce421172d9553fd2161bcf7a22990deb705614dc`，内容 SHA256 `96c19b1c542a3bdcc916ded94273911a5864b3fcb4f51a20065e23effa07ffd1`。这不是 Steam manifest。输出为 `D:/Survival_工坊输出/2026110801_network50_complete_v01`，view/trusted/overlay 均在树外 `D:/Survival_发布候选`。
+
+独立真实 `package_auth(full=False)` exit 0，核对双仓和原 producer 全读集、五个包文件大小/摘要及精确集合。VPK v2 的7050个唯一资源与签名manifest完全相等，四卷0..3，无旧包或7项删除残留；从分卷直接读取封面、HUD/tooltip三编译资源及英雄 Lua，再核 CRC/双摘要均正确。英雄显示修复确为现有明文策略下的 identity Lua v2，不属于186个保护模块，不能误称被新增保护。SDK调用、journal写入、上传均为0；本版未新安装/启动，不以此声称游戏内视觉或发布准入通过。
+
+联网入口沿用根目录 `联网登录测试.cmd`。固定本机选择记录为 `output/test_entry_runtime/online_signed_candidate.json`；切换必须先保留0705绑定原字节，再用真实0801包回执生成并精确比较期望版本/双仓/operator。最终同一 Windows PowerShell 启动链检查记录保存到 `D:/Survival_本地工具/runs/20261108_online0801/launcher_check01.receipt.json`，应返回 `SIGNED_ONLINE_ENTRY_CHECKED`、`release_sequence=2026110801`、`cloud_login_required=true`、`cheats_allowed=false`、`game_started=false` 才算入口只读检查通过。该记录不代表一次新原生游戏验收。
+
+正常使用时保持 Steam 登录，等待入口完整校验/暂装并在游戏内完成网页登录；保留启动器和 keeper，正常退出后完整恢复。新的 AGENTS 冻结规则要求：本局恢复收口前，后续需求先准备树外候选，不再修改参与签包重验的主工作区，避免再次出现封面开发 dirty 阻断。后续文档/规则提交不改变本包的0394运行来源。
