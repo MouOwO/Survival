@@ -112,12 +112,19 @@ function modifier_single_health_bar:publish_state()
         return
     end
 
+    -- The Q carrier has a stable name before npc_spawned/caller flags arrive.
+    -- Reuse this sample's one name read; do not hide other visual carriers.
+    local unit_name = unit.GetUnitName and unit:GetUnitName() or nil
+    if unit_name == "npc_survival_blademaster_q_visual" then
+        publish_removed(self, unit)
+        return
+    end
+
     local health = math.max(0, unit:GetHealth())
     local max_health = math.max(1, unit:GetMaxHealth())
     local scale = tonumber(unit.survival_endless_health_scale)
     local alive = unit:IsAlive() and 1 or 0
     local team = unit:GetTeamNumber()
-    local unit_name = unit.GetUnitName and unit:GetUnitName() or nil
     local forecast, revision = laser_prediction.snapshot(unit, max_health,
         GameRules and GameRules:GetGameTime() or 0)
     -- These flags can be assigned after npc_spawned attaches the modifier.

@@ -23,10 +23,10 @@ if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 sys.dont_write_bytecode = True
 
-REPORT = ROOT / "output/complete_delivery_release_20261108_v02"
+REPORT = ROOT / "output/complete_delivery_release_20261108_v03"
 INPUT_FILE = REPORT / "pipeline_inputs.json"
 JOURNAL = ROOT / "output/four_accounts_20261022/steam_upload_state.json"
-ITEM, APP, OWNER, SEQUENCE = "3824360109", 570, "76561198845461206", 2026110802
+ITEM, APP, OWNER, SEQUENCE = "3824360109", 570, "76561198845461206", 2026110803
 BASE_SEQUENCE = 2026110104
 BASE_CONTENT = "6ffc0816d040ffe4a4d7a3db472c74dc18b96fad36f5f204cba5b0879ab5489f"
 BASE_REPORT = ROOT / "output/admission_five_20261101/package.json"

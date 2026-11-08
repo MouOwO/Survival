@@ -17,6 +17,7 @@ local HIDDEN_BUILDING_NAMES = {
 local EXCLUDED_UNIT_NAMES = {
     npc_survival_upgrade_material = true,
     npc_survival_grid_preview_proxy = true,
+    npc_survival_blademaster_q_visual = true,
 }
 
 local function valid_entity(unit)
