@@ -3,7 +3,8 @@ $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path
 . (Join-Path $repo 'tools/backend_python.ps1')
 try {
-    $python=Resolve-SurvivalBackendPython -RepoRoot $repo
+    if($Mode -eq 'Online'){$python=Resolve-SurvivalReleasePython -RepoRoot $repo}
+    else{$python=Resolve-SurvivalBackendPython -RepoRoot $repo}
     $entryArguments=@('-B','-X','utf8',(Join-Path $PSScriptRoot 'test_entry.py'),$Mode.ToLowerInvariant())
     if($CheckOnly){$entryArguments+='--check'}
     if($Mode -eq 'Online' -and -not $CheckOnly){
@@ -23,6 +24,14 @@ try {
         else{Write-Output 'The signed online test has ended and the original installation has been restored. Workshop publication is still a separate step.'}
     }
 } catch {
+    # Only explain these fixed dependency failures. Never echo arbitrary
+    # subprocess/configuration exceptions (which may contain private values).
+    $failureMessage=[string]$_.Exception.Message
+    if($Mode -eq 'Online' -and $failureMessage.StartsWith('SURVIVAL_RELEASE_PYTHON must point',[StringComparison]::Ordinal)){
+        Write-Output 'SURVIVAL_RELEASE_PYTHON must point to a working Windows Python 3.10+ python.exe with cryptography. No dependencies are installed automatically.'
+    } elseif($Mode -eq 'Online' -and $failureMessage.StartsWith('Signed Online entry needs',[StringComparison]::Ordinal)){
+        Write-Output 'Signed Online entry needs Windows Python 3.10+ with cryptography. Set SURVIVAL_RELEASE_PYTHON to an existing release environment. No dependencies are installed automatically.'
+    }
     Write-Output 'test_entry_preparation_failed'
     exit 1
 }

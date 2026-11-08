@@ -26,10 +26,17 @@ function Invoke-SurvivalPythonCommand {
 }
 
 function Invoke-SurvivalPythonProbe {
-    param([string]$Executable, [string[]]$PrefixArguments = @())
+    param([string]$Executable, [string[]]$PrefixArguments = @(), [switch]$RequireReleaseCrypto)
     if (-not $Executable -or -not (Test-Path -LiteralPath $Executable -PathType Leaf)) { return }
     if ($Executable -match '[\\/]Microsoft[\\/]WindowsApps[\\/]python[^\\/]*\.exe$') { return }
-    $probeCode = 'import sys,json,ctypes,http.client,socket,subprocess,msvcrt; assert sys.platform == ''win32'' and sys.version_info >= (3,10); print(json.dumps(sys.executable))'
+    $probeCode = 'import sys,json,ctypes,http.client,socket,subprocess,msvcrt; assert sys.platform == ''win32'' and sys.version_info >= (3,10); '
+    if ($RequireReleaseCrypto) {
+        # Public RFC 8032 empty-message vector only: no key/config files, writes,
+        # network, installation or subprocess dependencies are used by this probe.
+        $probeCode += 'from cryptography.hazmat.primitives import serialization; from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey,Ed25519PublicKey; from cryptography.hazmat.primitives.ciphers import Cipher,algorithms,modes; '
+        $probeCode += 'Ed25519PublicKey.from_public_bytes(bytes.fromhex(''d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a'')).verify(bytes.fromhex(''e5564300c360ac729086e2cc806e828a84877f1eb8e5d974d873e065224901555fb8821590a33bacc61e39701cf9b46bd25bf5f0595bbe24655141438e7a100b''),b''''); '
+    }
+    $probeCode += 'print(json.dumps(sys.executable))'
     $probeArguments = @($PrefixArguments) + @('-I', '-B', '-c', ('"' + $probeCode + '"'))
     try {
         $output = Invoke-SurvivalPythonCommand -Executable $Executable -Arguments $probeArguments
@@ -85,4 +92,26 @@ function Resolve-SurvivalBackendPython {
         if ($resolved) { return $resolved }
     }
     throw 'Python 3.10+ was not found. Install Python, reopen the launcher, or set SURVIVAL_PYTHON to its python.exe. The old deployment venv is optional. See docs/STARTUP_LOADING.md for the other test connection requirements.'
+}
+
+# Signed Online entry needs cryptography; Offline/backend-only callers retain
+# their existing standard-library-only resolution and explicit override policy.
+function Resolve-SurvivalReleasePython {
+    param([Parameter(Mandatory = $true)][string]$RepoRoot, [string]$PythonPath = $env:SURVIVAL_RELEASE_PYTHON)
+    if ($PythonPath) {
+        $resolved = Invoke-SurvivalPythonProbe -Executable $PythonPath -RequireReleaseCrypto
+        if ($resolved) { return $resolved }
+        throw 'SURVIVAL_RELEASE_PYTHON must point to a working Windows Python 3.10+ python.exe with cryptography. No dependencies are installed automatically.'
+    }
+    $managedPython = ('D:/Survival_' + [char]0x5B89 + [char]0x5168 + [char]0x5DE5 + [char]0x5177 + '/venv/Scripts/python.exe')
+    $resolved = Invoke-SurvivalPythonProbe -Executable $managedPython -RequireReleaseCrypto
+    if ($resolved) { return $resolved }
+    $seen = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+    [void]$seen.Add($managedPython.Replace('/', '\'))
+    foreach ($candidate in @(Get-SurvivalPythonCandidates -RepoRoot $RepoRoot)) {
+        if (-not $candidate.Executable -or -not $seen.Add($candidate.Executable.Replace('/', '\'))) { continue }
+        $resolved = Invoke-SurvivalPythonProbe -Executable $candidate.Executable -PrefixArguments $candidate.PrefixArguments -RequireReleaseCrypto
+        if ($resolved) { return $resolved }
+    }
+    throw 'Signed Online entry needs Windows Python 3.10+ with cryptography. Set SURVIVAL_RELEASE_PYTHON to an existing release environment. No dependencies are installed automatically.'
 }
