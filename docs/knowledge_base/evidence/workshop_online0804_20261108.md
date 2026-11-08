@@ -12,7 +12,7 @@
 - 本次精确线上测试发行策略 operator：game `fb4f38ce646d41f01c2e0c047efd4fe42311954b`。发行工具绑定独立于已完成的签包构建，不重标旧生产证明。
 - 新目录：原 producer game/operator `03ecf060b28b8c7212c77e88f2962a7e5423e9ae`、content `534c3c8a2c5ed0871d9d699a7b3dd9a4a7d78bb0`；7942记录/188字段，完整 ID 历史保留。
 - 172项官方隔离编译：game/operator `563e21f11f2efc39484d2ba38e7f765ef06cb4ff`、content e081389b。新增两项 Keeper 粒子纳入严格双仓作者与依赖闭包，官方编译和逐字段DATA核验通过。
-- 新生产保护原 producer game/operator `b16629222710c45c2e75441905fdf7b9b7c8c289`、content e081389b；853输入、186保护模块、7项正式策略转换及完整值/RNG核验通过。最终收集重验原始读集与当前输入等价，未复制或改写原证明。
+- 新生产保护原 producer game/operator `b16629222710c45c2e75441905fdf7b9b7c8c289`、content e081389b；854输入、186保护模块、7项正式策略转换及完整值/RNG核验通过。最终收集重验原始读集与当前输入等价，未复制或改写原证明。
 
 本次最新的十戒连闯、科技/训练队列即时展开、生产 tooltip 前景层、原生错误横幅、金矿共享科技特效、武器成长中文名称、Keeper 弹道和全部历史未发布运行修改均由完整来源清单覆盖。具体资源与删除项以实际投影、签名 manifest 和机器摘要为准，不以本段举例作为固定 PAYLOADS。
 
@@ -44,7 +44,7 @@
 - `tools/monster_portrait_release_20261030/verify_download.py`
 - `tools/prepare_delivery_operator_20261103.py`
 
-content工作区干净。最终文档提交与双仓上游检查以本轮树外 git_delivery_final.json 为准。旧0104父证明、当前0804与被回执引用的编译/恢复备份保留，未凭目录名删除旧产物。
+content工作区干净。最终文档提交与双仓上游检查以本轮树外 git_delivery_final_v02_receipt.json 为准。旧0104父证明、当前0804与被回执引用的编译/恢复备份保留，未凭目录名删除旧产物。
 
 现在使用普通Dota客户端进入原游廊测试。本次没有暂装、keeper、模拟实机或新耗券；旧本地0803/0104排演控制不是新版正式安装身份，后续不能拿旧恢复入口覆盖当前官方0804。下一轮发行须从真实0804官方检查点及新父journal重新建立绑定。
 
