@@ -5,13 +5,13 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 45308,
-      "sha256": "3256b3c5183573bdc851667d4bc1f084533a7d748adc833a8aedf92f2b11b4a7"
+      "bytes": 46974,
+      "sha256": "0937061d62bed6d0290a6f332147114ecc27ed8f1aedc1470f4893d3b1fd9be9"
     },
     {
       "path": "01_architecture_and_workflow.md",
-      "bytes": 4848,
-      "sha256": "a15cdfd755cbe06c017365f084c25e0e94798f597db4090f7cc17ff83608dffe"
+      "bytes": 5279,
+      "sha256": "f729777176954984d2d531b5f5cfe01d8035f6399bd2fa28ab02cb881cd13795"
     },
     {
       "path": "02_core_gameplay.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 58952,
-      "sha256": "e09ca6021521c014ad72197082a15464979099caf096412b4c3b9f6ded29c81d"
+      "bytes": 60651,
+      "sha256": "6f9320cee6449062aa744581b60e8a4f9112a06f78c5111399d01f903f2622c5"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 32688,
-      "sha256": "0878055160a76ad050789ed88389f72b8038e5dc0eb1deed9efc54ff5527dfb5"
+      "bytes": 34234,
+      "sha256": "e1c75c6dc047dd7fd5108781f6bed69f5e1d1a0b810ffb1f590d01fec8d9fb92"
     },
     {
       "path": "data/completed_work_index.json",
@@ -279,6 +279,11 @@
       "sha256": "0224a5bec230a10a868d4552cd033d0fd2cf7c02873246c391303367a45e6871"
     },
     {
+      "path": "evidence/gold_mine_all_research_fx_20261108.md",
+      "bytes": 5141,
+      "sha256": "81b1ce8c2a42ed121dc238f4f6b891453e4aae1d98c25de465795f164c6e1dee"
+    },
+    {
       "path": "evidence/hero_altar_landing_followup_20261107.md",
       "bytes": 5912,
       "sha256": "fc95956b0747d6f4a68d91119fec45c793c5f3a14a355375d365fa4abac7d795"
@@ -287,6 +292,11 @@
       "path": "evidence/hero_teleport_native_20261101.public.json",
       "bytes": 8740,
       "sha256": "cc1b0370bd4e394dd1eccd7e43636df30474d044c1a77f6a925a469f875bf9c1"
+    },
+    {
+      "path": "evidence/keeper_attack_visual_20261108.md",
+      "bytes": 5489,
+      "sha256": "dc10c596819ac331007b5d2cbd3407e3d0ca1bf3639dbf20645362aae576ced2"
     },
     {
       "path": "evidence/login_relay_recovery_20261028.public.json",
@@ -352,6 +362,11 @@
       "path": "evidence/movement_daily_hint_20261031.md",
       "bytes": 6806,
       "sha256": "15055e5d097ab7043afa230ed14a09376f8dba3c0dc4305f1e27fedc684f3e71"
+    },
+    {
+      "path": "evidence/native_action_error_banner_20261108.md",
+      "bytes": 3853,
+      "sha256": "ad8951d350f800cc933e444d037334ed2cfe8649b585c6b44fcfc186e1250cbf"
     },
     {
       "path": "evidence/native_arcade_cloud_20261027.public.json",
@@ -472,6 +487,11 @@
       "path": "evidence/portrait_rollback_official_20261029.md",
       "bytes": 3195,
       "sha256": "7aae316ec173f0b1a976ca5f31011a55f935cfebe4a82290b7b046e2a2b0545d"
+    },
+    {
+      "path": "evidence/practice_reward_numbers_20261108.md",
+      "bytes": 5564,
+      "sha256": "eb9a768abc90198da9a6877ad627fa2acd1bfa6ad17b6c5a387627558bffb840"
     },
     {
       "path": "evidence/rebirth_n15_preview_20261028.md",
@@ -607,6 +627,11 @@
       "path": "evidence/storage_cleanup_20261103.md",
       "bytes": 3689,
       "sha256": "a87ce88d07edb26ababa77fe2f29764d1e2758648a91301e3304bf5463238b7a"
+    },
+    {
+      "path": "evidence/storage_ledger_20261108.md",
+      "bytes": 5385,
+      "sha256": "9ad0f01b80d005f032ebeed6e4f6a9a8bc5344745d4e21a09d99884fed03bbc9"
     },
     {
       "path": "evidence/storage_rehearsal_output_cleanup_20261103.md",
