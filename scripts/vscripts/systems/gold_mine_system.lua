@@ -11,7 +11,9 @@ local research_visual = require("systems/gold_mine_research_visual")
 
 local M = {}
 local state_by_entindex = {}
+local states_by_player = {}
 local technology_by_player = {}
+local visualized_technology_by_player = {}
 local auto_upgrade_by_entindex = {}
 local auto_sequence = 0
 local upgrade_mine
@@ -439,14 +441,21 @@ end
 local function on_created(payload)
     if payload.building_id ~= "gold_mine" or not valid(payload.unit) then return end
     local entindex = payload.unit:entindex()
+    local previous = state_by_entindex[entindex]
+    if previous and states_by_player[previous.player_id] then
+        states_by_player[previous.player_id][entindex] = nil
+    end
+    local player_id = tonumber(payload.player_id)
     state_by_entindex[entindex] = {
         unit = payload.unit,
         definition = payload.definition,
-        player_id = payload.player_id,
+        player_id = player_id,
         team = payload.team,
         mine_level = tonumber(payload.level) or 1,
     }
     local state = state_by_entindex[entindex]
+    states_by_player[player_id] = states_by_player[player_id] or {}
+    states_by_player[player_id][entindex] = state
     publish(state)
     schedule_production(state)
 end
@@ -460,20 +469,35 @@ local function on_technology_completed(payload)
     if not research_visual.particles[group] then return end
     local level = tonumber(payload.level)
     if not level or level <= 0 or technology_level(state.player_id, group) ~= level then return end
-    state.visualized_technology_levels = state.visualized_technology_levels or {}
-    if level <= (state.visualized_technology_levels[group] or 0) then return end
-    state.visualized_technology_levels[group] = level
-    research_visual.play(state.unit, group)
+    local player_id = state.player_id
+    local levels = visualized_technology_by_player[player_id] or {}
+    if level <= (levels[group] or 0) then return end
+    visualized_technology_by_player[player_id] = levels
+    levels[group] = level
+    -- These technologies affect every owned mine, including unselected mines.
+    -- Visit only this owner's index on a genuine completion, never on a tick.
+    for _, target in pairs(states_by_player[player_id] or {}) do
+        if valid(target.unit) and target.unit:IsAlive() then
+            local ok, err = pcall(research_visual.play, target.unit, group)
+            if not ok then
+                print("[GoldMine] research visual failed: " .. tostring(err))
+            end
+        end
+    end
 end
 
 local function on_destroyed(payload)
     if payload.building_id == "gold_mine" then
         upgrade_process.cancel_by_entindex(payload.entindex, "building_destroyed")
         local entindex = tonumber(payload.entindex)
+        local state = state_by_entindex[entindex]
+        if state and states_by_player[state.player_id] then
+            states_by_player[state.player_id][entindex] = nil
+        end
         auto_upgrade_by_entindex[entindex] = nil
         scheduler.cancel("gold_mine_auto_upgrade_" .. tostring(entindex))
         scheduler.cancel("gold_mine_production_" .. tostring(entindex))
-        state_by_entindex[payload.entindex] = nil
+        state_by_entindex[entindex] = nil
     end
 end
 
@@ -540,7 +564,9 @@ function M.init()
     -- reloads Lua modules without resetting the scheduler instance.
     scheduler.cancel("gold_mine_production")
     state_by_entindex = {}
+    states_by_player = {}
     technology_by_player = {}
+    visualized_technology_by_player = {}
     auto_upgrade_by_entindex = {}
     auto_sequence = 0
     event_bus.handle_request(
