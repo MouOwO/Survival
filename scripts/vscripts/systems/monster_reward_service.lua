@@ -4,10 +4,12 @@ local events = require("core/events")
 local reward_profiles = require("config/generated/reward_profiles")
 local reward_effects = require("config/generated/reward_effects")
 local return_home = require("systems/hero_return_home_service")
+local reward_numbers = require("ui/monster_reward_numbers")
 
 local M = {}
 local granted_non_repeatable = {}
 local granted_transactions = {}
+local effects_by_profile = {}
 
 local function return_rebirth_hero_home(result)
     if not string.match(
@@ -25,17 +27,24 @@ local function return_rebirth_hero_home(result)
 end
 
 local function effects_for(profile_id)
-    local result = {}
+    return effects_by_profile[profile_id] or {}
+end
+
+local function index_effects()
+    effects_by_profile = {}
     for _, effect in ipairs(reward_effects.rows or {}) do
-        if effect.reward_profile_id == profile_id
-            and effect.enabled ~= false then
-            table.insert(result, effect)
+        if effect.enabled ~= false then
+            local id = effect.reward_profile_id
+            local list = effects_by_profile[id]
+            if not list then list = {}; effects_by_profile[id] = list end
+            list[#list + 1] = effect
         end
     end
-    table.sort(result, function(a, b)
-        return (a.sort_order or 0) < (b.sort_order or 0)
-    end)
-    return result
+    for _, list in pairs(effects_by_profile) do
+        table.sort(list, function(a, b)
+            return (a.sort_order or 0) < (b.sort_order or 0)
+        end)
+    end
 end
 
 local function scaled_effects(effects, challenge_wave_number)
@@ -168,9 +177,17 @@ local function grant_reward(payload)
         end
     end
 
+    local floating_reward = result.ok
+        and profile.reward_group == "practice_room"
+        and profile.trigger_type == "on_each_kill"
+    if floating_reward then
+        -- Cosmetic failures never interrupt an already committed reward.
+        -- Emit before callbacks can retire the corpse or its entity handle.
+        pcall(reward_numbers.show, payload.victim, player_id, result)
+    end
     event_bus.emit(events.MONSTER_REWARD_GRANTED, result)
     return_rebirth_hero_home(result)
-    if payload.player_id and payload.player_id >= 0 then
+    if not floating_reward and payload.player_id and payload.player_id >= 0 then
         event_bus.emit(events.UI_NOTIFICATION, {
             player_id = payload.player_id,
             message = "获得奖励：" .. (profile.reward_text or ""),
@@ -197,6 +214,7 @@ end
 function M.init()
     granted_non_repeatable = {}
     granted_transactions = {}
+    index_effects()
     event_bus.handle_request(events.MONSTER_REWARD_GRANT_REQUEST, grant_reward)
     event_bus.subscribe(events.MONSTER_KILLED, on_monster_killed)
     event_bus.subscribe(events.MONSTER_ENCOUNTER_COMPLETED, on_encounter_completed)

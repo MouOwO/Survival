@@ -626,6 +626,7 @@ end
 
 function M.precache(context)
     PrecacheResource("particle", "particles/generic_hero_status/hero_levelup.vpcf", context)
+    require("ui/monster_reward_numbers").precache(context)
     require("systems/valley_environment_service").precache(context)
     require("systems/tower_visual_service").precache(context)
     require("systems/tower_projectile_visual").precache(context)
