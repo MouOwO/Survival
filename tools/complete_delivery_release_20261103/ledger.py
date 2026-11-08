@@ -211,6 +211,12 @@ def verify_compiler_receipt(*, plan_raw, plan_sha256, proof_raw, proof_sha256, s
             need(pin.get("compiler_input") == byte_fingerprint(payload) and pin.get("normalization") == normalization
                  and plan.get("inputs", {}).get(source_name) == pin, "compiler_checkout_or_global_input_binding_mismatch")
             author = pin.get("game_author")
+            if source_name in {
+                    'particles/survival/heroes/keeper/' + name + '.vpcf'
+                    for name in ('keeper_of_the_light_base_attack', 'keeper_base_attack')}:
+                need(isinstance(author, dict) and author.get('path') ==
+                     'art/effects/keeper_attack/source/' + source_name,
+                     'compiler_keeper_particle_dual_author_required')
             cover_author = {
                 'panorama/images/custom_game/loading/dawnward_citadel_background.png': 'art/ui/sources/custom_game/loading/dawnward_citadel_background.png',
                 'panorama/images/custom_game/loading/dawnward_citadel_background_png.vtex': 'art/ui/sources/custom_game/loading/dawnward_citadel_background_png.vtex',

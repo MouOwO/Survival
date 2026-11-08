@@ -7,6 +7,21 @@ spec=importlib.util.spec_from_file_location('release_compile_scope',Path(__file_
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 
 class CompileScopeTests(unittest.TestCase):
+    def test_keeper_particles_bind_only_reviewed_authors_and_dependency_closure(self):
+        outer = 'particles/survival/heroes/keeper/keeper_of_the_light_base_attack.vpcf'
+        inner = 'particles/survival/heroes/keeper/keeper_base_attack.vpcf'
+        native = 'particles/units/heroes/hero_keeper_of_the_light/keeper_base_attack_flash.vpcf'
+        for source in (outer, inner):
+            self.assertEqual(m.content_source(source + '_c'), source)
+            self.assertEqual(m.artifact_for(source), source + '_c')
+            self.assertEqual(m.KEEPER_PARTICLES[source + '_c'], 'art/effects/keeper_attack/source/' + source)
+        self.assertEqual(m.dependencies(outer, ('resource:"' + inner + '"').encode()), ([inner], []))
+        self.assertEqual(m.dependencies(inner, ('resource:"' + native + '"').encode()), ([], ['s2r://' + native]))
+        for bad in ('particles/other.vpcf', '../outside.vpcf', 'https://example.com/x.vpcf'):
+            with self.assertRaises(ValueError):
+                m.dependencies(inner, ('resource:"' + bad + '"').encode())
+        with self.assertRaises(ValueError):m.content_source('particles/other.vpcf_c')
+
     def test_exact_checkout_only(self):
         self.assertEqual(m.checkout_binding(b'a\nb\n',b'a\r\nb\r\n',True),'GIT_LF_TO_COMPILER_CRLF_ONLY')
         self.assertEqual(m.checkout_binding(b'a\r\n',b'a\r\n',True),'IDENTITY')

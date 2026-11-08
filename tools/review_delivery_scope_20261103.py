@@ -23,6 +23,11 @@ HISTORICAL=Path('D:/Survival_发布候选')
 
 def author_paths(resource):
     """Candidate source paths only; availability is not a compilation proof."""
+    keeper_prefix = 'particles/survival/heroes/keeper/'
+    if resource in {keeper_prefix + name + '.vpcf_c' for name in
+                    ('keeper_of_the_light_base_attack', 'keeper_base_attack')}:
+        source = resource[:-2]
+        return [('content', source), ('game', 'art/effects/keeper_attack/source/' + source)]
     if resource == inventory.LOADING_COVER_RESOURCE:
         primary = inventory.LOADING_COVER_DESCRIPTOR
         return [('game', inventory.LOADING_COVER_AUTHORS[primary]), ('content', primary)]

@@ -20,6 +20,11 @@ EXTERNAL=Path('D:/Survival_本地排演/compile_scope_20261103')
 HEX=re.compile(r'[a-f0-9]{64}\Z')
 REV=re.compile(r'[a-f0-9]{40}\Z')
 TEXT={'.js','.css','.xml','.vtex','.svg'}
+KEEPER_PARTICLES = {
+    'particles/survival/heroes/keeper/' + name + '.vpcf_c':
+    'art/effects/keeper_attack/source/particles/survival/heroes/keeper/' + name + '.vpcf'
+    for name in ('keeper_of_the_light_base_attack', 'keeper_base_attack')
+}
 MAX_OBJECT=32*1024*1024
 MAX_TOTAL=256*1024*1024
 spec=importlib.util.spec_from_file_location('compile_scope_inventory',Path(__file__).with_name('release_pending_inventory.py'))
@@ -123,11 +128,15 @@ def operator_binding(revision):
 
 def content_source(resource):
     safe(resource)
+    if resource in KEEPER_PARTICLES:
+        return resource[:-2]
     suffix=PurePosixPath(resource).suffix
     mapping={'.vjs_c':'.js','.vcss_c':'.css','.vxml_c':'.xml','.vsvg_c':'.svg','.vtex_c':'.vtex'}
     need(resource.startswith('panorama/')and suffix in mapping,'unsupported_official_compiler_mapping')
     return str(PurePosixPath(resource).with_suffix(mapping[suffix]))
 def artifact_for(source):
+    if source + '_c' in KEEPER_PARTICLES:
+        return source + '_c'
     path=PurePosixPath(safe(source));mapping={'.js':'.vjs_c','.css':'.vcss_c','.xml':'.vxml_c','.svg':'.vsvg_c','.vtex':'.vtex_c'}
     need(path.suffix in mapping,'unsupported_compiler_source_type');return str(path.with_suffix(mapping[path.suffix]))
 
@@ -156,6 +165,18 @@ def compiled_binding(resource,raw,compiler_input):
 
 def dependencies(path,raw):
     """Actual XML layouts, CSS image/import URLs and VTEX pixel dependencies."""
+    if path + '_c' in KEEPER_PARTICLES:
+        refs = sorted(set(re.findall(r'resource:"([^"\r\n]+)"', raw.decode('utf8'))))
+        local, engine = [], []
+        for ref in refs:
+            safe(ref)
+            if ref + '_c' in KEEPER_PARTICLES:
+                local.append(ref)
+            else:
+                need(ref.startswith('particles/units/heroes/hero_keeper_of_the_light/')
+                     and ref.endswith('.vpcf'), 'unreviewed_keeper_particle_dependency')
+                engine.append('s2r://' + ref)
+        return local, engine
     suffix=PurePosixPath(path).suffix
     if suffix not in TEXT:return [],[]
     text=raw.decode('utf-8-sig');refs=[];engine=[]
@@ -217,7 +238,9 @@ def make_plan(scope,scope_sha,revisions,roots=None,operator_revision=None):
         payload,normalization=compiler_bytes(value['raw'],PurePosixPath(path).suffix in TEXT)
         pin={k:v for k,v in value.items()if k!='raw'};pin.update(source_revision=revisions['content'],compiler_input=checks(payload),normalization=normalization)
         cover_author=inventory.LOADING_COVER_AUTHORS.get(path)
-        mirror=cover_author or (path if runtime_raw_dependency(path) else 'panorama/src/'+path[len('panorama/'):]if path.startswith('panorama/')else None)
+        particle_author = KEEPER_PARTICLES.get(path + '_c')
+        mirror=cover_author or particle_author or (path if runtime_raw_dependency(path) else 'panorama/src/'+path[len('panorama/'):]if path.startswith('panorama/')else None)
+        if particle_author:need(mirror in trees['game'],'keeper_particle_game_author_missing:'+path)
         if cover_author:need(mirror in trees['game'],'loading_cover_game_author_missing:'+path)
         if runtime_raw_dependency(path):need(mirror in trees['game'],'raw_movie_game_author_missing:'+path)
         if mirror and mirror in trees['game']:

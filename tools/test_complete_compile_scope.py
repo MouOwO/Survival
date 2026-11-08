@@ -43,6 +43,16 @@ def select(scope, trees, pins=None, digest=None):
 
 
 class DynamicScopeTests(unittest.TestCase):
+    def test_keeper_particles_require_both_exact_immutable_authors(self):
+        resource = 'particles/survival/heroes/keeper/keeper_base_attack.vpcf_c'
+        scope, trees = fixture([resource])
+        self.assertEqual(select(scope, trees)['selection_counts']['unique_resources'], 1)
+        authors = m._authors(resource)
+        self.assertEqual(authors, {('content', resource[:-2]),
+            ('game', 'art/effects/keeper_attack/source/' + resource[:-2])})
+        scope['decisions'][0]['candidate_authors'].pop()
+        with self.assertRaises(ValueError):select(scope, trees)
+
     def test_all_supported_types_and_historical_rows_are_selected_once_with_exact_provenance(self):
         resources = ["panorama/scripts/a.vjs_c", "panorama/styles/a.vcss_c",
                      "panorama/layout/a.vxml_c", "panorama/images/a.vtex_c", "panorama/images/a.vsvg_c"]
