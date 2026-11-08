@@ -44,7 +44,10 @@ def inventory():
     result = pending.classify_inventory(baseline_inventory=checkpoint["source_inventory"], head_inventory=trees,
         parent_manifest=manifest, deferred_sources=checkpoint["deferred_sources"],
         blob_facts=facts, dirty=dirty, production_resources=production)
-    result.update(target_commits=commits, baseline_mode="COMPLETE_SDK_NATIVE_AND_OFFICIAL_DOWNLOAD_VERIFIED_CHECKPOINT",
+    mode = ("COMPLETE_SDK_NATIVE_AND_OFFICIAL_DOWNLOAD_VERIFIED_CHECKPOINT"
+        if checkpoint.get("complete_delivery", {}).get("ordinary_production_acceptance") is True
+        else "COMPLETE_SDK_AND_OFFICIAL_DOWNLOAD_VERIFIED_NATIVE_PENDING_CHECKPOINT")
+    result.update(target_commits=commits, baseline_mode=mode,
         baseline_control=cursor, recorded_parent_sequence=checkpoint["parent_sequence"],
         recorded_parent_manifest_sha256=checkpoint["parent_manifest_sha256"],
         recorded_parent_content_sha256=checkpoint["parent_content_sha256"],

@@ -72,6 +72,23 @@ class CheckpointTests(unittest.TestCase):
     def setUp(self):
         self.f = Fixture()
 
+    def test_explicit_test_delivery_keeps_native_pending_and_requires_official_bytes(self):
+        self.f.delivery.update(ordinary_production_acceptance=False,
+            publication_mode="EXPLICIT_UNLISTED_ONLINE_TEST_NATIVE_PENDING",
+            online_test_release_authorized=True, native_acceptance_status="PENDING_USER_ONLINE_TEST",
+            online_test_authorization_sha256="d"*64)
+        result = self.f.run()
+        self.assertFalse(result["complete_delivery"]["ordinary_production_acceptance"])
+        self.assertEqual(result["complete_delivery"]["native_acceptance_status"], "PENDING_USER_ONLINE_TEST")
+        for field, bad in (("online_test_release_authorized", False),
+                           ("native_acceptance_status", "PASS"),
+                           ("official_full_installation_reverified", False),
+                           ("signature_valid", False)):
+            with self.subTest(field=field):
+                before = self.f.delivery[field]; self.f.delivery[field] = bad
+                with self.assertRaises(ValueError):self.f.run()
+                self.f.delivery[field] = before
+
     def test_complete_typed_transform_and_deletion_advance_without_plaintext_export_claim(self):
         old = copy.deepcopy(self.f.previous)
         self.f.projection["build_ready"] = False  # plan is never signing authority
@@ -238,6 +255,34 @@ class CheckpointTests(unittest.TestCase):
         self.assertFalse(result["workshop_synchronized"])
         self.assertFalse(result["automatic_resubmit"])
         publish.assert_called_once()
+
+
+class OnlineTestOfficialInstallationTests(unittest.TestCase):
+    def test_actual_official_verifier_and_exact_manifest_are_required(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);installed=root/"installed";installed.mkdir();acf=root/"workshop.acf";acf.write_bytes(b"acf")
+            rows=[dict(name="x.vpk",bytes=2,sha256="a"*64),dict(name="x_000.vpk",bytes=2,sha256="b"*64)]
+            report=dict(package_files=rows,vpk_sha256="a"*64,files=3,operator_revision="a"*40)
+            verification=dict(signature_valid=True,package_files=rows,vpk_sha256="a"*64,
+                verification=dict(files=3,archive_count=1,crc32_verified=True))
+            entry=dict(manifest="123");receipt=dict(download=dict(install_folder=str(installed)),
+                post_query={},steam_manifest="123",acf_installed_entry=entry)
+            protocol=SimpleNamespace(INSTALLED=installed,ACF=acf,callbacks=SimpleNamespace(CHECKS=("crc32_verified",)),
+                verify=SimpleNamespace(verify_installed=Mock(return_value=verification)),
+                api=SimpleNamespace(pack=SimpleNamespace(MAX_MANIFEST=100,read_metadata=Mock(return_value=b"acf"))),
+                acf_manifest=Mock(return_value=("123",entry)),unchanged=Mock())
+            downloaded=SimpleNamespace(REPORT_SHA=None,configure=Mock(),protocol=lambda:protocol,
+                _PROTOCOL_EXECUTED_PINS={"tools/x.py":"a"*64})
+            builder=SimpleNamespace(scene_maps=nullcontext,inc=SimpleNamespace(trusted_source=lambda path:nullcontext()),
+                TRUSTED=root,VIEW=root,verify_operator_paths=Mock())
+            with patch.object(pipeline,"pinned_module",return_value=downloaded):
+                snapshots={};b.reverify_online_test_installation(None,builder,report,"c"*64,{},receipt,snapshots)
+                self.assertEqual(snapshots,{acf:b"acf"})
+                protocol.verify.verify_installed.assert_called_once()
+                builder.verify_operator_paths.assert_called_once_with(downloaded._PROTOCOL_EXECUTED_PINS,"a"*40)
+                verification["signature_valid"]=False
+                with self.assertRaisesRegex(ValueError,"official_full_installation_failed"):
+                    b.reverify_online_test_installation(None,builder,report,"c"*64,{},receipt,{})
 
 
 if __name__ == "__main__":

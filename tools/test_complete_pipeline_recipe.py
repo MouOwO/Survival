@@ -232,6 +232,37 @@ class RecipeTests(unittest.TestCase):
 
 
 class ValidatorTests(unittest.TestCase):
+    def test_exact_online_test_authorization_cannot_move_to_other_package_or_native_pass(self):
+        policy = dict(schema=1, kind="EXPLICIT_CURRENT_USER_UNLISTED_ONLINE_TEST_AUTHORIZATION",
+            user_authorization="授权按线上测试版先上传，实机验收待测",
+            authorization_scope="UPLOAD_THIS_EXACT_SIGNED_PACKAGE_AND_VERIFY_OFFICIAL_DOWNLOAD",
+            workshop_id=r.ITEM, visibility="unlisted", release_sequence=2026110804,
+            ordinary_production_acceptance=False, native_acceptance_status="PENDING_USER_ONLINE_TEST",
+            source_revisions=PINS, signed_manifest_sha256="5"*64, content_sha256="7"*64,
+            report_sha256="c"*64, parent_journal_sha256="d"*64, generation=1)
+        request = {**policy, "publication_mode":v.ONLINE_TEST_MODE}
+        report = {key:policy[key] for key in ("release_sequence","source_revisions","signed_manifest_sha256","content_sha256")}
+        v.validate_online_test_document(policy,request,report)
+        for key,bad in (("visibility","public"),("release_sequence",2026110803),
+                        ("ordinary_production_acceptance",True),("native_acceptance_status","PASS"),
+                        ("report_sha256","0"*64),("parent_journal_sha256","0"*64),
+                        ("generation",2),("user_authorization","historical approval")):
+            with self.subTest(key=key),self.assertRaises(ValueError):
+                v.validate_online_test_document({**policy,key:bad},request,report)
+        with self.assertRaises(ValueError):
+            v.validate_online_test_document(policy,{**request,"production_evidence_path":"fake"},report)
+
+    def test_test_mode_result_preserves_native_pending(self):
+        with tempfile.TemporaryDirectory() as temp,self.mocked(temp,{}) as (report,request,load,journal):
+            request["publication_mode"] = v.ONLINE_TEST_MODE
+            with patch.object(v,"online_test_admission",return_value=dict(
+                    ordinary_production_acceptance=False,online_test_release_authorized=True,
+                    publication_mode=v.ONLINE_TEST_MODE)),patch.object(v,"_native_policy") as native:
+                result=v.validate_release(request)
+            self.assertFalse(result["ordinary_production_acceptance"])
+            self.assertTrue(result["online_test_release_authorized"])
+            native.assert_not_called()
+
     def fixture(self, temp):
         root=Path(temp);journal=root/"journal.json";cfgpath=root/"pipeline_inputs.json"
         journal.write_bytes(b'{"published":true}\n'); cfgpath.write_bytes(b"config")

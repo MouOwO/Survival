@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "kind": "EXPLICIT_CURRENT_USER_UNLISTED_ONLINE_TEST_AUTHORIZATION",
+  "authorization_observed_utc": "2026-11-08T14:40:20.275779+00:00",
+  "user_request": "现在把最新的代码打包到游廊上，我要进行线上测试",
+  "user_authorization": "授权按线上测试版先上传，实机验收待测",
+  "authorization_scope": "UPLOAD_THIS_EXACT_SIGNED_PACKAGE_AND_VERIFY_OFFICIAL_DOWNLOAD",
+  "workshop_id": "3824360109",
+  "visibility": "unlisted",
+  "release_sequence": 2026110804,
+  "source_revisions": {
+    "content": "e081389bfd0bfdd785cfb1572ab5bf95a3655c46",
+    "game": "32ef4951041f3cc2e115fe2ad114b3d030acbf80"
+  },
+  "signed_manifest_sha256": "d7dbdffd84502bdd27f117437ee2ccd6602ce878aff25271a09ca69b42572885",
+  "content_sha256": "14fe2af32440c6bf758cdb5f95aa415353b1ff32a5a5efe71ba8e0c3fecf1f9d",
+  "report_sha256": "5cd08b06cf2f3ee2ec0e735c2c3f13b499904e09dd05502698406ac42c138229",
+  "parent_journal_sha256": "6e6f5f6b09995bf715d68900d2c86f871aab83ccf2998da5a8c9e7412386628e",
+  "generation": 1,
+  "ordinary_production_acceptance": false,
+  "native_acceptance_status": "PENDING_USER_ONLINE_TEST"
+}

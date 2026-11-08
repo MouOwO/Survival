@@ -24,6 +24,8 @@ OWNER, APP, RELEASE_SEQUENCE = recipe.OWNER, recipe.APP, recipe.SEQUENCE
 TOOL = "tools/complete_delivery_release_20261103/publication_validator.py"
 NATIVE_TOOL = "tools/complete_delivery_release_20261103/native_admission.py"
 LOADED_LF_SHA256 = hashlib.sha256(Path(__file__).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+ONLINE_TEST_MODE = "EXPLICIT_UNLISTED_ONLINE_TEST_NATIVE_PENDING"
+ONLINE_TEST_POLICY = "publishing/workshop/online_test_authorization_2026110804.json"
 
 
 def need(value, reason):
@@ -41,6 +43,54 @@ def _operator_file(name, raw, revision):
     need(declared.replace(b"\r\n", b"\n") == raw.replace(b"\r\n", b"\n"),
          "publication_tool_not_in_declared_operator:" + name)
     return hashlib.sha256(declared).hexdigest()
+
+
+def publication_operator(request, report):
+    """Publication policy may advance independently of an unchanged signed build."""
+    from release_lineage_20261101 import guard
+    revision = request.get("publication_operator_revision", report["operator_revision"])
+    recipe.dependencies().ledger.revision(revision)
+    if revision != report["operator_revision"]:
+        guard.require_ancestor(ROOT, report["operator_revision"], revision)
+    _operator_file(TOOL, Path(__file__).read_bytes(), revision)
+    return revision
+
+
+def validate_online_test_document(policy, request, report):
+    """This one exact package was explicitly authorized for testing before native acceptance."""
+    need(policy.get("schema") == 1 and type(policy.get("generation")) is int
+         and request.get("publication_mode") == ONLINE_TEST_MODE
+         and policy.get("kind") == "EXPLICIT_CURRENT_USER_UNLISTED_ONLINE_TEST_AUTHORIZATION"
+         and policy.get("user_authorization") == "授权按线上测试版先上传，实机验收待测"
+         and policy.get("authorization_scope") == "UPLOAD_THIS_EXACT_SIGNED_PACKAGE_AND_VERIFY_OFFICIAL_DOWNLOAD"
+         and policy.get("workshop_id") == recipe.ITEM and policy.get("visibility") == "unlisted"
+         and policy.get("release_sequence") == report["release_sequence"] == 2026110804
+         and policy.get("ordinary_production_acceptance") is False
+         and policy.get("native_acceptance_status") == "PENDING_USER_ONLINE_TEST",
+         "explicit_same_package_unlisted_online_test_authorization_required")
+    for key in ("source_revisions", "signed_manifest_sha256", "content_sha256"):
+        need(policy.get(key) == report.get(key) == request.get(key),
+             "online_test_authorization_package_binding_mismatch:" + key)
+    need(policy.get("report_sha256") == request.get("report_sha256")
+         and policy.get("parent_journal_sha256") == request.get("parent_journal_sha256")
+         and policy.get("generation") == request.get("generation"),
+         "online_test_authorization_report_or_parent_generation_changed")
+    need(not any(name in request for name in
+         ("production_evidence_path", "production_evidence_sha256", "native_process_generation")),
+         "online_test_pending_native_must_not_claim_ordinary_evidence")
+
+
+def online_test_admission(request, report):
+    operator = publication_operator(request, report)
+    path = recipe.dependencies().build._plain(ROOT / ONLINE_TEST_POLICY, directory=False); raw = path.read_bytes()
+    need(len(raw) <= 65536 and recipe.sha(raw) == request.get("online_test_authorization_sha256"),
+         "online_test_authorization_original_bytes_required")
+    _operator_file(ONLINE_TEST_POLICY, raw, operator)
+    policy = json.loads(raw); validate_online_test_document(policy, request, report)
+    return dict(ordinary_production_acceptance=False, online_test_release_authorized=True,
+        publication_mode=ONLINE_TEST_MODE, native_acceptance_status="PENDING_USER_ONLINE_TEST",
+        online_test_authorization_sha256=recipe.sha(raw), publication_operator_revision=operator,
+        release_sequence=report["release_sequence"], content_sha256=report["content_sha256"])
 
 
 def _native_policy(config, operator_revision):
@@ -98,7 +148,7 @@ def validate_release(request):
     cfg, config_raw = recipe.config()
     raw = Path(__file__).read_bytes()
     need(recipe.sha(raw.replace(b"\r\n", b"\n")) == LOADED_LF_SHA256, "validator_changed_after_import")
-    _operator_file(TOOL, raw, report["operator_revision"])
+    publication_operator(request, report)
     need(report.get("pipeline_inputs_sha256") == recipe.sha(config_raw)
          and request.get("source_revisions") == report["source_revisions"]
          and set(request["source_revisions"]) == {"game", "content"}
@@ -113,12 +163,17 @@ def validate_release(request):
     journal_raw = recipe.JOURNAL.read_bytes()
     recipe.require_parent_journal(json.loads(journal_raw), parent_report)
     need(recipe.sha(journal_raw) == request["parent_journal_sha256"], "publication_parent_journal_changed")
-    admission = _native_policy(cfg, report["operator_revision"])
-    evidence = admission.validate_native_release(request, report, manifest, signed)
-    need(evidence.get("ordinary_production_acceptance") is True
-         and evidence.get("content_sha256") == manifest["content_sha256"]
-         and evidence.get("release_sequence", RELEASE_SEQUENCE) == RELEASE_SEQUENCE,
-         "same_signed_ordinary_client_complete_acceptance_required")
+    if request.get("publication_mode") == ONLINE_TEST_MODE:
+        evidence = online_test_admission(request, report)
+    else:
+        need(request.get("publication_mode") in (None, "ORDINARY_NATIVE_ACCEPTED"),
+             "unknown_publication_mode_refused")
+        admission = _native_policy(cfg, report["operator_revision"])
+        evidence = admission.validate_native_release(request, report, manifest, signed)
+        need(evidence.get("ordinary_production_acceptance") is True
+             and evidence.get("content_sha256") == manifest["content_sha256"]
+             and evidence.get("release_sequence", RELEASE_SEQUENCE) == RELEASE_SEQUENCE,
+             "same_signed_ordinary_client_complete_acceptance_required")
     need(recipe.JOURNAL.read_bytes() == journal_raw and recipe.INPUT_FILE.read_bytes() == config_raw,
          "parent_or_controls_changed_during_publication_validation")
     return dict(workshop_id=recipe.ITEM, app_id=APP, owner=OWNER,
@@ -132,4 +187,7 @@ def validate_release(request):
         parent_resource_origins_sha256=report["parent_resource_origins_sha256"],
         resource_origins_sha256=report["resource_origins_sha256"],
         package_dir=str(Path(cfg["candidate"]["output"]).resolve()),
-        operator_revision=report["operator_revision"], ordinary_production_acceptance=True)
+        operator_revision=report["operator_revision"],
+        ordinary_production_acceptance=evidence.get("ordinary_production_acceptance") is True,
+        online_test_release_authorized=evidence.get("online_test_release_authorized") is True,
+        publication_mode=evidence.get("publication_mode", "ORDINARY_NATIVE_ACCEPTED"))

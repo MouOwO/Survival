@@ -180,7 +180,15 @@ def advance(previous, report, manifest, projection, inventory, trees, delivery):
                  "complete_baseline_changed_origin_requires_actual_typed_binding")
         else:
             need(origin == old[name], "complete_baseline_unaffected_parent_origins_changed")
-    need(delivery.get("ordinary_production_acceptance") is True
+    online_test = (delivery.get("publication_mode") == "EXPLICIT_UNLISTED_ONLINE_TEST_NATIVE_PENDING"
+        and delivery.get("online_test_release_authorized") is True
+        and delivery.get("ordinary_production_acceptance") is False
+        and delivery.get("native_acceptance_status") == "PENDING_USER_ONLINE_TEST"
+        and isinstance(delivery.get("online_test_authorization_sha256"), str)
+        and len(delivery["online_test_authorization_sha256"]) == 64)
+    if online_test:
+        guard.checked_sha(delivery["online_test_authorization_sha256"])
+    need((delivery.get("ordinary_production_acceptance") is True or online_test)
          and delivery.get("official_full_installation_reverified") is True
          and delivery.get("signature_valid") is True,
          "complete_baseline_actual_ordinary_and_full_official_evidence_required")
@@ -208,6 +216,31 @@ def target_trees(builder, report):
     return trees, dict(counts)
 
 
+def reverify_online_test_installation(auth, builder, report, expected, journal, receipt, snapshots):
+    """Verify actual official bytes while leaving native gameplay acceptance pending."""
+    import release_pipeline as pipeline
+    downloaded = pipeline.pinned_module(auth, "download")
+    downloaded.REPORT_SHA = expected; downloaded.configure(report); protocol = downloaded.protocol()
+    installed = guard.regular(Path(receipt["download"]["install_folder"]))
+    need(installed == guard.regular(protocol.INSTALLED), "online_test_fixed_official_installation_required")
+    with builder.scene_maps(), builder.inc.trusted_source(builder.TRUSTED):
+        actual = protocol.verify.verify_installed(copy.deepcopy(receipt["download"]), builder.VIEW, journal)
+        need(actual.get("signature_valid") is True and actual.get("package_files") == report["package_files"]
+             and actual.get("vpk_sha256") == report["vpk_sha256"]
+             and actual.get("verification", {}).get("files") == report["files"]
+             and actual["verification"].get("archive_count") == len(report["package_files"]) - 1
+             and all(actual["verification"].get(key) is True for key in protocol.callbacks.CHECKS),
+             "online_test_actual_official_full_installation_failed")
+        raw = protocol.api.pack.read_metadata(protocol.ACF, protocol.api.pack.MAX_MANIFEST)
+        steam, row = protocol.acf_manifest(raw, receipt["post_query"],
+            sum(v["bytes"] for v in report["package_files"]), receipt["steam_manifest"])
+        need(steam == receipt["steam_manifest"] and row == receipt["acf_installed_entry"],
+             "online_test_official_manifest_changed")
+        snapshots[Path(protocol.ACF)] = raw
+    builder.verify_operator_paths(dict(downloaded._PROTOCOL_EXECUTED_PINS), report["operator_revision"])
+    protocol.unchanged(snapshots)
+
+
 def collect_verified(auth, builder, request, receipt_path, *, full):
     """Recheck original inputs; full completion additionally rehashes official VPK."""
     auth = checked_authority(auth)
@@ -221,8 +254,16 @@ def collect_verified(auth, builder, request, receipt_path, *, full):
     receipt, receipt_raw = read(path)
     journal, journal_raw, state, state_raw = current_head(auth, report, expected, request)
     verified_delivery(report, manifest, expected, journal, sha(journal_raw), receipt)
-    if full:
-        from complete_delivery_release_20261103 import publication_validator as publication
+    from complete_delivery_release_20261103 import publication_validator as publication
+    online_test = request.get("publication_mode") == publication.ONLINE_TEST_MODE
+    official_snapshots = {}
+    if online_test:
+        native_summary = publication.online_test_admission(request, report)
+        publication._operator_file(TOOL, Path(__file__).read_bytes(), native_summary["publication_operator_revision"])
+        if full:
+            reverify_online_test_installation(auth, builder, report, expected, journal, receipt, official_snapshots)
+        native_summary.update(official_full_installation_reverified=True, official_receipt_sha256=sha(receipt_raw))
+    elif full:
         native = publication._native_policy(ctx.config, report["operator_revision"])
         # The current installation is now the official target, whereas the
         # original same-process close/restore evidence remains mandatory.
@@ -255,12 +296,17 @@ def collect_verified(auth, builder, request, receipt_path, *, full):
         collection_operator_revision=report["collection_source_revisions"]["operator"],
         projection_document_sha256=sha(ctx.projection_raw), git_metadata_costs=costs,
         no_additional_sdk_calls=True, canonical_journal_written=False)
+    if online_test:
+        evidence.update({key: native_summary[key] for key in
+            ("publication_mode", "online_test_release_authorized", "native_acceptance_status",
+             "online_test_authorization_sha256", "publication_operator_revision")})
     result = advance(previous, report, manifest, ctx.projection, inventory, trees, evidence)
     return dict(baseline=result, report=report, manifest=manifest, receipt=receipt,
                 snapshots={Path(auth.policy["canonical_journal"]): journal_raw,
                            Path(auth.policy["lineage_state"]): state_raw,
                            path: receipt_raw, builder.INPUT_FILE: ctx.config_raw,
-                           builder.REPORT / "package.json": (builder.REPORT / "package.json").read_bytes()})
+                           builder.REPORT / "package.json": (builder.REPORT / "package.json").read_bytes(),
+                           **official_snapshots})
 
 
 def unchanged(snapshots):
