@@ -109,13 +109,19 @@ local function spawn_target(player_id, action, marker, location)
         if not valid(target) then return end
         target.survival_training_owner_player_id = player_id
         target.survival_display_name = "长青轮纹"
-        local health = math.max(1, tonumber(action.target_health) or 1000000000)
-        target:SetBaseMaxHealth(health)
-        target:SetMaxHealth(health)
-        target:SetHealth(health)
-        target:SetPhysicalArmorBaseValue(tonumber(action.target_armor) or 100000)
+        -- Keep authored health out of native integer setters. DamageFilter and
+        -- both health UIs already consume this shared projection.
+        local projected = require("combat/endless_stat_projection").prepare(target, {
+            health = math.max(1, tonumber(action.target_health) or 1000000000000),
+            attack = 0,
+        })
+        target:SetBaseMaxHealth(projected.health)
+        target:SetMaxHealth(projected.health)
+        target:SetHealth(projected.health)
+        target:SetPhysicalArmorBaseValue(tonumber(action.target_armor) or 1000000000)
         target:AddNewModifier(target, nil, "modifier_endless_training_target", {
-            health_regen = tonumber(action.target_health_regen) or 100000000,
+            health_regen = (tonumber(action.target_health_regen) or 100000000000)
+                / target.survival_endless_health_scale,
         })
         FindClearSpaceForUnit(target, origin, true)
     end)

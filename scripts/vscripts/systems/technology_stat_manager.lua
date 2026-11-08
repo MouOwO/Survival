@@ -487,7 +487,7 @@ function M.set_training_room_state(player_id, active, multiplier, action_id, rea
 end
 
 function M.training_room_multiplier(player_id, target)
-    local runtime = snapshot(ensure_state(player_id)).runtime or {}
+    local runtime = ensure_state(player_id).runtime or {}
     if runtime.training_room_active ~= true then return 1 end
     if not target or target:IsNull()
         or tonumber(target.survival_training_owner_player_id) ~= tonumber(player_id) then
@@ -495,7 +495,7 @@ function M.training_room_multiplier(player_id, target)
     end
     local permanent = event_bus.request(
         events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
-        { player_id = player_id }
+        { player_id = player_id, training_room_only = true }
     )
     local bonus_pct = tonumber(permanent and permanent.totals
         and permanent.totals.training_room_income_bonus_pct) or 0

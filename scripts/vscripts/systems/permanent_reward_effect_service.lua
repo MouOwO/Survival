@@ -343,6 +343,12 @@ local function on_damage(payload)
     if phase_guard.post_clear_frozen() then return end
     local attack_growth = M.value(player_id, "hero_damage_attack_growth")
     local attribute_growth = M.value(player_id, "hero_attributes_per_damage")
+    if attack_growth > 0 or attribute_growth > 0 then
+        local multiplier = require("systems/technology_stat_manager")
+            .training_room_multiplier(player_id, payload.target)
+        attack_growth = attack_growth * multiplier
+        attribute_growth = attribute_growth * multiplier
+    end
     if attack_growth > 0 then
         hero_damage_attack_bonus_by_player[player_id] =
             (hero_damage_attack_bonus_by_player[player_id] or 0) + attack_growth
@@ -451,6 +457,12 @@ local function on_hero_attack(payload)
     local attribute_growth = M.value(player_id, "hero_attribute_growth")
     attribute_growth = attribute_growth * (1
         + M.value(player_id, "hero_attack_attribute_efficiency_pct") / 100)
+    if attack_growth > 0 or attribute_growth > 0 then
+        local multiplier = require("systems/technology_stat_manager")
+            .training_room_multiplier(player_id, payload.target)
+        attack_growth = attack_growth * multiplier
+        attribute_growth = attribute_growth * multiplier
+    end
     if attack_growth > 0 then
         hero_basic_attack_bonus_by_player[player_id] =
             (hero_basic_attack_bonus_by_player[player_id] or 0) + attack_growth
@@ -518,6 +530,14 @@ local function get(payload)
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil or player_id < 0 then
         return { ok = false, error = "player_id_invalid" }
+    end
+    if payload.training_room_only == true then
+        return {
+            ok = true,
+            totals = {training_room_income_bonus_pct = tonumber(
+                (totals_by_player[player_id] or {}).training_room_income_bonus_pct
+            )},
+        }
     end
     if payload.lumberjack_growth_only == true then
         return {

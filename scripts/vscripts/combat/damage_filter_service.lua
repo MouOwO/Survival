@@ -383,6 +383,11 @@ local function filter(_, keys)
         -- infinity or oversized floats into the engine damage event.
         keys.damage = math.min(keys.damage, 1e30)
     end
+    if victim.survival_training_owner_player_id ~= nil then
+        -- MIN_HEALTH alone cannot protect native integer health from an
+        -- oversized hit. Bound it after projection, just like resource trees.
+        keys.damage = math.min(keys.damage, math.max(0, victim:GetHealth() - 1))
+    end
     if tree_damage_rules.is_tree(victim) then
         -- The entitlement grants double tree damage to every owned worker,
         -- including the immortal itself. A persistent unit tag is not proof
