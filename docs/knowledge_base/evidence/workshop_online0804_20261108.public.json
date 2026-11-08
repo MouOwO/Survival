@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "status": "WORKSHOP_SYNCED",
+  "release_sequence": 2026110804,
+  "workshop_id": "3824360109",
+  "steam_manifest": "8362187116891559911",
+  "runtime_sources": {
+    "content": "e081389bfd0bfdd785cfb1572ab5bf95a3655c46",
+    "game": "32ef4951041f3cc2e115fe2ad114b3d030acbf80"
+  },
+  "package_operator_revision": "32ef4951041f3cc2e115fe2ad114b3d030acbf80",
+  "publication_operator_revision": "fb4f38ce646d41f01c2e0c047efd4fe42311954b",
+  "source_coverage": 675,
+  "historical_sources_delivered": 242,
+  "runtime_files": 7053,
+  "changed_runtime_paths": 449,
+  "removed_runtime_paths": [
+    "panorama/layout/custom_game/onboarding.vxml_c",
+    "panorama/scripts/custom_game/onboarding.vjs_c",
+    "panorama/styles/custom_game/onboarding.vcss_c",
+    "scripts/vscripts/debug/offline_onboarding_test.lua",
+    "scripts/vscripts/systems/onboarding_persistence.lua",
+    "scripts/vscripts/systems/onboarding_service.lua",
+    "scripts/vscripts/systems/onboarding_targets.lua"
+  ],
+  "official_package_bytes": 3811715196,
+  "package_files": [
+    {
+      "bytes": 291070,
+      "name": "3824360109.vpk",
+      "sha256": "03d731ebb48c838da83ca29f7b8e24e4e405c334e03e0964c3206f60712a3e1e"
+    },
+    {
+      "bytes": 1072066284,
+      "name": "3824360109_000.vpk",
+      "sha256": "bda8c1d3eb507f1ecf32bf2832232b9d6f30c398c58a382881d68f709d891b40"
+    },
+    {
+      "bytes": 1071529200,
+      "name": "3824360109_001.vpk",
+      "sha256": "3046a3ae720dd0e80950e14562bf8c8c556f095a4ab068773d7f34dd78ca2b49"
+    },
+    {
+      "bytes": 1072379215,
+      "name": "3824360109_002.vpk",
+      "sha256": "e03f21542c7c283460e21c60c6350587a8b100b9ab5789d7cfa2ebe41fd1206a"
+    },
+    {
+      "bytes": 595449427,
+      "name": "3824360109_003.vpk",
+      "sha256": "ef2eb066b13b42aa1cd8d73dc4c8b2dc9680554e6d956a021c14a7fdd3b86f36"
+    }
+  ],
+  "signed_manifest_sha256": "d7dbdffd84502bdd27f117437ee2ccd6602ce878aff25271a09ca69b42572885",
+  "content_sha256": "14fe2af32440c6bf758cdb5f95aa415353b1ff32a5a5efe71ba8e0c3fecf1f9d",
+  "package_report_sha256": "5cd08b06cf2f3ee2ec0e735c2c3f13b499904e09dd05502698406ac42c138229",
+  "official_download_receipt_sha256": "ad613893724971facfd33b16103fbb2eaff083197b8b2e5ce00758ff89ead4d3",
+  "baseline_sha256": "b1d27b3fcfb231f6036005c087836eee5dc2a24dc9419ac8ea747326a1b7f644",
+  "pending_counts": {
+    "rows": 0,
+    "pending": 0,
+    "blocking": 0,
+    "historical_sources": 0,
+    "dirty_total": 5,
+    "dirty_runtime": 0,
+    "pending_resources": 0,
+    "by_status": {}
+  },
+  "native_acceptance_status": "PENDING_USER_ONLINE_TEST",
+  "ordinary_production_acceptance": false,
+  "backend_deployed_this_task": false,
+  "sdk_uploads_submitted": 1,
+  "download_callback": {
+    "callback_id": 3406,
+    "app_id": 570,
+    "workshop_id": "3824360109",
+    "result": 1,
+    "requested_utc": "2026-11-08T15:13:52.881747+00:00",
+    "received_utc": "2026-11-08T15:15:10.428748+00:00"
+  },
+  "fresh_queries_cached": false,
+  "new_gameplay_transactions_automated": 0
+}
