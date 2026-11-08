@@ -67,9 +67,19 @@ def pending_source_keys(baseline_inventory, head_inventory, *deferrals):
     return keys
 
 
+# One reviewed loading cover only; other PNG/VTEX authors remain unmapped.
+LOADING_COVER_RESOURCE = 'panorama/images/custom_game/loading/dawnward_citadel_background_png.vtex_c'
+LOADING_COVER_DESCRIPTOR = 'panorama/images/custom_game/loading/dawnward_citadel_background_png.vtex'
+LOADING_COVER_AUTHORS = {'panorama/images/custom_game/loading/dawnward_citadel_background.png': 'art/ui/sources/custom_game/loading/dawnward_citadel_background.png', 'panorama/images/custom_game/loading/dawnward_citadel_background_png.vtex': 'art/ui/sources/custom_game/loading/dawnward_citadel_background_png.vtex'}
+LOADING_COVER_GAME_AUTHORS = frozenset(LOADING_COVER_AUTHORS.values())
+
+
 def _resource(role, path, parent_rows):
     """Return a candidate mapping, not proof of compilation or production fit."""
     suffix = PurePosixPath(path).suffix.lower()
+    if ((role == 'content' and path in LOADING_COVER_AUTHORS)
+            or (role == 'game' and path in LOADING_COVER_GAME_AUTHORS)):
+        return LOADING_COVER_RESOURCE, 'author'
     # MoviePanel reads raw WebM bytes from the mounted game tree. New files
     # need the same mapping as movies already present in the signed parent;
     # the complete collector separately verifies a content mirror byte-for-byte.

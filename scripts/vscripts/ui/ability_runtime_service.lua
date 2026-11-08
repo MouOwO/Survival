@@ -19,6 +19,7 @@ local ability_keys_by_unit = {}
 local tower_trace_by_ability = {}
 local hero_runtime_trace_by_unit = {}
 local hero_skill_by_ability = {}
+local hero_skill_projection_by_player = {}
 local builder_slot_order_by_ability = {}
 local pending_resource_refresh = {}
 local pending_fusion_refresh = {}
@@ -383,6 +384,50 @@ local function trace_combat_hero_runtime(state)
     ))
 end
 
+local function update_hero_skill_projection(payload)
+    -- Only the authoritative skill-change edge builds this index. Generic
+    -- hero/attribute refreshes do no snapshot reads, owner calls or skill scans.
+    local player_id = tonumber(payload.player_id)
+    if not finite_number(player_id) or player_id < 0 or player_id ~= math.floor(player_id)
+        or not CustomNetTables or not CustomNetTables.GetTableValue then return nil end
+    local snapshot = CustomNetTables:GetTableValue("survival_hero_skills",
+        "player_" .. tostring(player_id))
+    if type(snapshot) ~= "table" or tonumber(snapshot.player_id) ~= player_id then return nil end
+    if tonumber(snapshot.unit_entindex) ~= tonumber(payload.unit_entindex)
+        or tonumber(snapshot.hero_ready) ~= tonumber(payload.hero_ready)
+        or tonumber(snapshot.version) ~= tonumber(payload.version)
+        or snapshot.hero_id ~= payload.hero_id then return false end
+    if tonumber(snapshot.hero_ready) ~= 1 then
+        hero_skill_projection_by_player[player_id] = nil
+        return true
+    end
+    local unit_key, version = tonumber(snapshot.unit_entindex), tonumber(snapshot.version)
+    local unit = unit_from_payload({entindex = unit_key})
+    if not unit or safe_method_number(unit, "GetPlayerOwnerID", -1) ~= player_id
+        or not finite_number(version) or version < 0 or version ~= math.floor(version)
+        or type(snapshot.skills) ~= "table" then return false end
+    local previous = hero_skill_projection_by_player[player_id]
+    if previous and previous.unit == unit and previous.unit_key == unit_key
+        and previous.version == version and previous.hero_id == snapshot.hero_id then return true end
+    local by_ability = {}
+    for _, row in ipairs(snapshot.skills) do
+        if type(row) == "table" then
+            local definition = hero_skill_by_ability[row.ability_name]
+            local level, locked = tonumber(row.level), tonumber(row.locked)
+            if definition and definition.skill_id == row.skill_id
+                and finite_number(level) and level >= 0 and level == math.floor(level)
+                and (locked == 0 or locked == 1) then
+                if by_ability[row.ability_name] ~= nil then by_ability[row.ability_name] = false
+                else by_ability[row.ability_name] = {level = level, locked = locked,
+                    locked_reason = tostring(row.locked_reason or "")} end
+            end
+        end
+    end
+    hero_skill_projection_by_player[player_id] = {unit = unit, unit_key = unit_key,
+        hero_id = snapshot.hero_id, version = version, by_ability = by_ability}
+    return true
+end
+
 local function publish(state, fusion_snapshot)
     local unit = state.unit
     if not valid_entity(unit) then
@@ -447,6 +492,10 @@ local function publish(state, fusion_snapshot)
         }
     )
     local resource_state = resources(state.player_id)
+    local hero_projection = state.building_id == "combat_hero"
+        and hero_skill_projection_by_player[tonumber(state.player_id)] or nil
+    local hero_skills = hero_projection and hero_projection.unit == unit
+        and hero_projection.unit_key == unit_key and hero_projection.by_ability or nil
     local current = {}
     local published = {}
     local watches_resources = false
@@ -515,6 +564,19 @@ local function publish(state, fusion_snapshot)
             runtime.can_afford = 1
         end
         sync_ability_active(ability, runtime, state.building_id == "building_advanced_research_lab")
+        local learned_skill = hero_skills and hero_skills[ability_name]
+        if learned_skill then
+            -- Display only: do not change the preceding native activation rules.
+            -- Native level 1 also displays locked skills; use the true level.
+            local learned = learned_skill.locked == 0 and learned_skill.level > 0
+            runtime.prerequisite_met = learned and 1 or 0
+            runtime.available = runtime.prerequisite_met
+            runtime.current_level = learned_skill.level
+            if not learned then
+                runtime.status_text = learned_skill.locked_reason ~= ""
+                    and learned_skill.locked_reason or "技能尚未解锁"
+            end
+        end
         if is_tower_upgrade(ability_name) then
             ensure_tower_upgrade_active(ability, runtime)
             local trace_key = ability:entindex()
@@ -577,6 +639,13 @@ end
 local function clear_unit(payload)
     local entindex = payload.entindex
     local previous = entindex and progression_unit_identity[entindex]
+    local prior_state = entindex and state_by_unit[entindex]
+    local player_id = prior_state and tonumber(prior_state.player_id)
+    local projection = player_id and hero_skill_projection_by_player[player_id]
+    if projection and projection.unit == prior_state.unit
+        and (not payload.unit or payload.unit == projection.unit) then
+        hero_skill_projection_by_player[player_id] = nil
+    end
     if previous then bump_progression_units(previous.player_id) end
     if entindex then progression_unit_identity[entindex] = nil end
     local keys = entindex and ability_keys_by_unit[entindex]
@@ -836,6 +905,9 @@ end
 
 
 local function on_hero_skill_changed(payload)
+    -- A late old-hero/version event must not overwrite the current index or
+    -- repaint an obsolete unit. Missing data retains the existing unknown path.
+    if update_hero_skill_projection(payload) == false then return end
     local entindex = tonumber(payload.unit_entindex)
     if not entindex or entindex < 0 then
         return
@@ -905,6 +977,7 @@ function M.init()
     ability_keys_by_unit = {}
     tower_trace_by_ability = {}
     hero_runtime_trace_by_unit = {}
+    hero_skill_projection_by_player = {}
     event_bus.subscribe(events.BUILDER_READY, on_builder_ready)
     event_bus.subscribe(events.HERO_CLONE_CREATED, on_hero_clone_created)
     event_bus.subscribe(events.HERO_CLONE_REMOVED, on_hero_clone_removed)

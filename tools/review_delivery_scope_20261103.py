@@ -23,6 +23,9 @@ HISTORICAL=Path('D:/Survival_发布候选')
 
 def author_paths(resource):
     """Candidate source paths only; availability is not a compilation proof."""
+    if resource == inventory.LOADING_COVER_RESOURCE:
+        primary = inventory.LOADING_COVER_DESCRIPTOR
+        return [('game', inventory.LOADING_COVER_AUTHORS[primary]), ('content', primary)]
     suffix=PurePosixPath(resource).suffix
     endings={'.vjs_c':'.js','.vcss_c':'.css','.vxml_c':'.xml','.vtex_c':'.vtex','.vsvg_c':'.svg'}
     if suffix not in endings:return []

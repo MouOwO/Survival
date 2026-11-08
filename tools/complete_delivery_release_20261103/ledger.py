@@ -211,6 +211,13 @@ def verify_compiler_receipt(*, plan_raw, plan_sha256, proof_raw, proof_sha256, s
             need(pin.get("compiler_input") == byte_fingerprint(payload) and pin.get("normalization") == normalization
                  and plan.get("inputs", {}).get(source_name) == pin, "compiler_checkout_or_global_input_binding_mismatch")
             author = pin.get("game_author")
+            cover_author = {
+                'panorama/images/custom_game/loading/dawnward_citadel_background.png': 'art/ui/sources/custom_game/loading/dawnward_citadel_background.png',
+                'panorama/images/custom_game/loading/dawnward_citadel_background_png.vtex': 'art/ui/sources/custom_game/loading/dawnward_citadel_background_png.vtex',
+            }.get(source_name)
+            if cover_author is not None:
+                need(isinstance(author, dict) and author.get("path") == cover_author,
+                     "compiler_loading_cover_dual_author_required")
             if source_name.startswith("panorama/videos/") and source_name.endswith(".webm"):
                 need(isinstance(author, dict) and author.get("path") == source_name,
                      "compiler_raw_movie_dual_author_required")

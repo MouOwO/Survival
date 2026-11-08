@@ -216,7 +216,9 @@ def make_plan(scope,scope_sha,revisions,roots=None,operator_revision=None):
         value=reader.get('content',path)
         payload,normalization=compiler_bytes(value['raw'],PurePosixPath(path).suffix in TEXT)
         pin={k:v for k,v in value.items()if k!='raw'};pin.update(source_revision=revisions['content'],compiler_input=checks(payload),normalization=normalization)
-        mirror=path if runtime_raw_dependency(path) else 'panorama/src/'+path[len('panorama/'):]if path.startswith('panorama/')else None
+        cover_author=inventory.LOADING_COVER_AUTHORS.get(path)
+        mirror=cover_author or (path if runtime_raw_dependency(path) else 'panorama/src/'+path[len('panorama/'):]if path.startswith('panorama/')else None)
+        if cover_author:need(mirror in trees['game'],'loading_cover_game_author_missing:'+path)
         if runtime_raw_dependency(path):need(mirror in trees['game'],'raw_movie_game_author_missing:'+path)
         if mirror and mirror in trees['game']:
             game=reader.get('game',mirror)

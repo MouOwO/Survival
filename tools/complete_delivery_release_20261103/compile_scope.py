@@ -26,6 +26,8 @@ DECISION = "IMMUTABLE_AUTHORS_AVAILABLE_RECOMPILE_OR_VALIDATE_EMBEDDED_BINDING"
 
 def _authors(resource):
     primary = compiler.content_source(resource)  # Reject unknown native types.
+    if resource == compiler.inventory.LOADING_COVER_RESOURCE:
+        return {("content", primary), ("game", compiler.inventory.LOADING_COVER_AUTHORS[primary])}
     values = [("content", primary)]
     if PurePosixPath(primary).suffix in {".js", ".css", ".xml"}:
         values.append(("game", primary.replace("panorama/", "panorama/src/", 1)))
