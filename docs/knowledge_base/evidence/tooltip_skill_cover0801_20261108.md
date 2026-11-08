@@ -48,3 +48,13 @@
 待完成双仓真实 source21 提交推送、全量待发范围/官方编译、生产转换、final21 来源冻结、严格 collector、完整签名、普通客户端及官方发布/完整下载。不要把这份文档中的候选回归当作新签包或游廊成功。17 项 UI/封面源应用回执 `D:/Survival_本地工具/runs/20261108_tooltip_skill_ui/applied_sources01.json` SHA256 `7543760f66f2cb9ddc9d37a041eb1e01c7994436f61728e319f9a9bdd983ef0c`。
 
 原五项无关改动继续保留：backend pyc、server/bundles/current.json、monster portrait 两工具和 prepare_delivery_operator_20261103.py；不混入本轮源码或运行包。按用户本会话覆盖流程 commit → push，不执行 stash/pull。
+
+## 首次正式编译后的产物覆盖拦截
+
+首轮真实 source21 已双仓提交推送：game/operator `f9f928577034cc5659bff4f252b5d9c75edd282c`，content `24f26689e60d0fb2f48fe9c410ae5e1f8be0ce14`。25 项真实 Git 绑定回归通过；全量计划选中 170 项，四份封面 PNG/descriptor 作者均绑定。production21 实际生成并逐文件复核 853 plain、186 保护、7 override，报告 SHA256 `081b71c3fe7dccbefe50d7987d6d358f85ddb5c8b1d77469fc62cf4bcee233d9`，保护报告 SHA256 `4915b811e50217902b0a29ea2e1bc583e71b8253dc827cc19517b3f893f246dd`。
+
+170 个官方命令退出码均为 0，但严格 handoff 拒绝了产物，不是完整编译验收通过。显式封面命令中间生成 BGRA8888 `6,295,572` 字节、SHA256 `c808cee9cbef830c364c39f2ff39328d5708bd9bba21b15536401a964718d8de`；随后原生 XML 的 PNG 依赖编译改写同一 `_png.vtex_c` 为 DXT5 `1,580,532` 字节、SHA256 `39f8c2934f27a58ca9f2aa93f409a60149222af491695b9800ac614447df3904`。源 descriptor 没有变化，问题是两个原生编译入口共用输出名。其余 169 项一致，临时挂载已清理，主仓未导入本轮失败产物。旧 proof（`1617e42c25662d098a4c77b826b206bb86e38dc730ac9d4372f77ba39554dbf4`）、日志及 `post_compile_artifact_audit01.json` 均保留。
+
+编译工具修复只将这一个明确的封面目标排在最后实际执行，其他资源相对顺序保持；证明结果仍恢复为原计划顺序。所有命令完成后再逐产物验证大小/SHA256/MD5，任何后续覆盖或删除都会阻止写成功 proof。8 项实际调用 compile_plan 的隔离回归及独立审阅通过，不能代替新官方编译。额外成本仅一次构建 O(N) 排序分区及 O(全部编译产物字节) 读取，不进入游戏循环。
+
+下一次使用新 operator 提交和独立 gen21a3 计划、编译目录、proof 及生产目录；为保持既有简单合约，production 实际重新生成，不重标旧 production21。新 source21a3/final21a3 控制保留全部真实来源，catalog20 继续原来源和完整读集核验。此前把 tooltip 的 JS 误写为 XML 的控制遗漏清单也已在新 attempt 中纠正，旧失败控制/回执不覆盖。

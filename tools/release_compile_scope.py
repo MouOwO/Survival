@@ -254,6 +254,34 @@ def make_plan(scope,scope_sha,revisions,roots=None,operator_revision=None):
         counts=dict(Counter(row['status']for row in results)),read_costs=dict(git_tree_calls=counts['git_tree_calls'],git_batch_processes=2,blob_requests=reader.requests,source_bytes=reader.used),
         tool_sha256=sha(Path(__file__).read_bytes()),operator_binding=operator,publication_ready=False,sdk_calls=0,git_mutations=0,project_worktree_writes=0)
 
+def compile_execution_rows(rows):
+    """One fixed descriptor runs after its Panorama implicit dependencies.
+
+    Preserve every other relative order. Proof rows remain in the original
+    plan order; this execution order is not a different source/coverage plan.
+    Cold O(N) rows and O(N) references; no runtime/game work.
+    """
+    return ([row for row in rows if row['resource'] != inventory.LOADING_COVER_RESOURCE]
+            + [row for row in rows if row['resource'] == inventory.LOADING_COVER_RESOURCE])
+
+
+def finalize_compile_results(plan_rows, results):
+    """Refuse a successful proof if a later native command changed an output."""
+    by_resource = {row['resource']: row for row in results}
+    expected = [row['resource'] for row in plan_rows]
+    need(len(by_resource) == len(results) == len(expected)
+         and len(set(expected)) == len(expected) and set(by_resource) == set(expected),
+         'final_compile_result_scope_changed')
+    ordered = [by_resource[name] for name in expected]
+    for result in ordered:
+        if result['status'] != 'OFFICIALLY_COMPILED_AND_SOURCE_BOUND':
+            continue
+        artifact = Path(result['artifact_path'])
+        need(artifact.is_file() and checks(artifact.read_bytes()) == result['artifact'],
+             'compiler_artifact_changed_after_later_compile:' + result['resource'])
+    return ordered
+
+
 def compile_plan(plan,plan_sha,run_id,proof_dir):
     need(plan.get('kind')=='IMMUTABLE_ISOLATED_OFFICIAL_COMPILE_PLAN','immutable_compile_plan_required')
     need(plan.get('tool_sha256')==sha(Path(__file__).read_bytes()),'compiler_tool_changed_since_plan')
@@ -291,7 +319,7 @@ def compile_plan(plan,plan_sha,run_id,proof_dir):
             created_mounts.append((mount,target))
             need(mount.resolve()==target.resolve(),'isolated_compiler_mount_mismatch')
         results=[]
-        for row in plan['resources']:
+        for row in compile_execution_rows(plan['resources']):
             if row['status']!='READY_FOR_ISOLATED_OFFICIAL_COMPILE':results.append(dict(resource=row['resource'],status='BLOCKED',error=row.get('error')));continue
             source=content_mount/row['primary_source'];artifact=stage_game/row['resource'];before=checks(artifact.read_bytes())if artifact.is_file()else None
             for pin in row['sources']:
@@ -318,6 +346,7 @@ def compile_plan(plan,plan_sha,run_id,proof_dir):
                 primary_source=row['primary_source'],inputs=row['sources'],engine_references=row['engine_references'],**binding)
             if runtime_raw:result['runtime_raw_dependencies']=runtime_raw
             results.append(result)
+        results = finalize_compile_results(plan['resources'], results)
         report=dict(schema=1,kind='ISOLATED_OFFICIAL_COMPILER_PROOF',plan_sha256=plan_sha,source_revisions=revisions,scope_sha256=plan['scope_sha256'],
             compiler_path=str(COMPILER),compiler_sha256=compiler_sha,tool_sha256=sha(Path(__file__).read_bytes()),operator_binding=plan['operator_binding'],external_stage=str(stage),game_mount=str(game_mount),content_mount=str(content_mount),
             results=results,counts=dict(Counter(r['status']for r in results)),complete=all(r['status']=='OFFICIALLY_COMPILED_AND_SOURCE_BOUND'for r in results),
