@@ -14,7 +14,9 @@ import io
 import json
 from pathlib import Path, PurePosixPath
 import re
+import sys
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from complete_delivery_release_20261109 import parent_pending as inventory
 
 ROOT=inventory.ROOT
