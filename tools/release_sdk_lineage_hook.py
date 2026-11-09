@@ -10,10 +10,10 @@ import importlib
 
 ROOT = Path(__file__).resolve().parents[1]
 CANONICAL_JOURNAL = ROOT / 'output/four_accounts_20261022/steam_upload_state.json'
-AUTHORITY_FILE = ROOT / 'publishing/workshop/release_authority_complete_20261103.json'
+AUTHORITY_FILE = ROOT / 'publishing/workshop/release_authority_complete_20261109.json'
 # Root freezes the exact tracked authority after its validator is reviewed.
 # Missing authority is an explicit publication refusal, never a legacy bypass.
-AUTHORITY_SHA256 = '87e68019c747588ebbef31ee3a8984e759c34e1ca588dee01a6e21bc81d2e913'
+AUTHORITY_SHA256 = '9c7bd0830b74cbaef78cf00ef52b448693c0b4633ff1425815d7b6f29674a115'
 
 # Local query construction and official download/subscription stay available.
 # An unknown UGC entry is guarded by default, rather than accidentally becoming
