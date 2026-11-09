@@ -45,4 +45,6 @@ ability_tooltip在原有最多五条字段遍历中记录是否存在英雄LV行
 
 本轮运行替换共三项：`ui/ability_runtime_service.lua`及两个vjs_c；新增/删除运行资源均0。配套作者源为两仓的ability_tooltip.js、tooltip_position.js。不改已有签包/authority，也不将局部编译scope当作完整发行计划。
 
-全量当前双仓待发以本轮树外pending_inventory.json为准，须相对真实0804签名manifest覆盖所有当前源码、编译资源、素材、删除及其他并行修复。新Lua/静态投影/生产转换来源需重新核对，完成新完整签包和对应普通客户端验收后才能发布、官方下载验证。0804先上传后实机的历史授权只针对其原包，不沿用到本轮；后台保持原状。
+完整待发尚未收口：旧独立release_pending_inventory默认仍以0104为父，其输出pending_inventory.json保留但不用于当前0804发行结论。随后通过唯一入口release_pipeline.py pending --full读取完整0804路径，真实返回dirty_or_unclassified_runtime_source、exit2，原输出保存在pending_inventory_0804.json；它是门禁拒绝记录，不是成功的0804待发清单。本轮没有绕过该门禁、清空其他运行源码改动或把旧盘点数字当作新基线。
+
+后续须相对真实0804签名manifest覆盖所有当前源码、编译资源、素材、删除及其他并行修复，新Lua/静态投影/生产转换来源重新核对；完成新完整签包和对应普通客户端验收后才能发布、官方下载验证。0804先上传后实机的历史授权只针对其原包，不沿用到本轮；后台保持原状。
