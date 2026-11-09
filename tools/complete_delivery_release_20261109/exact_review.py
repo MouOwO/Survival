@@ -563,7 +563,7 @@ def main():
         review = make_reviews(scope, sha(scope_raw), pins, blobs, sources.facts, scan, sha(scan_raw))
         review['operator_binding'] = scan['operator_binding']; review['diagnostic_only_uncommitted_tool'] = not committed
         review['read_costs'] = {**sources.counts, 'batch_blob_requests': sources.reader.requests, 'batch_source_bytes': sources.reader.used}
-        prefix = args.output_prefix.resolve(); need(prefix.is_relative_to((ROOT/'output/compact_delivery_scope_20261103').resolve()) and not prefix.is_symlink(), 'fixed_scope_output_prefix_required')
+        prefix = args.output_prefix.resolve(); need(prefix.is_relative_to((ROOT/'output/complete_delivery_release_20261109_v01/scope').resolve()) and not prefix.is_symlink(), 'fixed_scope_output_prefix_required')
         documents = [(Path(str(prefix)+'_reference_scan.json'), scan_raw), (Path(str(prefix)+'_path_review.json'), canonical(review))]
         for path, _ in documents: need(not path.exists(), 'fresh_exact_review_outputs_required')
         for path, raw in documents:
