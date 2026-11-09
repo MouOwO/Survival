@@ -632,6 +632,7 @@ local function register_shop_purchase_request()
         local result = event_bus.request(events.SHOP_PURCHASE_REQUEST, {
             player_id = player_id,
             entry_id = tostring(payload.entry_id or ""),
+            mode = payload.mode,
             request_id = payload.request_id,
             source_entindex = tonumber(payload.source_entindex),
         })

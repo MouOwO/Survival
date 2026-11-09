@@ -958,6 +958,16 @@ local function purchase(payload)
     if not entry then
         return { ok = false, error = "shop_entry_invalid" }
     end
+    -- Drawer observation may retire independently of a still visible client
+    -- page. Route this intent using its explicit page; eligibility, source,
+    -- price and grant checks below remain authoritative. Old callers retain
+    -- their existing remembered-page fallback. No observer rebuild is needed.
+    local mode = payload.mode
+    if mode ~= nil and mode ~= "shop" and mode ~= "challenge"
+        and mode ~= "research" then
+        return { ok = false, error = "购买页面无效，请重新打开", error_code = "shop_mode_invalid" }
+    end
+    mode = mode or state.opened_players[player_id] or "shop"
     local cooldown_remaining = purchase_cooldown_remaining(player_id, entry)
     if cooldown_remaining > 0 then
         return {
@@ -976,7 +986,7 @@ local function purchase(payload)
     local research_definition = research_config.by_legacy_group[technology_group]
     local research_source = payload.source == "research_lab_ability"
         or payload.source == "advanced_auto_research"
-        or (state.opened_players[player_id] == "research")
+        or mode == "research"
     local validated_research_source = false
     if entry.contenttype == "technology" and research_definition
         and not (technology_group == "gold_mine_efficiency"
@@ -994,8 +1004,7 @@ local function purchase(payload)
         payload.source_entindex or payload.entindex
     )
     local gold_mine_source_unit
-    local mode = state.opened_players[player_id] or "shop"
-    if not gold_mine_ability and not research_source then
+    if not gold_mine_ability and (not research_source or payload.mode ~= nil) then
         local allowed, mode_error = catalog.allowed_in_mode(entry, mode)
         if not allowed then
             return { ok = false, error = mode_error or "shop_mode_invalid" }
@@ -1085,8 +1094,7 @@ local function purchase(payload)
     local context = snapshot_context(
         player_id,
         "purchase_validation",
-        gold_mine_ability and "gold_mine"
-            or state.opened_players[player_id] or "shop",
+        gold_mine_ability and "gold_mine" or mode,
         payload.source_entindex
     )
     context.gold_mine_ability = gold_mine_ability
