@@ -303,3 +303,8 @@ panorama/src/scripts/custom_game/common/compact_lottery_model.js text eol=lf
 scripts/vscripts/systems/player_web_auth.lua text eol=lf
 scripts/vscripts/systems/lottery_http_service.lua text eol=lf
 scripts/vscripts/ui/compact_lottery_projection.lua text eol=lf
+
+# Complete0901 operator and exact testing authorization.
+tools/complete_delivery_release_20261109/*.py text eol=lf
+publishing/workshop/release_authority_complete_20261109.json text eol=lf
+publishing/workshop/online_test_authorization_2026110901.json text eol=lf

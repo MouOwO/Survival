@@ -32,8 +32,20 @@ def pending_inventory():
         # Fixed new loader authenticates the SDK/full official receipt, signed
         # projection, exact dual Git checkpoint and current lineage generation.
         # Never feed complete typed origins into the legacy sparse loader.
-        from complete_delivery_release_20261103 import complete_pending
-        return complete_pending.inventory()
+        import importlib
+        import release_pipeline as pipeline
+        auth = pipeline.authority()
+        family = Path(auth.policy['recipe_path']).parent.name
+        if family not in ('complete_delivery_release_20261103', 'complete_delivery_release_20261109'):
+            raise ValueError('registered_complete_delivery_family_required')
+        cursor, _ = read_control(complete)
+        if cursor.get('authority_sha256') != auth.digest:
+            if (family != 'complete_delivery_release_20261109'
+                or cursor.get('baseline_sha256') != auth.policy.get('reviewed_source_baseline_sha256')
+                or cursor.get('authority_sha256') != auth.policy.get('parent_authority_sha256')):
+                raise ValueError('registered_complete_parent_transition_required')
+            return importlib.import_module(family + '.parent_pending').inventory()
+        return importlib.import_module(family + '.complete_pending').inventory()
     import release_pending_inventory as pending
     arguments=[]
     active=ROOT/'output/release_baselines/active.json'
@@ -63,7 +75,7 @@ def report_directory(auth):
     if family.parent.resolve()!=(ROOT/'tools').resolve():raise ValueError('registered_delivery_family_required')
     if 'report_directory' not in auth.policy:
         return ROOT/'output'/family.name
-    if family.name!='complete_delivery_release_20261103':
+    if family.name not in ('complete_delivery_release_20261103', 'complete_delivery_release_20261109'):
         raise ValueError('report_directory_override_requires_complete_family')
     configured=auth.policy['report_directory']
     if not isinstance(configured,str):raise ValueError('absolute_real_report_directory_required')
@@ -101,7 +113,12 @@ def delivery_status(auth,*,download_receipt=None,pending=None):
     # merely selecting the target here never proves a completed download.
     if journal.get('uploaded') is True and journal.get('content_sha256')==local_manifest.get('content_sha256'):
         published_manifest=local_manifest
-    else:published_manifest,_=read_control(inventory.PARENT_MANIFEST)
+    else:
+        parent_manifest = inventory.PARENT_MANIFEST
+        if Path(auth.policy['recipe_path']).parent.name == 'complete_delivery_release_20261109':
+            from complete_delivery_release_20261109 import parent_pending
+            parent_manifest = parent_pending.PARENT_MANIFEST
+        published_manifest,_=read_control(parent_manifest)
     sources=pending_source_keys(pending)
     inputs=dict(local_package=local,local_package_report_sha256=report_sha,
         expected_source_revisions=local.get('source_revisions'),journal=journal,journal_sha256=journal_sha,
