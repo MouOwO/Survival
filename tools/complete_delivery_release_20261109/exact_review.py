@@ -289,6 +289,16 @@ def load_review_blobs(sources, rows, pins):
         if role == 'content' and path in localization.PATHS:
             blobs[path] = sources.get('game', path)
     for path in (JS, LUA): blobs[path] = sources.get('game', path)
+    # An authenticated complete parent leaves only the changed metadata in
+    # this scope. Validate the entire concrete catalog chain even then.
+    for path in (MANIFEST, REGISTRY, ATLAS):
+        if path not in blobs: blobs[path] = sources.get('game', path)
+    catalog_manifest = json.loads(blobs[MANIFEST])
+    history_paths = {path for path in catalog_manifest['source_hashes']
+                     if path.startswith('data/ui/registry_history/')}
+    history_paths.add('data/ui/registry_history/' + catalog_manifest['registry_sha256'] + '.json')
+    for path in sorted(history_paths):
+        if path not in blobs: blobs[path] = sources.get('game', path)
     csv_paths = {r['source']['path'] for r in rows if r['source']['repo'] == 'game'} & set(CSV_OUTPUTS)
     if csv_paths:
         blobs[CSV_GENERATOR] = sources.get('game', CSV_GENERATOR)
@@ -367,10 +377,9 @@ def make_reviews(scope, scope_sha256, pins, blobs, facts, scan, scan_sha256):
     current = manifest.get('registry_sha256')
     if isinstance(current, str) and re.fullmatch('[a-f0-9]{64}', current):
         histories.add('data/ui/registry_history/'+current+'.json')
-    expected = {ATLAS, MANIFEST, REGISTRY, *EVIDENCE, *histories}
-    if LOTTERY_SEED in paths: expected.add(LOTTERY_SEED)
-    expected.update(paths & set(CSV_OUTPUTS))
-    expected.update(paths & KEEPER_INPUTS)
+    known = {ATLAS, MANIFEST, REGISTRY, LOTTERY_SEED, *EVIDENCE, *histories,
+             *CSV_OUTPUTS, *KEEPER_INPUTS}
+    expected = paths & known
     need(len(rows) == len(paths) == len(expected) and paths == expected,
          'unmapped_set_not_exact_reviewed_paths')
     checks = validate_catalog(blobs)
