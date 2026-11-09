@@ -308,3 +308,10 @@ scripts/vscripts/ui/compact_lottery_projection.lua text eol=lf
 tools/complete_delivery_release_20261109/*.py text eol=lf
 publishing/workshop/release_authority_complete_20261109.json text eol=lf
 publishing/workshop/online_test_authorization_2026110901.json text eol=lf
+
+# Dedicated local packaging application; runtime payload is unchanged.
+tools/release_packager/*.py text eol=lf
+tools/release_packager/*.md text eol=lf
+tools/release_packager.ps1 text eol=crlf
+打包工具.cmd text eol=crlf
+一键打包.cmd text eol=crlf
