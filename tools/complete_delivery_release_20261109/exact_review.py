@@ -529,12 +529,15 @@ def main():
     scope = json.loads(scope_raw); sources = Sources(pins)
     try:
         operator = {}
-        for path in (TOOL, 'tools/release_pending_inventory.py', 'tools/release_compile_scope.py', LOCALIZATION_TOOL):
+        for path in (TOOL, 'tools/complete_delivery_release_20261109/parent_pending.py',
+                     'tools/release_pending_inventory.py', 'tools/release_compile_scope.py', LOCALIZATION_TOOL):
             actual = (ROOT/path).read_bytes().replace(b'\r\n', b'\n')
-            loaded = {TOOL: EXECUTED_SHA, 'tools/release_pending_inventory.py': pending.EXECUTED_SOURCE_LF_SHA256,
+            loaded = {TOOL: EXECUTED_SHA,
+                      'tools/complete_delivery_release_20261109/parent_pending.py': pending.EXECUTED_SOURCE_LF_SHA256,
+                      'tools/release_pending_inventory.py': pending.legacy.EXECUTED_SOURCE_LF_SHA256,
                       'tools/release_compile_scope.py': compiler.EXECUTED_TOOL_LF_SHA256,
                       LOCALIZATION_TOOL: localization.EXECUTED_SOURCE_LF_SHA256}[path]
-            need(sha(actual) == loaded, 'review_tool_or_dependency_changed_after_import')
+            need(sha(actual) == loaded, 'review_tool_or_dependency_changed_after_import:' + path)
             try: declared = compiler.run_git(ROOT, 'show', pins['operator']+':'+path).replace(b'\r\n', b'\n')
             except ValueError: declared = None
             operator[path] = {'executed_lf_sha256': sha(actual), 'declared_lf_sha256': sha(declared) if declared is not None else None, 'matches_operator_commit': declared == actual}
