@@ -52,7 +52,7 @@ social_ex,2,6,二次元挑战,1,social_ticket,ex,models/items/ogre_magi/ogre_arc
 击败后可获得1个邀请函，可以用于抽奖
 
 每天最多获得10个邀请函
-祥瑞挑战总次数大于100方可获得
+前置：祥瑞累计抽奖至少101次后可挑战
 
 会攻击塔",monster_archive_social_ex,,beast,100
 football,2,7,绿茵挑战,1,challenge_points,football,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3.0,1,"召唤一群足球怪
@@ -74,7 +74,7 @@ social_friend,3,4,动漫挑战,1,social_ticket,friend,models/items/ogre_magi/ogr
 击败后可获得1个义帖，可以用于抽奖
 
 每天最多获得10个义帖
-邀请函总次数大于100方可获得
+前置：二次元累计抽奖至少101次后可挑战
 
 会攻击塔",monster_archive_social_friend,,ex,100
 hunt_09,3,5,神兽狩猎-奥蕾莉亚,10,fragment,fragment_09,models/heroes/weaver/weaver.vmdl,1.2,weaver_time_lapse,3.0,1,"需要：
@@ -120,7 +120,7 @@ social_wife,4,8,二次元挑战2,10,social_ticket,wife,models/items/ogre_magi/og
 击败后可获得1个玫瑰，可以用于抽奖
 
 每天最多获得10个玫瑰
-义帖总次数大于100方可获得
+前置：动漫累计抽奖至少101次后可挑战
 
 会攻击塔",monster_archive_social_wife,N10解锁,friend,100
 social_concubine,4,9,我的侍妾挑战,10,social_ticket,concubine,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3.0,1,"需要：
@@ -129,6 +129,6 @@ social_concubine,4,9,我的侍妾挑战,10,social_ticket,concubine,models/items/
 击败后可获得1个工资，可以用于抽奖
 
 每天最多获得10个工资
-义帖总次数大于100方可获得
+前置：动漫累计抽奖至少101次后可挑战
 
 会攻击塔",monster_archive_social_wife,N10解锁,friend,100

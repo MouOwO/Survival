@@ -74,7 +74,7 @@ local function reward_eligibility(state, definition)
     local profiles = require("systems/player_profile_service")
     local profile = type(profiles.get_account_profile) == "function" and profiles.get_account_profile(state.player_id)
         or type(profiles.get_profile) == "function" and profiles.get_profile(state.player_id)
-    local save = profile and profile.save and profile.save.archive or {}
+    local save = profile and profile.save and profile.save.archive
     return require("systems/archive_challenge_reward_eligibility").check(save, definition)
 end
 local function daily_quota(player_id, key)
@@ -157,15 +157,13 @@ function M.ability_runtime(caster, ability_name)
         runtime.icon_name = definition.ability_icon
         runtime.fields = {{label = "解锁条件", value = definition.unlock_text or ("N" .. definition.min_difficulty .. "解锁")}}
         local eligible, reward_reason = reward_eligibility(state, definition)
+        ready = ready and eligible
         if not eligible then
-            -- Available archive challenges hide the normal status footer. Put
-            -- the no-reward condition in the title as well as its exact field.
-            runtime.display_name = runtime.display_name .. "（本次无奖励）"
             runtime.fields[#runtime.fields + 1] = {label = "奖励条件", value = reward_reason}
         end
         runtime.status_text = running and "该挑战进行中" or used and "本局已挑战（每个技能仅限一次）"
             or not unlocked and (definition.unlock_text or ("N" .. definition.min_difficulty .. "解锁"))
-            or not eligible and "可以挑战，但尚不满足奖励条件" or "可以挑战"
+            or not eligible and reward_reason or "可以挑战"
     else
         ready = false
         runtime.status_text = "挑战入口无效"
@@ -463,6 +461,13 @@ function M.summon(caster, challenge_id, ability)
         publish(state)
         return false, "今日奖励已达上限"
     end
+    -- Validate before allocating a group, spawning units or consuming this
+    -- match's attempt. A stale native button must obey the same gate as HUD.
+    local eligible, reward_reason = reward_eligibility(state, definition)
+    if not eligible then
+        publish(state)
+        return false, reward_reason
+    end
     -- Archived combat values are final for every difficulty. Keep movement,
     -- range and other existing fields from the original per-entry definition.
     local baseline = stats.by_id[challenge_id .. "_" .. state.difficulty_id]
@@ -524,10 +529,6 @@ function M.summon(caster, challenge_id, ability)
     state.cooldowns[challenge_id] = now() + definition.cooldown_seconds
     ability:StartCooldown(definition.cooldown_seconds)
     publish(state)
-    local eligible, reward_reason = reward_eligibility(state, definition)
-    if not eligible then
-        notify(state.player_id, definition.display_name .. "：本次挑战不会获得奖励。" .. reward_reason)
-    end
     return true
 end
 local function killed(payload)

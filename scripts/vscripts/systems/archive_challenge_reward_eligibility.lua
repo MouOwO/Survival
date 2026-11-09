@@ -1,4 +1,4 @@
--- Pure reward eligibility. A failed condition never blocks the summon itself.
+-- Pure reward eligibility shared by challenge entry and reward settlement.
 local items = require("config/generated/archive_social_items")
 local M = {}
 local prerequisites = {ex="beast", friend="ex", wife="friend", concubine="friend"}
