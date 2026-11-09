@@ -146,7 +146,9 @@ def replay(game, content, operator, identity, *, python=sys.executable,
                    if key.upper() in {"SYSTEMROOT", "WINDIR", "TEMP", "TMP"}}
     environment.update(PYTHONUTF8="1", PYTHONDONTWRITEBYTECODE="1")
     commands = []
-    with tempfile.TemporaryDirectory(prefix="survival_item_generator_") as temporary:
+    scratch = Path("D:/Survival_本地工具/scratch")
+    scratch.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="survival_item_generator_", dir=str(scratch)) as temporary:
         stage = Path(temporary)
         for path, raw in source.items():
             destination = stage / path
