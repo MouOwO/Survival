@@ -410,7 +410,9 @@ local function update_hero_skill_projection(payload)
     if previous and previous.unit == unit and previous.unit_key == unit_key
         and previous.version == version and previous.hero_id == snapshot.hero_id then return true end
     local by_ability = {}
-    for _, row in ipairs(snapshot.skills) do
+    -- NetTable round trips can stringify array indices. Order is irrelevant
+    -- for this ability-name index; ipairs would silently discard those rows.
+    for _, row in pairs(snapshot.skills) do
         if type(row) == "table" then
             local definition = hero_skill_by_ability[row.ability_name]
             local level, locked = tonumber(row.level), tonumber(row.locked)
