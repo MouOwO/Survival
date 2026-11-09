@@ -567,6 +567,9 @@ function M.finish_player(player_id, automatic)
     if not automatic and archive.has_pending(state.player_id) then return false, "奖励正在保存，请稍后结束" end
     state.finished = true
     cleanup(state)
+    -- The HUD is event-driven. Publish this player's finished state even
+    -- while other players continue, so its button/countdown updates now.
+    publish_phase()
     finish_if_all()
     return true
 end

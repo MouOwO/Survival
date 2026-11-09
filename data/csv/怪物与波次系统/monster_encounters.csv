@@ -11,10 +11,10 @@ encounter_rebirth_07,rebirth_boss,转生试炼·7转,spawn_rebirth_07,rebirth_bo
 encounter_rebirth_08,rebirth_boss,转生试炼·8转,spawn_rebirth_08,rebirth_boss_08,reward_rebirth_08,8,8,1,0,none,0,shop_rebirth_challenge_08,1,临时测试强度待平衡。
 encounter_rebirth_09,rebirth_boss,转生试炼·9转,spawn_rebirth_09,rebirth_boss_09,reward_rebirth_09,9,9,1,0,none,0,shop_rebirth_challenge_09,1,临时测试强度待平衡。
 encounter_rebirth_10,rebirth_boss,转生试炼·10转,spawn_rebirth_10,rebirth_boss_10,reward_rebirth_10,10,10,1,0,none,0,shop_rebirth_challenge_10,1,临时测试强度待平衡。
-encounter_challenge_01,challenge,木材试炼场,wood_room,,reward_practice_wood_100,0,1,10,1,maintain_count,1,,1,具体怪物和地点由encounter_members与challenge_locations管理。
-encounter_challenge_02,challenge,金币试炼场,gold_room,,reward_practice_gold_100,0,2,10,1,maintain_count,1,,1,具体怪物和地点由encounter_members与challenge_locations管理。
-encounter_challenge_03,challenge,属性试炼场,atribute_room,,reward_practice_attribute_10,0,3,10,1,maintain_count,1,,1,具体怪物和地点由encounter_members与challenge_locations管理。
-encounter_challenge_04,challenge,高阶属性试炼场,big_atribute_room,,reward_practice_attribute_100_gold_1000,0,4,10,1,maintain_count,1,,1,具体怪物和地点由encounter_members与challenge_locations管理。
+encounter_challenge_01,challenge,木材试炼场,wood_room,,reward_practice_wood_100,0,1,10,1,maintain_count,1.5,,1,具体怪物和地点由encounter_members与challenge_locations管理。
+encounter_challenge_02,challenge,金币试炼场,gold_room,,reward_practice_gold_100,0,2,10,1,maintain_count,1.5,,1,具体怪物和地点由encounter_members与challenge_locations管理。
+encounter_challenge_03,challenge,属性试炼场,atribute_room,,reward_practice_attribute_10,0,3,10,1,maintain_count,1.5,,1,具体怪物和地点由encounter_members与challenge_locations管理。
+encounter_challenge_04,challenge,高阶属性试炼场,big_atribute_room,,reward_practice_attribute_100_gold_1000,0,4,10,1,maintain_count,1.5,,1,具体怪物和地点由encounter_members与challenge_locations管理。
 encounter_challenge_05,challenge,合成晶石挑战,combination_room,,,0,5,1,0,none,0,,1,具体怪物和地点由encounter_members与challenge_locations管理。
 encounter_challenge_06,challenge,进入寒霜领域,ice_room,,,0,6,13,1,maintain_count,1,,1,持续维持13只冰之幽魂；战斗属性按v3特殊BOSS公式。
 encounter_challenge_07,challenge,熔核试炼Lv1–3,fire_room,,,0,7,10,1,maintain_count,1,,1,场内维持10只熔火怪物；每只怪物死亡1秒后独立重生，同时死亡同时重生，场内最多10只；每只授权击杀有20%概率掉落熔火核心Lv1。

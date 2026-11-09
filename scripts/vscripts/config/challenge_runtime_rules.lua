@@ -9,11 +9,11 @@ M.rebirth_retry_seconds = 2
 M.rows = {}
 M.by_id = {}
 
-local function add(challenge_id, completion_limit)
+local function add(challenge_id, completion_limit, respawn_seconds)
     local row = {
         challenge_id = challenge_id,
         repeatable = true,
-        respawn_seconds = 1,
+        respawn_seconds = respawn_seconds or 1,
         completion_limit = completion_limit or 0,
     }
     M.rows[#M.rows + 1] = row
@@ -21,7 +21,7 @@ local function add(challenge_id, completion_limit)
 end
 
 for index = 1, 10 do
-    add(string.format("challenge_%02d", index))
+    add(string.format("challenge_%02d", index), nil, index <= 4 and 1.5 or 1)
 end
 add("challenge_11", 10)
 

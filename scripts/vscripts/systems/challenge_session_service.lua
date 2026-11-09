@@ -25,7 +25,14 @@ local monster_hull_scale = require("systems/monster_hull_scale")
 local monster_navigation = require("systems/monster_navigation_policy")
 local wave_monster_collision = require("systems/wave_monster_collision")
 local shared_boss = require("systems/shared_challenge_boss_registry")
+local preparation_queue = require("core/preparation_queue")
 local challenge_11_staging = "modifier_challenge_11_staging"
+local practice_staging = "modifier_practice_respawn_staging"
+local respawn_preparation, preparation_epoch = nil, 0
+local prepared_practice_members = {
+    practice_wood=true, practice_gold=true,
+    practice_attribute=true, practice_greater_attribute=true,
+}
 
 local M = {}
 local sessions = {}
@@ -201,6 +208,7 @@ local function remove_dead(session)
 end
 
 local function destroy_session_monsters(session)
+    if respawn_preparation then respawn_preparation.cancel_owner(session) end
     shared_boss.detach(session)
     -- Prepared abyss groups share this cleanup but do not own a respawn timer.
     if session.player_id ~= nil and session.encounter_id ~= nil then
@@ -319,7 +327,36 @@ local function maintain_count_spawn_position(session, member, location, point)
     return origin
 end
 
-local function create_member(session, member)
+local function dispose_prepared_respawn(_, ticket)
+    local unit = ticket.prepared_unit
+    ticket.prepared_unit, ticket.prepared_position, ticket.prepared_ai = nil, nil, nil
+    if not valid(unit) then return end
+    unit.survival_challenge_teardown = true
+    monster_visual.clear(unit)
+    monster_hero_visual_service.clear(unit)
+    if UTIL_Remove then UTIL_Remove(unit)
+    elseif unit.RemoveSelf then unit:RemoveSelf() end
+end
+
+local function register_member(session, member, unit, ai)
+    unit:AddNewModifier(unit, nil, "modifier_practice_monster_ai", ai)
+    local id = unit:entindex()
+    session.monsters[id] = unit
+    session.monster_count = session.monster_count + 1
+    monster_meta[id] = {
+        unit=unit, shared_slot=session.shared_boss_slot,
+        player_id=session.player_id, team=session.team,
+        encounter_id=session.encounter_id, member=member,
+    }
+    event_bus.emit(events.MONSTER_SPAWNED, {
+        unit=unit, entindex=id, encounter_id=session.encounter_id,
+        player_id=session.player_id, team=session.team,
+        archetype_id=member.archetype_id, reward_profile_id=member.reward_profile_id,
+    })
+    return unit
+end
+
+local function create_member(session, member, preparation)
     if not session.shared_world
         and require("systems/player_context_service").is_defeated(session.player_id) then
         return nil, "player_defeated"
@@ -372,20 +409,36 @@ local function create_member(session, member)
     end
 
     local collision_profile = wave_monster_collision.profile(member, archetype)
+    local native_position = preparation
+        and Vector(position.x, position.y, position.z - 16384) or position
     local created, unit = pcall(CreateUnitByName,
         archetype.unit_name,
-        position,
+        native_position,
         false,
         nil,
         nil,
         DOTA_TEAM_BADGUYS
     )
+    if preparation and GameRules:GetGameModeEntity() ~= preparation.preparation_world then
+        return nil, "prepared_respawn_world_changed"
+    end
     if not created or not valid(unit) then
         print("[CHALLENGE_SPAWN_FAILED] member=" .. tostring(member.member_id)
             .. " unit=" .. tostring(archetype.unit_name) .. " detail=" .. tostring(unit))
         return nil, "challenge_unit_create_failed:" .. tostring(archetype.unit_name)
     end
     if session.shared_boss_slot then session.shared_boss_slot.pending_unit = unit end
+    if preparation then
+        preparation.prepared_unit = unit
+        if preparation.preparation_epoch ~= preparation_epoch then
+            dispose_prepared_respawn(session, preparation)
+            return nil, "prepared_respawn_generation_changed"
+        end
+        unit.survival_challenge_respawn_prepared = true
+        assert(unit:AddNewModifier(unit, nil, practice_staging, {}), "practice staging unavailable")
+        unit:AddNoDraw()
+        unit:SetAbsOrigin(native_position)
+    end
     monster_navigation.apply(unit)
     unit.survival_shared_challenge_boss = session.shared_world == true or nil
     if session.challenge.challenge_id == "challenge_11" then
@@ -396,7 +449,7 @@ local function create_member(session, member)
     if collision_profile.apply_before_placement then
         monster_hull_scale.apply(unit, 1, collision_profile.base_hull_radius)
     end
-    FindClearSpaceForUnit(unit, position, true)
+    if not preparation then FindClearSpaceForUnit(unit, position, true) end
     if not collision_profile.apply_before_placement then
         monster_hull_scale.apply(unit, 1, collision_profile.base_hull_radius)
     end
@@ -445,45 +498,58 @@ local function create_member(session, member)
         -- FindClearSpaceForUnit may fan several practice monsters out from one
         -- marker. Preserve each resolved position as its own leash origin so
         -- the AI does not repeatedly force all of them back into one point.
-        home = unit:GetAbsOrigin()
+        home = preparation and position or unit:GetAbsOrigin()
     elseif member.spawn_target_name and member.spawn_target_name ~= "" and point then
         home = point:GetAbsOrigin()
     else
         local home_marker = marker(location.home_target_name) or point
         home = home_marker and home_marker:GetAbsOrigin() or position
     end
-    local hero = hero_for(session.player_id)
+    local hero = not preparation and hero_for(session.player_id) or nil
     local aggro_radius = tonumber(session.encounter.aggro_radius) or 700
     local leash_radius = tonumber(session.encounter.leash_radius) or 1200
-    unit:AddNewModifier(unit, nil, "modifier_practice_monster_ai", {
+    local ai = {
         hero_entindex = hero and hero:entindex() or -1,
         home_x = home.x,
         home_y = home.y,
         home_z = home.z,
         aggro_radius = aggro_radius,
         leash_radius = leash_radius,
-    })
-
-    session.monsters[unit:entindex()] = unit
-    session.monster_count = session.monster_count + 1
-    monster_meta[unit:entindex()] = {
-        unit = unit,
-        shared_slot = session.shared_boss_slot,
-        player_id = session.player_id,
-        team = session.team,
-        encounter_id = session.encounter_id,
-        member = member,
     }
-    event_bus.emit(events.MONSTER_SPAWNED, {
-        unit = unit,
-        entindex = unit:entindex(),
-        encounter_id = session.encounter_id,
-        player_id = session.player_id,
-        team = session.team,
-        archetype_id = member.archetype_id,
-        reward_profile_id = member.reward_profile_id,
-    })
+    if preparation then
+        preparation.prepared_position, preparation.prepared_ai = position, ai
+        return unit
+    end
+    return register_member(session, member, unit, ai)
+end
+
+local function activate_prepared_respawn(session, member, ticket)
+    local unit, position, ai = ticket.prepared_unit, ticket.prepared_position, ticket.prepared_ai
+    if not alive(unit) or not position or not ai then return nil, "prepared_respawn_invalid" end
+    if unit.survival_challenge_respawn_prepared ~= true
+        or not unit:HasModifier(practice_staging) then return nil, "prepared_respawn_staging_lost" end
+    if GridNav:IsBlocked(position) or not GridNav:IsTraversable(position) then
+        return nil, "prepared_respawn_destination_changed"
+    end
+    FindClearSpaceForUnit(unit, position, true)
+    local home, hero = unit:GetAbsOrigin(), hero_for(session.player_id)
+    ai.home_x, ai.home_y, ai.home_z = home.x, home.y, home.z
+    ai.hero_entindex = alive(hero) and hero:entindex() or -1
+    unit.survival_challenge_respawn_prepared = nil
+    unit:RemoveModifierByName(practice_staging)
+    unit:RemoveNoDraw()
+    register_member(session, member, unit, ai)
+    ticket.prepared_unit, ticket.prepared_position, ticket.prepared_ai = nil, nil, nil
     return unit
+end
+
+local function prepare_respawn(session, ticket)
+    if not respawn_preparation or not prepared_practice_members[ticket.member.member_id] then return end
+    ticket.preparation_generation = session.generation
+    ticket.preparation_jobs = session.respawn_jobs
+    ticket.preparation_epoch = preparation_epoch
+    ticket.preparation_world = GameRules:GetGameModeEntity()
+    respawn_preparation.enqueue(session, ticket)
 end
 
 local function spawn_member(session, member)
@@ -1242,7 +1308,9 @@ end
 local function schedule_maintain_respawn(session, member)
     if get_session(session.player_id, session.encounter_id) ~= session
         or session.status ~= "active" then return 0 end
-    local delay, now = 1, GameRules:GetGameTime()
+    local delay = math.max(.1, tonumber(member.respawn_seconds)
+        or tonumber(session.encounter.respawn_seconds) or 1)
+    local now = GameRules:GetGameTime()
     local jobs = session.respawn_jobs or {}
     session.respawn_jobs = jobs
     session.respawn_count = session.respawn_count or 0
@@ -1256,12 +1324,15 @@ local function schedule_maintain_respawn(session, member)
             if not oldest or job.due_at < jobs[oldest].due_at then oldest = id end
         end
         if not oldest then break end
+        if respawn_preparation then respawn_preparation.cancel(session, jobs[oldest]) end
         jobs[oldest] = nil
         session.respawn_count = session.respawn_count - 1
     end
     session.respawn_serial = (session.respawn_serial or 0) + 1
-    jobs[session.respawn_serial] = {member = member, due_at = now + delay}
+    local ticket = {member=member, due_at=now + delay, id=session.respawn_serial}
+    jobs[session.respawn_serial] = ticket
     session.respawn_count = session.respawn_count + 1
+    prepare_respawn(session, ticket)
     if session.respawn_pending then return math.max(0, (session.respawn_at or now + delay) - now) end
 
     local generation = session.generation
@@ -1297,17 +1368,28 @@ local function schedule_maintain_respawn(session, member)
                 if not current() then return end
                 local job = entry.job
                 if jobs[entry.id] == job then
+                    local prepared = respawn_preparation and respawn_preparation.claim(session, job)
                     jobs[entry.id] = nil
                     session.respawn_count = session.respawn_count - 1
                     if session.monster_count < maintain_count_limit(session, job.member) then
-                        local ok, unit, error_message = pcall(spawn_member, session, job.member)
+                        local ok, unit, error_message
+                        if prepared then
+                            ok, unit, error_message = pcall(activate_prepared_respawn, session, job.member, job)
+                            if not ok or not unit then dispose_prepared_respawn(session, job) end
+                        end
+                        if not prepared or not ok or not unit then
+                            ok, unit, error_message = pcall(spawn_member, session, job.member)
+                        end
                         if not current() then return end
                         if not ok or not unit then
                             job.due_at = GameRules:GetGameTime() + delay
                             jobs[entry.id] = job
                             session.respawn_count = session.respawn_count + 1
+                            prepare_respawn(session, job)
                             respawn_error = ok and error_message or tostring(unit)
                         end
+                    elseif prepared then
+                        dispose_prepared_respawn(session, job)
                     end
                 end
             end
@@ -1622,6 +1704,29 @@ local function on_player_disconnected(payload)
 end
 
 function M.init()
+    if respawn_preparation then respawn_preparation.clear() end
+    respawn_preparation, preparation_epoch = nil, preparation_epoch + 1
+    local epoch = preparation_epoch
+    local mode = GameRules.GetGameModeEntity and GameRules:GetGameModeEntity()
+    if mode and type(mode.SetContextThink) == "function"
+        and rawget(_G, "MODIFIER_STATE_OUT_OF_GAME") ~= nil then
+        respawn_preparation = preparation_queue.new({
+            world=mode, name="SurvivalPracticeRespawnPreparation", capacity=160,
+            max_items=2, budget_seconds=.002,
+            current=function()
+                return epoch == preparation_epoch and GameRules:GetGameModeEntity() == mode
+            end,
+            valid=function(session, ticket)
+                return get_session(session.player_id, session.encounter_id) == session
+                    and session.status == "active"
+                    and session.generation == ticket.preparation_generation
+                    and session.respawn_jobs == ticket.preparation_jobs
+                    and session.respawn_jobs[ticket.id] == ticket
+            end,
+            prepare=function(session, ticket) return create_member(session, ticket.member, ticket) end,
+            dispose=dispose_prepared_respawn,
+        })
+    end
     shared_boss.configure({
         now = function() return GameRules:GetGameTime() end,
         after = scheduler.after,
@@ -1680,4 +1785,7 @@ function M.init()
     end)
 end
 
+function M.preparation_stats()
+    return respawn_preparation and respawn_preparation.inspect() or {disabled=true}
+end
 return M

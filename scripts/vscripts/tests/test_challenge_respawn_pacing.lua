@@ -4,7 +4,8 @@ local members=require("config/generated/encounter_members")
 assert(rules.rebirth_retry_seconds==2, "failed one-time rebirth attempt is not a monster respawn")
 for _,id in ipairs({"challenge_01","challenge_02","challenge_03","challenge_04","challenge_05",
  "challenge_06","challenge_07","challenge_08","challenge_09","challenge_10","challenge_11"}) do
- assert(rules.by_id[id].respawn_seconds==1, id .. " repeatable monster respawns after one second")
+ local expected=tonumber(id:match("(%d+)$")) <= 4 and 1.5 or 1
+ assert(rules.by_id[id].respawn_seconds==expected, id .. " retains its configured respawn interval")
 end
 for _,id in ipairs({"challenge_06","challenge_07","challenge_11"}) do
  assert(rules.by_id[id].respawn_seconds==1)
@@ -69,8 +70,9 @@ for _, member in ipairs(members.rows) do
  if member.spawn_mode == "maintain_count" then
   local encounter = assert(encounters.by_id[member.encounter_id])
   local expected=require("config/human_challenge_balance").member_count(member.member_id) or 10
-  assert(member.max_alive == expected and member.spawn_count == expected and member.respawn_seconds == 1)
-  assert(encounter.max_alive == expected and encounter.respawn_seconds == 1)
+  local delay=member.member_id:match("^practice_") and 1.5 or 1
+  assert(member.max_alive == expected and member.spawn_count == expected and member.respawn_seconds == delay)
+  assert(encounter.max_alive == expected and encounter.respawn_seconds == delay)
   practice_count = practice_count + 1
  end
 end
@@ -97,6 +99,7 @@ local spawn_environment = setmetatable({
  end, cancel = timer.cancel},
  get_session = function(player, encounter) return sessions[key(player, encounter)] end,
  remove_dead = function(s) s.monster_count = #s.world end,
+ prepare_respawn = function() end, -- this extracted suite checks the fallback path
  spawn_member = function(s, member)
   spawn_attempts=spawn_attempts+1
   if failures_remaining>0 then
@@ -135,7 +138,11 @@ local function kill(s, member, count)
   replenish(s, member)
  end
 end
-local member=members.by_id.practice_wood
+-- Exercise the legacy one-second fallback with an explicit override, then
+-- verify the actual authored 1.5-second farm-room configuration separately.
+local member={}
+for key,value in pairs(members.by_id.practice_wood)do member[key]=value end
+member.respawn_seconds=1
 reset()
 local current=fresh(member)
 kill(current,member,10)
@@ -233,10 +240,19 @@ for player=0,3 do
 end
 assert(#owned==28 and timer.task_count()==28,"one pending timer per player room, not per monster")
 tick(0.999);assert(created==0)
-tick(1);assert(created==296,"four owners x (four rooms40 + ice13 + molten10 + essence11) revive together")
+tick(1);assert(created==136,"special rooms retain their one-second interval")
+tick(1.499);assert(created==136,"farm-room replacements cannot arrive before 1.5 seconds")
+tick(1.5);assert(created==296,"four owners recover every room at its own authored deadline")
 for _,entry in ipairs(owned) do
  local s=entry.session;local cap=effective_count(entry.member,s.encounter)
  assert(#s.world==cap and s.monster_count==cap)
 end
 tick(2);assert(created==296 and timer.task_count()==0,"all player/room death tickets are consumed exactly once and rooms return idle")
-print("PRACTICE_RESPAWN_LIMIT_PASS: seven room types, independent death+1s, AoE and staggered/overdue deaths, 4 owners, exact live caps, re-entry, cancellation/replacement/generation, independent failed-ticket retry, duplicate callbacks and idle timers")
+reset();current=fresh(members.by_id.practice_attribute)
+kill(current,members.by_id.practice_attribute)
+tick(.4);kill(current,members.by_id.practice_attribute)
+tick(1.499);assert(created==0)
+tick(1.5);assert(created==1 and #current.world==9)
+tick(1.899);assert(created==1)
+tick(1.9);assert(created==2 and #current.world==10,"each farm-room death owns its full 1.5-second delay")
+print("PRACTICE_RESPAWN_LIMIT_PASS: farm rooms death+1.5s, other rooms death+1s, AoE and staggered/overdue deaths, 4 owners, exact live caps, re-entry, cancellation/replacement/generation, independent failed-ticket retry, duplicate callbacks and idle timers")

@@ -11,6 +11,7 @@ local M = {}
 local hit_count_by_target = {}
 local last_attack_id_by_target = {}
 local callback_count = 0
+local failed_apply_by_player = {}
 
 if detailed_diagnostics then print("[RESEARCH_ARMOR_SERVICE_LOAD] version=20260801_upstream_diagnostic") end
 
@@ -45,10 +46,14 @@ local function target_key(target)
 end
 
 local function on_main_attack_landed(payload)
+    local target = payload and payload.target
+    -- Native attack-landed may still carry the killing hit's valid corpse.
+    -- Reject before state allocation, inventory queries or modifier/native work.
+    if payload and payload.target_was_killed == true then return end
+    if valid_unit(target) and target.IsAlive and not target:IsAlive() then return end
     callback_count = callback_count + 1
     local player_id = tonumber(payload and payload.player_id)
     local attacker = payload and payload.attacker
-    local target = payload and payload.target
     local diagnostic = detailed_diagnostics and callback_count <= 5
     if diagnostic then
         print(string.format(
@@ -146,6 +151,8 @@ local function on_main_attack_landed(payload)
         end
         return
     end
+    -- Synchronous reward/proc callbacks may have killed it since entry.
+    if not valid_unit(target) or target.IsAlive and not target:IsAlive() then return end
     local key = target_key(target)
     local hit_count = (tonumber(hit_count_by_target[key]) or 0) + 1
     hit_count_by_target[key] = hit_count
@@ -165,10 +172,20 @@ local function on_main_attack_landed(payload)
         }
     )
     if not add_ok or modifier_or_error == nil then
+        -- A legitimate live-target failure remains visible, with an aggregate
+        -- count, without formatting/printing on every attack of every new mob.
+        local now = GameRules and GameRules.GetGameTime and GameRules:GetGameTime() or 0
+        local failure = failed_apply_by_player[player_id]
+        if failure and now >= failure.at and now - failure.at < 5 then
+            failure.suppressed = failure.suppressed + 1
+            return
+        end
+        local suppressed = failure and failure.suppressed or 0
+        failed_apply_by_player[player_id] = {at=now, suppressed=0}
         if armor_before == nil then armor_before = safe_call(target, "GetPhysicalArmorValue", "unavailable", false) end
         print(string.format(
             "[RESEARCH_ARMOR_APPLY_FAILED] hit=%s player=%s attacker=%s "
-                .. "target=%s reduction=%s armor_before=%s add_ok=%s result=%s",
+                .. "target=%s reduction=%s armor_before=%s add_ok=%s result=%s suppressed=%s",
             tostring(hit_count),
             tostring(player_id),
             tostring(safe_call(attacker, "entindex", -1)),
@@ -176,7 +193,8 @@ local function on_main_attack_landed(payload)
             tostring(reduction),
             tostring(armor_before),
             tostring(add_ok),
-            tostring(modifier_or_error)
+            tostring(modifier_or_error),
+            tostring(suppressed)
         ))
         return
     end
@@ -205,6 +223,7 @@ function M.init()
     hit_count_by_target = {}
     last_attack_id_by_target = {}
     callback_count = 0
+    failed_apply_by_player = {}
     local subscription = event_bus.subscribe(
         events.HERO_MAIN_ATTACK_LANDED,
         on_main_attack_landed

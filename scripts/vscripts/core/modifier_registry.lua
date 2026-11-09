@@ -215,6 +215,10 @@ local modifiers = {
         path = "modifiers/modifier_research_technology",
     },
     {
+        name = "modifier_practice_respawn_staging",
+        path = "modifiers/modifier_practice_respawn_staging",
+    },
+    {
         name = "modifier_research_armor_reduction",
         path = "modifiers/modifier_research_technology",
     },
