@@ -514,6 +514,8 @@ local function publish(state, fusion_snapshot)
         local hero_skill = hero_skill_by_ability[ability_name]
         local passive = hero_skill and (
             hero_skill.skill_id == "proto_flame_burst"
+                or hero_skill.skill_id == "proto_chain_lightning"
+                or hero_skill.skill_id == "proto_arcane_barrage"
                 or hero_skill.skill_id == "proto_ice_cone"
                 or hero_skill.skill_id == "proto_magic_slingshot"
                 or hero_skill.skill_id == "proto_holy_pulse"
