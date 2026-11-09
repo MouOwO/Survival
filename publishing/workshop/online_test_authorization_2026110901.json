@@ -1,0 +1,20 @@
+{
+  "authorization_scope": "UPLOAD_THIS_EXACT_SIGNED_PACKAGE_AND_VERIFY_OFFICIAL_DOWNLOAD",
+  "content_sha256": "7eb09ff7ee72a7d0155781049509d9f6994ec4925a475fad01757cd03fc9714b",
+  "generation": 2,
+  "kind": "EXPLICIT_CURRENT_USER_UNLISTED_ONLINE_TEST_AUTHORIZATION",
+  "native_acceptance_status": "PENDING_USER_ONLINE_TEST",
+  "ordinary_production_acceptance": false,
+  "parent_journal_sha256": "542a682b431fc5f244615086cf0037699cd79fd4ef8e9206b32a33aa2af2d438",
+  "release_sequence": 2026110901,
+  "report_sha256": "7c118a4ef630d1e2dc6b856440b7913cbd87b445f23925dcf4d89789dc809ebf",
+  "schema": 1,
+  "signed_manifest_sha256": "f1c7e50a0bed5523fb3467b440153f6ff4cd59eeddf955928cc32d2cb0910515",
+  "source_revisions": {
+    "content": "9abc2e8741dff9b6c7f5572777ae594323de4db8",
+    "game": "2730ebc3e62c5fccf2e428a2225859b2b9f1722e"
+  },
+  "user_authorization": "\u53d1\u5e03\u4e00\u4e2a\u6e38\u5eca\u5305\u8bd5\u4e00\u4e0b",
+  "visibility": "unlisted",
+  "workshop_id": "3824360109"
+}
