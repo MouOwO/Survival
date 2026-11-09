@@ -191,7 +191,8 @@ def complete(auth,builder,request):
             except ValueError:continue
             if isinstance(value,dict) and value.get('status')=='OFFICIAL_REFRESH_NATIVE_DOWNLOAD_FULLY_VERIFIED':records.append(value)
         guard.need(len(records)==1 and records[0].get('evidence'),'exact_official_download_receipt_required')
-        if Path(auth.policy.get('recipe_path','')).parent.name=='complete_delivery_release_20261103':
+        if Path(auth.policy.get('recipe_path','')).parent.name in (
+                'complete_delivery_release_20261103', 'complete_delivery_release_20261109'):
             # Download is a separate observed stage. Advance the full audited
             # source checkpoint only after its real receipt and under the same
             # canonical mutex; this never submits another SDK update.
