@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "ticket_content_id": "special_lottery_ticket",
+  "base_sku": "special_lottery_ticket_single",
+  "pool_ids": [
+    "cultivation",
+    "dragon_knight",
+    "summer"
+  ],
+  "per_account_per_code": 1,
+  "tiers": [
+    {
+      "quantity": 100,
+      "label": "金色抽奖券×100"
+    },
+    {
+      "quantity": 500,
+      "label": "金色抽奖券×500"
+    },
+    {
+      "quantity": 1000,
+      "label": "金色抽奖券×1000"
+    },
+    {
+      "quantity": 2000,
+      "label": "金色抽奖券×2000"
+    }
+  ]
+}

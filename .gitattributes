@@ -320,3 +320,8 @@ tools/release_packager.ps1 text eol=crlf
 tools/complete_delivery_pack_2026110902_351f87/*.py text eol=lf
 publishing/workshop/packager_pack_2026110902_45351f87_authority.json text eol=lf
 publishing/workshop/packager_pack_2026110902_45351f87_authorization.json text eol=lf
+
+# Additive gold-ticket redemption operator; private registries stay ignored.
+tools/redemption_gold_ticket_codes_20261110/*.py text eol=lf
+tools/redemption_gold_ticket_codes_20261110/*.json text eol=lf
+tools/redemption_gold_ticket_codes_20261110/*.md text eol=lf
