@@ -315,3 +315,8 @@ tools/release_packager/*.md text eol=lf
 tools/release_packager.ps1 text eol=crlf
 打包工具.cmd text eol=crlf
 一键打包.cmd text eol=crlf
+
+# Packager pack_2026110902_45351f87
+tools/complete_delivery_pack_2026110902_351f87/*.py text eol=lf
+publishing/workshop/packager_pack_2026110902_45351f87_authority.json text eol=lf
+publishing/workshop/packager_pack_2026110902_45351f87_authorization.json text eol=lf
