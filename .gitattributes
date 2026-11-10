@@ -337,3 +337,8 @@ tools/workshop_test/published_route.py text eol=lf
 tools/complete_delivery_pack_2026111001_4705ac/*.py text eol=lf
 publishing/workshop/packager_pack_2026111001_114705ac_authority.json text eol=lf
 publishing/workshop/packager_pack_2026111001_114705ac_authorization.json text eol=lf
+
+# Packager pack_2026111002_98e1fa24
+tools/complete_delivery_pack_2026111002_e1fa24/*.py text eol=lf
+publishing/workshop/packager_pack_2026111002_98e1fa24_authority.json text eol=lf
+publishing/workshop/packager_pack_2026111002_98e1fa24_authorization.json text eol=lf
