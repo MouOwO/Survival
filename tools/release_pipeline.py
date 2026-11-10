@@ -156,7 +156,7 @@ def complete(auth, builder, request):
             if isinstance(value, dict) and value.get('status') == 'OFFICIAL_REFRESH_NATIVE_DOWNLOAD_FULLY_VERIFIED':
                 records.append(value)
         guard.need(len(records) == 1 and records[0].get('evidence'), 'exact_official_download_receipt_required')
-        if Path(auth.policy.get('recipe_path', '')).parent.name in ('complete_delivery_release_20261103', 'complete_delivery_release_20261109', 'complete_delivery_pack_2026110902_351f87', 'complete_delivery_pack_2026111001_4705ac', 'complete_delivery_pack_2026111002_e1fa24', 'complete_delivery_pack_2026111003_b73d5c', 'complete_delivery_pack_2026111004_bdcfcd', 'complete_delivery_pack_2026111005_53969b'):
+        if Path(auth.policy.get('recipe_path', '')).parent.name in ('complete_delivery_release_20261103', 'complete_delivery_release_20261109', 'complete_delivery_pack_2026110902_351f87', 'complete_delivery_pack_2026111001_4705ac', 'complete_delivery_pack_2026111002_e1fa24', 'complete_delivery_pack_2026111003_b73d5c', 'complete_delivery_pack_2026111004_bdcfcd', 'complete_delivery_pack_2026111005_53969b', 'complete_delivery_pack_2026111006_49f754'):
             pinned_module(auth, 'baseline_completion').record_verified_delivery(auth, builder, request, Path(records[0]['evidence']))
         import release_workflow_diagnostics as diagnostics
         status = diagnostics.delivery_status(auth, download_receipt=Path(records[0]['evidence']))
