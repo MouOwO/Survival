@@ -352,3 +352,8 @@ publishing/workshop/packager_pack_2026111003_75b73d5c_authorization.json text eo
 tools/complete_delivery_pack_2026111004_bdcfcd/*.py text eol=lf
 publishing/workshop/packager_pack_2026111004_52bdcfcd_authority.json text eol=lf
 publishing/workshop/packager_pack_2026111004_52bdcfcd_authorization.json text eol=lf
+
+# Packager pack_2026111005_7453969b
+tools/complete_delivery_pack_2026111005_53969b/*.py text eol=lf
+publishing/workshop/packager_pack_2026111005_7453969b_authority.json text eol=lf
+publishing/workshop/packager_pack_2026111005_7453969b_authorization.json text eol=lf
