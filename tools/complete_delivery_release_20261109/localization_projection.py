@@ -1,9 +1,12 @@
-"""Exact six-file, two-token author projection into the reviewed game text.
+"""Exact historical localization projection with bounded Chinese-name additions.
 
 The content/game historical trees already diverged before the two W changes.
 Never overwrite game text with the whole content file. These fixed historical
 full-byte mask hashes retain every other byte (including order/comments/newlines).
 Both current Git sources, approved values and the complete game output are bound.
+The original proof shape/kind remains compatible with older receipts. A new
+optional, identical two-alias block is accepted only at the Tokens opening;
+removing that exact approved block must restore the original full-byte masks.
 No filesystem reads except this module's import identity; no producer relabeling.
 """
 from __future__ import annotations
@@ -121,10 +124,34 @@ def fingerprint(raw):
     return {"sha256": sha(raw), "bytes": len(raw), "md5": hashlib.md5(raw).hexdigest()}
 
 
+TRAINING_NAME_BLOCK = (
+    '        "building_endless_training_target" "长青轮纹"\n'
+    '        "npc_dota_unit_building_endless_training_target" "长青轮纹"\n'
+).encode("utf-8")
+TRAINING_NAME_KEYS = (
+    b'"building_endless_training_target"',
+    b'"npc_dota_unit_building_endless_training_target"',
+)
+
+
+def _without_training_name(raw):
+    counts = tuple(raw.count(key) for key in TRAINING_NAME_KEYS)
+    if counts == (0, 0):
+        return raw
+    need(counts == (1, 1), "localization_training_name_alias_pair_required")
+    opening = re.search(rb'(?m)^[ \t]*"Tokens"[ \t]*\n[ \t]*\{\n', raw)
+    need(opening is not None, "localization_training_name_tokens_opening_required")
+    start = opening.end()
+    need(raw[start:start + len(TRAINING_NAME_BLOCK)] == TRAINING_NAME_BLOCK,
+         "localization_training_name_value_or_layout_changed")
+    return raw[:start] + raw[start + len(TRAINING_NAME_BLOCK):]
+
+
 def _mask(raw):
     need(type(raw) is bytes and 0 < len(raw) <= MAX_BYTES, "localization_bounded_bytes_required")
     need(b"\r" not in raw and b"\x00" not in raw, "localization_exact_git_lf_required")
     raw.decode("utf-8-sig")  # reject malformed text; retain BOM and all raw bytes
+    raw = _without_training_name(raw)
     values = {}
     masked = raw
     for token in TOKENS:
@@ -144,6 +171,8 @@ def verify_projection(path, content_raw, game_raw):
     need(path in PATHS, "unreviewed_localization_projection_path")
     content_mask, content_values = _mask(content_raw)
     game_mask, game_values = _mask(game_raw)
+    need((TRAINING_NAME_KEYS[0] in content_raw) == (TRAINING_NAME_KEYS[0] in game_raw),
+         "localization_training_name_dual_source_required")
     language = path.rsplit("_", 1)[1][:-4]
     expected = APPROVED_VALUE_SHA256[language]
     need(content_values == game_values == expected, "localization_reviewed_values_or_projection_changed")
