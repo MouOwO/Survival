@@ -100,7 +100,18 @@ function M.preserve_current(unit, callback, source)
     local alive = unit.IsAlive and unit:IsAlive()
     local health = alive and unit.GetHealth and unit:GetHealth() or nil
     local ok, result = pcall(callback)
-    if alive and health and health > 0 then
+    if alive and health and health > 0 and valid(unit)
+        and unit.IsAlive and unit:IsAlive() then
+        -- Stat recalculation can clamp current health down while rebuilding
+        -- modifiers. Restore only this synchronous transaction's captured HP;
+        -- deferred guards remain downward-only so later damage is preserved.
+        if unit.GetMaxHealth and unit.GetHealth and unit.SetHealth then
+            local maximum = math.max(1, tonumber(unit:GetMaxHealth()) or 1)
+            local desired = math.max(1, math.min(health, maximum))
+            if (tonumber(unit:GetHealth()) or 0) < desired - 0.5 then
+                unit:SetHealth(desired)
+            end
+        end
         M.protect_value(unit, health, source or "preserve_current")
     end
     if not ok then error(result) end

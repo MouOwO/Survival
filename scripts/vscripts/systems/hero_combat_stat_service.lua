@@ -729,12 +729,6 @@ local function recalculate(player_id, reason, growth_snapshot)
         state.attack_modifier, state.modifier_values = modifier, modifier_values
         native_changed = true
     end
-    if changed then
-        event_bus.emit(events.HERO_COMBAT_STATS_CHANGED, {
-            player_id = player_id,
-            snapshot = state.snapshot,
-        })
-    end
     if native_changed and current_health and current_health > 0
         and current_max_health and current_max_health > 0
         and state.unit:IsAlive() then
@@ -747,12 +741,11 @@ local function recalculate(player_id, reason, growth_snapshot)
             final_max_health
         )
         local actual_health = safe_get(state.unit, "GetHealth", 0)
-        -- The health modifier projection normally applies this value during
-        -- the refresh. If a native stat recalculation temporarily retained the
-        -- old current health, restore the intended increase before scheduling
-        -- the guard that protects against a later engine refill.
-        if final_max_health > current_max_health
-            and actual_health < expected_health then
+        -- A native refresh can also clamp current health down even when its
+        -- final maximum is unchanged (for example during modifier rebuilding).
+        -- Restore the captured missing-health projection within this synchronous
+        -- transaction; deferred guards must never restore later combat damage.
+        if actual_health < expected_health then
             safe_call(state.unit, "SetHealth", expected_health)
         end
         hero_health_guard.protect_value(
@@ -760,6 +753,15 @@ local function recalculate(player_id, reason, growth_snapshot)
             expected_health,
             "combat_recalculate:" .. tostring(reason or "changed")
         )
+    end
+    -- Publish only after the native stat transaction has finalized HP.
+    -- Observers may legitimately heal or deal damage; an older captured
+    -- health value must not be applied after their callbacks have run.
+    if changed then
+        event_bus.emit(events.HERO_COMBAT_STATS_CHANGED, {
+            player_id = player_id,
+            snapshot = state.snapshot,
+        })
     end
     return state.snapshot
 end
