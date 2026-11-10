@@ -51,9 +51,22 @@ def read_json(path, digest=None):
     return json.loads(raw,object_pairs_hook=pairs),raw
 
 
-def remote(source, timeout=120):
-    transport=module('ticket_ws4_existing_hostkey_transport',ROOT/'tools/ws4_catalog_sync_20261031/driver.py')
-    return transport.remote(source,timeout=timeout)
+def remote(source, timeout=120, *, max_response=2*1024*1024):
+    transport=module('gold_ws4_existing_hostkey_transport',ROOT/'tools/archive_caps_20261020/remote_driver.py')
+    raw=transport.remote(source,timeout=timeout)
+    need(isinstance(raw,str) and len(raw.encode('utf8'))<=max_response,'bounded_remote_response_required')
+    lines=[line for line in raw.splitlines() if line.strip()]
+    need(bool(lines),'remote_response_missing')
+    # Current ArchiveService emits structured command timing before the one
+    # operator reply. Accept only that known telemetry; never ignore arbitrary
+    # banners/errors or guess which of several result records to trust.
+    for line in lines[:-1]:
+        need(line.startswith('SURVIVAL_ARCHIVE_TIMING '),'unexpected_remote_output')
+        timing=json.loads(line[len('SURVIVAL_ARCHIVE_TIMING '):])
+        need(isinstance(timing,dict) and timing.get('v')==1,'unexpected_remote_timing_schema')
+    value=json.loads(lines[-1])
+    need(isinstance(value,dict),'structured_remote_reply_required')
+    return value
 
 
 def operator_source():return (HERE/'ws4_operator.py').read_text(encoding='utf-8')
@@ -144,7 +157,7 @@ stage=checked_stage(PLAN);saved=load(stage,'backup');raw=Path(saved['path']).rea
 need(sha(raw)==saved['sha256'],'backup_changed')
 print(json.dumps({'data':base64.b64encode(raw).decode(),'sha256':saved['sha256']}))
 '''
-    value=remote(code,90);raw=base64.b64decode(value['data'],validate=True);need(sha(raw)==value['sha256'],'backup_transport_mismatch')
+    value=remote(code,90,max_response=128*1024*1024*4//3+1024*1024);raw=base64.b64decode(value['data'],validate=True);need(sha(raw)==value['sha256'],'backup_transport_mismatch')
     crypto=module('ticket_existing_dpapi',ROOT/'tools/onboarding_release_20261025/deploy.py')
     encrypted=crypto.dpapi(raw);need(sha(crypto.dpapi(encrypted,decrypt=True))==value['sha256'],'dpapi_roundtrip_failed')
     folder=OUT/'private/backups';folder.mkdir(parents=True,exist_ok=True);target=folder/(PurePosixPath(plan['stage']).name+'.dump.dpapi')
