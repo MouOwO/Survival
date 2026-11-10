@@ -30,3 +30,9 @@ clone 只复制数据库结构和公开配置，使用合成账号/码验证真�
 一次定义编译 O(P+4)，P 是已有商品数；一次服务器维护摘要 O(D log D + C log C)，D 是原定义数、C 是领取记录数，四次索引插入有 10 秒 SQL / 5 秒锁超时。游戏初始化、稳定刷新和原生桥新增成本为 0，无新定时器或扫描。兑领仍用原 prepare→Lua→commit；模拟计数、隔离 PostgreSQL 并发与真人验收分别记录。
 
 临时回归和执行日志位于树外 `D:/Survival_本地工具/runs/20261110_gold_ticket_codes01`。正式私有生成和登记控制沿用被忽略的 `output/redemption_gold_ticket_codes_20261110`；备份、stage 和原回执保留，不自动清理。
+
+本批已完成：48 项隔离回归、同计划 8 项真实 PostgreSQL/Lua 克隆、完整备份与 DPAPI 核验、一次新增 4 行及独立只读核验，136 项总数与原 132 项摘要保持。桌面交付 `金色抽奖券四档兑换码_已启用_20261110.xlsx`，原生成文件保留；详情见[本批真实交付](../../docs/knowledge_base/evidence/gold_ticket_codes_20261110.md)。
+
+现役后台会输出已知 `SURVIVAL_ARCHIVE_TIMING` 结构化计时；驱动只允许这些日志加唯一末尾 JSON 对象，其他输出拒绝。第一次克隆结果已只读核对并保留；解析器修正后使用新计划/新 stage 重验，生产 apply 只有一次。
+
+登记工具的存储根不包含仓内 private/backups。原始密文继续作为封存控制证据，同时另存一份到 `D:/Survival_加密备份/redemption_gold_ticket_codes_20261110/` 并核对完全相同 SHA256，以新的真实存储回执登记；不修改或冒充原失败回执。此过程不导出明文 dump。

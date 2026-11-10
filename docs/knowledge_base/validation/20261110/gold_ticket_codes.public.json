@@ -1,0 +1,62 @@
+{
+  "actual_postgres_clone_checks": [
+    "production_insert_four_sql_with_four_synthetic_hashes",
+    "old_select_before_lock_stale_snapshot_reproduced",
+    "table_lock_before_select_blocks_writer",
+    "writer_succeeds_after_lock_release",
+    "four_exact_ticket_deltas_and_four_pool_projection",
+    "same_account_once_retry_and_peer_isolation",
+    "actual_postgres_concurrent_single_grant",
+    "actual_committed_reply_loss_idempotency"
+  ],
+  "api_service_unchanged": true,
+  "apply_receipt": {
+    "automatic_retry": false,
+    "player_redemption_performed": false,
+    "receipt": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\redemption_gold_ticket_codes_20261110\\run_1c1d013d5db1_apply_af313f6a.json",
+    "sha256": "dc1b1182756eb395c6023d99aa1b05129e2054161e0ea8f4ec0ff73226ad51e5",
+    "status": "FOUR_WS4_TICKET_CODES_INSERTED"
+  },
+  "backend_program_deployed": false,
+  "client_release_sequence": 2026110902,
+  "client_runtime_changed": false,
+  "definitions_after": 136,
+  "definitions_before": 132,
+  "expires_at": null,
+  "generation_operator_revision": "fb079aaa890fcce499d7605a5c857417d9cb4a42",
+  "kind": "GOLD_TICKET_BACKEND_ONLY_DELIVERY_VERIFIED",
+  "new_workshop_uploads": 0,
+  "old_claims_preserved_in_same_rr_snapshot": true,
+  "old_definitions_preserved": {
+    "count": 132,
+    "sha256": "da82e3689f792251b3c08222dda34f2aab9ae0465275502c3724e9028ed00bc0"
+  },
+  "payment_services_unchanged": true,
+  "per_account_per_code": 1,
+  "private_workbook": {
+    "bytes": 7225,
+    "path": "C:\\Users\\Administrator\\Desktop\\\u91d1\u8272\u62bd\u5956\u5238\u56db\u6863\u5151\u6362\u7801_\u5df2\u542f\u7528_20261110.xlsx",
+    "sha256": "0ebfd05e77c646f0cc7e6857dccf0f5beef94e68ff3b084f136262ca9ba63abb"
+  },
+  "production_player_redemption": false,
+  "quantities": [
+    100,
+    500,
+    1000,
+    2000
+  ],
+  "registration_operator_revision": "ba2d204768d081931bfa9a5d0fbbf73ae86c03b0",
+  "same_four_codes_preserved": true,
+  "schema": 1,
+  "status": "FOUR_GOLD_TICKET_CODES_ENABLED_AND_PRIVATE_EXCEL_DELIVERED",
+  "steam_manifest": "6445398778833066003",
+  "synthetic_tests": 48,
+  "ticket_content_id": "special_lottery_ticket",
+  "verify_receipt": {
+    "automatic_retry": false,
+    "player_redemption_performed": false,
+    "receipt": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\redemption_gold_ticket_codes_20261110\\run_1c1d013d5db1_verify_9b37b008.json",
+    "sha256": "d48b7be24424c6a2cc604a4d926e8c221958aeb93563eba38eab175cf04cc4cb",
+    "status": "FOUR_ROWS_MATCH_VERIFIED"
+  }
+}
