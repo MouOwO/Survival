@@ -11,3 +11,5 @@
 成本：能力字段最多 3 项，校验时间/空间 O(1)，无初始化索引或稳定轮询；每次真实兑换沿用一次 prepare 与一次 commit RPC，冲突恢复仍最多 4 次。没有新增计时器、HTTP 或数据库查询。
 
 本地诊断和测试位于树外 `D:/Survival_本地工具/runs/20261110_gold_ticket_delivery_diag01`。原登记的生产 apply 不重试、不覆盖旧回执；客户端沿用 2026110902 / Steam manifest `6445398778833066003`。
+
+实际已完成：101 项隔离回归，服务器 16 个真实 Linux/Lua 向量与 11 个非法输入，独立激活/verify。现役后台为 `20261110-ws4-redemption-transport-ae3e77c24300`；只切换 WS4 API，支付/登录服务保持，136码及旧132项定义保持。真实玩家重试反馈待回报，详见[真实回执与边界](../../docs/knowledge_base/evidence/redemption_transport_20261110.md)。

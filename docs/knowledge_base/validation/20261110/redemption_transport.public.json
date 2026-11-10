@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "kind": "WS4_REDEMPTION_TRANSPORT_DELIVERY_VERIFICATION",
+  "source_revisions": {
+    "source": "80e0eb4e301d10713317583e5556b365bcc8280f",
+    "operator": "80e0eb4e301d10713317583e5556b365bcc8280f",
+    "content": "151c77f5a7580151a2553efa330fa76c1ef10240"
+  },
+  "backend": {
+    "status": "ACTUAL_WS4_REDEMPTION_TRANSPORT_ACTIVE_VERIFIED",
+    "release": "20261110-ws4-redemption-transport-ae3e77c24300",
+    "manifest_sha256": "25d4ea97b6c1a91ba868a978a975873c87ea65a616ffc9ff088db420fbda5cd4",
+    "api_pid": 1183895,
+    "retained_services_unchanged": true,
+    "module_sha256": "ad57165cadc9d798c7717ed07ea27350b435bfd02f754488ca2ca6bcfc45fd47",
+    "database_count": 136,
+    "old132_definitions_preserved": true,
+    "all_four_definitions_match": true
+  },
+  "checks": {
+    "offline": 101,
+    "real_linux_lua_vectors": 16,
+    "malformed_vectors": 11,
+    "real_player_redemption_by_operator": false,
+    "native_user_retry_observed": false
+  },
+  "client": {
+    "runtime_changed": false,
+    "sequence": 2026110902,
+    "steam_manifest": "6445398778833066003",
+    "upload_performed": false
+  },
+  "receipts": {
+    "audit": {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\ws4_redemption_transport_20261110_v01\\audit.json",
+      "sha256": "8fcfb30e86fb0ef7d8b281d8374cd75360c72abf24b80381c326602807a78eb7"
+    },
+    "prepare": {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\ws4_redemption_transport_20261110_v01\\prepare.json",
+      "sha256": "984ceaf97e612940e6d62ac84a17f667f58fa442a76334d51792bf140d27e40f"
+    },
+    "probe": {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\ws4_redemption_transport_20261110_v01\\probe.json",
+      "sha256": "46b8c41f3374a5dfbcfa6f7d603b55e6d8aeb206dd27ffc31111ec933ddf5e72"
+    },
+    "activate": {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\ws4_redemption_transport_20261110_v01\\activate.json",
+      "sha256": "110f2264d0a43c1f3d38806fbf215ba864c7d46404a59a6333769c30c98ddee1"
+    },
+    "verify": {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\ws4_redemption_transport_20261110_v01\\verify.json",
+      "sha256": "6fa2ddc3d470b8e3635cded0afe13af69c1b97a60e916f4b286b8c896698c141"
+    }
+  }
+}
