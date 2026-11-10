@@ -43,6 +43,7 @@ CSV_OUTPUTS = {
     for name in ('blademaster_exclusive_runtime', 'hero_skill_definitions', 'monkey_king_exclusive_runtime')
 }
 CSV_OUTPUTS.update({
+    'data/csv/公共规则/unit_display_names.csv': 'scripts/vscripts/config/generated/unit_display_names.lua',
     'data/csv/公共规则/tooltip_definitions.csv': 'scripts/vscripts/config/generated/tooltip_definitions.lua',
     'data/csv/挑战与奖励系统/challenge_definitions.csv': 'scripts/vscripts/config/generated/challenge_definitions.lua',
     'data/csv/英雄系统/hero_attack_projectiles.csv': 'scripts/vscripts/config/generated/hero_attack_projectiles.lua',
