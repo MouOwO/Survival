@@ -329,3 +329,8 @@ tools/redemption_gold_ticket_codes_20261110/*.md text eol=lf
 # Backend-only redemption transport compatibility repair.
 tools/ws4_redemption_transport_20261110/*.py text eol=lf
 tools/ws4_redemption_transport_20261110/*.md text eol=lf
+
+# Packager pack_2026111001_114705ac
+tools/complete_delivery_pack_2026111001_4705ac/*.py text eol=lf
+publishing/workshop/packager_pack_2026111001_114705ac_authority.json text eol=lf
+publishing/workshop/packager_pack_2026111001_114705ac_authorization.json text eol=lf
