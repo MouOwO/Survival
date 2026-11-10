@@ -1,6 +1,6 @@
 # 每日福利领取后入口光晕不消失（2026-11-10）
 
-本记录建立时仅本地源码更新，后台未改，正式为0902 / Steam manifest `6445398778833066003`。用户已正常退出Dota并保持Steam登录，后续按固定打包工具完成编译与交付，真实结果另行追加；不能把源码验证当作已同步游廊。
+已同步原游廊 `3824360109`，版本 `2026111001`，Steam manifest `5199509834036753839`。本轮没有后台部署，普通客户端实机显示效果仍待用户验证。用户确认正常退出Dota并保持Steam登录后，已由固定打包工具完成官方编译、完整签包、上传、官方完整下载和待发收口。
 
 ## 原因和修复
 
@@ -27,3 +27,20 @@
 game起点 `80e0eb4e301d10713317583e5556b365bcc8280f`，content起点 `151c77f5a7580151a2553efa330fa76c1ef10240`。本次实际game stash `5b45fd86d11c202b157dc38f987aa5dc5255b231`，pull后精确pop；原有后台pyc、bundle指针及三个发行工具逐字节恢复，content原本干净。历史stash保留。
 
 开始前并行任务已单独提交后台兑换码相关修改，本次不混入或回滚。备份及中断回执已由 `release_storage_ledger.py record` 按真实文件登记。正式源码/编译、签包、SDK成功和官方下载属于不同阶段，后续只追加实际完成结果。
+
+## 1001 完整交付
+
+固定任务为 `pack_2026111001_114705ac`。先执行 `tools/release_packager.ps1 -Action build`，随后对同一任务执行 `publish-test -Job`；十个构建阶段直接复用，没有重新编译或重签已验证的包。
+
+两项官方编译为每日控制器和静态目录。实际 `.vjs_c` 的DATA分别核对官方编译回执及不可变输入摘要；将两项DATA同时接入同一真实控制器/主界面回归，67项检查通过。原先源码和content作者也分别通过同一67项回归。编译DATA回执 `D:/Survival_本地工具/runs/20261110_daily_entry_glow03/official_data_verification.json`，SHA256 `e78e14a06f2700416c7733f80435f329f1a7f26857bacaaef51ad4a8b7ee52da`。
+
+7056个运行资源、5个包文件官方完整下载逐文件一致，186个保护模块通过。实际运行变化3项：每日控制器、静态目录编译文件及目录Lua映射；没有新增或删除资源。完整检查点与 `delivery-status --full --check` 均通过，运行资源/源码待发、阻断及dirty runtime均为0。普通实机、多人或FPS未冒充通过；此次资格提示修复没有真实领取或消费操作。
+
+- 运行与构建game绑定：`93fd0bee3cc09d0a46d2ec2958606edf599161d7`；content：`e8b8a659ac81385c2829783f24e17c52fc96e536`。
+- 测试发布operator：`9a9531936eb663edf34d37e34d2d61a981e70f79`。
+- 包回执：`output/packager/pack_2026111001_114705ac/package.json`，SHA256 `4e5147182b5c3f7b6c0d9f5f7931f344ffc1da2431ba081752fe8a8b450b15fd`。
+- 签名manifest摘要：`140f1f37486cd44ace0271cd71a45fa89de90036f0e3eabe44b8b89123336d0c`；内容摘要：`78eda0d1687f082a8dedf73c14718bbde734d1e6d2b802938569722171d34058`。
+- 官方下载回执：`output/packager/pack_2026111001_114705ac/download_evidence/20261110T011421Z_ca427da5d19541f3869bb766985fd048/verification.json`。
+- 全部构建阶段、真实命令、Git同步、登记和最终交付回执：`D:/Survival_本地工具/runs/packaging_jobs/pack_2026111001_114705ac`。
+
+并行工作中新增加的正式游廊启动入口、属性和说明修改单独保留，不混入本次运行修复或文档提交。最终双仓提交和保留项见树外修复目录的最终Git回执。
