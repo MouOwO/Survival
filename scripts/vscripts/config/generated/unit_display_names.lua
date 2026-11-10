@@ -5,6 +5,7 @@ M.rows = {
     { unit_name = "npc_dota_hero_undying", display_name = "建造者", enabled = true, notes = "初始建造单位在选中面板显示的名称。" },
     { unit_name = "npc_survival_builder_proxy", display_name = "建造者", enabled = true, notes = "独立建造代理单位的本地化名称。" },
     { unit_name = "npc_survival_repairer", display_name = "修理工", enabled = true, notes = "修理工单位的本地化名称。" },
+    { unit_name = "building_endless_training_target", display_name = "长青轮纹", enabled = true, notes = "长青轮纹圣殿练功目标的统一中文名。" },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do

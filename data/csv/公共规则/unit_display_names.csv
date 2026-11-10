@@ -4,3 +4,4 @@
 npc_dota_hero_undying,建造者,1,初始建造单位在选中面板显示的名称。
 npc_survival_builder_proxy,建造者,1,独立建造代理单位的本地化名称。
 npc_survival_repairer,修理工,1,修理工单位的本地化名称。
+building_endless_training_target,长青轮纹,1,长青轮纹圣殿练功目标的统一中文名。
