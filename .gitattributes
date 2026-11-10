@@ -331,6 +331,7 @@ tools/ws4_redemption_transport_20261110/*.py text eol=lf
 tools/ws4_redemption_transport_20261110/*.md text eol=lf
 tools/workshop_test/launch_published.ps1 text eol=crlf
 游廊正式游戏.cmd text eol=crlf
+tools/workshop_test/published_route.py text eol=lf
 
 # Packager pack_2026111001_114705ac
 tools/complete_delivery_pack_2026111001_4705ac/*.py text eol=lf

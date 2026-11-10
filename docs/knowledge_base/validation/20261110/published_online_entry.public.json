@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "kind": "PUBLISHED_ONLINE_ENTRY_AND_REDEMPTION_FOLLOWUP",
+  "release_sequence": 2026111001,
+  "steam_manifest": "5199509834036753839",
+  "installed_exact_files_verified": 5,
+  "selector_checks": 8,
+  "signed_guard_regression_tests": 20,
+  "passed": true,
+  "binding_updated_from": 2026110803,
+  "local_candidate_staged": false,
+  "installation_changed": false,
+  "publication_performed_by_this_task": false,
+  "dota_observed": {
+    "pid": 35128,
+    "session": 1,
+    "responding": true
+  },
+  "user_reported_resolved": true,
+  "exact_redemption_quantity_reported": false,
+  "real_player_redemption_by_operator": false,
+  "backend_release": "20261110-ws4-redemption-transport-ae3e77c24300",
+  "backend_source_revision": "80e0eb4e301d10713317583e5556b365bcc8280f",
+  "binding_repair_receipt": {
+    "path": "D:\\Survival_本地工具\\runs\\20261110_online_entry_repair01\\binding_repair_receipt.json",
+    "sha256": "84673226fafdd6e9f67fc846a978084055e1fadd610a03a77d584f9210c48f3e"
+  }
+}

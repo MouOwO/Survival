@@ -5,6 +5,18 @@ $repo=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path
 try {
     if($Mode -eq 'Online'){$python=Resolve-SurvivalReleasePython -RepoRoot $repo}
     else{$python=Resolve-SurvivalBackendPython -RepoRoot $repo}
+    if($Mode -eq 'Online'){
+        $publishedText=& $python -B -X utf8 (Join-Path $PSScriptRoot 'published_route.py')
+        $publishedCode=$LASTEXITCODE
+        if($publishedCode -eq 0){
+            $published=$publishedText|ConvertFrom-Json
+            if($published.ok -eq $true -and $published.mode -eq 'published_workshop'){
+                if(-not $CheckOnly){Write-Output ('Published Workshop '+$published.release_sequence+' / manifest '+$published.steam_manifest)}
+                & (Join-Path $PSScriptRoot 'launch_published.ps1') -CheckOnly:$CheckOnly
+                exit $LASTEXITCODE
+            }
+        }
+    }
     $entryArguments=@('-B','-X','utf8',(Join-Path $PSScriptRoot 'test_entry.py'),$Mode.ToLowerInvariant())
     if($CheckOnly){$entryArguments+='--check'}
     if($Mode -eq 'Online' -and -not $CheckOnly){
