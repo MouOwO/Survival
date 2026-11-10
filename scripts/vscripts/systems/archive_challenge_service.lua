@@ -34,6 +34,16 @@ function M.phase_snapshot(payload)
         deadline = deadline or 0,
         remaining_seconds = active and deadline and math.max(0, math.ceil(deadline - now())) or 0}
 end
+-- A private server request; it adds no fields to the client phase protocol.
+-- Growth stays frozen after clear, while a real active archive participant
+-- can still recover health until that player's challenge or the phase ends.
+function M.health_recovery_state(payload)
+    local state = payload and players[tonumber(payload.player_id)]
+    local allowed = state and active and not ended and not settling
+        and not state.finished and (not deadline or now() < deadline)
+    return {allowed = allowed == true}
+end
+
 local function publish_phase()
     bus.emit("archive.challenge_timer_changed", M.phase_snapshot())
 end
@@ -674,6 +684,7 @@ function M.init()
     scheduler.cancel(TIMER_ID)
     scheduler.cancel(DAILY_TIMER_ID)
     bus.handle_request("archive.challenge_state", M.phase_snapshot)
+    bus.handle_request("archive.health_recovery_state", M.health_recovery_state)
     require("systems/archive_endless_service").init(function(id)
         if players[id] then publish(players[id]) end
     end, function(id, variant)

@@ -4,6 +4,7 @@ local scheduler = require("core/scheduler")
 local armor_balance = require("config/armor_balance")
 local map_level_effect_rules = require("config/generated/map_level_effect_rules")
 local phase_guard = require("systems/gameplay_phase_guard")
+local hero_health_guard = require("core/hero_health_guard")
 local lottery_dynamic_effects = require("systems/lottery_dynamic_effects")
 
 local M = {}
@@ -302,12 +303,16 @@ local function heal_unit(unit, percent)
     if maximum <= 0 or health >= maximum then return false end
     local amount = maximum * percent / 100
     if amount <= 0 then return false end
+    hero_health_guard.allow_healing(unit)
     pcall(unit.SetHealth, unit, math.min(maximum, health + amount))
     return true
 end
 
 local function apply_health_regen_tick(player_id)
-    if phase_guard.post_clear_frozen() then return end
+    if phase_guard.post_clear_frozen() then
+        local phase = event_bus.request("archive.health_recovery_state", {player_id=player_id})
+        if not phase or phase.allowed ~= true then return end
+    end
     local hero_amount = math.max(0,
         M.value(player_id, "health_regen_per_second")
             + M.value(player_id, "hero_health_regen_per_second"))
