@@ -10,6 +10,8 @@ from pathlib import Path
 ACCOUNT = re.compile(r"[0-9]{1,20}\Z")
 TOKEN = re.compile(r"[A-Za-z0-9_.-]{8,96}\Z")
 SESSION = re.compile(r"[A-Za-z0-9_.:-]{8,128}\Z")
+RESPONSE_CAPABILITIES = frozenset(("archive_profile_refs_v1", "archive_profile_refs_v2",
+                                  "lottery_committed_profile_v1"))
 
 
 def normalize(code):
@@ -23,7 +25,15 @@ def normalize(code):
 
 def command(service, payload):
     if not isinstance(payload, dict) or set(payload) - {
-            "account_id", "match_session_id", "config_hash", "command"}:
+            "account_id", "match_session_id", "config_hash", "command", "response_capabilities"}:
+        raise ValueError("redeem_request_invalid")
+    # These flags select only the HTTP representation after settlement. Modern
+    # providers send them on every archive command, including code redemption.
+    # Keep reward/identity inputs closed and never forward flags into the RPC.
+    capabilities = payload.get("response_capabilities", {})
+    if (not isinstance(capabilities, dict) or len(capabilities) > len(RESPONSE_CAPABILITIES)
+            or set(capabilities) - RESPONSE_CAPABILITIES
+            or any(type(value) is not bool for value in capabilities.values())):
         raise ValueError("redeem_request_invalid")
     account, session, item = (payload.get(k) for k in
                               ("account_id", "match_session_id", "command"))

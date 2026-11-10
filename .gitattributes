@@ -325,3 +325,7 @@ publishing/workshop/packager_pack_2026110902_45351f87_authorization.json text eo
 tools/redemption_gold_ticket_codes_20261110/*.py text eol=lf
 tools/redemption_gold_ticket_codes_20261110/*.json text eol=lf
 tools/redemption_gold_ticket_codes_20261110/*.md text eol=lf
+
+# Backend-only redemption transport compatibility repair.
+tools/ws4_redemption_transport_20261110/*.py text eol=lf
+tools/ws4_redemption_transport_20261110/*.md text eol=lf
