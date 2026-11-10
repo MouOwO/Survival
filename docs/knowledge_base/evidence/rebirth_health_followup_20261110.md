@@ -20,6 +20,15 @@
 
 树外目录 D:/Survival_本地工具/runs/20261110_rebirth_health01 保留源码/原有改动逐字节备份、stash/pull/精确pop、三项旧源码负对照、候选与回归回执。53项定向检查通过：4亿最大生命、20轮吸血后同上限重算、同步压低/异常回填、生命上限变化、回调错误、通知回调回血与伤害、多玩家、死亡、后续战斗伤害和身份保护。四个指定纯Lua回归通过：hero_growth_hot_path、hero_large_attack_projection（1e12/9e15/20倍）、postclear18项、postclear真实永久服务。测试准入仅在进程内允许合成玩家，未修改正式策略。
 
-## 交付待办
+## 已确认随1009完整交付
 
-用户已再次正常退出Dota/Tools并保持Steam登录。源码提交、实际生产转换回归、完整签包、原游廊上传与官方下载核验待完成。另一个窗口的名称/界面改动保留给原任务，不自动暂存或覆盖；当前打包若受其未提交运行源码影响需明确保留真实阻断。当前已正式同步版本仍1005 / manifest 8113612381032502226，后台未改；新普通10转复现验收待测。
+此前确实因另一窗口7份未提交运行源码而未能打包。用户回复“那边已经提交”后恢复核对，发现名称修复已发布1008，后续抽奖修复又完整发布1009，本轮回血提交已一并进入两次完整运行绑定。两份1009不可变Git源码与树外候选逐份按CRLF/LF规范化字节一致；没有再改运行代码或重复上传。
+
+当前原封闭条目3824360109，版本2026111009，Steam manifest 7460464180809387257。使用1009真实官方下载回执执行 release_pipeline.py delivery-status --full --check，返回WORKSHOP_SYNCED；本地、上传和下载内容SHA256均为43f780aacf6bd33c037850b0b424ccaefefaa2582cbec9d736a79c73d817778e，双仓绑定、上传与官方下载证据匹配，pending/source/resource/historical/blocking/dirty runtime均0。7056资源/5包文件完整下载一致，后台未改，本轮SDK0。
+
+- 1009固定运行来源：game f5f80dd7ee1c10983b60e0869bca53205bc665d6，content 23ab62a9b47ae3c86a2ac79c743b28709e49bffd。
+- hero_health_guard.lua规范化SHA256：f333bcfc6dc81a345bf77720ce95430cd36ef7dd61f042f91616b37d82b2e4d1；hero_combat_stat_service.lua：9b4ba9f1205029b8c0de55429bedd14a113dce6371bf767e73f787a05cf46c49。
+- 包回执 output/packager/pack_2026111009_814969f8/package.json，SHA256 1c1d3f6a858501bbe1b03b8c727faedad624690f7042e37148f0161b39870d59。
+- 官方下载回执 output/packager/pack_2026111009_814969f8/download_evidence/20261110T103620Z_29f617b0d1af4110a040cf2d4228d16f/verification.json，SHA256 9b8588be8f14500cec90f6ae4f3af654463b47812d2c17bf35c18ea145b09491。
+
+恢复时Dota又在运行，固定工具正常拒绝构建；本轮随后仅执行现有签包的只读交付核验，不切包、不启动或关闭玩家游戏。另一次“对1009生产产物重跑53项”的执行请求被用户拒绝，未重试，也未将该项记为通过；仍只声称原53项源码/候选回归、原发行生产转换证据及本次全量交付检查。新普通客户端10转后的生命与吸血表现、具体原生触发调用及FPS仍待用户实机验证。原有5项无关工作区改动保持。
