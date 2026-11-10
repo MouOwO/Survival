@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "status": "WORKSHOP_SYNCED",
+  "release_sequence": 2026111002,
+  "steam_manifest": "5991413182401784926",
+  "source_revisions": {
+    "content": "4465c74ab055895c5269ecbbcbde9607dd16da37",
+    "game": "25f6d976877e7fbdd208ccc645579c1e7ed6f3c1"
+  },
+  "package_operator_revision": "25f6d976877e7fbdd208ccc645579c1e7ed6f3c1",
+  "publication_operator_revision": "a6ad36ab12ec5a9f1a4cc9702d21a34af2368754",
+  "resources": 7056,
+  "package_files": 5,
+  "pending_counts": {
+    "rows": 0,
+    "pending": 0,
+    "blocking": 0,
+    "historical_sources": 0,
+    "dirty_total": 5,
+    "dirty_runtime": 0,
+    "pending_resources": 0,
+    "by_status": {}
+  },
+  "source_runtime_pending": 0,
+  "source_runtime_dirty": 0,
+  "native_visual_acceptance": false,
+  "real_player_claims": false,
+  "server_changed": false,
+  "kind": "DAILY_TAB_HIGHLIGHT_PUBLIC_VERIFIED_DELIVERY",
+  "checks": {
+    "game_author": 36,
+    "content_author": 36,
+    "actual_compiler_DATA": 36,
+    "closed_halo": 67,
+    "incremental_controller_groups": 7,
+    "compact_model_groups": 8,
+    "stable_tab_writes_per_1000_deliveries": 0,
+    "single_delta_visits_with_512_extra_rows": 1
+  },
+  "evidence": {
+    "package": {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\packager\\pack_2026111002_98e1fa24\\package.json",
+      "sha256": "8a6d6dfc9d8a8849804cdd7db3dfcc5823c0d277533f48b87bbcb2b7b02f6e5f"
+    },
+    "official_download": {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\packager\\pack_2026111002_98e1fa24\\download_evidence\\20261110T051323Z_3c69f1530c474b82a827f8e436e65dba\\verification.json",
+      "sha256": "9555925d19d2553e62588b714f99750ee9f4b2ad23aceaefffbc4f12b03f0af7"
+    },
+    "actual_compiler_verification": {
+      "path": "D:\\Survival_本地工具\\runs\\20261110_daily_tab_highlight01\\official_data_verification.json",
+      "sha256": "3f3f1eff8a157a1ec1540c786ff52efe1cd6d458207b7b0cc71eb1da1573eb49"
+    }
+  }
+}

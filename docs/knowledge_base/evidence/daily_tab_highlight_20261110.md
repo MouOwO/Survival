@@ -23,4 +23,16 @@
 - 原紧凑控制器7组、模型8组和关闭领取光晕67项检查通过。旧 `test_daily_entry_hint.cjs` 仍假定已退役的legacy发送入口，在旧/新作者上同样失败；不篡改旧断言，使用实际紧凑链路及上述67项覆盖现行流程。
 - 所有原生/传输为合成夹具；调用计数不代表实机FPS或新客户端视觉验收，未实际领取玩家奖励。
 
-官方编译、实际DATA检查、签包、SDK上传和官方下载在真实完成后补记；源码提交不能替代游廊交付。
+## 1002 已完整交付
+
+固定工具任务 `pack_2026111002_98e1fa24` 已完成编译、生产转换、完整来源审查、签名、原条目SDK上传和官方完整下载。当前版本 `2026111002`，Steam manifest `5991413182401784926`；7056资源、5包文件逐文件一致，186保护模块通过。最后一次 `delivery-status --full --check` 返回 `WORKSHOP_SYNCED`，目标待发、历史来源、阻断及dirty runtime均为0，五项原有无关改动保留。后台本轮未修改。
+
+实际官方编译4项：紧凑每日模型、每日控制器、静态目录JS及每日CSS。三份JS的DATA逐字节核对作者输入（仅既定CRLF/LF换行差异），CSS实际DATA包含高亮类。将实际编译的模型/控制器DATA同时接入同一36项回归，通过，额外标签写入及单记录计数同样满足预算。`official_data_verification.json` 与最终交付回执已按真实产物登记，未重编译或重签已验证的结果。
+
+- 原始作者提交：game `83789674306ccbac943662b8a8cd7a4c9930b44a`，content `dcda8d2b56b1e22198c79ff20c52bdd9f3bf7a4c`。
+- 最终运行/构建来源：game `25f6d976877e7fbdd208ccc645579c1e7ed6f3c1`，content `4465c74ab055895c5269ecbbcbde9607dd16da37`；发布operator `a6ad36ab12ec5a9f1a4cc9702d21a34af2368754`。两仓均执行stash/pull/精确pop/定向commit/push，历史stash保留。
+- 包回执 `output/packager/pack_2026111002_98e1fa24/package.json`，SHA256 `8a6d6dfc9d8a8849804cdd7db3dfcc5823c0d277533f48b87bbcb2b7b02f6e5f`；签名manifest SHA256 `a7f12e35b47f479b34f4515142f0d98cdde0adc58eec9379274e22e47961373f`，完整内容SHA256 `d954a7c32f2d632285e5cb4f61df648a55c927ace58dc99a9affcefb55ac031a`。
+- 官方下载回执 `output/packager/pack_2026111002_98e1fa24/download_evidence/20261110T051323Z_3c69f1530c474b82a827f8e436e65dba/verification.json`，SHA256 `9555925d19d2553e62588b714f99750ee9f4b2ad23aceaefffbc4f12b03f0af7`；实际Steam callback3406/result1，manifest一致。
+- 树外 `final_delivery_receipt.json`、`final_delivery_status.stdout` 与所有来源/编译/备份/回归记录保留；工具阶段、实际命令和发行登记在 `D:/Survival_本地工具/runs/packaging_jobs/pack_2026111002_98e1fa24`。
+
+新普通客户端的实际颜色/光晕、多分辨率和FPS仍待用户开新局观察；没有自动授权网页、代领或补发任何玩家奖励，不以合成调用计数代替原生验收。
