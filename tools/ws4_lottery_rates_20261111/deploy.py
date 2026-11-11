@@ -113,6 +113,10 @@ new=base/('20261111-ws4-lottery-rates-'+sha(json.dumps(dict(payload_sha256=pins,
     need(text.count('config_registration_expected=False') >= 2,
          'audited_registration_status_anchor_changed')
     text = text.replace('config_registration_expected=False', 'config_registration_expected=True')
+    need(text.count("result['config_unchanged_on_api_rollback']=True") == 2,
+         'audited_recovery_status_anchor_changed')
+    text = text.replace("result['config_unchanged_on_api_rollback']=True",
+                        "result['config_unchanged_on_api_rollback']=False")
     compile(text, '<lottery-rates-remote>', 'exec')
     return text
 
@@ -166,16 +170,20 @@ def main(argv=None):
     parser.add_argument('mode', nargs='?', default='plan',
                         choices=('plan', 'audit', 'prepare', 'probe', 'activate', 'verify', 'rollback', 'recover'))
     parser.add_argument('--source-revision'); parser.add_argument('--operator-revision')
+    parser.add_argument('--receipt-directory', type=Path)
     args = parser.parse_args(argv)
     if args.mode == 'plan':
         print(json.dumps(dict(status='WS4_LOTTERY_RATES_PLAN_NOT_EXECUTED', parent=PARENT,
                               parent_manifest_sha256=MANIFEST, candidate_bundle=BUNDLE,
                               phases=['audit', 'prepare', 'probe', 'activate', 'verify'], remote_actions=0)))
         return 0
-    report = OUT / (args.mode + '.json')
+    output = args.receipt_directory.resolve() if args.receipt_directory else OUT.resolve()
+    need(output.parent == RUN.resolve() and output.name.startswith('server_deploy'),
+         'receipt_directory_outside_reviewed_run')
+    report = output / (args.mode + '.json')
     need(not report.exists(), 'preserve_existing_local_receipt')
     payloads, binding, source_pins, operator_pins = source_inputs(args.source_revision, args.operator_revision)
-    audit = {} if args.mode == 'audit' else json.loads((OUT / 'audit.json').read_bytes())
+    audit = {} if args.mode == 'audit' else json.loads((output / 'audit.json').read_bytes())
     if audit:
         need(audit.get('ok') is True and audit.get('source_revision') == args.source_revision
              and audit.get('source_sha256') == source_pins and audit.get('payload_sha256') == binding['payload_sha256']
@@ -199,7 +207,7 @@ def main(argv=None):
     need(sha(prior.prior.prior.TRANSPORT.read_bytes()) == prior.prior.prior.TRANSPORT_SHA, 'pinned_transport_changed')
     transport = load('lottery_pinned_transport', prior.prior.prior.TRANSPORT)
     result = transport.remote(remote, timeout=240)
-    OUT.mkdir(parents=True, exist_ok=True)
+    output.mkdir(parents=True, exist_ok=True)
     result['operator_file_sha256'] = operator_pins
     with report.open('x', encoding='utf8') as stream:
         json.dump(result, stream, sort_keys=True, indent=2); stream.write('\n')
