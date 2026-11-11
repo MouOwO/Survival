@@ -1,7 +1,6 @@
 """Explicit read-only export of code/public config and schema, never player rows."""
 from __future__ import annotations
 import base64
-import importlib.util
 import json
 from pathlib import Path
 import subprocess
@@ -17,7 +16,7 @@ assert str(root).startswith('/opt/goufayu-ws4/releases/') and root.name=='backen
 files={}
 for directory in ('fishing_api','archive_backend'):
  for p in (root/directory).rglob('*'):
-  if not p.is_file() or '__pycache__' in p.parts or p.suffix not in ('.py','.json','.csv') or p.is_symlink():continue
+  if not p.is_file() or '__pycache__' in p.parts or p.suffix not in ('.py','.lua','.json','.csv') or p.is_symlink():continue
   files[p.relative_to(root).as_posix()]=p.read_bytes()
 bundles=root.parent/'addon/server/bundles'
 digest=json.loads((bundles/'current.json').read_bytes())['hash']

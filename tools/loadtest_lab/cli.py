@@ -50,12 +50,13 @@ def prepare(args):
         elif name == 'database/schema.sql':
             target = 'database/10_schema.sql'
         else:
-            need(name.startswith(('fishing_api/', 'archive_backend/')) and Path(name).suffix in ('.py', '.json', '.csv'),
+            need(name.startswith(('fishing_api/', 'archive_backend/')) and Path(name).suffix in ('.py', '.lua', '.json', '.csv'),
                  'unreviewed_snapshot_source')
             target = 'runtime/' + name
         path = root.joinpath(*relative(target).parts)
         path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(raw)
         cfg['sources'][target] = sha(raw)
+    need('runtime/archive_backend/worker_fast.lua' in cfg['sources'], 'actual_lua_settlement_source_required')
     revision = subprocess.run(['git', '-C', str(ROOT), 'rev-parse', 'HEAD'], capture_output=True, check=True).stdout.decode().strip()
     for name in CSVS:
         source = 'data/csv/玩家档案系统/' + name + '.csv'
@@ -93,13 +94,18 @@ def prepare(args):
     load(root)  # Validate all budgets before producing executable bootstrap files.
     password = private['database_app']
     roles = ('CREATE ROLE anon NOLOGIN;\nCREATE ROLE authenticated NOLOGIN;\nCREATE ROLE service_role NOLOGIN;\n'
+             'CREATE ROLE goufayu_payment NOLOGIN;\n'
+             'CREATE ROLE goufayu_migrator NOLOGIN;\n'
              "CREATE ROLE goufayu_app LOGIN PASSWORD '" + password + "';\n")
-    (root / 'database/00_roles.sql').write_text(roles, encoding='utf8'); (root / 'database/00_roles.sql').chmod(0o600)
+    # Image entrypoint reads init SQL as its postgres UID. The enclosing lab
+    # remains 0700 on Linux; mounted init files must be readable by that UID.
+    (root / 'database').chmod(0o755)
+    (root / 'database/00_roles.sql').write_text(roles, encoding='utf8'); (root / 'database/00_roles.sql').chmod(0o644)
     marker = ('CREATE SCHEMA loadtest_lab; REVOKE ALL ON SCHEMA loadtest_lab FROM PUBLIC;\n'
         'CREATE TABLE loadtest_lab.marker(singleton boolean PRIMARY KEY CHECK(singleton),run_id text NOT NULL,'
         'proof text NOT NULL,manifest_sha256 text NOT NULL,seeded boolean NOT NULL DEFAULT false);\n'
         "INSERT INTO loadtest_lab.marker VALUES(true,'" + run + "','" + private['marker'] + "','" + sha(canonical(cfg)) + "',false);\n")
-    (root / 'database/90_marker.sql').write_text(marker, encoding='utf8'); (root / 'database/90_marker.sql').chmod(0o600)
+    (root / 'database/90_marker.sql').write_text(marker, encoding='utf8'); (root / 'database/90_marker.sql').chmod(0o644)
     # Linux host networking keeps PostgreSQL's own observed address/port equal
     # to the explicitly guarded loopback endpoint. No public DB listener.
     compose = ('services:\n  database:\n    image: postgres:17\n    container_name: survival-loadtest-' + run[:12]

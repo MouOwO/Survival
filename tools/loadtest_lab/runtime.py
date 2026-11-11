@@ -7,6 +7,7 @@ is replaced only by the separately authenticated synthetic lease endpoint.
 from __future__ import annotations
 import http.client
 import json
+import os
 import re
 import sys
 import threading
@@ -115,6 +116,9 @@ def serve(directory):
         request_timeout_seconds=20, database_backend='postgres', postgres_dsn=dsn(cfg, private),
         postgres_max_concurrency=cfg['db_concurrency'], http_max_concurrency=cfg['http_concurrency'],
         payment_mode='test', archive_http=True, addon_root=root / 'addon', archive_lua_path='lua5.1')
+    # Production's optional five-account whitelist is a process setting. This
+    # standalone process has its own bounded synthetic gate instead.
+    os.environ.pop('SURVIVAL_TEST_STEAM_IDS64', None)
     app = build_application(settings)
     base = make_handler(app, client_timeout=settings.http_client_timeout_seconds,
                         request_deadline=settings.http_request_deadline_seconds)

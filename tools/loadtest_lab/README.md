@@ -31,7 +31,9 @@ python -X utf8 -B -m tools.loadtest_lab.cli prepare --source-receipt D:/Survival
 ```bash
 cd /srv/survival-loadtest/NEW
 chmod 700 .
-chmod 600 private.json client.json compose.yaml database/00_roles.sql database/90_marker.sql
+chmod 600 private.json client.json compose.yaml
+chmod 755 database
+chmod 644 database/*.sql
 docker compose up -d database
 # 等数据库初始化完成；只初始化新 cluster，不复用现有数据目录
 /path/to/test-venv/bin/python -B run_lab.py seed --directory "$PWD"
@@ -67,7 +69,7 @@ locust -f tools/loadtest_lab/locustfile.py --headless --host http://127.0.0.1:29
 
 ## 成本与证据
 
-账号区间初始化O(1)，查询/分配/重试/释放O(1)，已发身份内存O(数量)，最多10万；无按人数扫描的刷新。种数O(N)，每批1000行、内存O(1000)，每批约3次SQL写入加1次COPY；初始化种数单独计时，不算稳定业务吞吐。每个虚拟用户O(1)状态；首次约9个HTTP（环境证明、身份、认证、登录、配置、奖池、结算、ready，具体以统计为准），稳定通常一次操作1个HTTP；有重放校验的写操作额外3个HTTP；收尾结算/释放2个HTTP。统计监控每5秒读累计计数O(1)，就绪时长按状态变更累计，无全账号轮询。
+账号区间初始化O(1)，查询/分配/重试/释放O(1)，已发身份内存O(数量)，最多10万；无按人数扫描的刷新。种数O(N)，每批1000行、内存O(1000)，每批约3次SQL写入加1次COPY；初始化种数单独计时，不算稳定业务吞吐。每个虚拟用户O(1)状态；首次8个HTTP（环境证明、身份、认证、登录、配置、奖池、结算、ready），稳定通常一次操作1个HTTP；有重放校验的写操作额外3个HTTP；收尾结算/释放2个HTTP。统计监控每5秒读累计计数O(1)，就绪时长按状态变更累计，无全账号轮询。
 
 保留 source_snapshot、prepare、seed、started、smoke、stopped 回执、Locust CSV/HTML及系统监控；回执明确 `capacity_certified=false`，程序不自动宣布通过。Windows prepare/snapshot/smoke 自动调用存储登记；Linux回执显示待导入。远程产物收回树外目录后，建立注明远程原路径、原回执SHA256及本地artifact_root的真实采集回执，再执行：
 
