@@ -172,7 +172,7 @@ function M.settle(profile,command)
         for _,item in ipairs(items) do
             results[#results+1]=grant(item,counts,stats,archive,profile.save.lottery_applied_item_effects)
         end
-        current.pity_counts=counters
+        if pool.streak_rule then current.pity_counts=counters end
         current.draws=(tonumber(current.draws) or 0)+count
         response.count=count;response.results=results;response.state_persisted=true
         response.guarantee_quality=guarantee or '';response.guarantee_satisfied=not guarantee or hit

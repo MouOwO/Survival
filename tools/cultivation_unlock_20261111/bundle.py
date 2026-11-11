@@ -106,7 +106,7 @@ def build(revision, output):
     receipt = dict(status='CULTIVATION_UNLOCK_BUNDLE_BUILT', recipe='gold-ur1-fifty-and-cultivation-unlock-v1',
                    source_revision=revision, source_sha256={**{CSV_PREFIX+k+'.csv':sha(v) for k,v in csv_files.items()}, **{'scripts/vscripts/'+k:sha(v) for k,v in source_files.items()}},
                    parent_bundle_hash=PARENT, candidate_bundle_hash=digest,
-                   candidate_directory=str(directory.resolve()), changed_configs=list(CONFIGS), changed_sources=list(SOURCES),
+                   candidate_dir=str(directory.resolve()), changed_configs=list(CONFIGS), changed_sources=list(SOURCES),
                    unchanged_sources=len(document['sources'])-len(SOURCES), sdk_calls=0, player_writes=0)
     (output / 'candidate_receipt.json').write_bytes(canonical(receipt) + b'\n')
     return receipt
