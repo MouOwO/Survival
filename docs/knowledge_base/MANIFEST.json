@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 59587,
-      "sha256": "265e4af4fe556c00a31fecd666d37bf0533e70c0e0774d15a18bb342501eede7"
+      "bytes": 60083,
+      "sha256": "25eff4a3161bfcba3b07823e6051596d5c206c7864d5775f1ab396eebf84947b"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 73246,
-      "sha256": "442f6b7b2b7c9af3bc79e62af6cfe051347c28789eea249ed9086aa3c217063d"
+      "bytes": 73742,
+      "sha256": "18eb34cea62b8d547cb25f57322a3bce36e5adc65d09eee9a3c24644909dd8bc"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 45996,
-      "sha256": "c7cc22bbc043c33405cc5ce4926731e8c795c34cca42dbabaac98e61c4f9e11a"
+      "bytes": 46492,
+      "sha256": "0796206c49d35fa25d495ccedf0531bca5733826cc192aa3ee942b2d3a4d8f0d"
     },
     {
       "path": "data/completed_work_index.json",
@@ -917,6 +917,11 @@
       "path": "validation/20261111/account_cleanup.public.json",
       "bytes": 1416,
       "sha256": "e819da328c7d3229fb46cff743b667fcdeabdbea910b45ba8771a9c96e448454"
+    },
+    {
+      "path": "evidence/capacity_4000_20261111.md",
+      "bytes": 5267,
+      "sha256": "faf1603400233d8c3a229eb7da74e97a91c2f191de43c89b1bb9950e2bc47914"
     }
   ]
 }
