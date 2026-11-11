@@ -11,7 +11,7 @@
 
 ## 运行前提
 
-使用独立 Linux 测试机，有 Docker Compose、PostgreSQL 17 镜像、Python 3.11+、Lua 5.1。不要求购买 PTS，可用自己的电脑运行 Locust。压测发生器尽量与业务测试机分开。Windows 只负责准备文件和运行发生器，数据库使用 Linux 主机网络，不能直接把该 compose 当作 Docker Desktop 配置使用。
+使用独立 Linux 测试机，有 Docker Compose、PostgreSQL 17 镜像、Python 3.11+、与待测后台一致的 Lua。不要求购买 PTS，可用自己的电脑运行 Locust。压测发生器尽量与业务测试机分开。Windows 只负责准备文件和运行发生器，数据库使用 Linux 主机网络，不能直接把该 compose 当作 Docker Desktop 配置使用。
 
 独立虚拟环境安装 `requirements.txt`，不要复用签包/支付虚拟环境。固定并保存实际依赖版本与镜像 digest；镜像获取、机器租用和实际负载启动是独立操作。真实4000容量测试使用 `purpose=capacity`，发现常用生产端口即拒绝启动；`functional-smoke` 只允许最多10注册/5活跃、最长180秒及150个前端请求，用于小规模事务验证。
 
@@ -42,7 +42,7 @@ docker compose up -d database
 
 serve 在前台运行，到期自动关闭 API。数据库监听回环25432，业务后端29565、认证代理29567；启动/种数前先验证真实数据库地址、库名、随机标记及清单摘要。服务账号由独立 cluster 创建，生产密码不参与。种数1000行一批，只有前 active 个合成账号有测试抽奖券/月卡；不生成订单。
 
-启动前检测 `lua5.1` 或 `lua` 的实际版本必须是 Lua 5.1，并在 started 回执登记可执行文件摘要。若不在 PATH，可在 serve 添加 `--lua-executable /absolute/path/to/lua`；不接受未经验证的版本。
+启动前检测 `lua5.1` 或 `lua` 的实际版本，并用真实不可变配置执行奖池目录预检；started 回执登记版本和可执行文件摘要。若不在 PATH，可在 serve 添加 `--lua-executable /absolute/path/to/lua`。默认只接受 Lua 5.1–5.4；正式容量比较应使用与待测后台相同的版本及构建，不用本地可执行文件替代服务器版本作结论。
 
 新终端可运行两账号验证（会修改合成账号并占用两个一次性身份，因此正式容量测试应另建新环境）：
 

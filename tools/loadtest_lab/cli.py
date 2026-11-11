@@ -188,7 +188,7 @@ def main(argv=None):
     init.add_argument('--global-http-per-minute', type=int, default=2400)
     data = subs.add_parser('seed'); data.add_argument('--directory', required=True)
     serve = subs.add_parser('serve'); serve.add_argument('--directory', required=True)
-    serve.add_argument('--lua-executable', help='Explicit Lua 5.1 executable; otherwise detect lua5.1/lua')
+    serve.add_argument('--lua-executable', help='Explicit Lua executable; otherwise detect lua5.1/lua')
     test = subs.add_parser('smoke'); test.add_argument('--directory', required=True)
     test.add_argument('--stop-lab', action='store_true')
     stop = subs.add_parser('stop'); stop.add_argument('--client', required=True)

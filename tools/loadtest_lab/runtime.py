@@ -101,18 +101,19 @@ def frontend_handler(service, cfg, private, stop, pending):
 def resolve_lua(executable=None):
     from pathlib import Path
     selected = shutil.which(executable) if executable else (shutil.which('lua5.1') or shutil.which('lua'))
-    need(selected, 'lua51_executable_required')
+    need(selected, 'lua_executable_required')
     path = Path(selected).resolve(strict=True)
     result = subprocess.run([str(path), '-e', 'io.write(_VERSION)'], capture_output=True, timeout=5)
-    need(result.returncode == 0 and result.stdout == b'Lua 5.1', 'lua51_version_required')
-    return str(path), sha(path.read_bytes())
+    need(result.returncode == 0 and result.stdout in (b'Lua 5.1', b'Lua 5.2', b'Lua 5.3', b'Lua 5.4'),
+         'supported_lua_version_required')
+    return str(path), sha(path.read_bytes()), result.stdout.decode('ascii')
 
 
 def serve(directory, *, lua_executable=None):
     root, cfg, private = load(directory)
     production_host_guard(cfg)
     need(not (root / 'started_receipt.json').exists(), 'lab_run_already_started_create_new_lab')
-    lua, lua_sha256 = resolve_lua(lua_executable)
+    lua, lua_sha256, lua_version = resolve_lua(lua_executable)
     import psycopg
     with psycopg.connect(dsn(cfg, private, admin=True), connect_timeout=3) as conn:
         conn.execute('SET TRANSACTION READ ONLY')
@@ -133,6 +134,9 @@ def serve(directory, *, lua_executable=None):
     # standalone process has its own bounded synthetic gate instead.
     os.environ.pop('SURVIVAL_TEST_STEAM_IDS64', None)
     app = build_application(settings)
+    # Verify actual immutable Lua modules/config before opening listeners.
+    from archive_backend.lottery_catalog import catalog_document
+    catalog_document(app.archive.bundle, lua)
     base = make_handler(app, client_timeout=settings.http_client_timeout_seconds,
                         request_deadline=settings.http_request_deadline_seconds)
     from .identity import IdentityService
@@ -152,7 +156,8 @@ def serve(directory, *, lua_executable=None):
             'http_concurrency': cfg['http_concurrency'], 'database_concurrency': cfg['db_concurrency'],
             'web_concurrency': cfg['web_concurrency'], 'global_http_per_minute': cfg['global_http_per_minute'],
             'registered_accounts': cfg['accounts'], 'max_active': cfg['active'], 'ports': PORTS,
-            'lua_executable': lua, 'lua_sha256': lua_sha256,
+            'lua_executable': lua, 'lua_sha256': lua_sha256, 'lua_version': lua_version,
+            'actual_catalog_preflight_passed': True,
             'steam_calls_enabled': False, 'payment_calls_enabled': False, 'public_listener': False})
         threads = [threading.Thread(target=srv.serve_forever, daemon=True) for srv in (backend, web)]
         for srv, thread in zip((backend, web), threads):
