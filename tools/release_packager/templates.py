@@ -25,6 +25,24 @@ def extend_lottery_csv_review(tree):
         raise ValueError('exact CSV review template assignment changed')
     tree.body.insert(matches[0] + 1, ast.parse('CSV_OUTPUTS.update(' + repr(LOTTERY_CSV_OUTPUTS) + ')').body[0])
 
+def extend_native_music_scope(tree):
+    """Bind the one reviewed native-music event source without widening types.
+
+    Compilation, dependency verification and immutable author checks remain in
+    the existing compiler path. Every other scope mapping retains its template.
+    """
+    matches = [node for node in tree.body if isinstance(node, ast.FunctionDef)
+               and node.name == 'author_paths']
+    if len(matches) != 1:
+        raise ValueError('exact author scope template function changed')
+    function = matches[0]
+    if [arg.arg for arg in function.args.args] != ['resource']:
+        raise ValueError('exact author scope template signature changed')
+    branch = ast.parse("if resource == 'soundevents/survival_background_music.vsndevts_c':\n"
+                       "    return [('content', 'soundevents/survival_background_music.vsndevts')]\n").body[0]
+    offset = 1 if function.body and isinstance(function.body[0], ast.Expr) and isinstance(function.body[0].value, ast.Constant) and isinstance(function.body[0].value.value, str) else 0
+    function.body.insert(offset, branch)
+
 def expression(source):
     return ast.parse(source, mode='eval').body
 
@@ -105,6 +123,8 @@ def render(project, revision, job, current):
             set_assignment(tree, 'ONLINE_TEST_POLICY', repr(job['authorization_relative']))
         elif name == 'exact_review.py':
             extend_lottery_csv_review(tree)
+        elif name == 'scope_review.py':
+            extend_native_music_scope(tree)
         ast.fix_missing_locations(tree)
         source = (ast.unparse(tree) + '\n').encode()
         compile(source, name, 'exec')
