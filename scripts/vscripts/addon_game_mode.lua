@@ -276,6 +276,11 @@ local function configure_game_rules()
             .. tostring(launch_error))
     end
     print("[SURVIVAL_LAUNCH_RULES] phase=activate ok=true deferred=false error=nil")
+    -- Our local HUD owns native music voices. Prevent the regular Dota music
+    -- controller from competing with the phase-selected playlist.
+    GameRules:SetCustomGameAllowBattleMusic(false)
+    GameRules:SetCustomGameAllowHeroPickMusic(false)
+    GameRules:SetCustomGameAllowMusicAtGameStart(false)
     local game_mode = GameRules:GetGameModeEntity()
     game_mode:SetBuybackEnabled(false)
     game_mode:SetFixedRespawnTime(2)
@@ -625,6 +630,7 @@ local function on_item_picked_up(keys)
 end
 
 function M.precache(context)
+    PrecacheResource("soundfile", "soundevents/survival_background_music.vsndevts", context)
     PrecacheResource("particle", "particles/generic_hero_status/hero_levelup.vpcf", context)
     require("ui/monster_reward_numbers").precache(context)
     require("systems/valley_environment_service").precache(context)

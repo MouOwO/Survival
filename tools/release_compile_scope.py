@@ -128,6 +128,8 @@ def operator_binding(revision):
 
 def content_source(resource):
     safe(resource)
+    if resource == 'soundevents/survival_background_music.vsndevts_c':
+        return resource[:-2]
     if resource in KEEPER_PARTICLES:
         return resource[:-2]
     suffix=PurePosixPath(resource).suffix
@@ -135,6 +137,8 @@ def content_source(resource):
     need(resource.startswith('panorama/')and suffix in mapping,'unsupported_official_compiler_mapping')
     return str(PurePosixPath(resource).with_suffix(mapping[suffix]))
 def artifact_for(source):
+    if source == 'soundevents/survival_background_music.vsndevts':
+        return source + '_c'
     if source + '_c' in KEEPER_PARTICLES:
         return source + '_c'
     path=PurePosixPath(safe(source));mapping={'.js':'.vjs_c','.css':'.vcss_c','.xml':'.vxml_c','.svg':'.vsvg_c','.vtex':'.vtex_c'}
@@ -165,6 +169,18 @@ def compiled_binding(resource,raw,compiler_input):
 
 def dependencies(path,raw):
     """Actual XML layouts, CSS image/import URLs and VTEX pixel dependencies."""
+    if path == 'soundevents/survival_background_music.vsndevts':
+        # Native audio stays in Dota's VPK, never copied into the addon. Only
+        # the three user-selected packs are admitted by this compiler recipe.
+        refs = re.findall(r'vsnd_files\s*=\s*"([^"\r\n]+)"', raw.decode('utf-8-sig'))
+        need(len(refs) == 14, 'reviewed_native_music_track_count_required')
+        for ref in refs:
+            safe(ref)
+            need(ref.startswith(('sounds/music/valve_dota_001/music/',
+                                 'sounds/music/valve_ti10/music/',
+                                 'sounds/music/jboberg_01/music/'))
+                 and ref.endswith('.vsnd'), 'unreviewed_native_music_dependency')
+        return [], sorted({'s2r://' + ref for ref in refs})
     if path + '_c' in KEEPER_PARTICLES:
         refs = sorted(set(re.findall(r'resource:"([^"\r\n]+)"', raw.decode('utf8'))))
         local, engine = [], []
