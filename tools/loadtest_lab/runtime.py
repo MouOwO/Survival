@@ -9,12 +9,14 @@ import http.client
 import json
 import os
 import re
+import shutil
+import subprocess
 import sys
 import threading
 import time
 from urllib.parse import parse_qs, urlsplit
 
-from .guard import PORTS, load, dsn, marker_guard, production_host_guard, attest, write_new, need
+from .guard import PORTS, load, dsn, marker_guard, production_host_guard, attest, write_new, need, sha
 
 BUSINESS_PATHS = frozenset(('/v1/session/authenticate', '/v1/session/login', '/v1/profile',
     '/v1/archive/config', '/v1/lottery/catalog', '/v1/lottery/snapshot',
@@ -96,10 +98,21 @@ def frontend_handler(service, cfg, private, stop, pending):
     return Handler
 
 
-def serve(directory):
+def resolve_lua(executable=None):
+    from pathlib import Path
+    selected = shutil.which(executable) if executable else (shutil.which('lua5.1') or shutil.which('lua'))
+    need(selected, 'lua51_executable_required')
+    path = Path(selected).resolve(strict=True)
+    result = subprocess.run([str(path), '-e', 'io.write(_VERSION)'], capture_output=True, timeout=5)
+    need(result.returncode == 0 and result.stdout == b'Lua 5.1', 'lua51_version_required')
+    return str(path), sha(path.read_bytes())
+
+
+def serve(directory, *, lua_executable=None):
     root, cfg, private = load(directory)
     production_host_guard(cfg)
     need(not (root / 'started_receipt.json').exists(), 'lab_run_already_started_create_new_lab')
+    lua, lua_sha256 = resolve_lua(lua_executable)
     import psycopg
     with psycopg.connect(dsn(cfg, private, admin=True), connect_timeout=3) as conn:
         conn.execute('SET TRANSACTION READ ONLY')
@@ -115,7 +128,7 @@ def serve(directory):
         gameplay_stats_csv=root / 'addon/data/csv/玩家档案系统/player_gameplay_stats.csv',
         request_timeout_seconds=20, database_backend='postgres', postgres_dsn=dsn(cfg, private),
         postgres_max_concurrency=cfg['db_concurrency'], http_max_concurrency=cfg['http_concurrency'],
-        payment_mode='test', archive_http=True, addon_root=root / 'addon', archive_lua_path='lua5.1')
+        payment_mode='test', archive_http=True, addon_root=root / 'addon', archive_lua_path=lua)
     # Production's optional five-account whitelist is a process setting. This
     # standalone process has its own bounded synthetic gate instead.
     os.environ.pop('SURVIVAL_TEST_STEAM_IDS64', None)
@@ -139,6 +152,7 @@ def serve(directory):
             'http_concurrency': cfg['http_concurrency'], 'database_concurrency': cfg['db_concurrency'],
             'web_concurrency': cfg['web_concurrency'], 'global_http_per_minute': cfg['global_http_per_minute'],
             'registered_accounts': cfg['accounts'], 'max_active': cfg['active'], 'ports': PORTS,
+            'lua_executable': lua, 'lua_sha256': lua_sha256,
             'steam_calls_enabled': False, 'payment_calls_enabled': False, 'public_listener': False})
         threads = [threading.Thread(target=srv.serve_forever, daemon=True) for srv in (backend, web)]
         for srv, thread in zip((backend, web), threads):
