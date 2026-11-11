@@ -189,15 +189,15 @@ def main(argv=None):
                    AUDITED_ADDON_ROOT='/opt/goufayu-ws4/releases/' + PARENT + '/addon',
                    UNIT_SHA=audit.get('unit_sha256'),
                    PARENT_INVENTORY_SHA=audit.get('parent_inventory_sha256'),
-                   GATE_SOURCE=git_blob(args.operator_revision, prior.prior.GATE_TOOL).decode('utf8'),
+                   GATE_SOURCE=git_blob(args.operator_revision, prior.prior.prior.GATE_TOOL).decode('utf8'),
                    GATE_EXECUTABLE=audit.get('gate_environment', {}).get('executable'),
                    GATE_EXECUTABLE_SHA=audit.get('gate_environment', {}).get('executable_sha256'),
                    PROBE_SOURCE=git_blob(args.operator_revision, PROBE).decode('utf8'))
     recovery = '\n'.join(key + '=' + repr(value) for key, value in {**context, 'MODE': 'recover'}.items()) + '\n' + REMOTE
     context['WATCHDOG_RECOVERY_SOURCE'] = recovery
     remote = '\n'.join(key + '=' + repr(value) for key, value in context.items()) + '\n' + REMOTE
-    need(sha(prior.prior.TRANSPORT.read_bytes()) == prior.prior.TRANSPORT_SHA, 'pinned_transport_changed')
-    transport = load('lottery_pinned_transport', prior.prior.TRANSPORT)
+    need(sha(prior.prior.prior.TRANSPORT.read_bytes()) == prior.prior.prior.TRANSPORT_SHA, 'pinned_transport_changed')
+    transport = load('lottery_pinned_transport', prior.prior.prior.TRANSPORT)
     result = transport.remote(remote, timeout=240)
     OUT.mkdir(parents=True, exist_ok=True)
     result['operator_file_sha256'] = operator_pins
