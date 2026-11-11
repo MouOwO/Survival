@@ -20,6 +20,7 @@ def operator_sources():
     files = {}
     inputs = {name: HERE / name for name in SOURCES}
     inputs['transport.py'] = ROOT / 'tools/archive_caps_20261020/remote_driver.py'
+    inputs['ledger.py'] = ROOT / 'tools/release_storage_ledger.py'
     for name, path in inputs.items():
         blob = subprocess.run(['git','-C',str(ROOT),'show','HEAD:' + path.relative_to(ROOT).as_posix()],
                               capture_output=True, check=True).stdout.replace(b'\r\n', b'\n')
@@ -61,6 +62,25 @@ def save(path, value):
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open('xb') as stream:
         stream.write(canonical(value) + b'\n')
+
+
+def save_maintenance_result(directory, name, value, files):
+    path = directory / name
+    save(path, {**value, 'artifact_root': str(directory.resolve())})
+    # Register actual receipts only, including interrupted/unknown outcomes.
+    # Execute the committed bytes already included in the operator binding.
+    source = ('__file__=' + repr(str(ROOT / 'tools/release_storage_ledger.py'))
+              + '\nexec(compile(' + repr(files['ledger.py']) + ',__file__,"exec"))\n').encode()
+    try:
+        result = subprocess.run([sys.executable,'-B','-X','utf8','-','record','--receipt',str(path)],
+                                input=source,capture_output=True,timeout=60)
+        record = {'returncode':result.returncode,'stdout':result.stdout.decode('utf8','replace')}
+        save(directory / ('storage_registration_' + name), record)
+        registered = result.returncode == 0
+    except (OSError, subprocess.SubprocessError, KeyboardInterrupt):
+        registered = False
+    if not registered:
+        print('维护回执已保留，但清理目录登记未完成：' + str(path), file=sys.stderr)
 
 
 def show_preview(value):
@@ -134,11 +154,11 @@ def main(argv=None):
         result = remote({'action':'apply','account':plan['account_id'],'operator_sha256':digest,
             'expected':plan,'confirm':'DELETE ' + plan['account_id'],'request_id':request_id}, files)
     except (Exception, KeyboardInterrupt):
-        save(directory / ('unknown_' + request_id + '.json'), {'status':'REMOTE_RESULT_UNKNOWN',
-            'request_id':request_id,'automatic_retry':False})
+        save_maintenance_result(directory, 'unknown_' + request_id + '.json', {'status':'REMOTE_RESULT_UNKNOWN',
+            'request_id':request_id,'automatic_retry':False}, files)
         print('远端结果未知，不会自动重试。请用 status --request-id ' + request_id + ' 核对维护回执。')
         return 2
-    save(directory / ('result_' + request_id + '.json'), result)
+    save_maintenance_result(directory, 'result_' + request_id + '.json', result, files)
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0 if result['ok'] else 2
 

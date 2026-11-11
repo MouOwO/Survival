@@ -8,6 +8,22 @@ TEMPLATE_RELEASE = 2026110901
 TEMPLATE_PARENT = 2026110804
 TEMPLATE_REPORT = 'output/complete_delivery_release_20261109_v01'
 PROGRAM_AUTH = '用户通过专用打包工具明确执行发布测试包'
+LOTTERY_CSV_OUTPUTS = {
+    'data/csv/抽奖系统/' + name + '.csv': 'scripts/vscripts/config/generated/' + name + '.lua'
+    for name in ('lottery_pity_rules', 'lottery_pool_definitions', 'lottery_pool_updates', 'lottery_quality_weights')
+}
+
+def extend_lottery_csv_review(tree):
+    """Add four exact generator projections without modifying frozen operators.
+
+    The existing review still executes the pinned build() on immutable inputs
+    and checks every output byte. Unknown paths remain blocking.
+    """
+    matches = [i for i, node in enumerate(tree.body) if isinstance(node, ast.Assign)
+               and any(isinstance(t, ast.Name) and t.id == 'CSV_OUTPUTS' for t in node.targets)]
+    if len(matches) != 1:
+        raise ValueError('exact CSV review template assignment changed')
+    tree.body.insert(matches[0] + 1, ast.parse('CSV_OUTPUTS.update(' + repr(LOTTERY_CSV_OUTPUTS) + ')').body[0])
 
 def expression(source):
     return ast.parse(source, mode='eval').body
@@ -87,6 +103,8 @@ def render(project, revision, job, current):
                 set_assignment(tree, key, value)
         elif name == 'publication_validator.py':
             set_assignment(tree, 'ONLINE_TEST_POLICY', repr(job['authorization_relative']))
+        elif name == 'exact_review.py':
+            extend_lottery_csv_review(tree)
         ast.fix_missing_locations(tree)
         source = (ast.unparse(tree) + '\n').encode()
         compile(source, name, 'exec')

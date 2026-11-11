@@ -20,6 +20,7 @@
 
 - 本机：`D:/Survival_本地工具/runs/account_cleanup/run_*`，保存预览、请求号和结果，不保存原始账号行。
 - 服务器：`/root/goufayu_upload/account_cleanup/run_<请求号>`，保存 root 私有完整备份、目标行及事务回执。不要转发这些文件。
+- 实际执行返回及结果未知时，本机用固定的已提交登记工具运行 `record --receipt`，保存登记回执；登记失败会明确显示并保留原回执，不自动扫描或删除备份。
 - 默认不重试。SSH 断开或结果未知时，按输出的请求号只读查询：
 
 ```powershell
