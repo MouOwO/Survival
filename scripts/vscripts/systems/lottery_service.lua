@@ -604,8 +604,7 @@ local function draw(payload)
             busy_by_player[player_id] = nil
             return failed
         end
-        if guarantee and quality_rank(item.quality)
-            >= quality_rank(guarantee.target_quality) then
+        if guarantee and item.quality == guarantee.target_quality then
             guarantee_hit = true
         end
         counts[item.id] = (counts[item.id] or 0) + (grant.duplicate and 0 or 1)

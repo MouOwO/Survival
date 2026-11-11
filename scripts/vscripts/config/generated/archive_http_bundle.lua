@@ -1,2 +1,2 @@
--- Public-beta daily gift and existing archive rules; deploy with the coordinated 20261106 backend.
-return { protocol = 1, hash = "f8ab7087c042cc82f43555500e134262211062e78c88190b6691dcce57ebff42" }
+-- Draw rules and presentation are bound to the 2026-11-11 WS4 lottery bundle.
+return { protocol = 1, hash = "98761e2a9386174e696fada8efdc2fc6891365dc661215b576b5f90f02fc8fac" }

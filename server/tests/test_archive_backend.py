@@ -865,7 +865,7 @@ class ArchiveTests(unittest.TestCase):
 
     def test_lottery_pity_tiers_and_forced_ssr_fallback(self):
         # Seed zero selects the lowest available tier; cultivation and dragon_knight have no N in their screenshot pools.
-        for pool,expected in [('map','ssr'),('cultivation','ssr'),('dragon_knight','ur'),('summer','ur')]:
+        for pool,expected in [('map','ssr'),('cultivation','ssr'),('dragon_knight','ssr'),('summer','ssr')]:
             profile=copy.deepcopy(self.profile)
             profile['save']['content_inventory']={'lottery_ticket':100,'special_lottery_ticket':100}
             profile['save']['archive']={'lottery_state':{'pools':{'map':{'draws':100}}}}
@@ -884,7 +884,27 @@ class ArchiveTests(unittest.TestCase):
             self.assertEqual(single['guarantee_quality'],'');self.assertEqual(single['results'][0]['quality'],natural)
         projection=self.service.lottery_snapshot({'account_id':'100','config_hash':self.bundle.hash})
         for snapshot in projection['snapshots']:
-            wanted='ssr' if snapshot['selected_pool_id'] in ('map','cultivation') else 'ur'
-            self.assertEqual(snapshot['selected_pool']['pity'][0]['quality'],wanted)
+            self.assertEqual(snapshot['selected_pool']['pity'][0]['quality'],'ssr')
+
+    def test_gold_ten_keeps_natural_ur_and_still_grants_exact_ssr(self):
+        # Seed 11 naturally rolls UR on draw six, with no SSR in the first nine.
+        # The last result must be SSR; a natural UR cannot consume that guarantee.
+        for pool in ('cultivation','dragon_knight','summer'):
+            profile=copy.deepcopy(self.profile)
+            profile['save']['content_inventory']={'lottery_ticket':100,'special_lottery_ticket':10}
+            profile['save']['archive']={'lottery_state':{'pools':{'map':{'draws':100}}}}
+            payload={'profile':profile,'configs':self.bundle.configs,'seed':11,'has_pass':False,
+                'command':{'kind':'lottery_draw','pool_id':pool,'count':10,
+                           'id':'natural_ur_then_ssr','request_id':'natural_ur_then_ssr'}}
+            completed=subprocess.run([self.lua,'worker.lua'],cwd=self.bundle.directory,
+                input=json.dumps(payload),capture_output=True,text=True,check=True)
+            result=json.loads(completed.stdout)
+            self.assertTrue(result['ok'],result)
+            response=result['response'];qualities=[item['quality'] for item in response['results']]
+            self.assertEqual(qualities[5],'ur',pool)
+            self.assertEqual(qualities[9],'ssr',pool)
+            self.assertEqual(response['guarantee_quality'],'ssr')
+            self.assertTrue(response['guarantee_satisfied'])
+            self.assertEqual(result['content_inventory']['special_lottery_ticket'],0)
 
 if __name__=='__main__':unittest.main()

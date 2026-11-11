@@ -172,7 +172,9 @@ function M.settle(profile,command)
         for i=1,count do
             local item=roll(pool,i==count and not hit and guarantee or nil)
             results[#results+1]=grant(item,counts,stats,archive,profile.save.lottery_applied_item_effects)
-            if guarantee and config.quality_rank[item.quality]>=config.quality_rank[guarantee] then hit=true end
+            -- A ten-draw promises an actual SSR item. A natural UR remains
+            -- independent and does not consume that promise.
+            if guarantee and item.quality==guarantee then hit=true end
         end
         current.draws=(tonumber(current.draws) or 0)+count
         response.count=count;response.results=results;response.state_persisted=true

@@ -6,18 +6,18 @@ map_r,map,r,2500,1,ok,用户2026-09-30概率截图确认：R25%。
 map_sr,map,sr,400,1,ok,用户2026-09-30概率截图确认：SR4%。
 map_ssr,map,ssr,150,1,ok,用户2026-09-30概率截图确认：SSR1.5%。
 map_ur,map,ur,0,0,ok,2026-09-29截图地图奖池仅N/R/SR/SSR，无UR成员。
-cultivation_n,cultivation,n,0,0,needs_confirmation,截图修仙奖池无N成员；正式概率待用户提供。
-cultivation_r,cultivation,r,8450,1,needs_confirmation,仅本地联调临时值84.5%；原N权重暂并入R，以保持SR/SSR/UR原临时权重。正式概率待用户提供，暂不发布。
-cultivation_sr,cultivation,sr,400,1,needs_confirmation,特殊池临时联调概率4%。
-cultivation_ssr,cultivation,ssr,150,1,needs_confirmation,特殊池临时联调概率1.5%。
-cultivation_ur,cultivation,ur,1000,1,needs_confirmation,特殊池临时联调概率10%；正式数值待确认。
-dragon_knight_n,dragon_knight,n,0,0,needs_confirmation,截图第三宝箱无N成员；正式概率待用户提供。
-dragon_knight_r,dragon_knight,r,8450,1,needs_confirmation,仅本地联调临时值84.5%；原N权重暂并入R，保留SR/SSR/UR原临时权重。正式概率待用户提供，暂不发布。
-dragon_knight_sr,dragon_knight,sr,400,1,needs_confirmation,特殊池临时联调概率4%。
-dragon_knight_ssr,dragon_knight,ssr,150,1,needs_confirmation,特殊池临时联调概率1.5%。
-dragon_knight_ur,dragon_knight,ur,1000,1,needs_confirmation,特殊池临时联调概率10%；正式数值待确认。
-summer_n,summer,n,0,0,needs_confirmation,截图第四宝箱无N；沿用其他特殊池联调规则，N临时权重并入R。正式概率待用户确认，暂不发布。
-summer_r,summer,r,8450,1,needs_confirmation,截图第四宝箱无N；沿用其他特殊池联调规则，N临时权重并入R。正式概率待用户确认，暂不发布。
-summer_sr,summer,sr,400,1,needs_confirmation,特殊池临时联调概率4%。
-summer_ssr,summer,ssr,150,1,needs_confirmation,特殊池临时联调概率1.5%。
-summer_ur,summer,ur,1000,1,needs_confirmation,特殊池临时联调概率10%；正式数值待确认。
+cultivation_n,cultivation,n,0,0,ok,修仙宝箱无N成员。
+cultivation_r,cultivation,r,9150,1,ok,2026-11-11 金券池分配：R91.5%；N无成员。
+cultivation_sr,cultivation,sr,400,1,ok,2026-11-11 金券池分配：SR4%。
+cultivation_ssr,cultivation,ssr,150,1,ok,2026-11-11 金券池分配：SSR1.5%；一次十连固定至少一件SSR。
+cultivation_ur,cultivation,ur,300,1,ok,2026-11-11 用户指定：单抽UR3%；十连不保底UR。
+dragon_knight_n,dragon_knight,n,0,0,ok,龙骑宝箱无N成员。
+dragon_knight_r,dragon_knight,r,9150,1,ok,2026-11-11 金券池分配：R91.5%；N无成员。
+dragon_knight_sr,dragon_knight,sr,400,1,ok,2026-11-11 金券池分配：SR4%。
+dragon_knight_ssr,dragon_knight,ssr,150,1,ok,2026-11-11 金券池分配：SSR1.5%；一次十连固定至少一件SSR。
+dragon_knight_ur,dragon_knight,ur,300,1,ok,2026-11-11 用户指定：单抽UR3%；十连不保底UR。
+summer_n,summer,n,0,0,ok,暑期宝箱无N成员。
+summer_r,summer,r,9150,1,ok,2026-11-11 金券池分配：R91.5%；N无成员。
+summer_sr,summer,sr,400,1,ok,2026-11-11 金券池分配：SR4%。
+summer_ssr,summer,ssr,150,1,ok,2026-11-11 金券池分配：SSR1.5%；一次十连固定至少一件SSR。
+summer_ur,summer,ur,300,1,ok,2026-11-11 用户指定：单抽UR3%；十连不保底UR。
