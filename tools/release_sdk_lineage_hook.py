@@ -9,8 +9,8 @@ import hashlib
 import importlib
 ROOT = Path(__file__).resolve().parents[1]
 CANONICAL_JOURNAL = ROOT / 'output/four_accounts_20261022/steam_upload_state.json'
-AUTHORITY_FILE = ROOT / 'publishing/workshop/packager_pack_2026111009_814969f8_authority.json'
-AUTHORITY_SHA256 = '17bdbb99cef0e82bacafac83e3742aa64a8e0f350a32bcb86ed97ab1727542a5'
+AUTHORITY_FILE = ROOT / 'publishing/workshop/packager_pack_2026111101_c7b1ea02_authority.json'
+AUTHORITY_SHA256 = '4063da3a9f0e6225b20b34b482ca6512108159ded9e7763171cfa9d060510b76'
 _QUERY_AND_DOWNLOAD = frozenset({'SendQueryUGCRequest', 'ReleaseQueryUGCRequest', 'DownloadItem', 'SubscribeItem', 'UnsubscribeItem', 'SetAllowCachedResponse', 'SetLanguage', 'SetSearchText', 'SetCloudFileNameFilter', 'SetMatchAnyTag', 'SetRankedByTrendDays', 'SetTimeCreatedDateRange', 'SetTimeUpdatedDateRange', 'AddRequiredTag', 'AddExcludedTag', 'AddRequiredKeyValueTag', 'AddRequiredTagGroup'})
 _UGC = 'SteamAPI_ISteamUGC_'
 
