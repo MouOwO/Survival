@@ -159,27 +159,29 @@ class ServiceTests(unittest.TestCase):
         self.assertEqual(self.db.row['state'],'pending');self.assertEqual(self.db.deliveries,0)
     def reset_body(self):
         return {'account_id':'123','match_session_id':'session_test','kind':'refreshmoney','request_id':'reset_test_request'}
-    def test_reset_requires_explicit_server_switch(self):
-        with self.assertRaises(PaymentError) as error:self.app.game('reset',self.reset_body())
-        self.assertEqual(error.exception.code,'test_reset_disabled')
-        self.assertEqual(self.db.resets,0);self.wx.close.assert_not_called()
-    def test_reset_closes_pending_and_retries_are_idempotent(self):
-        self.app.config['test_reset_enabled']=True
-        self.assertTrue(self.app.game('reset',self.reset_body())['ok'])
-        self.wx.close.assert_called_once_with(ID)
-        self.app.game('reset',self.reset_body())
-        self.assertEqual(self.db.resets,1)
-    def test_failed_close_does_not_clear_reward(self):
-        self.app.config['test_reset_enabled']=True
-        self.wx.close.side_effect=PaymentError('gateway_unavailable',503)
-        with self.assertRaises(PaymentError):self.app.game('reset',self.reset_body())
-        self.assertEqual(self.db.resets,0)
-    def test_reset_settles_already_paid_before_clear(self):
-        self.app.config['test_reset_enabled']=True
-        self.wx.query.side_effect=None;self.wx.query.return_value=paid()
-        self.assertTrue(self.app.game('reset',self.reset_body())['ok'])
-        self.assertEqual(self.db.deliveries,1);self.assertEqual(self.db.resets,1)
+    def test_reset_route_is_removed_even_with_old_switch_enabled(self):
+        for enabled in (False, True):
+            self.app.config['test_reset_enabled'] = enabled
+            with self.assertRaises(PaymentError) as error:
+                self.app.game('reset', self.reset_body())
+            self.assertEqual((error.exception.code,error.exception.status), ('route_not_found',404))
+        self.assertEqual((self.db.resets,self.db.deliveries),(0,0))
         self.wx.close.assert_not_called()
+        self.wx.query.assert_not_called()
+
+    def test_http_reset_is_rejected_before_auth_or_body(self):
+        from .service import handler
+        for isolated in (False, True):
+            self.app.endpoints = Mock(isolated=isolated)
+            self.app.config['test_reset_enabled'] = True
+            request = Mock(path='/v1/payments/reset')
+            with self.assertRaises(PaymentError) as error:
+                handler(self.app).post(request)
+            self.assertEqual((error.exception.code,error.exception.status), ('route_not_found',404))
+            request.headers.get_all.assert_not_called()
+            request.rfile.read.assert_not_called()
+        self.assertEqual((self.db.resets,self.db.deliveries),(0,0))
+
     def test_previous_ten_fen_receipt_still_uses_original_amount(self):
         receipt=paid();receipt['amount']['total']=10
         original=order();original['amount']=10

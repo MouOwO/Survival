@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "00_START_HERE.md",
-      "bytes": 49028,
-      "sha256": "d7b4d8fa4a523b7eaa7295e8c255e7e0a14432407d4d688b36d9d2d85ca83d8a"
+      "bytes": 59645,
+      "sha256": "1996eb2df7add51d9f3ee7af9b0d876033e1a5d2a50abb9e4ef495d8d5cc4895"
     },
     {
       "path": "01_architecture_and_workflow.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "07_decisions_incidents_pending.md",
-      "bytes": 62209,
-      "sha256": "d7d3424661af1bc743454ae3f5d169c6ac644084ac991cc80e30ee7fe42c7a1f"
+      "bytes": 73304,
+      "sha256": "ad9178506b057750c07c56c03a2c292c7318fd3cb73bd01d91df9e3c8a8223e8"
     },
     {
       "path": "08_new_project_reuse.md",
@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 35596,
-      "sha256": "eb225ece69e9703e6d0bec5e13332e47ddb45fe50fd547b3e59b485483c347b3"
+      "bytes": 46054,
+      "sha256": "bf23219ae88f28c3f7051c61e854e6b29d24db84d2aa8319614c0e9d6530925d"
     },
     {
       "path": "data/completed_work_index.json",
@@ -907,6 +907,11 @@
       "path": "validation/20261101/workshop_cover.json",
       "bytes": 1393,
       "sha256": "d64d4ee5cba3fbddc7f0e4b1d692dd50a14e5cbbe3a54c5e4dea1d7bdd3ca376"
+    },
+    {
+      "path": "evidence/account_cleanup_operator_20261111.md",
+      "bytes": 4603,
+      "sha256": "a635bff2bd8e745e36e67686e38f0e731bd7457e04ec92b02dee94fff03235af"
     }
   ]
 }

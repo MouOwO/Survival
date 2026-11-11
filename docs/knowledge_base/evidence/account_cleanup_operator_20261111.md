@@ -1,0 +1,29 @@
+# 2026-11-11 账号清档入口审计与独立维护工具
+
+用户要求检查游廊清档指令、移除入口，并提供包含兑换码领取情况的远程 CMD 清理工具。没有指定真实目标账号，本轮未清理真实账号、未停止线上服务、未兑换或创建订单。
+
+## 审计与变更
+
+旧 `debug/payment_test_commands.lua` 注册 `refreshdata`、`refreshmoney`，要求 development + server + Tools + 网页认证关闭。实际1009签名候选的 release_profile 是 production，所以普通游廊不会注册这两个命令；不能据此声称线上玩家原本能随意清档。
+
+现在模块保留无操作 init 以兼容旧离线调用，删除所有注册；payment_service 删除 reset_player、reset 请求和缓存分支，仅保留 catalog/create/status/cancel。后台源码一并删除旧 HTTP reset 路由及 begin_reset/finish_reset 调用映射。WS4 隔离路由原本已不提供 reset，网页登录代理也不接受该路径。历史 SQL 函数保留，不执行数据库迁移。后台源码尚未部署。
+
+根目录 `远程清理账号.cmd` 进入 `tools/account_cleanup/cli.py`。固定 SSH 主机密钥、已有私钥、仅管理员维护电脑使用；无游戏或网页管理入口。预览显示规范化 AccountID/SteamID64 与各表行数，实际执行要求完整目标确认语及维护停服确认。源码必须与 Git blob 一致，目标结构合同、服务版本/进程和账号摘要再次核对。
+
+清理23张身份相关表，含档案/属性/库存/权益/限额/排行/会话、支付充值、兑换领取与尝试、奖励幂等；删除对应领取时减 reserved_count，码定义保留。保留身份行、提高版本和重建初始 onboarding；管理员准入 enabled 不变。认证 SQLite 清理目标旧会话/授权/流程/账号限流，其他账号及共享 IP 限流保留。
+
+实际执行才短暂停止 WS4 web/payment/archive，先备份完整 PostgreSQL 和 SQLite，私有原始数据只存 root 目录；锁表内单事务删除并恢复唯一奖励触发器。未结订单、旧预览或结构变化阻断。COMMIT 回执丢失仅只读核对前后指纹，不重放；真正未知时不启动写服务，失败恢复逐一尝试。详细使用、恢复路径和限制见工具 README（项目源码路径 `tools/account_cleanup/README.md`）。
+
+## 验证与保留
+
+树外证据根：`D:/Survival_本地工具/runs/20261111_account_cleanup01`。源码备份8项及 SHA 已登记。旧聊天模块和旧 payment_service 均触发新断言失败；当前聊天组合8项无注册，四组 Lua 支付/认证/发布门禁通过，发布门禁178项。发布测试夹具补齐现有 compact transport 所需 GetGameModeEntity 空接口，没有改动运行时退路。
+
+维护本地5项测试含真实认证 SQLite 结构的双合成账号；9项编排故障测试覆盖仅预览、错误账号、未结单、备份失败、SQL回滚、COMMIT已成功/已失败/未知及服务启动失败仍继续恢复。后台远端现有 Python 环境34项隔离测试，32通过、2跳过（含旧开关开启时 HTTP reset 在读认证/请求体前404）；连接限于模拟DB及本机loopback，无真实交易。
+
+实际 PostgreSQL 克隆：`/root/goufayu_upload/account_cleanup_checks/4ce8cdd97cb810d0512cc085`，仅从生产导出结构，真实玩家复制0。合成双账号验证完整备份恢复、清理范围、另一账号不变、奖励触发器/兑换计数回滚、结构变化/旧计划/未结单拒绝、同码重新占用名额。克隆库 `goufayu_ws4_account_test_c6158b53ae3d` 和 `goufayu_ws4_account_restore_c6158b53ae3d` 及失败尝试证据均保留，没有按日期清理。真实维护停服和真实账号清理未执行，不以克隆通过冒充线上实测。
+
+成本：无新增游戏定时器/原生桥/网络调用。单次 snapshot 23目标表各2条读取，加3条结构、时区及3条核对共53条SQL；全预览PG55条，认证 SQLite16条（服务探测另外3次 systemctl）。账号排序约 O(K log K)、可保留行 O(K)，总预算10万行/100MiB；兑换全局定义/计数及明确确认后的全库备份随全表/全库规模增长。SQL30秒、锁5秒、备份180秒、维护300秒有界。均为手工操作，不是 FPS 或线上耗时结论。
+
+## 交付边界
+
+当前本轮仅本地更新，尚未完成新签包/SDK/官方下载链；正式游廊已发布1009保持。后台未部署。默认交付待办仍含移除两份 Lua 入口的完整包，必须按固定工具尝试，若并行源码/工具未提交阻断，记录真实原因并保留其改动。

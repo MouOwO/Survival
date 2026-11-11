@@ -8,7 +8,7 @@ local scheduler = require("core/scheduler")
 local cash_policy = require("core/commerce_release_policy")
 local web_auth = require("systems/player_web_auth")
 local M = {}
-local busy, orders, resets, catalogs, bindings = {}, {}, {}, {}, {}
+local busy, orders, catalogs, bindings = {}, {}, {}, {}
 local serial, initialized = 0, false
 local initialized_generation, compact_capability
 local WEB_BASE = "https://pay.xiaofengnet.com/ws4-web"
@@ -37,7 +37,7 @@ local function actor(source)
     if resolved and human(id) == entity then return id end
 end
 local function clear_binding(id)
-    bindings[id], busy[id], orders[id], resets[id], catalogs[id] = nil, nil, nil, nil, nil
+    bindings[id], busy[id], orders[id], catalogs[id] = nil, nil, nil, nil
 end
 local function binding_for(id)
     local player = human(id)
@@ -118,7 +118,8 @@ end
 local function notify(id, message, level)
     bus.emit(events.UI_NOTIFICATION, {player_id=id, message=message, level=level or "info"})
 end
-local function request(id, action, sku, kind, channel, request_id, quantity)
+local function request(id, action, sku, channel, request_id, quantity)
+    if not ONLINE_ACTIONS[action] then return false,"payment_action_invalid" end
     if not id or id ~= math.floor(id) or not PlayerResource:IsValidPlayerID(id)
         or PlayerResource:IsFakeClient(id) then return false, "player_id_invalid" end
     local bound = binding_for(id)
@@ -181,17 +182,6 @@ local function request(id, action, sku, kind, channel, request_id, quantity)
         end
         body.order_id=order.order_id
     end
-    if action=="reset" then
-        local old=resets[id]
-        if old and old.binding==bound then
-            if old.kind~=kind then return false,"reset_in_progress" end
-        else
-            serial=serial+1
-            resets[id]={binding=bound,kind=kind,
-                request_id="reset:"..tostring(id)..":"..tostring(math.floor(now*1000))..":"..serial..":"..tostring(RandomInt(1,999999999))}
-        end
-        body.kind=kind; body.request_id=resets[id].request_id
-    end
     local job={binding=bound,action=action,waiters={request_id or ""}}
     busy[id]=job; bound.last[action]=now
     if action~="catalog" then catalogs[id]=nil end
@@ -231,7 +221,6 @@ local function request(id, action, sku, kind, channel, request_id, quantity)
         end
         catalogs[id]=nil
         if not result.ok then
-            if action=="reset" then notify(id,"清理尚未完成，请稍后再次输入同一命令重试。未确认的付款会先核对并关闭。","error") end
             reply(result); return
         end
         if result.state=="delivered" and (type(result.order_id)~="string" or #result.order_id==0) then
@@ -241,9 +230,9 @@ local function request(id, action, sku, kind, channel, request_id, quantity)
             orders[id]=orders[id] or {}
             orders[id][result.sku]={binding=bound,order_id=result.order_id}
         end
-        local needs_refresh = action=="reset" or (result.state=="delivered" and not bound.refreshed[result.order_id])
+        local needs_refresh = result.state=="delivered" and not bound.refreshed[result.order_id]
         if needs_refresh then
-            local reason=action=="reset" and "payment_test_reset" or "payment_delivered"
+            local reason="payment_delivered"
             -- Keep the operation busy until the authoritative profile commits.
             -- Repeated status polls cannot supersede its load generation.
             busy[id]=job
@@ -264,11 +253,7 @@ local function request(id, action, sku, kind, channel, request_id, quantity)
                     reply({ok=false,action=action,error="reward_refresh_pending",state=result.state,sku=sku})
                     return
                 end
-                if action=="reset" then
-                    orders[id]={}; resets[id]=nil
-                    notify(id,kind=="refreshdata" and "测试存档已恢复新号初始状态，远端已更新。已生成的本局单位需重开对局。"
-                        or "购买内容及对应属性已清理，远端已更新，可以重新购买。")
-                else bound.refreshed[result.order_id]=true end
+                bound.refreshed[result.order_id]=true
                 reply(result)
             end
             -- Another authoritative load may supersede this generation. Its
@@ -383,19 +368,7 @@ function M.handle(source, payload)
             send(id,{ok=false,action=action,error="quantity_invalid",request_id=request_id});return
         end
     end
-    return request(id,action,sku,nil,channel,request_id,quantity)
-end
-function M.reset_player(context, kind)
-    -- TODO(PAYMENT_TEST_ONLY): remove chat reset entry points before public release.
-    -- Tools check + authenticated account + remote config + DB allowlist are required.
-    if not require("core/release_policy").development_allowed() then
-        return false,"test_reset_disabled"
-    end
-    if #context.args~=0 then return false,"usage: "..kind end
-    if kind~="refreshdata" and kind~="refreshmoney" then return false,"reset_invalid" end
-    local ok,err=request(tonumber(context.player_id),"reset",nil,kind)
-    if ok then notify(context.player_id,"正在核对订单并清理远端测试数据，请等待完成提示…") end
-    return ok,err
+    return request(id,action,sku,channel,request_id,quantity)
 end
 function M.open_pass_checkout(id, selection, done)
     local function finish(ok,message)
@@ -434,7 +407,7 @@ function M.init()
     local expected=world_generation()
     if initialized and initialized_generation==expected then return end
     if compact_capability then compact_capability.dispose();compact_capability=nil end
-    if initialized then busy,orders,resets,catalogs,bindings={},{},{},{},{} end
+    if initialized then busy,orders,catalogs,bindings={},{},{},{} end
     initialized=true
     initialized_generation=expected
     local function live() return initialized_generation==expected and world_generation()==expected end
@@ -484,6 +457,5 @@ function M.init()
             transport=require("ui/compact_ui_transport"),scope=binding_for,scope_current=current,
             current=live,evaluate=evaluate_compact_capability}))
     end
-    require("debug/payment_test_commands").init()
 end
 return M

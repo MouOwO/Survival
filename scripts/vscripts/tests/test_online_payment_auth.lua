@@ -221,7 +221,7 @@ dispatch(0,{action="cancel",sku="monthly_pass",order_id="forged"})
 assert(requests[#requests].url==web_config.base_url.."/v1/payments/cancel" and requests[#requests].body.order_id==order_id)
 complete(#requests,{ok=true,sku="monthly_pass",order_id=order_id,state="delivered"})
 local resets_before=#requests
-assert(not payment.reset_player({player_id=0,args={}},"refreshmoney"))
+assert(payment.reset_player==nil,"online payment exposes no account reset API")
 dispatch(0,{action="reset",kind="refreshdata"})
 assert(#requests==resets_before,"production cannot expose reset routes")
 dispatch(0,{action="create",sku="refresh_connection"})

@@ -79,11 +79,7 @@ local function assert_acceptance_cash_closed()
             assert(result.ok and result.real_money_enabled==false and #result.products==0)
         else assert(result.ok==false and result.error=="real_money_disabled") end
     end
-    for _,kind in ipairs({"refreshdata","refreshmoney"}) do
-        local ok,reason=payment.reset_player({player_id=0,args={}},kind)
-        assert(ok==false and reason=="real_money_disabled",
-            "read-only acceptance must not reset a real account")
-    end
+    assert(payment.reset_player==nil,"account maintenance cannot be invoked by the game")
     local completed
     assert(payment.open_pass_checkout(0,{sku="archive_pass_monthly"},function(result)completed=result end)==false)
     assert(completed and completed.ok==false and http==before_http,

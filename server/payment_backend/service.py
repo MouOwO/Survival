@@ -31,7 +31,7 @@ from . import ucoin_recharge
 LOG = logging.getLogger('payments')
 ORDER = re.compile(r'(?:WX|AL)[0-9a-f]{30}\Z')
 CALLS = {'catalog':2,'create_order':4,'get_order':1,'pending':0,'update_gateway':3,'deliver':5,
-    'begin_reset':4,'finish_reset':4,'create_order_channel':5,'create_order_quantity':6}
+    'create_order_channel':5,'create_order_quantity':6}
 
 
 def ucoin_quote(amount_fen, *, recharge=False, rate=U_COIN_PER_YUAN):
@@ -264,7 +264,7 @@ class Payments:
         return self.db.call('get_order',order_id)
 
     def game(self, path, body):
-        fields = {'catalog':set(),'create':{'sku'},'status':{'order_id'},'cancel':{'order_id'},'reset':{'kind','request_id'}}
+        fields = {'catalog':set(),'create':{'sku'},'status':{'order_id'},'cancel':{'order_id'}}
         if path not in fields:raise PaymentError('route_not_found',404)
         allowed = {'account_id','match_session_id'} | fields[path]
         if path=='create' and 'provider' in body:allowed.add('provider')
@@ -292,19 +292,6 @@ class Payments:
                     'unit_u_coin_price':quote['u_coin_price'],'max_quantity':maximum})
             return {**catalog,'products':products,'u_coin_per_yuan':U_COIN_PER_YUAN,
                     'wechat':True,'alipay':self.alipay is not None,'alipay_checkout_mode':self.alipay_mode}
-        if path=='reset':
-            # TODO(PAYMENT_TEST_ONLY): disabled by default, both HTTP and SQL gates required.
-            if self.endpoints.isolated or self.config.get('test_reset_enabled') is not True:
-                raise PaymentError('test_reset_disabled',403)
-            kind,request=body['kind'],body['request_id']
-            if kind not in ('refreshdata','refreshmoney') or not isinstance(request,str) or not re.fullmatch(r'[A-Za-z0-9_.:-]{8,128}',request):
-                raise PaymentError('reset_invalid')
-            started=self.db.call('begin_reset',account,session,kind,request)
-            if started.get('completed'):return started
-            for pending in started.get('orders',[]):
-                with self.lock(pending['order_id']):
-                    self.close_order(self.db.call('get_order',pending['order_id']))
-            return self.db.call('finish_reset',account,session,kind,request)
         if path in ('status','cancel'):
             order_id=body['order_id']
             if not isinstance(order_id,str) or not ORDER.fullmatch(order_id):
@@ -437,7 +424,7 @@ def handler(app):
             self.send(200,output.getvalue(),'image/svg+xml')
         def do_POST(self):self.run(self.post)
         def post(self):
-            actions=('catalog','create','status','cancel') if app.endpoints.isolated else ('catalog','create','status','cancel','reset')
+            actions=('catalog','create','status','cancel')
             paths={x:'/v1/payments/'+x for x in actions}
             is_alipay=self.path=='/v1/payments/alipay/notify'
             is_notice=self.path=='/v1/payments/wechat/notify' or is_alipay

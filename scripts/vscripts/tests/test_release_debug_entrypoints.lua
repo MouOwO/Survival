@@ -7,7 +7,7 @@ package.loaded["config/player_web_auth"] = web_config
 -- without depending on the owner's four-account roster.
 package.loaded["config/test_access"] = { enabled = false }
 IsServer, IsInToolsMode = function() return true end, function() return true end
-GameRules = {IsCheatMode=function() return true end}
+GameRules = {IsCheatMode=function() return true end, GetGameModeEntity=function() return nil end}
 local bus, events = require("core/event_bus"), require("core/events")
 local calls, chat, listeners = 0, nil, {}
 local function poison() calls = calls + 1; error("production reached a mutating dependency") end
@@ -90,8 +90,8 @@ local function assert_denied_entrypoints()
     for _, name in ipairs({"cheat", "xinyang", "yitie", "zaixian"}) do
         denied_pair(archive[name], payload)
     end
-    local reset_ok, reset_error = require("systems/payment_service").reset_player(payload, "refreshdata")
-    assert(reset_ok == false and reset_error == "test_reset_disabled")
+    assert(require("systems/payment_service").reset_player == nil,
+        "account reset API must be absent, not merely protected by a mode flag")
     assert(calls == before, "denials must precede grants, registrations, state reads and HTTP")
 end
 
@@ -109,8 +109,7 @@ cheats.init()
 local development_chat, scale = chat, listeners.survival_scale_selection_changed
 assert(type(development_chat) == "function" and type(scale) == "function")
 require("debug/payment_test_commands").init()
-local payment_chat = chat
-assert(type(payment_chat) == "function" and payment_chat ~= development_chat)
+assert(chat == development_chat, "retired payment module never registers a second chat handler")
 local commands = upvalue(development_chat, "COMMANDS")
 local count = calls
 profile.channel = "production"
@@ -124,8 +123,6 @@ local function assert_captured_callbacks_denied()
         development_chat({playerid=0, text=command})
     end
     scale(nil, payload)
-    payment_chat({playerid=0, text="refreshdata"})
-    payment_chat({playerid=0, text="refreshmoney"})
     assert(calls == count, "captured callbacks recheck the trusted build and online policy")
 end
 assert_captured_callbacks_denied()
