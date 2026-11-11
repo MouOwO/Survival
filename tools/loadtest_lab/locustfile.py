@@ -7,11 +7,12 @@ each virtual user obtains a unique lease from the common indexed allocator.
 import os
 from pathlib import Path
 import random
+import secrets
 import sys
 import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from loadtest_lab.guard import load_client, target_url
+from loadtest_lab.guard import load_client, target_url, canonical, sha, write_new, register_storage
 from loadtest_lab.workload import Player, checked
 from locust import HttpUser, task, events
 from locust.exception import StopUser
@@ -114,3 +115,28 @@ class SyntheticPlayer(HttpUser):
 def exit_on_failure(environment, **kwargs):
     if environment.stats.total.num_failures:
         environment.process_exit_code = 2
+    from locust.runners import WorkerRunner
+    if isinstance(environment.runner, WorkerRunner):
+        return  # Master owns aggregate evidence; workers never overwrite it.
+    try:
+        folder = Path(os.environ.get('LOADTEST_REPORT_DIRECTORY',
+                                     str(Path(os.environ['LOADTEST_CLIENT']).resolve().parent))).resolve()
+        project = Path(__file__).resolve().parents[2]
+        if not folder.is_dir() or folder.is_relative_to(project):
+            raise ValueError('external_report_directory_required')
+        total = environment.stats.total
+        path = folder / ('locust_final_' + secrets.token_hex(8) + '_receipt.json')
+        write_new(path, {'kind': 'REAL_BUSINESS_LOCUST_FINAL_RECEIPT', 'artifact_root': str(folder),
+            'run_id': CFG['run_id'], 'manifest_sha256': sha(canonical(CFG)),
+            'requests': total.num_requests, 'failures': total.num_failures,
+            'includes_user_finalization': True, 'capacity_certified': False,
+            'reset_stats_requested': bool(getattr(environment.parsed_options, 'reset_stats', False)),
+            'routes': [{'method': entry.method, 'name': entry.name,
+                        'requests': entry.num_requests, 'failures': entry.num_failures}
+                       for entry in environment.stats.entries.values()]})
+        import json
+        print(json.dumps({'status': 'FINAL_STATISTICS_SAVED', 'receipt': str(path),
+                          'storage_registration': register_storage(path)}), flush=True)
+    except Exception:
+        environment.process_exit_code = 2
+        print('final_statistics_not_saved', flush=True)
