@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "observed_at": "2026-11-11T06:16:58.010609+00:00",
+  "status": "WORKSHOP_SYNCED_NATIVE_TEST_PENDING",
+  "release_sequence": 2026111102,
+  "workshop_id": "3824360109",
+  "steam_manifest": "7805846272729005356",
+  "signed_resources_verified": 7056,
+  "protected_modules_verified": 186,
+  "package_files": 5,
+  "source_revisions": {
+    "content": "dc667dca77c285cfe3c91946ac58e69ef1047f1f",
+    "game": "e5d552d91107d504e3eecc377463c18cb1b9cc2a",
+    "operator": "e5d552d91107d504e3eecc377463c18cb1b9cc2a"
+  },
+  "official_receipt_sha256": "eccd9e0e74d3449bc90fed0f9d04cea81a697d3ae360176a180e651384e7ce9d",
+  "pending_counts": {
+    "rows": 0,
+    "pending": 0,
+    "blocking": 0,
+    "historical_sources": 0,
+    "dirty_total": 5,
+    "dirty_runtime": 0,
+    "pending_resources": 0,
+    "by_status": {}
+  },
+  "backend_deployed": false,
+  "real_accounts_deleted": 0,
+  "production_services_stopped": 0,
+  "maintenance_tool_real_apply_tested": false,
+  "synthetic_postgres_clone_verified": true,
+  "local_operator_tests": 5,
+  "orchestration_tests": 9,
+  "backend_tests": {
+    "run": 34,
+    "passed": 32,
+    "skipped": 2
+  },
+  "debug_gate_checks": 178,
+  "chat_modes_without_registration": 8,
+  "projection_storage_tests": 5,
+  "maintenance_operator_bound_to_committed_sources": true,
+  "pre_sdk_failed_intent_preserved_and_explicitly_reconciled": true,
+  "ordinary_client_acceptance": false
+}
