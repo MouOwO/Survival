@@ -82,7 +82,7 @@ def load(directory):
     for key in ('controller', 'backend', 'auth_secret', 'pepper', 'database_admin', 'database_app', 'marker'):
         need(bool(re.fullmatch('[a-f0-9]{64}', private.get(key, ''))), 'independent_lab_secret_required')
     need(len(set(private.values())) == 7, 'lab_secrets_must_be_independent')
-    for key, limit in (('http_concurrency', 128), ('db_concurrency', 16), ('web_concurrency', 128),
+    for key, limit in (('http_concurrency', 32), ('db_concurrency', 16), ('web_concurrency', 128),
                        ('global_http_per_minute', 1000000)):
         need(type(cfg.get(key)) is int and 1 <= cfg[key] <= limit, 'lab_concurrency_budget_invalid')
     sources = cfg.get('sources')

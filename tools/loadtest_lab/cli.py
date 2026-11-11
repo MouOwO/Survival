@@ -101,7 +101,8 @@ def prepare(args):
     # remains 0700 on Linux; mounted init files must be readable by that UID.
     (root / 'database').chmod(0o755)
     (root / 'database/00_roles.sql').write_text(roles, encoding='utf8'); (root / 'database/00_roles.sql').chmod(0o644)
-    marker = ('CREATE SCHEMA loadtest_lab; REVOKE ALL ON SCHEMA loadtest_lab FROM PUBLIC;\n'
+    marker = ('REVOKE CREATE,TEMPORARY ON DATABASE "' + cfg['database'] + '" FROM PUBLIC;\n'
+        'CREATE SCHEMA loadtest_lab; REVOKE ALL ON SCHEMA loadtest_lab FROM PUBLIC;\n'
         'CREATE TABLE loadtest_lab.marker(singleton boolean PRIMARY KEY CHECK(singleton),run_id text NOT NULL,'
         'proof text NOT NULL,manifest_sha256 text NOT NULL,seeded boolean NOT NULL DEFAULT false);\n'
         "INSERT INTO loadtest_lab.marker VALUES(true,'" + run + "','" + private['marker'] + "','" + sha(canonical(cfg)) + "',false);\n")
@@ -219,7 +220,8 @@ def entry():
     except Exception as error:
         import re
         message = str(error)
-        code = message if isinstance(error, ValueError) and re.fullmatch('[a-z0-9_:]{1,100}', message) else 'loadtest_operation_not_completed'
+        public = message if isinstance(error, ValueError) else getattr(error, 'code', '')
+        code = public if isinstance(public, str) and re.fullmatch('[a-z0-9_:]{1,100}', public) else 'loadtest_operation_not_completed'
         print(json.dumps({'ok': False, 'error': code, 'error_type': type(error).__name__, 'automatic_retry': False}))
         return 2
 
