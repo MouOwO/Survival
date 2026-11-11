@@ -85,7 +85,7 @@ def prepare(args):
         target = 'operator/loadtest_lab/' + Path(name).name
         path = root / target; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(raw)
         cfg['sources'][target] = sha(raw)
-    runner = b"import sys\nfrom pathlib import Path\nsys.path[:0]=[str(Path(__file__).parent/'operator'),str(Path(__file__).parent/'runtime')]\nfrom loadtest_lab.cli import main\nraise SystemExit(main())\n"
+    runner = b"import sys\nfrom pathlib import Path\nsys.path[:0]=[str(Path(__file__).parent/'operator'),str(Path(__file__).parent/'runtime')]\nfrom loadtest_lab.cli import entry\nraise SystemExit(entry())\n"
     (root / 'run_lab.py').write_bytes(runner); cfg['sources']['run_lab.py'] = sha(runner)
     cfg['csv_source_revision'] = revision
     write_new(root / 'lab.json', cfg)
@@ -213,9 +213,16 @@ def main(argv=None):
     print(json.dumps(result, ensure_ascii=False)); return 0 if result.get('ok', True) else 2
 
 
-if __name__ == '__main__':
+def entry():
     try:
-        raise SystemExit(main())
-    except Exception:
-        print(json.dumps({'ok': False, 'error': 'loadtest_operation_not_completed', 'automatic_retry': False}))
-        raise SystemExit(2)
+        return main()
+    except Exception as error:
+        import re
+        message = str(error)
+        code = message if isinstance(error, ValueError) and re.fullmatch('[a-z0-9_:]{1,100}', message) else 'loadtest_operation_not_completed'
+        print(json.dumps({'ok': False, 'error': code, 'error_type': type(error).__name__, 'automatic_retry': False}))
+        return 2
+
+
+if __name__ == '__main__':
+    raise SystemExit(entry())

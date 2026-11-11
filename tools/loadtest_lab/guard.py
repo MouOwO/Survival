@@ -119,7 +119,7 @@ def dsn(cfg, private, *, admin=False):
 
 
 def marker_guard(conn, cfg, private, *, seeded=False):
-    actual = conn.execute('SELECT current_database(),inet_server_addr()::text,inet_server_port()').fetchone()
+    actual = conn.execute('SELECT current_database(),host(inet_server_addr()),inet_server_port()').fetchone()
     need(actual == (cfg['database'], '127.0.0.1', PORTS['database']), 'database_endpoint_scope_mismatch')
     row = conn.execute('SELECT run_id,proof,manifest_sha256,seeded FROM loadtest_lab.marker WHERE singleton').fetchone()
     need(row is not None and row[:3] == (cfg['run_id'], private['marker'], sha(canonical(cfg))),
