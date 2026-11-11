@@ -80,6 +80,7 @@ local function selected_pool_state(state, pool)
         pity_counts = {},
     }
     local result = state.pools[pool.id]
+    result.pity_counts = result.pity_counts or {}
     for _, rule in ipairs(pool.pity_rules) do
         result.pity_counts[rule.id] = math.max(0,
             math.floor(tonumber(result.pity_counts[rule.id]) or 0))
@@ -300,26 +301,11 @@ local function random_item_for_quality(pool, quality)
     return rows[#rows]
 end
 
-local function draw_one(pool, state, forced_quality)
+local function draw_one(pool, forced_quality)
     local quality = forced_quality or random_quality(pool)
     local item = random_item_for_quality(pool, quality)
     if not item then return nil end
-    state.draws = state.draws + 1
     return item
-end
-
-local function batch_guarantee(pool, draw_count)
-    local selected = nil
-    for _, rule in ipairs(pool.pity_rules) do
-        if rule.trigger_mode == "batch_only"
-            and tonumber(rule.threshold) == tonumber(draw_count)
-            and (not selected
-                or quality_rank(rule.target_quality)
-                    > quality_rank(selected.target_quality)) then
-            selected = rule
-        end
-    end
-    return selected
 end
 
 local function item_owned_count(counts, item)
@@ -422,8 +408,9 @@ local function public_pity(pool, state)
             quality = rule.target_quality,
             trigger_mode = rule.trigger_mode,
             batch_size = rule.threshold,
-            label = tostring(rule.threshold) .. "连保底 "
-                .. string.upper(tostring(rule.target_quality)),
+            label = rule.trigger_mode == "consecutive_misses"
+                and "最多50抽保底 UR（单抽/十连累计，出UR重置）"
+                or tostring(rule.threshold) .. "连保底 " .. string.upper(tostring(rule.target_quality)),
         }
     end
     return rows
@@ -563,8 +550,6 @@ local function draw(payload)
             ticket_name = (config.currencies[pool.ticket_content_id] or {}).display_name }
     end
     local before_draws = current.draws
-    local guarantee = batch_guarantee(pool, count)
-    local guarantee_hit = false
     busy_by_player[player_id] = true
     local consume = event_bus.request(events.INVENTORY_TRANSACTION_EXECUTE_REQUEST, {
         player_id = player_id,
@@ -581,14 +566,8 @@ local function draw(payload)
     seed_random()
     local results = {}
     local counts = copy_map(inventory.counts)
-    for draw_index = 1, count do
-        local forced_quality = nil
-        if guarantee and draw_index == count and not guarantee_hit then
-            -- The guarantee supplies its configured quality exactly. Higher
-            -- qualities, especially map-pool UR, remain natural rolls only.
-            forced_quality = guarantee.target_quality
-        end
-        local item = draw_one(pool, current, forced_quality)
+    local items, guarantee, guarantee_hit, pity_counts = config.draw_batch(pool, current, count, draw_one)
+    for _, item in ipairs(items) do
         local grant = item and grant_item(player_id, item, counts)
             or { ok = false, error = "lottery_pool_empty" }
         if not grant.ok then
@@ -603,9 +582,6 @@ local function draw(payload)
             request_cache[player_id][request_id] = failed
             busy_by_player[player_id] = nil
             return failed
-        end
-        if guarantee and item.quality == guarantee.target_quality then
-            guarantee_hit = true
         end
         counts[item.id] = (counts[item.id] or 0) + (grant.duplicate and 0 or 1)
         results[#results + 1] = {
@@ -622,12 +598,14 @@ local function draw(payload)
             gameplay_stat_changes = grant.gameplay_stat_changes or {},
         }
     end
+    current.draws = before_draws + count
+    current.pity_counts = pity_counts
     local state_persisted = persist_state(player_id, state)
     state.sequence = state.sequence + 1
     local response = {
         ok = true, request_id = request_id, pool_id = pool.id,
         count = count, results = results, state_persisted = state_persisted,
-        guarantee_quality = guarantee and guarantee.target_quality or "",
+        guarantee_quality = guarantee or "",
         guarantee_satisfied = guarantee == nil or guarantee_hit,
         snapshot = snapshot(player_id, "draw", pool.id),
     }

@@ -804,20 +804,26 @@ class ArchiveTests(unittest.TestCase):
         with self.assertRaisesRegex(TimeoutError,'archive_pending_retry'):
             self.service.profile({'account_id':'100'})
 
-    def test_lottery_cultivation_locked_at_99_without_any_debit(self):
-        self.profile['save']['content_inventory']={'lottery_ticket':50,'special_lottery_ticket':80}
-        self.profile['save']['archive']={'lottery_state':{'pools':{'map':{'draws':99}}}}
-        before=copy.deepcopy(self.profile)
-        for count in (1,10):
-            result=self.send('lottery_draw',pool_id='cultivation',count=count,request_id='locked_'+str(count))
-            self.assertFalse(result['ok']);self.assertEqual(result['error'],'lottery_pool_locked')
-            self.assertEqual(self.profile,before)
-        projection=self.service.lottery_snapshot({'account_id':'100','config_hash':self.bundle.hash})
-        selected=next(s for s in projection['snapshots'] if s['selected_pool_id']=='cultivation')['selected_pool']
-        self.assertFalse(selected['unlocked']);self.assertEqual(selected['unlock_progress'],99)
-        self.assertEqual(selected['unlock_required'],100);self.assertEqual(selected['ticket_content_id'],'special_lottery_ticket')
+    def test_lottery_cultivation_gold_works_without_map_progress(self):
+        for progress in (0,99,100):
+            self.profile['save']['content_inventory']={'lottery_ticket':50,'special_lottery_ticket':1362}
+            self.profile['save']['archive']={'lottery_state':{'pools':{'map':{'draws':progress}}}}
+            projection=self.service.lottery_snapshot({'account_id':'100','config_hash':self.bundle.hash})
+            selected=next(s for s in projection['snapshots'] if s['selected_pool_id']=='cultivation')['selected_pool']
+            self.assertTrue(selected['unlocked']);self.assertEqual(selected['unlock_required'],0)
+            self.assertEqual(selected['ticket_content_id'],'special_lottery_ticket')
+            for count in (1,10):
+                payload=self.command('lottery_draw',pool_id='cultivation',count=count,
+                                     request_id='gold_no_gate_'+str(progress)+'_'+str(count))
+                self.assertTrue(self.service.command(payload)['ok'])
+                after=copy.deepcopy(self.profile)
+                self.assertTrue(self.service.command(payload)['ok'])
+                self.assertEqual(self.profile,after,'retry must never debit twice')
+            self.assertEqual(self.profile['save']['content_inventory']['special_lottery_ticket'],1351)
+            self.assertEqual(self.profile['save']['content_inventory']['lottery_ticket'],50)
+            self.assertEqual(self.profile['save']['archive']['lottery_state']['pools']['map']['draws'],progress)
 
-    def test_lottery_map_ten_unlocks_at_100_and_cultivation_spends_gold(self):
+    def test_lottery_map_ten_counts_once_and_cultivation_spends_gold(self):
         self.profile['save']['content_inventory']={'lottery_ticket':100,'special_lottery_ticket':17}
         self.profile['save']['archive']={'lottery_state':{'pools':{'map':{'draws':90}}}}
         payload=self.command('lottery_draw',pool_id='map',count=10,request_id='unlock_ten')
@@ -844,8 +850,8 @@ class ArchiveTests(unittest.TestCase):
         self.assertEqual(self.profile,before)
 
     def test_lottery_gold_pools_have_no_progress_gate(self):
-        self.profile['save']['content_inventory']={'lottery_ticket':17,'special_lottery_ticket':22}
-        for pool in ('dragon_knight','summer'):
+        self.profile['save']['content_inventory']={'lottery_ticket':17,'special_lottery_ticket':33}
+        for pool in ('cultivation','dragon_knight','summer'):
             self.assertTrue(self.send('lottery_draw',pool_id=pool,count=1,request_id=pool+'_one')['ok'])
             self.assertTrue(self.send('lottery_draw',pool_id=pool,count=10,request_id=pool+'_ten')['ok'])
         self.assertEqual(self.profile['save']['content_inventory']['lottery_ticket'],17)
@@ -887,13 +893,13 @@ class ArchiveTests(unittest.TestCase):
             self.assertEqual(snapshot['selected_pool']['pity'][0]['quality'],'ssr')
 
     def test_gold_ten_keeps_natural_ur_and_still_grants_exact_ssr(self):
-        # Seed 11 naturally rolls UR on draw six, with no SSR in the first nine.
+        # Seed 67 naturally rolls UR on draw six at the 1% base rate.
         # The last result must be SSR; a natural UR cannot consume that guarantee.
         for pool in ('cultivation','dragon_knight','summer'):
             profile=copy.deepcopy(self.profile)
             profile['save']['content_inventory']={'lottery_ticket':100,'special_lottery_ticket':10}
             profile['save']['archive']={'lottery_state':{'pools':{'map':{'draws':100}}}}
-            payload={'profile':profile,'configs':self.bundle.configs,'seed':11,'has_pass':False,
+            payload={'profile':profile,'configs':self.bundle.configs,'seed':67,'has_pass':False,
                 'command':{'kind':'lottery_draw','pool_id':pool,'count':10,
                            'id':'natural_ur_then_ssr','request_id':'natural_ur_then_ssr'}}
             completed=subprocess.run([self.lua,'worker.lua'],cwd=self.bundle.directory,
@@ -906,5 +912,46 @@ class ArchiveTests(unittest.TestCase):
             self.assertEqual(response['guarantee_quality'],'ssr')
             self.assertTrue(response['guarantee_satisfied'])
             self.assertEqual(result['content_inventory']['special_lottery_ticket'],0)
+
+    def test_lottery_ur_deadline_persists_atomically_and_retries_once(self):
+        for pool in ('cultivation','dragon_knight','summer'):
+            rule=pool+'_ur_fifty'
+            self.profile['save']['content_inventory']={'special_lottery_ticket':10}
+            self.profile['save']['archive']={'lottery_state':{'pools':{
+                pool:{'draws':999,'pity_counts':{rule:49}},
+                'map':{'draws':0},'other':{'pity_counts':{'untouched':12}}}}}
+            self.db.lose_reply=True
+            payload=self.command('lottery_draw',pool_id=pool,count=10,request_id='pity_retry_'+pool)
+            with self.assertRaises(TimeoutError): self.service.command(payload)
+            after=copy.deepcopy(self.profile)
+            self.service=ArchiveService(self.app,self.bundle,self.lua)
+            result=self.service.command(payload)
+            self.assertTrue(result['ok'],result)
+            self.assertEqual(result['response']['results'][0]['quality'],'ur')
+            self.assertIn('ssr',[row['quality'] for row in result['response']['results']])
+            self.assertEqual(self.profile,after,'lost reply/reconnect must not advance pity or debit twice')
+            saved=self.profile['save']['archive']['lottery_state']['pools']
+            self.assertEqual(saved['map']['draws'],0)
+            self.assertEqual(saved['other']['pity_counts'],{'untouched':12})
+            self.assertLess(saved[pool]['pity_counts'][rule],50)
+            self.assertEqual(self.profile['save']['content_inventory']['special_lottery_ticket'],0)
+
+    def test_lottery_ur50_single_ten_and_last_slot_ssr_coexist(self):
+        for pool in ('cultivation','dragon_knight','summer'):
+            rule=pool+'_ur_fifty'
+            for start,count in ((48,1),(49,1),(40,10),(48,10),(49,10)):
+                profile=copy.deepcopy(self.profile)
+                profile['save']['content_inventory']={'special_lottery_ticket':100}
+                profile['save']['archive']={'lottery_state':{'pools':{pool:{'draws':10000,'pity_counts':{rule:start}}}}}
+                payload={'profile':profile,'configs':self.bundle.configs,'seed':0,'has_pass':False,
+                    'command':{'kind':'lottery_draw','pool_id':pool,'count':count,'id':'ur50_boundary','request_id':'ur50_boundary'}}
+                completed=subprocess.run([self.lua,'worker.lua'],cwd=self.bundle.directory,
+                    input=json.dumps(payload),capture_output=True,text=True,check=True)
+                result=json.loads(completed.stdout);self.assertTrue(result['ok'],result)
+                qualities=[row['quality'] for row in result['response']['results']]
+                self.assertEqual(qualities.count('ur'),int(start+count>=50))
+                self.assertEqual(result['archive']['lottery_state']['pools'][pool]['pity_counts'][rule],(start+count)%50)
+                if count==10:self.assertIn('ssr',qualities)
+                if start==40:self.assertEqual(qualities[-2:],['ssr','ur'])
 
 if __name__=='__main__':unittest.main()

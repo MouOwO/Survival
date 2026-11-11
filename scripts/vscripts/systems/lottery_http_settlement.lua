@@ -41,7 +41,7 @@ end
 local function pool_public(pool,counts,state)
     local s=state.pools[pool.id] or {}
     local pity={}
-    for _,rule in ipairs(pool.pity_rules) do pity[#pity+1]={quality=rule.target_quality,trigger_mode=rule.trigger_mode,batch_size=rule.threshold,label=tostring(rule.threshold)..'连保底 '..string.upper(rule.target_quality)} end
+    for _,rule in ipairs(pool.pity_rules) do pity[#pity+1]={quality=rule.target_quality,trigger_mode=rule.trigger_mode,batch_size=rule.threshold,label=rule.trigger_mode=='consecutive_misses' and '最多50抽保底 UR（单抽/十连累计，出UR重置）' or tostring(rule.threshold)..'连保底 '..string.upper(rule.target_quality)} end
     local result={id=pool.id,revision=pool.revision,update_notice=pool.update_notice,
         updated_at=tonumber(pool.update_notice.updated_at) or 0,
         update_unread=s.details_revision~=pool.revision,notice_unread=s.notice_revision~=pool.revision,
@@ -167,15 +167,12 @@ function M.settle(profile,command)
         if (tonumber(counts[pool.ticket_content_id]) or 0)<cost then return {ok=false,error='lottery_ticket_insufficient'} end
         response.unique_points_reconciliation=reconcile_unique_points(counts,archive)
         counts[pool.ticket_content_id]=counts[pool.ticket_content_id]-cost
-        local guarantee=nil;local hit=false;local results={}
-        for _,rule in ipairs(pool.pity_rules) do if rule.trigger_mode=='batch_only' and rule.threshold==count and (not guarantee or config.quality_rank[rule.target_quality]>config.quality_rank[guarantee]) then guarantee=rule.target_quality end end
-        for i=1,count do
-            local item=roll(pool,i==count and not hit and guarantee or nil)
+        local items,guarantee,hit,counters=config.draw_batch(pool,current,count,roll)
+        local results={}
+        for _,item in ipairs(items) do
             results[#results+1]=grant(item,counts,stats,archive,profile.save.lottery_applied_item_effects)
-            -- A ten-draw promises an actual SSR item. A natural UR remains
-            -- independent and does not consume that promise.
-            if guarantee and item.quality==guarantee then hit=true end
         end
+        current.pity_counts=counters
         current.draws=(tonumber(current.draws) or 0)+count
         response.count=count;response.results=results;response.state_persisted=true
         response.guarantee_quality=guarantee or '';response.guarantee_satisfied=not guarantee or hit

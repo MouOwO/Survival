@@ -142,13 +142,21 @@ for _, row in ipairs(pity_rows.rows or {}) do
             "lottery pity pool missing: " .. tostring(row.pool_id))
         assert(quality_rank[row.target_quality],
             "lottery pity quality invalid: " .. tostring(row.target_quality))
-        pool.pity_rules[#pool.pity_rules + 1] = {
+        local rule = {
             id = row.rule_id,
             target_quality = row.target_quality,
             threshold = math.max(1, math.floor(tonumber(row.threshold) or 1)),
             trigger_mode = tostring(row.trigger_mode or "batch_only"),
             priority = tonumber(row.priority) or 0,
         }
+        pool.pity_rules[#pool.pity_rules + 1] = rule
+        if rule.trigger_mode == "consecutive_misses" then
+            assert(not pool.streak_rule and rule.target_quality == "ur" and rule.threshold == 50,
+                "lottery_streak_rule_invalid")
+            pool.streak_rule = rule
+        else
+            assert(rule.trigger_mode == "batch_only", "lottery_pity_mode_invalid")
+        end
     end
 end
 
@@ -225,6 +233,46 @@ function M.unlock_status(pool, state)
     return {unlocked=required==0 or progress>=required,
         unlock_pool_id=pool.unlock_pool_id,unlock_pool_name=source and source.display_name or "",
         unlock_required=required,unlock_progress=progress}
+end
+
+-- At most ten draws and two rules. Work is O(count + rules), with O(count)
+-- result storage. Both trusted settlement paths use the same ordering and
+-- counters; callers commit these counters only with the successful rewards.
+function M.draw_batch(pool, state, count, roll)
+    local guarantee
+    for _, rule in ipairs(pool.pity_rules) do
+        if rule.trigger_mode == "batch_only" and rule.threshold == count
+            and (not guarantee or M.quality_rank[rule.target_quality] > M.quality_rank[guarantee]) then
+            guarantee = rule.target_quality
+        end
+    end
+    local counters = {}
+    for id, value in pairs(state.pity_counts or {}) do counters[id] = value end
+    local streak = pool.streak_rule
+    local misses = streak and math.max(0, math.floor(tonumber(counters[streak.id]) or 0)) or 0
+    local hit, items = false, {}
+    for index = 1, count do
+        local forced
+        if streak and misses >= streak.threshold - 1 then
+            forced = streak.target_quality
+        elseif guarantee and not hit then
+            -- Reserve an actual SSR before a last-slot UR deadline. The UR
+            -- must never be replaced by the separate ten-draw SSR promise.
+            if index == count or (streak and index == count - 1 and misses >= streak.threshold - 2) then
+                forced = guarantee
+            end
+        end
+        local item = assert(roll(pool, forced), "lottery_pool_empty")
+        items[index] = item
+        if guarantee and item.quality == guarantee then hit = true end
+        if streak then
+            misses = item.quality == streak.target_quality and 0 or misses + 1
+            assert(misses < streak.threshold, "lottery_streak_deadline_missed")
+        end
+    end
+    if streak then counters[streak.id] = misses end
+    assert(not guarantee or hit, "lottery_batch_guarantee_missed")
+    return items, guarantee, hit, counters
 end
 
 -- Deterministic fingerprint includes private weights, but only the digest is public.
