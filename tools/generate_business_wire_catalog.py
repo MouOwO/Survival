@@ -20,6 +20,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = ROOT / "server/player_web_auth/business_wire_schema.json"
 DAILY_PATH = ROOT / "data/csv/存档系统/archive_daily_limits.csv"
+STATS_PATH = ROOT / "data/csv/玩家档案系统/player_gameplay_stats.csv"
 INITIAL_FIELDS = """schema_version account_id revision entitlements achievements save public
 profile account_profile match_session_id mode game_mode progression daily_limits
 rows by_key key name earned limit remaining capped implemented sort_order active
@@ -98,6 +99,15 @@ def daily_templates():
             suffix = hashlib.sha256(canonical(defaults)).hexdigest()[:12]
             values.append({"name": "daily." + row["limit_id"] + "." + suffix,
                            "defaults": defaults})
+            # The pass changes only the server-selected allowance. Keep both
+            # complete defaults locally; earned/remaining differences remain
+            # explicit. Immutable normal-template IDs are never rewritten.
+            pass_limit = int(float(row.get("pass_daily_limit") or row["daily_limit"]))
+            if pass_limit != limit:
+                pass_defaults = dict(defaults, limit=pass_limit, remaining=pass_limit)
+                pass_suffix = hashlib.sha256(canonical(pass_defaults)).hexdigest()[:12]
+                values.append({"name": "daily.pass." + row["limit_id"] + "." + pass_suffix,
+                               "defaults": pass_defaults})
     values.extend([
         {"name": "flag.active.false", "defaults": {"active": False}},
         {"name": "entitlement.inactive.permanent", "defaults": {"active": False, "expires_at": None}},
@@ -106,19 +116,43 @@ def daily_templates():
     return values
 
 
+def gameplay_templates():
+    """Public numeric defaults; the backend still supplies every changed value.
+
+    Pure-mode projections normalize integral numbers while the durable account
+    retains decimal/percentage JSON numbers. Two complete shapes preserve both
+    representations exactly; no player/account fixture is used as a source.
+    """
+    integral, storage = {}, {}
+    with STATS_PATH.open(encoding="utf-8-sig", newline="") as stream:
+        for row in csv.DictReader(stream):
+            if row["field_id"].startswith("#") or row["enabled"] != "1":
+                continue
+            number = float(row["default_value"])
+            value = int(number) if number.is_integer() else number
+            integral[row["field_id"]] = value
+            storage[row["field_id"]] = int(number) if row["storage_type"] == "integer" else number
+    values = []
+    for name, defaults in (("integral", integral), ("storage", storage)):
+        suffix = hashlib.sha256(canonical(defaults)).hexdigest()[:12]
+        values.append({"name": "gameplay." + name + "." + suffix, "defaults": defaults})
+    return values
+
+
 def updated_schema(existing=None):
     schema = existing or {"version": 1, "fields": initial_field_candidates(), "symbols": [], "templates": []}
     # Copy lists to preserve the caller's input and immutable ID prefix.
     schema = dict(schema, fields=list(schema["fields"]), symbols=list(schema["symbols"]),
                   templates=list(schema["templates"]))
-    for field in INITIAL_FIELDS:
+    gameplay = gameplay_templates()
+    for field in [*INITIAL_FIELDS, *gameplay[0]["defaults"]]:
         if field not in schema["fields"]:
             schema["fields"].append(field)
     for symbol in public_symbols():
         if symbol not in schema["symbols"]:
             schema["symbols"].append(symbol)
     names = {template["name"]: template for template in schema["templates"]}
-    for template in daily_templates():
+    for template in [*daily_templates(), *gameplay]:
         if template["name"] in names:
             if names[template["name"]] != template:
                 raise ValueError("business_wire_existing_template_changed")

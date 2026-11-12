@@ -43,6 +43,59 @@ def extend_native_music_scope(tree):
     offset = 1 if function.body and isinstance(function.body[0], ast.Expr) and isinstance(function.body[0].value, ast.Constant) and isinstance(function.body[0].value.value, str) else 0
     function.body.insert(offset, branch)
 
+
+def extend_business_wire_binding(tree, name):
+    """Add one exact generated producer to new families, never frozen source.
+
+    Original collector, source, protection and signing checks still execute.
+    The helper is itself included in immutable operator identity/readsets.
+    """
+    roles = {'collect_inputs.py': 'collector', 'exact_review.py': 'exact_review', 'package.py': 'package'}
+    if name not in roles:
+        return
+    helper = 'tools/business_wire_binding.py'
+    generator = 'tools/seal_business_wire_catalog.py'
+    if name == 'package.py':
+        matches = [node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == '_loaded_paths']
+        if len(matches) != 1:
+            raise ValueError('exact package operator identity template changed')
+        returns = [node for node in ast.walk(matches[0]) if isinstance(node, ast.Return)]
+        if (len(returns) != 1 or not isinstance(returns[0].value, ast.Call)
+                or not isinstance(returns[0].value.func, ast.Name) or returns[0].value.func.id != 'sorted'
+                or len(returns[0].value.args) != 1 or not isinstance(returns[0].value.args[0], ast.Set)):
+            raise ValueError('exact package loaded operator set template changed')
+        returns[0].value.args[0].elts.extend([ast.Constant(helper), ast.Constant(generator)])
+    if name == 'exact_review.py':
+        mains = [node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'main']
+        if len(mains) != 1:
+            raise ValueError('exact review operator binding template changed')
+        loops = [node for node in ast.walk(mains[0]) if isinstance(node, ast.For)
+                 and isinstance(node.target, ast.Name) and node.target.id == 'path'
+                 and isinstance(node.iter, ast.Tuple)
+                 and any(isinstance(value, ast.Name) and value.id == 'TOOL' for value in node.iter.elts)]
+        if len(loops) != 1:
+            raise ValueError('exact review tool readset template changed')
+        loops[0].iter.elts.extend([ast.Constant(helper), ast.Constant(generator)])
+        loaded = [node for node in ast.walk(loops[0]) if isinstance(node, ast.Assign)
+                  and any(isinstance(target, ast.Name) and target.id == 'loaded' for target in node.targets)
+                  and isinstance(node.value, ast.Subscript) and isinstance(node.value.value, ast.Dict)]
+        if len(loaded) != 1:
+            raise ValueError('exact review loaded identity map template changed')
+        mapping = loaded[0].value.value
+        mapping.keys.extend([ast.Constant(helper), ast.Constant(generator)])
+        mapping.values.extend([expression('_business_wire_binding.EXECUTED_SOURCE_LF_SHA256'),
+                               expression('_business_wire_binding.SEAL_SOURCE_LF_SHA256')])
+    statements = ast.parse('import business_wire_binding as _business_wire_binding\n'
+                           + '_business_wire_binding.install(globals(), ' + repr(roles[name]) + ')\n').body
+    # CLI entry must run after hooks are installed; normal module imports also
+    # finish with the exact same hook installation before any signing call.
+    mains = [index for index, node in enumerate(tree.body) if isinstance(node, ast.If)
+             and any(isinstance(child, ast.Name) and child.id == '__name__' for child in ast.walk(node.test))]
+    if len(mains) > 1:
+        raise ValueError('ambiguous release module entry template')
+    offset = mains[0] if mains else len(tree.body)
+    tree.body[offset:offset] = statements
+
 def expression(source):
     return ast.parse(source, mode='eval').body
 
@@ -125,6 +178,7 @@ def render(project, revision, job, current):
             extend_lottery_csv_review(tree)
         elif name == 'scope_review.py':
             extend_native_music_scope(tree)
+        extend_business_wire_binding(tree, name)
         ast.fix_missing_locations(tree)
         source = (ast.unparse(tree) + '\n').encode()
         compile(source, name, 'exec')

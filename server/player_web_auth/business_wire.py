@@ -67,7 +67,7 @@ def validate_schema(schema):
         if (type(template) is not dict or set(template) != {"name", "defaults"}
                 or type(template["name"]) is not str or not template["name"]
                 or template["name"] in names or type(template["defaults"]) is not dict
-                or not 1 <= len(template["defaults"]) <= 32
+                or not 1 <= len(template["defaults"]) <= 256
                 or any(k not in fields or not _scalar(v) for k, v in template["defaults"].items())):
             raise ValueError("business_wire_template_invalid")
         names.add(template["name"])
@@ -94,26 +94,48 @@ def _template_index():
     groups = {}
     for index, template in enumerate(_TEMPLATES, 1):
         groups.setdefault(frozenset(template["defaults"]), []).append((index, template["defaults"]))
-    result = {}
-    for keys, entries in groups.items():
+    def indexed(keys, entries, remaining):
         if len(entries) == 1:
-            result[keys] = (None, entries[0])
-            continue
-        # The daily table's stable key chooses exactly one template in O(1).
-        # Do not rescan all templates for every row or reply.
-        for discriminator in ("key", "id", "name"):
-            if discriminator in keys:
-                indexed = {_typed(defaults[discriminator]): (index, defaults)
-                           for index, defaults in entries}
-                # If a later config appends a new immutable template for the
-                # same public ID, choose the newest template in O(1). Older
-                # template IDs retain their original decode meaning.
-                result[keys] = (discriminator, indexed)
-                break
-        else:
-            # One bounded candidate, never a per-object global template scan.
-            result[keys] = (None, entries[-1])
-    return result
+            return (None, entries[0])
+        # A fixed-depth trie selects daily key -> actual allowance. Quotas can
+        # change without scanning 40/80 candidate templates on every response.
+        for discriminator in remaining:
+            if discriminator not in keys:
+                continue
+            children = {}
+            for entry in entries:
+                children.setdefault(_typed(entry[1][discriminator]), []).append(entry)
+            if len(children) > 1:
+                following = tuple(key for key in remaining if key != discriminator)
+                return (discriminator, ({value: indexed(keys, subset, following)
+                                         for value, subset in children.items()}, entries[-1]))
+        # Pure and persisted stat projections can differ in JSON number types.
+        # A changed value keeps the same type and still selects one candidate.
+        for key in sorted(keys):
+            by_type = {type(defaults[key]).__name__: (index, defaults)
+                       for index, defaults in entries}
+            if len(by_type) > 1:
+                return (("type", key), (by_type, entries[-1]))
+        return (None, entries[-1])
+
+    return {keys: indexed(keys, entries, ("key", "id", "name", "limit"))
+            for keys, entries in groups.items()}
+
+
+def _select_template(current, group):
+    # The construction above bounds this traversal to four value selectors and
+    # one type selector; it is independent of schema/row/account population.
+    for _ in range(6):
+        discriminator, entries = group
+        if discriminator is None:
+            return entries
+        by_value, fallback = entries
+        if type(discriminator) is tuple:
+            return by_value.get(type(current[discriminator[1]]).__name__, fallback)
+        group = by_value.get(_typed(current[discriminator]))
+        if group is None:
+            return fallback
+    raise ValueError("business_wire_template_index_invalid")
 
 
 _TEMPLATE_INDEX = _template_index()
@@ -208,8 +230,7 @@ def encode(value):
                            for key, child_size in encoded_sizes.items()) - bool(encoded)
             group = _TEMPLATE_INDEX.get(frozenset(current))
             if group:
-                discriminator, entries = group
-                entry = entries if discriminator is None else entries.get(_typed(current[discriminator]))
+                entry = _select_template(current, group)
                 if entry:
                     index, defaults = entry
                     patch = {_key(key): child[0] for key, child in children
