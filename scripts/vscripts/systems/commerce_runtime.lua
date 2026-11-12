@@ -19,19 +19,11 @@ local function clear_aura(s)
         pcall(ParticleManager.ReleaseParticleIndex,ParticleManager,particle)
     end
 end
-local function clear_cannon(s)
-    local cannon=s and s.cannon
-    if not s then return end
-    s.cannon,s.cannon_wall=nil,nil
-    if cannon and s.world==world() then
-        pcall(function() if not cannon:IsNull() then cannon:RemoveSelf() end end)
-    end
-end
 local function clear_owner(id)
     local s=players[id]
     players[id],trees[id],walls[id]=nil,nil,nil
     cancel('commerce_orbital_'..id)
-    clear_aura(s);clear_cannon(s)
+    clear_aura(s)
 end
 local function alive(u) return u and not u:IsNull() and u:IsAlive() end
 local function hero(id)
@@ -155,10 +147,9 @@ local function reconcile_owner(id, periodic)
     local lumberyard=effects.owned(id,'lumberyard')
     local aura_owned=effects.owned(id,'lottery_immortal_slaying_sword_array')
     local sovereign=effects.owned(id,'sovereign')
-    local cannon_owned=effects.owned(id,'orbital')
     local flame_wall=effects.owned(id,'flame_wall')
     local signature=(immortal and 1 or 0)+(lumber_fury and 2 or 0)+(lumberyard and 4 or 0)
-        +(aura_owned and 8 or 0)+(sovereign and 16 or 0)+(cannon_owned and 32 or 0)+(flame_wall and 64 or 0)
+        +(aura_owned and 8 or 0)+(sovereign and 16 or 0)+(flame_wall and 64 or 0)
     if not periodic and s.entitlement_signature==signature then publish(id);return end
     s.entitlement_signature=signature
     require('systems/worker_system').refresh_commerce_capacity(id)
@@ -196,19 +187,6 @@ local function reconcile_owner(id, periodic)
     end
     if alive(h) and sovereign and not h.survival_commerce_title then
         h.survival_commerce_title=true;h.survival_display_name='【统御王印】'..tostring(h.survival_display_name or '')
-    end
-    if s.cannon and (s.cannon:IsNull() or s.cannon_wall~=wall or not alive(wall) or not cannon_owned) then
-        clear_cannon(s)
-    end
-    if alive(wall) and cannon_owned and not s.cannon then
-        local definition=require('config/buildings_config').arrow_tower
-        local cannon=CreateUnitByName(definition.unit_name,wall:GetAbsOrigin(),true,wall,wall,wall:GetTeamNumber())
-        if cannon then
-            cannon.survival_visual_only=true;cannon:SetHullRadius(0);cannon:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
-            cannon:AddNewModifier(cannon,nil,'modifier_invulnerable',{})
-            cannon:AddNewModifier(cannon,nil,'modifier_phased',{})
-            cannon.survival_display_name='轨道炮';s.cannon=cannon;s.cannon_wall=wall
-        end
     end
     if periodic and alive(wall) and flame_wall and not require('systems/gameplay_phase_guard').post_clear_frozen() then
         for _,target in ipairs(enemies(wall,800)) do
@@ -269,7 +247,7 @@ function M.init()
         end
         if p.building_id~='wall' or not wall then return end
         local matches=p.unit==wall or (p.unit==nil and p.entindex~=nil and not wall:IsNull() and wall:entindex()==p.entindex)
-        if matches then walls[id]=nil;clear_cannon(players[id]);cancel('commerce_orbital_'..id) end
+        if matches then walls[id]=nil;cancel('commerce_orbital_'..id) end
     end)
     subscribe(events.WAVE_CHANGED,function(p)
         if tostring(p.reason or ''):find('wave_started',1,true) then
