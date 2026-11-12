@@ -24,8 +24,16 @@
 
 ## 交付边界
 
-当前仅本地修复，后台未修改/未部署，未执行SDK上传。读取到的已发布完整检查点为2026111202、Steam manifest `503273922170155206`；不能把该旧版本当成本修复的发行证明。
+**已同步原封闭游廊条目3824360109，版本2026111204，Steam manifest `6754330934111248152`。** SDK上传成功，官方完整下载验证7061个签名资源、187个保护模块及5个包文件逐一一致；最终工具返回`WORKSHOP_SYNCED`，完整运行/来源待发及阻断均为0。后台未修改/未部署，未消耗玩家道具；新普通客户端建墙视觉及FPS仍待用户开新局验收。父版为2026111202 / manifest `503273922170155206`，不作为新修复验收证据。
 
 双仓已按stash→pull→pop恢复并同步远端检查，game分支dev、content分支master，未覆盖其他窗口原有改动。原Git代理端口失效，本次仅用命令级17789代理成功拉取，没有改写全局代理配置。content没有本轮运行修改，不创建空提交。
 
-前一轮Dota进程21144仍在运行，因此保留待发；用户随后确认“已退出”，本轮只读进程检查也确认已退出，继续源码固定和专用打包发布。未强制结束游戏、未覆盖运行中正式包；专用工具仍须核对暂装事务恢复。正式上传、官方完整下载和实际视觉验收分别以新回执为准。运行待发至少包含本次`commerce_runtime.lua`，完整清单须由专用打包工具重新审计，不能提前声称为空。
+前一轮Dota进程21144仍在运行，因此保留待发；用户随后确认“已退出”，进程检查也确认已退出。源码推送首次被自动审核以目标未明确授权拒绝，用户后续明确“允许”推送既有`MouOwO/Survival`的dev及`MouOwO/SurvivalContent`的master并继续原游廊交付后才执行；拒绝的命令未执行。没有强制结束游戏或覆盖运行中正式包。
+
+## 实际发行与证据
+
+- 修复提交`19eea47a2`已推送game/dev；签名运行源绑定game `79b1e5e659778b5028b5d3b52e78149d6f2d44e7`、content `d46453edf80750d0ee0ed25f69b6329c58b00d8a`，两仓对应分支已推送。发行授权另绑定game `88403d4c3`。原有其他窗口的未提交改动及历史stash均保留。
+- 正式任务`D:/Survival_本地工具/runs/packaging_jobs/pack_2026111204_8ed07060`，入口仍是专用`tools/release_packager/cli.py`及统一`tools/release_pipeline.py`。新包独立目录`D:/Survival_工坊输出/pack_2026111204_8ed07060`，总3812454334字节；3个运行资源变化，新增/删除均0，包含修复模块及配套生成目录。原始6项待发来源全部审计覆盖，没有排除历史待发。
+- 最终生产模块重新运行三组回归通过，`production_1204_regression.log`保存在上述树外回归目录。其SHA256 `2759fe0cdfbe007b07f373ed96894a5c197855a2ab1e749757335d118ae71852`与实际签包视图的`commerce_runtime.lua`完全一致；官方下载随后逐资源核验同一签名包。
+- 官方回执：`output/packager/pack_2026111204_8ed07060/download_evidence/20261112T115505Z_84f02ed0f6ee452a9f840da1abfc590a/verification.json`，状态`OFFICIAL_REFRESH_NATIVE_DOWNLOAD_FULLY_VERIFIED`。任务内`delivery_status_1.stdout`、`checkpoint_receipt.json`、`delivery_receipt.json`保留完整收口；产物登记返回`RECORDED`，记录`D:/Survival_清理记录/records/ba4c14bbe8f684a431403ad551fc06a9761fa4359fa92a385ed3c528681996ea.json`。
+- 1203失败任务完整保留：初始Python314缺少`cryptography`，收集阶段失败；切到现有安全发行venv后，同任务因解释器属于不可变请求而拒绝改写。遵循门禁新建独立1204任务完成交付；1203未上传，没有删除失败回执或通过改写旧请求绕过。最终1204无自动重传，官方核验不创建/提交其他条目。
