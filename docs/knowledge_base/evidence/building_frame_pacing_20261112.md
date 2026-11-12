@@ -1,6 +1,6 @@
 # 建筑密集掉帧：原生采样与界面快照缓存
 
-当前仅本地更新，后台未修改或部署。原正式版本仍为2026111204 / Steam manifest `6754330934111248152`。本轮未操作真实账号奖励、购买、券或存档；离线测试全部通过纯内存提供者。
+**已同步原封闭游廊条目3824360109，版本2026111206，Steam manifest `1373872142964349175`。** 后台未修改或部署。7061资源、187保护模块及5包官方下载逐一一致，完整运行/来源待发及阻断均0。普通游廊新局性能验收仍待，不宣称全部长帧已消除。本轮未操作真实账号奖励、购买、券或存档；离线测试全部通过纯内存提供者。
 
 ## 普通游廊实测
 
@@ -49,6 +49,14 @@
 
 ## 交付
 
-双仓stash→pull→pop已完成：game原有14项改动精确恢复，content原本干净，无空stash。game/dev、content/master均为既有用户授权远端。正式签包、原条目上传和官方完整下载核验待完成后更新本节。
+双仓stash→pull→pop已完成：game原有14项改动恢复并保留，content原本干净，无空stash。game/dev、content/master均为既有用户授权远端。代码提交content `4a3f3ae`、game镜像`87055dd1`均已推送；正式运行源绑定game `da4ebe27d641c2890b4798b95981fddc371304b3`、content `b9b9a371e8c435607ac3a727c8e405d01a75975d`。
 
 初始任务`pack_2026111205_40eb8ef8`在官方编译门禁被阻断：六项`game_content_authors_differ`，因为遗漏game仓库`panorama/src/scripts/custom_game`的配套镜像。该任务未签包、未上传；保留失败proof和回执，补齐六份镜像并逐字节核对已测试candidate/content后，另建新版本，不修改旧不可变计划。
+
+正式任务为`D:/Survival_本地工具/runs/packaging_jobs/pack_2026111206_25da5ca1`，8个运行资源变化、新增/删除0。六组回归直接执行官方vjs_c的DATA，逐字节匹配实测候选；`compiled_regression_1206.json`和`signed_candidate_regression_binding_1206.json`均在树外证据根，证明实际签包的六项编译资源与回归输入一致。
+
+1206前两次SDK提交在Steam清单上传时超时。每次都保留未知pending，使用独立协调工具取得新鲜官方1204完整下载证明后，在原发布锁内CAS恢复精确父记录，失败状态/意图/既有历史均完整备份，无上传副作用或自动重放。第一次协调因错误时间边界被旧协议拒绝，未改发行记录；改为沿用原协议配置后完成。相关目录`reconcile_1206_failed_upload_01/02/03`保留，恢复工具四项独立JSON负对照通过。正常退出并重启Steam后，第三次新lease提交成功；未改变网络配置，观察到新Steam连接17789代理。不能据此断言前两次超时的精确底层网络原因。
+
+官方最终回执：`output/packager/pack_2026111206_25da5ca1/download_evidence/20261112T142922Z_d9991929e82042babcad2db41cb78ada/verification.json`，状态`OFFICIAL_REFRESH_NATIVE_DOWNLOAD_FULLY_VERIFIED`。任务内`delivery_receipt.json`为`WORKSHOP_SYNCED_NATIVE_TEST_PENDING`，`delivery_status_1.stdout`确认完整待发与阻断为0。
+
+测试进程均正常退出；两个临时junction已在核对目标后非递归移除，完整快照、失败回执及原始采样均保留。树外副本已按真实观察回执登记，记录ID `e0f9920b648c46a69d4e9593b91333dd662cd26efa9467884c8c2ff995d98d37`；正式编译、生产、签包及交付回执均由打包器登记。
