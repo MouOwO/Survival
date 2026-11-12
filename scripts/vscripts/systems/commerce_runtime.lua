@@ -69,8 +69,8 @@ function M.orbital(id,key)
     scheduler.every(.5,function()
         if started_epoch~=epoch or players[id]~=s or walls[id]~=wall or not alive(wall) or not alive(unit) then return false end
         ticks=ticks+1
-        local damage=(unit:GetStrength()+unit:GetAgility()+unit:GetIntellect())*10
-        local projected=bus.request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,{player_id=id})
+        local damage=(unit:GetStrength()+unit:GetAgility()+unit:GetIntellect(false))*10
+        local projected=bus.request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,{player_id=id,armor_reduction_only=true})
         local strip=(projected and projected.totals or {}).hero_attack_armor_reduction or 0
         for _,target in ipairs(enemies(wall,1600)) do
             if strip>0 then target:AddNewModifier(unit,nil,'modifier_research_armor_reduction',

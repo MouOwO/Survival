@@ -4,6 +4,7 @@ local M = {}
 local advance
 local HALF, REAR_WIDTH, REAR_DEPTH = 128, 600, 900
 local PATH_STEP, PATH_BUDGET, FAILURE_SECONDS = 0.5, 8, 2
+local CELL_SIZE = 128
 
 local function alive(unit)
     return unit and (not unit.IsNull or not unit:IsNull())
@@ -23,7 +24,33 @@ local function lateral(origin, point, side)
     return side <= 2 and point.y - origin.y or point.x - origin.x
 end
 local function distance(a, b)
-    return math.sqrt((a.x-b.x)^2 + (a.y-b.y)^2)
+    local x,y=a.x-b.x,a.y-b.y
+    return math.sqrt(x*x+y*y)
+end
+local function overlaps(a,b,radius)
+    local x,y=a.x-b.x,a.y-b.y
+    return x*x+y*y < radius*radius
+end
+local function unindex(queue,record)
+    for _,key in ipairs(record.cells or {}) do
+        local cell=queue.cells[key]
+        cell[record.id]=nil
+        if next(cell)==nil then queue.cells[key]=nil end
+    end
+    record.cells=nil
+end
+local function index(queue,record)
+    record.cells={}
+    local point,radius=record.point,record.padding
+    for x=math.floor((point.x-radius)/CELL_SIZE),math.floor((point.x+radius)/CELL_SIZE) do
+        for y=math.floor((point.y-radius)/CELL_SIZE),math.floor((point.y+radius)/CELL_SIZE) do
+            local key=x..":"..y
+            local cell=queue.cells[key]
+            if not cell then cell={};queue.cells[key]=cell end
+            cell[record.id]=record
+            record.cells[#record.cells+1]=key
+        end
+    end
 end
 local function world(queue, side, depth, along)
     local origin = queue.origin
@@ -55,7 +82,7 @@ local function get_queue(state, wall)
     queue = {wall=wall, state=state, origin=Vector(origin.x,origin.y,origin.z),
         wall_revision=tonumber(wall.survival_wall_relocation_revision) or 0,
         geometry_revision=tonumber(state.rear_queue_geometry_revision) or 0,
-        records={}, pending={}, grids={}, faces={}, next_order=0,
+        records={}, pending={}, grids={}, faces={}, cells={}, query_serial=0, next_order=0,
         sweep_after=0, failures={}, paths_left=0, path_step=-1}
     state.rear_queue = queue
     return queue
@@ -66,14 +93,24 @@ local function face_for(queue, side)
     return face
 end
 local function separated(queue, point, padding, except)
-    for id, record in pairs(queue.records) do
-        if id ~= except and alive(record.unit)
-            and distance(point, record.point) < padding+record.padding+4-0.01 then return false end
+    queue.query_serial=queue.query_serial+1
+    local serial,radius=queue.query_serial,padding+4
+    for x=math.floor((point.x-radius)/CELL_SIZE),math.floor((point.x+radius)/CELL_SIZE) do
+        for y=math.floor((point.y-radius)/CELL_SIZE),math.floor((point.y+radius)/CELL_SIZE) do
+            local cell=queue.cells[x..":"..y]
+            if cell then for id,record in pairs(cell) do
+                if record.query_serial~=serial then
+                    record.query_serial=serial
+                    if id~=except and alive(record.unit)
+                        and overlaps(point,record.point,padding+record.padding+4-0.01) then return false end
+                end
+            end end
+        end
     end
     for _, face in pairs(queue.faces) do
         local promotion = face.promotion
         if promotion and promotion.id ~= except
-            and distance(point,promotion.point) < padding+promotion.padding+4-0.01 then return false end
+            and overlaps(point,promotion.point,padding+promotion.padding+4-0.01) then return false end
     end
     return true
 end
@@ -101,6 +138,7 @@ local function remove(queue, id)
     local record = queue.records[id]
     queue.records[id],queue.pending[id],queue.failures[id]=nil,nil,nil
     if not record then return end
+    unindex(queue,record)
     local face=face_for(queue,record.side)
     if face.promotion and face.promotion.id==id then face.promotion=nil end
     face.gaps[#face.gaps+1]={point=record.point,padding=record.padding}
@@ -153,7 +191,7 @@ local function path(queue, unit, point, stamp)
     if not failures then failures={};queue.failures[id]=failures end
     local key=string.format("%.3f:%.3f:%.3f",point.x,point.y,point.z)
     local failed=failures[key]
-    if failed and stamp<failed.until_time and distance(origin,failed.origin)<32 then return false end
+    if failed and stamp<failed.until_time and overlaps(origin,failed.origin,32) then return false end
     queue.paths_left=queue.paths_left-1
     state.paths_left=state.paths_left-1
     local length=GridNav:FindPathLength(origin,point)
@@ -212,7 +250,9 @@ advance=function(queue, record, stamp)
     local reachable=path(queue,record.unit,promotion.point,stamp)
     if reachable then
         local previous=record.point
+        unindex(queue,record)
         record.point=promotion.point;face.promotion=nil
+        index(queue,record)
         queue.failures[record.id]=nil
         face.gaps[#face.gaps+1]={point=previous,padding=record.padding}
         schedule(queue,record.side)
@@ -274,6 +314,7 @@ function M.reserve(state, wall, unit, side, front_edge, stamp)
                 record={id=id,unit=unit,side=side,hull=hull,padding=padding,
                     point=candidate.point,order=pending.order}
                 queue.records[id],queue.pending[id]=record,nil
+                index(queue,record)
                 queue.failures[id]=nil
                 return record.point
             end

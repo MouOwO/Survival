@@ -49,7 +49,7 @@ local function permanent_stats(player_id)
     local ok, result = pcall(
         event_bus.request,
         events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
-        { player_id = player_id }
+        { player_id = player_id, gold_mine_only = true }
     )
     if not ok then return {} end
     return result and result.totals or {}

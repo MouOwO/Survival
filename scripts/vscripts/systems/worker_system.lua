@@ -664,11 +664,8 @@ local function on_tree_depleted(payload)
     local player_id = tonumber(payload and payload.player_id)
     local attacker = payload and payload.attacker
     if player_id == nil or not valid_entity(attacker) then return end
-    local state = nil
-    for _, candidate in pairs(workers) do
-        if candidate.unit == attacker then state = candidate break end
-    end
-    if not state or not personality_has(attacker,
+    local state = workers[attacker:entindex()]
+    if not state or state.unit ~= attacker or not personality_has(attacker,
         "lumberjack_personality_scavenger") then return end
     if (state.scavenger_uses or 0) >= 3
         or RandomFloat(0, 100) >= personality_value(

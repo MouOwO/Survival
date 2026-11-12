@@ -536,6 +536,21 @@ local function get(payload)
     if player_id == nil or player_id < 0 then
         return { ok = false, error = "player_id_invalid" }
     end
+    if payload.gold_mine_only == true then
+        local source = totals_by_player[player_id] or {}
+        return {
+            ok = true,
+            totals = {
+                gold_mine_efficiency_pct = tonumber(source.gold_mine_efficiency_pct),
+                gold_mine_yield_bonus_pct = tonumber(source.gold_mine_yield_bonus_pct),
+                gold_mine_yield_flat = tonumber(source.gold_mine_yield_flat),
+                gold_mine_final_output_flat = tonumber(source.gold_mine_final_output_flat),
+                gold_mine_income_interval_reduction = tonumber(source.gold_mine_income_interval_reduction),
+            },
+            test_isolation = test_isolated_field_by_player[player_id] ~= nil,
+            isolated_field_id = test_isolated_field_by_player[player_id],
+        }
+    end
     if payload.training_room_only == true then
         return {
             ok = true,

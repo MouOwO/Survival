@@ -14,9 +14,18 @@ local PATH_STEP_SECONDS, PATHS_PER_STEP = 0.5, 16
 local SETTLE_DISTANCE, WAIT_CLEARANCE = 36, 8
 local MAX_NATIVE_ROUTE = ENGAGE_DISTANCE*3
 local function alive(u) return u and not u:IsNull() and u:IsAlive() end
-local function distance(a,b)
+local function distance_squared(a,b)
     local x,y=a.x-b.x,a.y-b.y
-    return math.sqrt(x*x+y*y)
+    return x*x+y*y
+end
+local function distance(a,b)
+    return math.sqrt(distance_squared(a,b))
+end
+local function within(a,b,radius)
+    return radius>=0 and distance_squared(a,b)<=radius*radius
+end
+local function overlaps(a,b,radius)
+    return radius>0 and distance_squared(a,b)<radius*radius
 end
 local function now() return GameRules:GetGameTime() end
 local function hull(u) return math.max(1,u:GetHullRadius()) end
@@ -40,7 +49,7 @@ end
 -- row behind a live blocker. Never teleport an entrant into its reserved slot.
 function M.arrived(wall,unit,point,retained)
     local p=unit:GetAbsOrigin()
-    return distance(p,point)<=(retained and 48 or SETTLE_DISTANCE)
+    return within(p,point,retained and 48 or SETTLE_DISTANCE)
         and math.abs(p.z-point.z)<=32
 end
 function M.entry_ready(wall,unit,point)
@@ -120,7 +129,7 @@ local function bodies_clear(wall,unit,point)
             local other_radius=other:GetHullRadius()
             if other_radius>0 then
                 local limit=radius+other_radius
-                if distance(point,other:GetAbsOrigin())<limit-.5 then return false end
+                if overlaps(point,other:GetAbsOrigin(),limit-.5) then return false end
             end
         end
     end
@@ -211,7 +220,7 @@ local function eligible_waiter(s,record,side,stamp)
     local owner=u.survival_wall_contact_owner
     if owner and owner.wall_entindex~=s.wall:entindex() then return false end
     local p=u:GetAbsOrigin()
-    if distance(p,s.wall:GetAbsOrigin())>ENGAGE_DISTANCE or interrupted(u)
+    if not within(p,s.wall:GetAbsOrigin(),ENGAGE_DISTANCE) or interrupted(u)
         or (u.IsCurrentlyHorizontalMotionControlled and u:IsCurrentlyHorizontalMotionControlled())
         or (u.IsCurrentlyVerticalMotionControlled and u:IsCurrentlyVerticalMotionControlled()) then return false end
     local retry=s.retries[u:entindex()]
@@ -230,7 +239,7 @@ local function eligible_route_owner(s,claim,side,stamp,point)
     local owner=u.survival_wall_contact_owner
     if owner and owner.wall_entindex~=s.wall:entindex() then return false end
     local p=u:GetAbsOrigin()
-    if distance(p,s.wall:GetAbsOrigin())>ENGAGE_DISTANCE
+    if not within(p,s.wall:GetAbsOrigin(),ENGAGE_DISTANCE)
         or face_for(p,s.wall:GetAbsOrigin())~=side or interrupted(u)
         or (u.IsCurrentlyHorizontalMotionControlled and u:IsCurrentlyHorizontalMotionControlled())
         or (u.IsCurrentlyVerticalMotionControlled and u:IsCurrentlyVerticalMotionControlled()) then return false end
@@ -246,7 +255,7 @@ local function vacant_candidate(s,unit,candidate)
     local face=s.faces[candidate.face]
     if face.slots[candidate.lane] then return false end
     for _,claim in pairs(s.claims) do
-        if claim.unit~=unit and distance(candidate.point,claim.point)<hull(unit)+hull(claim.unit)+4 then
+        if claim.unit~=unit and overlaps(candidate.point,claim.point,hull(unit)+hull(claim.unit)+4) then
             return false
         end
     end
@@ -283,7 +292,7 @@ local function replacement_owner(s,side,stamp)
                     if candidate.face==side and not face.slots[candidate.lane] then
                         local blocker
                         for _,other in pairs(s.claims) do
-                            if distance(candidate.point,other.point)<radius+hull(other.unit)+4 then
+                            if overlaps(candidate.point,other.point,radius+hull(other.unit)+4) then
                                 if blocker then blocker=true;break end
                                 blocker=other.unit
                             end
@@ -313,7 +322,7 @@ local function replacement_owner(s,side,stamp)
         local eligible,p=eligible_waiter(s,record,side,stamp)
         if eligible then consider(record.unit,p)
         elseif not alive(record.unit) or stamp-record.updated>2
-            or distance(record.unit:GetAbsOrigin(),s.wall:GetAbsOrigin())>ENGAGE_DISTANCE then
+            or not within(record.unit:GetAbsOrigin(),s.wall:GetAbsOrigin(),ENGAGE_DISTANCE) then
             forget_waiter(s,id,alive(record.unit))
         end
     end
@@ -483,7 +492,7 @@ local function clean_face(s,side,origin,stamp)
     for id,c in pairs(face.claims) do
         local p=alive(c.unit) and c.unit:GetAbsOrigin()
         if not p or stamp-c.updated>2
-            or distance(p,origin)>ENGAGE_DISTANCE+64 then
+            or not within(p,origin,ENGAGE_DISTANCE+64) then
             retire_claim(s,id,p~=nil)
         else
             -- Native MOVE may stop short of its contact. Rear goals must
@@ -589,7 +598,7 @@ function M.resolve(wall,unit,preferred_face)
     if not alive(wall) or not alive(unit) then return nil end
     local p,origin=unit:GetAbsOrigin(),wall:GetAbsOrigin()
     local id=unit:entindex()
-    if distance(p,origin)>ENGAGE_DISTANCE then
+    if not within(p,origin,ENGAGE_DISTANCE) then
         local s=state_for(wall)
         retire_claim(s,id)
         local point,queue_side=rear_queue.peek(s,unit)
@@ -782,7 +791,7 @@ function M.resolve(wall,unit,preferred_face)
             -- their way around a corner. No fifth owner can use that face.
             local separated=true
             for _,other in pairs(s.claims) do
-                if distance(c.point,other.point)<hull(unit)+hull(other.unit)+4 then
+                if overlaps(c.point,other.point,hull(unit)+hull(other.unit)+4) then
                     separated=false;break
                 end
             end
