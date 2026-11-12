@@ -71,3 +71,33 @@
 出口预算公式为`(Σ正文B×RPS + 总RPS×2048B)×1.10×8/1000000`，额外2048B/请求及10%作为头部/传输余量。结果普通约9.92Mbps、活跃约22.61Mbps、极端叠加约86.02Mbps。仅每天4小时、每月30天的峰段对应约535/1221/4645GB；低峰、重试和其他业务另加，不作为云账单或购买承诺。完整目录失配、2000库存键增长案例仍可能超出所用正文大小；未启用gzip。
 
 当前共享2核与已有全局限流、认证存储不因包体变小就获得4000并发准入。需要后续分级容量压测来验证CPU、数据库、延迟及失败率；本轮只完成两个合成身份的真实业务功能验证。
+
+## 1202签包、后台上线及Steam连接门禁
+
+部署修复`a2645e38292ec0ebb08281899d952d9f42c375f9`已推送game/dev，content/master同期核对同步。按固定入口重新建立`pack_2026111202_27b5573e`，保留旧1201。1202已完成7061资源、187保护模块、完整签名和整包核验；运行来源game `b842a8d6509e36088507cdde83927ac9259d453a` / content `342bb10f6035918e83a0ba9d17d0d8626e235b3d`，均已推送。发布授权提交game `2499d16aefe3dd160a7053d26cea74f00ce73cd7`。
+
+新后台计划`web_release_v2/deploy_plan.json` SHA256 `4e1435fdd1583b81731d2a93868f18a96c6af13eb420d5ffd6ce760cbc83264c`，候选`/opt/goufayu-ws4-web/releases/business-wire-195f682a8fbf89673c29d131d16dae7b1c797dbfa4d9815934f2cbfe47f1e3bd`已激活，进程1364654。`activate_1bcabeaed7c6ba59_receipt.json`和独立`verify_40cc66b9352ebc8f_receipt.json`均`ACTIVE_VERIFIED`；首次就绪2轮、复验1轮，环境及其他7服务未变。候选实际selftest 4769→472B，生产账号业务请求0；真实业务无损证明沿用隔离31请求/29正文，普通客户端仍待用户实测。
+
+1202首次publish在`sdk.Steam.__enter__`在线身份检查处拒绝，`publish_1.execution_receipt.json`/stdout/stderr完整保留；账号及AppID均正确，单独只读探针确认`BLoggedOn=false`、UGC写调用0。正式journal仍1106，lineage保留1202原始pending，未清除、重放或改写成成功。用户确认Steam已在线后，独立协调查询仍在同一只读初始化门禁停止；Steam连接日志仅按状态分类读取，观察到连接超时。已请求完全重启并恢复网络，后续必须新鲜官方查询确认1106父包未变化，再在全局锁内显式协调已知上传前失败，之后才可继续同包发布。当前游廊仍1106 / manifest `6291919402900133473`，1202没有SDK成功或官方下载证据。
+
+本轮Git原配置指向已关闭本地代理；直连GitHub实际成功，后续仅在本轮命令进程覆盖http/https proxy为空，未修改永久配置。本轮stash `8390149d87cbbc7288927230358b0f712ea687b4`已精确pop；其他窗口的Steam桥接修复、README、bundle指针、pycache及5项发行辅助未跟踪文件均保留，content工作区干净。待交付结束再提交本节收口文档，避免改变1202任务严格HEAD绑定。
+
+## 最终交付：已同步游廊1202，后台已部署
+
+截至2026-11-12 17:45，固定任务`pack_2026111202_27b5573e`返回`WORKSHOP_SYNCED`，原条目3824360109、Steam manifest **`503273922170155206`**。7061签名资源、187保护模块、5个包文件官方完整下载逐文件一致，发行generation 13、pending为空；完整来源检查点已收口，待发和阻断均0。运行来源仍为game `b842a8d6509e36088507cdde83927ac9259d453a` / content `342bb10f6035918e83a0ba9d17d0d8626e235b3d`，发布operator `2499d16aefe3dd160a7053d26cea74f00ce73cd7`。收口文档另行提交，不改已发运行绑定。游廊维持封闭测试可见性3，普通实机验收`PENDING_USER_ONLINE_TEST`；本轮没有真人券、兑换或支付操作，4000并发容量尚未测试。
+
+正式官方回执：`output/packager/pack_2026111202_27b5573e/download_evidence/20261112T094401Z_015ae09ac45d42d884be2f6ce136b3d1/verification.json`，SHA256 `39781ec29bfb629f999f0d1c0ef598bc37dba0fef864929b6f66bc4ec3f9f59e`。任务交付回执：`D:/Survival_本地工具/runs/packaging_jobs/pack_2026111202_27b5573e/delivery_receipt.json`。后台仍为上节已独立验证的`business-wire-195f682a…`及schema `e7911bcf…`，没有再次切换数据库、支付或环境。
+
+### Steam连接恢复及已知失败协调
+
+官方商店、社区和两个客户端节点的DNS/TLS探针均通过，但客户端SDK仍离线。确认RunningAppID=0且无Dota后，正常退出Steam PID19468，临时以`-tcp -silent`重启为PID18840；随后SDK真实在线检查及无缓存官方查询成功。未强制结束进程、清除登录资料或改永久网络配置；不能据此断言UDP是唯一原因。[Steam官方TCP启动参数说明](https://help.steampowered.com/en/faqs/view/0188-6BB7-D467-08E1)。已有OpenID桥接器只处理社区验签，未把桥接READY误当客户端在线。
+
+当时官方1106条目更新时间从1794405279变为1794405668，大小3811766367及可见性3相同，因此协调v3拒绝旧时间参照，未清意图。先用当前正式recipe的`baseline(full=True,require_current_journal=True)`及固定下载协议重新核验完整父包；新回执确认manifest仍`6291919402900133473`、7058资源和5文件字节全部一致。旧recipe独立重跑因当前保护policy已升级而拒绝，未改旧门禁；该失败脚本一并保留。
+
+树外`pre_sdk_reconciliation/reconcile_pre_sdk_failure_v4.py`固定新旧官方回执和refresh helper摘要，review与apply各独立执行非缓存官方查询，精确核对owner/AppID/条目、完整新鲜父包结果和当前控制摘要。在同一全局锁内先保存lineage/journal原字节并登记备份，写前CAS，再仅恢复已证明未到SDK写调用的pending；generation/head/journal保持。最终review SHA `0d74c9595fb58f37762e8028743b952eb0ed7325c21f51e1ad8069101d3f7b66`，协调operator SHA `af931e64191d5daad281cd3e4cbdb0c08cb59b7248f489b711233500d93aa9a6`；已知失败、备份、登记及应用回执均保留。不能将此方法用于SDK提交结果未知的情况。实际query的成功、缓存结果、多结果、错误owner与AppID共5项替身检查通过。
+
+### 签包后文档审计漂移及修正
+
+第二次publish在SDK调用前拒绝`reviewed_projection_differs_from_fresh_collection`。逐字段诊断确认运行绑定一致，但签包后追加的本篇与知识库README使dirty清单多出两个非运行路径，改变inventory/scope/ledger摘要。完整保留诊断和两文档原字节备份并登记，再把本人后续文档修改推迟到树外，主工作区恢复已签提交的原文；未改其他窗口文件或放宽collector检查。新鲜投影随后逐字节等于原签包投影，SHA256 `3b86dfcaf3d9b33d8529492ac75c3810dd238219d8d18484e508a8787837bdea`，第三次固定publish完成唯一一次实际SDK上传，之后官方下载及全部待发收口成功。两文档在任务done后才合回并记录最终事实。
+
+本轮3次publish入口的结果分别是SDK初始化在线门禁失败、来源投影审计失败、成功提交；前两次没有实际UGC发布。未自动重传未知提交、伪造普通实机通过或删掉失败意图证据。后续从签包审计冻结到交付完成，文档也先放树外候选，完整交付后再合入，避免重复这一错误。
