@@ -89,7 +89,7 @@ def write_new(path, raw):
 
 
 def record(receipt):
-    result = subprocess.run([sys.executable, "-B", str(ROOT / LEDGER), "record",
+    result = subprocess.run([sys.executable, "-X", "utf8", "-B", str(ROOT / LEDGER), "record",
                              "--receipt", str(receipt)], cwd=ROOT, capture_output=True,
                             timeout=45)
     need(result.returncode == 0, "storage_ledger_registration_failed_receipt_retained")
@@ -133,12 +133,12 @@ def private(path,create=False):
  if not path.exists() and create: path.mkdir(mode=0o700,parents=False)
  need(path.is_dir() and not path.is_symlink() and path.stat().st_uid==0
       and stat.S_IMODE(path.stat().st_mode)&0o077==0,'private_operator_directory_required')
-def ctl(*args):
- result=subprocess.run(['systemctl',*args],stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=35)
+def ctl(*args,timeout=35):
+ result=subprocess.run(['systemctl',*args],stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=timeout)
  need(result.returncode==0,'systemctl_operation_failed')
  return result.stdout.decode().strip()
-def props(name):
- result=ctl('show',name,'--property=MainPID,ActiveState,FragmentPath')
+def props(name,timeout=35):
+ result=ctl('show',name,'--property=MainPID,ActiveState,FragmentPath',timeout=timeout)
  return dict(line.split('=',1) for line in result.splitlines() if '=' in line)
 def working_directory(raw):
  matches=re.findall(rb'(?m)^[ \t]*WorkingDirectory[ \t]*=[ \t]*([^\r\n]+)\r?$',raw)
@@ -159,12 +159,12 @@ def environment_digest(raw):
  path=Path(matches[0].strip().decode('utf-8'))
  need(path.is_absolute() and path.parent==Path('/etc/goufayu-ws4-web'),'environment_path_unexpected')
  return sha(regular(path))
-def health():
+def health(timeout=2):
  try:
   class NoRedirect(urllib.request.HTTPRedirectHandler):
    def redirect_request(self,*args,**kwargs): return None
   opener=urllib.request.build_opener(urllib.request.ProxyHandler({}),NoRedirect())
-  with opener.open('http://127.0.0.1:18767/health',timeout=2) as response:
+  with opener.open('http://127.0.0.1:18767/health',timeout=timeout) as response:
    raw=response.read(16385)
    return response.status==200 and len(raw)<=16384 and json.loads(raw).get('ok') is True
  except Exception: return False
@@ -173,6 +173,57 @@ def healthy():
   if health(): return
   time.sleep(0.25)
  need(False,'web_health_failed')
+
+def safe_failure(error):
+ result={'error_type':type(error).__name__}
+ if isinstance(error,GuardError) and re.fullmatch('[a-z_]{1,100}',str(error)):
+  result['failure_code']=str(error)
+ else: result['failure_code']='unexpected_operator_exception'
+ fields={'attempts':int,'active':bool,'pid':int,'cwd_matches':bool,
+         'healthy':bool,'identity_stable':bool}
+ state=getattr(error,'readiness',None)
+ if (result['failure_code']=='web_readiness_timeout' and isinstance(error,GuardError)
+     and type(state) is dict and set(state)==set(fields)
+     and all(type(state[key]) is expected for key,expected in fields.items())):
+  result['readiness']={key:state[key] for key in fields}
+ return result
+
+def wait_web_ready(root,excluded_pid=None,timeout=12):
+ # Deployment-only bounded polling: at most 49 iterations, O(1) state. Each
+ # attempt reads one service and one cwd; only a matching candidate gets one
+ # loopback health request and a second identity read. No player/SQL calls.
+ deadline=time.monotonic()+timeout
+ state={'attempts':0,'active':False,'pid':0,'cwd_matches':False,
+        'healthy':False,'identity_stable':False}
+ while True:
+  remaining=deadline-time.monotonic()
+  if remaining<=0: break
+  try: web=props(SERVICE,timeout=remaining)
+  except subprocess.TimeoutExpired: break
+  pid=web.get('MainPID','0')
+  state.update(attempts=state['attempts']+1,active=web.get('ActiveState')=='active',
+               pid=int(pid),cwd_matches=False,healthy=False,identity_stable=False)
+  if state['active'] and int(pid)>0 and pid!=excluded_pid:
+   try: state['cwd_matches']=Path(os.readlink('/proc/'+pid+'/cwd'))==root
+   except (FileNotFoundError,ProcessLookupError): pass
+   if state['cwd_matches']:
+    remaining=deadline-time.monotonic()
+    if remaining<=0: break
+    state['healthy']=health(timeout=min(2,remaining))
+    if state['healthy']:
+     remaining=deadline-time.monotonic()
+     if remaining<=0: break
+     try: after=props(SERVICE,timeout=remaining)
+     except subprocess.TimeoutExpired: break
+     if after==web:
+      try: state['identity_stable']=Path(os.readlink('/proc/'+pid+'/cwd'))==root
+      except (FileNotFoundError,ProcessLookupError): pass
+     if state['identity_stable'] and time.monotonic()<=deadline: return web,state
+  remaining=deadline-time.monotonic()
+  if remaining<=0: break
+  time.sleep(min(0.25,remaining))
+ error=GuardError('web_readiness_timeout');error.readiness=state
+ raise error
 def source_hashes(parent):
  actual={p.relative_to(parent).as_posix() for p in parent.rglob('*.py')}
  need(actual==set(SOURCES),'unclassified_parent_python_source')
@@ -291,15 +342,15 @@ def verify_active(plan,ops):
  expected_unit=changed_unit(parent_unit,root)
  need(regular(UNIT,128*1024)==expected_unit,'active_unit_differs_from_candidate')
  need(environment_digest(expected_unit)==plan['parent']['environment_sha256'],'environment_changed')
- web=props(SERVICE)
- need(web.get('ActiveState')=='active' and int(web.get('MainPID','0'))>0
-      and web['MainPID']!=plan['parent']['web']['MainPID'],'candidate_web_not_restarted')
- need(Path(os.readlink('/proc/'+web['MainPID']+'/cwd'))==root,'active_web_directory_mismatch')
  need({name:props(name) for name in RETAINED}==plan['parent']['retained'],'retained_service_changed')
- healthy()
+ web,readiness=wait_web_ready(root,plan['parent']['web']['MainPID'])
+ need(regular(UNIT,128*1024)==expected_unit,'active_unit_changed_during_readiness')
+ need(environment_digest(expected_unit)==plan['parent']['environment_sha256'],'environment_changed')
+ need({name:props(name) for name in RETAINED}==plan['parent']['retained'],'retained_service_changed')
+ validate_release(plan)
  return {'status':'ACTIVE_VERIFIED','candidate':str(root),'web':web,
          'schema_hash':plan['schema_hash'],'retained_services_unchanged':True,
-         'environment_unchanged':True,'authenticated_player_requests':0}
+         'environment_unchanged':True,'authenticated_player_requests':0,'readiness':readiness}
 def activate(plan,plan_hash,payload):
  ops=operator_directory(plan,plan_hash)
  need((ops/'prepared.json').is_file(),'prepared_receipt_required')
@@ -313,26 +364,36 @@ def activate(plan,plan_hash,payload):
      'parent_unit_sha256':sha(original),'candidate_unit_sha256':sha(updated),
      'attempt':payload['attempt']}))
  need(regular(UNIT,128*1024)==original,'parent_unit_changed_before_switch')
- switched=False
+ switched=False;stage='unit_switch'
  try:
   atomic_unit(updated,payload['attempt']);switched=True
-  ctl('daemon-reload');ctl('restart',SERVICE)
+  stage='daemon_reload';ctl('daemon-reload')
+  stage='web_restart';ctl('restart',SERVICE)
+  stage='candidate_verification'
   result=verify_active(plan,ops)
   result['selftest']=proof
   new(ops/'activated.json',canonical(result))
   return result
- except Exception:
-  rolled_back=False
+ except Exception as error:
+  rolled_back=False;rollback_failure=None
   # Never overwrite another operator's post-switch change.
   if switched and regular(UNIT,128*1024)==updated:
    try:
+    need(environment_digest(original)==plan['parent']['environment_sha256'],
+         'rollback_environment_changed_reconcile_required')
+    need(source_hashes(Path(plan['parent']['working_directory']))==plan['parent']['source_hashes'],
+         'rollback_parent_source_changed_reconcile_required')
     atomic_unit(original,payload['attempt']+'-rollback')
-    ctl('daemon-reload');ctl('restart',SERVICE);healthy()
+    ctl('daemon-reload');ctl('restart',SERVICE)
+    wait_web_ready(Path(plan['parent']['working_directory']),plan['parent']['web']['MainPID'])
     rolled_back=(regular(UNIT,128*1024)==original
+       and environment_digest(original)==plan['parent']['environment_sha256']
        and {name:props(name) for name in RETAINED}==plan['parent']['retained'])
-   except Exception: rolled_back=False
+   except Exception as rollback_error: rollback_failure=safe_failure(rollback_error)
   result={'status':'ACTIVATION_FAILED','ok':False,'rolled_back':rolled_back,
-          'backup_directory':str(ops),'pending_preserved':True}
+          'backup_directory':str(ops),'pending_preserved':True,
+          'failure_stage':stage,**safe_failure(error)}
+  if rollback_failure: result['rollback_failure']=rollback_failure
   new(ops/'activation_failed.json',canonical(result))
   return result
 def execute(payload):
