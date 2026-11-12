@@ -5,6 +5,7 @@ local mode_test = require("debug/mode_unlock_test")
 local workshop = require("systems/workshop_connection")
 local web_auth = require("systems/player_web_auth")
 local profile_wire = require("systems/http_profile_wire")
+local business_wire = require("systems/business_wire")
 
 local M = {}
 local active_rule = nil
@@ -142,6 +143,8 @@ local function request(path, payload, on_success, on_error)
         local http = CreateHTTPRequestScriptVM("POST", tostring(url) .. path)
         if not http then on_error("http_request_create_failed") return end
         http:SetHTTPRequestHeaderValue("Authorization", "Bearer " .. token)
+        local wire_hash = business_wire.schema_hash()
+        if wire_hash then http:SetHTTPRequestHeaderValue("X-Survival-Wire", wire_hash) end
         local encode_started=trace and trace.clock()
         local encoded=json_encoder.encode(body)
         if trace then trace.encoded(encode_started,#encoded)end
@@ -152,20 +155,42 @@ local function request(path, payload, on_success, on_error)
         if trace then trace.sent()end
         http:Send(function(response)
             local status = tonumber(response and response.StatusCode) or 0
+            local response_body = tostring(response and response.Body or '')
             -- Internal transport metadata only; never consume same-named JSON
             -- fields or re-encode the response to measure its existing bytes.
-            local catalog_bytes=path=="/v1/lottery/catalog" and #tostring(response and response.Body or "") or nil
-            if trace then trace.received(#tostring(response and response.Body or ''),status)end
-            if status ~= 200 then
-                local parsed, response_body = pcall(json_decoder.decode, tostring(response and response.Body or ""))
+            local catalog_bytes=path=="/v1/lottery/catalog" and #response_body or nil
+            if trace then trace.received(#response_body,status)end
+            if #response_body > 8 * 1024 * 1024 then
                 if trace then trace.decoded()end
-                on_error(workshop.failure(parsed and response_body or nil, "http_status_" .. tostring(status)), status, catalog_bytes)
+                if status == 200 and path == '/v1/archive/command' then
+                    on_success({ok=false,terminal=true,error='business_wire_invalid',
+                        http_profile_resync=true,recovery_session=session})
+                else on_error('http_response_too_large',status,catalog_bytes) end
                 return
             end
-            local ok, decoded = pcall(json_decoder.decode, tostring(response.Body or ""))
+            if status ~= 200 then
+                local parsed, response_value = pcall(json_decoder.decode, response_body)
+                if trace then trace.decoded()end
+                on_error(workshop.failure(parsed and response_value or nil, "http_status_" .. tostring(status)), status, catalog_bytes)
+                return
+            end
+            local ok, decoded = pcall(json_decoder.decode, response_body)
             if not ok or type(decoded) ~= "table" then
                 if trace then trace.decoded()end
                 on_error("http_json_invalid",path=="/v1/lottery/catalog" and status or nil,catalog_bytes) return
+            end
+            decoded = business_wire.decode(decoded)
+            if not decoded then
+                if trace then trace.decoded()end
+                if path == '/v1/archive/command' then
+                    -- A grant may already be durable. Read authoritative state
+                    -- through the existing recovery path; never replay a write.
+                    on_success({ok=false,terminal=true,error='business_wire_invalid',
+                        http_profile_resync=true,recovery_session=session})
+                else
+                    on_error('business_wire_invalid', status, catalog_bytes)
+                end
+                return
             end
             if path=='/v1/archive/command'then
                 decoded=profile_wire.decode(decoded)

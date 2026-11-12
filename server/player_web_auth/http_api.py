@@ -8,6 +8,17 @@ import threading
 from urllib.parse import parse_qsl, urlsplit
 
 from .service import AuthError, BODY_LIMIT
+from .business_wire import pack_bytes
+
+
+# A transport-only, exact catalog digest. Kept out of JSON so old gateways can
+# ignore it and business allowlists / durable idempotency fingerprints do not
+# change. Payment, authorization and lobby messages keep their existing format.
+BUSINESS_WIRE_PATHS = frozenset((
+    "/v1/session/authenticate", "/v1/session/login", "/v1/profile",
+    "/v1/archive/config", "/v1/lottery/catalog", "/v1/lottery/snapshot",
+    "/v1/archive/command", "/v1/archive/endless-batch", "/v1/online-time/checkpoint",
+))
 
 
 def strict_pairs(raw, maximum=30):
@@ -195,6 +206,13 @@ def handler(service, lobby=None):
                     header = self.headers.get("Authorization", "")
                     bearer = header[7:] if header.startswith("Bearer ") else ""
                     status, body = service.proxy(path, bearer, payload, peer)
+                    if status == 200 and path in BUSINESS_WIRE_PATHS:
+                        versions = self.headers.get_all("X-Survival-Wire", [])
+                        # Duplicate/unknown headers select the original reply.
+                        # Packing happens after the real business result and
+                        # adds no RPC, transaction, timer or mutation retry.
+                        if len(versions) == 1:
+                            body = pack_bytes(body, versions[0])
                     self.reply(status, body)
             except lobby_errors as error:
                 self.reply(error.status, {"ok": False, "error": error.code, **(error.context or lobby.response_context())})

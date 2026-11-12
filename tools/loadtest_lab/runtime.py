@@ -20,7 +20,7 @@ from .guard import PORTS, load, dsn, marker_guard, production_host_guard, attest
 
 BUSINESS_PATHS = frozenset(('/v1/session/authenticate', '/v1/session/login', '/v1/profile',
     '/v1/archive/config', '/v1/lottery/catalog', '/v1/lottery/snapshot',
-    '/v1/archive/command', '/v1/online-time/checkpoint'))
+    '/v1/archive/command', '/v1/archive/endless-batch', '/v1/online-time/checkpoint'))
 
 
 def forward(private, path, raw):

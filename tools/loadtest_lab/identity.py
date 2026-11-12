@@ -177,10 +177,16 @@ class IdentityService(Service):
     def proxy(self, path, bearer, payload, peer):
         if path not in {'/v1/session/authenticate', '/v1/session/login', '/v1/profile',
                         '/v1/archive/config', '/v1/lottery/catalog', '/v1/lottery/snapshot',
-                        '/v1/archive/command', '/v1/online-time/checkpoint'}:
+                        '/v1/archive/command', '/v1/archive/endless-batch', '/v1/online-time/checkpoint'}:
             raise AuthError('lab_business_route_not_allowed', 403)
         if path == '/v1/archive/command' and (not isinstance(payload, dict)
                 or not isinstance(payload.get('command'), dict)
                 or payload['command'].get('kind') not in ('lottery_draw', 'benefit_claim', 'daily_claim')):
             raise AuthError('lab_business_command_not_allowed', 403)
+        if path == '/v1/archive/endless-batch':
+            commands = payload.get('commands') if isinstance(payload, dict) else None
+            if (type(commands) is not list or not 1 <= len(commands) <= 32
+                    or any(type(command) is not dict or command.get('kind') != 'endless'
+                           for command in commands)):
+                raise AuthError('lab_business_command_not_allowed', 403)
         return super().proxy(path, bearer, payload, peer)

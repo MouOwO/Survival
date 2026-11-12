@@ -40,5 +40,16 @@
     "static_code_and_assets": "Workshop version updates after complete offline verification",
     "lottery_catalogue": "existing login MD5 comparison and server push cache",
     "minimum_sequence_is_trusted_state_not_downloaded_from_an_untrusted_package": true
+  },
+  "local_configuration_storage": {
+    "cipher": "RFC8439 ChaCha20, counter 1, independent per-generation key and nonce",
+    "scope": ["scripts/vscripts/config/generated/business_wire_catalog.lua"],
+    "loader": "scripts/vscripts/core/local_config_cipher.lua",
+    "builder": "tools/seal_business_wire_catalog.py",
+    "plaintext_is_json_data_only": true,
+    "local_read_key_is_not_a_server_secret": true,
+    "confidentiality_from_the_player_claimed": false,
+    "authenticity_requires_release_signature": true,
+    "native_initialization_smoke_required": true
   }
 }

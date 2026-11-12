@@ -66,7 +66,7 @@ def prepare(args):
     names = subprocess.run(['git', '-C', str(ROOT), 'ls-tree', '-r', '--name-only', revision,
                             'server/player_web_auth'], capture_output=True, check=True).stdout.decode().splitlines()
     for name in names:
-        if not name.endswith('.py'):
+        if not (name.endswith('.py') or name == 'server/player_web_auth/business_wire_schema.json'):
             continue
         raw = subprocess.run(['git', '-C', str(ROOT), 'show', revision + ':' + name], capture_output=True, check=True).stdout
         target = 'runtime/' + name.removeprefix('server/')
