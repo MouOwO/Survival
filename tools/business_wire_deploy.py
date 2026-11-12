@@ -141,22 +141,22 @@ def props(name):
  result=ctl('show',name,'--property=MainPID,ActiveState,FragmentPath')
  return dict(line.split('=',1) for line in result.splitlines() if '=' in line)
 def working_directory(raw):
- matches=re.findall(rb'(?m)^WorkingDirectory=([^\r\n]+)\r?$',raw)
+ matches=re.findall(rb'(?m)^[ \t]*WorkingDirectory[ \t]*=[ \t]*([^\r\n]+)\r?$',raw)
  need(len(matches)==1,'unique_working_directory_required')
- value=Path(matches[0].decode('utf-8'))
+ value=Path(matches[0].strip().decode('utf-8'))
  need(value.is_absolute() and value.parent==BASE and value.resolve()==value
       and re.fullmatch(r'[A-Za-z0-9_-]+',value.name),'web_parent_directory_invalid')
  return value
 def changed_unit(raw,candidate):
  working_directory(raw)
- replacement=b'WorkingDirectory='+str(candidate).encode()
- result,count=re.subn(rb'(?m)^WorkingDirectory=[^\r\n]+',replacement,raw)
+ result,count=re.subn(rb'(?m)^([ \t]*WorkingDirectory[ \t]*=[ \t]*)[^\r\n]+',
+                       lambda match:match.group(1)+str(candidate).encode(),raw)
  need(count==1,'working_directory_replace_failed')
  return result
 def environment_digest(raw):
- matches=re.findall(rb'(?m)^EnvironmentFile=([^\r\n]+)\r?$',raw)
+ matches=re.findall(rb'(?m)^[ \t]*EnvironmentFile[ \t]*=[ \t]*([^\r\n]+)\r?$',raw)
  need(len(matches)==1,'unique_environment_file_required')
- path=Path(matches[0].decode('utf-8'))
+ path=Path(matches[0].strip().decode('utf-8'))
  need(path.is_absolute() and path.parent==Path('/etc/goufayu-ws4-web'),'environment_path_unexpected')
  return sha(regular(path))
 def health():

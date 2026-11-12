@@ -154,7 +154,7 @@ def updated_schema(existing=None):
     names = {template["name"]: template for template in schema["templates"]}
     for template in [*daily_templates(), *gameplay]:
         if template["name"] in names:
-            if names[template["name"]] != template:
+            if canonical(names[template["name"]]) != canonical(template):
                 raise ValueError("business_wire_existing_template_changed")
         else:
             schema["templates"].append(template)
@@ -196,7 +196,7 @@ def main():
     baseline = verify_committed_prefix(expected)
     if args.update:
         SCHEMA_PATH.write_text(json.dumps(expected, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    elif existing != expected:
+    elif canonical(existing) != canonical(expected):
         raise ValueError("business_wire_registry_update_required_run_explicit_update")
     # Only import after a deliberate first creation; import validates the exact
     # schema limits and static template indexes used by the serving process.
