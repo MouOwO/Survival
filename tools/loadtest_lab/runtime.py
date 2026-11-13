@@ -149,6 +149,28 @@ def checked_database_pool_stats(client, cfg):
     return stats
 
 
+def checked_http_admission_stats(server, layer, cfg):
+    """Read fixed counters once at startup/shutdown, with effective limits."""
+    from .experiments import has_experiment
+    if not has_experiment(cfg, 'http-admission-v1'):
+        return None
+    stats = server.admission_stats()
+    need(type(stats) is dict and stats.get('layer') == layer
+         and stats.get('max_concurrency') == (48 if layer == 'frontend' else 32)
+         and stats.get('backlog') == 64
+         and stats.get('accept_wait_seconds') == (0 if layer == 'frontend' else 2),
+         'actual_http_admission_budget_mismatch')
+    return stats
+
+
+def checkpoint_observation_stats(cfg):
+    from .experiments import has_experiment
+    if not has_experiment(cfg, 'checkpoint-observation-v1'):
+        return None
+    from archive_backend._checkpoint_observation import observation_stats
+    return observation_stats()
+
+
 def serve(directory, *, lua_executable=None):
     root, cfg, private = load(directory)
     production_host_guard(cfg)
@@ -195,17 +217,27 @@ def serve(directory, *, lua_executable=None):
     service = IdentityService(root, cfg, private, lambda path, raw: forward(private, path, raw))
     stop = threading.Event()
     pending = threading.Condition(); pending.inflight = 0
+    from .experiments import has_experiment
+    admission_mode = has_experiment(cfg, 'http-admission-v1')
+    backend_admission = ({'request_backlog': 64, 'admission_wait_seconds': 2.0}
+                         if admission_mode else {})
     backend = BoundedThreadingHTTPServer(('127.0.0.1', PORTS['backend']), base,
-                                        max_concurrency=cfg['http_concurrency'])
+                                        max_concurrency=cfg['http_concurrency'], **backend_admission)
     # The lab performs its own finite drain below. Never let ThreadingMixIn
     # add an unbounded join after an incomplete request or socket timeout.
     backend.block_on_close = False
     web = None
     running = []
     try:
-        web = BoundedServer(('127.0.0.1', PORTS['web']), frontend_handler(service, cfg, private, stop, pending))
+        frontend_admission = ({'max_concurrency': cfg['web_concurrency'], 'request_backlog': 64}
+                              if admission_mode else {})
+        web = BoundedServer(('127.0.0.1', PORTS['web']),
+                            frontend_handler(service, cfg, private, stop, pending), **frontend_admission)
         web.block_on_close = False
-        web.slots = threading.BoundedSemaphore(cfg['web_concurrency'])
+        if not admission_mode:
+            web.slots = threading.BoundedSemaphore(cfg['web_concurrency'])
+        frontend_started = checked_http_admission_stats(web, 'frontend', cfg)
+        backend_started = checked_http_admission_stats(backend, 'backend', cfg)
         write_new(root / 'started_receipt.json', {'kind': 'ISOLATED_REAL_API_LAB_STARTED',
             'artifact_root': str(root), 'run_id': cfg['run_id'], 'purpose': cfg['purpose'],
             'http_concurrency': cfg['http_concurrency'], 'database_concurrency': cfg['db_concurrency'],
@@ -215,6 +247,9 @@ def serve(directory, *, lua_executable=None):
             'backend_db_pool': cfg.get('backend_db_pool', 'baseline'),
             'database_pool_limits': cfg.get('database_pool_limits'),
             'database_pool_parameters': cfg.get('database_pool_parameters'),
+            'runtime_experiments': cfg.get('runtime_experiments', []),
+            'http_admission_started': {'frontend': frontend_started, 'backend': backend_started},
+            'checkpoint_observation_started': checkpoint_observation_stats(cfg),
             'actual_database_pool_limits_verified': pool_mode,
             'database_pool_started': pool_started,
             'requested_postgres_image': cfg.get('postgres_image', 'postgres:17'),
@@ -277,6 +312,11 @@ def serve(directory, *, lua_executable=None):
             'frontend_drain': web_drain, 'backend_drain': backend_drain,
             'backend_db_pool': cfg.get('backend_db_pool', 'baseline'),
             'database_pool_parameters': cfg.get('database_pool_parameters'),
+            'runtime_experiments': cfg.get('runtime_experiments', []),
+            'http_admission_stopped': {
+                'frontend': checked_http_admission_stats(web, 'frontend', cfg) if web is not None else None,
+                'backend': checked_http_admission_stats(backend, 'backend', cfg)},
+            'checkpoint_observation_stopped': checkpoint_observation_stats(cfg),
             'actual_database_pool_limits_verified': pool_mode,
             'database_pool_close_deferred': pool_mode and not drained,
             'database_pool_closed': pool_closed, 'database_pool_close_error': pool_close_error,

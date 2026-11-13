@@ -116,6 +116,8 @@ def resolve_database_pool(mode, *, http_concurrency=None, db_concurrency=4,
 
 def validate_database_pool(cfg):
     """Fixed reviewed experiment budgets and source bindings, once per load."""
+    from .experiments import validate_experiments
+    restored = validate_experiments(cfg)
     mode = cfg.get('backend_db_pool', 'baseline')
     need(mode in ('baseline', 'bounded-v1', 'bounded-v2'), 'lab_database_pool_mode_invalid')
     parameters = cfg.get('database_pool_parameters')
@@ -174,7 +176,7 @@ def validate_database_pool(cfg):
     for name, target in (('postgres.py', 'runtime/fishing_api/postgres.py'),
                          ('server.py', 'runtime/fishing_api/server.py'),
                          ('http_request_timing.py', 'runtime/archive_backend/http_request_timing.py')):
-        need(sources.get(target) == overlay['runtime_sha256'][name]
+        need(restored.get(target, sources.get(target)) == overlay['runtime_sha256'][name]
              and overlay['parent_runtime_sha256'][name] != overlay['runtime_sha256'][name],
              'database_pool_transport_hash_mismatch')
     return mode

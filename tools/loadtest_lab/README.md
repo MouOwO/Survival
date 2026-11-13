@@ -21,6 +21,10 @@
 
 默认同机PG预算改为2GiB/1CPU，functional-smoke保持256MiB/0.5CPU，避免旧8GiB/4CPU配方占满上海4核8GiB机器。可显式设置`--database-memory-mib`和`--database-cpu-limit`；capacity启动检查PG声明不超过主机60%内存/50%逻辑CPU。实际容器Memory/CPU、镜像digest须另行inspect核对，回执中的requested不是已生效证明。该拓扑明确为`same_host_database_diagnostic`，不能外推独立RDS性能；现有固定回环DB门禁仍不支持RDS，不能改地址常量绕过。
 
+40人集中退出修复实验增加两个显式开关，均只允许新建的`bounded-v2`隔离候选：`--checkpoint-observation`增加结算/代理分段观测；`--http-admission bounded-v1`使用已审阅的HTTP32、web48、DB4、等待28、排队2秒组合（其余参数必须显式匹配），两层backlog64、后台accept等待最多2秒。准备顺序固定为pool-v2→观测→接入；各层分别绑定已提交operator、所有父/子摘要，启动逆向核对重叠文件，拒绝错序、漏文件或混合来源。旧候选及默认baseline/v1/v2配置保持原有来源。
+
+观测记录只含固定类别、次数、状态、字节数和分段耗时，不含账号、会话、SQL及凭据；同进程backend与代理合计最多60条/分钟、300条/24小时、每条4096字节，为最终结算预留份额。采样分布不能代替Locust全量时延。准备和启动是一次O(源码字节数)验证；稳定请求只做固定map/计数/时钟操作，接入存储为O(并发槽+固定backlog)，无玩家集合扫描、无限队列或未知写重试。启动/停服回执分别记录实际接入参数、计数与诊断预算；更高阶梯须重新审查接入预算和完整清理，不能凭新增开关宣称容量通过。
+
 正式比较应填写`--postgres-image docker.io/library/postgres@sha256:<真实摘要>`或`public.ecr.aws/docker/library/postgres@sha256:<真实摘要>`，匹配拟上线PG版本及镜像。显式参数仅允许这两个官方仓库的固定摘要；省略时保留`postgres:17`兼容，运行前仍须记录实际镜像。不要为下载方便改用无法核验来源的镜像。
 
 ## 准备（项目 Windows 工作目录）

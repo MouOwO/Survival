@@ -169,9 +169,13 @@ def prepare(args):
         cfg['sources'][target] = sha(raw)
     if backend_db_pool in ('bounded-v1', 'bounded-v2'):
         apply_db_pool_overlay(root, cfg, revision)
+    cfg['csv_source_revision'] = revision
+    from .experiments import apply_experiments
+    apply_experiments(root, cfg, revision,
+        observation=getattr(args, 'checkpoint_observation', False),
+        admission=getattr(args, 'http_admission', 'baseline') == 'bounded-v1', repository=ROOT)
     runner = b"import sys\nfrom pathlib import Path\nsys.path[:0]=[str(Path(__file__).parent/'operator'),str(Path(__file__).parent/'runtime')]\nfrom loadtest_lab.cli import entry\nraise SystemExit(entry())\n"
     (root / 'run_lab.py').write_bytes(runner); cfg['sources']['run_lab.py'] = sha(runner)
-    cfg['csv_source_revision'] = revision
     write_new(root / 'lab.json', cfg)
     write_new(root / 'client.json', {'config': cfg, 'controller': private['controller'],
                                    'manifest_sha256': sha(canonical(cfg))})
@@ -206,6 +210,7 @@ def prepare(args):
         'manifest_sha256': sha(canonical(cfg)), 'sources': cfg['sources'],
         'backend_db_pool': backend_db_pool, 'backend_overlay': cfg.get('backend_overlay'),
         'database_pool_parameters': pool_parameters,
+        'runtime_experiments': cfg.get('runtime_experiments', []),
         'cloud_resources_created': 0, 'requests_sent': 0, 'production_rows_copied': 0})
     return {'status': 'LAB_PREPARED_NOT_STARTED', 'directory': str(root), 'run_id': run,
             'accounts': accounts, 'active': active, 'purpose': purpose,
@@ -291,6 +296,10 @@ def main(argv=None):
                       help='bounded-v2 only: bounded DB waiting queue, default 20; maximum 32')
     init.add_argument('--db-pool-wait-seconds', type=float,
                       help='bounded-v2 only: queue wait cap, default 2; maximum 5 and request remaining deadline')
+    init.add_argument('--checkpoint-observation', action='store_true',
+                      help='Opt-in exact-source checkpoint/proxy timing; isolated bounded-v2 labs only')
+    init.add_argument('--http-admission', choices=('baseline', 'bounded-v1'), default='baseline',
+                      help='Opt-in reviewed bounded burst admission; requires HTTP32/web48/DB4/waiters28/wait2')
     init.add_argument('--database-memory-mib', type=int,
                       help='Isolated local database memory cap; default 2048 MiB (smoke: 256)')
     init.add_argument('--database-cpu-limit', type=float,
