@@ -146,7 +146,7 @@ earth_rock.explosion_core_particle =
     "particles/survival/skills/earth_phoenix_impact_core.vpcf"
 earth_rock.cleanup_grace = 0.25
 local tornado_visual = {
-    particle = "particles/survival_tornado/survival_tornado_follow.vpcf",
+    particle = "particles/items_fx/cyclone.vpcf",
 }
 local TORNADO_THINK_INTERVAL = 0.05
 
