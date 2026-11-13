@@ -173,7 +173,8 @@ def prepare(args):
     from .experiments import apply_experiments
     apply_experiments(root, cfg, revision,
         observation=getattr(args, 'checkpoint_observation', False),
-        admission=getattr(args, 'http_admission', 'baseline') == 'bounded-v1', repository=ROOT)
+        admission=getattr(args, 'http_admission', 'baseline'),
+        pool_notify=getattr(args, 'targeted_pool_notify', False), repository=ROOT)
     runner = b"import sys\nfrom pathlib import Path\nsys.path[:0]=[str(Path(__file__).parent/'operator'),str(Path(__file__).parent/'runtime')]\nfrom loadtest_lab.cli import entry\nraise SystemExit(entry())\n"
     (root / 'run_lab.py').write_bytes(runner); cfg['sources']['run_lab.py'] = sha(runner)
     write_new(root / 'lab.json', cfg)
@@ -298,8 +299,10 @@ def main(argv=None):
                       help='bounded-v2 only: queue wait cap, default 2; maximum 5 and request remaining deadline')
     init.add_argument('--checkpoint-observation', action='store_true',
                       help='Opt-in exact-source checkpoint/proxy timing; isolated bounded-v2 labs only')
-    init.add_argument('--http-admission', choices=('baseline', 'bounded-v1'), default='baseline',
-                      help='Opt-in reviewed bounded burst admission; requires HTTP32/web48/DB4/waiters28/wait2')
+    init.add_argument('--http-admission', choices=('baseline', 'bounded-v1', 'bounded-v2'), default='baseline',
+                      help='Reviewed HTTP32/web48/DB4/wait2; v1 waiters28, v2 waiters32 includes idle handoff')
+    init.add_argument('--targeted-pool-notify', action='store_true',
+                      help='Opt-in exact-source FIFO head notification experiment; requires HTTP admission v2')
     init.add_argument('--database-memory-mib', type=int,
                       help='Isolated local database memory cap; default 2048 MiB (smoke: 256)')
     init.add_argument('--database-cpu-limit', type=float,

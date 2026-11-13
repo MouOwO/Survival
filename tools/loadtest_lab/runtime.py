@@ -151,8 +151,8 @@ def checked_database_pool_stats(client, cfg):
 
 def checked_http_admission_stats(server, layer, cfg):
     """Read fixed counters once at startup/shutdown, with effective limits."""
-    from .experiments import has_experiment
-    if not has_experiment(cfg, 'http-admission-v1'):
+    from .experiments import has_http_admission
+    if not has_http_admission(cfg):
         return None
     stats = server.admission_stats()
     need(type(stats) is dict and stats.get('layer') == layer
@@ -217,8 +217,8 @@ def serve(directory, *, lua_executable=None):
     service = IdentityService(root, cfg, private, lambda path, raw: forward(private, path, raw))
     stop = threading.Event()
     pending = threading.Condition(); pending.inflight = 0
-    from .experiments import has_experiment
-    admission_mode = has_experiment(cfg, 'http-admission-v1')
+    from .experiments import has_http_admission
+    admission_mode = has_http_admission(cfg)
     backend_admission = ({'request_backlog': 64, 'admission_wait_seconds': 2.0}
                          if admission_mode else {})
     backend = BoundedThreadingHTTPServer(('127.0.0.1', PORTS['backend']), base,

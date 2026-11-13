@@ -1,7 +1,7 @@
 """Exact-source, opt-in runtime experiments for isolated labs only.
 
 Preparation reads each reviewed operator source from the immutable Git binding
-once and compiles the resulting files. Startup validates at most two overlays
+once and compiles the resulting files. Startup validates at most three overlays
 and ten touched files: O(S) hashing belongs to the existing source guard, with
 O(1) binding work and no extra request-time source reads or database calls.
 """
@@ -30,7 +30,13 @@ SPECS = {
         frozenset(('fishing_api/server.py', 'player_web_auth/http_api.py',
                    'survival_http_admission.py'))),
 }
-ORDER = ('checkpoint-observation-v1', 'http-admission-v1')
+SPECS['http-admission-v2'] = SPECS['http-admission-v1']
+SPECS['pool-notify-v1'] = (
+    ('db_pool_notify_patch.py', 'bounded_pool_notify.py'),
+    frozenset(('fishing_api/_bounded_pool.py',)),
+    frozenset(('fishing_api/_bounded_pool.py',)))
+ADMISSION_IDS = ('http-admission-v1', 'http-admission-v2')
+ORDER = ('checkpoint-observation-v1', *ADMISSION_IDS, 'pool-notify-v1')
 ROW_KEYS = frozenset(('id', 'source_revision', 'operator_sources',
                       'parent_runtime_sha256', 'runtime_sha256'))
 
@@ -48,10 +54,18 @@ def has_experiment(cfg, name):
     return any(row['id'] == name for row in cfg.get('runtime_experiments', ()))
 
 
+def has_http_admission(cfg):
+    return any(row['id'] in ADMISSION_IDS for row in cfg.get('runtime_experiments', ()))
+
+
 def apply_experiments(root, cfg, revision, *, observation=False, admission=False,
-                      repository):
+                      pool_notify=False, repository):
     """Apply reviewed transformations in order, before the lab manifest exists."""
-    selected = ([ORDER[0]] if observation else []) + ([ORDER[1]] if admission else [])
+    admission = ('bounded-v1' if admission is True else 'baseline' if admission is False else admission)
+    _need(admission in ('baseline', 'bounded-v1', 'bounded-v2'), 'http_admission_mode_invalid')
+    selected = ([ORDER[0]] if observation else []) + (
+        [ADMISSION_IDS[0] if admission == 'bounded-v1' else ADMISSION_IDS[1]]
+        if admission != 'baseline' else []) + (['pool-notify-v1'] if pool_notify else [])
     if not selected:
         return
     _need(cfg.get('backend_db_pool') == 'bounded-v2', 'runtime_experiment_requires_bounded_v2')
@@ -109,7 +123,7 @@ def apply_experiments(root, cfg, revision, *, observation=False, admission=False
 def validate_experiments(cfg):
     """Return restored parent digests; final bytes remain guarded by load()."""
     rows = cfg.get('runtime_experiments', [])
-    _need(type(rows) is list and len(rows) <= len(ORDER), 'runtime_experiment_list_invalid')
+    _need(type(rows) is list and len(rows) <= 3, 'runtime_experiment_list_invalid')
     if not rows:
         return {}
     _need(cfg.get('backend_db_pool') == 'bounded-v2', 'runtime_experiment_requires_bounded_v2')
@@ -138,7 +152,10 @@ def validate_experiments(cfg):
                       for digest in mapping.values()), 'runtime_experiment_digest_invalid')
     _need(identities == [name for name in ORDER if name in identities],
           'runtime_experiment_order_or_duplicate_invalid')
-    # Walk a fixed two-step chain backwards: each child's parent must equal
+    _need(not all(name in identities for name in ADMISSION_IDS), 'http_admission_modes_are_exclusive')
+    _need('pool-notify-v1' not in identities or ADMISSION_IDS[1] in identities,
+          'targeted_pool_notify_requires_http_v2_queue32')
+    # Walk a fixed three-step chain backwards: each child's parent must equal
     # the immediately preceding output, even when both touch the same file.
     restored = {}
     for row in reversed(rows):
@@ -147,9 +164,13 @@ def validate_experiments(cfg):
                   'runtime_experiment_output_hash_mismatch')
         for target in row['runtime_sha256']:
             restored[target] = row['parent_runtime_sha256'].get(target)
-    if ORDER[1] in identities:
+    if any(name in identities for name in ADMISSION_IDS):
+        # A waiter remains counted until it gets the mutex after notify. Even
+        # with idle connections, all HTTP workers can briefly be queued. V2
+        # reserves one waiting place per HTTP worker; connection count stays 4.
+        waiting = 32 if ADMISSION_IDS[1] in identities else 28
         _need((cfg.get('http_concurrency'), cfg.get('web_concurrency'),
                cfg.get('db_concurrency'), cfg.get('database_pool_limits')) ==
-              (32, 48, 4, {'connections': 4, 'waiting': 28, 'wait_seconds': 2}),
+              (32, 48, 4, {'connections': 4, 'waiting': waiting, 'wait_seconds': 2}),
               'reviewed_http_admission_budgets_required')
     return restored

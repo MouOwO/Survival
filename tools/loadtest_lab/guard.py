@@ -169,9 +169,11 @@ def validate_database_pool(cfg):
     for name in patch_names:
         target = ('runtime/fishing_api/_bounded_pool.py' if name == 'bounded_pool.py'
                   else 'operator/db_pool_overlays/' + name)
-        need(sources.get(target) == overlay['overlay_sources']['server/fishing_api_overrides/' + name],
+        need(restored.get(target, sources.get(target)) ==
+             overlay['overlay_sources']['server/fishing_api_overrides/' + name],
              'database_pool_overlay_hash_mismatch')
-    need(sources.get('runtime/fishing_api/_bounded_pool.py') == overlay['helper_sha256'],
+    need(restored.get('runtime/fishing_api/_bounded_pool.py',
+                      sources.get('runtime/fishing_api/_bounded_pool.py')) == overlay['helper_sha256'],
          'database_pool_helper_hash_mismatch')
     for name, target in (('postgres.py', 'runtime/fishing_api/postgres.py'),
                          ('server.py', 'runtime/fishing_api/server.py'),
