@@ -92,6 +92,8 @@ locust -f tools/loadtest_lab/locustfile.py --headless --host http://127.0.0.1:29
 
 Locust 的周期 CSV 可能停在用户退出前；`locust_final_*_receipt.json` 在正常 quitting 时保存包含用户收尾的最终统计，分布式只由 master 写一份。请将它与 stopped 回执一起核对，不凭周期 CSV 的最后一行判断收尾成功。报告目录必须是已存在的树外目录；不设置时使用 client.json 所在目录。
 
+在线结算分别使用 `[checkpoint:setup]`、`[checkpoint:periodic]`、`[checkpoint:final]` 统计名，区分入局、正常在线和退出时延。这只影响本地统计，不改变请求路径、正文、幂等请求ID或服务端处理；不得将集中退出的结果冒称常规稳态表现。
+
 ## 容量判断与限制
 
 默认保留现有 HTTP=8、DB=4、PWA=24、全局2400次/分钟（40 RPS）限制。4000人每分钟结算已经需要约66.7 RPS，**现有限流本身就无法达到目标**。这套工具用于测出问题，不能把拒绝请求当作服务达标。调整 prepare 的 `--http-concurrency / --db-concurrency / --web-concurrency / --global-http-per-minute` 会明确标记为参数实验，不修改生产配置。

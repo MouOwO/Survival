@@ -105,8 +105,10 @@ class Player:
 
     def checkpoint(self, final=False, request=None):
         request = request or ('lt_checkpoint_' + secrets.token_hex(16))
+        phase = 'final' if final else ('setup' if self.next_checkpoint is None else 'periodic')
         value = self.business('/v1/online-time/checkpoint',
-            {'session_id': self.identity['match_session_id'], 'request_id': request, 'final': final})
+            {'session_id': self.identity['match_session_id'], 'request_id': request, 'final': final},
+            label='[checkpoint:' + phase + '] /v1/online-time/checkpoint')
         if isinstance(value.get('profile'), dict):
             self.last_profile = profile(value, self.identity['account_id'])
         self.next_checkpoint = self.clock() + 60
