@@ -841,14 +841,7 @@ function M.precache(context)
     end
     for _, particle in ipairs({
         "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_lizard_blobs_arced.vpcf",
-        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_impact.vpcf",
-        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_shockwave.vpcf",
-        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_impact_burst.vpcf",
-        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_ground_shockwave.vpcf",
-        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_impact_glow.vpcf",
-        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_torns.vpcf",
-        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_ground_sparks.vpcf",
-        "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_ground.vpcf",
+        "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion.vpcf",
         "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse.vpcf",
         "particles/status_fx/status_effect_wyvern_curse_target.vpcf",
     }) do

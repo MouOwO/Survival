@@ -27,6 +27,7 @@ local progression_runtime_cache = {}
 local progression_unit_generation = {}
 local progression_unit_identity = {}
 local progression_refresh_epoch = {}
+local attribute_reward_reasons = {}
 local attribute_progression_fields = {
     star_blessing_attributes_per_second = {
         player_id = "id", reason = "string", amount = "number",
@@ -43,6 +44,30 @@ local attribute_progression_fields = {
     },
 }
 
+local function index_attribute_rewards()
+    attribute_reward_reasons = {}
+    local profiles = require("config/generated/reward_profiles").by_id or {}
+    local candidates = {}
+    for _, effect in ipairs(require("config/generated/reward_effects").rows or {}) do
+        local id = effect.reward_profile_id
+        local profile = profiles[id]
+        if effect.enabled ~= false and profile and profile.enabled ~= false
+            and profile.reward_group == "practice_room" and profile.trigger_type == "on_each_kill"
+            and profile.repeatable == true then
+            local candidate = candidates[id]
+            if not candidate then candidate = { safe = true }; candidates[id] = candidate end
+            if effect.effect_type == "add_all_attributes" and effect.target == "player_hero" then
+                candidate.attributes = true
+            elseif effect.effect_type ~= "add_wood" and effect.effect_type ~= "add_gold" then
+                candidate.safe = false
+            end
+        end
+    end
+    for id, candidate in pairs(candidates) do
+        if candidate.safe and candidate.attributes then attribute_reward_reasons["monster_reward:" .. id] = true end
+    end
+end
+
 local function finite_number(value)
     return type(value) == "number" and value == value
         and value ~= math.huge and value ~= -math.huge
@@ -50,6 +75,9 @@ end
 
 local function attribute_only_progression(payload)
     local fields = type(payload) == "table" and attribute_progression_fields[payload.reason]
+    if not fields and type(payload) == "table" and attribute_reward_reasons[payload.reason] then
+        fields = attribute_progression_fields.attack_all_attribute_growth
+    end
     if not fields then return false end
     for key, value in pairs(payload) do
         local kind = fields[key]
@@ -950,6 +978,7 @@ local function on_builder_ready(payload)
 end
 
 function M.init()
+    index_attribute_rewards()
     for player in pairs(pending_fusion_refresh) do scheduler.cancel("ability_fusion_refresh_"..tostring(player)) end
     pending_fusion_refresh = {}
     local function city_changed(payload)

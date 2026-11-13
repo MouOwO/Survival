@@ -77,19 +77,7 @@ local FLAME_BURN_THINK_INTERVAL = 0.05
 local ARCANE_MAX_HULL_RADIUS = 256
 local ice_cone_visual = {
     flight = "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_lizard_blobs_arced.vpcf",
-    impact = "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_impact.vpcf",
-    -- Native impact owns the explosion sphere; the remaining burst, shockwaves
-    -- and ice debris belong to the cosmetic linger graph. Keep those finite
-    -- effects per missile while Winter's Curse supplies the shared ground.
-    landing_effects = {
-        { particle = "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_shockwave.vpcf" },
-        { particle = "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_impact_burst.vpcf" },
-        { particle = "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_ground_shockwave.vpcf" },
-        { particle = "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_impact_glow.vpcf" },
-        { particle = "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_torns.vpcf" },
-        { particle = "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_ground_sparks.vpcf", delay = 0.2 },
-    },
-    field = "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_ground.vpcf",
+    impact = "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion.vpcf",
     field_duration = 5,
     field_fade_duration = 1,
     impact_radius = 75,
@@ -3456,6 +3444,7 @@ function ice_cone_visual.prepare_hail(state, current_time, impact_count, impact_
                 position = position,
                 height = 1800 + ice_cone_visual.random(state) * 400,
                 wave = wave,
+                visible = (ball - 1) % 4 == 0,
                 launch_at = launch_at,
                 travel_duration = travel_time,
                 land_at = launch_at + travel_time,
@@ -3478,10 +3467,12 @@ function ice_cone_visual.spawn(state, missile, now)
         state.wave_landings[missile.wave] = missile.land_at
     end
     local ok, message = pcall(function()
-        missile.particle = ParticleManager:CreateParticle(
-            ice_cone_visual.flight, PATTACH_WORLDORIGIN, state.attacker
-        )
-        ice_cone_visual.configure_flight(missile, now)
+        if missile.visible then
+            missile.particle = ParticleManager:CreateParticle(
+                ice_cone_visual.flight, PATTACH_WORLDORIGIN, state.attacker
+            )
+            ice_cone_visual.configure_flight(missile, now)
+        end
     end)
     if not ok then
         ice_cone_visual.release_flight(missile)
@@ -3511,22 +3502,6 @@ end
 
 function ice_cone_visual.landing(attacker, position, radius)
     ice_cone_visual.landing_particle(ice_cone_visual.impact, attacker, position)
-    local generation = ice_cone_visual.active
-    for _, effect in ipairs(ice_cone_visual.landing_effects) do
-        local path = effect.particle
-        if (effect.delay or 0) > 0 then
-            -- The native crystal spray begins after the initial blast. A
-            -- completed cast/recast keeps it; resetting the game cancels it.
-            scheduler.after(effect.delay, function()
-                if ice_cone_visual.active == generation and valid(attacker) then
-                    ice_cone_visual.landing_particle(path, attacker, position)
-                end
-                return false
-            end)
-        else
-            ice_cone_visual.landing_particle(path, attacker, position)
-        end
-    end
 end
 
 function ice_cone_visual.update_hail(state, now)
@@ -3547,7 +3522,7 @@ function ice_cone_visual.update_hail(state, now)
             -- A real landing keeps the native shrinking shell, snow and
             -- ribbon endcaps. Cancellation still removes the graph immediately.
             ice_cone_visual.release_flight(missile, not landed_on_time)
-            if landed_on_time then
+            if landed_on_time and missile.visible then
                 ice_cone_visual.landing(state.attacker, missile.position, ice_cone_visual.impact_radius)
             end
         end

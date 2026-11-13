@@ -49,23 +49,30 @@ function modifier_practice_monster_ai:OnIntervalThink()
     local unit = self:GetParent()
     if not valid(unit) then return end
 
+    local position = unit:GetAbsOrigin()
     local hero
     if unit.survival_shared_challenge_boss then
-        hero = shared_boss.target_for(unit, unit:GetAbsOrigin(), self.leash_radius)
+        hero = shared_boss.target_for(unit, position, self.leash_radius)
     else
         hero = self.hero_entindex > 0 and EntIndexToHScript(self.hero_entindex) or nil
     end
-    local from_home = (unit:GetAbsOrigin() - self.home):Length2D()
-    local hero_distance = valid(hero)
-        and (hero:GetAbsOrigin() - unit:GetAbsOrigin()):Length2D() or 999999
+    local home_x, home_y = position.x - self.home.x, position.y - self.home.y
+    local from_home_sq = home_x * home_x + home_y * home_y
+    local hero_distance_sq = math.huge
+    if valid(hero) then
+        local hero_position = hero:GetAbsOrigin()
+        local x, y = hero_position.x - position.x, hero_position.y - position.y
+        hero_distance_sq = x * x + y * y
+    end
+    local leash_sq = self.leash_radius * self.leash_radius
 
-    if from_home > self.leash_radius or not valid(hero)
-        or hero_distance > self.leash_radius then
+    if from_home_sq > leash_sq or not valid(hero)
+        or hero_distance_sq > leash_sq then
         if self.has_target then
             unit:SetForceAttackTarget(nil)
             self.has_target = false
         end
-        if from_home > 64 then
+        if from_home_sq > 4096 then
             if not self.returning_home then
                 unit:MoveToPosition(self.home)
                 self.returning_home = true
@@ -76,7 +83,7 @@ function modifier_practice_monster_ai:OnIntervalThink()
         return
     end
 
-    if hero_distance <= self.aggro_radius then
+    if hero_distance_sq <= self.aggro_radius * self.aggro_radius then
         self.returning_home = false
         if not self.has_target or self.target_entindex ~= hero:entindex() then
             unit:SetForceAttackTarget(hero)
@@ -90,7 +97,7 @@ function modifier_practice_monster_ai:OnIntervalThink()
             unit:MoveToPosition(self.home)
             self.returning_home = true
         end
-    elseif from_home <= 64 then
+    elseif from_home_sq <= 4096 then
         self.returning_home = false
     end
 end
