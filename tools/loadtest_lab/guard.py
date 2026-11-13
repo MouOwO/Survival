@@ -79,6 +79,17 @@ def load(directory):
     if cfg['purpose'] == 'functional-smoke':
         need(cfg['active'] <= 5 and cfg['accounts'] <= 10 and cfg['duration_seconds'] <= 180,
              'functional_smoke_budget_exceeded')
+    need(cfg.get('wire_mode', 'business-wire-v1') in ('business-wire-v1', 'legacy-json'),
+         'lab_wire_mode_invalid')
+    catalog_md5 = cfg.get('lottery_catalog_md5')
+    need(catalog_md5 is None or type(catalog_md5) is str and re.fullmatch('[a-f0-9]{32}', catalog_md5),
+         'lab_catalog_seed_invalid')
+    memory = cfg.get('database_memory_mib', 256 if cfg['purpose'] == 'functional-smoke' else 8192)
+    cpu = cfg.get('database_cpu_limit', .5 if cfg['purpose'] == 'functional-smoke' else 4)
+    need(type(memory) is int and 256 <= memory <= 32768, 'lab_database_memory_budget_invalid')
+    need(type(cpu) in (int, float) and .25 <= cpu <= 16, 'lab_database_cpu_budget_invalid')
+    if cfg['purpose'] == 'functional-smoke':
+        need(memory <= 512 and cpu <= 1, 'functional_smoke_database_budget_exceeded')
     for key in ('controller', 'backend', 'auth_secret', 'pepper', 'database_admin', 'database_app', 'marker'):
         need(bool(re.fullmatch('[a-f0-9]{64}', private.get(key, ''))), 'independent_lab_secret_required')
     need(len(set(private.values())) == 7, 'lab_secrets_must_be_independent')
@@ -136,6 +147,21 @@ def production_host_guard(cfg):
         with socket.socket() as sock:
             sock.settimeout(.2)
             need(sock.connect_ex(('127.0.0.1', port)) != 0, 'production_service_on_capacity_host')
+    # Startup only: keep capacity for the application on a small shared host.
+    # Preserve old declared budgets, refusing an oversized old local-DB lab
+    # instead of silently changing the meaning of an immutable experiment.
+    if os.name == 'posix' and Path('/proc/meminfo').is_file():
+        memory_kib = None
+        for line in Path('/proc/meminfo').read_text().splitlines():
+            if line.startswith('MemTotal:'):
+                memory_kib = int(line.split()[1])
+                break
+        requested_memory = cfg.get('database_memory_mib', 8192)
+        requested_cpu = cfg.get('database_cpu_limit', 4)
+        need(memory_kib is not None and requested_memory * 1024 <= memory_kib * .6,
+             'local_database_leaves_insufficient_host_memory')
+        need(requested_cpu <= (os.cpu_count() or 1) * .5,
+             'local_database_leaves_insufficient_host_cpu')
 
 
 def attest(cfg, private, nonce):
@@ -163,4 +189,6 @@ def load_client(path):
          and type(cfg.get('active')) is int and 1 <= cfg['active'] <= MAX_ACTIVE
          and type(cfg.get('accounts')) is int and cfg['active'] <= cfg['accounts'] <= MAX_ACCOUNTS,
          'invalid_lab_client_namespace')
+    need(cfg.get('wire_mode', 'business-wire-v1') in ('business-wire-v1', 'legacy-json'),
+         'lab_wire_mode_invalid')
     return cfg, controller

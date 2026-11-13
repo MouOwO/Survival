@@ -156,6 +156,10 @@ def serve(directory, *, lua_executable=None):
             'http_concurrency': cfg['http_concurrency'], 'database_concurrency': cfg['db_concurrency'],
             'web_concurrency': cfg['web_concurrency'], 'global_http_per_minute': cfg['global_http_per_minute'],
             'registered_accounts': cfg['accounts'], 'max_active': cfg['active'], 'ports': PORTS,
+            'wire_mode': cfg.get('wire_mode', 'business-wire-v1'),
+            'requested_local_database_limits': {
+                'memory_mib': cfg.get('database_memory_mib', 256 if cfg['purpose'] == 'functional-smoke' else 8192),
+                'cpus': cfg.get('database_cpu_limit', .5 if cfg['purpose'] == 'functional-smoke' else 4)},
             'lua_executable': lua, 'lua_sha256': lua_sha256, 'lua_version': lua_version,
             'actual_catalog_preflight_passed': True,
             'steam_calls_enabled': False, 'payment_calls_enabled': False, 'public_listener': False})

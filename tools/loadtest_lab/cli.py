@@ -26,6 +26,10 @@ def prepare(args):
     active = args.active if args.active is not None else (2 if purpose == 'functional-smoke' else 4000)
     accounts = args.accounts if args.accounts is not None else (2 if purpose == 'functional-smoke' else 100000)
     duration = args.duration if args.duration is not None else (120 if purpose == 'functional-smoke' else 7200)
+    memory_option = getattr(args, 'database_memory_mib', None)
+    cpu_option = getattr(args, 'database_cpu_limit', None)
+    database_memory_mib = memory_option if memory_option is not None else (256 if purpose == 'functional-smoke' else 2048)
+    database_cpu_limit = cpu_option if cpu_option is not None else (.5 if purpose == 'functional-smoke' else 1)
     run = secrets.token_hex(16)
     cfg = {'schema': 1, 'kind': 'SURVIVAL_ISOLATED_LOADTEST', 'run_id': run,
            'purpose': purpose, 'database': 'survival_loadtest_' + run, 'ports': PORTS,
@@ -33,6 +37,10 @@ def prepare(args):
            'duration_seconds': duration, 'http_concurrency': args.http_concurrency,
            'db_concurrency': args.db_concurrency, 'web_concurrency': args.web_concurrency,
            'global_http_per_minute': args.global_http_per_minute, 'sources': {},
+           'wire_mode': getattr(args, 'wire_mode', 'business-wire-v1'),
+           'topology': 'same_host_database_diagnostic',
+           'database_memory_mib': database_memory_mib, 'database_cpu_limit': database_cpu_limit,
+           'lottery_catalog_md5': getattr(args, 'lottery_catalog_md5', None),
            'source_snapshot_sha256': sha(receipt_path.read_bytes()),
            'profile': ('baseline_limits' if (args.http_concurrency, args.db_concurrency,
                        args.web_concurrency, args.global_http_per_minute) == (8, 4, 24, 2400)
@@ -110,8 +118,8 @@ def prepare(args):
     # Linux host networking keeps PostgreSQL's own observed address/port equal
     # to the explicitly guarded loopback endpoint. No public DB listener.
     compose = ('services:\n  database:\n    image: postgres:17\n    container_name: survival-loadtest-' + run[:12]
-        + '\n    network_mode: host\n    restart: "no"\n    mem_limit: ' + ('256m' if purpose == 'functional-smoke' else '8g')
-        + '\n    cpus: ' + ('0.5' if purpose == 'functional-smoke' else '4')
+        + '\n    network_mode: host\n    restart: "no"\n    mem_limit: ' + str(database_memory_mib) + 'm'
+        + '\n    cpus: ' + str(database_cpu_limit)
         + '\n    environment:\n      PGPORT: "25432"\n      POSTGRES_DB: ' + cfg['database']
         + '\n      POSTGRES_PASSWORD: ' + private['database_admin']
         + '\n    command: ["postgres", "-p", "25432", "-c", "listen_addresses=127.0.0.1"]'
@@ -186,12 +194,21 @@ def main(argv=None):
     init.add_argument('--db-concurrency', type=int, default=4)
     init.add_argument('--web-concurrency', type=int, default=24)
     init.add_argument('--global-http-per-minute', type=int, default=2400)
+    init.add_argument('--wire-mode', choices=('business-wire-v1', 'legacy-json'), default='business-wire-v1')
+    init.add_argument('--database-memory-mib', type=int,
+                      help='Isolated local database memory cap; default 2048 MiB (smoke: 256)')
+    init.add_argument('--database-cpu-limit', type=float,
+                      help='Isolated local database CPU cap; default 1 CPU (smoke: 0.5)')
+    init.add_argument('--lottery-catalog-md5', help='Verified public client-local catalog seed MD5; otherwise startup is cold')
     data = subs.add_parser('seed'); data.add_argument('--directory', required=True)
     serve = subs.add_parser('serve'); serve.add_argument('--directory', required=True)
     serve.add_argument('--lua-executable', help='Explicit Lua executable; otherwise detect lua5.1/lua')
     test = subs.add_parser('smoke'); test.add_argument('--directory', required=True)
     test.add_argument('--stop-lab', action='store_true')
     stop = subs.add_parser('stop'); stop.add_argument('--client', required=True)
+    mon = subs.add_parser('monitor'); mon.add_argument('--directory', required=True)
+    mon.add_argument('--duration', type=int)
+    mon.add_argument('--interval', type=int, default=5)
     args = p.parse_args(argv)
     if args.action == 'snapshot':
         from .snapshot import snapshot
@@ -206,6 +223,10 @@ def main(argv=None):
     elif args.action == 'stop':
         from .smoke import stop_lab
         result = stop_lab(args.client)
+    elif args.action == 'monitor':
+        from .monitor import monitor
+        result = monitor(args.directory, duration_seconds=args.duration, interval_seconds=args.interval)
+        result['ok'] = result['status'] == 'MONITOR_COMPLETE'
     else:
         from .runtime import serve
         return serve(args.directory, lua_executable=args.lua_executable)
