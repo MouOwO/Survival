@@ -226,6 +226,8 @@ def load(directory):
         path = root.joinpath(*relative(name).parts)
         need(path.resolve().is_relative_to(root) and not path.is_symlink() and path.is_file()
              and sha(path.read_bytes()) == digest, 'lab_source_changed:' + name)
+    from .database_experiments import validate_schema_experiment
+    validate_schema_experiment(cfg, lambda name: (root / name).read_bytes())
     return root, cfg, private
 
 
