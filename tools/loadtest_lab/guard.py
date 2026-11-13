@@ -77,6 +77,54 @@ def register_storage(receipt):
     return json.loads(result.stdout)
 
 
+def validate_database_pool(cfg):
+    """Fixed reviewed experiment budgets and source bindings, once per load."""
+    mode = cfg.get('backend_db_pool', 'baseline')
+    need(mode in ('baseline', 'bounded-v1'), 'lab_database_pool_mode_invalid')
+    if mode == 'baseline':
+        need(cfg.get('database_pool_limits') is None and cfg.get('backend_overlay') is None,
+             'baseline_database_pool_overlay_forbidden')
+        return mode
+    need(cfg.get('db_concurrency') == 4 and cfg.get('database_pool_limits') ==
+         {'connections': 4, 'waiting': 4, 'wait_seconds': 2},
+         'reviewed_database_pool_limits_changed')
+    overlay = cfg.get('backend_overlay')
+    need(type(overlay) is dict and set(overlay) == {
+        'id', 'source_revision', 'overlay_sources', 'parent_runtime_sha256',
+        'runtime_sha256', 'helper_sha256'}, 'reviewed_database_pool_binding_required')
+    need(overlay['id'] == 'bounded-v1' and overlay['source_revision'] == cfg.get('csv_source_revision')
+         and type(overlay['source_revision']) is str
+         and re.fullmatch('[a-f0-9]{40}', overlay['source_revision']),
+         'database_pool_operator_revision_mismatch')
+    patch_names = ('db_pool_patch.py', 'db_pool_http_patch.py', 'bounded_pool.py')
+    expected = {'server/fishing_api_overrides/' + name for name in patch_names}
+    need(type(overlay['overlay_sources']) is dict and set(overlay['overlay_sources']) == expected,
+         'database_pool_overlay_sources_invalid')
+    digests = list(overlay['overlay_sources'].values()) + [overlay['helper_sha256']]
+    for key in ('parent_runtime_sha256', 'runtime_sha256'):
+        need(type(overlay[key]) is dict and set(overlay[key]) ==
+             {'postgres.py', 'server.py', 'http_request_timing.py'},
+             'database_pool_transport_binding_invalid')
+        digests.extend(overlay[key].values())
+    need(all(type(value) is str and re.fullmatch('[a-f0-9]{64}', value) for value in digests),
+         'database_pool_binding_digest_invalid')
+    sources = cfg.get('sources', {})
+    for name in patch_names:
+        target = ('runtime/fishing_api/_bounded_pool.py' if name == 'bounded_pool.py'
+                  else 'operator/db_pool_overlays/' + name)
+        need(sources.get(target) == overlay['overlay_sources']['server/fishing_api_overrides/' + name],
+             'database_pool_overlay_hash_mismatch')
+    need(sources.get('runtime/fishing_api/_bounded_pool.py') == overlay['helper_sha256'],
+         'database_pool_helper_hash_mismatch')
+    for name, target in (('postgres.py', 'runtime/fishing_api/postgres.py'),
+                         ('server.py', 'runtime/fishing_api/server.py'),
+                         ('http_request_timing.py', 'runtime/archive_backend/http_request_timing.py')):
+        need(sources.get(target) == overlay['runtime_sha256'][name]
+             and overlay['parent_runtime_sha256'][name] != overlay['runtime_sha256'][name],
+             'database_pool_transport_hash_mismatch')
+    return mode
+
+
 def load(directory):
     root = Path(directory).resolve()
     need(not Path(directory).is_symlink(), 'lab_symlink_refused')
@@ -112,6 +160,7 @@ def load(directory):
     for key, limit in (('http_concurrency', 32), ('db_concurrency', 16), ('web_concurrency', 128),
                        ('global_http_per_minute', 1000000)):
         need(type(cfg.get(key)) is int and 1 <= cfg[key] <= limit, 'lab_concurrency_budget_invalid')
+    validate_database_pool(cfg)
     sources = cfg.get('sources')
     need(isinstance(sources, dict) and 1 <= len(sources) <= 300, 'pinned_lab_sources_required')
     for name, digest in sources.items():

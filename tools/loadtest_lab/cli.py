@@ -5,12 +5,61 @@ import json
 from pathlib import Path
 import secrets
 import subprocess
+import time
 
 from .guard import (PORTS, ACCOUNT_START, canonical, sha, need, relative, read_json,
                     write_new, load, dsn, marker_guard, DEFAULT_POSTGRES_IMAGE, validate_postgres_image)
 
 ROOT = Path(__file__).resolve().parents[2]
 CSVS = ('star_blessing_reward_definitions', 'fishing_system_rules', 'player_gameplay_stats')
+POOL_OVERLAYS = ('db_pool_patch.py', 'db_pool_http_patch.py', 'bounded_pool.py')
+
+
+def apply_db_pool_overlay(root, cfg, revision):
+    """Apply only the committed, exact-parent reviewed transport overlay once.
+
+    Preparation is O(source bytes), with three Git reads and three guarded patch
+    calls. No overlay lookup, Git access or source scan runs per request.
+    """
+    import runpy
+    targets = {'postgres.py': 'runtime/fishing_api/postgres.py',
+               'server.py': 'runtime/fishing_api/server.py',
+               'http_request_timing.py': 'runtime/archive_backend/http_request_timing.py'}
+    parent = {name: cfg['sources'][target] for name, target in targets.items()}
+    overlay_sources = {}
+    for name in POOL_OVERLAYS:
+        source = 'server/fishing_api_overrides/' + name
+        raw = subprocess.run(['git', '-C', str(ROOT), 'show', revision + ':' + source],
+                             capture_output=True, check=True).stdout
+        need(raw.replace(b'\r\n', b'\n') == (ROOT / source).read_bytes().replace(b'\r\n', b'\n'),
+             'database_pool_overlay_must_match_committed_source')
+        target = ('runtime/fishing_api/_bounded_pool.py' if name == 'bounded_pool.py'
+                  else 'operator/db_pool_overlays/' + name)
+        path = root / target
+        need(not path.exists(), 'database_pool_overlay_target_already_exists')
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(raw)
+        cfg['sources'][target] = sha(raw)
+        overlay_sources[source] = sha(raw)
+    outputs = {}
+    for filename, patch_name, function_name in (
+            ('postgres.py', 'db_pool_patch.py', 'patch_postgres'),
+            ('server.py', 'db_pool_http_patch.py', 'patch_server'),
+            ('http_request_timing.py', 'db_pool_http_patch.py', 'patch_timing')):
+        target = targets[filename]
+        path = root / target
+        namespace = runpy.run_path(str(root / 'operator/db_pool_overlays' / patch_name),
+                                  run_name='loadtest_reviewed_pool_overlay')
+        patched = namespace[function_name](path.read_text(encoding='utf-8-sig'))
+        need(type(patched) is str, 'database_pool_overlay_output_invalid')
+        compile(patched, target, 'exec')
+        raw = patched.encode('utf8')
+        path.write_bytes(raw)
+        cfg['sources'][target] = outputs[filename] = sha(raw)
+    cfg['backend_overlay'] = {'id': 'bounded-v1', 'source_revision': revision,
+        'overlay_sources': overlay_sources, 'parent_runtime_sha256': parent,
+        'runtime_sha256': outputs,
+        'helper_sha256': cfg['sources']['runtime/fishing_api/_bounded_pool.py']}
 
 
 def prepare(args):
@@ -33,6 +82,10 @@ def prepare(args):
     database_cpu_limit = cpu_option if cpu_option is not None else (.5 if purpose == 'functional-smoke' else 1)
     image_option = getattr(args, 'postgres_image', None)
     postgres_image = DEFAULT_POSTGRES_IMAGE if image_option is None else validate_postgres_image(image_option)
+    backend_db_pool = getattr(args, 'backend_db_pool', 'baseline')
+    need(backend_db_pool in ('baseline', 'bounded-v1'), 'lab_database_pool_mode_invalid')
+    need(backend_db_pool != 'bounded-v1' or args.db_concurrency == 4,
+         'reviewed_database_pool_requires_four_connections')
     run = secrets.token_hex(16)
     cfg = {'schema': 1, 'kind': 'SURVIVAL_ISOLATED_LOADTEST', 'run_id': run,
            'purpose': purpose, 'database': 'survival_loadtest_' + run, 'ports': PORTS,
@@ -41,6 +94,7 @@ def prepare(args):
            'db_concurrency': args.db_concurrency, 'web_concurrency': args.web_concurrency,
            'global_http_per_minute': args.global_http_per_minute, 'sources': {},
            'wire_mode': getattr(args, 'wire_mode', 'business-wire-v1'),
+           'backend_db_pool': backend_db_pool,
            'topology': 'same_host_database_diagnostic',
            'database_memory_mib': database_memory_mib, 'database_cpu_limit': database_cpu_limit,
            'postgres_image': postgres_image,
@@ -49,6 +103,8 @@ def prepare(args):
            'profile': ('baseline_limits' if (args.http_concurrency, args.db_concurrency,
                        args.web_concurrency, args.global_http_per_minute) == (8, 4, 24, 2400)
                        else 'parameter_experiment_not_production')}
+    if backend_db_pool == 'bounded-v1':
+        cfg['database_pool_limits'] = {'connections': 4, 'waiting': 4, 'wait_seconds': 2}
     private = {key: secrets.token_hex(32) for key in
                ('controller', 'backend', 'auth_secret', 'pepper', 'database_admin', 'database_app', 'marker')}
     root.mkdir(parents=True, mode=0o700)
@@ -97,6 +153,8 @@ def prepare(args):
         target = 'operator/loadtest_lab/' + Path(name).name
         path = root / target; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(raw)
         cfg['sources'][target] = sha(raw)
+    if backend_db_pool == 'bounded-v1':
+        apply_db_pool_overlay(root, cfg, revision)
     runner = b"import sys\nfrom pathlib import Path\nsys.path[:0]=[str(Path(__file__).parent/'operator'),str(Path(__file__).parent/'runtime')]\nfrom loadtest_lab.cli import entry\nraise SystemExit(entry())\n"
     (root / 'run_lab.py').write_bytes(runner); cfg['sources']['run_lab.py'] = sha(runner)
     cfg['csv_source_revision'] = revision
@@ -132,6 +190,7 @@ def prepare(args):
     write_new(root / 'prepare_receipt.json', {'kind': 'ISOLATED_LOADTEST_PREPARATION_RECEIPT',
         'artifact_root': str(root), 'source_root': str(original), 'run_id': run,
         'manifest_sha256': sha(canonical(cfg)), 'sources': cfg['sources'],
+        'backend_db_pool': backend_db_pool, 'backend_overlay': cfg.get('backend_overlay'),
         'cloud_resources_created': 0, 'requests_sent': 0, 'production_rows_copied': 0})
     return {'status': 'LAB_PREPARED_NOT_STARTED', 'directory': str(root), 'run_id': run,
             'accounts': accounts, 'active': active, 'purpose': purpose,
@@ -143,12 +202,13 @@ def connect_admin(cfg, private):
     return psycopg.connect(dsn(cfg, private, admin=True), connect_timeout=3)
 
 
-def seed(directory):
+def seed(directory, *, analyze_after_seed=False):
     """O(N) initial COPY in chunks of 1000; O(chunk) memory, no real accounts.
 
     Registration and archive fixtures only. Active account defaults are still
     initialized by the real application on authenticate/login.
     """
+    need(type(analyze_after_seed) is bool, 'lab_seed_analyze_flag_invalid')
     root, cfg, private = load(directory)
     from .guard import account, database_account, production_host_guard
     production_host_guard(cfg)
@@ -176,11 +236,21 @@ def seed(directory):
             conn.commit()
         count = conn.execute('SELECT count(*) FROM public.survival_players').fetchone()[0]
         need(count == cfg['accounts'], 'lab_contains_unexpected_accounts')
+        analyze = {'requested': analyze_after_seed, 'completed': False, 'elapsed_ms': None}
+        if analyze_after_seed:
+            started = time.monotonic()
+            # The marker and endpoint guard above prove this is only the new
+            # synthetic database. One explicit bulk-load statistics pass, not
+            # a timer or a request hot-path sweep. Both A/B arms must opt in.
+            conn.execute('ANALYZE')
+            conn.commit()
+            analyze.update(completed=True, elapsed_ms=round((time.monotonic() - started) * 1000, 3))
         conn.execute('UPDATE loadtest_lab.marker SET seeded=true WHERE singleton'); conn.commit()
     receipt = root / ('seed_' + secrets.token_hex(8) + '_receipt.json')
     write_new(receipt, {'kind': 'SYNTHETIC_LOADTEST_DATASET_RECEIPT', 'artifact_root': str(root),
         'run_id': cfg['run_id'], 'registered_accounts': count, 'active_ticket_fixtures': cfg['active'],
-        'real_accounts_modified': 0, 'chunk_rows': 1000, 'synthetic_monthly_card_fixtures': cfg['active']})
+        'real_accounts_modified': 0, 'chunk_rows': 1000, 'synthetic_monthly_card_fixtures': cfg['active'],
+        'statistics_after_bulk_load': analyze})
     return {'status': 'SYNTHETIC_DATASET_READY', 'registered_accounts': count, 'receipt': str(receipt)}
 
 
@@ -199,6 +269,8 @@ def main(argv=None):
     init.add_argument('--web-concurrency', type=int, default=24)
     init.add_argument('--global-http-per-minute', type=int, default=2400)
     init.add_argument('--wire-mode', choices=('business-wire-v1', 'legacy-json'), default='business-wire-v1')
+    init.add_argument('--backend-db-pool', choices=('baseline', 'bounded-v1'), default='baseline',
+                      help='Explicit reviewed DB pool overlay experiment; baseline keeps production transport bytes')
     init.add_argument('--database-memory-mib', type=int,
                       help='Isolated local database memory cap; default 2048 MiB (smoke: 256)')
     init.add_argument('--database-cpu-limit', type=float,
@@ -207,6 +279,8 @@ def main(argv=None):
                       help='Official PostgreSQL image pinned by sha256 digest; omitted: postgres:17')
     init.add_argument('--lottery-catalog-md5', help='Verified public client-local catalog seed MD5; otherwise startup is cold')
     data = subs.add_parser('seed'); data.add_argument('--directory', required=True)
+    data.add_argument('--analyze-after-seed', action='store_true',
+                      help='Run one guarded ANALYZE after synthetic bulk load; use for both A/B arms')
     serve = subs.add_parser('serve'); serve.add_argument('--directory', required=True)
     serve.add_argument('--lua-executable', help='Explicit Lua executable; otherwise detect lua5.1/lua')
     test = subs.add_parser('smoke'); test.add_argument('--directory', required=True)
@@ -222,7 +296,7 @@ def main(argv=None):
     elif args.action == 'prepare':
         result = prepare(args)
     elif args.action == 'seed':
-        result = seed(args.directory)
+        result = seed(args.directory, analyze_after_seed=args.analyze_after_seed)
     elif args.action == 'smoke':
         from .smoke import smoke
         result = smoke(args.directory, stop=args.stop_lab)

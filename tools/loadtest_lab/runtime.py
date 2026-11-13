@@ -109,6 +109,27 @@ def resolve_lua(executable=None):
     return str(path), sha(path.read_bytes()), result.stdout.decode('ascii')
 
 
+def drain_server_workers(server, semaphore_name, capacity, deadline):
+    """Prove every accepted worker released its slot after shutdown.
+
+    O(capacity) only once at shutdown (HTTP <=32, frontend <=128); no scan of
+    players or threads. Holding all slots also covers a thread not yet started.
+    Both known servers use daemon worker threads; server_close must not join
+    them without the same bounded deadline.
+    """
+    semaphore = getattr(server, semaphore_name)
+    acquired = 0
+    try:
+        for _ in range(capacity):
+            if not semaphore.acquire(timeout=max(0, deadline - time.monotonic())):
+                break
+            acquired += 1
+        return {'drained': acquired == capacity, 'worker_slots_not_drained': capacity - acquired}
+    finally:
+        for _ in range(acquired):
+            semaphore.release()
+
+
 def serve(directory, *, lua_executable=None):
     root, cfg, private = load(directory)
     production_host_guard(cfg)
@@ -146,10 +167,14 @@ def serve(directory, *, lua_executable=None):
     pending = threading.Condition(); pending.inflight = 0
     backend = BoundedThreadingHTTPServer(('127.0.0.1', PORTS['backend']), base,
                                         max_concurrency=cfg['http_concurrency'])
+    # The lab performs its own finite drain below. Never let ThreadingMixIn
+    # add an unbounded join after an incomplete request or socket timeout.
+    backend.block_on_close = False
     web = None
     running = []
     try:
         web = BoundedServer(('127.0.0.1', PORTS['web']), frontend_handler(service, cfg, private, stop, pending))
+        web.block_on_close = False
         web.slots = threading.BoundedSemaphore(cfg['web_concurrency'])
         write_new(root / 'started_receipt.json', {'kind': 'ISOLATED_REAL_API_LAB_STARTED',
             'artifact_root': str(root), 'run_id': cfg['run_id'], 'purpose': cfg['purpose'],
@@ -157,6 +182,10 @@ def serve(directory, *, lua_executable=None):
             'web_concurrency': cfg['web_concurrency'], 'global_http_per_minute': cfg['global_http_per_minute'],
             'registered_accounts': cfg['accounts'], 'max_active': cfg['active'], 'ports': PORTS,
             'wire_mode': cfg.get('wire_mode', 'business-wire-v1'),
+            'backend_db_pool': cfg.get('backend_db_pool', 'baseline'),
+            'database_pool_limits': cfg.get('database_pool_limits'),
+            'database_pool_started': (app.rpc_client.pool_stats()
+                                      if cfg.get('backend_db_pool') == 'bounded-v1' else None),
             'requested_postgres_image': cfg.get('postgres_image', 'postgres:17'),
             'topology': cfg.get('topology', 'same_host_database_diagnostic'),
             'requested_local_database_limits': {
@@ -175,21 +204,47 @@ def serve(directory, *, lua_executable=None):
     except KeyboardInterrupt:
         stop.set()
     finally:
-        if backend in running:
-            backend.shutdown()
-        backend.server_close()
+        deadline = time.monotonic() + 45
+        # Stop accepting new frontend requests while already accepted work can
+        # still forward to a live backend. Then prove both handler sets ended.
+        web_drain = {'drained': True, 'worker_slots_not_drained': 0}
         if web is not None:
             if web in running:
                 web.shutdown()
+            web_drain = drain_server_workers(web, 'slots', cfg['web_concurrency'], deadline)
             web.server_close()
-        deadline = time.monotonic() + 45
+        if backend in running:
+            backend.shutdown()
+        backend_drain = drain_server_workers(backend, '_workers', cfg['http_concurrency'], deadline)
+        backend.server_close()
         with pending:
             while pending.inflight and time.monotonic() < deadline:
                 pending.wait(min(1, max(0, deadline - time.monotonic())))
+        drained = web_drain['drained'] and backend_drain['drained'] and pending.inflight == 0
+        pool_mode = cfg.get('backend_db_pool', 'baseline') == 'bounded-v1'
+        pool_closed = None
+        pool_close_error = None
+        if pool_mode and drained:
+            try:
+                app.rpc_client.close()
+            except Exception:
+                pool_closed = False
+                pool_close_error = 'database_pool_close_not_completed'
+        pool_stats = app.rpc_client.pool_stats() if pool_mode else None
+        if pool_mode and drained and pool_closed is not False:
+            pool_closed = pool_stats.get('closed') is True and pool_stats.get('total') == 0
+            if not pool_closed:
+                pool_close_error = 'database_pool_close_not_completed'
         write_new(root / 'stopped_receipt.json', {'kind': 'ISOLATED_LOADTEST_LAB_STOPPED',
             'artifact_root': str(root), 'run_id': cfg['run_id'], 'requests_accepted': service.request_count,
             'remaining_http_requests': pending.inflight, 'active_synthetic_leases': service.active,
             'synthetic_activity': service.counts(),
+            'frontend_drain': web_drain, 'backend_drain': backend_drain,
+            'backend_db_pool': cfg.get('backend_db_pool', 'baseline'),
+            'database_pool_close_deferred': pool_mode and not drained,
+            'database_pool_closed': pool_closed, 'database_pool_close_error': pool_close_error,
+            'database_pool_stopped': pool_stats,
             'account_state_modified_only_in_lab': True, 'capacity_certified': False})
-        service.close()
-    return 0 if pending.inflight == 0 else 2
+        if web_drain['drained']:
+            service.close()
+    return 0 if drained and pool_closed is not False else 2
