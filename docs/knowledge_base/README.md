@@ -1,6 +1,6 @@
 # 孤城逐晓／Survival 统一知识库
 
-**2026-11-14 容量自主优化进行中，正式后台未部署。** client-v2补齐真实grant后续读档与intent workflow；同请求初始化证明18项、来源13项/8组合及reset扩展16项/10组合通过，SQLite原生4项/绑定6项通过。PG四臂35×4权限场景和8表/session核对完成，原raw安全hash失败保持NOT_CONFIRMED，另附ACL顺序语义审计；平衡1920次微基准未证明合并guard有总体收益。下一候选为reset＋scope＋frontend；G40 final P95仍11秒失败，未进100或证明4000/4小时，无采购/正式部署/游廊更新。见[阶段事实、来源、边界与下一步](evidence/capacity_autonomous_20261114.md)。
+**2026-11-14 容量候选B原生边界已过，真实40人复测仍待。** client-v2补grant后续读档/intent workflow，scope18项、SQLite4项/绑定6项与最新来源20项/12组合通过。旧四臂raw失败/ACL语义审计保留，合并guard未证收益；新reset-filtered B通过35×2权限/故障/GUC/deadline、raw元数据/8表/session核对。960次微基准P95为79.40→61.02ms，但B最大386.29ms保留，不当容量；下一步B＋scope＋frontend同版2账号/40人。G40 final仍11秒失败，未进100或证明4000/4小时，无采购/正式部署/游廊更新。见[阶段事实、来源、边界与下一步](evidence/capacity_autonomous_20261114.md)。
 
 **2026-11-13 已省去未使用的档案预读，40人仍零错，集中结算目标尚未过。** 初始化、两轮drain、最终profile/grants与VIP/榜单处理保留；12组真实函数流程、65项来源兼容及两账号39HTTP/3重放通过。G40同资源实测2249HTTP零错、40完整清理、零残留；profile/周期/final P95为630/940/11000ms，final最长10738ms，不能把分桶P95改写成10秒。原严格和预算优先标准独立保留，未进100；上海测试全停，本轮未部署后台/操作游廊或采购，14项并行改动保留。见[最小变化、风险边界、真实结果及待办](evidence/profile_pre_read_20261113.md)。
 

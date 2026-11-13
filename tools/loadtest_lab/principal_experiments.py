@@ -1,7 +1,7 @@
-"""Two fixed, opt-in post-G experiments for isolated labs only.
+"""Two fixed, opt-in post-G experiment factors for isolated labs only.
 
 Metadata restores a constant-size parent view without I/O. Startup reads at most
-six fixed files, proves each child by replay and returns original parent bytes
+seven fixed files, proves each child by replay and returns original parent bytes
 for the earlier business validator. Preparation does bounded local Git reads;
 there is no database execution, request-time source I/O or authorization cache.
 """
@@ -48,8 +48,16 @@ SPECS['transport-reset-v1'] = {
     'operators': dict(SPECS['transport-principal-v1']['operators']),
     'parents': {PG: G_SOURCES[PG]},
     'outputs': {PG: 'fde92f0b97b31769d6e42e0f76fc81db6a30db68c4f5536ab4c89bb8008fa7a8'}}
-ORDER = ('transport-principal-v1', 'transport-reset-v1', 'ensure-scope-v1')
-TRANSPORT_MODES = {'principal-v1': ORDER[0], 'reset-v1': ORDER[1]}
+FILTERED_OPERATOR = PREFIX + 'filtered_role_guard_patch.py'
+SPECS['transport-reset-filtered-v1'] = {
+    'operators': {**SPECS['transport-reset-v1']['operators'], FILTERED_OPERATOR:
+                  'a0308de046139287bfb253ff3807426178ac18c985a07224cf3b01d46f40fdc4'},
+    'parents': {PG: G_SOURCES[PG]},
+    'outputs': {PG: '894df9749b0dbe72f64d2c893587efb5248bfa7f2d0dbc534dbf015a624aafad'}}
+ORDER = ('transport-principal-v1', 'transport-reset-v1',
+         'transport-reset-filtered-v1', 'ensure-scope-v1')
+TRANSPORT_MODES = {'principal-v1': ORDER[0], 'reset-v1': ORDER[1],
+                   'reset-filtered-v1': ORDER[2]}
 TRANSPORT_IDS = frozenset(TRANSPORT_MODES.values())
 ROW_KEYS = frozenset(('id', 'source_revision', 'operator_sources',
                       'parent_runtime_sha256', 'runtime_sha256'))
@@ -142,6 +150,22 @@ def _namespace(raw, identity):
     return namespace
 
 
+
+def _transport_output(identity, operators, parent):
+    namespace = _namespace(operators[next(iter(SPECS[identity]['operators']))], identity)
+    arm = 'principal-v1' if identity == 'transport-principal-v1' else 'reset-v1'
+    result = namespace['patch_postgres'](parent.decode('utf8'), arm)
+    if identity == 'transport-reset-filtered-v1':
+        raw = operators[FILTERED_OPERATOR]
+        _need(type(raw) is bytes and len(raw) <= 65536
+              and _sha(raw) == SPECS[identity]['operators'][FILTERED_OPERATOR],
+              'principal_experiment_filtered_operator_changed')
+        filtered = {'__name__': 'isolated_reviewed_filtered_role_experiment'}
+        exec(compile(raw, FILTERED_OPERATOR, 'exec'), filtered)
+        result = filtered['patch_postgres'](result)
+    return result.encode('utf8')
+
+
 def _full_proof(identity, operators, outputs):
     spec = SPECS[identity]
     _need(set(operators) == set(spec['operators']) and set(outputs) == set(spec['outputs']),
@@ -150,14 +174,13 @@ def _full_proof(identity, operators, outputs):
         expected = spec['operators'].get(name, spec['outputs'].get(name))
         _need(type(raw) is bytes and len(raw) <= (65536 if name in operators else SOURCE_BUDGET)
               and _sha(raw) == expected, 'principal_experiment_source_changed')
-    namespace = _namespace(operators[next(iter(spec['operators']))], identity)
     if identity in TRANSPORT_IDS:
         raw = operators[PREFIX + 'principal_transport_parent.py']
         restored = {PG: raw}
-        arm = 'reset-v1' if identity == 'transport-reset-v1' else 'principal-v1'
-        _need(namespace['patch_postgres'](raw.decode('utf8'), arm).encode('utf8') == outputs[PG],
+        _need(_transport_output(identity, operators, raw) == outputs[PG],
               'principal_experiment_transport_replay_failed')
     else:
+        namespace = _namespace(operators[next(iter(spec['operators']))], identity)
         texts = {name.removeprefix('runtime/'): raw.decode('utf8') for name, raw in outputs.items()}
         original = namespace['restore_sources'](texts)
         _need(type(original) is dict and set(original) == set(texts)
@@ -174,7 +197,7 @@ def _full_proof(identity, operators, outputs):
 
 
 def validate_principal_experiments(cfg, read_source):
-    """Full startup proof after generic path/hash checks; at most six reads."""
+    """Full startup proof after generic path/hash checks; at most seven reads."""
     rows, unused = _metadata(cfg)
     if not rows:
         return {}
@@ -230,11 +253,10 @@ def apply_principal_experiments(root, cfg, revision, *, transport='baseline',
             _need(cfg['sources'].get(name) == expected and _sha(raw) == expected,
                   'principal_experiment_parent_changed')
             parents[name] = raw
-        namespace = _namespace(operators[next(iter(spec['operators']))], identity)
         if identity in TRANSPORT_IDS:
-            arm = 'reset-v1' if identity == 'transport-reset-v1' else 'principal-v1'
-            outputs = {PG: namespace['patch_postgres'](parents[PG].decode('utf8'), arm).encode('utf8')}
+            outputs = {PG: _transport_output(identity, operators, parents[PG])}
         else:
+            namespace = _namespace(operators[next(iter(spec['operators']))], identity)
             patched = namespace['patch_sources']({name.removeprefix('runtime/'): raw.decode('utf8')
                                                   for name, raw in parents.items()})
             _need(type(patched) is dict and set(patched) == {name.removeprefix('runtime/') for name in parents}

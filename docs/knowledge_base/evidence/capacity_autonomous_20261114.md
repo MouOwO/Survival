@@ -55,15 +55,32 @@ v5真实执行35种权限/DDL场景×4臂，并完成会话污染、故障、dea
 | guard-v1 | 4 | 74.19 | 48.00 | 76.82 |
 | principal-v1 | 3 | 87.62 | 39.43 | 68.87 |
 
-合并guard没有确定总体收益，execute减少不等于性能通过。当前选择较小的**reset-v1＋ensure-scope＋frontend**进入下一轮真实2账号烟测和40人macro；这是待测recipe，不是已经上线或证明更快。含原生故障验证的四臂也不能证明成熟账号、HTTP/SQLite/Lua、4000人或4小时。
+合并guard没有确定总体收益，execute减少不等于性能通过。该阶段先选择较小的reset-v1＋ensure-scope＋frontend，再继续独立审阅下面的候选B。含原生故障验证的四臂也不能证明成熟账号、HTTP/SQLite/Lua、4000人或4小时。
+
+## 后续候选B：完整过滤guard的原生边界通过，macro仍待
+
+新`reset-filtered-v1`仍保留两条独立权限检查，只在角色SQL中将相同用户namespace条件及relation/function候选先MATERIALIZED，再求原owner、表/列、sequence、PUBLIC/继承及函数权限谓词。表类型r/p/v/m/f、序列S与所有用户函数保持，非白名单扫描不缩成21项；第二FUNCTION_CHECK、Python函数和中间deadline未变，没有跨RPC授权缓存。仍需扫描目录并物化候选，不能称O(用户对象)或O(玩家)查询，也不能保证未来固定提速。
+
+新的真实两臂回执为`FILTERED_ROLE_NATIVE_TWO_ARM_PASSED`：35种权限场景×2臂、selected会话污染/GUC、真实写入及commit/reset/close故障和deadline均完成，raw元数据前后一致、8表数据一致、session0。这是独立新回执，不覆盖前述v5的raw hash失败或语义审计。
+
+PG仍2CPU/2048MiB、4连接/Q32/2秒；平衡微基准每臂480次、合计960次SELECT1：
+
+| 臂 | RPS | 中位ms | P95ms | Max ms |
+| --- | --- | --- | --- | --- |
+| 原baseline传输 | 81.99 | 43.24 | 79.40 | 254.72 |
+| reset＋filtered候选B | 94.44 | 35.98 | 61.02 | 386.29 |
+
+候选有一轮明显慢样本，386.29ms完整保留；该比较同时包含reset与SQL过滤，不能全归因过滤，更不是HTTP、成熟数据或容量通过。当前下一真实macro改选**reset-filtered-v1＋ensure-scope＋frontend**，先同版2账号烟测，再40人；尚未取得新40人结果，不升100。
+
+源证明仍从原15efa…父源码，经原7d1518…operator生成reset fde92…，再以新a0308de0…operator只换角色SQL得到894df974…。三种transport互斥、principal行数仍最多2；filtered＋scope启动固定最多7读，无新module/driver绑定名。树外20项/12组合验证通过后，在原生边界通过的明确指令下仅把principal模块、CLI及filtered operator落main；正式后台未部署。
 
 ## 来源门禁、集成与下一步
 
-`principal_experiments`最多2行：至多一种transport（principal/reset互斥），再ensure-scope；共享operator/父源码按所选recipe绑定，不能把未选transport共享文件误认成孤立来源。默认不写新字段、零新增source读取；未知、丢失/伪造证明、混修订、回绑或源漂移拒绝。
+`principal_experiments`最多2行：至多一种transport（principal/reset/reset-filtered互斥），再ensure-scope；共享operator/父源码按所选recipe绑定，不能把未选transport共享文件误认成孤立来源。默认不写新字段、零新增source读取；未知、丢失/伪造证明、混修订、回绑或源漂移拒绝。
 
 启动先核实际完整sources，再principal replay返回原G父字节给旧business validator。metadata在副本中按frontend a62父视图→principal G父视图→business父视图→旧runtime最多3层恢复；旧observation层确实覆盖PWA service，不能跳过frontend父视图。client只验证metadata，不读服务源码。client-workload绑定仍保留。
 
-初版13项/8组合来源与客户端检查通过；新增reset独立recipe后的16项/10组合检查也通过，包括reset-only、reset＋scope＋frontend实际`guard.load`/client门禁、transport互斥与max2。Git传输为显式内存夹具；实际不可变Git导出、同版2账号及40人复测由后续真实回执证明，不以此代替。新文件仍需按双仓规则同步，提交编号由实际Git回执补记。
+初版13项/8组合来源与客户端检查通过；新增reset后的16项/10组合、再加filtered后的20项/12组合均通过，包括实际`guard.load`/client门禁、transport互斥/max2、shared operator缺失/孤立、实字节漂移和7读上界。Git传输为显式内存夹具；实际不可变Git导出、同版2账号及40人复测由后续真实回执证明，不以此代替。新文件仍需按双仓规则同步，提交编号由实际Git回执补记。
 
 后续先完成新recipe烟测和40人workflow/清理/RPS验证，再按事前门槛决定100→200→500等阶段；成熟合成档案、正常房间结束/独立同步storm、4小时稳定窗口和公网7Mbps发生器链路均须真实观测。不得用长排队、错峰、延长timeout或遗漏grant读取掩盖失败。未达标就保留失败并定位，不凭SELECT1推断购买更强服务器即可解决。
 
@@ -77,3 +94,4 @@ v5真实执行35种权限/DDL场景×4臂，并完成会话污染、故障、dea
 - [初版13项/8组合](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/tests/principal_binding_02/verification_receipt.json)、[reset版16项/10组合](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/tests/principal_binding_03/verification_receipt.json)、[当前六文件来源冻结](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/integration_source_freeze_02/candidate_generation_receipt.json)。
 - [DB-only生成与守卫](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/principal_native_db_only_01/candidate_generation_receipt.json)、[原v5真实NOT_CONFIRMED](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/principal_native_v5_verification_receipt.json)（SHA256 `9c66cb12d5480d0a8a26579c5fb102743536928026ee3e805d398213df1aeb70`）。
 - [ACL顺序语义审计](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/principal_native_semantic_audit_receipt_01.json)、[独立重算审计](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/principal_native_semantic_restore_independent_audit_receipt.json)、[平衡1920次结果](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/principal_balanced_phase_result_01_receipt.json)（原始外层文件SHA256 `b0ba1f827b7901820d0e66ba18427bb1f7087b9d22672eea95922087fa22552b`）。
+- [候选B真实35×2与960次微基准](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/filtered_role_native_result_01_receipt.json)（原始外层文件SHA256 `5e731488806a69f8d3fb41b55e6b54f256d12bb7c2d38a53163a428c9664c8a3`）、[B来源20项/12组合](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/tests/principal_filtered_binding_01/verification_receipt.json)、[树外B集成冻结](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/integration_source_filtered_candidate/candidate_generation_receipt.json)。

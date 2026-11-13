@@ -331,8 +331,8 @@ def main(argv=None):
                       help='Opt-in exact-source set validation of gameplay defaults; isolated bounded-v2 only')
     init.add_argument('--profile-load', choices=('baseline', 'init-only-v1'), default='baseline',
                       help='Opt-in removal of discarded profile pre-read; reviewed observed bounded-v2 sources only')
-    init.add_argument('--principal-transport', choices=('baseline', 'principal-v1', 'reset-v1'), default='baseline',
-                      help='Opt-in verified reset baseline, optionally complete merged guard; exact isolated G sources only')
+    init.add_argument('--principal-transport', choices=('baseline', 'principal-v1', 'reset-v1', 'reset-filtered-v1'), default='baseline',
+                      help='Opt-in verified reset baseline with reviewed role filtering or merged guard; exact isolated G sources only')
     init.add_argument('--ensure-scope', action='store_true',
                       help='Opt-in same-checkpoint initialization proof; exact isolated G sources only')
     init.add_argument('--frontend-rate', choices=('baseline', 'hot-rate-v1'), default='baseline',
