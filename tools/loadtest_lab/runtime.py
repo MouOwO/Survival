@@ -157,6 +157,8 @@ def serve(directory, *, lua_executable=None):
             'web_concurrency': cfg['web_concurrency'], 'global_http_per_minute': cfg['global_http_per_minute'],
             'registered_accounts': cfg['accounts'], 'max_active': cfg['active'], 'ports': PORTS,
             'wire_mode': cfg.get('wire_mode', 'business-wire-v1'),
+            'requested_postgres_image': cfg.get('postgres_image', 'postgres:17'),
+            'topology': cfg.get('topology', 'same_host_database_diagnostic'),
             'requested_local_database_limits': {
                 'memory_mib': cfg.get('database_memory_mib', 256 if cfg['purpose'] == 'functional-smoke' else 8192),
                 'cpus': cfg.get('database_cpu_limit', .5 if cfg['purpose'] == 'functional-smoke' else 4)},

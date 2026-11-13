@@ -13,11 +13,26 @@ PORTS = {'database': 25432, 'backend': 29565, 'web': 29567}
 ACCOUNT_START = 4000000000
 MAX_ACCOUNTS = 100000
 MAX_ACTIVE = 4000
+DEFAULT_POSTGRES_IMAGE = 'postgres:17'
+POSTGRES_IMAGE = re.compile(
+    r'(?:docker\.io/library/postgres|public\.ecr\.aws/docker/library/postgres)@sha256:[a-f0-9]{64}\Z')
 
 
 def need(value, code):
     if not value:
         raise ValueError(code)
+
+
+def validate_postgres_image(value, *, allow_default=False):
+    """Only known official repositories and immutable lowercase SHA256 digests.
+
+    The historical default is accepted only when reading a manifest or using
+    the omitted CLI option. Explicit CLI values must always pin a digest.
+    """
+    if allow_default and value == DEFAULT_POSTGRES_IMAGE:
+        return value
+    need(type(value) is str and POSTGRES_IMAGE.fullmatch(value), 'lab_postgres_image_invalid')
+    return value
 
 
 def canonical(value):
@@ -81,6 +96,7 @@ def load(directory):
              'functional_smoke_budget_exceeded')
     need(cfg.get('wire_mode', 'business-wire-v1') in ('business-wire-v1', 'legacy-json'),
          'lab_wire_mode_invalid')
+    validate_postgres_image(cfg.get('postgres_image', DEFAULT_POSTGRES_IMAGE), allow_default=True)
     catalog_md5 = cfg.get('lottery_catalog_md5')
     need(catalog_md5 is None or type(catalog_md5) is str and re.fullmatch('[a-f0-9]{32}', catalog_md5),
          'lab_catalog_seed_invalid')
@@ -191,4 +207,5 @@ def load_client(path):
          'invalid_lab_client_namespace')
     need(cfg.get('wire_mode', 'business-wire-v1') in ('business-wire-v1', 'legacy-json'),
          'lab_wire_mode_invalid')
+    validate_postgres_image(cfg.get('postgres_image', DEFAULT_POSTGRES_IMAGE), allow_default=True)
     return cfg, controller

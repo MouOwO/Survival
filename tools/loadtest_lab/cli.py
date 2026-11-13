@@ -6,7 +6,8 @@ from pathlib import Path
 import secrets
 import subprocess
 
-from .guard import PORTS, ACCOUNT_START, canonical, sha, need, relative, read_json, write_new, load, dsn, marker_guard
+from .guard import (PORTS, ACCOUNT_START, canonical, sha, need, relative, read_json,
+                    write_new, load, dsn, marker_guard, DEFAULT_POSTGRES_IMAGE, validate_postgres_image)
 
 ROOT = Path(__file__).resolve().parents[2]
 CSVS = ('star_blessing_reward_definitions', 'fishing_system_rules', 'player_gameplay_stats')
@@ -30,6 +31,8 @@ def prepare(args):
     cpu_option = getattr(args, 'database_cpu_limit', None)
     database_memory_mib = memory_option if memory_option is not None else (256 if purpose == 'functional-smoke' else 2048)
     database_cpu_limit = cpu_option if cpu_option is not None else (.5 if purpose == 'functional-smoke' else 1)
+    image_option = getattr(args, 'postgres_image', None)
+    postgres_image = DEFAULT_POSTGRES_IMAGE if image_option is None else validate_postgres_image(image_option)
     run = secrets.token_hex(16)
     cfg = {'schema': 1, 'kind': 'SURVIVAL_ISOLATED_LOADTEST', 'run_id': run,
            'purpose': purpose, 'database': 'survival_loadtest_' + run, 'ports': PORTS,
@@ -40,6 +43,7 @@ def prepare(args):
            'wire_mode': getattr(args, 'wire_mode', 'business-wire-v1'),
            'topology': 'same_host_database_diagnostic',
            'database_memory_mib': database_memory_mib, 'database_cpu_limit': database_cpu_limit,
+           'postgres_image': postgres_image,
            'lottery_catalog_md5': getattr(args, 'lottery_catalog_md5', None),
            'source_snapshot_sha256': sha(receipt_path.read_bytes()),
            'profile': ('baseline_limits' if (args.http_concurrency, args.db_concurrency,
@@ -117,7 +121,7 @@ def prepare(args):
     (root / 'database/90_marker.sql').write_text(marker, encoding='utf8'); (root / 'database/90_marker.sql').chmod(0o644)
     # Linux host networking keeps PostgreSQL's own observed address/port equal
     # to the explicitly guarded loopback endpoint. No public DB listener.
-    compose = ('services:\n  database:\n    image: postgres:17\n    container_name: survival-loadtest-' + run[:12]
+    compose = ('services:\n  database:\n    image: ' + postgres_image + '\n    container_name: survival-loadtest-' + run[:12]
         + '\n    network_mode: host\n    restart: "no"\n    mem_limit: ' + str(database_memory_mib) + 'm'
         + '\n    cpus: ' + str(database_cpu_limit)
         + '\n    environment:\n      PGPORT: "25432"\n      POSTGRES_DB: ' + cfg['database']
@@ -199,6 +203,8 @@ def main(argv=None):
                       help='Isolated local database memory cap; default 2048 MiB (smoke: 256)')
     init.add_argument('--database-cpu-limit', type=float,
                       help='Isolated local database CPU cap; default 1 CPU (smoke: 0.5)')
+    init.add_argument('--postgres-image',
+                      help='Official PostgreSQL image pinned by sha256 digest; omitted: postgres:17')
     init.add_argument('--lottery-catalog-md5', help='Verified public client-local catalog seed MD5; otherwise startup is cold')
     data = subs.add_parser('seed'); data.add_argument('--directory', required=True)
     serve = subs.add_parser('serve'); serve.add_argument('--directory', required=True)

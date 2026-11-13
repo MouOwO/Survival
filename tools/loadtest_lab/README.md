@@ -21,6 +21,8 @@
 
 默认同机PG预算改为2GiB/1CPU，functional-smoke保持256MiB/0.5CPU，避免旧8GiB/4CPU配方占满上海4核8GiB机器。可显式设置`--database-memory-mib`和`--database-cpu-limit`；capacity启动检查PG声明不超过主机60%内存/50%逻辑CPU。实际容器Memory/CPU、镜像digest须另行inspect核对，回执中的requested不是已生效证明。该拓扑明确为`same_host_database_diagnostic`，不能外推独立RDS性能；现有固定回环DB门禁仍不支持RDS，不能改地址常量绕过。
 
+正式比较应填写`--postgres-image docker.io/library/postgres@sha256:<真实摘要>`或`public.ecr.aws/docker/library/postgres@sha256:<真实摘要>`，匹配拟上线PG版本及镜像。显式参数仅允许这两个官方仓库的固定摘要；省略时保留`postgres:17`兼容，运行前仍须记录实际镜像。不要为下载方便改用无法核验来源的镜像。
+
 ## 准备（项目 Windows 工作目录）
 
 运行工具必须先提交，`prepare` 只导出不可变 Git HEAD 的操作者及 PWA/CSV，与工作区工具不一致会拒绝。源码快照只导出当前后端代码、公开配置及数据库结构，不复制表数据或生产环境变量。
