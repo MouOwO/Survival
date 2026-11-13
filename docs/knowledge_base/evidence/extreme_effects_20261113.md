@@ -1,6 +1,6 @@
 # 2026-11-13 满配英雄、练功房与寒冰锥性能
 
-当前状态：仅本地更新，最终签包、原游廊上传及官方完整下载验证待完成。后台未修改。正式父版仍为2026111301，manifest `2302734921456589826`。
+当前状态：已同步原游廊3824360109，版本2026111302，Steam manifest `2100041677948351067`；后台未修改。7061个签名资源、187个保护模块、5个包文件官方完整下载一致，运行待发0、dirty runtime 0。普通在线实机验收仍为 `PENDING_USER_ONLINE_TEST`，不与隔离Tools性能验收混同。
 
 ## 范围与实际夹具
 
@@ -57,9 +57,10 @@
 
 最终测试源来自独立复制快照，原准备摘要`c6d2e4e…`及四文件覆盖回执保留。生成登记：原快照`3274d8e1…`、最终覆盖`08c5db39…`；没有删除失败证据、旧发行包或玩家文件。
 
-## 交付待办
+## 实际交付与剩余验收
 
-- 最终四文件剑圣收尾和最高塔终波已完成；挂载清理及发布检查继续。
-- 双仓stash→pull→pop、源回归、精确文件提交/推送；原14项其他改动逐Git对象核对保留。
-- 正式构建、实际生产Lua回归及签名资源绑定、原条目3824360109 SDK成功和官方下载全量核对。
-- 更新版本、manifest、双仓HEAD和待发清单；普通游廊在线验收与隔离Tools结果分别记录。
+- 四个运行源的最终原生验收摘要见 `native_runtime_binding.json`，剑圣/斧王完整矩阵均匹配本轮源码；测试进程已正常退出，两个实验挂载已移除，物理快照和失败证据保留，见 `lab_mount_retirement_receipt.json`。
+- 源码定向回归、生产保护配置逐字段一致性及真实签名候选Lua三组回归全部通过。生产包装有两份继承依赖仅换行格式不同，首次严格字节绑定未通过；随后直接以签名候选作为工作目录和模块输入重跑，没有修改发行包或放宽语义检查。见 `production_lua_regression.json`、`signed_candidate_lua_regression.json`、`signed_candidate_regression_binding.json`；九项输入逐SHA256绑定已签名manifest。
+- 构建任务 `pack_2026111302_2f448589`，签名manifest SHA256 `a811dd7260ca58b08650d804c35560c488a440d6bc78c758c0bd47ab3d782257`。运行来源game `8907d5a766b79c9a89d767d8e9439add06d378b2`、content `426846ae527d23237fd41598c7d41098c3a4ffc7`。SDK成功后进行了官方完整下载，manifest `2100041677948351067`，并经发行检查点确认所有待发来源清零；没有重复上传。
+- 官方验证路径：`D:\SteamLibrary\steamapps\common\dota 2 beta\game\dota_addons\survival\output\packager\pack_2026111302_2f448589\download_evidence\20261113T024240Z_108b049de21f4fd798891138d86b4a64\verification.json`；SHA256 `5a038157cb1810c11ec616e052beff17a9fa62d7ef6ac62b99a34463edf4ea75`。收口审计 `final_audit.json`，文档同步后再次只读审计 `final_audit_after_documentation.json`；后者记录最终双仓HEAD。两仓分别执行stash→pull→pop→commit→push，content无额外文档改动不造空提交。game原14项未提交内容逐Git对象核验保留，content工作区干净，后台和玩家数据未修改。
+- 本轮测试控制器、夹具、功能检查和原始PresentMon/VProf证据统一保留树外。后续仍需用户普通游廊新局验收，尤其剑圣/斧王极限30波、近镜头连续特效及长局重复练功；13技能超上限压力仍存在28–32FPS及CPU长帧，不能标记为已消除抽帧。
