@@ -8,7 +8,8 @@ import subprocess
 import time
 
 from .guard import (PORTS, ACCOUNT_START, canonical, sha, need, relative, read_json,
-                    write_new, load, dsn, marker_guard, DEFAULT_POSTGRES_IMAGE, validate_postgres_image)
+                    write_new, load, dsn, marker_guard, DEFAULT_POSTGRES_IMAGE, validate_postgres_image,
+                    resolve_database_pool)
 
 ROOT = Path(__file__).resolve().parents[2]
 CSVS = ('star_blessing_reward_definitions', 'fishing_system_rules', 'player_gameplay_stats')
@@ -18,16 +19,18 @@ POOL_OVERLAYS = ('db_pool_patch.py', 'db_pool_http_patch.py', 'bounded_pool.py')
 def apply_db_pool_overlay(root, cfg, revision):
     """Apply only the committed, exact-parent reviewed transport overlay once.
 
-    Preparation is O(source bytes), with three Git reads and three guarded patch
-    calls. No overlay lookup, Git access or source scan runs per request.
+    Preparation is O(source bytes), with a fixed three/four operator Git reads
+    and guarded patches. No Git access or source scan runs per request.
     """
     import runpy
     targets = {'postgres.py': 'runtime/fishing_api/postgres.py',
                'server.py': 'runtime/fishing_api/server.py',
                'http_request_timing.py': 'runtime/archive_backend/http_request_timing.py'}
     parent = {name: cfg['sources'][target] for name, target in targets.items()}
+    mode = cfg['backend_db_pool']
+    names = POOL_OVERLAYS + (('db_pool_patch_v2.py',) if mode == 'bounded-v2' else ())
     overlay_sources = {}
-    for name in POOL_OVERLAYS:
+    for name in names:
         source = 'server/fishing_api_overrides/' + name
         raw = subprocess.run(['git', '-C', str(ROOT), 'show', revision + ':' + source],
                              capture_output=True, check=True).stdout
@@ -42,21 +45,28 @@ def apply_db_pool_overlay(root, cfg, revision):
         cfg['sources'][target] = sha(raw)
         overlay_sources[source] = sha(raw)
     outputs = {}
+    namespaces = {}
+    def patch_namespace(name):
+        if name not in namespaces:
+            namespaces[name] = runpy.run_path(str(root / 'operator/db_pool_overlays' / name),
+                                            run_name='loadtest_reviewed_pool_overlay')
+        return namespaces[name]
     for filename, patch_name, function_name in (
-            ('postgres.py', 'db_pool_patch.py', 'patch_postgres'),
+            ('postgres.py', 'db_pool_patch_v2.py' if mode == 'bounded-v2' else 'db_pool_patch.py', 'patch_postgres'),
             ('server.py', 'db_pool_http_patch.py', 'patch_server'),
             ('http_request_timing.py', 'db_pool_http_patch.py', 'patch_timing')):
         target = targets[filename]
         path = root / target
-        namespace = runpy.run_path(str(root / 'operator/db_pool_overlays' / patch_name),
-                                  run_name='loadtest_reviewed_pool_overlay')
+        namespace = patch_namespace(patch_name)
         patched = namespace[function_name](path.read_text(encoding='utf-8-sig'))
+        if mode == 'bounded-v2' and filename == 'server.py':
+            patched = patch_namespace('db_pool_patch_v2.py')['patch_server'](patched)
         need(type(patched) is str, 'database_pool_overlay_output_invalid')
         compile(patched, target, 'exec')
         raw = patched.encode('utf8')
         path.write_bytes(raw)
         cfg['sources'][target] = outputs[filename] = sha(raw)
-    cfg['backend_overlay'] = {'id': 'bounded-v1', 'source_revision': revision,
+    cfg['backend_overlay'] = {'id': mode, 'source_revision': revision,
         'overlay_sources': overlay_sources, 'parent_runtime_sha256': parent,
         'runtime_sha256': outputs,
         'helper_sha256': cfg['sources']['runtime/fishing_api/_bounded_pool.py']}
@@ -83,28 +93,32 @@ def prepare(args):
     image_option = getattr(args, 'postgres_image', None)
     postgres_image = DEFAULT_POSTGRES_IMAGE if image_option is None else validate_postgres_image(image_option)
     backend_db_pool = getattr(args, 'backend_db_pool', 'baseline')
-    need(backend_db_pool in ('baseline', 'bounded-v1'), 'lab_database_pool_mode_invalid')
-    need(backend_db_pool != 'bounded-v1' or args.db_concurrency == 4,
-         'reviewed_database_pool_requires_four_connections')
+    pool_parameters, pool_limits = resolve_database_pool(backend_db_pool,
+        http_concurrency=getattr(args, 'http_concurrency', None),
+        db_concurrency=args.db_concurrency, web_concurrency=args.web_concurrency,
+        pool_max_waiters=getattr(args, 'db_pool_max_waiters', None),
+        pool_wait_seconds=getattr(args, 'db_pool_wait_seconds', None))
+    http_concurrency = pool_parameters['effective']['http_concurrency']
     run = secrets.token_hex(16)
     cfg = {'schema': 1, 'kind': 'SURVIVAL_ISOLATED_LOADTEST', 'run_id': run,
            'purpose': purpose, 'database': 'survival_loadtest_' + run, 'ports': PORTS,
            'account_start': ACCOUNT_START, 'accounts': accounts, 'active': active,
-           'duration_seconds': duration, 'http_concurrency': args.http_concurrency,
+           'duration_seconds': duration, 'http_concurrency': http_concurrency,
            'db_concurrency': args.db_concurrency, 'web_concurrency': args.web_concurrency,
            'global_http_per_minute': args.global_http_per_minute, 'sources': {},
            'wire_mode': getattr(args, 'wire_mode', 'business-wire-v1'),
            'backend_db_pool': backend_db_pool,
+           'database_pool_parameters': pool_parameters,
            'topology': 'same_host_database_diagnostic',
            'database_memory_mib': database_memory_mib, 'database_cpu_limit': database_cpu_limit,
            'postgres_image': postgres_image,
            'lottery_catalog_md5': getattr(args, 'lottery_catalog_md5', None),
            'source_snapshot_sha256': sha(receipt_path.read_bytes()),
-           'profile': ('baseline_limits' if (args.http_concurrency, args.db_concurrency,
+           'profile': ('baseline_limits' if (http_concurrency, args.db_concurrency,
                        args.web_concurrency, args.global_http_per_minute) == (8, 4, 24, 2400)
                        else 'parameter_experiment_not_production')}
-    if backend_db_pool == 'bounded-v1':
-        cfg['database_pool_limits'] = {'connections': 4, 'waiting': 4, 'wait_seconds': 2}
+    if pool_limits is not None:
+        cfg['database_pool_limits'] = pool_limits
     private = {key: secrets.token_hex(32) for key in
                ('controller', 'backend', 'auth_secret', 'pepper', 'database_admin', 'database_app', 'marker')}
     root.mkdir(parents=True, mode=0o700)
@@ -153,7 +167,7 @@ def prepare(args):
         target = 'operator/loadtest_lab/' + Path(name).name
         path = root / target; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(raw)
         cfg['sources'][target] = sha(raw)
-    if backend_db_pool == 'bounded-v1':
+    if backend_db_pool in ('bounded-v1', 'bounded-v2'):
         apply_db_pool_overlay(root, cfg, revision)
     runner = b"import sys\nfrom pathlib import Path\nsys.path[:0]=[str(Path(__file__).parent/'operator'),str(Path(__file__).parent/'runtime')]\nfrom loadtest_lab.cli import entry\nraise SystemExit(entry())\n"
     (root / 'run_lab.py').write_bytes(runner); cfg['sources']['run_lab.py'] = sha(runner)
@@ -191,6 +205,7 @@ def prepare(args):
         'artifact_root': str(root), 'source_root': str(original), 'run_id': run,
         'manifest_sha256': sha(canonical(cfg)), 'sources': cfg['sources'],
         'backend_db_pool': backend_db_pool, 'backend_overlay': cfg.get('backend_overlay'),
+        'database_pool_parameters': pool_parameters,
         'cloud_resources_created': 0, 'requests_sent': 0, 'production_rows_copied': 0})
     return {'status': 'LAB_PREPARED_NOT_STARTED', 'directory': str(root), 'run_id': run,
             'accounts': accounts, 'active': active, 'purpose': purpose,
@@ -264,13 +279,18 @@ def main(argv=None):
     init.add_argument('--purpose', choices=('capacity', 'functional-smoke'), default='capacity')
     init.add_argument('--accounts', type=int); init.add_argument('--active', type=int)
     init.add_argument('--duration', type=int)
-    init.add_argument('--http-concurrency', type=int, default=8)
+    init.add_argument('--http-concurrency', type=int,
+                      help='HTTP workers; omitted: baseline/v1 8, bounded-v2 24')
     init.add_argument('--db-concurrency', type=int, default=4)
     init.add_argument('--web-concurrency', type=int, default=24)
     init.add_argument('--global-http-per-minute', type=int, default=2400)
     init.add_argument('--wire-mode', choices=('business-wire-v1', 'legacy-json'), default='business-wire-v1')
-    init.add_argument('--backend-db-pool', choices=('baseline', 'bounded-v1'), default='baseline',
+    init.add_argument('--backend-db-pool', choices=('baseline', 'bounded-v1', 'bounded-v2'), default='baseline',
                       help='Explicit reviewed DB pool overlay experiment; baseline keeps production transport bytes')
+    init.add_argument('--db-pool-max-waiters', type=int,
+                      help='bounded-v2 only: bounded DB waiting queue, default 20; maximum 32')
+    init.add_argument('--db-pool-wait-seconds', type=float,
+                      help='bounded-v2 only: queue wait cap, default 2; maximum 5 and request remaining deadline')
     init.add_argument('--database-memory-mib', type=int,
                       help='Isolated local database memory cap; default 2048 MiB (smoke: 256)')
     init.add_argument('--database-cpu-limit', type=float,

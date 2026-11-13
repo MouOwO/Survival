@@ -38,6 +38,10 @@ python -X utf8 -B -m tools.loadtest_lab.cli prepare --source-receipt D:/Survival
 
 连接池对照可显式添加 `--backend-db-pool bounded-v1 --db-concurrency 4`。这只给新隔离目录应用经过精确父源码摘要和 AST 检查的连接复用/限时排队/错误分类候选；Git 中的两个 overlay 和 helper 必须与同一个 HEAD 一致。回执绑定原始快照、操作器提交、变更前后 transport 摘要及 helper，不改旧快照或正式后台。当前候选固定每进程4连接、最多4个等待者、排队最多2秒且受整个HTTP请求剩余期限约束；不自动重放结果不明的写入。baseline 不应用 overlay。其他HTTP/PG CPU/内存/前端限流参数应保持相同，先比较软件变化，再另做参数实验。
 
+联动参数实验使用 `--backend-db-pool bounded-v2`，省略并发选项时采用 DB=4、HTTP=24、PWA=24、等待队列20、等待上限2秒。新增独立v2来源补丁，保留v1补丁及helper原字节；通过构造参数传入队列与等待预算。可显式设置 `--db-pool-max-waiters`（0–32）及 `--db-pool-wait-seconds`（大于0且不超过5）；HTTP必须不超过DB连接数加等待队列，DB连接数保持4。requested/effective参数、实际池预算及运行计数写入清单和started/stopped回执，实际构造预算不符即拒绝就绪。baseline/v1省略HTTP选项仍为8，其历史清单继续可验证。v2改变了HTTP/排队准入，应与v1分组报告，不能将差异全部归因于连接复用，也不能据此宣布4000人容量通过。
+
+v2普通后台入口的默认值仍为4个等待者，当前仅隔离lab显式传入20；正式服务的配置接线和部署尚未完成。隔离lab也没有生产systemd的TasksMax限制，当前正式单位的64任务上限须连同HTTP线程、每连接deadline Timer和Lua子进程另行核算；两层服务在lab与正式环境的进程布局不同，不能直接照搬HTTP=24认定正式资源预算已通过。
+
 ## 测试机（将完整目录安全复制到独立 Linux 目录）
 
 ```bash

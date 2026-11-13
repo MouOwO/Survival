@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
+import math
 import os
 from pathlib import Path, PurePosixPath
 import re
@@ -77,26 +78,80 @@ def register_storage(receipt):
     return json.loads(result.stdout)
 
 
+def resolve_database_pool(mode, *, http_concurrency=None, db_concurrency=4,
+                          web_concurrency=24, pool_max_waiters=None,
+                          pool_wait_seconds=None):
+    """Resolve explicit inputs once; baseline/v1 retain their historical defaults."""
+    need(mode in ('baseline', 'bounded-v1', 'bounded-v2'), 'lab_database_pool_mode_invalid')
+    requested = {'http_concurrency': http_concurrency, 'db_concurrency': db_concurrency,
+                 'web_concurrency': web_concurrency, 'pool_max_waiters': pool_max_waiters,
+                 'pool_wait_seconds': pool_wait_seconds}
+    http = (24 if mode == 'bounded-v2' else 8) if http_concurrency is None else http_concurrency
+    for value, maximum in ((http, 32), (db_concurrency, 16), (web_concurrency, 128)):
+        need(type(value) is int and 1 <= value <= maximum, 'lab_concurrency_budget_invalid')
+    limits = None
+    if mode != 'baseline':
+        need(db_concurrency == 4, 'reviewed_database_pool_requires_four_connections')
+        if mode == 'bounded-v1':
+            need(pool_max_waiters is None and pool_wait_seconds is None,
+                 'bounded_v1_pool_parameters_are_fixed')
+            waiting, wait = 4, 2
+        else:
+            waiting = 20 if pool_max_waiters is None else pool_max_waiters
+            wait = 2 if pool_wait_seconds is None else pool_wait_seconds
+            need(type(waiting) is int and 0 <= waiting <= 32, 'lab_database_pool_queue_invalid')
+            need(type(wait) in (int, float) and math.isfinite(wait) and 0 < wait <= 5,
+                 'lab_database_pool_wait_invalid')
+            need(http <= db_concurrency + waiting, 'http_exceeds_database_pool_admission_budget')
+        limits = {'connections': db_concurrency, 'waiting': waiting, 'wait_seconds': wait}
+    else:
+        need(pool_max_waiters is None and pool_wait_seconds is None,
+             'baseline_database_pool_parameters_forbidden')
+    effective = {'http_concurrency': http, 'db_concurrency': db_concurrency,
+                 'web_concurrency': web_concurrency,
+                 'pool_max_waiters': None if limits is None else limits['waiting'],
+                 'pool_wait_seconds': None if limits is None else limits['wait_seconds']}
+    return {'requested': requested, 'effective': effective}, limits
+
+
 def validate_database_pool(cfg):
     """Fixed reviewed experiment budgets and source bindings, once per load."""
     mode = cfg.get('backend_db_pool', 'baseline')
-    need(mode in ('baseline', 'bounded-v1'), 'lab_database_pool_mode_invalid')
+    need(mode in ('baseline', 'bounded-v1', 'bounded-v2'), 'lab_database_pool_mode_invalid')
+    parameters = cfg.get('database_pool_parameters')
+    if parameters is not None:
+        keys = {'http_concurrency', 'db_concurrency', 'web_concurrency',
+                'pool_max_waiters', 'pool_wait_seconds'}
+        need(type(parameters) is dict and set(parameters) == {'requested', 'effective'}
+             and type(parameters['requested']) is dict and set(parameters['requested']) == keys
+             and type(parameters['effective']) is dict and set(parameters['effective']) == keys,
+             'database_pool_parameter_audit_invalid')
+        resolved, limits = resolve_database_pool(mode, **parameters['requested'])
+        need(parameters == resolved and cfg.get('database_pool_limits') == limits
+             and all(cfg.get(k) == resolved['effective'][k]
+                     for k in ('http_concurrency', 'db_concurrency', 'web_concurrency')),
+             'database_pool_requested_effective_mismatch')
+    elif mode == 'bounded-v2':
+        need(False, 'bounded_v2_parameter_audit_required')
     if mode == 'baseline':
         need(cfg.get('database_pool_limits') is None and cfg.get('backend_overlay') is None,
              'baseline_database_pool_overlay_forbidden')
         return mode
-    need(cfg.get('db_concurrency') == 4 and cfg.get('database_pool_limits') ==
-         {'connections': 4, 'waiting': 4, 'wait_seconds': 2},
-         'reviewed_database_pool_limits_changed')
+    if mode == 'bounded-v1':
+        need(cfg.get('db_concurrency') == 4 and cfg.get('database_pool_limits') ==
+             {'connections': 4, 'waiting': 4, 'wait_seconds': 2},
+             'reviewed_database_pool_limits_changed')
     overlay = cfg.get('backend_overlay')
     need(type(overlay) is dict and set(overlay) == {
         'id', 'source_revision', 'overlay_sources', 'parent_runtime_sha256',
         'runtime_sha256', 'helper_sha256'}, 'reviewed_database_pool_binding_required')
-    need(overlay['id'] == 'bounded-v1' and overlay['source_revision'] == cfg.get('csv_source_revision')
+    need(overlay['id'] == mode and overlay['source_revision'] == cfg.get('csv_source_revision')
          and type(overlay['source_revision']) is str
          and re.fullmatch('[a-f0-9]{40}', overlay['source_revision']),
          'database_pool_operator_revision_mismatch')
     patch_names = ('db_pool_patch.py', 'db_pool_http_patch.py', 'bounded_pool.py')
+    if mode == 'bounded-v2':
+        patch_names += ('db_pool_patch_v2.py',)
     expected = {'server/fishing_api_overrides/' + name for name in patch_names}
     need(type(overlay['overlay_sources']) is dict and set(overlay['overlay_sources']) == expected,
          'database_pool_overlay_sources_invalid')

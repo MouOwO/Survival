@@ -130,6 +130,20 @@ def drain_server_workers(server, semaphore_name, capacity, deadline):
             semaphore.release()
 
 
+def checked_database_pool_stats(client, cfg):
+    """Fixed O(1) aggregates, including effective constructor budget checks."""
+    stats = client.pool_stats()
+    limits = cfg['database_pool_limits']
+    need(type(stats) is dict and type(stats.get('max_size')) is int
+         and type(stats.get('max_waiters')) is int
+         and type(stats.get('wait_timeout')) in (int, float)
+         and stats['max_size'] == limits['connections']
+         and stats['max_waiters'] == limits['waiting']
+         and stats['wait_timeout'] == limits['wait_seconds'],
+         'actual_database_pool_budget_mismatch')
+    return stats
+
+
 def serve(directory, *, lua_executable=None):
     root, cfg, private = load(directory)
     production_host_guard(cfg)
@@ -154,7 +168,18 @@ def serve(directory, *, lua_executable=None):
     # Production's optional five-account whitelist is a process setting. This
     # standalone process has its own bounded synthetic gate instead.
     os.environ.pop('SURVIVAL_TEST_STEAM_IDS64', None)
-    app = build_application(settings)
+    pool_mode = cfg.get('backend_db_pool') in ('bounded-v1', 'bounded-v2')
+    pool_options = ({'pool_max_waiters': cfg['database_pool_limits']['waiting'],
+                     'pool_wait_timeout': cfg['database_pool_limits']['wait_seconds']}
+                    if cfg.get('backend_db_pool') == 'bounded-v2' else {})
+    app = build_application(settings, **pool_options)
+    try:
+        pool_started = checked_database_pool_stats(app.rpc_client, cfg) if pool_mode else None
+    except Exception:
+        # No listener or request worker exists yet; a constructor mismatch is
+        # startup failure, never a ready lab or an assumed active pool budget.
+        app.rpc_client.close()
+        raise
     # Verify actual immutable Lua modules/config before opening listeners.
     from archive_backend.lottery_catalog import catalog_document
     catalog_document(app.archive.bundle, lua)
@@ -184,8 +209,9 @@ def serve(directory, *, lua_executable=None):
             'wire_mode': cfg.get('wire_mode', 'business-wire-v1'),
             'backend_db_pool': cfg.get('backend_db_pool', 'baseline'),
             'database_pool_limits': cfg.get('database_pool_limits'),
-            'database_pool_started': (app.rpc_client.pool_stats()
-                                      if cfg.get('backend_db_pool') == 'bounded-v1' else None),
+            'database_pool_parameters': cfg.get('database_pool_parameters'),
+            'actual_database_pool_limits_verified': pool_mode,
+            'database_pool_started': pool_started,
             'requested_postgres_image': cfg.get('postgres_image', 'postgres:17'),
             'topology': cfg.get('topology', 'same_host_database_diagnostic'),
             'requested_local_database_limits': {
@@ -221,7 +247,6 @@ def serve(directory, *, lua_executable=None):
             while pending.inflight and time.monotonic() < deadline:
                 pending.wait(min(1, max(0, deadline - time.monotonic())))
         drained = web_drain['drained'] and backend_drain['drained'] and pending.inflight == 0
-        pool_mode = cfg.get('backend_db_pool', 'baseline') == 'bounded-v1'
         pool_closed = None
         pool_close_error = None
         if pool_mode and drained:
@@ -230,7 +255,7 @@ def serve(directory, *, lua_executable=None):
             except Exception:
                 pool_closed = False
                 pool_close_error = 'database_pool_close_not_completed'
-        pool_stats = app.rpc_client.pool_stats() if pool_mode else None
+        pool_stats = checked_database_pool_stats(app.rpc_client, cfg) if pool_mode else None
         if pool_mode and drained and pool_closed is not False:
             pool_closed = pool_stats.get('closed') is True and pool_stats.get('total') == 0
             if not pool_closed:
@@ -241,6 +266,8 @@ def serve(directory, *, lua_executable=None):
             'synthetic_activity': service.counts(),
             'frontend_drain': web_drain, 'backend_drain': backend_drain,
             'backend_db_pool': cfg.get('backend_db_pool', 'baseline'),
+            'database_pool_parameters': cfg.get('database_pool_parameters'),
+            'actual_database_pool_limits_verified': pool_mode,
             'database_pool_close_deferred': pool_mode and not drained,
             'database_pool_closed': pool_closed, 'database_pool_close_error': pool_close_error,
             'database_pool_stopped': pool_stats,

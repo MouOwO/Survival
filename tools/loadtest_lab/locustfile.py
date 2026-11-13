@@ -32,14 +32,76 @@ RUN_ENVIRONMENT = None
 RUN_MASTER_RAMP = None
 RUN_ABORT_ACK = None
 RUN_PENDING_WORKERS = set()
+RUN_STOPPING = False
+RUN_STOPPED = False
+RUN_WORKER_SHUTDOWN_STARTED = False
+RUN_MASTER_QUIT_OWNER = None
+RUN_MASTER_QUIT_DONE = None
+RUN_FAILURE_NOTIFIED = False
 RUN_COUNTERS = dict.fromkeys(('start_attempts', 'start_blocked_after_failure',
                              'cleanup_attempts', 'cleanup_completed', 'cleanup_failed', 'cleanup_interrupted'), 0)
+
+
+class CleanupTimeout(Exception):
+    """Fixed local teardown budget expiry, never a business retry signal."""
+
+
+def cleanup_budget(environment):
+    return min(70.0, max(.05, float(getattr(environment, 'stop_timeout', 0) or 35)))
 
 
 def run_state():
     return {'failed': RUN_FAILED, 'first_failure': RUN_FIRST_FAILURE,
             'quit_requested': RUN_QUIT_REQUESTED, 'notification_failed': RUN_NOTIFICATION_FAILED,
+            'stopping': RUN_STOPPING, 'stopped': RUN_STOPPED,
             'counters': dict(RUN_COUNTERS)}
+
+
+def cleanup_balanced(state):
+    counters = state['counters']
+    return counters['cleanup_attempts'] == sum(counters[name] for name in
+        ('cleanup_completed', 'cleanup_failed', 'cleanup_interrupted'))
+
+
+def worker_settled(state):
+    return (type(state) is dict and state.get('stopped') is True
+            and type(state.get('counters')) is dict and cleanup_balanced(state))
+
+
+def wire_balanced(report):
+    counters = report['counters']
+    return counters['requests'] == counters['responses']
+
+
+def notify_failure(runner):
+    global RUN_FAILURE_NOTIFIED, RUN_NOTIFICATION_FAILED
+    if RUN_FAILURE_NOTIFIED:
+        return
+    RUN_FAILURE_NOTIFIED = True
+    try:
+        runner.send_message('survival_run_failed', {'error': RUN_FIRST_FAILURE})
+    except Exception:
+        RUN_NOTIFICATION_FAILED = True
+
+
+def stop_worker(environment):
+    """One owner drains users; cleanup failures never start a second quit."""
+    global RUN_WORKER_SHUTDOWN_STARTED, RUN_STOPPING, RUN_NOTIFICATION_FAILED
+    if RUN_WORKER_SHUTDOWN_STARTED:
+        return
+    RUN_WORKER_SHUTDOWN_STARTED = True
+    RUN_STOPPING = True
+    runner = environment.runner
+    try:
+        runner.stop()
+        if RUN_ABORT_ACK is None or not RUN_ABORT_ACK.wait(timeout=10):
+            RUN_NOTIFICATION_FAILED = True
+            environment.process_exit_code = 2
+        runner.quit()
+    except Exception:
+        RUN_NOTIFICATION_FAILED = True
+        environment.process_exit_code = 2
+        runner.greenlet.kill(block=True)
 
 
 def fail_run(environment, reason, *, notify_master=True):
@@ -51,47 +113,24 @@ def fail_run(environment, reason, *, notify_master=True):
     if environment is None:
         return
     environment.process_exit_code = 2
-    if RUN_QUIT_REQUESTED or environment.runner is None:
+    if environment.runner is None:
         return
-    RUN_QUIT_REQUESTED = True
     from locust.runners import WorkerRunner, MasterRunner
     runner = environment.runner
-    try:
-        if isinstance(runner, WorkerRunner) and notify_master:
-            runner.send_message('survival_run_failed', {'error': RUN_FIRST_FAILURE})
-        elif isinstance(runner, MasterRunner):
-            runner.send_message('survival_run_abort', {'error': RUN_FIRST_FAILURE})
-    except Exception:
-        RUN_NOTIFICATION_FAILED = True
+    if isinstance(runner, WorkerRunner) and notify_master:
+        notify_failure(runner)
+    # test_stopping fires before Locust begins on_stop. Calling quit again
+    # while that owner waits for users can kill the owner and save partial
+    # statistics while checkpoint/release requests are still in flight.
+    if RUN_STOPPING or RUN_QUIT_REQUESTED:
+        return
+    RUN_QUIT_REQUESTED = True
     import gevent
     def stop_stage():
-        global RUN_NOTIFICATION_FAILED
         if isinstance(runner, WorkerRunner):
-            # Master acknowledgement proves the whole run was told to stop.
-            runner.stop()
-            if RUN_ABORT_ACK is None or not RUN_ABORT_ACK.wait(timeout=10):
-                RUN_NOTIFICATION_FAILED = True
-            runner.quit()
+            stop_worker(environment)
         else:
-            if isinstance(runner, MasterRunner):
-                try:
-                    if RUN_MASTER_RAMP is not None and not RUN_MASTER_RAMP.ready():
-                        RUN_MASTER_RAMP.kill(block=True)
-                    RUN_PENDING_WORKERS.update(client.id for client in runner.clients.all
-                        if not (WIRE_WORKERS.get(client.id, {}).get('final')
-                                and WIRE_WORKERS.get(client.id, {}).get('run_state') is not None))
-                    # Worker abort owns cleanup. Standard stop removes workers
-                    # from Locust's index before quit can reach them.
-                    runner.stop(send_stop_to_client=False)
-                    deadline = time.monotonic() + (environment.stop_timeout or 0) + 15
-                    while RUN_PENDING_WORKERS and time.monotonic() < deadline:
-                        gevent.sleep(.05)
-                    if RUN_PENDING_WORKERS:
-                        RUN_NOTIFICATION_FAILED = True
-                finally:
-                    runner.quit()
-            else:
-                runner.quit()
+            runner.quit()
     gevent.spawn(stop_stage)
 
 
@@ -99,6 +138,8 @@ def validate_run_state(state):
     if (type(state) is not dict or type(state.get('failed')) is not bool
             or type(state.get('quit_requested')) is not bool
             or type(state.get('notification_failed')) is not bool
+            or type(state.get('stopping')) is not bool
+            or type(state.get('stopped')) is not bool
             or type(state.get('counters')) is not dict
             or set(state['counters']) != set(RUN_COUNTERS)
             or any(type(value) is not int or value < 0 for value in state['counters'].values())
@@ -110,10 +151,12 @@ def validate_run_state(state):
 def final_run_state(environment):
     from locust.runners import MasterRunner
     if not isinstance(environment.runner, MasterRunner):
-        return run_state() | {'scope': 'this_process', 'collection_complete': True}
+        state = run_state()
+        return state | {'scope': 'this_process',
+                        'collection_complete': WIRE_FINAL and worker_settled(state)}
     states = [value.get('run_state') for value in WIRE_WORKERS.values()]
     complete = (bool(WIRE_WORKERS_SEEN) and set(WIRE_WORKERS) == WIRE_WORKERS_SEEN
-                and all(value['final'] and value.get('run_state') is not None for value in WIRE_WORKERS.values())
+                and all(value['final'] and worker_settled(value.get('run_state')) for value in WIRE_WORKERS.values())
                 and not WIRE_REPORT_ERROR)
     counters = dict.fromkeys(RUN_COUNTERS, 0)
     for state in states:
@@ -137,7 +180,7 @@ def remember_worker(client_id, report, *, final=False, state=None):
         if not isinstance(client_id, str) or len(client_id) > 256 or len(WIRE_WORKERS) >= 512 and client_id not in WIRE_WORKERS:
             raise ValueError('loadtest_worker_wire_identity_invalid')
         WIRE_WORKERS[client_id] = {'report': report, 'final': final, 'run_state': state}
-        if final and state is not None:
+        if final and worker_settled(state):
             RUN_PENDING_WORKERS.discard(client_id)
     except Exception:
         WIRE_REPORT_ERROR = 'loadtest_worker_wire_report_invalid'
@@ -162,6 +205,48 @@ def register_wire_messages(environment, **kwargs):
             finally:
                 RUN_MASTER_RAMP = None
         environment.runner.start = start_without_recovery
+        original_quit = environment.runner.quit
+        def quit_after_worker_cleanup():
+            # One O(W) identity snapshot at shutdown, then O(1) updates as each
+            # worker reports a settled final state. No player/container scans.
+            global RUN_MASTER_QUIT_OWNER, RUN_MASTER_QUIT_DONE, RUN_STOPPING, RUN_NOTIFICATION_FAILED
+            import gevent
+            from gevent.event import Event
+            current = gevent.getcurrent()
+            if RUN_MASTER_QUIT_OWNER is not None:
+                if RUN_MASTER_QUIT_OWNER is not current:
+                    RUN_MASTER_QUIT_DONE.wait(timeout=cleanup_budget(environment) + 15)
+                return
+            RUN_MASTER_QUIT_OWNER, RUN_MASTER_QUIT_DONE = current, Event()
+            RUN_STOPPING = True
+            runner = environment.runner
+            try:
+                if (RUN_MASTER_RAMP is not None and RUN_MASTER_RAMP is not current
+                        and not RUN_MASTER_RAMP.ready()):
+                    RUN_MASTER_RAMP.kill(block=True)
+                WIRE_WORKERS_SEEN.update(client.id for client in runner.clients.all)
+                RUN_PENDING_WORKERS.update(client_id for client_id in WIRE_WORKERS_SEEN
+                    if not (WIRE_WORKERS.get(client_id, {}).get('final')
+                            and worker_settled(WIRE_WORKERS.get(client_id, {}).get('run_state'))))
+                message = 'survival_run_abort' if RUN_FAILED else 'survival_run_finish'
+                for client_id in tuple(RUN_PENDING_WORKERS):
+                    runner.send_message(message, {'error': RUN_FIRST_FAILURE}, client_id=client_id)
+                # Custom worker messages own cleanup and process exit. Locust's
+                # standard quit only waits 0.5s; standard stop removes identities
+                # from the index before quit can reach those same processes.
+                runner.stop(send_stop_to_client=False)
+                deadline = time.monotonic() + cleanup_budget(environment) + 15
+                while RUN_PENDING_WORKERS and time.monotonic() < deadline:
+                    gevent.sleep(.05)
+                if RUN_PENDING_WORKERS:
+                    RUN_NOTIFICATION_FAILED = True
+                    fail_run(environment, 'worker_finalization_not_collected')
+            finally:
+                try:
+                    original_quit()
+                finally:
+                    RUN_MASTER_QUIT_DONE.set()
+        environment.runner.quit = quit_after_worker_cleanup
         def receive(environment, msg, **kwargs):
             WIRE_WORKERS_SEEN.add(msg.node_id)
             payload = msg.data if isinstance(msg.data, dict) else {}
@@ -178,7 +263,14 @@ def register_wire_messages(environment, **kwargs):
             RUN_ABORT_ACK.set()
             value = msg.data.get('error') if type(msg.data) is dict else None
             fail_run(environment, value or 'master_stopped_run', notify_master=False)
+        def finish(environment, msg, **kwargs):
+            global RUN_STOPPING
+            RUN_ABORT_ACK.set()
+            RUN_STOPPING = True
+            import gevent
+            gevent.spawn(stop_worker, environment)
         environment.runner.register_message('survival_run_abort', abort)
+        environment.runner.register_message('survival_run_finish', finish)
 
 
 @events.report_to_master.add_listener
@@ -199,9 +291,9 @@ def collect_wire(client_id, data, **kwargs):
 
 @events.test_stop.add_listener
 def finish_worker_wire(environment, **kwargs):
-    global WIRE_FINAL
+    global WIRE_FINAL, RUN_STOPPED
     from locust.runners import WorkerRunner
-    WIRE_FINAL = True
+    RUN_STOPPED = WIRE_FINAL = True
     if isinstance(environment.runner, WorkerRunner):
         # Send HTTP stats after cleanup; quit may arrive after stop_timeout.
         try:
@@ -214,9 +306,13 @@ def finish_worker_wire(environment, **kwargs):
 def final_wire_report(environment):
     from locust.runners import MasterRunner
     if not isinstance(environment.runner, MasterRunner):
-        return WIRE.report() | {'scope': 'this_process', 'collection_complete': True}
+        report = WIRE.report()
+        return report | {'scope': 'this_process',
+                         'collection_complete': WIRE_FINAL and worker_settled(run_state()) and wire_balanced(report)}
     complete = (bool(WIRE_WORKERS_SEEN) and set(WIRE_WORKERS) == WIRE_WORKERS_SEEN
-                and all(value['final'] for value in WIRE_WORKERS.values()) and not WIRE_REPORT_ERROR)
+                and all(value['final'] and worker_settled(value.get('run_state'))
+                        and wire_balanced(value['report']) for value in WIRE_WORKERS.values())
+                and not WIRE_REPORT_ERROR)
     report = aggregate_reports((value['report'] for value in WIRE_WORKERS.values()), WIRE.mode)
     return report | {'scope': 'latest_cumulative_worker_snapshots',
         'collection_complete': complete, 'workers_seen': len(WIRE_WORKERS_SEEN),
@@ -247,6 +343,12 @@ def validate_host(environment, **kwargs):
         gevent.spawn(monitor)
 
 
+@events.test_stopping.add_listener
+def mark_stopping(environment, **kwargs):
+    global RUN_STOPPING
+    RUN_STOPPING = True
+
+
 class SyntheticPlayer(HttpUser):
     host = 'http://127.0.0.1:29567'
 
@@ -254,6 +356,9 @@ class SyntheticPlayer(HttpUser):
         return max(.05, min(self.next_activity, self.player.next_checkpoint) - time.monotonic())
 
     def exchange(self, method, path, body, authorization, name):
+        if (getattr(self, '_finalizing', False)
+                and time.monotonic() >= getattr(self, '_cleanup_deadline', float('inf'))):
+            raise CleanupTimeout()
         if RUN_FAILED:
             existing = getattr(self, 'player', None)
             cleanup = (getattr(self, '_finalizing', False) and existing is not None
@@ -340,10 +445,21 @@ class SyntheticPlayer(HttpUser):
         if hasattr(self, 'player') and not getattr(self, '_cleanup_started', False):
             self._cleanup_started = True
             self._finalizing = True
+            import gevent
+            budget = cleanup_budget(self.environment)
+            self._cleanup_deadline = time.monotonic() + budget
             RUN_COUNTERS['cleanup_attempts'] += 1
             try:
-                self.player.stop()
+                # Locust's async stop of a waiting user joins on_stop before its
+                # stop-group timeout. Bound this multi-request cleanup itself.
+                with gevent.Timeout(budget, CleanupTimeout()):
+                    self.player.stop()
                 RUN_COUNTERS['cleanup_completed'] += 1
+            except CleanupTimeout:
+                RUN_COUNTERS['cleanup_interrupted'] += 1
+                self.environment.events.request.fire(request_type='ASSERT', name='final_checkpoint_or_release',
+                    response_time=0, response_length=0, exception=ValueError('finalization_interrupted'), context={})
+                fail_run(self.environment, 'finalization_interrupted')
             except Exception:
                 RUN_COUNTERS['cleanup_failed'] += 1
                 self.environment.events.request.fire(request_type='ASSERT', name='final_checkpoint_or_release',
@@ -374,6 +490,10 @@ def exit_on_failure(environment, **kwargs):
         total = environment.stats.total
         wire = final_wire_report(environment)
         run = final_run_state(environment)
+        http_requests = sum(entry.num_requests for entry in environment.stats.entries.values()
+                            if entry.method in ('GET', 'POST', 'HEAD', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'))
+        if http_requests != wire['counters']['requests']:
+            wire['collection_complete'] = False
         if not wire['collection_complete'] or not run['collection_complete']:
             environment.process_exit_code = 2
         path = folder / ('locust_final_' + secrets.token_hex(8) + '_receipt.json')
