@@ -54,3 +54,11 @@ N为同墙预留人数，K为候选周围记录，C为覆盖的网格数，A为�
 运行源码已推送：game/dev `5158c0210386f0cda03a23006c681b2373ec2482`，content/master `af9a0a62dae3642e502d0632835eab4576ef7fea`。最终签包版本、编译输入回归与官方完整下载在完成后追加。后台未改。本轮真实玩家交易、清档和存档修改均为0。
 
 树外副本先以 `prepared.json` 登记被工具文件名白名单拒绝，未改登记器或旧证据；使用明确区分原创建时间和本次观察时间的 `lab_copy_receipt.json` 补登记成功，记录ID `2dcb706d6b28cdc82996658ec86992551d1a96ce5573f44fa2a490153d88a39f`。
+
+正式版本 **2026111301** 已同步原游廊条目 **3824360109**，Steam manifest **2302734921456589826**。任务 `D:/Survival_本地工具/runs/packaging_jobs/pack_2026111301_a096b439`，签包 `D:/Survival_工坊输出/pack_2026111301_a096b439`；9个运行资源变化（7项代码及2项配套自动目录）、新增/删除0。完整来源绑定game `cfdd1d8ea0b6818b14cf4bea7e781eecc6d2fb69`、content `406b794bacd38a47038f35fcda17e4036a185f74`、operator同game，签名manifest SHA256 `96e76eb08ca8a9f80a30231d97fc87fdb3df1271b3ca7f30f4fa23e0db40526a`。
+
+正式官方编译的血条 `.vjs_c` DATA与已测试最终源逐字节一致（SHA256 `e2b9e1a5b194c7568ff40b96b0da324309b5d5ff66fcaf989df1791a9ddfb70e`），直接执行DATA的生命周期/遮挡回归通过。实际生产目录的6份Lua与不可变源码证明一致，直接加载后9组几何/工人/金矿/权益及原生参数回归通过。`compiled_worldbar_regression.json`、`production_lua_regression.json`和`signed_candidate_regression_binding.json`将这些实际回归输入逐项绑定到签名候选对应资源。本轮最初的生产输入测试误要求准备回执具有签名授权标志而被拒绝，修正测试职责后仍严格验证生产输入摘要；正式发行授权门禁未改。
+
+SDK于UTC2026-11-13 00:01:52上传成功；官方强制刷新下载成功并逐一核验7061个签名资源、187保护模块和5个包文件。回执 `output/packager/pack_2026111301_a096b439/download_evidence/20261113T000457Z_6b647796a39f4735921394902287d51f/verification.json`，SHA256 `4e7bd1a9d3f3fee7fa348249fd478ba7bc5c95bbe5f051662d736441de45479e`，状态 `OFFICIAL_REFRESH_NATIVE_DOWNLOAD_FULLY_VERIFIED`。00:06:54全部待发来源收口通过，任务最终返回 `WORKSHOP_SYNCED`，当前待发/阻断0、脏运行文件0，后台未改。普通联网游廊验收为 `PENDING_USER_ONLINE_TEST`，不以Tools样本替代。
+
+所有本轮Tools进程正常退出，两个junction核对完整目标后仅移除链接，快照和失败证据仍保留。一次因PowerShell将Target视为字符串而触发错误索引的挂载检查拒绝了删除，未删除任何链接；改为明确数组取完整Target并核验后安全完成。正式候选、编译与签包由流水线按真实回执登记。双仓既定stash→pull→pop→commit→push已完成，原有14项改动在发行后逐项Git对象摘要仍一致；content工作区干净。
