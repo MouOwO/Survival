@@ -181,6 +181,18 @@ def prepare(args):
     from .business_experiments import apply_business_experiment
     apply_business_experiment(root, cfg, revision,
         mode=getattr(args, 'profile_load', 'baseline'), repository=ROOT)
+    from .principal_experiments import apply_principal_experiments
+    apply_principal_experiments(root, cfg, revision,
+        transport=getattr(args, 'principal_transport', 'baseline'),
+        ensure_scope=getattr(args, 'ensure_scope', False), repository=ROOT)
+    from .frontend_experiments import apply_frontend_experiment
+    apply_frontend_experiment(root, cfg, revision,
+        mode=getattr(args, 'frontend_rate', 'baseline'), repository=ROOT)
+    from .workload_profiles import build_workload_profile, CSV_SOURCE
+    client_workload = getattr(args, 'client_workload', 'legacy-v1')
+    if client_workload != 'legacy-v1':
+        cfg['client_workload'] = client_workload
+        cfg['workload_profile'] = build_workload_profile((root / CSV_SOURCE).read_bytes())
     runner = b"import sys\nfrom pathlib import Path\nsys.path[:0]=[str(Path(__file__).parent/'operator'),str(Path(__file__).parent/'runtime')]\nfrom loadtest_lab.cli import entry\nraise SystemExit(entry())\n"
     (root / 'run_lab.py').write_bytes(runner); cfg['sources']['run_lab.py'] = sha(runner)
     write_new(root / 'lab.json', cfg)
@@ -220,6 +232,8 @@ def prepare(args):
         'runtime_experiments': cfg.get('runtime_experiments', []),
         **({'schema_experiment': cfg['schema_experiment']} if 'schema_experiment' in cfg else {}),
         **({'business_experiment': cfg['business_experiment']} if 'business_experiment' in cfg else {}),
+        **({'principal_experiments': cfg['principal_experiments']} if 'principal_experiments' in cfg else {}),
+        **({'frontend_experiment': cfg['frontend_experiment']} if 'frontend_experiment' in cfg else {}),
         'cloud_resources_created': 0, 'requests_sent': 0, 'production_rows_copied': 0})
     return {'status': 'LAB_PREPARED_NOT_STARTED', 'directory': str(root), 'run_id': run,
             'accounts': accounts, 'active': active, 'purpose': purpose,
@@ -299,6 +313,8 @@ def main(argv=None):
     init.add_argument('--web-concurrency', type=int, default=24)
     init.add_argument('--global-http-per-minute', type=int, default=2400)
     init.add_argument('--wire-mode', choices=('business-wire-v1', 'legacy-json'), default='business-wire-v1')
+    init.add_argument('--client-workload', choices=('legacy-v1', 'client-v2'), default='legacy-v1',
+                      help='client-v2 includes grant-triggered profile refresh and complete workflow timing')
     init.add_argument('--backend-db-pool', choices=('baseline', 'bounded-v1', 'bounded-v2'), default='baseline',
                       help='Explicit reviewed DB pool overlay experiment; baseline keeps production transport bytes')
     init.add_argument('--db-pool-max-waiters', type=int,
@@ -315,6 +331,12 @@ def main(argv=None):
                       help='Opt-in exact-source set validation of gameplay defaults; isolated bounded-v2 only')
     init.add_argument('--profile-load', choices=('baseline', 'init-only-v1'), default='baseline',
                       help='Opt-in removal of discarded profile pre-read; reviewed observed bounded-v2 sources only')
+    init.add_argument('--principal-transport', choices=('baseline', 'principal-v1', 'reset-v1'), default='baseline',
+                      help='Opt-in verified reset baseline, optionally complete merged guard; exact isolated G sources only')
+    init.add_argument('--ensure-scope', action='store_true',
+                      help='Opt-in same-checkpoint initialization proof; exact isolated G sources only')
+    init.add_argument('--frontend-rate', choices=('baseline', 'hot-rate-v1'), default='baseline',
+                      help='Opt-in bounded SQLite expired-rate housekeeping; exact observed isolated PWA source only')
     init.add_argument('--database-memory-mib', type=int,
                       help='Isolated local database memory cap; default 2048 MiB (smoke: 256)')
     init.add_argument('--database-cpu-limit', type=float,

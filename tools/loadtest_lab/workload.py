@@ -8,11 +8,13 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import math
 import re
 import secrets
 import time
 
 from .guard import canonical, need, verify_attestation
+from .workload_profiles import COUNTERS, MAX_SEEN_GRANTS, profile_for
 
 
 class BusinessFailure(ValueError):
@@ -43,8 +45,14 @@ def persisted_fingerprint(value):
 
 
 class Player:
-    def __init__(self, transport, cfg, controller, *, clock=time.monotonic):
+    def __init__(self, transport, cfg, controller, *, clock=time.monotonic,
+                 workflow_observer=None):
         self.transport, self.cfg, self.controller, self.clock = transport, cfg, controller, clock
+        self.client_profile = profile_for(cfg)
+        self.workflow_observer = workflow_observer
+        self.workload_counters = dict.fromkeys(COUNTERS, 0)
+        self._seen_grants = set()
+        self.grant_followup_final = False
         self.lease = secrets.token_hex(16)
         self.identity = self.token = self.config_hash = None
         self.session_logged_in = False
@@ -99,11 +107,22 @@ class Player:
         self.checkpoint()
         self.admin('/_loadtest/ready', {'run_id': self.cfg['run_id'], 'lease_id': self.lease})
 
-    def read_profile(self):
-        self.last_profile = profile(self.business('/v1/profile'), self.identity['account_id'])
+    def read_profile(self, *, label=None):
+        self.last_profile = profile(self.business('/v1/profile', label=label), self.identity['account_id'])
         return self.last_profile
 
+    def _workflow(self, name, started, error, counters):
+        for key, value in counters.items():
+            self.workload_counters[key] += value
+        finished = self.clock()
+        need(math.isfinite(finished) and finished >= started, 'workflow_clock_invalid')
+        elapsed = (finished - started) * 1000
+        if self.workflow_observer is not None:
+            self.workflow_observer(name, elapsed, error, counters)
+
     def checkpoint(self, final=False, request=None):
+        if self.client_profile.mode == 'client-v2':
+            return self._checkpoint_v2(final, request)
         request = request or ('lt_checkpoint_' + secrets.token_hex(16))
         phase = 'final' if final else ('setup' if self.next_checkpoint is None else 'periodic')
         value = self.business('/v1/online-time/checkpoint',
@@ -113,6 +132,47 @@ class Player:
             self.last_profile = profile(value, self.identity['account_id'])
         self.next_checkpoint = self.clock() + 60
         return value
+
+    def _checkpoint_v2(self, final, request):
+        started, error = self.clock(), None
+        counters = dict.fromkeys(COUNTERS, 0)
+        counters['checkpoint_attempts'] = 1
+        phase = 'final' if final else ('setup' if self.next_checkpoint is None else 'periodic')
+        try:
+            request = request or ('lt_checkpoint_' + secrets.token_hex(16))
+            value = self.business('/v1/online-time/checkpoint',
+                {'session_id': self.identity['match_session_id'], 'request_id': request, 'final': final},
+                label='[checkpoint:' + phase + '] /v1/online-time/checkpoint')
+            need(isinstance(value.get('profile'), dict), 'checkpoint_profile_missing')
+            self.last_profile = profile(value, self.identity['account_id'])
+            grants = self.client_profile.grants(value.get('grants'))
+            counters['grants_validated'] = len(grants)
+            if grants:
+                counters['grant_responses'] = 1
+                unseen = {grant for grant in grants if grant not in self._seen_grants}
+                need(len(self._seen_grants) + len(unseen) <= MAX_SEEN_GRANTS, 'grant_history_budget_exceeded')
+                # Real Lua refreshes even if a repeated response contains an
+                # already seen grant. Publishing/deduplication follows refresh.
+                self.grant_followup_final = bool(final)
+                counters['grant_followup_attempts'] = 1
+                try:
+                    self.read_profile(label='[grant-followup] /v1/profile')
+                except BaseException:
+                    counters['grant_followup_failed'] = 1
+                    raise
+                finally:
+                    self.grant_followup_final = False
+                counters['grant_followup_completed'] = 1
+                self._seen_grants.update(grants)
+            self.next_checkpoint = self.clock() + 60
+            counters['checkpoint_completed'] = 1
+            return value
+        except BaseException as caught:
+            error = caught
+            counters['checkpoint_failed'] = 1
+            raise
+        finally:
+            self._workflow('checkpoint_' + phase, started, error, counters)
 
     def snapshot(self):
         value = self.business('/v1/lottery/snapshot', {'config_hash': self.config_hash})
@@ -237,7 +297,28 @@ class Player:
         self.claimed = True
         return result
 
-    def stop(self):
+    def stop(self, *, intent_started=None):
+        if self.client_profile.mode != 'client-v2':
+            return self._stop_session()
+        now = self.clock()
+        started = now if intent_started is None else intent_started
+        need(type(started) in (int, float) and 0 <= started <= now,
+             'finalization_intent_time_invalid')
+        error = None
+        counters = dict.fromkeys(COUNTERS, 0)
+        counters['finalization_attempts'] = 1
+        try:
+            result = self._stop_session()
+            counters['finalization_completed'] = 1
+            return result
+        except BaseException as caught:
+            error = caught
+            counters['finalization_failed'] = 1
+            raise
+        finally:
+            self._workflow('finalization', started, error, counters)
+
+    def _stop_session(self):
         if self.identity is None:
             self.token = None
             self.session_logged_in = False

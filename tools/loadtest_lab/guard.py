@@ -116,6 +116,14 @@ def resolve_database_pool(mode, *, http_concurrency=None, db_concurrency=4,
 
 def validate_database_pool(cfg):
     """Fixed reviewed experiment budgets and source bindings, once per load."""
+    from .frontend_experiments import metadata_parent_sources as frontend_parent_sources
+    frontend_parents = frontend_parent_sources(cfg)
+    if frontend_parents:
+        cfg = {**cfg, 'sources': {**cfg['sources'], **frontend_parents}}
+    from .principal_experiments import metadata_parent_sources as principal_parent_sources
+    principal_parents = principal_parent_sources(cfg)
+    if principal_parents:
+        cfg = {**cfg, 'sources': {**cfg['sources'], **principal_parents}}
     from .business_experiments import metadata_parent_sources
     business_parents = metadata_parent_sources(cfg)
     if business_parents:
@@ -234,8 +242,17 @@ def load(directory):
              and sha(path.read_bytes()) == digest, 'lab_source_changed:' + name)
     from .database_experiments import validate_schema_experiment
     validate_schema_experiment(cfg, lambda name: (root / name).read_bytes())
+    from .principal_experiments import validate_principal_experiments
+    principal_bytes = validate_principal_experiments(cfg, lambda name: (root / name).read_bytes())
+    business_cfg = ({**cfg, 'sources': {**cfg['sources'], **{
+        name: sha(raw) for name, raw in principal_bytes.items()}}} if principal_bytes else cfg)
     from .business_experiments import validate_business_experiment
-    validate_business_experiment(cfg, lambda name: (root / name).read_bytes())
+    validate_business_experiment(business_cfg, lambda name: (
+        principal_bytes[name] if name in principal_bytes else (root / name).read_bytes()))
+    from .frontend_experiments import validate_frontend_experiment
+    validate_frontend_experiment(cfg, lambda name: (root / name).read_bytes())
+    from .workload_profiles import validate_workload_profile
+    validate_workload_profile(cfg, lambda name: (root / name).read_bytes())
     return root, cfg, private
 
 
@@ -326,6 +343,14 @@ def load_client(path):
     need(cfg.get('wire_mode', 'business-wire-v1') in ('business-wire-v1', 'legacy-json'),
          'lab_wire_mode_invalid')
     validate_postgres_image(cfg.get('postgres_image', DEFAULT_POSTGRES_IMAGE), allow_default=True)
+    from .frontend_experiments import metadata_parent_sources as frontend_parent_sources
+    frontend_parent_sources(cfg)  # Client-only metadata proof, no source reads.
+    from .principal_experiments import metadata_parent_sources as principal_parent_sources
+    principal_parents = principal_parent_sources(cfg)
+    business_cfg = ({**cfg, 'sources': {**cfg['sources'], **principal_parents}}
+                    if principal_parents else cfg)
     from .business_experiments import metadata_parent_sources
-    metadata_parent_sources(cfg)  # Client-only proof: no source-file reads.
+    metadata_parent_sources(business_cfg)  # Client-only proof: no source-file reads.
+    from .workload_profiles import validate_workload_profile
+    validate_workload_profile(cfg)
     return cfg, controller

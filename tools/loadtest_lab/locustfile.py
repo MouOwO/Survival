@@ -14,11 +14,14 @@ import time
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from loadtest_lab.guard import load_client, target_url, canonical, sha, write_new, register_storage
 from loadtest_lab.workload import Player, checked
+from loadtest_lab.workload_profiles import COUNTERS as WORKLOAD_COUNTERS, WORKFLOWS, profile_for
 from loadtest_lab.wire_client import WireClient, WIRE_MODE, aggregate_reports, http_error_label, failure_label
 from locust import HttpUser, task, events
 from locust.exception import StopUser
 
 CFG, CONTROLLER = load_client(os.environ['LOADTEST_CLIENT'])
+CLIENT_PROFILE = profile_for(CFG)
+WORKLOAD_COUNTS = dict.fromkeys(WORKLOAD_COUNTERS, 0)
 WIRE = WireClient(CFG.get('wire_mode', WIRE_MODE))
 WIRE_WORKERS = {}
 WIRE_WORKERS_SEEN = set()
@@ -33,6 +36,7 @@ RUN_MASTER_RAMP = None
 RUN_ABORT_ACK = None
 RUN_PENDING_WORKERS = set()
 RUN_STOPPING = False
+RUN_STOPPING_AT = None
 RUN_STOPPED = False
 RUN_WORKER_SHUTDOWN_STARTED = False
 RUN_MASTER_QUIT_OWNER = None
@@ -51,10 +55,22 @@ def cleanup_budget(environment):
 
 
 def run_state():
-    return {'failed': RUN_FAILED, 'first_failure': RUN_FIRST_FAILURE,
+    value = {'failed': RUN_FAILED, 'first_failure': RUN_FIRST_FAILURE,
             'quit_requested': RUN_QUIT_REQUESTED, 'notification_failed': RUN_NOTIFICATION_FAILED,
             'stopping': RUN_STOPPING, 'stopped': RUN_STOPPED,
             'counters': dict(RUN_COUNTERS)}
+    if CLIENT_PROFILE.mode == 'client-v2':
+        value.update(client_workload='client-v2', workload_counters=dict(WORKLOAD_COUNTS))
+    return value
+
+
+def validate_workload_counters(value):
+    if (type(value) is not dict or set(value) != set(WORKLOAD_COUNTERS)
+            or any(type(count) is not int or not 0 <= count <= 10**12 for count in value.values())
+            or value['checkpoint_attempts'] != value['checkpoint_completed'] + value['checkpoint_failed']
+            or value['grant_followup_attempts'] != value['grant_followup_completed'] + value['grant_followup_failed']
+            or value['finalization_attempts'] != value['finalization_completed'] + value['finalization_failed']):
+        raise ValueError('loadtest_workload_counters_invalid')
 
 
 def cleanup_balanced(state):
@@ -146,6 +162,10 @@ def validate_run_state(state):
             or state.get('first_failure') is not None
             and failure_label(state['first_failure'], 'invalid_worker_failure') != state['first_failure']):
         raise ValueError('loadtest_worker_run_state_invalid')
+    if CLIENT_PROFILE.mode == 'client-v2':
+        if state.get('client_workload') != 'client-v2':
+            raise ValueError('loadtest_worker_workload_mismatch')
+        validate_workload_counters(state.get('workload_counters'))
 
 
 def final_run_state(environment):
@@ -159,12 +179,19 @@ def final_run_state(environment):
                 and all(value['final'] and worker_settled(value.get('run_state')) for value in WIRE_WORKERS.values())
                 and not WIRE_REPORT_ERROR)
     counters = dict.fromkeys(RUN_COUNTERS, 0)
+    workload = dict.fromkeys(WORKLOAD_COUNTERS, 0)
     for state in states:
         if state is not None:
             for name in counters:
                 counters[name] += state['counters'][name]
-    return run_state() | {'scope': 'latest_cumulative_worker_snapshots',
-                         'counters': counters, 'collection_complete': complete}
+            if CLIENT_PROFILE.mode == 'client-v2':
+                for name in workload:
+                    workload[name] += state['workload_counters'][name]
+    value = run_state() | {'scope': 'latest_cumulative_worker_snapshots',
+                          'counters': counters, 'collection_complete': complete}
+    if CLIENT_PROFILE.mode == 'client-v2':
+        value['workload_counters'] = workload
+    return value
 
 
 def remember_worker(client_id, report, *, final=False, state=None):
@@ -345,8 +372,10 @@ def validate_host(environment, **kwargs):
 
 @events.test_stopping.add_listener
 def mark_stopping(environment, **kwargs):
-    global RUN_STOPPING
+    global RUN_STOPPING, RUN_STOPPING_AT
     RUN_STOPPING = True
+    if CLIENT_PROFILE.mode == 'client-v2' and RUN_STOPPING_AT is None:
+        RUN_STOPPING_AT = time.monotonic()
 
 
 class SyntheticPlayer(HttpUser):
@@ -354,6 +383,18 @@ class SyntheticPlayer(HttpUser):
 
     def wait_time(self):
         return max(.05, min(self.next_activity, self.player.next_checkpoint) - time.monotonic())
+
+    def record_workflow(self, name, elapsed_ms, error, counters):
+        # Fixed names/counters only: no account, token, grant or payload data.
+        if name not in WORKFLOWS or set(counters) != set(WORKLOAD_COUNTERS):
+            raise ValueError('loadtest_workflow_metric_invalid')
+        validate_workload_counters(counters)
+        for key in WORKLOAD_COUNTERS:
+            WORKLOAD_COUNTS[key] += counters[key]
+        safe = None if error is None else ValueError(failure_label(error, 'workflow_not_confirmed'))
+        self.environment.events.request.fire(request_type='WORKFLOW', name=name,
+            response_time=elapsed_ms, response_length=0, exception=safe,
+            context={'client_workload': 'client-v2'})
 
     def exchange(self, method, path, body, authorization, name):
         if (getattr(self, '_finalizing', False)
@@ -363,7 +404,9 @@ class SyntheticPlayer(HttpUser):
             existing = getattr(self, 'player', None)
             cleanup = (getattr(self, '_finalizing', False) and existing is not None
                        and existing.identity is not None and method == 'POST'
-                       and path in ('/v1/online-time/checkpoint', '/_loadtest/release'))
+                       and (path in ('/v1/online-time/checkpoint', '/_loadtest/release')
+                            or CLIENT_PROFILE.mode == 'client-v2' and path == '/v1/profile'
+                            and getattr(existing, 'grant_followup_final', False)))
             if not cleanup:
                 raise StopUser()
         # Locust follows redirects by default; explicitly disable that path.
@@ -394,7 +437,11 @@ class SyntheticPlayer(HttpUser):
         try:
             target_url(self.environment.host or self.host)
             self._finalizing = False
-            self.player = Player(self.exchange, CFG, CONTROLLER)
+            if CLIENT_PROFILE.mode == 'client-v2':
+                self.player = Player(self.exchange, CFG, CONTROLLER,
+                                     workflow_observer=self.record_workflow)
+            else:
+                self.player = Player(self.exchange, CFG, CONTROLLER)
             self.player.start()
             self.next_activity = time.monotonic()
         except StopUser:
@@ -453,7 +500,10 @@ class SyntheticPlayer(HttpUser):
                 # Locust's async stop of a waiting user joins on_stop before its
                 # stop-group timeout. Bound this multi-request cleanup itself.
                 with gevent.Timeout(budget, CleanupTimeout()):
-                    self.player.stop()
+                    if CLIENT_PROFILE.mode == 'client-v2':
+                        self.player.stop(intent_started=RUN_STOPPING_AT)
+                    else:
+                        self.player.stop()
                 RUN_COUNTERS['cleanup_completed'] += 1
             except CleanupTimeout:
                 RUN_COUNTERS['cleanup_interrupted'] += 1
@@ -473,6 +523,32 @@ class SyntheticPlayer(HttpUser):
                 self._finalizing = False
 
 
+def workload_statistics(environment, run):
+    if CLIENT_PROFILE.mode != 'client-v2':
+        return {}
+    counters = run['workload_counters']
+    entries = {entry.name: entry for entry in environment.stats.entries.values()
+               if entry.method == 'WORKFLOW'}
+    if set(entries) - set(WORKFLOWS):
+        raise ValueError('loadtest_workflow_name_invalid')
+    rows = []
+    for name in WORKFLOWS:
+        entry = entries.get(name)
+        count = 0 if entry is None else entry.num_requests
+        rows.append({'name': name, 'requests': count,
+                     'failures': 0 if entry is None else entry.num_failures,
+                     'mean_ms': None if not count else entry.total_response_time / count,
+                     'max_ms': None if not count else entry.max_response_time,
+                     'p95_ms': None if not count else entry.get_response_time_percentile(.95)})
+    checkpoint_count = sum(row['requests'] for row in rows if row['name'].startswith('checkpoint_'))
+    final_count = next(row['requests'] for row in rows if row['name'] == 'finalization')
+    return {'client_workload': 'client-v2', 'workload_counters': counters,
+            'workflow_statistics': rows,
+            'workflow_statistics_complete': checkpoint_count == counters['checkpoint_attempts']
+                and final_count == counters['finalization_attempts'],
+            'workflow_timing_scope': 'WORKFLOW checkpoint includes grant followup profile; finalization starts at worker test_stopping intent before cleanup scheduling and includes checkpoint, followup, release. WORKFLOW is not HTTP.'}
+
+
 @events.quitting.add_listener
 def exit_on_failure(environment, **kwargs):
     if environment.stats.total.num_failures or RUN_FAILED:
@@ -490,11 +566,14 @@ def exit_on_failure(environment, **kwargs):
         total = environment.stats.total
         wire = final_wire_report(environment)
         run = final_run_state(environment)
+        workload = workload_statistics(environment, run)
         http_requests = sum(entry.num_requests for entry in environment.stats.entries.values()
                             if entry.method in ('GET', 'POST', 'HEAD', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'))
         if http_requests != wire['counters']['requests']:
             wire['collection_complete'] = False
         if not wire['collection_complete'] or not run['collection_complete']:
+            environment.process_exit_code = 2
+        if workload and not workload['workflow_statistics_complete']:
             environment.process_exit_code = 2
         path = folder / ('locust_final_' + secrets.token_hex(8) + '_receipt.json')
         write_new(path, {'kind': 'REAL_BUSINESS_LOCUST_FINAL_RECEIPT', 'artifact_root': str(folder),
@@ -504,6 +583,11 @@ def exit_on_failure(environment, **kwargs):
             'business_wire': wire,
             'run_state': run,
             'http_timing_scope': 'locust_http_time_excludes_client_wire_decode',
+            **workload,
+            **({'http_requests': http_requests,
+                'http_failures': sum(entry.num_failures for entry in environment.stats.entries.values()
+                    if entry.method in ('GET', 'POST', 'HEAD', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'))}
+               if CLIENT_PROFILE.mode == 'client-v2' else {}),
             'reset_stats_requested': bool(getattr(environment.parsed_options, 'reset_stats', False)),
             'routes': [{'method': entry.method, 'name': entry.name,
                         'requests': entry.num_requests, 'failures': entry.num_failures}
