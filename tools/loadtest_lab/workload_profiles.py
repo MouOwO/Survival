@@ -109,8 +109,9 @@ class ClientProfile:
             need(type(identity) is str and identity in self.rules, 'grant_reward_missing')
             version, enabled, scope, low, high = self.rules[identity]
             need(enabled, 'grant_reward_disabled')
-            need(scope == 'permanent' and grant.get('effect_scope') == 'permanent',
-                 'grant_scope_mismatch')
+            # Scope is defined by the source-bound local CSV. The actual API
+            # deliberately returns only grant_id/reward_id/amount/version.
+            need(scope == 'permanent', 'grant_scope_mismatch')
             need(number(grant.get('definition_version')) == version, 'grant_definition_version_mismatch')
             amount = number(grant.get('amount'))
             need(low <= amount <= high, 'grant_amount_out_of_range')
