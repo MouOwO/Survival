@@ -80,7 +80,7 @@ locust -f tools/loadtest_lab/locustfile.py --headless --host http://127.0.0.1:29
 
 先20，再100、500、1000、2000、4000；每轮新建环境和输出目录。4000建议每秒增加10–20人，ready稳态至少60分钟，通过后再做4小时长稳，并同时采集测试机CPU、内存、磁盘延迟、PostgreSQL连接/锁等待、业务错误及发生器CPU/网络。先确认发生器没有成为瓶颈，再决定多进程/多机 Locust；服务统一分配账号，worker不会撞号。Windows不支持Locust的`--processes`自动fork，应使用显式master/worker；主从final未收齐会非零退出。关闭只停止本轮监听服务；数据库用 `docker compose stop database`，保留数据及证据，不自动删除。
 
-脚本连续两个5秒窗口、每窗至少100请求且错误率超过5%会停止；任何业务/不变量错误导致非零退出。中止或网络断开可能留下未完成请求，检查 stopped 回执中的 remaining_http_requests 和业务状态后再判断，不能自动重放写操作。
+认证、登录、活动或不变量出现非预期失败时，立即停止整轮并阻止申请替换身份；分布式由master通知所有worker停止，避免失败后自动补人形成启动风暴。未确认登录的身份清理只释放；已登录会话仍尝试最终结算并释放。另保留两次5秒窗口的错误率守护。HTTP失败标签只保留状态及经过严格筛选的业务代码，不记录响应正文、令牌或账号。中止或网络断开可能留下未完成请求，检查 stopped 回执中的 remaining_http_requests 和业务状态后再判断，不能自动重放写操作。
 
 Locust 的周期 CSV 可能停在用户退出前；`locust_final_*_receipt.json` 在正常 quitting 时保存包含用户收尾的最终统计，分布式只由 master 写一份。请将它与 stopped 回执一起核对，不凭周期 CSV 的最后一行判断收尾成功。报告目录必须是已存在的树外目录；不设置时使用 client.json 所在目录。
 

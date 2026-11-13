@@ -47,6 +47,7 @@ class Player:
         self.transport, self.cfg, self.controller, self.clock = transport, cfg, controller, clock
         self.lease = secrets.token_hex(16)
         self.identity = self.token = self.config_hash = None
+        self.session_logged_in = False
         self.next_checkpoint = None
         self.last_profile = None
         self.catalog_md5 = cfg.get('lottery_catalog_md5')
@@ -84,6 +85,7 @@ class Player:
         response = self.business('/v1/session/authenticate', label='[setup] authenticate')
         need(response.get('authenticated') is True and response.get('account_id') == value['account_id'], 'authenticate_not_confirmed')
         self.last_profile = profile(self.business('/v1/session/login', {'mode': 'pure'}, '[setup] login'), value['account_id'])
+        self.session_logged_in = True
         config = self.business('/v1/archive/config', label='[setup] archive/config')
         need(bool(re.fullmatch('[a-f0-9]{64}', config.get('config_hash', ''))), 'invalid_archive_config_hash')
         self.config_hash = config['config_hash']
@@ -235,9 +237,17 @@ class Player:
 
     def stop(self):
         if self.identity is None:
+            self.token = None
+            self.session_logged_in = False
             return
         try:
-            self.checkpoint(final=True)
+            # An issued identity is not yet a logged-in online-time session.
+            # Failed authentication/login must not invent a final checkpoint.
+            if self.session_logged_in:
+                self.checkpoint(final=True)
         finally:
-            self.admin('/_loadtest/release', {'run_id': self.cfg['run_id'], 'lease_id': self.lease})
-            self.identity = self.token = None
+            try:
+                self.admin('/_loadtest/release', {'run_id': self.cfg['run_id'], 'lease_id': self.lease})
+            finally:
+                self.identity = self.token = None
+                self.session_logged_in = False

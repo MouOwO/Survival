@@ -8,7 +8,7 @@ import time
 
 from .guard import PORTS, load_client, target_url, write_new, need, verify_attestation
 from .workload import Player, BusinessFailure, checked, persisted_fingerprint
-from .wire_client import WireClient, WIRE_MODE
+from .wire_client import WireClient, WIRE_MODE, http_error_label
 
 
 class JsonTransport:
@@ -25,10 +25,14 @@ class JsonTransport:
             conn.request(method, path, body=raw, headers=self.wire.headers(method, path, authorization))
             response = conn.getresponse(); data = response.read(8*1024*1024 + 1)
             need(len(data) <= 8*1024*1024, 'response_budget_exceeded')
-            value = self.wire.decode(method, path, data, response.status, request_body=body)
+            try:
+                value = self.wire.decode(method, path, data, response.status, request_body=body)
+            except Exception:
+                if response.status != 200:
+                    raise BusinessFailure(http_error_label(response.status, None)) from None
+                raise
             if response.status != 200:
-                code = value.get('error', 'http_request_failed') if isinstance(value, dict) else 'http_request_failed'
-                raise BusinessFailure(code)
+                raise BusinessFailure(http_error_label(response.status, value))
             return checked(value)
         finally:
             self.requests += 1

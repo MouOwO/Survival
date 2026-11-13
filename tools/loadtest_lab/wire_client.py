@@ -28,6 +28,8 @@ PROFILE_MARKER = '_http_profile_refs'
 ACCOUNT_FIELDS = ('schema_version', 'account_id', 'revision', 'entitlements',
                   'achievements', 'save', 'public')
 DAILY_KEY = re.compile(r'[a-z][a-z0-9_]{0,95}\Z')
+ERROR_CODE = re.compile(r'[a-z][a-z0-9_]{0,63}\Z')
+PRIVATE_IDENTIFIER = re.compile(r'[0-9]{8,}|[a-f0-9]{32,}')
 BUSINESS_PATHS = frozenset((
     '/v1/session/authenticate', '/v1/session/login', '/v1/profile',
     '/v1/archive/config', '/v1/lottery/catalog', '/v1/lottery/snapshot',
@@ -41,6 +43,29 @@ COUNTERS = (
     'profile_refs_v1_responses', 'profile_refs_v2_responses',
     'invalid_responses', 'decode_wall_ns', 'max_decode_wall_ns',
 )
+
+
+def safe_error_code(value, fallback='error_unavailable'):
+    """Keep short machine codes, never an account ID, digest or bearer value."""
+    if (type(value) is not str or not ERROR_CODE.fullmatch(value)
+            or PRIVATE_IDENTIFIER.search(value)
+            or value.startswith(('lt1_', 'bearer_', 'sk_', 'access_token_', 'refresh_token_'))):
+        return fallback
+    return value
+
+
+def http_error_label(status, value):
+    status = status if type(status) is int and 100 <= status <= 599 else 0
+    code = safe_error_code(value.get('error') if type(value) is dict else None)
+    return 'http_' + str(status) + ':' + code
+
+
+def failure_label(error, fallback='invalid_response'):
+    code = str(error)
+    match = re.fullmatch(r'http_([0-9]{1,3}):([a-z][a-z0-9_]{0,63})', code)
+    if match:
+        return http_error_label(int(match[1]), {'error': match[2]})
+    return safe_error_code(code, fallback)
 
 
 def _unique(pairs):
