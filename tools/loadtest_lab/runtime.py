@@ -156,7 +156,7 @@ def checked_http_admission_stats(server, layer, cfg):
         return None
     stats = server.admission_stats()
     need(type(stats) is dict and stats.get('layer') == layer
-         and stats.get('max_concurrency') == (48 if layer == 'frontend' else 32)
+         and stats.get('max_concurrency') == cfg['web_concurrency' if layer == 'frontend' else 'http_concurrency']
          and stats.get('backlog') == 64
          and stats.get('accept_wait_seconds') == (0 if layer == 'frontend' else 2),
          'actual_http_admission_budget_mismatch')

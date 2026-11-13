@@ -31,11 +31,12 @@ SPECS = {
                    'survival_http_admission.py'))),
 }
 SPECS['http-admission-v2'] = SPECS['http-admission-v1']
+SPECS['http-admission-v3'] = SPECS['http-admission-v1']
 SPECS['pool-notify-v1'] = (
     ('db_pool_notify_patch.py', 'bounded_pool_notify.py'),
     frozenset(('fishing_api/_bounded_pool.py',)),
     frozenset(('fishing_api/_bounded_pool.py',)))
-ADMISSION_IDS = ('http-admission-v1', 'http-admission-v2')
+ADMISSION_IDS = ('http-admission-v1', 'http-admission-v2', 'http-admission-v3')
 ORDER = ('checkpoint-observation-v1', *ADMISSION_IDS, 'pool-notify-v1')
 ROW_KEYS = frozenset(('id', 'source_revision', 'operator_sources',
                       'parent_runtime_sha256', 'runtime_sha256'))
@@ -62,9 +63,10 @@ def apply_experiments(root, cfg, revision, *, observation=False, admission=False
                       pool_notify=False, repository):
     """Apply reviewed transformations in order, before the lab manifest exists."""
     admission = ('bounded-v1' if admission is True else 'baseline' if admission is False else admission)
-    _need(admission in ('baseline', 'bounded-v1', 'bounded-v2'), 'http_admission_mode_invalid')
+    admission_modes = dict(zip(('bounded-v1', 'bounded-v2', 'bounded-v3'), ADMISSION_IDS))
+    _need(admission == 'baseline' or admission in admission_modes, 'http_admission_mode_invalid')
     selected = ([ORDER[0]] if observation else []) + (
-        [ADMISSION_IDS[0] if admission == 'bounded-v1' else ADMISSION_IDS[1]]
+        [admission_modes[admission]]
         if admission != 'baseline' else []) + (['pool-notify-v1'] if pool_notify else [])
     if not selected:
         return
@@ -152,9 +154,9 @@ def validate_experiments(cfg):
                       for digest in mapping.values()), 'runtime_experiment_digest_invalid')
     _need(identities == [name for name in ORDER if name in identities],
           'runtime_experiment_order_or_duplicate_invalid')
-    _need(not all(name in identities for name in ADMISSION_IDS), 'http_admission_modes_are_exclusive')
-    _need('pool-notify-v1' not in identities or ADMISSION_IDS[1] in identities,
-          'targeted_pool_notify_requires_http_v2_queue32')
+    _need(sum(name in identities for name in ADMISSION_IDS) <= 1, 'http_admission_modes_are_exclusive')
+    _need('pool-notify-v1' not in identities or any(name in identities for name in ADMISSION_IDS[1:]),
+          'targeted_pool_notify_requires_reviewed_queue_budget')
     # Walk a fixed three-step chain backwards: each child's parent must equal
     # the immediately preceding output, even when both touch the same file.
     restored = {}
@@ -168,9 +170,10 @@ def validate_experiments(cfg):
         # A waiter remains counted until it gets the mutex after notify. Even
         # with idle connections, all HTTP workers can briefly be queued. V2
         # reserves one waiting place per HTTP worker; connection count stays 4.
-        waiting = 32 if ADMISSION_IDS[1] in identities else 28
+        workers = 8 if ADMISSION_IDS[2] in identities else 32
+        waiting = 8 if ADMISSION_IDS[2] in identities else 32 if ADMISSION_IDS[1] in identities else 28
         _need((cfg.get('http_concurrency'), cfg.get('web_concurrency'),
                cfg.get('db_concurrency'), cfg.get('database_pool_limits')) ==
-              (32, 48, 4, {'connections': 4, 'waiting': waiting, 'wait_seconds': 2}),
+              (workers, 48, 4, {'connections': 4, 'waiting': waiting, 'wait_seconds': 2}),
               'reviewed_http_admission_budgets_required')
     return restored
