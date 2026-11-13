@@ -76,15 +76,15 @@ local FLAME_BURN_PARTICLE =
 local FLAME_BURN_THINK_INTERVAL = 0.05
 local ARCANE_MAX_HULL_RADIUS = 256
 local ice_cone_visual = {
-    flight = "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_lizard_blobs_arced.vpcf",
-    impact = "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion.vpcf",
+    flight = "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion_ice.vpcf",
+    impact = "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion_ice_debris.vpcf",
     field_duration = 5,
     field_fade_duration = 1,
     impact_radius = 75,
-    fall_duration_scale = 2,
-    fall_speed_multiplier = 0.7,
+    -- Native Freezing Field ice travels from CP1 to CP2 in exactly 0.4s.
+    fall_duration = 0.4,
     first_impact_delay = 0.8 / 0.7,
-    max_flights = 20,
+    max_flights = 3,
     max_lateness = 0.15,
     active = {},
 }
@@ -3394,12 +3394,11 @@ function ice_cone_visual.create_field(state, position, radius)
 end
 
 function ice_cone_visual.configure_flight(missile, now)
-    local duration = missile.travel_duration
     local sky = missile.position + Vector(0, 0, missile.height)
-    ParticleManager:SetParticleControl(missile.particle, 0, sky)
-    ParticleManager:SetParticleControl(missile.particle, 1, missile.position)
-    ParticleManager:SetParticleControl(missile.particle, 2, Vector(missile.height / duration, 0, 0))
-    ParticleManager:SetParticleControl(missile.particle, 3, sky)
+    ParticleManager:SetParticleControl(missile.particle, 0, missile.position)
+    ParticleManager:SetParticleControl(missile.particle, 1, sky)
+    ParticleManager:SetParticleControl(missile.particle, 2, missile.position)
+    ParticleManager:SetParticleControl(missile.particle, 3, missile.position)
 end
 
 function ice_cone_visual.ensure_task()
@@ -3426,34 +3425,34 @@ end
 
 function ice_cone_visual.prepare_hail(state, current_time, impact_count, impact_interval)
     for wave = 1, impact_count do
+        -- Keep the configured damage deadline; every ice chunk in this wave
+        -- launches and lands together, rather than staggering individual shells.
         local wave_start = current_time + (wave - 1) * impact_interval
-        for ball = 1, 10 do
+            + ice_cone_visual.first_impact_delay - ice_cone_visual.fall_duration
+        for ball = 1, 3 do
             local sequence = #state.hail + 1
             local radial_jitter = ice_cone_visual.random(state)
             local angle_jitter = ice_cone_visual.random(state) - 0.5
-            local distance = math.sqrt(((sequence - 1) % 13 + radial_jitter) / 13)
+            local distance = math.sqrt((ball - 1 + radial_jitter) / 3)
                 * math.max(0, state.radius - ice_cone_visual.impact_radius)
             local angle = sequence * 2.399963229728653 + angle_jitter * 0.45
             local position = state.position + Vector(math.cos(angle) * distance, math.sin(angle) * distance, 0)
             if GetGroundPosition then position = GetGroundPosition(position, nil) end
-            local travel_time = (0.40 + ice_cone_visual.random(state) * 0.08)
-                * ice_cone_visual.fall_duration_scale / ice_cone_visual.fall_speed_multiplier
-            local launch_at = wave_start + (ball - 1) * 0.008
+            local travel_time = ice_cone_visual.fall_duration
+            local launch_at = wave_start
             state.hail[sequence] = {
                 state = state,
                 position = position,
-                height = 1800 + ice_cone_visual.random(state) * 400,
+                height = 1600,
                 wave = wave,
-                visible = (ball - 1) % 4 == 0,
+                visible = true,
                 launch_at = launch_at,
                 travel_duration = travel_time,
                 land_at = launch_at + travel_time,
             }
         end
     end
-    table.sort(state.hail, function(a, b)
-        return a.launch_at == b.launch_at and a.land_at < b.land_at or a.launch_at < b.launch_at
-    end)
+    -- Already ordered by wave; no sorting or invisible placeholder missiles.
 end
 
 function ice_cone_visual.spawn(state, missile, now)
@@ -3651,8 +3650,8 @@ local function run_ice_cone(context, definition)
     local function run_next_impact()
         if state.hail_stopped or not ice_cone_visual.active[state] then return false end
         if next_impact > impact_count then return false end
-        -- Each wave's random fall times and late launch ticks can move its
-        -- first arrival. Wait for that shell, even if its visual failed to load.
+        -- A late launch tick moves the whole wave's arrival together. Wait
+        -- for it even if the native visual failed to load.
         local now = game_time()
         local first_landing = state.wave_landings[next_impact]
         if first_landing and now + 0.000001 < first_landing then

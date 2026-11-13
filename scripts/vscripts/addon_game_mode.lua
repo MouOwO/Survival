@@ -840,8 +840,8 @@ function M.precache(context)
         PrecacheResource("particle", particle, context)
     end
     for _, particle in ipairs({
-        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_lizard_blobs_arced.vpcf",
-        "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion.vpcf",
+        "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion_ice.vpcf",
+        "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion_ice_debris.vpcf",
         "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse.vpcf",
         "particles/status_fx/status_effect_wyvern_curse_target.vpcf",
     }) do
