@@ -178,6 +178,9 @@ def prepare(args):
     from .database_experiments import apply_schema_experiment
     apply_schema_experiment(root, cfg, revision,
         mode=getattr(args, 'gameplay_defaults', 'baseline'), repository=ROOT)
+    from .business_experiments import apply_business_experiment
+    apply_business_experiment(root, cfg, revision,
+        mode=getattr(args, 'profile_load', 'baseline'), repository=ROOT)
     runner = b"import sys\nfrom pathlib import Path\nsys.path[:0]=[str(Path(__file__).parent/'operator'),str(Path(__file__).parent/'runtime')]\nfrom loadtest_lab.cli import entry\nraise SystemExit(entry())\n"
     (root / 'run_lab.py').write_bytes(runner); cfg['sources']['run_lab.py'] = sha(runner)
     write_new(root / 'lab.json', cfg)
@@ -216,6 +219,7 @@ def prepare(args):
         'database_pool_parameters': pool_parameters,
         'runtime_experiments': cfg.get('runtime_experiments', []),
         **({'schema_experiment': cfg['schema_experiment']} if 'schema_experiment' in cfg else {}),
+        **({'business_experiment': cfg['business_experiment']} if 'business_experiment' in cfg else {}),
         'cloud_resources_created': 0, 'requests_sent': 0, 'production_rows_copied': 0})
     return {'status': 'LAB_PREPARED_NOT_STARTED', 'directory': str(root), 'run_id': run,
             'accounts': accounts, 'active': active, 'purpose': purpose,
@@ -309,6 +313,8 @@ def main(argv=None):
                       help='Opt-in exact-source FIFO head notification experiment; requires HTTP admission v2/v3')
     init.add_argument('--gameplay-defaults', choices=('baseline', 'set-v1'), default='baseline',
                       help='Opt-in exact-source set validation of gameplay defaults; isolated bounded-v2 only')
+    init.add_argument('--profile-load', choices=('baseline', 'init-only-v1'), default='baseline',
+                      help='Opt-in removal of discarded profile pre-read; reviewed observed bounded-v2 sources only')
     init.add_argument('--database-memory-mib', type=int,
                       help='Isolated local database memory cap; default 2048 MiB (smoke: 256)')
     init.add_argument('--database-cpu-limit', type=float,

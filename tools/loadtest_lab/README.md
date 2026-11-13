@@ -39,6 +39,12 @@
 
 上述元数据复杂度按索引查找分析，实际也可能采用O(M+A)的hash连接；尚未以EXPLAIN证明具体计划。F40真实2305HTTP零错、40完整退出，最终P95约11秒仍超预定10秒；该开关不能据此当作正式容量通过，详情见知识库40人修复记录。
 
+`--profile-load init-only-v1`只在新`bounded-v2`隔离候选移除`ArchiveService.profile`的一次未使用预读。原账号校验和ensure由共享初始化helper保留；独立`application.profile`仍为原ensure+get，两轮online drain、archive_pending、最终fresh profile、grants以及VIP/排行榜包装器均保持。已审SQL限`56467cf6…`或`600eb5d3…`，补丁来源`a478be66…`，两个Python父/子摘要独立绑定`business_experiment`，准备在原runtime/schema层之后执行。
+
+业务补丁与观测层共用application文件，门禁用固定父摘要的临时视图校验原runtime链，真实manifest/source map保持最终字节；随后逐源path/hash及三份固定文件的restore/replay/compile验证。客户端仅校验metadata，不读取运行源码。旧默认不加业务字段，已知新输出丢失证明会拒绝。准备/启动O(源码字节数+≤300个来源项)，请求无新缓存、遍历或本地读；每次archive profile省1RPC及被丢弃档案的O(P)构造/公开转换，P为档案大小，新增状态O(1)。常见正elapsed checkpoint静态11→10RPC，零待办9→8；带match context的普通profile6→5，不把源码计数写成延迟证明。
+
+等价范围为冻结SQL和合法业务数据。被删除预读原本触发的数据库/档案异常可能移到后续drain之后；该差异在故障注入用例中明确保留，不宣称任意DDL/损坏数据/网络故障点完全相同。所有剩余RPC仍执行实时权限检查和原重置；已提交写入不换ID重试。必须真实两账号事务/重放核验及同负载40人复测后判断效果，不能用mock调用数替代容量结果。
+
 正式比较应填写`--postgres-image docker.io/library/postgres@sha256:<真实摘要>`或`public.ecr.aws/docker/library/postgres@sha256:<真实摘要>`，匹配拟上线PG版本及镜像。显式参数仅允许这两个官方仓库的固定摘要；省略时保留`postgres:17`兼容，运行前仍须记录实际镜像。不要为下载方便改用无法核验来源的镜像。
 
 ## 准备（项目 Windows 工作目录）

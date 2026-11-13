@@ -116,6 +116,12 @@ def resolve_database_pool(mode, *, http_concurrency=None, db_concurrency=4,
 
 def validate_database_pool(cfg):
     """Fixed reviewed experiment budgets and source bindings, once per load."""
+    from .business_experiments import metadata_parent_sources
+    business_parents = metadata_parent_sources(cfg)
+    if business_parents:
+        # Validate the existing runtime chain against the reviewed child layer's
+        # parents. The real manifest/source map still binds the final bytes.
+        cfg = {**cfg, 'sources': {**cfg['sources'], **business_parents}}
     from .experiments import validate_experiments
     restored = validate_experiments(cfg)
     mode = cfg.get('backend_db_pool', 'baseline')
@@ -228,6 +234,8 @@ def load(directory):
              and sha(path.read_bytes()) == digest, 'lab_source_changed:' + name)
     from .database_experiments import validate_schema_experiment
     validate_schema_experiment(cfg, lambda name: (root / name).read_bytes())
+    from .business_experiments import validate_business_experiment
+    validate_business_experiment(cfg, lambda name: (root / name).read_bytes())
     return root, cfg, private
 
 
@@ -318,4 +326,6 @@ def load_client(path):
     need(cfg.get('wire_mode', 'business-wire-v1') in ('business-wire-v1', 'legacy-json'),
          'lab_wire_mode_invalid')
     validate_postgres_image(cfg.get('postgres_image', DEFAULT_POSTGRES_IMAGE), allow_default=True)
+    from .business_experiments import metadata_parent_sources
+    metadata_parent_sources(cfg)  # Client-only proof: no source-file reads.
     return cfg, controller
