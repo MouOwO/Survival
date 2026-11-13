@@ -45,14 +45,18 @@ def frontend_handler(service, cfg, private, stop, pending):
     class Handler(base):
         def do_GET(self):
             try:
-                service.budget()
                 parsed = urlsplit(self.path)
-                if parsed.path == '/_loadtest/context':
+                service.budget(controller=parsed.path in ('/_loadtest/context', '/_loadtest/status'))
+                if parsed.path in ('/_loadtest/context', '/_loadtest/status'):
+                    if len(self.headers.get_all('Authorization', [])) != 1:
+                        raise AuthError('lab_controller_required', 401)
                     service.controller(self.headers.get('Authorization'))
                     query = parse_qs(parsed.query, strict_parsing=True)
                     if set(query) != {'nonce'} or len(query['nonce']) != 1 or not re.fullmatch('[a-f0-9]{32}', query['nonce'][0]):
                         raise AuthError('lab_nonce_required', 400)
-                    self.reply(200, attest(cfg, private, query['nonce'][0]))
+                    value = (service.status(query['nonce'][0]) if parsed.path == '/_loadtest/status'
+                             else attest(cfg, private, query['nonce'][0]))
+                    self.reply(200, value)
                 elif self.path == '/health':
                     self.reply(200, {'ok': True, 'service': 'survival-loadtest', 'synthetic_only': True})
                 else:
@@ -66,7 +70,8 @@ def frontend_handler(service, cfg, private, stop, pending):
             with pending:
                 pending.inflight += 1
             try:
-                service.budget()
+                service.budget(controller=self.path in (
+                    '/_loadtest/identity', '/_loadtest/release', '/_loadtest/ready', '/_loadtest/stop'))
                 if self.path in ('/_loadtest/identity', '/_loadtest/release', '/_loadtest/ready', '/_loadtest/stop'):
                     if len(self.headers.get_all('Authorization', [])) != 1:
                         raise AuthError('lab_controller_required', 401)
@@ -219,6 +224,7 @@ def serve(directory, *, lua_executable=None):
                 'cpus': cfg.get('database_cpu_limit', .5 if cfg['purpose'] == 'functional-smoke' else 4)},
             'lua_executable': lua, 'lua_sha256': lua_sha256, 'lua_version': lua_version,
             'actual_catalog_preflight_passed': True,
+            'synthetic_identity_policy': service.identity_policy(),
             'steam_calls_enabled': False, 'payment_calls_enabled': False, 'public_listener': False})
         threads = [threading.Thread(target=srv.serve_forever, daemon=True) for srv in (backend, web)]
         for srv, thread in zip((backend, web), threads):
@@ -230,6 +236,9 @@ def serve(directory, *, lua_executable=None):
     except KeyboardInterrupt:
         stop.set()
     finally:
+        # Measurement ends before accepting stops/drain waits. This never
+        # cancels authorization for business requests accepted before shutdown.
+        service.end_tracking()
         deadline = time.monotonic() + 45
         # Stop accepting new frontend requests while already accepted work can
         # still forward to a live backend. Then prove both handler sets ended.
@@ -264,6 +273,7 @@ def serve(directory, *, lua_executable=None):
             'artifact_root': str(root), 'run_id': cfg['run_id'], 'requests_accepted': service.request_count,
             'remaining_http_requests': pending.inflight, 'active_synthetic_leases': service.active,
             'synthetic_activity': service.counts(),
+            'synthetic_identity_policy': service.identity_policy(),
             'frontend_drain': web_drain, 'backend_drain': backend_drain,
             'backend_db_pool': cfg.get('backend_db_pool', 'baseline'),
             'database_pool_parameters': cfg.get('database_pool_parameters'),

@@ -86,13 +86,19 @@ $env:LOADTEST_REPORT_DIRECTORY='D:/Survival_本地工具/runs/loadtest_NEW'
 locust -f tools/loadtest_lab/locustfile.py --headless --host http://127.0.0.1:29567 --users 20 --spawn-rate 2 --run-time 5m --stop-timeout 45 --csv D:/Survival_本地工具/runs/loadtest_NEW/load20 --html D:/Survival_本地工具/runs/loadtest_NEW/load20.html
 ```
 
-先20，再100、500、1000、2000、4000；每轮新建环境和输出目录。4000建议每秒增加10–20人，ready稳态至少60分钟，通过后再做4小时长稳，并同时采集测试机CPU、内存、磁盘延迟、PostgreSQL连接/锁等待、业务错误及发生器CPU/网络。先确认发生器没有成为瓶颈，再决定多进程/多机 Locust；服务统一分配账号，worker不会撞号。Windows不支持Locust的`--processes`自动fork，应使用显式master/worker；主从final未收齐会非零退出。关闭只停止本轮监听服务；数据库用 `docker compose stop database`，保留数据及证据，不自动删除。
+先20、40，再100、200、500、1000、2000、4000；每轮新建环境和输出目录。40人诊断先保持每4秒增加1人、满员至少10分钟，并把集中退出单列；当前40人的退出结算与延迟尚未通过，不自动进入100。4000建议每秒增加10–20人，ready稳态至少60分钟，通过后另建一轮4小时长稳，并同时采集测试机CPU、内存、磁盘延迟、PostgreSQL连接/锁等待、业务错误及发生器CPU/网络。先确认发生器没有成为瓶颈，再决定多进程/多机 Locust；服务统一分配账号，worker不会撞号。Windows不支持Locust的`--processes`自动fork，应使用显式master/worker；主从final未收齐会非零退出。关闭只停止本轮监听服务；数据库用 `docker compose stop database`，保留数据及证据，不自动删除。
 
 认证、登录、活动或不变量出现非预期失败时，立即停止整轮并阻止申请替换身份；分布式由master通知所有worker停止，避免失败后自动补人形成启动风暴。未确认登录的身份清理只释放；已登录会话仍尝试最终结算并释放。另保留两次5秒窗口的错误率守护。HTTP失败标签只保留状态及经过严格筛选的业务代码，不记录响应正文、令牌或账号。中止或网络断开可能留下未完成请求，检查 stopped 回执中的 remaining_http_requests 和业务状态后再判断，不能自动重放写操作。
 
 Locust 的周期 CSV 可能停在用户退出前；`locust_final_*_receipt.json` 在正常 quitting 时保存包含用户收尾的最终统计，分布式只由 master 写一份。请将它与 stopped 回执一起核对，不凭周期 CSV 的最后一行判断收尾成功。报告目录必须是已存在的树外目录；不设置时使用 client.json 所在目录。
 
 在线结算分别使用 `[checkpoint:setup]`、`[checkpoint:periodic]`、`[checkpoint:final]` 统计名，区分入局、正常在线和退出时延。这只影响本地统计，不改变请求路径、正文、幂等请求ID或服务端处理；不得将集中退出的结果冒称常规稳态表现。
+
+合成 `lt1_` 身份统一到“本轮启动时间＋已校验的运行预算＋120秒收尾余量”过期；配置足够运行预算（上限18000秒）后可覆盖入场后四小时长稳，新业务仍在原单调时钟期限停止。没有续签、换号或未知写重试，生产四小时授权规则与生产对 `lt1_` 的拒绝保持。4小时边界由模拟时钟回归覆盖，不等同已经实际执行4小时压测，也不覆盖真实Steam授权续期。时钟偏差超过60秒（仅容许1微秒表示精度）或单调时钟回退会使本轮持续失效，计时保守截到最后验证时刻。
+
+控制器可读取 `GET /_loadtest/status?nonce=<32位小写hex>`，必须单个控制器Authorization。响应使用独立kind、run、manifest、nonce及HMAC固定签名；调用方缓存清单摘要一次，用 `loadtest_lab.status.decode_status()` 验证16KiB上限、重复键、字段和签名。状态读取为固定字段O(1)，不扫描身份集合或查询DB；新增请求计入API总请求和 `status_requests`，外部观察不能混入Locust业务统计。状态保留原始未释放数，并分别提供有效已确认ready、当前/最长连续满员及起止时间。关服开始时冻结测量，已受理请求仍可在原业务期限内完成；排空时间不增加有效ready时长。
+
+ready表示已确认且仍有效的合成租约能力，不是客户端心跳。容量判断必须结合停止前的签名状态、发生器实际运行窗口、到达率及完成率；不能单靠stopped累计/最长秒数认定稳定负载。当前仍需人工逐级设置和审查，没有自动放行到4000的一键控制器。
 
 ## 容量判断与限制
 
