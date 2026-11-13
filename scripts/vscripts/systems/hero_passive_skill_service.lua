@@ -76,6 +76,7 @@ local FLAME_BURN_PARTICLE =
 local FLAME_BURN_THINK_INTERVAL = 0.05
 local ARCANE_MAX_HULL_RADIUS = 256
 local ice_cone_visual = {
+    field = "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_ground.vpcf",
     flight = "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion_ice.vpcf",
     impact = "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion_ice_debris.vpcf",
     field_duration = 5,
@@ -84,7 +85,8 @@ local ice_cone_visual = {
     -- Native Freezing Field ice travels from CP1 to CP2 in exactly 0.4s.
     fall_duration = 0.4,
     first_impact_delay = 0.8 / 0.7,
-    max_flights = 3,
+    hail_per_wave = 10,
+    max_flights = 10,
     max_lateness = 0.15,
     active = {},
 }
@@ -3429,11 +3431,11 @@ function ice_cone_visual.prepare_hail(state, current_time, impact_count, impact_
         -- launches and lands together, rather than staggering individual shells.
         local wave_start = current_time + (wave - 1) * impact_interval
             + ice_cone_visual.first_impact_delay - ice_cone_visual.fall_duration
-        for ball = 1, 3 do
+        for ball = 1, ice_cone_visual.hail_per_wave do
             local sequence = #state.hail + 1
             local radial_jitter = ice_cone_visual.random(state)
             local angle_jitter = ice_cone_visual.random(state) - 0.5
-            local distance = math.sqrt((ball - 1 + radial_jitter) / 3)
+            local distance = math.sqrt((ball - 1 + radial_jitter) / ice_cone_visual.hail_per_wave)
                 * math.max(0, state.radius - ice_cone_visual.impact_radius)
             local angle = sequence * 2.399963229728653 + angle_jitter * 0.45
             local position = state.position + Vector(math.cos(angle) * distance, math.sin(angle) * distance, 0)

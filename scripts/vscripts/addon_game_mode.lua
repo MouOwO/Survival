@@ -842,6 +842,7 @@ function M.precache(context)
     for _, particle in ipairs({
         "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion_ice.vpcf",
         "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion_ice_debris.vpcf",
+        "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_ground.vpcf",
         "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse.vpcf",
         "particles/status_fx/status_effect_wyvern_curse_target.vpcf",
     }) do
