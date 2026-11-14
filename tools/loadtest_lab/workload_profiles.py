@@ -13,13 +13,14 @@ from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 import hashlib
 import io
+import json
 import re
 import threading
 from types import MappingProxyType
 
 from .guard import canonical, need
 
-MODES = frozenset(('legacy-v1', 'client-v2'))
+MODES = frozenset(('legacy-v1', 'client-v2', 'client-v3'))
 CSV_SOURCE = 'addon/data/csv/玩家档案系统/star_blessing_reward_definitions.csv'
 MAX_DEFINITIONS = 256
 MAX_GRANTS = MAX_SEEN_GRANTS = 128
@@ -60,7 +61,7 @@ def _rule(row):
     return identity, (row['definition_version'], row['enabled'], row['effect_scope'], low, high)
 
 
-def build_workload_profile(csv_bytes):
+def build_workload_profile(csv_bytes, mode='client-v2', *, compact_seed=None):
     """Prepare public metadata from the actual exported reward CSV bytes."""
     need(type(csv_bytes) is bytes and 1 <= len(csv_bytes) <=256*1024,
          'workload_csv_budget_invalid')
@@ -90,15 +91,19 @@ def build_workload_profile(csv_bytes):
     except (UnicodeError, csv.Error, StopIteration):
         raise ValueError('workload_csv_invalid') from None
     need(bool(rows), 'workload_reward_definitions_empty')
-    return {'id': 'client-v2', 'source': CSV_SOURCE,
-            'source_sha256': hashlib.sha256(csv_bytes).hexdigest(),
-            'rules': sorted(rows, key=lambda row: row['reward_id'])}
+    result = {'id': mode, 'source': CSV_SOURCE,
+              'source_sha256': hashlib.sha256(csv_bytes).hexdigest(),
+              'rules': sorted(rows, key=lambda row: row['reward_id'])}
+    need(mode in ('client-v2', 'client-v3'), 'client_profile_mode_invalid')
+    if mode == 'client-v3':result['compact'] = compact_contract(compact_seed)
+    return result
 
 
 @dataclass(frozen=True)
 class ClientProfile:
     mode: str
     rules: object
+    compact: object = None
 
     def grants(self, value):
         need(type(value) is list and len(value) <= MAX_GRANTS, 'checkpoint_grants_invalid')
@@ -132,7 +137,8 @@ def validate_workload_profile(cfg, read_source=None):
         need('workload_profile' not in cfg, 'legacy_workload_metadata_unexpected')
         return _LEGACY
     value = cfg.get('workload_profile')
-    need(type(value) is dict and set(value) == {'id', 'source', 'source_sha256', 'rules'}
+    keys = {'id', 'source', 'source_sha256', 'rules'} | ({'compact'} if mode == 'client-v3' else set())
+    need(type(value) is dict and set(value) == keys
          and value.get('id') == mode and value.get('source') == CSV_SOURCE,
          'workload_profile_binding_invalid')
     digest = value['source_sha256']
@@ -149,9 +155,15 @@ def validate_workload_profile(cfg, read_source=None):
     need(order == sorted(order), 'workload_rule_order_invalid')
     if read_source is not None:
         raw = read_source(CSV_SOURCE)
-        need(type(raw) is bytes and canonical(build_workload_profile(raw)) == canonical(value),
+        need(type(raw) is bytes and canonical(build_workload_profile(raw, mode, compact_seed=read_source(COMPACT_TARGET) if mode == 'client-v3' else None)) == canonical(value),
              'workload_csv_rules_mismatch')
-    return ClientProfile(mode, MappingProxyType(rules))
+    compact = None
+    if mode == 'client-v3':
+        compact = value['compact']
+        need(type(compact) is dict and canonical(compact) == canonical(COMPACT_METADATA), 'compact_client_metadata_changed')
+        need(cfg.get('sources', {}).get(COMPACT_TARGET) == COMPACT_SEED_SHA and cfg.get('lottery_catalog_md5') == compact['catalog_md5'], 'compact_seed_source_binding_changed')
+        compact = MappingProxyType(dict(compact))
+    return ClientProfile(mode, MappingProxyType(rules), compact)
 
 
 def profile_for(cfg):
@@ -169,3 +181,17 @@ def profile_for(cfg):
         if len(_CACHE) > 8:
             _CACHE.popitem(last=False)
         return profile
+
+COMPACT_TARGET = 'operator/fixtures/compact_client_v3_catalog.json'
+COMPACT_SEED_SHA = '558c6830ca39df0e08615e24574b1f847a205fad175de41bfba2306764d2126e'
+COMPACT_METADATA = {'id': 'compact-room-v1', 'source': 'operator/fixtures/compact_client_v3_catalog.json', 'source_sha256': '558c6830ca39df0e08615e24574b1f847a205fad175de41bfba2306764d2126e', 'catalog_md5': '4027c0e0b4d3218bd246a701478ce5c2', 'config_hash': 'd38866d1be2dec7b3b8c27ddd1315bab9cb27a1c7e0a136b670e5e9df12e3ed1', 'room_size': 4, 'catalog_interval_seconds': 30, 'checkpoint_interval_seconds': 60, 'single_worker_only': True, 'pool_revisions': {'map': '604029679-664651516', 'cultivation': '1688628271-1060922468', 'dragon_knight': '941368790-1864694631', 'summer': '474022853-1112315570'}}
+
+def compact_contract(raw):
+    need(type(raw) is bytes and len(raw) <= 256*1024 and hashlib.sha256(raw).hexdigest() == COMPACT_SEED_SHA, 'compact_catalog_source_changed')
+    seed=json.loads(raw);document=seed.get('catalog_json')
+    need(type(document) is str and hashlib.md5(document.encode('utf8'),usedforsecurity=False).hexdigest()==COMPACT_METADATA['catalog_md5']
+         and seed.get('md5')==COMPACT_METADATA['catalog_md5'] and seed.get('config_hash')==COMPACT_METADATA['config_hash'],'compact_catalog_identity_changed')
+    data=json.loads(document)
+    need(data.get('schema')==1 and type(data.get('snapshots'))is list and len(data['snapshots'])==4,'compact_catalog_shape_invalid')
+    need({s['selected_pool_id']:s['selected_pool']['revision']for s in data['snapshots']}==COMPACT_METADATA['pool_revisions'],'compact_pool_revision_changed')
+    return dict(COMPACT_METADATA)

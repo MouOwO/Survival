@@ -213,11 +213,21 @@ def prepare(args):
     apply_frontend_experiment(root, cfg, revision,
         mode=getattr(args, 'frontend_rate', 'baseline'), repository=ROOT,
         private_sqlite_build_receipt=getattr(args, 'private_sqlite_build_receipt', None))
-    from .workload_profiles import build_workload_profile, CSV_SOURCE
+    from .workload_profiles import build_workload_profile, CSV_SOURCE, COMPACT_TARGET, COMPACT_SEED_SHA
     client_workload = getattr(args, 'client_workload', 'legacy-v1')
     if client_workload != 'legacy-v1':
         cfg['client_workload'] = client_workload
-        cfg['workload_profile'] = build_workload_profile((root / CSV_SOURCE).read_bytes())
+        compact_seed = None
+        if client_workload == 'client-v3':
+            source = 'data/ui/lottery_catalog.json'
+            compact_seed = subprocess.run(['git','-C',str(ROOT),'show',revision+':'+source],capture_output=True,check=True,timeout=20).stdout
+            need(sha(compact_seed)==COMPACT_SEED_SHA and compact_seed.replace(b'\r\n',b'\n')==(ROOT/source).read_bytes().replace(b'\r\n',b'\n'),'compact_catalog_must_match_committed_source')
+            target=root/COMPACT_TARGET;need(not target.exists(),'compact_catalog_target_exists');target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(compact_seed)
+            cfg['sources'][COMPACT_TARGET]=sha(compact_seed)
+            from .workload_profiles import COMPACT_METADATA
+            need(cfg.get('lottery_catalog_md5')in(None,COMPACT_METADATA['catalog_md5']),'compact_catalog_argument_mismatch')
+            cfg['lottery_catalog_md5']=COMPACT_METADATA['catalog_md5']
+        cfg['workload_profile'] = build_workload_profile((root / CSV_SOURCE).read_bytes(),client_workload,compact_seed=compact_seed)
     mature_mode = getattr(args, 'mature_fixture', None)
     if mature_mode is not None:
         _prepare_mature_fixture(root, cfg, revision, mature_mode)
@@ -365,7 +375,7 @@ def main(argv=None):
     init.add_argument('--wire-mode', choices=('business-wire-v1', 'legacy-json'), default='business-wire-v1')
     init.add_argument('--mature-fixture', choices=('mature-v1',),
                       help='Opt-in bounded synthetic mature data; native2/40 validation required before large seed')
-    init.add_argument('--client-workload', choices=('legacy-v1', 'client-v2'), default='legacy-v1',
+    init.add_argument('--client-workload', choices=('legacy-v1', 'client-v2', 'client-v3'), default='legacy-v1',
                       help='client-v2 includes grant-triggered profile refresh and complete workflow timing')
     init.add_argument('--backend-db-pool', choices=('baseline', 'bounded-v1', 'bounded-v2'), default='baseline',
                       help='Explicit reviewed DB pool overlay experiment; baseline keeps production transport bytes')

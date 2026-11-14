@@ -96,6 +96,18 @@ PG仍2CPU/2048MiB、4连接/Q32/2秒；平衡微基准每臂480次、合计960�
 
 SQLite 3.51.3已从固定官方C源码在上海独立目录构建，真实ABI、WAL/FULL及持久计数回读通过，实际库SHA256 `ddd51819f5bba0b54508c45f2bccd2bcdafabf3f3dd0d8667f96ab5a783fb090`，系统库和旧venv没有修改。它**未用于C40**；后续WAL候选须显式绑定此私有库并先做新的完整HTTP烟测。构建[真实回执](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/sqlite_private_build_result_02_receipt.json)不能替代服务验证或更大容量结论。本轮没有正式后台部署、游廊发布或收费资源采购。
 
+### WAL、成熟数据及真实compact负载的边界
+
+WAL两账号完整HTTP已通过：31 HTTP＋8 WORKFLOW零失败，2账号清理，真实加载私有3.51.3、同一Service连接wal/FULL=2、启动/停服依赖和独立终态库摘要均完成。[完整回执](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/WAL_smoke_full_analysis_01/analysis_receipt.json)。此90秒烟测没有正checkpoint奖励，不以它代替奖励覆盖。
+
+成熟2账号原生种数后，首次checkpoint elapsed=0且历史累计不变；普通与final同request_id重放的revision、stats、archive/content_inventory、effects/session明确投影与4表计数不变，另外账号投影不变、正常release。8笔真实star grant来自种数调用，区别于首次零elapsed checkpoint新奖励。该probe的保护表检查在HTTP之前，后置保护表由以下40人实际验证补充，不扩大旧回执。
+
+成熟40（game `0609f2c4`、run `38c07e4ba829b89240fcc0af72d1c687`）已完整通过：2466 HTTP＋640 WORKFLOW零失败，600 checkpoint、41次真实checkpoint grant及后续profile读取成功，40个完整退出。档案P95 570ms、周期1500ms、完整退出9100ms；连续满员下界813.14秒。后置只读SQL确认4503条持久行、5种实际原型、会话/待处理项清理及保护表0；PG2CPU/2048MiB、WAL依赖、监控和正常停服均已核对。只有40个注册成熟账号；不是10万成熟账号验证。完整[分析回执](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/Mature40_full_analysis_01/analysis_receipt.json) SHA256 `ac27f0d8f5586b72e62c7a61b7c4eec8dc7b8aa513dbbd475f9b1993b941f5dd`，及[后置SQL](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/native_phase_operations/mature_stage40_01/small_post_http/execution_receipt.json)。
+
+成熟原型artifact有16型；确定性100000/4000映射实际覆盖14型，不是早先审查转述的15型。缺active+dense的returning与collector两型。实际覆盖由种数和聚合回执报告，不把可用模板数当已执行覆盖数。
+
+client-v2兼容压力保留。C的旧snapshot平均约36KB及每账号冷catalog约102KB不是新compact客户端的必然开销：真实Lua在compact_bound时停用旧snapshot，依靠profile与本地目录；已发布1303的双仓来源、关键11文件、本地种子及签名编译资源均独立核对，MD5 `4027c0e0b4d3218bd246a701478ce5c2`。新显式client-v3只按该路径建模：四人逻辑房间共享目录，启动/30秒poll明确真实HTTP，本地查看意图另计，不冒充请求；仍保留45%额外人工profile压力及原奖励、幂等和完整退出流程。13项定向检查及独立审阅通过；v3原生烟测/更大阶段尚待同提交实测，不能仅凭删除旧请求宣布容量提升。room初始化/空间O(N/4)，稳定tick/join/leave为O(1)，继任查找最多4成员，无逐tick全用户扫描。相关[来源与冻结回执](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/client_v3_compact_candidate_02/candidate_generation_receipt.json)。
+
 树外根`D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01`，以下链接均为现有真实文件；没有原始认证、密钥或账号完整数据。旧回执不生成新的部署/收费/清档授权。
 
 - [事前计划](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/autonomous_plan_receipt.json)、[client-v2来源与19项检查](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/client_workload_01/implementation_freeze_receipt.json)。

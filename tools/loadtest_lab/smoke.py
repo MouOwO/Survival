@@ -65,7 +65,7 @@ def smoke(directory, *, stop=False):
         after = a.read_profile()['save'].get('content_inventory', {}).get('lottery_ticket', 0)
         need(before - after == 10, 'draw_debit_not_exactly_ten_once')
         a.claim(replay=True)
-        a.snapshot()
+        a.local_view() if cfg.get('client_workload') == 'client-v3' else a.snapshot()
         a.catalog()
         a.catalog(force_miss=True)
         a.endless_batch(32, replay=True)

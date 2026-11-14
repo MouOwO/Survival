@@ -66,6 +66,7 @@ class Player:
         self.next_endless_wave = 1
         self.endless_waves = self.endless_batches = 0
         self.pending_endless = None
+        self._compact_room = None
         self.claimed = False
         self.draws = self.replays_verified = 0
 
@@ -103,7 +104,10 @@ class Player:
             limit = capabilities.get('endless_batch_limit')
             need(type(limit) is int and 1 <= limit <= 32, 'invalid_endless_batch_limit')
             self.endless_batch_limit = limit
-        self.catalog(label='[setup] lottery/catalog')
+        if self.client_profile.mode == 'client-v3':
+            need(self.config_hash == self.client_profile.compact['config_hash'], 'compact_game_bundle_changed')
+            compact_rooms().join(self)
+        else:self.catalog(label='[setup] lottery/catalog')
         self.checkpoint()
         self.admin('/_loadtest/ready', {'run_id': self.cfg['run_id'], 'lease_id': self.lease})
 
@@ -121,7 +125,7 @@ class Player:
             self.workflow_observer(name, elapsed, error, counters)
 
     def checkpoint(self, final=False, request=None):
-        if self.client_profile.mode == 'client-v2':
+        if self.client_profile.mode in ('client-v2', 'client-v3'):
             return self._checkpoint_v2(final, request)
         request = request or ('lt_checkpoint_' + secrets.token_hex(16))
         phase = 'final' if final else ('setup' if self.next_checkpoint is None else 'periodic')
@@ -174,7 +178,18 @@ class Player:
         finally:
             self._workflow('checkpoint_' + phase, started, error, counters)
 
+    def local_view(self):
+        need(self.client_profile.mode == 'client-v3' and self.last_profile is not None and self.identity is not None, 'compact_local_profile_required')
+        need(self.last_profile.get('account_id') == self.identity['account_id'] and self.config_hash == self.client_profile.compact['config_hash'], 'compact_local_view_identity_changed')
+        rooms=compact_rooms()
+        with rooms.lock:rooms.counts['local_view_intents'] += 1
+        return {'local_intent': True, 'http_requests': 0}
+
     def snapshot(self):
+        if self.client_profile.mode == 'client-v3':
+            rooms=compact_rooms()
+            with rooms.lock:rooms.counts['legacy_snapshot_attempts'] += 1
+            raise ValueError('legacy_snapshot_forbidden_for_compact_client')
         value = self.business('/v1/lottery/snapshot', {'config_hash': self.config_hash})
         need(isinstance(value.get('snapshots'), list) and len(value['snapshots']) > 0, 'lottery_snapshot_missing')
         return value
@@ -298,7 +313,7 @@ class Player:
         return result
 
     def stop(self, *, intent_started=None):
-        if self.client_profile.mode != 'client-v2':
+        if self.client_profile.mode not in ('client-v2', 'client-v3'):
             return self._stop_session()
         now = self.clock()
         started = now if intent_started is None else intent_started
@@ -316,7 +331,9 @@ class Player:
             counters['finalization_failed'] = 1
             raise
         finally:
-            self._workflow('finalization', started, error, counters)
+            try:self._workflow('finalization', started, error, counters)
+            finally:
+                if self.client_profile.mode == 'client-v3':compact_rooms().leave(self)
 
     def _stop_session(self):
         if self.identity is None:
@@ -334,3 +351,95 @@ class Player:
             finally:
                 self.identity = self.token = None
                 self.session_logged_in = False
+
+
+class CompactRooms:
+    """One LocalRunner's bounded room schedule, not an authorization/cache bypass.
+    O(N/4) initialization/space; each join/tick/leave O(1), never scans users.
+    Followers wait once <=20s for the room's validated startup catalogue.
+    Real HTTP and local-view counters are separate; no synthetic HTTP event.
+    """
+    def __init__(self):
+        import threading
+        self.lock=threading.RLock();self.event_factory=threading.Event
+        self.rooms={};self.counts=dict.fromkeys(('rooms_opened','rooms_closed','room_startup_catalog_attempts','room_startup_catalog','room_startup_catalog_failed','room_periodic_catalog_attempts','room_periodic_catalog','room_periodic_catalog_failed','catalog_hits','catalog_misses','room_failures','local_view_intents','legacy_snapshot_attempts'),0)
+    @staticmethod
+    def advance(previous,now):
+        following=previous+30
+        if following<=now:following+=30*(math.floor((now-following)/30)+1)
+        return following
+    def join(self,player):
+        index=int(player.identity['account_id'])-player.cfg['account_start'];room=index//4
+        need(0<=index<player.cfg['accounts'],'compact_room_account_invalid')
+        with self.lock:
+            state=self.rooms.get(room)
+            owner=state is None
+            if owner:
+                state={'owner':index,'event':self.event_factory(),'ready':False,'error':False,'members':set(),'next':None};self.rooms[room]=state;self.counts['rooms_opened']+=1
+            need(index not in state['members'] and len(state['members'])<4,'compact_room_member_invalid')
+            state['members'].add(index);player._compact_room=(room,index)
+        if owner:
+            scheduled=player.clock()
+            with self.lock:self.counts['room_startup_catalog_attempts']+=1
+            try:
+                value=player.catalog(label='[room-startup] lottery/catalog')
+                if value.get('unchanged') is not True:
+                    with self.lock:self.counts['catalog_misses']+=1
+                need(value.get('unchanged') is True,'compact_room_catalog_miss')
+                with self.lock:
+                    state['ready']=True;state['next']=self.advance(scheduled,player.clock())
+                    self.counts['room_startup_catalog']+=1;self.counts['catalog_hits']+=1;state['event'].set()
+            except BaseException:
+                with self.lock:state['error']=True;self.counts['room_failures']+=1;self.counts['room_startup_catalog_failed']+=1;state['event'].set()
+                raise
+        else:
+            need(state['event'].wait(20),'compact_room_startup_timeout')
+        need(state['ready'] and not state['error'],'compact_room_catalog_unavailable')
+    def next_poll(self,player):
+        if player._compact_room is None:return float('inf')
+        room,index=player._compact_room
+        with self.lock:
+            state=self.rooms.get(room)
+            need(state is not None and not state['error'],'compact_room_catalog_unavailable')
+            return state['next'] if state['owner']==index else float('inf')
+    def tick(self,player):
+        if player.clock()<self.next_poll(player):return
+        room,index=player._compact_room
+        with self.lock:self.counts['room_periodic_catalog_attempts']+=1
+        try:
+            value=player.catalog(label='[room-poll] lottery/catalog')
+            if value.get('unchanged') is not True:
+                with self.lock:self.counts['catalog_misses']+=1
+            need(value.get('unchanged') is True,'compact_room_catalog_miss')
+            with self.lock:
+                state=self.rooms[room];state['next']=self.advance(state['next'],player.clock())
+                self.counts['room_periodic_catalog']+=1;self.counts['catalog_hits']+=1
+        except BaseException:
+            with self.lock:
+                state=self.rooms.get(room)
+                if state is not None:state['error']=True;state['event'].set()
+                self.counts['room_failures']+=1;self.counts['room_periodic_catalog_failed']+=1
+            raise
+    def leave(self,player):
+        if player._compact_room is None:return
+        room,index=player._compact_room;player._compact_room=None
+        with self.lock:
+            state=self.rooms.get(room)
+            if state is None:return
+            state['members'].discard(index)
+            if state['owner']==index and state['members'] and not state['error']:
+                # At most four room members; preserve a healthy room timer if
+                # its authenticated catalog representative leaves first.
+                state['owner']=min(state['members'])
+            if not state['members']:del self.rooms[room];self.counts['rooms_closed']+=1
+    def report(self):
+        with self.lock:return dict(self.counts,rooms_remaining=len(self.rooms))
+
+COMPACT_ROOMS=None
+
+def compact_rooms():
+    global COMPACT_ROOMS
+    from .workload_profiles import _CACHE_LOCK
+    with _CACHE_LOCK:
+        if COMPACT_ROOMS is None:COMPACT_ROOMS=CompactRooms()
+        return COMPACT_ROOMS
