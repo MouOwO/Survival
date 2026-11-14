@@ -8,10 +8,10 @@ import hashlib,json,math,re,subprocess
 from pathlib import Path
 OPERATOR_SOURCE='server/player_web_auth_overrides/sqlite_hot_rate_patch.py'
 OPERATOR_TARGET='operator/frontend_experiments/sqlite_hot_rate_patch.py'
-OPERATOR_SHA256='6f3397906e3dfe1a217876a443b88f005bf62b1f004efc2f55e4616fba0e1e31'
+OPERATOR_SHA256='88ac0dbd07e4c9c146bbdb9fe6ccdb17f9fe09ec22bdb556c77fb0a88b3bc614'
 WAL_SOURCE='server/player_web_auth_overrides/sqlite_wal_full_patch.py'
 WAL_TARGET='operator/frontend_experiments/sqlite_wal_full_patch.py'
-WAL_OPERATOR_SHA256='071aea50b990c352f5ac7cb1af93174d6849973dc8a5bc7567c10f59c75b2b38'
+WAL_OPERATOR_SHA256='9ac303836ef6ebc00b99e3f7c592071d0f96193ba31bcf1845d9b10f71266cf6'
 BUILD_PROOF='operator/frontend_experiments/private_sqlite_build_result.json'
 TARGETS=('runtime/player_web_auth/service.py',)
 PARENTS={TARGETS[0]:'a62b2355e84fb56bbc0e9613c2c00354f4e385599b483ea0cd4132d5d514b4b5'}
@@ -39,14 +39,29 @@ ENV_FIXED={'schema':1,'kind':'ISOLATED_PRIVATE_SQLITE_3513','build_run_id':BUILD
  'sqlite3_extension_sha256':EXTENSION_SHA}
 ENV_DYNAMIC=frozenset(('library_sha256','build_receipt_sha256','build_result_sha256'))
 OP_SPECS={OPERATOR_TARGET:(OPERATOR_SOURCE,OPERATOR_SHA256),WAL_TARGET:(WAL_SOURCE,WAL_OPERATOR_SHA256)}
+LEGACY_OP_SPECS={OPERATOR_TARGET:(OPERATOR_SOURCE,'6f3397906e3dfe1a217876a443b88f005bf62b1f004efc2f55e4616fba0e1e31'),WAL_TARGET:(WAL_SOURCE,'071aea50b990c352f5ac7cb1af93174d6849973dc8a5bc7567c10f59c75b2b38')}
+INDEXED_PARENTS={TARGETS[0]:'acdd532fffd66e86907f22ed34bcd2b04d12a240ae38018420e8729060e5586b'}
+INDEXED_OUTPUTS={TARGETS[0]:'842ac27041e69f494c33782256d322a926e5b7f68f75ef5c914c39ee42caa11e'}
+INDEXED_WAL_OUTPUTS={TARGETS[0]:'7fcc7a7f3eb1c1bce248dc4299f2f21d15b950693bca038f8ee02e5063d32e73'}
+INDEXED_WAL_ONLY='f1e384c795815a11369242978d8b267ccb11fbcfc17b5fb618f3f28b6a53ce22'
+
 def _need(v,c):
  if not v:raise ValueError(c)
 def _sha(raw):return hashlib.sha256(raw).hexdigest()
 def _digest(v):return type(v)is str and re.fullmatch('[a-f0-9]{64}',v)is not None
 def _isolated(cfg):
  _need(cfg.get('schema')==1 and cfg.get('kind')=='SURVIVAL_ISOLATED_LOADTEST'and cfg.get('purpose')in('capacity','functional-smoke')and cfg.get('backend_db_pool')=='bounded-v2','frontend_experiment_requires_isolated_bounded_v2')
-def _operators(mode):return {p:OP_SPECS[p][1]for p in ((OPERATOR_TARGET,WAL_TARGET)if mode=='hot-wal-full-v1'else(OPERATOR_TARGET,))}
-def _outputs(mode):return WAL_OUTPUTS if mode=='hot-wal-full-v1'else OUTPUTS
+def _operators(mode,legacy=False):
+ specs=LEGACY_OP_SPECS if legacy else OP_SPECS
+ return {p:specs[p][1]for p in ((OPERATOR_TARGET,WAL_TARGET)if mode=='hot-wal-full-v1'else(OPERATOR_TARGET,))}
+def _outputs(mode,parents=None):
+ parents=PARENTS if parents is None else parents
+ _need(parents==PARENTS or parents==INDEXED_PARENTS,'frontend_experiment_parent_changed')
+ return (INDEXED_WAL_OUTPUTS if mode=='hot-wal-full-v1'else INDEXED_OUTPUTS)if parents==INDEXED_PARENTS else(WAL_OUTPUTS if mode=='hot-wal-full-v1'else OUTPUTS)
+def _parents_for_output(mode,digest):
+ for parents in(PARENTS,INDEXED_PARENTS):
+  if digest==_outputs(mode,parents)[TARGETS[0]]:return parents
+ raise ValueError('frontend_experiment_output_changed')
 def _environment_metadata(cfg,mode):
  if mode!='hot-wal-full-v1':
   _need('sqlite_environment'not in cfg and BUILD_PROOF not in cfg.get('sources',{}),'sqlite_environment_requires_wal_mode');return None
@@ -57,15 +72,20 @@ def _environment_metadata(cfg,mode):
 def _metadata(cfg):
  _need(type(cfg)is dict and type(cfg.get('sources',{}))is dict,'frontend_experiment_manifest_invalid');sources=cfg.get('sources',{})
  if 'frontend_experiment'not in cfg:
-  known=set(OUTPUTS.values())|set(WAL_OUTPUTS.values())|{WAL_ONLY}
+  known=set(OUTPUTS.values())|set(WAL_OUTPUTS.values())|set(INDEXED_OUTPUTS.values())|set(INDEXED_WAL_OUTPUTS.values())|{WAL_ONLY,INDEXED_WAL_ONLY}
   _need(not any(p in sources for p in(OPERATOR_TARGET,WAL_TARGET,BUILD_PROOF))and not any(sources.get(p)in known for p in TARGETS),'frontend_experiment_binding_missing');_environment_metadata(cfg,None);return None
  _isolated(cfg);row=cfg['frontend_experiment'];_need(type(row)is dict and set(row)==ROW_KEYS and row.get('id')in('hot-rate-v1','hot-wal-full-v1'),'frontend_experiment_binding_invalid');mode=row['id'];rev=row['source_revision']
  _need(type(rev)is str and re.fullmatch('[a-f0-9]{40}',rev)and rev==cfg.get('csv_source_revision'),'frontend_experiment_revision_mismatch')
- _need(row['operator_sources']==_operators(mode)and row['parent_runtime_sha256']==PARENTS and row['runtime_sha256']==_outputs(mode),'frontend_experiment_exact_binding_required')
- _need(all(sources.get(p)==d for p,d in {**_operators(mode),**_outputs(mode)}.items()),'frontend_experiment_source_map_mismatch')
+ parents=row['parent_runtime_sha256'];operators=row['operator_sources']
+ _need(parents==PARENTS or parents==INDEXED_PARENTS,'frontend_experiment_exact_binding_required')
+ _need(operators==_operators(mode)or operators==_operators(mode,True),'frontend_experiment_exact_binding_required')
+ _need(parents!=INDEXED_PARENTS or operators==_operators(mode),'frontend_experiment_indexed_requires_current_operators')
+ _need(row['runtime_sha256']==_outputs(mode,parents),'frontend_experiment_exact_binding_required')
+ _need(all(sources.get(p)==d for p,d in {**operators,**_outputs(mode,parents)}.items()),'frontend_experiment_source_map_mismatch')
  _need(mode=='hot-wal-full-v1'or WAL_TARGET not in sources,'frontend_experiment_orphan_wal_operator');_environment_metadata(cfg,mode);return row
 
-def metadata_parent_sources(cfg):return {}if _metadata(cfg)is None else dict(PARENTS)
+def metadata_parent_sources(cfg):
+ row=_metadata(cfg);return {}if row is None else dict(row['parent_runtime_sha256'])
 
 def _environment_from_build(raw):
  _need(type(raw)is bytes and len(raw)<=SOURCE_BUDGET,'private_sqlite_build_result_budget');outer=json.loads(raw)
@@ -88,17 +108,19 @@ def _environment_from_build(raw):
  return {**ENV_FIXED,'library_sha256':lib['sha256'],'build_receipt_sha256':outer['receipt_sha256'],'build_result_sha256':_sha(raw)}
 
 def _namespace(raw,path):
- _need(type(raw)is bytes and len(raw)<=65536 and _sha(raw)==OP_SPECS[path][1],'frontend_experiment_operator_changed');ns={'__name__':'reviewed_isolated_frontend_experiment'};exec(compile(raw,path,'exec'),ns);return ns
+ _need(type(raw)is bytes and len(raw)<=65536 and _sha(raw)in(OP_SPECS[path][1],LEGACY_OP_SPECS[path][1]),'frontend_experiment_operator_changed');ns={'__name__':'reviewed_isolated_frontend_experiment'};exec(compile(raw,path,'exec'),ns);return ns
 
 def _restore_replay(mode,operators,raw):
- _need(type(raw)is bytes and len(raw)<=SOURCE_BUDGET and _sha(raw)==_outputs(mode)[TARGETS[0]],'frontend_experiment_output_changed');text={TARGETS[0]:raw.decode('utf8')};hot=_namespace(operators[OPERATOR_TARGET],OPERATOR_TARGET);wal=_namespace(operators[WAL_TARGET],WAL_TARGET)if mode=='hot-wal-full-v1'else None
- mid=wal['restore_sources'](text)if wal else text;_need(type(mid)is dict and set(mid)==set(TARGETS)and _sha(mid[TARGETS[0]].encode())==OUTPUTS[TARGETS[0]],'frontend_experiment_hot_parent_changed')
- parent=hot['restore_sources'](mid);_need(type(parent)is dict and set(parent)==set(TARGETS)and _sha(parent[TARGETS[0]].encode())==PARENTS[TARGETS[0]],'frontend_experiment_parent_changed');replay=hot['patch_sources'](parent);replay=wal['patch_sources'](replay)if wal else replay;_need(replay==text,'frontend_experiment_restore_replay_failed');compile(text[TARGETS[0]],TARGETS[0],'exec');return dict(PARENTS)
+ _need(type(raw)is bytes and len(raw)<=SOURCE_BUDGET,'frontend_experiment_output_changed');parents=_parents_for_output(mode,_sha(raw));text={TARGETS[0]:raw.decode('utf8')};hot=_namespace(operators[OPERATOR_TARGET],OPERATOR_TARGET);wal=_namespace(operators[WAL_TARGET],WAL_TARGET)if mode=='hot-wal-full-v1'else None
+ mid=wal['restore_sources'](text)if wal else text;_need(type(mid)is dict and set(mid)==set(TARGETS)and _sha(mid[TARGETS[0]].encode())==_outputs('hot-rate-v1',parents)[TARGETS[0]],'frontend_experiment_hot_parent_changed')
+ parent=hot['restore_sources'](mid);_need(type(parent)is dict and set(parent)==set(TARGETS)and _sha(parent[TARGETS[0]].encode())==parents[TARGETS[0]],'frontend_experiment_parent_changed');replay=hot['patch_sources'](parent);replay=wal['patch_sources'](replay)if wal else replay;_need(replay==text,'frontend_experiment_restore_replay_failed');compile(text[TARGETS[0]],TARGETS[0],'exec');return dict(parents)
 
 def validate_frontend_experiment(cfg,read_source):
  row=_metadata(cfg)
  if row is None:return {}
- _need(callable(read_source),'frontend_experiment_source_reader_required');mode=row['id'];operators={p:read_source(p)for p in _operators(mode)};raw=read_source(TARGETS[0]);parents=_restore_replay(mode,operators,raw)
+ _need(callable(read_source),'frontend_experiment_source_reader_required');mode=row['id'];operators={p:read_source(p)for p in row['operator_sources']}
+ _need(all(type(raw)is bytes and _sha(raw)==row['operator_sources'][p]for p,raw in operators.items()),'frontend_experiment_operator_changed')
+ raw=read_source(TARGETS[0]);parents=_restore_replay(mode,operators,raw);_need(parents==row['parent_runtime_sha256'],'frontend_experiment_parent_changed')
  if mode=='hot-wal-full-v1':_need(_environment_from_build(read_source(BUILD_PROOF))==cfg['sqlite_environment'],'sqlite_environment_build_result_mismatch')
  return parents
 
@@ -109,9 +131,9 @@ def apply_frontend_experiment(root,cfg,revision,mode,repository,private_sqlite_b
  proof=None;environment=None
  if mode=='hot-wal-full-v1':
   _need(private_sqlite_build_receipt is not None,'private_sqlite_build_receipt_required');path=Path(private_sqlite_build_receipt);_need(path.is_file()and not path.is_symlink()and path.stat().st_size<=SOURCE_BUDGET,'private_sqlite_build_receipt_path_invalid');proof=path.read_bytes();environment=_environment_from_build(proof)
- path=root/TARGETS[0];_need(path.is_file()and not path.is_symlink()and path.resolve().is_relative_to(resolved)and path.stat().st_size<=SOURCE_BUDGET,'frontend_experiment_parent_path_invalid');parent=path.read_bytes();_need(cfg['sources'].get(TARGETS[0])==PARENTS[TARGETS[0]]and _sha(parent)==PARENTS[TARGETS[0]],'frontend_experiment_parent_changed');operators={}
+ path=root/TARGETS[0];_need(path.is_file()and not path.is_symlink()and path.resolve().is_relative_to(resolved)and path.stat().st_size<=SOURCE_BUDGET,'frontend_experiment_parent_path_invalid');parent=path.read_bytes();parents={TARGETS[0]:_sha(parent)};_need((parents==PARENTS or parents==INDEXED_PARENTS)and cfg['sources'].get(TARGETS[0])==parents[TARGETS[0]],'frontend_experiment_parent_changed');operators={}
  for target in _operators(mode):
-  dest=root/target;_need(not dest.exists()and not dest.is_symlink()and dest.resolve().is_relative_to(resolved),'frontend_experiment_operator_path_invalid');source=OP_SPECS[target][0];raw=subprocess.run(['git','-C',str(repository),'show',revision+':'+source],capture_output=True,check=True,timeout=20).stdout;_namespace(raw,target);_need(raw.replace(b'\r\n',b'\n')==(repository/source).read_bytes().replace(b'\r\n',b'\n'),'frontend_experiment_must_match_committed_source');operators[target]=raw
+  dest=root/target;_need(not dest.exists()and not dest.is_symlink()and dest.resolve().is_relative_to(resolved),'frontend_experiment_operator_path_invalid');source=OP_SPECS[target][0];raw=subprocess.run(['git','-C',str(repository),'show',revision+':'+source],capture_output=True,check=True,timeout=20).stdout;_namespace(raw,target);_need(_sha(raw)==_operators(mode)[target],'frontend_experiment_operator_changed');_need(raw.replace(b'\r\n',b'\n')==(repository/source).read_bytes().replace(b'\r\n',b'\n'),'frontend_experiment_must_match_committed_source');operators[target]=raw
  if proof is not None:_need(not(root/BUILD_PROOF).exists()and not(root/BUILD_PROOF).is_symlink()and(root/BUILD_PROOF).resolve().is_relative_to(resolved),'private_sqlite_proof_path_exists')
  texts=_namespace(operators[OPERATOR_TARGET],OPERATOR_TARGET)['patch_sources']({TARGETS[0]:parent.decode('utf8')})
  if mode=='hot-wal-full-v1':texts=_namespace(operators[WAL_TARGET],WAL_TARGET)['patch_sources'](texts)
@@ -123,7 +145,7 @@ def apply_frontend_experiment(root,cfg,revision,mode,repository,private_sqlite_b
  if proof is not None:
   with(root/BUILD_PROOF).open('xb')as stream:stream.write(proof)
   cfg['sources'][BUILD_PROOF]=_sha(proof);cfg['sqlite_environment']=environment
- path.write_bytes(raw);cfg['sources'][TARGETS[0]]=_outputs(mode)[TARGETS[0]];cfg['frontend_experiment']={'id':mode,'source_revision':revision,'operator_sources':_operators(mode),'parent_runtime_sha256':dict(PARENTS),'runtime_sha256':dict(_outputs(mode))};_metadata(cfg)
+ path.write_bytes(raw);cfg['sources'][TARGETS[0]]=_outputs(mode,parents)[TARGETS[0]];cfg['frontend_experiment']={'id':mode,'source_revision':revision,'operator_sources':_operators(mode),'parent_runtime_sha256':dict(parents),'runtime_sha256':dict(_outputs(mode,parents))};_metadata(cfg)
 
 def _runtime_file(path,maximum):
  path=Path(path);_need(path.is_file()and not path.is_symlink()and path.stat().st_size<=maximum,'private_sqlite_runtime_file_invalid');raw=path.read_bytes();_need(len(raw)<=maximum,'private_sqlite_runtime_file_budget');return raw

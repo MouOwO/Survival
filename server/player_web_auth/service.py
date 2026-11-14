@@ -278,6 +278,11 @@ class Service:
             CREATE TABLE IF NOT EXISTS limits(
                 key TEXT NOT NULL, bucket INTEGER NOT NULL, count INTEGER NOT NULL,
                 PRIMARY KEY(key,bucket));
+            CREATE INDEX IF NOT EXISTS challenges_expires_token_expires_idx ON challenges(expires,COALESCE(token_expires,0));
+            CREATE INDEX IF NOT EXISTS browsers_expires_idx ON browsers(expires);
+            CREATE INDEX IF NOT EXISTS flows_expires_idx ON flows(expires);
+            CREATE INDEX IF NOT EXISTS nonces_expires_idx ON nonces(expires);
+            CREATE INDEX IF NOT EXISTS flows_sid_hash_idx ON flows(sid_hash);
         """)
         # A separate additive table preserves existing six-column flows and old
         # INSERT statements during restart/rollback. Never store assertion text.

@@ -27,9 +27,31 @@ def _apply(value,restore=False):
   value=value.replace(a,b)
  if _sha(value)!=(INPUT_SHA256 if restore else OUTPUT_SHA256):raise ValueError('sqlite_rate_output_changed')
  compile(value,TARGET,'exec');return value
+
+# Separate exact indexed lineage; legacy constants and _apply remain unchanged.
+INDEXED_INPUT_SHA256='acdd532fffd66e86907f22ed34bcd2b04d12a240ae38018420e8729060e5586b'
+INDEXED_OUTPUT_SHA256='842ac27041e69f494c33782256d322a926e5b7f68f75ef5c914c39ee42caa11e'
+INDEX_DDL='            CREATE INDEX IF NOT EXISTS challenges_expires_token_expires_idx ON challenges(expires,COALESCE(token_expires,0));\n            CREATE INDEX IF NOT EXISTS browsers_expires_idx ON browsers(expires);\n            CREATE INDEX IF NOT EXISTS flows_expires_idx ON flows(expires);\n            CREATE INDEX IF NOT EXISTS nonces_expires_idx ON nonces(expires);\n            CREATE INDEX IF NOT EXISTS flows_sid_hash_idx ON flows(sid_hash);\n'
+INDEX_ANCHOR='                PRIMARY KEY(key,bucket));\n'
+def _apply_any(value,restore=False):
+ value=_normal(value)
+ indexed_source=INDEXED_OUTPUT_SHA256 if restore else INDEXED_INPUT_SHA256
+ if _sha(value)!=indexed_source:
+  return _apply(value,restore)
+ # Only this exact five-index block can be removed/reinstated. No SQL executes.
+ anchor=INDEX_ANCHOR+INDEX_DDL
+ if value.count(anchor)!=1 or value.count(INDEX_DDL)!=1:raise ValueError('indexed_auth_DDL_changed')
+ original=value.replace(anchor,INDEX_ANCHOR,1)
+ if _sha(original)!=(OUTPUT_SHA256 if restore else INPUT_SHA256):raise ValueError('indexed_auth_original_parent_changed')
+ original=_apply(original,restore)
+ if original.count(INDEX_ANCHOR)!=1 or INDEX_DDL in original:raise ValueError('indexed_auth_output_anchor_changed')
+ result=original.replace(INDEX_ANCHOR,anchor,1)
+ if _sha(result)!=(INDEXED_INPUT_SHA256 if restore else INDEXED_OUTPUT_SHA256):raise ValueError('indexed_auth_output_changed')
+ compile(result,TARGET,'exec');return result
+
 def patch_sources(inputs):
  if type(inputs)is not dict or set(inputs)!={TARGET}:raise ValueError('sqlite_rate_input_keys_invalid')
- return {TARGET:_apply(inputs[TARGET])}
+ return {TARGET:_apply_any(inputs[TARGET])}
 def restore_sources(outputs):
  if type(outputs)is not dict or set(outputs)!={TARGET}:raise ValueError('sqlite_rate_output_keys_invalid')
- return {TARGET:_apply(outputs[TARGET],True)}
+ return {TARGET:_apply_any(outputs[TARGET],True)}

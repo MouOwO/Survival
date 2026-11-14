@@ -131,3 +131,158 @@ SQL与预热组合仍是隔离测试可选配方，尚未部署正式后台或�
 - [DB-only生成与守卫](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/principal_native_db_only_01/candidate_generation_receipt.json)、[原v5真实NOT_CONFIRMED](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/principal_native_v5_verification_receipt.json)（SHA256 `9c66cb12d5480d0a8a26579c5fb102743536928026ee3e805d398213df1aeb70`）。
 - [ACL顺序语义审计](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/principal_native_semantic_audit_receipt_01.json)、[独立重算审计](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/principal_native_semantic_restore_independent_audit_receipt.json)、[平衡1920次结果](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/principal_balanced_phase_result_01_receipt.json)（原始外层文件SHA256 `b0ba1f827b7901820d0e66ba18427bb1f7087b9d22672eea95922087fa22552b`）。
 - [候选B真实35×2与960次微基准](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/filtered_role_native_result_01_receipt.json)（原始外层文件SHA256 `5e731488806a69f8d3fb41b55e6b54f256d12bb7c2d38a53163a428c9664c8a3`）、[B来源20项/12组合](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/tests/principal_filtered_binding_01/verification_receipt.json)、[树外B集成冻结](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/integration_source_filtered_candidate/candidate_generation_receipt.json)。
+
+
+## 本轮补记：100人可靠性全过，五项延迟门槛失败
+
+此处是当前阶段的补记。前文各时点“待烟测”“尚未进100”及旧失败证据原样保留。正式后台和游廊本轮均未部署，未购买或变配云资源，4000在线仍未认证。
+
+C40为10万薄合成注册/40并发，2459 HTTP＋640 WORKFLOW零失败，档案/周期/完整退出P95为670/1200/8900ms；成熟40为40注册账号，2466 HTTP＋640流程零失败，档案/周期/退出P95为570/1500/9100ms。二者按事前预算取向门槛通过，原严格目标分开报告；40注册成熟账号不等于10万成熟注册验证，更不等于4小时通过。
+
+### 新100的完整结果与清理
+
+`warm_indexed100_01`，run `e8ff519634944f2558e505f5f193f386`，100000成熟合成注册/100 active；实际PG2CPU/2GiB、4连接/Q32、每次池等待2秒，后端HTTP32/前端128。prepared `9ee3dae2…`与实际operator `5f68f810…`的20个消费者LF字节绑定相同，130份prepared源、7份原始采集和派生摘要已独立核验。Windows经单条SSH公网转发，仍受上海7Mbps上限影响；不覆盖生产Nginx/TLS、真实Steam或支付。
+
+最终HTML窗口为2026-11-14 01:34:56–01:47:19 UTC（743秒，含启动、爬坡及集中收尾）。6141个最终事件＝4807 HTTP＋1334 WORKFLOW，均零失败，无效wire0、ASSERT0。周期CSV停在6117个事件，不能当最终值。147份签名status形成100有效已确认身份的连续满员下界659.125506秒；这不是逐玩家心跳或每人持续业务进展证明。
+
+| 指标 | 次数 | P95分桶 | 事前预算门槛 |
+| --- | ---: | ---: | --- |
+| profile HTTP | 1346 | 4800ms | 1000ms，失败 |
+| periodic checkpoint HTTP | 1034 | 7400ms | 1500ms，失败 |
+| periodic完整流程 | 1034 | 8600ms | 1500ms，失败 |
+| final checkpoint HTTP | 100 | 23000ms | 单项HTTP另报 |
+| final checkpoint完整流程 | 100 | 23000ms | 10000ms，失败 |
+| 共同退出意图至完整结束 | 100 | 23000ms | 10000ms，失败 |
+
+结论为`FAILED_FIXED_BUDGET`，恰有五项延迟门槛失败、pending为空；零错误与数据完整性不能覆盖延迟失败。P95是Locust分桶观测值，HTTP与WORKFLOW重叠，不相加、平均或用原始Max替换。checkpoint完整流程含奖励后真实profile读取；退出意图还含on_stop调度等待和release。
+
+1234个checkpoint全部完成；101次真实grant响应、101次grant校验和101次后续profile HTTP全部完成。100次final、release、cleanup均成功，不要求或宣称每个用户都取得了奖励。前端接收4956＝4807 Locust HTTP＋147独立status GET＋2停止控制，额外控制请求不计业务RPS。
+
+后置只读SQL通过：100000 HMAC映射、13种实际原型（artifact提供16型）、87676条原完成历史、501笔持久奖励与幂等/定义关联保持。pending operation/outbox、online session、idle-in-transaction及支付/兑换保护表均0；当时仍有5个其他client backend，不能写成“SQL验收时全部会话为0”。最终API/monitor/PG正常停止、容器exit0无OOM、端口关闭、HTTP/lease/pool归零，原数据与失败证据保留。
+
+[最终完整分析](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/Warm_indexed100_full_analysis_01/analysis_receipt.json)、[完整采集](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/warm_indexed100_01_results_01/collection_receipt.json)、[后置SQL](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/native_phase_operations_v2/warm_indexed100_01/large_post_http/execution_receipt.json)、[独立最终审阅](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/warm_indexed100_independent_final_audit_01/audit_receipt.json)（SHA256 `52292c0caa65b4d9f782413c73e52ce58f8df58a0fa5b01b396097cb33446a6f`）。
+
+### 局部优化与下一代码方向的界限
+
+两账号Linux监听前预热224.914ms（约225ms），56表/1621395字节，build1/hit0/retained1、业务命令0；该烟测31 HTTP＋8流程零失败。新100预热244.311ms，终态build1/hit1961/retained1、job failure0。私有SQLite 3.51.3、线程安全3、WAL/FULL=2及启动/停服同库摘要通过。SQL与预热组合验证，不能以小烟测或新100零错证明某一变化单独解决旧503。[预热及旧100独立审阅](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/warm_smoke_and_failed100_independent_audit_01/audit_receipt.json)。
+
+CHECK候选6675个原生bool、SQLSTATE、真实CHECK表及属性/权限通过；98键全1非法输入约0.474→0.642ms、回归约35.5%完整保留。ABBA含SQL规划执行与本机往返，不是HTTP提速、纯CPU时间或全输入改善。PG4CPU配置尝试被主机资源门禁拒绝，未启动，不能列为实测更大CPU结果。[CHECK独立原生审阅](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/archive_unique_native_actual_audit_01/audit_receipt.json)。
+
+live100受限样本中最慢regular为6832.464ms，poolwait5942.517ms、DB服务768.777ms（其中guard429.535ms）；42条同记录guard占DB服务成本中位52.4%，Lua cache/exec中位约1.7/85ms。它支持优先审查连接占用与重复RPC，但样本有时间和预算选择偏差、无请求关联ID，不能跨PWA/backend相减P95；单点PG cgroup含启动/种数累计，不能证明当前持续quota饱和。[只读数字分段审阅](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/live_warm100_readonly_snapshot_analysis_01/analysis_receipt.json)。
+
+下一方向仍针对5/7/9RPC与profile phase，但完全融合的profile5→3/checkpoint9→7/grant流程14→10只是调用数模型，**不能称语义等价**：把最终get_fishing_profile放入较早事务会改变transaction_timestamp()/now()起点，跨午夜的每日额度与权益starts_at边界可能返回不同视图；VOLATILE的新数据快照不能修复事务时钟变化，也不能临时把now改成clock_timestamp。最保守首候选仅合并两个pending检查，保留最终fresh profile原独立RPC/事务：空待办profile5→4、checkpoint9→8、grant流程14→12。非空online立即返回ID并提交，再沿原序Lua结算；64＋64两轮drain保留。**仅静态设计，尚未原生验证、实现或部署。**
+
+保持旧21项函数及角色的实时权限检查；若新增phase函数，同步纳入严格白名单、权限与来源证明。事务/失败隔离、幂等、最终fresh profile及grants保留。没有grants仍可能更新福利日/周秒数、在线金币、地图经验、commerce/welfare/title等，不能当no-op跳过Lua；不以异步短ACK、自动mutation重试或延长期限绕过标准。先原生并发、时钟边界、故障/跨账号差分，再同源2账号与40/100复测。[事务时钟补充审查](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/rpc_phase_clock_addendum_01/verification_receipt.json)。
+
+
+### 新100流量的实际口径
+
+发生器记录4807个HTTP响应body合计15598556B，除最终743秒窗口为20994.019B/s（约21KB/s；包含此发生器观察的控制响应，不等于TLS/SSH总线上字节）。NIC全内窗覆盖740.183秒、99.621%；最大完整约5.0018秒区间的TX均值为152918.064B/s＝1.2233445Mbps，这是全接口含SSH/status的采样区间均值峰，不是瞬时峰或精确业务出网账单。
+
+本轮100人SLA失败，闭环发生器因响应慢而自限后续请求，故`normal4000_forecast_eligible:false`。不能把这组小流量或低平均RPS直接乘40来证明4000正常体验、更不能据此承诺20Mbps足够；当前7Mbps仍穿过SSH链路，也未实测生产TLS/Steam。报价可以比较20Mbps上限，最终带宽和按流量成本仍需合格SLA下的真实负载验证。[实际流量分析](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/traffic_budget_analyzer_02/samples/New100_01/analysis_receipt.json)、[范围解释](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/traffic_budget_analyzer_02/samples/New100_01/interpretation_receipt.json)。
+
+### 40人／10万成熟注册长测最终结果
+
+**最终状态：通过事前预算门槛。** run `e5a77eda68ae477a3be333c196bb0951`，manifest `959c19ee650ce24acf12182c733c88aeb812db655ef0bbd98d832dcf8923acb9`；实际HTML窗口2026-11-14T01:57:12Z–2026-11-14T06:01:20Z，14648.000秒，含启动/爬坡/集中收尾。计划14640秒，签名连续40有效已确认身份下界14615.920611秒；满员门槛14400秒，身份可用性不是逐玩家心跳。
+
+HTTP 34396次/0失败；WORKFLOW 9781次/0失败；ASSERT 0/0。真实grant响应961次、validated grant 961、奖励后profile 961/961完成；final/release/cleanup各40完成。
+
+| 指标 | 最终P95分桶ms |
+| --- | ---: |
+| profile HTTP | 400 |
+| periodic HTTP | 760 |
+| periodic完整流程 | 860 |
+| final HTTP | 8700 |
+| final完整流程 | 8700 |
+| 共同退出意图完整流程 | 8800 |
+
+原分析失败门槛：无；pending为空。HTTP/流程百分位重叠不相加或平均；退出流程保留排队、奖励后读取和release，原严格目标仍由完整报告单独列出。
+
+PG实际2CPU/2GiB、DB4/Q32/2秒及原HTTP有界参数保持；prepared/operator实际为`5f68f8102151fa1b23d202fa81f9644ebdda5355`。与先前prepared `9ee3dae2…`的130份源映射相同、20消费者导出逐项绑定；testbundle仍d388…和原runner61c，不把未部署候选说成生产。
+
+后置只读SQL通过：持久行801476、数据库445208243B、实际原型13/16、奖励1121及幂等/定义关联完整，原历史每表87676保留；pending/outbox/online session/idle-in-transaction及保护表0。SQL审计时其他client backend=5，不等于所有会话0。API/monitor/PG已正常停止、容器exit0无OOM、端口/HTTP/lease/pool归零；私有SQLite库启动/停服/终态摘要一致，数据与旧证据保留。
+
+数据库大小是post时点总量，不能把相对更早seed标记的增长当成HTTP阶段增长；关系物理分配、完整回执JSON逻辑字节、临时文件累计和WAL/备份分别报告，不相加重复计费。长期预测与按表增长若另有完整回执，由root附录，不能只凭初始0.4GB或短测机械外推。
+
+本结果仅覆盖40人、10万成熟合成注册、该时长及Windows经SSH公网转发拓扑。即使此档通过，也不覆盖100人五项延迟失败、4000未认证、真实Steam/支付或生产TLS。预算≤3000仅取报价，本轮无采购、正式后台部署或游廊更新。
+
+长测HTTP响应body实际182364676B，整个HTML窗均值12449.800B/s（含启动/控制/收尾，不含请求、头、SSH/TLS开销）。NIC全内窗覆盖14641.232秒，≥5秒采样区间TX均值峰0.887301Mbps；这是全接口含SSH/status的区间均值，非瞬时或body峰。仍非生产4000容量或账单证明。[长测流量回执](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/traffic_budget_analyzer_02/samples/Soak40_01/analysis_receipt.json)，SHA256 `1fe609041f41a3b66e924f702ad05a8f7fd6633f7c4f091b99a80474f6203b82`。
+
+长测前后实际数据库407230131→445208243B，差分37978112B、新增38018行。五类历史/幂等/奖励关系物理分配差分32997376B；完整奖励response::text逻辑差分6583008B，不能重复加入物理增长。页复用、TOAST/index、WAL/备份另按实际指标解释，初始与短期增长不承诺长期容量。[按表存储回执](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/storage_growth_model_01/samples/Soak40_01/analysis_receipt.json)，SHA256 `d4a931829e0e6650f81566fdb34252085f0d412d102fdece271d85380b9388df`。
+
+长测独立审阅回执若晚于本候选生成，由root另附；不把尚未取得的审阅写成通过。
+
+最终来源与证据：
+- [完整分析](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/Soak40_full_analysis_01/analysis_receipt.json)，SHA256 `989b34fac6fd7921d06abba016c0fc4fd405d8b2e65bb9a499fdae48d56bcdae`。
+- [完整采集](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/warm_indexed_soak40_01_results_01/collection_receipt.json)，SHA256 `5a85b4bcfe7f37159c51945be67a80431a5745af595a455bc963271076373a41`。
+- [最终driver](D:/Survival_本地工具/runs/shanghai_test_20261113/stage_20261114T015701Z_629e9cb72c/stage_receipt.json)，SHA256 `da1e7c76817582a5c9460d639398872c78a395051ac84abed85c2a0914504262`。
+- [后置SQL](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/native_phase_operations_v2/warm_indexed_soak40_01/large_post_http/execution_receipt.json)，SHA256 `a9ae0fe43a72f6b389673b9557dc6fd629dd3876e9829f7e881968953b21a5d8`。
+- [正常停止](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/capacity_operations_v4/operations_warm_indexed_soak40_01/stop_result_receipt.json)，SHA256 `44cfa3cdd59e5967224368fbe7722d3120f5c54646639c99dca900fdc5d7dd58`。
+- [SQLite终态](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/stage_toolsets_v5/warm_indexed_soak40_01/sqlite_terminal_observation.json)，SHA256 `1ea7d6ff64977bdd326c31038a5dc05123ce3b7e083280515cf0d6e8c723231d`。
+
+当前仓库最终commit/push状态只由root最后真实Sync回执另附；本生成器未执行Git，不能把测试source revision填作最终交付提交。
+
+
+### 隔离研究与成本补记
+
+仅本地更新。以下内容为隔离压测研究及证据补记，不构成游廊发布、生产 gzip 启用或已支持 4,000 人的结论。
+
+Windows 本机固定 Steam SDK DLL 的原生 ISteamHTTPv003 探针完成三案：identity 返回原始 3,873 B；显式 Accept-Encoding:gzip 和脚本不主动设置该头但服务强制 gzip 的两案，服务均发送 1,642 B，SteamHTTP 返回相同 SHA 的 3,873 B JSON，说明该本机路径自动解压。第三案底层 Steam 仍附加了未记录原文的 Accept-Encoding，不能写成实际请求头缺失。三请求句柄均释放、SDK正常关闭，wall 0.283 秒、子进程 CPU 0.046875 秒；未触远端压测、未启动 Dota/Tools，原始 SDK 日志及旁置文件未收集。这只证明当前本机 Flat ABI，不能替代普通 Dota 的 CreateHTTPRequestScriptVM 实机、TLS/代理路径或当前真实业务节流收益验证；生产 gzip 仍未因本探针而开启。证据：steam_http_gzip_probe_01/native_audit_01/verification_receipt.json（SHA64012dd3…），完整三案表在同目录 OBSERVATION.md。
+
+本轮考虑用直接 aclexplode 目录 ACL 查询替换 has_*，经双人静态审阅后否决，严格原检查保持。尽管完整旧 MEMBER/owner/超权门槛可把普通准入域收窄到当前 role 与 PUBLIC，替换会删除旧 helper 的函数 EXECUTE 检查、增加新 helper 的 EXECUTE 检查，并新增 relacl/attacl/proacl 等目录列 SELECT 依赖。合法权限 DDL 即可让原查询与改写查询接受结果不同，不能默认为 stock 目录权限恒定。没有生成改写 operator、没有新原生实验或修改环境合同，也未将该研究称为生产性能修复。历史隔离库实际计划只有4个用户namespace、36条guard relation、107条guard function及21条独立允许函数检查；复杂度由对象、列和ACL规模决定，不是注册玩家数，展开也可能增加 tuple/内存成本。证据：acl_guard_source_review_01/verification_receipt.json（SHAb3b1476b…），独立 peer 在 acl_expanded_independent_static_peer_01/review.md（SHA5a1ab216…）。
+
+已完成百人短测的实际数据库大小从 407,008,947 B 变为 413,054,643 B，差分为 6,045,696 B、新增4,727行；不能直接把 post 相对更早seed标记的6,206,628 B当本阶段增长，因为seed自身已增加160,932 B。五类历史/回执关系物理分配增加3,915,776 B；101笔新增奖励的完整 response::text 合计增加584,805 B，是逻辑文本量，不能重复加进物理增长。已审冻结 schema/runtime 未发现普通历史TTL；final checkpoint 只删除当前在线游标，而幂等回执、outbox/operation、奖励与会话基线保留。未审计远端外部cron，因此不宣称绝无另配任务。删除这些记录可能破坏防重、日限额、兑换码使用状态或支付对账，未自动删除任何数据。把743秒的全物理增长机械延伸到4,000人×每天4小时×30天约140.6 GB，只是高延迟闭环短测的风险情景，非长期预测或采购保证，也不是与另一时间分母构成上下界。初始10万账号约0.4GB不能代表长期需求；须用完整4小时40人快响应阶段的前后聚合，再考虑页复用、实际增长、备份/WAL/日志与保留协议。证据：storage_growth_model_01/samples/New100_01/analysis_receipt.json（SHAd2aff977…）、STORAGE_REVIEW.md及retention_review_receipt.json（SHA9f8f30e0…）。
+
+
+Windows Lua5.3独立功能预演仅证明同host的9组fixture/27 fresh VM父重复与子完整typed JSON一致；原Linux POSIX验证器保持，不能把Windows结果、RNG/时区或预算耗时当Linux原生性能，更不能称备份恢复演练已完成。相关后续原生证据如有由root独立附录。 [Windows同host功能范围回执](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/windows_lua53_preflight_01/actual_scope_audit_receipt.json)，SHA256 `7e4e6387bf28b4fc2157ec72b78e177a1fea41833e74538d5e4b1d0a27ab0828`。
+
+补记原始来源摘要：
+- [verification_receipt.json](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/steam_http_gzip_probe_01/native_audit_01/verification_receipt.json)，SHA256 `64012dd3c782cbc2d73d139b728671f8a43d1c75ae046f3d3d77418d864020d7`。
+- [native_child_receipt.json](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/steam_http_gzip_probe_01/executions/native_01/native_child_receipt.json)，SHA256 `8d8b15ea9eb98a3ee66593ee4cc366fb9aa7a12c126be9bb5835cff81150fb25`。
+- [verification_receipt.json](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/acl_guard_source_review_01/verification_receipt.json)，SHA256 `b3b1476bbb07aa0bdb0b4a03c764c2b936ef5f0399ee89bcfd2765f946777518`。
+- [review.md](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/acl_expanded_independent_static_peer_01/review.md)，SHA256 `5a1ab2162c3857c139030226d475d268f26bf07ac6cb54e8676028427642b0df`。
+- [analysis_receipt.json](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/storage_growth_model_01/samples/New100_01/analysis_receipt.json)，SHA256 `d2aff97728edf23e234ad27cb750ac25a530f7b14274cbc38bdd9dee52fcbd07`。
+- [retention_review_receipt.json](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/storage_growth_model_01/retention_review_receipt.json)，SHA256 `9f8f30e044440700111083b663b070fb8b68330b202713bec189c0a02825dd0c`。
+
+用户现在可与Codex并行：向阿里云只取企业8核16GB、16核32GB＋同地域SSD/独立数据盘、公网20Mbps按流量的相同周期首期和续费报价；另取8核16GB＋同区托管PG作比较，不购买或改现有7Mbps。总账含租金、实际流量、备份、监控和旧机重叠，每月≤3000；不能承诺8核hold住4000。Steam登录出口、备份实际恢复演练、普通Dota客户端HTTP gzip自动解压仍需分别验收，gzip研究不等于启用。具体采购、生产迁移/部署及游廊发布另行确认。
+### SQLite认证清理五索引：Windows原生局部结果
+
+新的树外候选仅新增五个非唯一索引，保持原清理SQL、TTL/时钟、限流提交顺序和外键行为。实际验证使用Windows标准库SQLite **3.50.4／DELETE journal／单线程合成库**：四个主要认证历史表各100000行、合计400000行；这不是PostgreSQL的10万注册账号，也不是正在运行的Linux私有SQLite3.51.3/WAL服务。
+
+原Service.start与logout实际调用的VM指令计数如下。计数开启逐指令Python callback，wall受该instrumentation开销影响，不能把表中比值解释成HTTP延迟或P95。
+
+| 实际操作 | 父版VM步数 | 五索引候选VM步数 |
+| --- | ---: | ---: |
+| start | 1200204 | 230 |
+| logout | 300348 | 385 |
+
+父/子功能投影及重启投影相同，覆盖NULL/0/live token/严格过期边界、FK级联、退出、失败回滚与已提交rate保留、时钟回拨和持久429。四种源码父绑定含hot/WAL字节恢复证明；实际原生Service功能仅base与tracked/latest父子四臂，不能扩大为hot/WAL或Linux均已实测。400k初建索引单次约0.165秒、文件增加12644352B；索引维护、历史库初建、写放大和更多过期行成本仍需计入。
+
+稳定范围查找可减少无关历史扫描；challenge索引先按expires范围定位，COALESCE(token_expires,0)仍有残余过滤，成本依候选范围R而非仅删除K。全体过期K接近N的情况未测，不能写成任意历史规模恒定耗时。同名错误定义仅由外部metadata验证发现，constructor不自动修复，也未证明所有初始化失败都自动完整回滚。
+
+该结果为局部功能/执行量证据，未做Linux3.51.3/WAL多连接或HTTP宏观/P95验收，未改main、正式后台或当前长测来源，不能用它覆盖100人SLA失败。实际[Windows原生回执](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/sqlite_auth_expiry_indexes_candidate_03/runs/native_01/native_receipt.json)，SHA256 `d43cc04d4c977b5e084053dbd4dadc914c1a40c4fb52fcb4d3872ab3bcfbb232`；[四父源码冻结](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/sqlite_auth_expiry_indexes_candidate_03/candidate_generation_receipt.json)，SHA256 `f77764c0c51d9525ecf8ab7cafe3b321c4ffd911aedc79f70c334ba7804c1ad3`。
+
+### 最新报价记录：用户已说明参考月价，续费仍待订单核验
+
+用户已将16核规格更正为`ecs.u2a-c1m2.4xlarge`，并最新说明“参考价格人民币每月，再计算了满1000减80，应该续费也是同价位”。本轮预算按下表用户提供的参考月价记录；是否已包含满1000减80尚不确定，因此不再次减80。续费同价只是用户预计，未经实际续费页面或账单核验，不能写成续费保证。此前型号/账期未明确的旧候选和回执均保留。
+
+| 用户最新规格 | 官方规格对照 | 用户提供的参考月价 | 用户口述磁盘 |
+| --- | --- | ---: | --- |
+| `ecs.u2a-c1m2.4xlarge`，用户描述AMD | 16 vCPU／32 GiB | 1012元/月；不再扣80 | 40GB；“扩4倍、加20–30元”待订单核实 |
+| `ecs.c9i.2xlarge`，用户描述Intel | 8 vCPU／16 GiB | 738元/月；不再扣80 | 40GB；“扩4倍、加20–30元”待订单核实 |
+
+官方[实例规格总览](https://help.aliyun.com/en/ecs/user-guide/overview-of-instance-families)列出上述两档vCPU与内存；[c9i CPU选项表](https://help.aliyun.com/zh/ecs/user-guide/cpu-options-of-compute-optimized-instance-families)也说明c9i.2xlarge默认8vCPU。u2a官方说明兼容多代AMD EPYC并提供企业级算力，不能据型号或“最高”频率推定报价实例的具体CPU代次、实际分配频率或单核性能。[u2a官方说明](https://help.aliyun.com/en/ecs/user-guide/general-work-force)。
+
+用户下一步只需核对同地域/可用区、完整规格ID、实际CPU与资源分配、首期和续费页面总额、优惠是否已含、磁盘类型/扩容后确切容量及加价周期、备份、20Mbps按流量的实际GB单价和旧机重叠费用。40GB扩容“4倍”及20–30元只保留为口述，不预设扩后容量或每月加价。Codex据完整总账比较每月≤3000元方案；当前没有购买、变配、生产部署或游廊发布授权。较多vCPU、参考月价及Windows局部优化均不证明4000人已可用，仍需同源目标硬件原生及分级SLA验收。
+
+### JIT假设的既有证据边界
+
+只读核对两份已有实际EXPLAIN回执：8个查询标签各3次TIMING FALSE，共24条记录的`jit`均为null；源探针直接取真实JSON计划的JIT字段。没有记录JIT编译耗时，安全摘要也未保留Total Cost或实际JIT设置，不能证明成本越过阈值，不能将每RPC编译当作已定位原因。另8条TIMING TRUE摘要未保留JIT字段，不扩大为这些计划也已证明无JIT。本次没有新增SQL、SSH或native请求，已停止此方向排查。[filtered计划回执](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/filtered_role_plan_result_01_receipt.json)，SHA256 `4d8b2454731e674238e566a4800176ab02c92cc07655c554bfbb108dec52bf1e`；[principal计划回执](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/principal_plan_probe_result_01_receipt.json)，SHA256 `f2fa5d1304683d4b58d2febe54d3700ab4c11993f42aa2bbbce79a486b27c03d`。
+
+### 选型限制：本轮lab的后台与PWA为同进程HTTP线程
+
+已只读核对当前长测实际导出的`operator/loadtest_lab/runtime.py`，原始SHA256 `c6aa4233bd6747bbdd85495d156f2d288f4511eabb2c945517f26cb822b6f700`，与该lab清单及已完成100人测试的实际导出相同。第284行创建后台HTTPServer，第294行创建PWA HTTPServer，第326–328行对两个server分别启动`threading.Thread(...serve_forever...)`：它们由同一个Python进程构造并以不同线程服务。内部后台/代理接口绑定loopback；Windows发生器经SSH公网进入服务器，未绕过7Mbps公网传输限制。PostgreSQL则是同机独立容器，限定2CPU/2GiB，不能把整机4核8GB都当成数据库可用资源。[本次启动源码只读核验](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/final_doc_supplement_04/topology_readonly_receipt.json)。
+
+因此，本轮100人延迟失败是这一软件拓扑、配额、请求节奏和测量路径下的结果，不能当作整台4核8GB硬件的容量上限。已有whole-host CPU及池排队数据不足以证明PG配额耗尽，也未证明GIL或其他串行等待已是根因。较多vCPU不保证同进程路径或等待按比例改善；不能从核数线性预判16核可以承载4000人。所有100人失败门槛和4000未认证结论继续保留。
+
+下一步先补各进程CPU、IO与分层排队观测，再确认并匹配正式部署拓扑做同源对照，随后才决定RPC合并候选和采购。本地已知systemd模板分别为`player_web_auth.run`和`workshop_test.run_api`独立入口，源码仅证明部署意图；本次未查询生产，不能据模板声称现网实际分进程。16核u2a的1012元/月及8核c9i的738元/月仍只是参考采购候选，优惠不二扣、续费待核；用户暂不需要立即购买或变配。[模板来源与准确行号](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/final_doc_supplement_04/topology_readonly_receipt.json)。
