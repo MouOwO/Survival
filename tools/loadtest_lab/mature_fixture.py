@@ -48,9 +48,11 @@ def validate_fixture_profile(cfg,read_source=None):
  need(v.get('id')=='mature-v1'and v.get('cohort_seed')==SEED and v.get('schema_sha256')==SCHEMA_SHA and v.get('bundle_sha256')==BUNDLE_SHA and type(v.get('rows'))is list and len(v['rows'])==16,'mature_archetypes_shape_invalid')
  need({(r['cohort'],r['active'],r['dense'])for r in v['rows']}=={(c,a,d)for c in range(4)for a in(False,True)for d in(False,True)},'mature_archetypes_keys_invalid')
  source_map=v['source_sha256'];need(type(source_map)is dict and len(source_map)==66 and sum(name.startswith('runtime/')for name in source_map)==30 and sum(name.startswith('addon/server/bundles/')for name in source_map)==36,'mature_archetype_sources_shape_invalid')
+ from .leaderboard_experiments import validate_leaderboard_binding
+ restored = validate_leaderboard_binding(cfg, read_source)
  for name,digest in source_map.items():
-  need(type(name)is str and (name.startswith('runtime/')or name.startswith('addon/server/bundles/'))and cfg['sources'].get(name)==digest,'mature_archetype_source_binding_changed')
-  actual=read_source(name);need(type(actual)is bytes and len(actual)<=4*1024*1024 and _sha(actual)==digest,'mature_archetype_source_bytes_changed')
+  need(type(name)is str and (name.startswith('runtime/')or name.startswith('addon/server/bundles/'))and restored.get(name,cfg['sources'].get(name))==digest,'mature_archetype_source_binding_changed')
+  actual=read_source(name);need(type(actual)is bytes and len(actual)<=4*1024*1024 and _sha(actual)==cfg['sources'].get(name),'mature_archetype_source_bytes_changed')
  return v
 
 def actual_row_admission(before,budget):
