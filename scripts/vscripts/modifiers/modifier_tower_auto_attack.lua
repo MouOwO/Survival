@@ -81,12 +81,82 @@ function modifier_tower_auto_attack:EnterIdle(force_stop)
     self.forced_target, self.manual_target = nil, nil
     self.windup_target = nil
     self.attack_order_wait = 0
+    self.critical_attack_recovery = nil
     if valid(tower) and needs_stop then
         tower:SetForceAttackTarget(nil)
         if tower.Stop then tower:Stop() end
         clear_attack_gestures(tower)
     end
     self.idle_initialized = true
+end
+
+-- Keep a Shadow Fiend tower's current backswing across a lethal retarget.
+-- Native order handoff briefly selects idle before the next permitted attack;
+-- do not restart a gesture or alter the attack cooldown/point to cover that gap.
+local CRITICAL_RECOVERY_DELAY_FRAMES = 2.5
+local function critical_attack_recovery(modifier, tower)
+    if modifier.windup_target ~= nil or tower.survival_tower_class ~= "class_1"
+        or type(tower.GetSequence) ~= "function" or type(tower.GetCycle) ~= "function"
+        or type(tower.SequenceDuration) ~= "function" or type(tower.SetSequence) ~= "function"
+        or type(tower.SetCycle) ~= "function" or type(tower.SetContextThink) ~= "function"
+        or not GameRules or type(GameRules.GetGameTime) ~= "function"
+        or type(GameRules.GetGameModeEntity) ~= "function" then return nil end
+    local ok, recovery = pcall(function()
+        local sequence, cycle = tower:GetSequence(), tower:GetCycle()
+        if type(sequence) ~= "string" or not sequence:match("^attack0[12]_anim$")
+            or type(cycle) ~= "number" or cycle ~= cycle or cycle < 0 or cycle >= 1 then return nil end
+        local model = tower:GetModelName()
+        if type(model) ~= "string" or model == "" then return nil end
+        local profile = modifier.critical_attack_recovery_profile
+        if not profile or profile.model ~= model then
+            profile = {model=model, durations={}, world=GameRules:GetGameModeEntity()}
+            if not profile.world then return nil end
+            modifier.critical_attack_recovery_profile = profile
+        end
+        local duration = profile.durations[sequence]
+        if not duration then
+            duration = tower:SequenceDuration(sequence)
+            if type(duration) ~= "number" or duration ~= duration or duration <= 0 or duration > 8 then return nil end
+            profile.durations[sequence] = duration
+        end
+        return {sequence=sequence, cycle=cycle, duration=duration, model=model,
+            started=GameRules:GetGameTime(), world=profile.world}
+    end)
+    return ok and recovery or nil
+end
+
+function modifier_tower_auto_attack:ContinueCriticalAttackRecovery(target, recovery)
+    self.critical_attack_recovery = nil
+    if not recovery or not valid(target) then return end
+    local tower = self:GetParent()
+    local frame = type(FrameTime) == "function" and FrameTime() or 1 / 30
+    if type(frame) ~= "number" or frame ~= frame or frame <= 0 or frame > 0.1 then frame = 1 / 30 end
+    -- One delayed check after native death/order processing, never a frame poll.
+    local delay = frame * CRITICAL_RECOVERY_DELAY_FRAMES
+    recovery.target = target
+    self.critical_attack_recovery = recovery
+    tower:SetContextThink("SurvivalTowerCriticalAttackRecovery", function()
+        if self.critical_attack_recovery ~= recovery then return nil end
+        local function finish()
+            if self.critical_attack_recovery == recovery then self.critical_attack_recovery = nil end
+            return nil
+        end
+        if self.destroyed or not valid(tower) or self:GetParent() ~= tower
+            or GameRules:GetGameModeEntity() ~= recovery.world
+            or self.forced_target ~= target or not targeting.valid(tower, target)
+            or tower:IsDisarmed() or tower:GetModelName() ~= recovery.model then return finish() end
+        local elapsed = GameRules:GetGameTime() - recovery.started
+        local cycle = recovery.cycle + elapsed / recovery.duration
+        if elapsed ~= elapsed or elapsed < 0 or elapsed > 0.25 or cycle >= 1 then return finish() end
+        -- HandleAttackStart cancels this token before the native animation is
+        -- selected. Never overwrite a fresh attack, even on its idle setup tick.
+        if tower:GetSequence() == "idle_anim" and tower:GetAttackTarget() == target then
+            finish()
+            pcall(function() tower:SetSequence(recovery.sequence); tower:SetCycle(cycle) end)
+            return nil
+        end
+        return finish()
+    end, delay)
 end
 
 local function is_training_dummy(unit)
@@ -110,6 +180,7 @@ function modifier_tower_auto_attack:HandleAttackStart(params)
     end
     local tower = self:GetParent()
     local target = params.target
+    self.critical_attack_recovery = nil
     if valid(target) and target:GetTeamNumber() ~= tower:GetTeamNumber()
         and self:GetStackCount() ~= 0 and not tree_damage_rules.is_tree(target)
         and anti_air_rules.can_attack(tower, target)
@@ -161,10 +232,12 @@ function modifier_tower_auto_attack:OnDeath(params)
     if params.unit and (params.unit == self.forced_target or params.unit == self.manual_target
         or (valid(tower) and params.unit == tower:GetAttackTarget())) then
         if not valid(tower) then return end
+        local recovery = critical_attack_recovery(self, tower)
         self.last_dead_target = params.unit
         -- Start a fresh selection even if Lua and the native order disagree.
         -- SelectTarget preserves living locks and is only for normal updates.
         self:ReacquireTarget(params.unit)
+        if recovery then self:ContinueCriticalAttackRecovery(self.forced_target, recovery) end
     end
 end
 
@@ -203,6 +276,7 @@ end
 -- Stop/disarm when a replacement exists; native attack cooldown remains intact.
 function modifier_tower_auto_attack:ReacquireTarget(excluded_target)
     if not IsServer() or self.destroyed then return end
+    self.critical_attack_recovery = nil
     local tower = self:GetParent()
     if not valid(tower) then return end
     disable_native_acquisition(tower, self, true)
@@ -320,6 +394,8 @@ end
 function modifier_tower_auto_attack:OnDestroy()
     if IsServer() then
         self.destroyed = true
+        self.critical_attack_recovery = nil
+        self.critical_attack_recovery_profile = nil
         local tower = self:GetParent()
         if type(attack_observer.unregister_auto_attack) == "function" then
             attack_observer.unregister_auto_attack(tower, self)
