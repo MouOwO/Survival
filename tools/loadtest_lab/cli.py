@@ -72,6 +72,28 @@ def apply_db_pool_overlay(root, cfg, revision):
         'helper_sha256': cfg['sources']['runtime/fishing_api/_bounded_pool.py']}
 
 
+def _prepare_mature_fixture(root, cfg, revision, mode):
+    # Optional, seed-only helper. Baseline does not import it or read its data.
+    need(mode == 'mature-v1', 'mature_fixture_mode_invalid')
+    from .mature_fixture import (ARCHETYPE_TARGET, ARCHETYPE_SHA,
+                                 build_fixture_profile, validate_fixture_profile)
+    need('operator/loadtest_lab/mature_fixture.py' in cfg['sources'],
+         'mature_fixture_operator_not_exported')
+    source = 'tools/loadtest_lab/fixtures/mature_v1_archetypes.json'
+    raw = subprocess.run(['git', '-C', str(ROOT), 'show', revision + ':' + source],
+                         capture_output=True, check=True).stdout
+    need(sha(raw) == ARCHETYPE_SHA and raw.replace(b'\r\n', b'\n') ==
+         (ROOT / source).read_bytes().replace(b'\r\n', b'\n'),
+         'mature_fixture_artifact_must_match_committed_source')
+    path = root / ARCHETYPE_TARGET
+    need(not path.exists(), 'mature_fixture_export_target_already_exists')
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(raw)
+    cfg['sources'][ARCHETYPE_TARGET] = sha(raw)
+    cfg['mature_fixture'] = build_fixture_profile(cfg)
+    validate_fixture_profile(cfg, lambda name: (root / name).read_bytes())
+
+
 def prepare(args):
     receipt_path = Path(args.source_receipt).resolve()
     receipt = read_json(receipt_path)
@@ -161,6 +183,8 @@ def prepare(args):
     for name in operator_names:
         if not name.endswith('.py'):
             continue
+        if name == 'tools/loadtest_lab/mature_fixture.py' and getattr(args, 'mature_fixture', None) is None:
+            continue  # Baseline performs no new mature helper Git read/import.
         raw = subprocess.run(['git', '-C', str(ROOT), 'show', revision + ':' + name], capture_output=True, check=True).stdout
         need(raw.replace(b'\r\n', b'\n') == (ROOT / name).read_bytes().replace(b'\r\n', b'\n'),
              'loadtest_operator_must_match_committed_source')
@@ -187,12 +211,16 @@ def prepare(args):
         ensure_scope=getattr(args, 'ensure_scope', False), repository=ROOT)
     from .frontend_experiments import apply_frontend_experiment
     apply_frontend_experiment(root, cfg, revision,
-        mode=getattr(args, 'frontend_rate', 'baseline'), repository=ROOT)
+        mode=getattr(args, 'frontend_rate', 'baseline'), repository=ROOT,
+        private_sqlite_build_receipt=getattr(args, 'private_sqlite_build_receipt', None))
     from .workload_profiles import build_workload_profile, CSV_SOURCE
     client_workload = getattr(args, 'client_workload', 'legacy-v1')
     if client_workload != 'legacy-v1':
         cfg['client_workload'] = client_workload
         cfg['workload_profile'] = build_workload_profile((root / CSV_SOURCE).read_bytes())
+    mature_mode = getattr(args, 'mature_fixture', None)
+    if mature_mode is not None:
+        _prepare_mature_fixture(root, cfg, revision, mature_mode)
     runner = b"import sys\nfrom pathlib import Path\nsys.path[:0]=[str(Path(__file__).parent/'operator'),str(Path(__file__).parent/'runtime')]\nfrom loadtest_lab.cli import entry\nraise SystemExit(entry())\n"
     (root / 'run_lab.py').write_bytes(runner); cfg['sources']['run_lab.py'] = sha(runner)
     write_new(root / 'lab.json', cfg)
@@ -234,6 +262,8 @@ def prepare(args):
         **({'business_experiment': cfg['business_experiment']} if 'business_experiment' in cfg else {}),
         **({'principal_experiments': cfg['principal_experiments']} if 'principal_experiments' in cfg else {}),
         **({'frontend_experiment': cfg['frontend_experiment']} if 'frontend_experiment' in cfg else {}),
+        **({'sqlite_environment': cfg['sqlite_environment']} if 'sqlite_environment' in cfg else {}),
+        **({'mature_fixture': cfg['mature_fixture']} if 'mature_fixture' in cfg else {}),
         'cloud_resources_created': 0, 'requests_sent': 0, 'production_rows_copied': 0})
     return {'status': 'LAB_PREPARED_NOT_STARTED', 'directory': str(root), 'run_id': run,
             'accounts': accounts, 'active': active, 'purpose': purpose,
@@ -253,12 +283,22 @@ def seed(directory, *, analyze_after_seed=False):
     """
     need(type(analyze_after_seed) is bool, 'lab_seed_analyze_flag_invalid')
     root, cfg, private = load(directory)
+    mature = None
+    if 'mature_fixture' in cfg:
+        from .mature_fixture import validate_fixture_profile, seed_mature_fixture
+        validate_fixture_profile(cfg, lambda name: (root / name).read_bytes())
+        need(analyze_after_seed, 'mature_fixture_final_analyze_required')
     from .guard import account, database_account, production_host_guard
     production_host_guard(cfg)
     with connect_admin(cfg, private) as conn:
         marker_guard(conn, cfg, private)
         lock = conn.execute('SELECT pg_try_advisory_lock(124710,1)').fetchone()[0]
         need(lock, 'lab_seed_already_running')
+        if 'mature_fixture' in cfg:
+            need(conn.execute('SELECT seeded FROM loadtest_lab.marker WHERE singleton').fetchone() == (False,),
+                 'mature_fixture_requires_fresh_unseeded_lab')
+            need(conn.execute("SELECT to_regclass('loadtest_lab.mature_seed')").fetchone() == (None,),
+                 'mature_fixture_seed_once_required')
         for begin in range(0, cfg['accounts'], 1000):
             end = min(begin + 1000, cfg['accounts'])
             with conn.transaction():
@@ -279,6 +319,8 @@ def seed(directory, *, analyze_after_seed=False):
             conn.commit()
         count = conn.execute('SELECT count(*) FROM public.survival_players').fetchone()[0]
         need(count == cfg['accounts'], 'lab_contains_unexpected_accounts')
+        if 'mature_fixture' in cfg:
+            mature = seed_mature_fixture(root, cfg, private, conn)
         analyze = {'requested': analyze_after_seed, 'completed': False, 'elapsed_ms': None}
         if analyze_after_seed:
             started = time.monotonic()
@@ -288,12 +330,20 @@ def seed(directory, *, analyze_after_seed=False):
             conn.execute('ANALYZE')
             conn.commit()
             analyze.update(completed=True, elapsed_ms=round((time.monotonic() - started) * 1000, 3))
+        if mature is not None:
+            need(conn.execute('SELECT status,manifest_sha256 FROM loadtest_lab.mature_seed WHERE singleton').fetchone() ==
+                 ('complete', sha(canonical(cfg))), 'mature_fixture_completion_marker_invalid')
+            final_bytes = conn.execute('SELECT pg_database_size(current_database())').fetchone()[0]
+            need(type(final_bytes) is int and final_bytes <= cfg['mature_fixture']['max_database_bytes'],
+                 'mature_fixture_post_analyze_bytes_exceeded')
+            mature['database_bytes_after_final_analyze'] = final_bytes
         conn.execute('UPDATE loadtest_lab.marker SET seeded=true WHERE singleton'); conn.commit()
     receipt = root / ('seed_' + secrets.token_hex(8) + '_receipt.json')
     write_new(receipt, {'kind': 'SYNTHETIC_LOADTEST_DATASET_RECEIPT', 'artifact_root': str(root),
         'run_id': cfg['run_id'], 'registered_accounts': count, 'active_ticket_fixtures': cfg['active'],
         'real_accounts_modified': 0, 'chunk_rows': 1000, 'synthetic_monthly_card_fixtures': cfg['active'],
-        'statistics_after_bulk_load': analyze})
+        'statistics_after_bulk_load': analyze,
+        **({'mature_fixture': mature} if mature is not None else {})})
     return {'status': 'SYNTHETIC_DATASET_READY', 'registered_accounts': count, 'receipt': str(receipt)}
 
 
@@ -313,6 +363,8 @@ def main(argv=None):
     init.add_argument('--web-concurrency', type=int, default=24)
     init.add_argument('--global-http-per-minute', type=int, default=2400)
     init.add_argument('--wire-mode', choices=('business-wire-v1', 'legacy-json'), default='business-wire-v1')
+    init.add_argument('--mature-fixture', choices=('mature-v1',),
+                      help='Opt-in bounded synthetic mature data; native2/40 validation required before large seed')
     init.add_argument('--client-workload', choices=('legacy-v1', 'client-v2'), default='legacy-v1',
                       help='client-v2 includes grant-triggered profile refresh and complete workflow timing')
     init.add_argument('--backend-db-pool', choices=('baseline', 'bounded-v1', 'bounded-v2'), default='baseline',
@@ -323,10 +375,10 @@ def main(argv=None):
                       help='bounded-v2 only: queue wait cap, default 2; maximum 5 and request remaining deadline')
     init.add_argument('--checkpoint-observation', action='store_true',
                       help='Opt-in exact-source checkpoint/proxy timing; isolated bounded-v2 labs only')
-    init.add_argument('--http-admission', choices=('baseline', 'bounded-v1', 'bounded-v2', 'bounded-v3'), default='baseline',
-                      help='Reviewed web48/DB4/wait2; v1 HTTP32/Q28, v2 HTTP32/Q32, v3 HTTP8/Q8')
+    init.add_argument('--http-admission', choices=('baseline', 'bounded-v1', 'bounded-v2', 'bounded-v3', 'bounded-v4'), default='baseline',
+                      help='Reviewed DB4/wait2; v1 web48/HTTP32/Q28, v2 web48/HTTP32/Q32, v3 web48/HTTP8/Q8, v4 web128/HTTP32/Q32/backlog128')
     init.add_argument('--targeted-pool-notify', action='store_true',
-                      help='Opt-in exact-source FIFO head notification experiment; requires HTTP admission v2/v3')
+                      help='Opt-in exact-source FIFO head notification experiment; requires HTTP admission v2/v3/v4')
     init.add_argument('--gameplay-defaults', choices=('baseline', 'set-v1'), default='baseline',
                       help='Opt-in exact-source set validation of gameplay defaults; isolated bounded-v2 only')
     init.add_argument('--profile-load', choices=('baseline', 'init-only-v1'), default='baseline',
@@ -335,8 +387,10 @@ def main(argv=None):
                       help='Opt-in verified reset baseline with reviewed role filtering or merged guard; exact isolated G sources only')
     init.add_argument('--ensure-scope', action='store_true',
                       help='Opt-in same-checkpoint initialization proof; exact isolated G sources only')
-    init.add_argument('--frontend-rate', choices=('baseline', 'hot-rate-v1'), default='baseline',
-                      help='Opt-in bounded SQLite expired-rate housekeeping; exact observed isolated PWA source only')
+    init.add_argument('--frontend-rate', choices=('baseline', 'hot-rate-v1', 'hot-wal-full-v1'), default='baseline',
+                      help='Opt-in exact observed SQLite housekeeping/WAL FULL with verified private library')
+    init.add_argument('--private-sqlite-build-receipt',
+                      help='Verified build02 public outer JSON; required only for hot-wal-full-v1')
     init.add_argument('--database-memory-mib', type=int,
                       help='Isolated local database memory cap; default 2048 MiB (smoke: 256)')
     init.add_argument('--database-cpu-limit', type=float,

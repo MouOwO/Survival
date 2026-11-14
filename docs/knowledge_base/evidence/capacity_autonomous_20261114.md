@@ -86,6 +86,16 @@ PG仍2CPU/2048MiB、4连接/Q32/2秒；平衡微基准每臂480次、合计960�
 
 ## 可复核证据
 
+### C40完整实测（2026-11-14补记）
+
+新C40（`84918eae30a84868d60d80924a679a9b`，game `594df7c7`）已完成真实客户端式HTTP负载、正常停服与独立完整采集：100000个薄合成注册账号、40并发，PG实际2CPU/2048MiB、4连接/Q32/2秒，前端48/后台32。2459次HTTP、640次WORKFLOW均零失败；40次真实奖励及40次奖励后档案刷新成功，40个账号完成最终结算和释放，服务端HTTP/lease/pool均清零，容器正常退出。签名连续满员下界811.46秒。
+
+档案HTTP P95为670ms，周期checkpoint为1200ms，最终checkpoint流程为8500ms，从共同退出意图到完整结束为8900ms。按事前预算取向1000/1500/10000ms标准完整通过；原500/1500ms严格标准仍有失败，不改写为严格通过。最大值、失败B40以及本轮压测器奖励字段错误的修复分别保留。此结果仅证明本次40人、薄合成数据与Windows经SSH公网转发拓扑；不是100/4000人、成熟档案、4小时、真实Steam或公开TLS容量结论。
+
+权威证据：[完整分析](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/C_full_analysis_01/analysis_receipt.json)，SHA256 `34d394ab683a203c8fb807a4f6c9f5e97d0e3f2e57ee9ffa8be07a31c1829f6d`；[原始采集](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/C_results_01/collection_receipt.json)。`capacity_certified:false`仍保留，避免将诊断阶段通过当成整个项目上线认证。
+
+SQLite 3.51.3已从固定官方C源码在上海独立目录构建，真实ABI、WAL/FULL及持久计数回读通过，实际库SHA256 `ddd51819f5bba0b54508c45f2bccd2bcdafabf3f3dd0d8667f96ab5a783fb090`，系统库和旧venv没有修改。它**未用于C40**；后续WAL候选须显式绑定此私有库并先做新的完整HTTP烟测。构建[真实回执](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/sqlite_private_build_result_02_receipt.json)不能替代服务验证或更大容量结论。本轮没有正式后台部署、游廊发布或收费资源采购。
+
 树外根`D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01`，以下链接均为现有真实文件；没有原始认证、密钥或账号完整数据。旧回执不生成新的部署/收费/清档授权。
 
 - [事前计划](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/autonomous_plan_receipt.json)、[client-v2来源与19项检查](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/client_workload_01/implementation_freeze_receipt.json)。
