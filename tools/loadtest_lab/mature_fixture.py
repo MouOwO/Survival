@@ -32,8 +32,13 @@ def counts(accounts,active):
  persistent=5*accounts+10*active+3*history+1000;peak=persistent+accounts+history_accounts+17
  need(peak<=MAX_ROWS,'mature_total_row_admission_exceeded')
  return {'accounts':accounts,'active':active,'cohort_counts':[_period(accounts,tuple(int(v==c)for v in pattern))for c in range(4)],'dense_accounts':dense,'completed_history_each_table':history,'temporary_online_session_accounts':history_accounts,'base_existing_five_tables_rows':4*accounts+active,'new_gameplay_stats_rows':accounts,'new_reward_grants':4*active,'new_reward_idempotency':4*active,'new_effect_totals':active,'persistent_row_ceiling':persistent,'peak_including_temporary_rows_ceiling':peak,'temporary_mapping_rows':accounts,'temporary_template_context_rows':17}
+def _reviewed_schema(cfg):
+ from .database_experiments import metadata_schema_parent_sources
+ parent=metadata_schema_parent_sources(cfg)
+ return parent.get('database/10_schema.sql',cfg.get('sources',{}).get('database/10_schema.sql'))
+
 def build_fixture_profile(cfg):
- need(type(cfg)is dict and cfg.get('schema')==1 and cfg.get('kind')=='SURVIVAL_ISOLATED_LOADTEST'and cfg.get('purpose')in('capacity','functional-smoke')and cfg.get('backend_db_pool')=='bounded-v2'and cfg.get('sources',{}).get('database/10_schema.sql')==SCHEMA_SHA,'mature_isolated_reviewed_schema_required')
+ need(type(cfg)is dict and cfg.get('schema')==1 and cfg.get('kind')=='SURVIVAL_ISOLATED_LOADTEST'and cfg.get('purpose')in('capacity','functional-smoke')and cfg.get('backend_db_pool')=='bounded-v2'and _reviewed_schema(cfg)==SCHEMA_SHA,'mature_isolated_reviewed_schema_required')
  return {'id':'mature-v1','seed':SEED,'archetype_source':ARCHETYPE_TARGET,'archetype_sha256':ARCHETYPE_SHA,'schema_sha256':SCHEMA_SHA,'chunk_rows':CHUNK,'max_rows':MAX_ROWS,'max_database_bytes':MAX_BYTES,'counts':counts(cfg.get('accounts'),cfg.get('active'))}
 def validate_fixture_profile(cfg,read_source=None):
  if 'mature_fixture'not in cfg:return None

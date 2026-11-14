@@ -231,6 +231,25 @@ def prepare(args):
     mature_mode = getattr(args, 'mature_fixture', None)
     if mature_mode is not None:
         _prepare_mature_fixture(root, cfg, revision, mature_mode)
+    from .database_experiments import apply_archive_validation
+    apply_archive_validation(root, cfg, revision,
+        mode=getattr(args, 'archive_validation', 'baseline'), repository=ROOT)
+    cache_mode = getattr(args, 'settlement_cache', 'baseline')
+    need(cache_mode in ('baseline', 'warm-v1'), 'settlement_cache_mode_invalid')
+    if cache_mode == 'warm-v1':
+        from .guard import (SETTLEMENT_BUNDLE_TARGET, SETTLEMENT_BUNDLE_MANIFEST_SHA256,
+            SETTLEMENT_BUNDLE_HASH, SETTLEMENT_RUNNER_SHA256, validate_settlement_cache)
+        bundle_path = root / SETTLEMENT_BUNDLE_TARGET
+        need(bundle_path.is_file() and not bundle_path.is_symlink()
+             and bundle_path.resolve().is_relative_to(root.resolve()), 'settlement_cache_bundle_path_invalid')
+        bundle_raw = bundle_path.read_bytes()
+        need(sha(bundle_raw) == SETTLEMENT_BUNDLE_MANIFEST_SHA256
+             and json.loads(bundle_raw).get('hash') == SETTLEMENT_BUNDLE_HASH,
+             'settlement_cache_bundle_manifest_changed')
+        cfg['settlement_cache'] = {'id': 'warm-v1', 'source_revision': revision,
+            'runner_sha256': SETTLEMENT_RUNNER_SHA256, 'bundle_hash': SETTLEMENT_BUNDLE_HASH,
+            'bundle_manifest_sha256': SETTLEMENT_BUNDLE_MANIFEST_SHA256}
+        validate_settlement_cache(cfg)
     runner = b"import sys\nfrom pathlib import Path\nsys.path[:0]=[str(Path(__file__).parent/'operator'),str(Path(__file__).parent/'runtime')]\nfrom loadtest_lab.cli import entry\nraise SystemExit(entry())\n"
     (root / 'run_lab.py').write_bytes(runner); cfg['sources']['run_lab.py'] = sha(runner)
     write_new(root / 'lab.json', cfg)
@@ -269,6 +288,8 @@ def prepare(args):
         'database_pool_parameters': pool_parameters,
         'runtime_experiments': cfg.get('runtime_experiments', []),
         **({'schema_experiment': cfg['schema_experiment']} if 'schema_experiment' in cfg else {}),
+        **({'archive_validation': cfg['archive_validation']} if 'archive_validation' in cfg else {}),
+        **({'settlement_cache': cfg['settlement_cache']} if 'settlement_cache' in cfg else {}),
         **({'business_experiment': cfg['business_experiment']} if 'business_experiment' in cfg else {}),
         **({'principal_experiments': cfg['principal_experiments']} if 'principal_experiments' in cfg else {}),
         **({'frontend_experiment': cfg['frontend_experiment']} if 'frontend_experiment' in cfg else {}),
@@ -389,6 +410,10 @@ def main(argv=None):
                       help='Reviewed DB4/wait2; v1 web48/HTTP32/Q28, v2 web48/HTTP32/Q32, v3 web48/HTTP8/Q8, v4 web128/HTTP32/Q32/backlog128')
     init.add_argument('--targeted-pool-notify', action='store_true',
                       help='Opt-in exact-source FIFO head notification experiment; requires HTTP admission v2/v3/v4')
+    init.add_argument('--settlement-cache', choices=('baseline', 'warm-v1'), default='baseline',
+                      help='Prebuild the fixed observed bundle configuration cache before opening listeners')
+    init.add_argument('--archive-validation', choices=('baseline', 'indexed-v1'), default='baseline',
+                      help='Exact indexed archive CHECK child of set-v1; new isolated labs only')
     init.add_argument('--gameplay-defaults', choices=('baseline', 'set-v1'), default='baseline',
                       help='Opt-in exact-source set validation of gameplay defaults; isolated bounded-v2 only')
     init.add_argument('--profile-load', choices=('baseline', 'init-only-v1'), default='baseline',

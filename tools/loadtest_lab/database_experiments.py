@@ -41,7 +41,7 @@ def _isolated(cfg):
           'schema_experiment_requires_isolated_bounded_v2')
 
 
-def _metadata(cfg):
+def _base_metadata(cfg):
     sources = cfg.get('sources', {})
     _need(type(sources) is dict, 'schema_experiment_sources_invalid')
     if 'schema_experiment' not in cfg:
@@ -99,6 +99,9 @@ def validate_schema_experiment(cfg, read_source):
     _need(callable(read_source), 'schema_experiment_source_reader_required')
     operator_raw = read_source(OPERATOR_TARGET)
     schema_raw = read_source(SCHEMA_TARGET)
+    if 'archive_validation' in cfg:
+        archive_raw = read_source(ARCHIVE_OPERATOR_TARGET)
+        schema_raw = _archive_restore_replay(archive_raw, schema_raw)
     _restore_replay(operator_raw, schema_raw)
     return {SCHEMA_TARGET: PARENT_SHA256}
 
@@ -149,4 +152,85 @@ def apply_schema_experiment(root, cfg, revision, mode, repository):
         'id': 'set-v1', 'source_revision': revision,
         'operator_sources': {OPERATOR_TARGET: OPERATOR_SHA256},
         'parent_schema_sha256': PARENT_SHA256, 'schema_sha256': OUTPUT_SHA256}
+    _metadata(cfg)
+
+
+# One optional child of the already reviewed set-v1 schema. No SQL executes here.
+ARCHIVE_OPERATOR_SOURCE = 'server/fishing_api_overrides/archive_unique_check_patch.py'
+ARCHIVE_OPERATOR_TARGET = 'operator/database_experiments/archive_unique_check_patch.py'
+ARCHIVE_OPERATOR_SHA256 = '93fc7fbff55fb67394dfa06ef50c1b63fe641c4ba73b7d4851a801cda8169df2'
+ARCHIVE_OUTPUT_SHA256 = '1f30d656ffa7d70b31d3fca59d90b92326ee48c25502de825902c93856d5cca7'
+
+def _archive_metadata(cfg):
+    sources=cfg.get('sources',{})
+    _need(type(sources)is dict,'archive_validation_sources_invalid')
+    if 'archive_validation'not in cfg:
+        _need(sources.get(SCHEMA_TARGET)!=ARCHIVE_OUTPUT_SHA256 and ARCHIVE_OPERATOR_TARGET not in sources,'archive_validation_binding_missing')
+        return None
+    _isolated(cfg)
+    row=cfg['archive_validation']
+    _need(type(row)is dict and set(row)==ROW_KEYS and row['id']=='indexed-v1','archive_validation_binding_invalid')
+    revision=row['source_revision']
+    _need(type(revision)is str and re.fullmatch('[a-f0-9]{40}',revision)and revision==cfg.get('csv_source_revision'),'archive_validation_revision_mismatch')
+    _need(type(row['operator_sources'])is dict and row['operator_sources']=={ARCHIVE_OPERATOR_TARGET:ARCHIVE_OPERATOR_SHA256}
+          and row['parent_schema_sha256']==OUTPUT_SHA256 and row['schema_sha256']==ARCHIVE_OUTPUT_SHA256,'archive_validation_exact_binding_required')
+    _need(sources.get(ARCHIVE_OPERATOR_TARGET)==ARCHIVE_OPERATOR_SHA256 and sources.get(SCHEMA_TARGET)==ARCHIVE_OUTPUT_SHA256,'archive_validation_source_map_mismatch')
+    return row
+
+def metadata_schema_parent_sources(cfg):
+    """Zero-IO exact certificate view for old600 business/archetype validators."""
+    if _archive_metadata(cfg)is None:return {}
+    view={**cfg,'sources':{**cfg['sources'],SCHEMA_TARGET:OUTPUT_SHA256}}
+    _need(_base_metadata(view)is not None,'archive_validation_requires_set_v1')
+    return {SCHEMA_TARGET:OUTPUT_SHA256}
+
+def _metadata(cfg):
+    parents=metadata_schema_parent_sources(cfg)
+    view={**cfg,'sources':{**cfg['sources'],**parents}}if parents else cfg
+    return _base_metadata(view)
+
+def _archive_namespace(raw):
+    _need(type(raw)is bytes and len(raw)<=65536 and _sha(raw)==ARCHIVE_OPERATOR_SHA256,'archive_validation_operator_changed')
+    namespace={'__name__':'isolated_reviewed_archive_validation'}
+    exec(compile(raw,ARCHIVE_OPERATOR_TARGET,'exec'),namespace)
+    return namespace
+
+def _archive_restore_replay(operator_raw,schema_raw):
+    _need(type(schema_raw)is bytes and len(schema_raw)<=1024*1024 and _sha(schema_raw)==ARCHIVE_OUTPUT_SHA256,'archive_validation_output_changed')
+    namespace=_archive_namespace(operator_raw)
+    parent=namespace['restore_schema'](schema_raw.decode('utf8'))
+    _need(type(parent)is str and _sha(parent.encode('utf8'))==OUTPUT_SHA256
+          and namespace['patch_schema'](parent).encode('utf8')==schema_raw,'archive_validation_restore_replay_failed')
+    return parent.encode('utf8')
+
+def apply_archive_validation(root,cfg,revision,mode,repository):
+    """One final preparation transform, after other overlays/archetype metadata.
+    Fixed one Git read and O(schema bytes); no DB/HTTP/request-time work.
+    """
+    _need(type(mode)is str and mode in('baseline','indexed-v1'),'archive_validation_mode_invalid')
+    _need('archive_validation'not in cfg,'archive_validation_already_bound')
+    metadata_schema_parent_sources(cfg)
+    if mode=='baseline':return
+    _isolated(cfg)
+    _need(_base_metadata(cfg)is not None,'archive_validation_requires_set_v1')
+    _need(type(revision)is str and re.fullmatch('[a-f0-9]{40}',revision)and revision==cfg.get('csv_source_revision'),'archive_validation_revision_mismatch')
+    root,repository=Path(root),Path(repository)
+    _need(root.is_dir()and not root.is_symlink()and not(root/'lab.json').exists()and not(root/ARCHIVE_OPERATOR_TARGET).exists(),'archive_validation_new_unbound_lab_required')
+    path=root/SCHEMA_TARGET
+    _need(path.is_file()and not path.is_symlink()and path.resolve().is_relative_to(root.resolve())and path.stat().st_size<=1024*1024,'archive_validation_parent_path_invalid')
+    parent=path.read_bytes()
+    _need(cfg['sources'].get(SCHEMA_TARGET)==OUTPUT_SHA256 and _sha(parent)==OUTPUT_SHA256,'archive_validation_parent_changed')
+    raw=subprocess.run(['git','-C',str(repository),'show',revision+':'+ARCHIVE_OPERATOR_SOURCE],capture_output=True,check=True,timeout=20).stdout
+    namespace=_archive_namespace(raw)
+    _need(raw.replace(b'\r\n',b'\n')==(repository/ARCHIVE_OPERATOR_SOURCE).read_bytes().replace(b'\r\n',b'\n'),'archive_validation_must_match_committed_source')
+    output=namespace['patch_schema'](parent.decode('utf8')).encode('utf8')
+    _need(_archive_restore_replay(raw,output)==parent,'archive_validation_parent_restore_changed')
+    target=root/ARCHIVE_OPERATOR_TARGET
+    _need(target.resolve().is_relative_to(root.resolve()),'archive_validation_operator_path_invalid')
+    target.parent.mkdir(parents=True,exist_ok=True)
+    with target.open('xb')as stream:stream.write(raw)
+    path.write_bytes(output)
+    cfg['sources'][ARCHIVE_OPERATOR_TARGET]=ARCHIVE_OPERATOR_SHA256
+    cfg['sources'][SCHEMA_TARGET]=ARCHIVE_OUTPUT_SHA256
+    cfg['archive_validation']={'id':'indexed-v1','source_revision':revision,'operator_sources':{ARCHIVE_OPERATOR_TARGET:ARCHIVE_OPERATOR_SHA256},'parent_schema_sha256':OUTPUT_SHA256,'schema_sha256':ARCHIVE_OUTPUT_SHA256}
     _metadata(cfg)

@@ -108,6 +108,20 @@ WAL两账号完整HTTP已通过：31 HTTP＋8 WORKFLOW零失败，2账号清理�
 
 client-v2兼容压力保留。C的旧snapshot平均约36KB及每账号冷catalog约102KB不是新compact客户端的必然开销：真实Lua在compact_bound时停用旧snapshot，依靠profile与本地目录；已发布1303的双仓来源、关键11文件、本地种子及签名编译资源均独立核对，MD5 `4027c0e0b4d3218bd246a701478ce5c2`。新显式client-v3只按该路径建模：四人逻辑房间共享目录，启动/30秒poll明确真实HTTP，本地查看意图另计，不冒充请求；仍保留45%额外人工profile压力及原奖励、幂等和完整退出流程。13项定向检查及独立审阅通过；v3原生烟测/更大阶段尚待同提交实测，不能仅凭删除旧请求宣布容量提升。room初始化/空间O(N/4)，稳定tick/join/leave为O(1)，继任查找最多4成员，无逐tick全用户扫描。相关[来源与冻结回执](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/client_v3_compact_candidate_02/candidate_generation_receipt.json)。
 
+### 10万成熟数据通过，100启动失败与后续候选
+
+client-v3两账号真实完整烟测通过：30 HTTP＋8流程零失败；1房间共享1次startup catalog、2次30秒poll均命中，2次本地查看无旧snapshot HTTP，2账号清理；WAL/签名/实际源/终态全门通过。见[完整回执](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/Compact_smoke_full_analysis_01/analysis_receipt.json)。
+
+100000注册/100 active成熟夹具真实种数493.47秒完成。独立只读聚合证明100000 HMAC映射、764058条持久行、409384627B数据库、87676条完成历史、400笔种数奖励、13种实际原型、保护表及pending/session/idle事务0。初版审计错误使用`prefix <= id < prefix+'~'`，实际排序下计到0；原FAIL保留，02仅去掉错误范围并用精确left前缀，原库没有修改，[新完整审计通过](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/native_phase_operations_v2/compact_mature100_01/large_seed/execution_receipt.json)。
+
+随后100人、spawn5/s、计划840秒阶段在31秒提前失败，未达满员。实际80 start/cleanup，431 HTTP含1个503、136 workflow含4失败、3 ASSERT失败，连续100-ready未成立；不能称80人容量通过。失败后SQL历史/奖励/保护表与待处理会话审计通过，API/lease/pool正常清理，保留[完整失败分析](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/Compact100_failed_full_analysis_01/analysis_receipt.json)。
+
+首个503的内容无关采样：benefit_claim总3226.395ms、lua_cache2009.359ms，且没有lua_exec；DB等待916.34ms、guard107.367ms。真实runner对同key冷cache follower等待固定2秒，证据支持在取得配置缓存前触顶，不把它解释为奖励数据丢失或已证明CHECK造成503。新可选`--settlement-cache warm-v1`在监听前以空`_cache`上下文真实编译静态配置，不运行交易；固定observed runner61c/bundle d388/current a958来源，默认零新增IO，2秒/4worker/20秒请求限制不变。19项绑定/生命周期检查通过，但其中cache生命周期使用fakeEntry；Windows编译失败保留，必须后续Linux真实编译、HTTP及宏观复验，不提前写“503已修”。
+
+另一独立候选`--archive-validation indexed-v1`仅改原CHECK函数体，按实际键匹配固定规则，保留约束、函数属性及权限，完整源证明child1f30→600→564。6675原生bool用例、4组SQLSTATE、2张真实CHECK表与权限一致，12.43秒内完成；empty/sparse/rich/98合法/4096未知键小ABBA有改善，**98键全1非法输入回归0.474→0.642ms（约35.5%）**。这些是SQL规划执行和本机往返均摊，不是HTTP或CPU纯时，不宣称全输入提速。独立新数据库保留，100基线库未改，见[真实执行](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/archive_unique_native_executor_02/execution_receipt.json)、[独立审计](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/archive_unique_native_actual_audit_01/audit_receipt.json)。
+
+SQL与预热组合仍是隔离测试可选配方，尚未部署正式后台或游廊。所有后续阶段保留1000/1500/10000ms、连续满员600秒和零错误标准；短过载诊断另列实际issued/ready，不冒充通过。4小时验证必须记录真实连续满员下界。
+
 树外根`D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01`，以下链接均为现有真实文件；没有原始认证、密钥或账号完整数据。旧回执不生成新的部署/收费/清档授权。
 
 - [事前计划](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/autonomous_plan_receipt.json)、[client-v2来源与19项检查](D:/Survival_本地工具/runs/survival_capacity_autonomous_20261113_01/client_workload_01/implementation_freeze_receipt.json)。

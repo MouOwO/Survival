@@ -116,6 +116,11 @@ def resolve_database_pool(mode, *, http_concurrency=None, db_concurrency=4,
 
 def validate_database_pool(cfg):
     """Fixed reviewed experiment budgets and source bindings, once per load."""
+    validate_settlement_cache(cfg)
+    from .database_experiments import metadata_schema_parent_sources
+    schema_parents = metadata_schema_parent_sources(cfg)
+    if schema_parents:
+        cfg = {**cfg, 'sources': {**cfg['sources'], **schema_parents}}
     from .frontend_experiments import metadata_parent_sources as frontend_parent_sources
     frontend_parents = frontend_parent_sources(cfg)
     if frontend_parents:
@@ -242,10 +247,13 @@ def load(directory):
              and sha(path.read_bytes()) == digest, 'lab_source_changed:' + name)
     from .database_experiments import validate_schema_experiment
     validate_schema_experiment(cfg, lambda name: (root / name).read_bytes())
+    from .database_experiments import metadata_schema_parent_sources
+    schema_parents = metadata_schema_parent_sources(cfg)
+    schema_cfg = {**cfg, 'sources': {**cfg['sources'], **schema_parents}} if schema_parents else cfg
     from .principal_experiments import validate_principal_experiments
-    principal_bytes = validate_principal_experiments(cfg, lambda name: (root / name).read_bytes())
-    business_cfg = ({**cfg, 'sources': {**cfg['sources'], **{
-        name: sha(raw) for name, raw in principal_bytes.items()}}} if principal_bytes else cfg)
+    principal_bytes = validate_principal_experiments(schema_cfg, lambda name: (root / name).read_bytes())
+    business_cfg = ({**schema_cfg, 'sources': {**schema_cfg['sources'], **{
+        name: sha(raw) for name, raw in principal_bytes.items()}}} if principal_bytes else schema_cfg)
     from .business_experiments import validate_business_experiment
     validate_business_experiment(business_cfg, lambda name: (
         principal_bytes[name] if name in principal_bytes else (root / name).read_bytes()))
@@ -346,11 +354,38 @@ def load_client(path):
     from .frontend_experiments import metadata_parent_sources as frontend_parent_sources
     frontend_parent_sources(cfg)  # Client-only metadata proof, no source reads.
     from .principal_experiments import metadata_parent_sources as principal_parent_sources
-    principal_parents = principal_parent_sources(cfg)
-    business_cfg = ({**cfg, 'sources': {**cfg['sources'], **principal_parents}}
-                    if principal_parents else cfg)
+    from .database_experiments import metadata_schema_parent_sources
+    schema_parents = metadata_schema_parent_sources(cfg)
+    schema_cfg = {**cfg, 'sources': {**cfg['sources'], **schema_parents}} if schema_parents else cfg
+    principal_parents = principal_parent_sources(schema_cfg)
+    business_cfg = ({**schema_cfg, 'sources': {**schema_cfg['sources'], **principal_parents}}
+                    if principal_parents else schema_cfg)
     from .business_experiments import metadata_parent_sources
     metadata_parent_sources(business_cfg)  # Client-only proof: no source-file reads.
     from .workload_profiles import validate_workload_profile
     validate_workload_profile(cfg)
+    validate_settlement_cache(cfg)
     return cfg, controller
+
+
+SETTLEMENT_RUNNER_TARGET = 'runtime/archive_backend/settlement_runner.py'
+SETTLEMENT_RUNNER_SHA256 = '61c51346fc526a76816810469b6a8f82e1fe9b0a548628e0d18d9ac897421234'
+SETTLEMENT_BUNDLE_TARGET = 'addon/server/bundles/current.json'
+SETTLEMENT_BUNDLE_MANIFEST_SHA256 = 'a9586f77be3c07b6966376d43617b5cffa891fb1fbda6fce8fcff05c39655926'
+SETTLEMENT_BUNDLE_HASH = 'd38866d1be2dec7b3b8c27ddd1315bab9cb27a1c7e0a136b670e5e9df12e3ed1'
+SETTLEMENT_CACHE_ROW_KEYS = frozenset(('id','source_revision','runner_sha256','bundle_hash','bundle_manifest_sha256'))
+
+def validate_settlement_cache(cfg):
+    """Fixed metadata only, zero reads/imports for an unselected cache recipe."""
+    if 'settlement_cache'not in cfg:return None
+    need(cfg.get('schema')==1 and cfg.get('kind')=='SURVIVAL_ISOLATED_LOADTEST'
+         and cfg.get('purpose')in('capacity','functional-smoke')and cfg.get('backend_db_pool')=='bounded-v2','settlement_cache_requires_isolated_bounded_v2')
+    row=cfg['settlement_cache'];revision=cfg.get('csv_source_revision')
+    need(type(row)is dict and set(row)==SETTLEMENT_CACHE_ROW_KEYS and row['id']=='warm-v1','settlement_cache_binding_invalid')
+    need(type(revision)is str and re.fullmatch('[a-f0-9]{40}',revision)and row['source_revision']==revision,'settlement_cache_revision_mismatch')
+    need(row['runner_sha256']==SETTLEMENT_RUNNER_SHA256 and row['bundle_hash']==SETTLEMENT_BUNDLE_HASH
+         and row['bundle_manifest_sha256']==SETTLEMENT_BUNDLE_MANIFEST_SHA256,'settlement_cache_exact_binding_required')
+    sources=cfg.get('sources',{})
+    need(type(sources)is dict and sources.get(SETTLEMENT_RUNNER_TARGET)==SETTLEMENT_RUNNER_SHA256
+         and sources.get(SETTLEMENT_BUNDLE_TARGET)==SETTLEMENT_BUNDLE_MANIFEST_SHA256,'settlement_cache_source_map_mismatch')
+    return row

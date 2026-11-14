@@ -171,6 +171,53 @@ def checkpoint_observation_stats(cfg):
     return observation_stats()
 
 
+
+def _checked_settlement_cache_info(runner):
+    info = runner.cache_info()
+    keys = {'builds','hits','job_failures','retained','retained_source_bytes'}
+    need(type(info)is dict and set(info)==keys
+         and all(type(v)is int and 0<=v<=10**12 for v in info.values())
+         and info['retained']<=4 and info['retained_source_bytes']<=4*16*1024*1024,
+         'settlement_cache_stats_invalid')
+    return dict(info)
+
+def warm_settlement_cache(root,cfg,app,lua):
+    # Baseline exits before importing/statting/reading any runner or cache file.
+    if 'settlement_cache'not in cfg:return None
+    from .guard import (validate_settlement_cache, SETTLEMENT_RUNNER_TARGET,
+        SETTLEMENT_RUNNER_SHA256, SETTLEMENT_BUNDLE_HASH)
+    validate_settlement_cache(cfg)
+    from pathlib import Path
+    from archive_backend import settlement_runner
+    root=Path(root).resolve();path=root/SETTLEMENT_RUNNER_TARGET
+    need(Path(settlement_runner.__file__).resolve()==path.resolve()
+         and sha(path.read_bytes())==SETTLEMENT_RUNNER_SHA256,'settlement_cache_imported_runner_changed')
+    bundle=app.archive.bundle
+    need(bundle.hash==SETTLEMENT_BUNDLE_HASH
+         and Path(bundle.directory).resolve()==(root/'addon/server/bundles'/SETTLEMENT_BUNDLE_HASH).resolve()
+         and app.archive.lua==lua,'settlement_cache_runtime_identity_mismatch')
+    before=_checked_settlement_cache_info(settlement_runner);started=time.monotonic()
+    with settlement_runner._cache(bundle,app.archive.lua) as entry:
+        tables,source_bytes=entry.tables,entry.source_bytes
+        need(type(tables)is int and 1<=tables<=512 and type(source_bytes)is int
+             and 1<=source_bytes<=16*1024*1024,'settlement_cache_entry_invalid')
+        # No run(), worker(), settlement or command is executed by this context.
+    elapsed=(time.monotonic()-started)*1000;after=_checked_settlement_cache_info(settlement_runner)
+    need(elapsed>=0 and after['retained']>=1 and after['retained_source_bytes']>=source_bytes
+         and after['builds']>=before['builds'],'settlement_cache_warm_not_retained')
+    return {'id':'warm-v1','elapsed_ms':round(elapsed,3),'runner_sha256':SETTLEMENT_RUNNER_SHA256,
+        'bundle_hash':bundle.hash,'tables':tables,'source_bytes':source_bytes,
+        'cache_info_before':before,'cache_info_after':after,'business_commands_executed':0}
+
+def settlement_cache_snapshot(cfg):
+    # Terminal observation happens after HTTP drain; no source/binary reread.
+    if 'settlement_cache'not in cfg:return None
+    try:
+        from archive_backend import settlement_runner
+        return {'cache_info':_checked_settlement_cache_info(settlement_runner),'error':None}
+    except Exception:
+        return {'cache_info':None,'error':'settlement_cache_terminal_stats_unavailable'}
+
 def serve(directory, *, lua_executable=None):
     root, cfg, private = load(directory)
     production_host_guard(cfg)
@@ -204,14 +251,14 @@ def serve(directory, *, lua_executable=None):
     app = build_application(settings, **pool_options)
     try:
         pool_started = checked_database_pool_stats(app.rpc_client, cfg) if pool_mode else None
-    except Exception:
-        # No listener or request worker exists yet; a constructor mismatch is
-        # startup failure, never a ready lab or an assumed active pool budget.
+        # Both preflights precede identity/server construction and all listeners.
+        from archive_backend.lottery_catalog import catalog_document
+        catalog_document(app.archive.bundle, lua)
+        settlement_cache_warmup = warm_settlement_cache(root, cfg, app, lua)
+    except BaseException:
+        # No accepted HTTP worker exists; preserve startup failure, close RPC.
         app.rpc_client.close()
         raise
-    # Verify actual immutable Lua modules/config before opening listeners.
-    from archive_backend.lottery_catalog import catalog_document
-    catalog_document(app.archive.bundle, lua)
     base = make_handler(app, client_timeout=settings.http_client_timeout_seconds,
                         request_deadline=settings.http_request_deadline_seconds)
     from .identity import IdentityService
@@ -272,6 +319,7 @@ def serve(directory, *, lua_executable=None):
                 'cpus': cfg.get('database_cpu_limit', .5 if cfg['purpose'] == 'functional-smoke' else 4)},
             'lua_executable': lua, 'lua_sha256': lua_sha256, 'lua_version': lua_version,
             'actual_catalog_preflight_passed': True,
+            **({'settlement_cache_warmup': settlement_cache_warmup} if settlement_cache_warmup is not None else {}),
             'synthetic_identity_policy': service.identity_policy(),
             **({'sqlite_dependency': sqlite_dependency} if sqlite_dependency is not None else {}),
             'steam_calls_enabled': False, 'payment_calls_enabled': False, 'public_listener': False})
@@ -337,6 +385,8 @@ def serve(directory, *, lua_executable=None):
                 'database_pool_close_deferred': pool_mode and not drained,
                 'database_pool_closed': pool_closed, 'database_pool_close_error': pool_close_error,
                 'database_pool_stopped': pool_stats,
+                **({'settlement_cache_warmup': settlement_cache_warmup,
+                    'settlement_cache_stopped': settlement_cache_snapshot(cfg)} if settlement_cache_warmup is not None else {}),
                 'account_state_modified_only_in_lab': True, 'capacity_certified': False})
         finally:
             if web_drain['drained']:
