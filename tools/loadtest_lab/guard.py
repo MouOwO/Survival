@@ -280,6 +280,8 @@ def load(directory):
     validate_frontend_experiment(cfg, lambda name: (root / name).read_bytes())
     from .workload_profiles import validate_workload_profile
     validate_workload_profile(cfg, lambda name: (root / name).read_bytes())
+    from .progress import validate_profile as validate_actor_progress
+    validate_actor_progress(cfg)
     return root, cfg, private
 
 
@@ -389,6 +391,8 @@ def load_client(path):
     if 'process_topology' in cfg or 'process_observation' in cfg:
         from .process_runtime import validate_process_options
         validate_process_options(cfg)
+    from .progress import validate_profile as validate_actor_progress
+    validate_actor_progress(cfg)
     return cfg, controller
 
 

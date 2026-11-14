@@ -18,9 +18,13 @@ from loadtest_lab.workload_profiles import COUNTERS as WORKLOAD_COUNTERS, WORKFL
 from loadtest_lab.wire_client import WireClient, WIRE_MODE, aggregate_reports, http_error_label, failure_label
 from locust import HttpUser, task, events
 from locust.exception import StopUser
+from loadtest_lab.progress import validate_profile as validate_actor_progress, ProgressIndex, ProgressObservation
 
 CFG, CONTROLLER = load_client(os.environ['LOADTEST_CLIENT'])
 CLIENT_PROFILE = profile_for(CFG)
+PROGRESS_PROFILE = validate_actor_progress(CFG)
+PROGRESS_INDEX = PROGRESS_OBSERVER = None
+PROGRESS_FROZEN = False
 WORKLOAD_COUNTS = dict.fromkeys(WORKLOAD_COUNTERS, 0)
 WIRE = WireClient(CFG.get('wire_mode', WIRE_MODE))
 WIRE_WORKERS = {}
@@ -350,7 +354,28 @@ def final_wire_report(environment):
 
 @events.test_start.add_listener
 def validate_host(environment, **kwargs):
+    global PROGRESS_INDEX, PROGRESS_OBSERVER
     target_url(environment.host)
+    if PROGRESS_PROFILE is not None:
+        from locust.runners import LocalRunner
+        if not isinstance(environment.runner, LocalRunner) or PROGRESS_INDEX is not None:
+            raise ValueError('loadtest_progress_requires_fresh_local_worker')
+        folder = Path(os.environ['LOADTEST_REPORT_DIRECTORY']).resolve()
+        if not folder.is_dir() or folder.is_relative_to(Path(__file__).resolve().parents[2]):
+            raise ValueError('external_report_directory_required')
+        PROGRESS_INDEX = ProgressIndex(CFG['active'], CFG['accounts'])
+        PROGRESS_OBSERVER = ProgressObservation(PROGRESS_INDEX, folder, run_id=CFG['run_id'],
+            manifest_sha256=sha(canonical(CFG)), controller=CONTROLLER)
+        if not PROGRESS_OBSERVER.sample():
+            raise ValueError('loadtest_progress_observation_failed')
+        import gevent
+        def sample_progress():
+            while not RUN_STOPPING:
+                gevent.sleep(5)
+                if not RUN_STOPPING and not PROGRESS_OBSERVER.sample():
+                    fail_run(environment, 'actor_progress_not_confirmed')
+                    return
+        gevent.spawn(sample_progress)
     if environment.parsed_options.num_users and environment.parsed_options.num_users > CFG['active']:
         raise ValueError('virtual_users_exceed_manifest_budget')
     from locust.runners import WorkerRunner
@@ -372,10 +397,16 @@ def validate_host(environment, **kwargs):
 
 @events.test_stopping.add_listener
 def mark_stopping(environment, **kwargs):
-    global RUN_STOPPING, RUN_STOPPING_AT
+    global RUN_STOPPING, RUN_STOPPING_AT, PROGRESS_FROZEN
     RUN_STOPPING = True
     if CLIENT_PROFILE.mode in ('client-v2', 'client-v3') and RUN_STOPPING_AT is None:
         RUN_STOPPING_AT = time.monotonic()
+    if PROGRESS_INDEX is not None and not PROGRESS_FROZEN:
+        try:
+            PROGRESS_INDEX.freeze(RUN_STOPPING_AT)
+            PROGRESS_FROZEN = True
+        except Exception:
+            fail_run(environment, 'actor_progress_not_confirmed')
 
 
 class SyntheticPlayer(HttpUser):
@@ -413,25 +444,43 @@ class SyntheticPlayer(HttpUser):
                             and getattr(existing, 'grant_followup_final', False)))
             if not cleanup:
                 raise StopUser()
-        # Locust follows redirects by default; explicitly disable that path.
-        with self.client.request(method, path, json=body, headers=WIRE.headers(method, path, authorization),
-                                 name=name, timeout=35, allow_redirects=False, catch_response=True) as response:
-            try:
+        # One attempt, no redirect or retry; preserve incomplete HTTP accounting.
+        headers = WIRE.headers(method, path, authorization)
+        entered = False
+        try:
+            with self.client.request(method, path, json=body, headers=headers,
+                                     name=name, timeout=35, allow_redirects=False, catch_response=True) as response:
+                entered = True
                 try:
-                    value = WIRE.decode(method, path, response.content, response.status_code, request_body=body)
-                except Exception:
+                    try:
+                        value = WIRE.decode(method, path, response.content, response.status_code, request_body=body)
+                    except Exception:
+                        if response.status_code != 200:
+                            raise ValueError(http_error_label(response.status_code, None)) from None
+                        raise
                     if response.status_code != 200:
-                        raise ValueError(http_error_label(response.status_code, None)) from None
-                    raise
-                if response.status_code != 200:
-                    raise ValueError(http_error_label(response.status_code, value))
-                value = checked(value)
-            except Exception as error:
-                safe = failure_label(error)
-                response.failure(safe)
-                fail_run(getattr(self, 'environment', None), safe)
-                raise StopUser() from None
-            return value
+                        raise ValueError(http_error_label(response.status_code, value))
+                    value = checked(value)
+                except Exception as error:
+                    safe = failure_label(error)
+                    response.failure(safe)
+                    fail_run(getattr(self, 'environment', None), safe)
+                    raise StopUser() from None
+                if (PROGRESS_INDEX is not None and WIRE.business(method, path)
+                        and not getattr(self, '_finalizing', False) and not RUN_STOPPING):
+                    self._progress_last_success = time.monotonic()
+                    slot = getattr(self, '_progress_slot', None)
+                    if slot is not None:
+                        try:
+                            PROGRESS_INDEX.success(slot, self)
+                        except Exception:
+                            fail_run(self.environment, 'actor_progress_not_confirmed')
+                            raise StopUser() from None
+                return value
+        except BaseException as error:
+            if not entered:
+                WIRE.note_incomplete(error)
+            raise
 
     def on_start(self):
         RUN_COUNTERS['start_attempts'] += 1
@@ -445,12 +494,17 @@ class SyntheticPlayer(HttpUser):
                 if not isinstance(self.environment.runner, LocalRunner):
                     raise ValueError('compact_client_requires_single_local_worker')
             self._finalizing = False
+            self._progress_slot = self._progress_last_success = None
             if CLIENT_PROFILE.mode in ('client-v2', 'client-v3'):
                 self.player = Player(self.exchange, CFG, CONTROLLER,
                                      workflow_observer=self.record_workflow)
             else:
                 self.player = Player(self.exchange, CFG, CONTROLLER)
             self.player.start()
+            if PROGRESS_INDEX is not None and not RUN_STOPPING:
+                slot = int(self.player.identity['account_id']) - CFG['account_start']
+                PROGRESS_INDEX.register(slot, self, self._progress_last_success)
+                self._progress_slot = slot
             self.next_activity = time.monotonic()
         except StopUser:
             if not RUN_FAILED:
@@ -532,6 +586,13 @@ class SyntheticPlayer(HttpUser):
                 raise
             finally:
                 self._finalizing = False
+                slot = getattr(self, '_progress_slot', None)
+                if slot is not None:
+                    self._progress_slot = None
+                    try:
+                        PROGRESS_INDEX.depart(slot, self)
+                    except Exception:
+                        fail_run(self.environment, 'actor_progress_not_confirmed')
 
 
 def workload_statistics(environment, run):
@@ -579,6 +640,9 @@ def exit_on_failure(environment, **kwargs):
         wire = final_wire_report(environment)
         run = final_run_state(environment)
         workload = workload_statistics(environment, run)
+        progress = None if PROGRESS_OBSERVER is None else PROGRESS_OBSERVER.finish()
+        if PROGRESS_PROFILE is not None and (progress is None or not progress['complete']):
+            environment.process_exit_code = 2
         http_requests = sum(entry.num_requests for entry in environment.stats.entries.values()
                             if entry.method in ('GET', 'POST', 'HEAD', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'))
         if http_requests != wire['counters']['requests']:
@@ -596,6 +660,7 @@ def exit_on_failure(environment, **kwargs):
             'run_state': run,
             'http_timing_scope': 'locust_http_time_excludes_client_wire_decode',
             **workload,
+            **({'actor_progress': progress} if PROGRESS_PROFILE is not None else {}),
             **({'http_requests': http_requests,
                 'http_failures': sum(entry.num_failures for entry in environment.stats.entries.values()
                     if entry.method in ('GET', 'POST', 'HEAD', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'))}

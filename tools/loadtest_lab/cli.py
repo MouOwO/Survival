@@ -239,6 +239,12 @@ def prepare(args):
             need(cfg.get('lottery_catalog_md5')in(None,COMPACT_METADATA['catalog_md5']),'compact_catalog_argument_mismatch')
             cfg['lottery_catalog_md5']=COMPACT_METADATA['catalog_md5']
         cfg['workload_profile'] = build_workload_profile((root / CSV_SOURCE).read_bytes(),client_workload,compact_seed=compact_seed)
+    actor_progress = getattr(args, 'actor_progress', 'baseline')
+    if actor_progress != 'baseline':
+        from .progress import PROFILE_ID, TTL_SECONDS, validate_profile
+        need(actor_progress == PROFILE_ID, 'loadtest_actor_progress_profile_invalid')
+        cfg['actor_progress'] = {'id': PROFILE_ID, 'ttl_seconds': TTL_SECONDS}
+        validate_profile(cfg)
     mature_mode = getattr(args, 'mature_fixture', None)
     if mature_mode is not None:
         _prepare_mature_fixture(root, cfg, revision, mature_mode)
@@ -453,6 +459,8 @@ def main(argv=None):
                       help='Opt-in exact observed SQLite housekeeping/WAL FULL with verified private library')
     init.add_argument('--private-sqlite-build-receipt',
                       help='Verified build02 public outer JSON; required only for hot-wal-full-v1')
+    init.add_argument('--actor-progress', choices=('baseline', 'active-business-v1'),
+                      default='baseline', help='Track every active actor successful business without extra HTTP')
     init.add_argument('--database-resource-profile',
                       choices=tuple(DB8_RESOURCE_PROFILES),
                       help='Explicit reviewed DB8 CPU/memory budget; overrides must match')

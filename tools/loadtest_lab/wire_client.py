@@ -189,12 +189,20 @@ def decode_profile_refs(value, capabilities):
     return result, version
 
 
+INCOMPLETE_KINDS = ('greenlet_exit', 'stop_user', 'cleanup_timeout',
+                    'keyboard_interrupt', 'system_exit', 'other')
+INCOMPLETE_NAMES = {'GreenletExit': 'greenlet_exit', 'StopUser': 'stop_user',
+                    'CleanupTimeout': 'cleanup_timeout', 'KeyboardInterrupt': 'keyboard_interrupt',
+                    'SystemExit': 'system_exit'}
+
+
 class WireClient:
     def __init__(self, mode=WIRE_MODE):
         if mode not in MODES:
             raise ValueError('loadtest_wire_mode_invalid')
         self.mode = mode
         self._counts = dict.fromkeys(COUNTERS, 0)
+        self._incomplete = dict.fromkeys(INCOMPLETE_KINDS, 0)
 
     @staticmethod
     def business(method, path):
@@ -258,11 +266,16 @@ class WireClient:
             counts['decode_wall_ns'] += elapsed
             counts['max_decode_wall_ns'] = max(counts['max_decode_wall_ns'], elapsed)
 
+    def note_incomplete(self, error):
+        # Fixed enum only: never serialize an exception message, token or URL.
+        self._incomplete[INCOMPLETE_NAMES.get(type(error).__name__, 'other')] += 1
+
     def report(self):
         return {'mode': self.mode, 'schema_hash': codec.SCHEMA_HASH,
                 'decoder': 'production_player_web_auth.business_wire.decode',
                 'profile_refs_decoder': 'production_lua_contract_v1_v2_bounded',
                 'counters': dict(self._counts),
+                'incomplete_exchanges': dict(self._incomplete),
                 'counter_scope': 'entire_process_including_rampup_and_finalization_not_locust_reset_stats',
                 'timing_scope': 'client_parse_and_decode_wall_time_not_server_time'}
 
@@ -270,12 +283,19 @@ class WireClient:
 def aggregate_reports(reports, mode):
     """O(worker count * fixed counters), independent of the player population."""
     total = dict.fromkeys(COUNTERS, 0)
+    incomplete = dict.fromkeys(INCOMPLETE_KINDS, 0)
     for report in reports:
         if (type(report) is not dict or report.get('mode') != mode
                 or report.get('schema_hash') != codec.SCHEMA_HASH
                 or type(report.get('counters')) is not dict
                 or set(report['counters']) != set(COUNTERS)):
             raise ValueError('loadtest_worker_wire_report_invalid')
+        value = report.get('incomplete_exchanges', dict.fromkeys(INCOMPLETE_KINDS, 0))
+        if (type(value) is not dict or set(value) != set(INCOMPLETE_KINDS)
+                or any(type(item) is not int or item < 0 for item in value.values())):
+            raise ValueError('loadtest_incomplete_exchange_report_invalid')
+        for name in INCOMPLETE_KINDS:
+            incomplete[name] += value[name]
         for name in COUNTERS:
             value = report['counters'][name]
             if type(value) is not int or value < 0:
@@ -283,4 +303,5 @@ def aggregate_reports(reports, mode):
             total[name] = max(total[name], value) if name == 'max_decode_wall_ns' else total[name] + value
     result = WireClient(mode).report()
     result['counters'] = total
+    result['incomplete_exchanges'] = incomplete
     return result
