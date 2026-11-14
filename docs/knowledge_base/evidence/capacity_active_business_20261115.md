@@ -57,3 +57,12 @@ V10离线控制包将新资源档、23/24消费者、成熟夹具精确恢复、
 新机还必须核对Python3.12二进制扩展和私有SQLite3.51.3实际库的摘要/ABI。当前源码严格绑定旧构建、gcc和_sqlite3扩展摘要，新Ubuntu包若不同会正确拒绝；届时生成真实新构建/搬迁及精确来源绑定，不能复制回执冒充新机生成或取消校验。远端使用Podman的容器证据契约保持。当前离线配置不是已验证的新机安装包。
 
 待机器及上传范围获准后，必须根据实际依赖和当时不可变operator提交重新生成独立操作包，不能把这些未绑定预览直接改JSON投入执行。正式后台/游廊仍未部署；4000四小时实际压测尚未执行，目标未完成。需用户处理的仍只有已发出的测试机选择/创建及接入信息，其余源码和隔离测试由本对话继续。
+
+
+## 只读依赖指纹与原库搬迁准备
+
+2026-11-15继续轮仅在旧机读取公共依赖元数据，并做内存SQLite ABI探针，未安装软件、写远端文件、改服务或连接PostgreSQL。Python3.12.3包3.12.3-1ubuntu0.17，Podman4.9.3+ds1-1ubuntu0.2，Lua5.3.6-2build2，glibc2.39-0ubuntu8.12；psycopg/psycopg-binary3.3.8、typing_extensions4.15.0、binary实现/libpq180006。系统_sqlite3扩展ecf54958…、原gcc1b998261…和私库ddd51819…与原绑定一致。证据readonly_dependency_baseline_20261115_01/execution_01/observation_receipt.json。
+
+已从旧机只读取回固定SHA的公开SQLite库1165624字节；核对ELF64/x86_64、小端和原编译目标/通用参数（没有march=native）。保留原始构建回执、原生成时间及摘要，新增明确标记“复制原构建、不是新构建”的搬迁证明，三成员打包/解包逐SHA一致。归档590521字节，SHA256 c76b5c41c44ec3e46b7c443ab4df3a74c6475e0e7f9bbc6e01118f049fc14587；位置sqlite_exact_artifact_transfer_20261115_01/execution_01/transfer_receipt.json，已登记，未向新机上传。
+
+复用该原库时，gcc摘要属于原构建来源证明，并不表示在新机重新编译；新机是否适用必须以真实Python路径、_sqlite3扩展摘要、映射库、SQLite source_id/线程安全及原startup guard为准。若新机不匹配则拒绝，另做真实构建/精确绑定，不能改贴旧回执。它不是新机ABI通过、磁盘WAL验证或业务容量证据；新机2/40原生预检和4000四小时目标均仍待执行。
