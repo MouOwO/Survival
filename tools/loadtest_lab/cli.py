@@ -214,6 +214,9 @@ def prepare(args):
     apply_frontend_experiment(root, cfg, revision,
         mode=getattr(args, 'frontend_rate', 'baseline'), repository=ROOT,
         private_sqlite_build_receipt=getattr(args, 'private_sqlite_build_receipt', None))
+    from .leaderboard_experiments import apply_leaderboard_binding
+    apply_leaderboard_binding(root, cfg, revision,
+        mode=getattr(args, 'leaderboard_binding', 'baseline'), repository=ROOT)
     from .workload_profiles import build_workload_profile, CSV_SOURCE, COMPACT_TARGET, COMPACT_SEED_SHA
     client_workload = getattr(args, 'client_workload', 'legacy-v1')
     if client_workload != 'legacy-v1':
@@ -303,6 +306,7 @@ def prepare(args):
         **({'business_experiment': cfg['business_experiment']} if 'business_experiment' in cfg else {}),
         **({'principal_experiments': cfg['principal_experiments']} if 'principal_experiments' in cfg else {}),
         **({'frontend_experiment': cfg['frontend_experiment']} if 'frontend_experiment' in cfg else {}),
+        **({'leaderboard_binding': cfg['leaderboard_binding']} if 'leaderboard_binding' in cfg else {}),
         **({'sqlite_environment': cfg['sqlite_environment']} if 'sqlite_environment' in cfg else {}),
         **({'mature_fixture': cfg['mature_fixture']} if 'mature_fixture' in cfg else {}),
         'cloud_resources_created': 0, 'requests_sent': 0, 'production_rows_copied': 0})
@@ -430,6 +434,8 @@ def main(argv=None):
                       help='Exact indexed archive CHECK child of set-v1; new isolated labs only')
     init.add_argument('--gameplay-defaults', choices=('baseline', 'set-v1'), default='baseline',
                       help='Opt-in exact-source set validation of gameplay defaults; isolated bounded-v2 only')
+    init.add_argument('--leaderboard-binding', choices=('baseline', 'striped-v1'), default='baseline',
+                      help='Opt-in exact-source fixed128 stripe identity binding; new bounded-v2 labs only')
     init.add_argument('--profile-load', choices=('baseline', 'init-only-v1'), default='baseline',
                       help='Opt-in removal of discarded profile pre-read; reviewed observed bounded-v2 sources only')
     init.add_argument('--principal-transport', choices=('baseline', 'principal-v1', 'reset-v1', 'reset-filtered-v1'), default='baseline',

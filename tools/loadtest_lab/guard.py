@@ -262,6 +262,8 @@ def load(directory):
         path = root.joinpath(*relative(name).parts)
         need(path.resolve().is_relative_to(root) and not path.is_symlink() and path.is_file()
              and sha(path.read_bytes()) == digest, 'lab_source_changed:' + name)
+    from .leaderboard_experiments import validate_leaderboard_binding
+    validate_leaderboard_binding(cfg, lambda name: (root / name).read_bytes())
     from .database_experiments import validate_schema_experiment
     validate_schema_experiment(cfg, lambda name: (root / name).read_bytes())
     from .database_experiments import metadata_schema_parent_sources
@@ -368,6 +370,8 @@ def load_client(path):
     need(cfg.get('wire_mode', 'business-wire-v1') in ('business-wire-v1', 'legacy-json'),
          'lab_wire_mode_invalid')
     validate_postgres_image(cfg.get('postgres_image', DEFAULT_POSTGRES_IMAGE), allow_default=True)
+    from .leaderboard_experiments import metadata as leaderboard_metadata
+    leaderboard_metadata(cfg)  # Client-only fixed metadata proof, no source reads.
     from .frontend_experiments import metadata_parent_sources as frontend_parent_sources
     frontend_parent_sources(cfg)  # Client-only metadata proof, no source reads.
     from .principal_experiments import metadata_parent_sources as principal_parent_sources
