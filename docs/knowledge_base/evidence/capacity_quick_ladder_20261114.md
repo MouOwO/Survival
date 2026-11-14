@@ -118,3 +118,16 @@ HTML／final／路由／HTTP／wire计数相互一致。driver通用错误为 `f
 用户738/月与1012/月仍为参考报价，含盘/优惠/续费未独立核实。官方变配矩阵不保证现e能直接变c9i/u2a，Intel/AMD跨平台和回退有约束；先询价并在取得具体费用授权后新建一档按量临时机验证，不能承诺核数线性或当前方案可hold4000。旁证保存在 `survival_capacity_autonomous_20261113_01/budget_review_20261114/purchase_preflight_20261114_1935/purchase_preflight.md`。
 
 旧源40人/10万成熟账号四小时通过仍限于[原证据](capacity_autonomous_20261114.md)，不自动变成新源100或4000通过。本轮不进行移交到其他对话的游戏卡顿修复。
+
+
+## 2026-11-15 新候选授权、上海CPU对照及业务准备
+
+用户已明确授权8文件新派生候选上传原上海ECS的独立压测目录并继续CPU与业务对照；原自动拒绝保留，后续成功有独立授权／上传／执行回执，不改写旧失败。新目录codec_key_size_probe_20261114_01，归档SHA256 c683b8044ecee26fa8b4562defd7328a3f8d6532778b81db5f863c622a92c5d0，73733字节。五种输入各72次pack，旧／键优化／组合三臂全部输出字节一致。组合候选045afbbe03cd4e5cc91f879f6db2cd6881b7362c80cc1c248152a94619387ff5，原生Python3.12 process CPU均值相对旧版约下降12.31%、25.51%、3.18%、16.75%、24.52%，配对中位数下降约16.94%、15.88%、11.74%、4.92%、20.98%；单轮存在反向噪声，不能承诺固定增益或据此认证在线人数。
+
+调用计数869→334、656→198，初始化仅O(固定schema别名)，稳定已知编码键尺寸O(1)、未知键保留精确JSON转义；整次pack仍O(B+sum K log K)，额外空间仅固定表和本次pack至多64KiB。没有按账号或授权的全局缓存。状态变化不跨请求保留，新回包重新处理；公共decode和全部解析/预算/重复字段/类型检查及完整重建比对保留。每请求HTTP、RPC、DB调用增量均0。实际Handler.do_POST对照每臂720合成请求、4321项检查通过：9业务和3非业务路由、200/400/503、协议头重复或未知、fallback均与父版一致。它是本地分派一致性证据，不是真实认证或容量证据。
+
+独立旧版100控制run ad9a7c4c7d2e27a95abc75199b082240，manifest 90f44a110788247459867c48fd1211a5305cbce62ee3f9e6dcd432f0e2980a39，仍b354的131源、同PG2核/2GiB/DB8及100/180秒/spawn5。实际16:26:21—16:26:53UTC仅476HTTP、1次login backend_busy；最高签名采样ready8，未达到100。90次退出全部完成，SQL03完整46execute/22aggregate通过，pending/error/outbox/online及受保护表均0。API/BE/PG/monitor正常退出、首次采集与SQLite终态确认。原分析器因必要路由未覆盖返回analysis_required_route_missing，保留失败、不放宽门。不能把短测或零残留视为100通过。
+
+停API后的只读目录检查EXPLAIN显示role查询原生执行约1.45～3.35ms、function约0.46～0.96ms；与负载下数百毫秒墙钟样本存在明显排队/调度区别，单凭栈频率不能断言SQL计划就是全部瓶颈。首次使用系统解释器缺依赖的失败保留，后续专用venv只读对照有独立记录。
+
+树外证据位于capacity_process_topology_20261114_01的wire_key_size_native_benchmark_01、wire_cpu_result_review_20261115_01、wire_http_dispatch_integration_20261115_01及codec_business_pair_20261115_01。仅将精确组合候选合入后台源码以供下一轮固定源压测；未部署正式后台、未改客户端协议或schema、未操作游廊、未购买。下一轮须断言131源仅business_wire.py一份变化，再执行相同100对照与收尾。4000四小时及新2小时长稳仍未执行。

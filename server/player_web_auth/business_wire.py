@@ -80,6 +80,18 @@ _FIELD_IDS = {value: str(index) for index, value in enumerate(SCHEMA["fields"], 
 _SYMBOL_IDS = {value: index for index, value in enumerate(SCHEMA["symbols"], 1)}
 _KEY_SYMBOL_IDS = {value: "@" + str(index) for value, index in _SYMBOL_IDS.items()
                    if len("@" + str(index)) < len(value.encode("utf-8"))}
+_ENCODED_KEY_JSON_SIZES = {key: len(key) + 2 for key in
+                           (*_FIELD_IDS.values(), *_KEY_SYMBOL_IDS.values())}
+
+
+def _encoded_key_json_size(key):
+    # Stored aliases are ASCII IDs; unknown keys retain exact JSON escaping.
+    size = _ENCODED_KEY_JSON_SIZES.get(key)
+    if size is not None:
+        return size
+    return len(json.encoder.encode_basestring(key).encode("utf-8"))
+
+
 _SYMBOL_SAVINGS = {value: len(canonical(value)) - len(canonical([1, index]))
                    for value, index in _SYMBOL_IDS.items()}
 _TEMPLATES = SCHEMA["templates"]
@@ -177,7 +189,22 @@ def _original_key(key):
     return key
 
 
+_PACK_RETAIN_BYTES = 64 * 1024
+
+
+class _EncodedEnvelope:
+    """One pack call's original-writer bytes; never an account/global cache."""
+    __slots__ = ("value", "raw")
+
+    def __init__(self, value, raw):
+        self.value, self.raw = value, raw
+
+
 def encode(value):
+    return _encode(value)
+
+
+def _encode(value, *, _retain=False):
     """Return a fresh versioned envelope. Input objects are never mutated."""
     count = 0
     # Exact structural identities use already-interned child IDs, rather than
@@ -223,10 +250,13 @@ def encode(value):
             # only K short field names yields deterministic exact duplicates.
             # Total sorting is O(sum K log K), K is bounded by input node budget.
             children = [(key, visit(child, depth + 1)) for key, child in current.items()]
-            encoded = {_key(key): child[0] for key, child in children}
-            encoded_sizes = {_key(key): child[2] for key, child in children}
+            encoded, encoded_sizes = {}, {}
+            for key, child in children:
+                encoded_key = _key(key)
+                encoded[encoded_key] = child[0]
+                encoded_sizes[encoded_key] = child[2]
             node = encoded
-            size = 2 + sum(len(canonical(key)) + child_size + 2
+            size = 2 + sum(_encoded_key_json_size(key) + child_size + 2
                            for key, child_size in encoded_sizes.items()) - bool(encoded)
             group = _TEMPLATE_INDEX.get(frozenset(current))
             if group:
@@ -235,7 +265,7 @@ def encode(value):
                     index, defaults = entry
                     patch = {_key(key): child[0] for key, child in children
                              if not (type(current[key]) is type(defaults[key]) and current[key] == defaults[key])}
-                    patch_size = 2 + sum(len(canonical(key)) + encoded_sizes[key] + 2
+                    patch_size = 2 + sum(_encoded_key_json_size(key) + encoded_sizes[key] + 2
                                          for key in patch) - bool(patch)
                     template_size = 5 + len(str(index)) + patch_size
                     if template_size < size:
@@ -298,18 +328,33 @@ def encode(value):
     # Compare the finished alternatives so incidental child definitions cannot
     # make the final representation larger than the no-reference candidate.
     baseline = {MARKER: [1, SCHEMA_HASH, root]}
-    result_size = len(canonical(result))
-    baseline_size = len(canonical(baseline))
+    result_bytes = canonical(result)
+    result_size = len(result_bytes)
+    retained = result_bytes if _retain and result_size <= _PACK_RETAIN_BYTES else None
+    del result_bytes
+    baseline_bytes = canonical(baseline)
+    baseline_size = len(baseline_bytes)
     if baseline_size <= result_size:
         result, result_size = baseline, baseline_size
+        retained = baseline_bytes if _retain and baseline_size <= _PACK_RETAIN_BYTES else None
+    del baseline_bytes
     if result_size > MAX_BYTES:
         raise ValueError("business_wire_output_budget_exceeded")
-    return result
+    return _EncodedEnvelope(result, retained) if _retain else result
 
 
 def decode(value):
-    """Strict reference implementation for cross-language verification."""
-    if len(canonical(value)) > MAX_BYTES:
+    return _decode(value)
+
+
+def _decode(value, *, _writer=None):
+    """Public decode recomputes; only pack's exact writer can reuse its bytes."""
+    if (type(_writer) is _EncodedEnvelope and _writer.value is value
+            and _writer.raw is not None):
+        input_size = len(_writer.raw)
+    else:
+        input_size = len(canonical(value))
+    if input_size > MAX_BYTES:
         raise ValueError("business_wire_input_budget_exceeded")
     if (type(value) is not dict or set(value) != {MARKER}
             or type(value[MARKER]) is not list or len(value[MARKER]) != 3
@@ -406,13 +451,14 @@ def pack_bytes(body, advertised_hash):
         value = _loads(body)
         if type(value) is not dict or MARKER in value:
             return body
-        envelope = encode(value)
+        writer = _encode(value, _retain=True)
+        envelope = writer.value
         # An optional pack must never produce a representation that exceeds
         # the consumer's expansion/depth budget. This one local pass also
         # verifies exact default types and reference reconstruction.
-        if canonical(decode(envelope)) != canonical(value):
+        if canonical(_decode(envelope, _writer=writer)) != canonical(value):
             return body
-        packed = canonical(envelope)
+        packed = writer.raw if writer.raw is not None else canonical(envelope)
         return packed if len(packed) < len(body) else body
     except (ValueError, TypeError, OverflowError, RecursionError, UnicodeError):
         return body
