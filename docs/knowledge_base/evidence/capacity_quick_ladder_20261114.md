@@ -52,13 +52,41 @@ DB4源为0908e0cf，DB8源为353ade7c；仅池预算接线4→8，其余126份�
 
 原5秒资源样本未显示持续网卡/磁盘占满或发生器CPU满核，但不排除短峰、单核、锁等待或宿主限制，不能据此排除CPU问题。
 
-## 尚未执行的100人和继续条件
+## 用户授权后已实际完成的新100人
 
-新100人run `7a6d572003e557c78bd3b77524d71d8f`，manifest `edb6b86c1cecff6450dbfc7c057954b0d182967e2771cf17f8ae4d4ea84a81da` 已准备，131源与获准并通过的两账号版完全相同。V9/V12及收尾控件已独立复核、冻结登记；计划100/180秒/spawn5，保留原五项延迟、连续ready、完整WF/SQL/清理门。
+新100人run `7a6d572003e557c78bd3b77524d71d8f`，manifest `edb6b86c1cecff6450dbfc7c057954b0d182967e2771cf17f8ae4d4ea84a81da`，131源与获准并通过的两账号版完全相同。用户已明确授权向47.116.11.179的该独立目录上传并继续阶梯；随后实际完成上传、bootstrap、warmup、100/180秒/spawn5、收尾和离线分析。
 
-上传原命令两次被自动审批拒绝，均在CreateProcess前，100档没有上传、启动、业务请求或远程新run。拒绝理由是需要用户明确授权这批内部131源向47.116.11.179上传；已向用户提出具体payload/独立目录确认，尚待答复。原拒绝证据 `striped100_upload_approval_block_01/refusal_receipt.json` SHA `72b215a04ec27a45e37b93eba34d1f8205b020825917f24e8893e590bfaf9e41`。没有改入口绕过，也没有重写成成功上传回执。
+此前两次自动审批拒绝均在CreateProcess前；保留原拒绝证据 `striped100_upload_approval_block_01/refusal_receipt.json` SHA `72b215a04ec27a45e37b93eba34d1f8205b020825917f24e8893e590bfaf9e41`，不改写为成功。这次成功以用户后续具体授权和新执行回执为依据。
 
-获明确授权后，继续原OpsV5 upload/bootstrap/warmup→正确Locust venv的V12真实100→API正常stop→PG仍运行时只读SQL03→PG/monitor正常stop→首次V9采集→SQLite终态→原分析器。命令清单 `striped100_post_controls_01/command_list.json`；SQL03仍原27needs、14受保护表及45秒只读限制，失败保持失败，不静默重试。按实际结果再决定200及更高档，未达满员时不跑空的4000四小时。
+实际HTTP窗口12:50:40—12:54:03UTC，1691HTTP/3失败、460WF/6失败、3ASSERT/3失败；后两者是相同失败的派生事件，不能算成12次HTTP错误。3次均为最终checkpoint的503/backend_busy，普通1491HTTP零失败。退出100尝试、97完成、3失败；签名最高ready100，连续满员保守下界118.075秒，但42探针中有1次失败，严格连续证据未过。profile/周期HTTP/最终checkpoint WF/完整finalization WF的P95分别7600/10000/23000/23000ms。短测没有正grant覆盖，不能解释为奖励丢失或通过正发奖验收。
+
+API先正常停，PG仍运行时原SQL03读到pending/error/outbox均0、online_sessions=3，第11次execute／第5个aggregate即拒绝；后续14受保护表及奖励关联检查未执行，不能写成其均通过。随后BE、PG、monitor正常停、池关闭、三个端口均不监听，首次采集和SQLite终态已完成；物理停服不代表三次业务退出成功。原生SQL回执SHA `5585b96d1dcdfc32cabb1d1374ac93330c61e7670981a1ca1175923a71c8ff36`。
+
+源导出固定b354，而实际operator为仅多3份文档的e93febf8。原分析器错误地要求两种提交号相同而拒绝；新独立分析控件分别精确绑定两者，验证22个实际Git消费者字节及全部131导出，29个其他函数／类不变，6项负对照通过；全部SLA、错误、SQL、清理门保留。最终 `Striped100_full_analysis_03/analysis_receipt.json` 为FAILED_FIXED_BUDGET、pending空，不是通过。原分析器拒绝与后续纠正均保留。
+
+## 新40人诊断及真实函数采样
+
+另外运行 `bd6d336498c743a7f975e1975821a583`，manifest `b0fa226babb2b8e3e6bdf1af82cc8173831ad846c6a79b49d919672fe58ce50d`，b354相同131源、40/150秒/spawn5、10万薄档案及相同资源。682HTTP与200WF均零失败，40次完整退出，签名连续满员下界125.689秒。SQL03完整46次execute／22个aggregate通过，pending/error/outbox/online、奖励关联及14受保护表均0；所有进程、池、端口正常停止，SQLite终态确认。
+
+诊断profile/周期HTTP/完整退出WF P95为1900/5000/10000ms，仍超读档和周期门，且短测无正grant覆盖；`Profile40_full_analysis_01/analysis_receipt.json` 为FAILED_FIXED_BUDGET、pending空。不能把这轮零失败写成性能通过或套用旧源40人四小时结论。
+
+通过官方py-spy0.4.3、固定wheel和二进制摘要，在实际40-ready业务窗口对已核验身份的FE/BE分别采样45秒、10Hz、GIL-only/nonblocking；获得FE50、BE45个有效栈。无locals/真实回包/原生SQL栈采集或目标信号。FE pack_bytes包含35/50、encode23/50、canonical15/50；BE rpc包含28/45、权限检查13/45。这是少量GIL栈频率，不是精确CPU占比、调用计数或PG/Lua耗时。原先错过窗口的CPU40失败仍独立保留。证据 `pyspy_profile40_01/{execution_receipt,profiles_collection_receipt,hotspot_summary_receipt}.json`。
+
+原100的5秒样本约200秒：FE均值0.475核、BE0.538核、PG1.156核／最高1.678核；PG上限2核，累计节流计数增加9.824秒，不能直接当墙钟百分比。磁盘平均忙6.95%、5秒峰18.8%，发生器单核CPU峰5.9%；没有持续磁盘饱和证据，仍不排除短峰、单核、锁或共享宿主限制。见 `metrics_summary_01/samples/striped_db8_quick100_01/summary_receipt.json`。
+
+对已有157+111条限额、指定命令脱敏耗时记录做一次离线聚合：100档74个最终checkpoint记录平均6776.8ms，其中DB池等待累计平均4814.0ms、role/function guard累计562.0/280.8ms、实际query累计433.3ms。通常周期路径7次RPC，带结算时更多，最终路径9次。此为有选择的墙钟样本，包含排队和调度；嵌套阶段不可相加，也不是CPU归因。见 `http_stage_timing_summary_01/summary_receipt.json`。
+
+## 编码CPU候选与当前继续条件
+
+通用标量缓存只作上海独立合成微测，5种输入中2种CPU反而慢约5.6%和11.4%，没有合入。另准备更局部的候选：一次构建编码键JSON长度索引、每字段只编码一次，并复用单次pack自身写出的不超过64KiB字节；保留严格解析、权限、边界、完整解码逐字节核验及原回退。
+
+局部候选父／键长度／组合版本各1462项旧回归、1028项定向、8770键长度差分和800项附加encode行为检查通过；主业务文件未修改。初始化O(固定协议别名)，稳定已知键O(1)查询、未知键O(键字节)，每回包复杂度仍O(B+sum K log K)，无按账号的全局缓存、额外网络或DB调用。示例实际JSON序列化调用从869→334、656→198；这是函数调用计数，不是CPU/FPS结果。
+
+本机Windows/Python3.14合成微测仅显示优化方向，CPU时钟粒度有限，不能代替上海Python3.12或HTTP容量。8文件/约74KB的新派生候选尚未上传：自动审批认为先前b354的131冻结源授权未覆盖新派生源码，在CreateProcess前拒绝；已再次列明文件、47.116.11.179及全新 `/srv/survival-loadtest/codec_key_size_probe_20261114_01` 向用户申请授权。保留 `wire_key_size_native_benchmark_01/approval_refusal_observation_receipt.json`，没有绕过拒绝。获得授权后先做独立CPU对照，再决定接入下一轮业务压测。
+
+本轮20份显式回执登记18份成功或已登记；原生SQL原始回执无已知storage绑定、SQLite observation不在白名单，两份被登记器拒绝，原证据和上层执行／采集回执保留，不修改日期或伪造绑定。见 `post_profile_evidence_registration_01/registration_observation.json`。不清理任何旧数据。新200以上、2小时及4000四小时不据失败的100自动宣称完成；需要先改善实际瓶颈并通过相应门。未购买、升级或改变生产后台／游廊。
+
+另尝试仅把本机PG容器CPU上限2→4准备一个100人对照，既有冻结工具在本地返回 `reviewed_db8_postgres_resources_required`：当前8连接实验合同严格绑定2核／2GiB。此新档未准备完成、未上传或启动，不能拿更改JSON绕过来源与预算校验。若继续资源对照，应先扩展并验证资源合同及对应采集／分析绑定，再运行；不能报告为已完成4核对照。
 
 ## 流量模型与采购边界
 
