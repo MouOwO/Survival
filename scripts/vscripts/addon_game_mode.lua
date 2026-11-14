@@ -918,7 +918,7 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
-        "particles/items_fx/cyclone.vpcf",
+        "particles/survival/skills/void_cyclone_smooth.vpcf",
         context
     )
     PrecacheResource(

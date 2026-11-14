@@ -148,7 +148,7 @@ earth_rock.explosion_core_particle =
     "particles/survival/skills/earth_phoenix_impact_core.vpcf"
 earth_rock.cleanup_grace = 0.25
 local tornado_visual = {
-    particle = "particles/items_fx/cyclone.vpcf",
+    particle = "particles/survival/skills/void_cyclone_smooth.vpcf",
 }
 local TORNADO_THINK_INTERVAL = 0.05
 
@@ -3676,6 +3676,7 @@ function tornado_visual.release(state)
     if not state or state.particle == nil then return end
     local particle = state.particle
     state.particle = nil
+    state.visual_target, state.visual_position, state.visual_velocity = nil, nil, nil
     local destroy_ok, destroy_error = pcall(function()
         ParticleManager:DestroyParticle(particle, true)
     end)
@@ -3688,12 +3689,40 @@ function tornado_visual.release(state)
     end
 end
 
-function tornado_visual.sync(state)
+function tornado_visual.same_vector(a, b)
+    return a and b and a.x == b.x and a.y == b.y and a.z == b.z
+end
+
+function tornado_visual.sync(state, velocity)
     if state.particle == nil then return end
-    -- Native Invoker funnel/base follow CP3, while the dust follows CP0.
-    -- Lua owns movement; the wrapper omits the native straight-line mover.
-    ParticleManager:SetParticleControl(state.particle, 0, state.position)
-    ParticleManager:SetParticleControl(state.particle, 3, state.position)
+    velocity = velocity or state.direction * state.move_speed
+    if state.attached_to_target and alive(state.target) then
+        if state.visual_target ~= state.target then
+            ParticleManager:SetParticleControl(state.particle, 21, Vector(0, 0, 0))
+            ParticleManager:SetParticleControlEnt(state.particle, 20, state.target,
+                PATTACH_ABSORIGIN_FOLLOW, "", state.position, false)
+            state.visual_target = state.target
+            state.visual_velocity = Vector(0, 0, 0)
+            state.visual_position = nil
+        end
+        return
+    end
+    -- The native child computes anchor + velocity * bounded anchor age every
+    -- render frame. Combat queries keep their existing shared cadence.
+    if not tornado_visual.same_vector(state.visual_velocity, velocity) then
+        ParticleManager:SetParticleControl(state.particle, 21, velocity)
+        state.visual_velocity = copy_position(velocity)
+    end
+    if state.visual_target ~= nil then
+        ParticleManager:SetParticleControlEnt(state.particle, 20, nil,
+            PATTACH_WORLDORIGIN, "", state.position, false)
+        state.visual_target = nil
+        state.visual_position = nil
+    end
+    if not tornado_visual.same_vector(state.visual_position, state.position) then
+        ParticleManager:SetParticleControl(state.particle, 20, state.position)
+        state.visual_position = copy_position(state.position)
+    end
 end
 
 function tornado_visual.create(state)
@@ -3925,7 +3954,11 @@ local function sync_tornadoes()
             if GetGroundPosition then
                 state.position = GetGroundPosition(state.position, nil)
             end
-            tornado_visual.sync(state)
+            local visual_ok, visual_error = pcall(tornado_visual.sync, state, velocity)
+            if not visual_ok then
+                tornado_visual.release(state)
+                print("[HeroPassiveSkill] tornado visual update failed: " .. tostring(visual_error))
+            end
             if state.area_slow_pct > 0 then
                 for _, target in ipairs(enemies_touching_radius(
                     state.context.attacker, state.position, state.effect_radius

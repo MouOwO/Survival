@@ -1,5 +1,7 @@
 # 2026-11-14 虚空震爆移动跳步检查
 
+后续修复已完成本地实现、原生运动与 GPU 验证，见 [虚空震爆平滑移动与 GPU 验证](void_smooth_gpu_20261114.md)。下文保留修复前的诊断范围和当时证据边界。
+
 本次用户要求检查气旋特效移动不连贯、其他单位平滑的问题。仅检查，未改虚空震爆实现或全局调度器；后台未改，未操作游廊。寒冰锥同轮已另行完成十枚＋冰冻地面，见`ice_cone_hail10_ground_20261114.md`。
 
 当前资源为Valve风杖`particles/items_fx/cyclone.vpcf`，不是旧卡尔包装。`hero_passive_skill_service.lua`的`tornado_visual.create`创建`PATTACH_WORLDORIGIN`粒子，`tornado_visual.sync`每次直接写CP0/3为`state.position`。`sync_tornadoes`在共享调度器里以0.05秒请求重复：追踪期按500×实际elapsed计算步长；到达目标后仍从目标读取位置并逐次写CP，没有改用`SetParticleControlEnt`绑定原生目标跟随，也没有独立渲染插值层。因此代码中存在明确的低频位置阶梯来源，而不是已经证明整局GPU/FPS掉帧。
