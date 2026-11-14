@@ -10,6 +10,7 @@ import time
 from .guard import (PORTS, ACCOUNT_START, canonical, sha, need, relative, read_json,
                     write_new, load, dsn, marker_guard, DEFAULT_POSTGRES_IMAGE, validate_postgres_image,
                     resolve_database_pool)
+from .experiments import DB8_RESOURCE_PROFILES, resolve_database_resources
 
 ROOT = Path(__file__).resolve().parents[2]
 CSVS = ('star_blessing_reward_definitions', 'fishing_system_rules', 'player_gameplay_stats')
@@ -110,8 +111,9 @@ def prepare(args):
     duration = args.duration if args.duration is not None else (120 if purpose == 'functional-smoke' else 7200)
     memory_option = getattr(args, 'database_memory_mib', None)
     cpu_option = getattr(args, 'database_cpu_limit', None)
-    database_memory_mib = memory_option if memory_option is not None else (256 if purpose == 'functional-smoke' else 2048)
-    database_cpu_limit = cpu_option if cpu_option is not None else (.5 if purpose == 'functional-smoke' else 1)
+    resource_profile = getattr(args, 'database_resource_profile', None)
+    database_memory_mib, database_cpu_limit = resolve_database_resources(
+        purpose, profile=resource_profile, memory=memory_option, cpu=cpu_option)
     image_option = getattr(args, 'postgres_image', None)
     postgres_image = DEFAULT_POSTGRES_IMAGE if image_option is None else validate_postgres_image(image_option)
     backend_db_pool = getattr(args, 'backend_db_pool', 'baseline')
@@ -140,6 +142,11 @@ def prepare(args):
            'profile': ('baseline_limits' if (http_concurrency, args.db_concurrency,
                        args.web_concurrency, args.global_http_per_minute) == (8, 4, 24, 2400)
                        else 'parameter_experiment_not_production')}
+    if resource_profile is not None:
+        need(getattr(args, 'http_admission', 'baseline') == 'bounded-v5'
+             and backend_db_pool == 'bounded-v2',
+             'db8_resource_profile_requires_admission_v5')
+        cfg['database_resource_profile'] = resource_profile
     if pool_limits is not None:
         cfg['database_pool_limits'] = pool_limits
     private = {key: secrets.token_hex(32) for key in
@@ -446,6 +453,9 @@ def main(argv=None):
                       help='Opt-in exact observed SQLite housekeeping/WAL FULL with verified private library')
     init.add_argument('--private-sqlite-build-receipt',
                       help='Verified build02 public outer JSON; required only for hot-wal-full-v1')
+    init.add_argument('--database-resource-profile',
+                      choices=tuple(DB8_RESOURCE_PROFILES),
+                      help='Explicit reviewed DB8 CPU/memory budget; overrides must match')
     init.add_argument('--database-memory-mib', type=int,
                       help='Isolated local database memory cap; default 2048 MiB (smoke: 256)')
     init.add_argument('--database-cpu-limit', type=float,

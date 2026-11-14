@@ -49,6 +49,32 @@ def _need(value, code):
         raise ValueError(code)
 
 
+# Exact opt-in DB8 resource budgets. This is startup/preparation metadata only:
+# O(3) module initialization, O(1) lookups; zero request-time work or I/O.
+DB8_RESOURCE_PROFILES = {
+    'db8-2cpu-2g-v1': (2, 2048),
+    'db8-4cpu-4g-v1': (4, 4096),
+    'db8-8cpu-8g-v1': (8, 8192),
+}
+
+
+def resolve_database_resources(purpose, *, profile=None, memory=None, cpu=None):
+    if profile is None:
+        return (memory if memory is not None else
+                256 if purpose == 'functional-smoke' else 2048,
+                cpu if cpu is not None else
+                .5 if purpose == 'functional-smoke' else 1)
+    _need(purpose == 'capacity', 'db8_resource_profile_requires_capacity')
+    _need(type(profile) is str and profile in DB8_RESOURCE_PROFILES,
+          'db8_resource_profile_invalid')
+    expected_cpu, expected_memory = DB8_RESOURCE_PROFILES[profile]
+    _need(memory is None or type(memory) is int and memory == expected_memory,
+          'db8_resource_profile_memory_conflict')
+    _need(cpu is None or type(cpu) in (int, float) and cpu == expected_cpu,
+          'db8_resource_profile_cpu_conflict')
+    return expected_memory, expected_cpu
+
+
 def _sha(raw):
     return hashlib.sha256(raw).hexdigest()
 
@@ -134,6 +160,8 @@ def validate_experiments(cfg):
     rows = cfg.get('runtime_experiments', [])
     _need(type(rows) is list and len(rows) <= 3, 'runtime_experiment_list_invalid')
     if not rows:
+        _need('database_resource_profile' not in cfg,
+              'db8_resource_profile_requires_admission_v5')
         return {}
     _need(cfg.get('backend_db_pool') == 'bounded-v2', 'runtime_experiment_requires_bounded_v2')
     identities = []
@@ -173,6 +201,9 @@ def validate_experiments(cfg):
                   'runtime_experiment_output_hash_mismatch')
         for target in row['runtime_sha256']:
             restored[target] = row['parent_runtime_sha256'].get(target)
+    if 'database_resource_profile' in cfg:
+        _need(ADMISSION_IDS[4] in identities,
+              'db8_resource_profile_requires_admission_v5')
     if any(name in identities for name in ADMISSION_IDS):
         # A waiter remains counted until it gets the mutex after notify. Even
         # with idle connections, all HTTP workers can briefly be queued. V2
@@ -182,7 +213,16 @@ def validate_experiments(cfg):
         frontend = 128 if any(name in identities for name in ADMISSION_IDS[3:]) else 48
         connections = 8 if ADMISSION_IDS[4] in identities else 4
         if ADMISSION_IDS[4] in identities:
-            _need(cfg.get('database_cpu_limit') == 2 and cfg.get('database_memory_mib') == 2048,
+            expected_cpu, expected_memory = 2, 2048
+            if 'database_resource_profile' in cfg:
+                profile = cfg['database_resource_profile']
+                _need(cfg.get('purpose') == 'capacity',
+                      'db8_resource_profile_requires_capacity')
+                _need(type(profile) is str and profile in DB8_RESOURCE_PROFILES,
+                      'db8_resource_profile_invalid')
+                expected_cpu, expected_memory = DB8_RESOURCE_PROFILES[profile]
+            _need(cfg.get('database_cpu_limit') == expected_cpu
+                  and cfg.get('database_memory_mib') == expected_memory,
                   'reviewed_db8_postgres_resources_required')
         _need((cfg.get('http_concurrency'), cfg.get('web_concurrency'),
                cfg.get('db_concurrency'), cfg.get('database_pool_limits')) ==
