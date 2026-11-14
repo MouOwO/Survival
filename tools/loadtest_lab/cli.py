@@ -119,7 +119,8 @@ def prepare(args):
         http_concurrency=getattr(args, 'http_concurrency', None),
         db_concurrency=args.db_concurrency, web_concurrency=args.web_concurrency,
         pool_max_waiters=getattr(args, 'db_pool_max_waiters', None),
-        pool_wait_seconds=getattr(args, 'db_pool_wait_seconds', None))
+        pool_wait_seconds=getattr(args, 'db_pool_wait_seconds', None),
+        admission_mode=getattr(args, 'http_admission', 'baseline'))
     http_concurrency = pool_parameters['effective']['http_concurrency']
     run = secrets.token_hex(16)
     cfg = {'schema': 1, 'kind': 'SURVIVAL_ISOLATED_LOADTEST', 'run_id': run,
@@ -415,8 +416,8 @@ def main(argv=None):
                       help='bounded-v2 only: queue wait cap, default 2; maximum 5 and request remaining deadline')
     init.add_argument('--checkpoint-observation', action='store_true',
                       help='Opt-in exact-source checkpoint/proxy timing; isolated bounded-v2 labs only')
-    init.add_argument('--http-admission', choices=('baseline', 'bounded-v1', 'bounded-v2', 'bounded-v3', 'bounded-v4'), default='baseline',
-                      help='Reviewed DB4/wait2; v1 web48/HTTP32/Q28, v2 web48/HTTP32/Q32, v3 web48/HTTP8/Q8, v4 web128/HTTP32/Q32/backlog128')
+    init.add_argument('--http-admission', choices=('baseline', 'bounded-v1', 'bounded-v2', 'bounded-v3', 'bounded-v4', 'bounded-v5'), default='baseline',
+                      help='Reviewed wait2; v1-v4 DB4 unchanged; v5 DB8/PG2CPU2048MiB/web128/HTTP32/Q32/backlog128')
     init.add_argument('--targeted-pool-notify', action='store_true',
                       help='Opt-in exact-source FIFO head notification experiment; requires HTTP admission v2/v3/v4')
     init.add_argument('--process-topology', choices=('same-v1', 'split-v1'),

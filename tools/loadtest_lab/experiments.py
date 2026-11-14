@@ -33,11 +33,12 @@ SPECS = {
 SPECS['http-admission-v2'] = SPECS['http-admission-v1']
 SPECS['http-admission-v3'] = SPECS['http-admission-v1']
 SPECS['http-admission-v4'] = SPECS['http-admission-v1']
+SPECS['http-admission-v5'] = SPECS['http-admission-v1']
 SPECS['pool-notify-v1'] = (
     ('db_pool_notify_patch.py', 'bounded_pool_notify.py'),
     frozenset(('fishing_api/_bounded_pool.py',)),
     frozenset(('fishing_api/_bounded_pool.py',)))
-ADMISSION_IDS = ('http-admission-v1', 'http-admission-v2', 'http-admission-v3', 'http-admission-v4')
+ADMISSION_IDS = ('http-admission-v1', 'http-admission-v2', 'http-admission-v3', 'http-admission-v4', 'http-admission-v5')
 ORDER = ('checkpoint-observation-v1', *ADMISSION_IDS, 'pool-notify-v1')
 ROW_KEYS = frozenset(('id', 'source_revision', 'operator_sources',
                       'parent_runtime_sha256', 'runtime_sha256'))
@@ -62,14 +63,14 @@ def has_http_admission(cfg):
 
 def http_admission_backlog(cfg):
     """Fixed reviewed capacity profile; no caller-provided queue override."""
-    return 128 if has_experiment(cfg, 'http-admission-v4') else 64
+    return 128 if any(has_experiment(cfg, name) for name in ADMISSION_IDS[3:]) else 64
 
 
 def apply_experiments(root, cfg, revision, *, observation=False, admission=False,
                       pool_notify=False, repository):
     """Apply reviewed transformations in order, before the lab manifest exists."""
     admission = ('bounded-v1' if admission is True else 'baseline' if admission is False else admission)
-    admission_modes = dict(zip(('bounded-v1', 'bounded-v2', 'bounded-v3', 'bounded-v4'), ADMISSION_IDS))
+    admission_modes = dict(zip(('bounded-v1', 'bounded-v2', 'bounded-v3', 'bounded-v4', 'bounded-v5'), ADMISSION_IDS))
     _need(admission == 'baseline' or admission in admission_modes, 'http_admission_mode_invalid')
     selected = ([ORDER[0]] if observation else []) + (
         [admission_modes[admission]]
@@ -178,9 +179,13 @@ def validate_experiments(cfg):
         # reserves one waiting place per HTTP worker; connection count stays 4.
         workers = 8 if ADMISSION_IDS[2] in identities else 32
         waiting = 8 if ADMISSION_IDS[2] in identities else 28 if ADMISSION_IDS[0] in identities else 32
-        frontend = 128 if ADMISSION_IDS[3] in identities else 48
+        frontend = 128 if any(name in identities for name in ADMISSION_IDS[3:]) else 48
+        connections = 8 if ADMISSION_IDS[4] in identities else 4
+        if ADMISSION_IDS[4] in identities:
+            _need(cfg.get('database_cpu_limit') == 2 and cfg.get('database_memory_mib') == 2048,
+                  'reviewed_db8_postgres_resources_required')
         _need((cfg.get('http_concurrency'), cfg.get('web_concurrency'),
                cfg.get('db_concurrency'), cfg.get('database_pool_limits')) ==
-              (workers, frontend, 4, {'connections': 4, 'waiting': waiting, 'wait_seconds': 2}),
+              (workers, frontend, connections, {'connections': connections, 'waiting': waiting, 'wait_seconds': 2}),
               'reviewed_http_admission_budgets_required')
     return restored
