@@ -117,6 +117,9 @@ def resolve_database_pool(mode, *, http_concurrency=None, db_concurrency=4,
 def validate_database_pool(cfg):
     """Fixed reviewed experiment budgets and source bindings, once per load."""
     validate_settlement_cache(cfg)
+    if 'process_topology' in cfg or 'process_observation' in cfg:
+        from .process_runtime import validate_process_options
+        validate_process_options(cfg)
     from .database_experiments import metadata_schema_parent_sources
     schema_parents = metadata_schema_parent_sources(cfg)
     if schema_parents:
@@ -365,6 +368,9 @@ def load_client(path):
     from .workload_profiles import validate_workload_profile
     validate_workload_profile(cfg)
     validate_settlement_cache(cfg)
+    if 'process_topology' in cfg or 'process_observation' in cfg:
+        from .process_runtime import validate_process_options
+        validate_process_options(cfg)
     return cfg, controller
 
 

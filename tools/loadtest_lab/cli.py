@@ -250,6 +250,15 @@ def prepare(args):
             'runner_sha256': SETTLEMENT_RUNNER_SHA256, 'bundle_hash': SETTLEMENT_BUNDLE_HASH,
             'bundle_manifest_sha256': SETTLEMENT_BUNDLE_MANIFEST_SHA256}
         validate_settlement_cache(cfg)
+    process_topology = getattr(args, 'process_topology', None)
+    process_observation = getattr(args, 'process_observation', None)
+    if process_topology is not None:
+        cfg['process_topology'] = process_topology
+    if process_observation is not None:
+        cfg['process_observation'] = process_observation
+    if process_topology is not None or process_observation is not None:
+        from .process_runtime import validate_process_options
+        validate_process_options(cfg)
     runner = b"import sys\nfrom pathlib import Path\nsys.path[:0]=[str(Path(__file__).parent/'operator'),str(Path(__file__).parent/'runtime')]\nfrom loadtest_lab.cli import entry\nraise SystemExit(entry())\n"
     (root / 'run_lab.py').write_bytes(runner); cfg['sources']['run_lab.py'] = sha(runner)
     write_new(root / 'lab.json', cfg)
@@ -410,6 +419,10 @@ def main(argv=None):
                       help='Reviewed DB4/wait2; v1 web48/HTTP32/Q28, v2 web48/HTTP32/Q32, v3 web48/HTTP8/Q8, v4 web128/HTTP32/Q32/backlog128')
     init.add_argument('--targeted-pool-notify', action='store_true',
                       help='Opt-in exact-source FIFO head notification experiment; requires HTTP admission v2/v3/v4')
+    init.add_argument('--process-topology', choices=('same-v1', 'split-v1'),
+                      help='Opt-in same-process baseline or fresh-exec backend process; synthetic lab only')
+    init.add_argument('--process-observation', choices=('pid-v1',),
+                      help='Fixed-identity process CPU/RSS/IO observation; no process-list refresh')
     init.add_argument('--settlement-cache', choices=('baseline', 'warm-v1'), default='baseline',
                       help='Prebuild the fixed observed bundle configuration cache before opening listeners')
     init.add_argument('--archive-validation', choices=('baseline', 'indexed-v1'), default='baseline',
@@ -438,6 +451,8 @@ def main(argv=None):
                       help='Run one guarded ANALYZE after synthetic bulk load; use for both A/B arms')
     serve = subs.add_parser('serve'); serve.add_argument('--directory', required=True)
     serve.add_argument('--lua-executable', help='Explicit Lua executable; otherwise detect lua5.1/lua')
+    worker = subs.add_parser('serve-backend'); worker.add_argument('--directory', required=True)
+    worker.add_argument('--lua-executable')
     test = subs.add_parser('smoke'); test.add_argument('--directory', required=True)
     test.add_argument('--stop-lab', action='store_true')
     stop = subs.add_parser('stop'); stop.add_argument('--client', required=True)
@@ -458,6 +473,9 @@ def main(argv=None):
     elif args.action == 'stop':
         from .smoke import stop_lab
         result = stop_lab(args.client)
+    elif args.action == 'serve-backend':
+        from .process_runtime import backend_worker
+        return backend_worker(args.directory, lua_executable=args.lua_executable)
     elif args.action == 'monitor':
         from .monitor import monitor
         result = monitor(args.directory, duration_seconds=args.duration, interval_seconds=args.interval)

@@ -145,3 +145,14 @@ python -X utf8 -B tools/release_storage_ledger.py record --receipt D:/Survival_�
 ```
 
 登记失败须保留回执并处理；不触发全盘扫描或自动清理。任何私密令牌、账号原始会话和数据库密码均不写进知识库、Git或公开报告。
+
+
+## 前后端独立进程与进程观测（隔离候选）
+
+新候选显式组合 `--process-topology same-v1 --process-observation pid-v1` 或 `--process-topology split-v1 --process-observation pid-v1` 做同源对照。缺省仍走原单进程路径；只有观测开关时按 same-v1。split-v1 仅接受 bounded-v2，由前端 supervisor fresh-exec 一个 backend，不用 fork、每请求 IPC、第二份身份库或第二个连接池。前端独占合成身份、SQLite、令牌/就绪时钟和活动租约；后端独占真实 PG pool、Lua 及配置预热。业务仍走原回环 HTTP、原交易/重放/权限检查及截止时间。生产入口模板使用两进程；本开关不部署正式服务，也不证明当前生产实际进程布局或容量。
+
+启动用 run/manifest/nonce 绑定的独占原子控制文件及 PID/starttime/boot/exe 身份证明；每次必须新目录。后端通过独立 session、pidfd、父死信号及未回收的 leader 身份限定回收对象，不扫描进程表或杀用户 shell。停服先停止计量及前端接入，再排空前端，最后排空后端和关闭真实 pool；两层共享45秒业务排空预算，另最多3秒用于 OS 强退/回收。只有实际正常退出、两层排空、pool 关闭、零剩余请求/租约及完整终态证明才能通过；强退、缺失/旧回执或清理错误保持失败。父死等异常不能把空前端统计冒充后端清理结果。
+
+进程观测在服务就绪后启动，初始化一次索引最多4个 PID（相同 PID 的前后端角色只算一次）及4个设备；固定镜像/容器资源只 inspect 一次，不读取 Env/Args。初始化 O(P×E+D)，E 为最多64MiB的 executable；稳定每5秒 O(P+D)，split 正常夹具为26次 counter 文件读、10次 executable 元数据读和7次目录打开，输出 O(时长/间隔)。退出、PID 复用、计数重置和新设备保留 gap，不补0、不重绑定；CPU 自身与 waited-child 分开，RSS 合计含共享页，进程 IO 不能父子重复求和，不能替代公网峰值。原 host/PG/SQL 观测和业务门槛保持。夹具调用计数不代表 Linux 实耗、FPS 或容量通过。
+
+split 的 checkpoint/proxy 观测预算各属于实际进程，按角色保存 started/stopped；不能套用原单进程合计300条/60条每分钟的描述。最终判定仍使用全量 HTTP/工作流结果、HTML 的 P95、实际连续就绪时间、SQL 及清理证明；日常读档1000ms、周期1500ms、最终10000ms的既定目标不因拆分放宽。必须新同源候选完成两账号、40和100账号分层验收后再讨论更高人数或购买配置。

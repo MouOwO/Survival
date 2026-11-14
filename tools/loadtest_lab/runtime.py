@@ -220,6 +220,9 @@ def settlement_cache_snapshot(cfg):
 
 def serve(directory, *, lua_executable=None):
     root, cfg, private = load(directory)
+    if cfg.get('process_topology') == 'split-v1':
+        from .process_runtime import serve_split
+        return serve_split(directory, lua_executable=lua_executable, _loaded=(root, cfg, private))
     production_host_guard(cfg)
     need(not (root / 'started_receipt.json').exists(), 'lab_run_already_started_create_new_lab')
     from .frontend_experiments import checked_sqlite_environment, checked_sqlite_connection
@@ -298,6 +301,10 @@ def serve(directory, *, lua_executable=None):
             web.slots = threading.BoundedSemaphore(cfg['web_concurrency'])
         frontend_started = checked_http_admission_stats(web, 'frontend', cfg)
         backend_started = checked_http_admission_stats(backend, 'backend', cfg)
+        process_scope = None
+        if cfg.get('process_observation') == 'pid-v1':
+            from .process_runtime import publish_same_scope
+            process_scope = publish_same_scope(root, cfg)
         write_new(root / 'started_receipt.json', {'kind': 'ISOLATED_REAL_API_LAB_STARTED',
             'artifact_root': str(root), 'run_id': cfg['run_id'], 'purpose': cfg['purpose'],
             'http_concurrency': cfg['http_concurrency'], 'database_concurrency': cfg['db_concurrency'],
@@ -320,6 +327,8 @@ def serve(directory, *, lua_executable=None):
             'lua_executable': lua, 'lua_sha256': lua_sha256, 'lua_version': lua_version,
             'actual_catalog_preflight_passed': True,
             **({'settlement_cache_warmup': settlement_cache_warmup} if settlement_cache_warmup is not None else {}),
+            **({'process_topology': cfg.get('process_topology', 'same-v1'), 'processes': process_scope}
+               if process_scope is not None else {}),
             'synthetic_identity_policy': service.identity_policy(),
             **({'sqlite_dependency': sqlite_dependency} if sqlite_dependency is not None else {}),
             'steam_calls_enabled': False, 'payment_calls_enabled': False, 'public_listener': False})
@@ -371,6 +380,8 @@ def serve(directory, *, lua_executable=None):
                 'artifact_root': str(root), 'run_id': cfg['run_id'], 'requests_accepted': service.request_count,
                 'remaining_http_requests': pending.inflight, 'active_synthetic_leases': service.active,
                 'synthetic_activity': service.counts(),
+                **({'process_topology': cfg.get('process_topology', 'same-v1'), 'processes': process_scope}
+                   if process_scope is not None else {}),
                 'synthetic_identity_policy': service.identity_policy(),
                 **({'sqlite_dependency': sqlite_dependency} if sqlite_dependency is not None else {}),
                 'frontend_drain': web_drain, 'backend_drain': backend_drain,
