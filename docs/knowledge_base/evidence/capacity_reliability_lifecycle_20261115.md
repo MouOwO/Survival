@@ -58,3 +58,45 @@
 后续新增 `--checkpoint-drain single-profile-v1` 为默认关闭的独立候选：精确绑定服务器及未改动的实际 `ArchiveService.profile`，只删其前面重复的一次 `drain_online`。3 项可逆来源/篡改检查和 5 项实际方法编排（模拟 RPC）通过；真实 HTTP 新候选验收与人数阶梯仍待。初始化范围证明和完整授权每次保留；没有减少实际待处理项的 resume/commit。
 
 用户随后提出请求处理期间加锁的建议。源码核对：checkpoint、奖励和 archive 提交均已有按账号的 stats→player 锁序；奖励还有 grant advisory transaction lock。事务提交成功后才从 RPC 返回，异常回滚；跨 Lua 计算不长持数据库行锁，而由 `archive_commit` 校验 profile_revision、`finish_prepared` 最多四次重读重算。现有机制能防止重复奖励和旧数据覆盖；同账号不同操作并发的实际 HTTP 补测另列待办，不把已有同 ID 重放测试当成不同操作竞争测试。两轮 100 人 DB 锁等待采样峰值均为零，当前不能把尾延迟归因于锁竞争。
+
+## 同账号并发与回包防护补测
+
+`a4463c111781040cd943df394f91beab647dbb9c` 的单次 profile drain 候选在独立两账号真实 HTTP 环境通过 11 项检查、41 次实际 HTTP（12 次来自独立并发 transport），原始 HTTP 错误、无效响应、未完成交换均为零。同一账号 2 笔及 4 笔不同单抽并发时精确扣券 2/4 张，再并发重放相同 ID 不再扣券，另一账号不变；丢 ACK 后同 ID final 恢复并取得同一份真实奖励的检查也全部通过。正常停止，证据 `same_account_native_03/execution_receipt.json`。前一轮探针因报告聚合遗漏 mode 参数而失败，原结果保留，不计作通过。
+
+已有保护分别解决不同问题：数据库按账号行锁跨进程串行关键写入，请求 ID 与持久回执防重复执行，profile revision 冲突校验防旧计算覆盖，客户端 `player_profile_service.apply_snapshot` 的账号/当前局/代际与账号版本高水位防旧回包覆盖新视图。事务在提交/回滚后释放锁；不把锁一直占到网络 ACK 返回，不新增全局互斥锁。上述功能样本没有证明任意规模容量或所有故障模式。
+
+## CPU 与实际数据库往返成本补测
+
+原机独立纯计算进程依次为 1/2/4/1 路，各自 4 秒，分别固定到不同 guest 逻辑 CPU，总吞吐约为 721.1/661.8/652.0/650.6 万操作每秒；4 路总吞吐没有明显增加。guest 显示 2 个 core/每 core 2 个 SMT sibling，纯计算探针所在的 Linux 可见祖先 cgroup 未发现 CPU quota 限制（实验数据库仍有显式 2CPU 配额）。不能由此断言具体宿主调度原因或只有一个物理核，也不是 SQL/HTTP 容量；仍待独立实例对照。见 `cpu_process_scaling_01/verification_receipt.json`。
+
+从两份已关闭 100 人日志只提取数字白名单：基线/合并检查的周期 checkpoint 样本均值分别约 2218/1037ms，其中全部 RPC wall 为 2096/974ms、连接池等待 1174/431ms、projection+serialize 15/9ms；集中退出样本 RPC wall 为 5331/5987ms、连接池等待 3720/4406ms。采样不是随机样本或路由 P95，嵌套阶段不能相加推导收益。普通无奖励 checkpoint 原有 7 RPC、含奖励的样本均值约 8.3，单次 drain 候选减少其中重复的一次 archive_online_pending。见 `paired100_safe_timings_01/RPC_cost_receipt.json`。
+
+独立两账号、固定 20 次实际 profile 直接调用的 cProfile 线程 CPU 诊断已通过：总 wall 945.590ms、带 profiler 的 Python 线程 CPU 369.542ms、所属 PostgreSQL cgroup CPU 564.168ms；每次实际为 ensure/defaults、online pending、archive pending、profile 四个 RPC，存档指纹不变、会话关闭、服务正常停机。它排除了 HTTP 授权/上下文/投影和传输，profiler 有自身开销，数据库 CPU 含后台工作；不能当作未采样完整 HTTP 的 CPU 占比或容量。见 `components_native_02/execution_receipt.json`。第一轮诊断写死了未安装的 Lua5.1 路径，无耗时样本，证据保留；修正版用实际 resolver 和已核对的 Lua5.3 二进制摘要。
+
+## 额外回收授权和阶梯当前状态
+
+本轮 5 个已正常关闭的合成库已逐库压缩、实际恢复核对全部字节/UID/GID/权限/mtime 后回收展开副本；源、日志、回执和压缩备份保留。用户又明确授权精确历史库 `b4c226b345af210661835a197e8c1a52/pgdata`，约 0.94GB 展开副本已在约 191MB 备份实际恢复核对后回收，原失败 2000 人测试证据未删除。最终可用约 13.37GB。仅这一个历史库获得新增授权，不扩展到其他历史数据库。见 `storage_current_round_batch_01` 和 `storage_historical_b4_01`。
+
+200 人首个新候选因导入过程磁盘安全检查停止，未发压；第二个新候选启动时 SSH 连接失败，只读核对确认无数据库/容器/端口/进程启动。两次失败保留，不能算作 200 人业务压测结果。第三个新候选 `91d9634b69e6e761b14b8350de240058`（manifest `e8df0dcaa0e1ed35a598eaf66bfaaca1cc02521365f6d83ed75fbb4c6e5c9df5`）已完成发压、正常关闭、完整采集和 SQLite 终态核对。最终 HTML/native final 口径 HTTP 3671 次、611 次失败（16.64%），其中 476 次明确 frontend_busy、135 次未取得有效 HTTP 回复。周期 CSV 末次刷新并非最终窗口，不能用其 3633 次代替最终计数。收尾函数完成 110/200、失败 90；SQL V5 实际执行 13 次、6 个聚合后因在线会话 4 而拒绝，pending/outbox/errored 为 0，但后续奖励关联与受保护交易审计未完整执行。
+
+500/1000 短阶段及 2000 的 8000 秒请求阶段已离线准备，2000 仍要求真实共同业务活跃至少 7200 秒；不能以启动虚拟用户数代替在线人数。四套源绑定离线校验全过，200 阶段已关闭，后续三档实际执行仍待空间恢复后启动；新实例实际按量报价及独立硬件试机授权仍待。当前后台与游廊均未部署，无采购。
+
+
+200 的严格 stage 因 final_statistics_mismatch 未确认，随后分析因 progress_server_ready_not_confirmed 停止；原失败不改为通过。最终 HTTP/Wire 数和普通 WORKFLOW 计数可对齐，但 compact/catalog/room/recovery 部分门禁未对齐；签名 status 71 次中 46 次验证成功、25 次失败，采样 server-marked ready 峰值 184，没有证明 200 人共同持续业务活跃。167 个 actor 被隔离后不能继续当作活跃玩家。
+
+复用冻结分析器独立核对来源与物理关闭后，一次离线 69 个完整进程区间汇总：前端/后端自身 CPU 均值约 0.664/0.680 guest core，PG cgroup 均值 1.506、峰值 1.709 core，PG 内存峰 1.384GB、OOM 0。PG 在 3440 个配额周期中 585 个发生限流，累计 throttled 19.851 秒；这不是墙钟节流百分比。全主机采样 CPU 均值 87.46%、峰 95.14%，DB 锁等待采样峰 0，idle-in-transaction 采样峰 7，5秒 TX 峰 1.164Mbps（含 SSH，非计费或连续瞬时峰）。尚不能据此断言具体共享宿主原因、所有 HTTP0 均为丢包，或外推4000人的流量。见 `single200_factual_01/{factual_receipt,CPU_by_role_receipt}.json`。
+
+本轮200及两个新小诊断库均已完整备份并实际恢复核验，后续按既有授权回收展开副本，保留失败数据的全量压缩副本。另精确历史合成库 `e8ff519634944f2558e505f5f193f386/pgdata` 约1.09GB也已只备份（约246.5MB）、实际恢复核对，不含删除授权，原库保留；更高阶段需按当前实际空余量安排，不降低12GB导入余量门禁。见 `storage_for_higher_stages_01`。
+
+
+## 故障恢复与导入空间补充验证
+
+独立两账号真实补测：writer 在实际 SQL 提交后、Lua/archive结算前以预定77码退出，另一实际HTTP后台进程成功从持久outbox恢复。8项检查、26次HTTP通过且原始错误0；同finalID重放不重复奖励、不再次改变存档，另一账号不变，最终会话/待操作/出站队列均完成。只结束本测试新建的writer子进程，API/PG均正常关闭。不是PostgreSQL断电/整机灾难恢复或容量证明。见 `process_crash_native_01/execution_receipt.json`。
+
+备份文件元数据盘点：约1.09GB展开库中，业务数据目录约435MB、WAL654MB。独立新两账号库以39次有界WAL切换复现后，仅临时调整检查点参数，由PG自身将WAL654MB→134MB，随后原GUC、postgresql.auto.conf字节摘要和新连接设置全部恢复；8项检查、12次真实HTTP通过。fsync、同步提交、full_page_writes及wal_level均未关闭/改变，没有手动删WAL或更改任何历史库。见 `seed_storage_breakdown_01`、`seed_wal_native_01`。
+
+新增默认关闭的正式工具选项 `--seed-storage wal-checkpoint-v1`：只允许新的mature-v1合成库，独立核对固定PG容器/镜像/挂载与未seeded标记、started导入记录、原始默认配置；在导入期间每批做O(1)LSN元数据查询，累计32MiB WAL或10秒单调时间时做检查点。初始化一次独立admin连接和两次容器检查，保留状态O(1)+9个GUC，批量导入额外成本O(批数+检查点数)，稳定业务/监控阶段新增SQL与定时器0。保留12GB空余量、行数/3GB数据量/900秒导入门禁和全部实际数据检查，ready前精确恢复设置与配置文件，并以新连接验证。失败恢复另有5秒预算，和原5秒advisory解锁合计在所选模式中明确报告10秒，baseline仍5秒。
+
+候选实际类故障回归通过：35种篡改/孤立元数据拒绝、错误数据库/已seeded标记在ALTER前拒绝、非事务配置写入后失败恢复、查询前后截止、独立恢复查询预留、计数一致与baseline零额外SQL/原12GB门禁。真实10万存档接入仍待；这些结果不代表更高人数容量通过。为后续同源对照将重新绑定候选，不启动已过期的operator来源。`e8ff…/pgdata`回收仍未授权且原库保留，只有新导入模式实际满足余量后才能不依赖该授权继续测试。
+
+配置回收与恢复语义参照[PostgreSQL17 WAL配置](https://www.postgresql.org/docs/17/runtime-config-wal.html)、[ALTER SYSTEM](https://www.postgresql.org/docs/17/sql-altersystem.html)与[CHECKPOINT](https://www.postgresql.org/docs/17/sql-checkpoint.html)；此选项仅用于离线合成数据导入，压测阶段恢复原配置。

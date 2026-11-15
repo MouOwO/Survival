@@ -259,6 +259,12 @@ def prepare(args):
     mature_mode = getattr(args, 'mature_fixture', None)
     if mature_mode is not None:
         _prepare_mature_fixture(root, cfg, revision, mature_mode)
+    seed_storage = getattr(args, 'seed_storage', 'baseline')
+    need(seed_storage in ('baseline', 'wal-checkpoint-v1'), 'seed_storage_profile_invalid')
+    if seed_storage != 'baseline':
+        from .mature_fixture import SEED_STORAGE_PROFILE, validate_seed_storage_profile
+        cfg['seed_storage'] = dict(SEED_STORAGE_PROFILE)
+        validate_seed_storage_profile(cfg)
     from .database_experiments import apply_archive_validation
     apply_archive_validation(root, cfg, revision,
         mode=getattr(args, 'archive_validation', 'baseline'), repository=ROOT)
@@ -436,6 +442,8 @@ def main(argv=None):
     init.add_argument('--web-concurrency', type=int, default=24)
     init.add_argument('--global-http-per-minute', type=int, default=2400)
     init.add_argument('--wire-mode', choices=('business-wire-v1', 'legacy-json'), default='business-wire-v1')
+    init.add_argument('--seed-storage', choices=('baseline', 'wal-checkpoint-v1'), default='baseline',
+                      help='Fresh mature synthetic seed only: bounded WAL/checkpoints; exact original settings restored before ready')
     init.add_argument('--mature-fixture', choices=('mature-v1',),
                       help='Opt-in bounded synthetic mature data; native2/40 validation required before large seed')
     init.add_argument('--client-workload', choices=('legacy-v1', 'client-v2', 'client-v3'), default='legacy-v1',

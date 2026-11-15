@@ -41,6 +41,7 @@ def build_fixture_profile(cfg):
  need(type(cfg)is dict and cfg.get('schema')==1 and cfg.get('kind')=='SURVIVAL_ISOLATED_LOADTEST'and cfg.get('purpose')in('capacity','functional-smoke')and cfg.get('backend_db_pool')=='bounded-v2'and _reviewed_schema(cfg)==SCHEMA_SHA,'mature_isolated_reviewed_schema_required')
  return {'id':'mature-v1','seed':SEED,'archetype_source':ARCHETYPE_TARGET,'archetype_sha256':ARCHETYPE_SHA,'schema_sha256':SCHEMA_SHA,'chunk_rows':CHUNK,'max_rows':MAX_ROWS,'max_database_bytes':MAX_BYTES,'counts':counts(cfg.get('accounts'),cfg.get('active'))}
 def validate_fixture_profile(cfg,read_source=None):
+ validate_seed_storage_profile(cfg)
  if 'mature_fixture'not in cfg:return None
  need(type(cfg['mature_fixture'])is dict and canonical(cfg['mature_fixture'])==canonical(build_fixture_profile(cfg)),'mature_fixture_metadata_changed');need(cfg['sources'].get(ARCHETYPE_TARGET)==ARCHETYPE_SHA,'mature_archetype_binding_missing')
  if read_source is None:return dict(cfg['mature_fixture'])
@@ -119,7 +120,8 @@ def _tables(conn):
   need(schema in('public','payments','loadtest_lab')and re.fullmatch('[a-z_][a-z0-9_]{0,62}',name),'mature_table_name_invalid');result[schema+'.'+name]=conn.execute('SELECT count(*) FROM "'+schema+'"."'+name+'"').fetchone()[0]
  return result
 
-def _check_resources(root,conn,deadline):
+def _check_resources(root,conn,deadline,storage=None):
+ if storage is not None:storage.checkpoint_if_due()
  need(time.monotonic()<deadline,'mature_seed_deadline');size=conn.execute('SELECT pg_database_size(current_database())').fetchone()[0]
  need(type(size)is int and size<=MAX_BYTES,'mature_database_byte_admission_exceeded');need(shutil.disk_usage(root).free>=12000000000,'mature_host_free_space_insufficient');return size
 
@@ -184,18 +186,20 @@ def seed_mature_fixture(root,cfg,private,conn):
  data must be empty. One own marker survives failure, so this is never resumed
  into the same lab. A/B use the same frozen archetype artifact and cohort seed.
  """
- deadline=time.monotonic()+900;raw_conn=conn;conn=_SeedBudget(raw_conn,deadline);root=Path(root).resolve();profile=validate_fixture_profile(cfg,lambda name:(root/name).read_bytes());need(profile is not None,'mature_mode_required');budget=build_fixture_profile(cfg)['counts']
+ deadline=time.monotonic()+900;raw_conn=conn;conn=_SeedBudget(raw_conn,deadline);root=Path(root).resolve();profile=validate_fixture_profile(cfg,lambda name:(root/name).read_bytes());need(profile is not None,'mature_mode_required');budget=build_fixture_profile(cfg)['counts'];storage=None
  marker_guard(conn,cfg,private);need(conn.execute('SELECT seeded FROM loadtest_lab.marker WHERE singleton').fetchone()==(False,),'mature_seed_requires_unseeded_marker');need(conn.execute('SELECT session_user,current_user').fetchone()==('postgres','postgres'),'mature_seed_admin_only')
  need(conn.execute("SELECT to_regclass('loadtest_lab.mature_seed')").fetchone()==(None,),'mature_seed_once_required');before=_tables(conn)
  need(before.get('public.survival_players')==cfg['accounts'] and before.get('public.player_archive_state')==cfg['accounts']and before.get('public.archive_leaderboard_identities')==cfg['accounts']and before.get('public.player_onboarding_state')==cfg['accounts']and before.get('public.archive_entitlements')==cfg['active'],'mature_base_seed_counts_changed')
  need(all(before.get(name)==0 for name in (*NEW_EMPTY,*PROTECTED)),'mature_nonempty_or_transaction_data_present');need(conn.execute('SELECT coalesce(max(profile_revision),0) FROM public.survival_players').fetchone()==(0,),'mature_existing_player_progress')
- actual_admission=actual_row_admission(before,budget);additional=actual_admission['new_persistent_row_reserve'];initial_bytes=_check_resources(root,conn,deadline)
+ actual_admission=actual_row_admission(before,budget);additional=actual_admission['new_persistent_row_reserve'];initial_bytes=_check_resources(root,conn,deadline,storage)
  max_row=max(len(canonical(row))for row in profile['rows']);snapshots=sum(budget['cohort_counts'][i]*max(len(canonical(r['archive']))+len(canonical(r['inventory']))for r in profile['rows']if r['cohort']==i)for i in range(4));conservative_growth=cfg['accounts']*(256*32+512)+3*snapshots+4*cfg['active']*(3*(max_row+4096)+2048)+budget['completed_history_each_table']*4096+additional*256
  need(initial_bytes+conservative_growth<=MAX_BYTES,'mature_bytes_pre_admission_failed');conn.commit();need(conn.execute('SELECT pg_try_advisory_lock(124710,1)').fetchone()==(True,),'mature_seed_lock_unavailable');conn.commit();created=False;result=None
  try:
   from psycopg.types.json import Jsonb
   conn.execute("CREATE TABLE loadtest_lab.mature_seed(singleton boolean PRIMARY KEY CHECK(singleton),run_id text NOT NULL,manifest_sha256 text NOT NULL,profile jsonb NOT NULL,status text NOT NULL,receipt jsonb,started_at timestamptz DEFAULT clock_timestamp(),completed_at timestamptz)")
   conn.execute('INSERT INTO loadtest_lab.mature_seed(singleton,run_id,manifest_sha256,profile,status)VALUES(true,%s,%s,%s,\'started\')',(cfg['run_id'],_sha(canonical(cfg)),Jsonb(cfg['mature_fixture'])));conn.commit();created=True
+  if 'seed_storage' in cfg:
+   storage=_SeedWALStorage(root,cfg,private,deadline);storage.start()
   defaults,defs=_startup_sync(root,cfg,conn);keys=sorted(defaults);need(len(keys)<=256 and all(re.fullmatch('[a-z][a-z0-9_]{0,62}',key)and key not in('player_id','created_at','updated_at')for key in keys),'mature_gameplay_identifiers_invalid');need(all(set(row['stats'])==set(keys)for row in profile['rows']),'mature_archetypes_defaults_mismatch');conn.commit()
   conn.execute('CREATE TEMP TABLE mature_accounts(account_ordinal bigint PRIMARY KEY,account_id text UNIQUE,cohort int,active boolean,dense boolean,history int) ON COMMIT PRESERVE ROWS');conn.execute('CREATE TEMP TABLE mature_templates(cohort int,active boolean,dense boolean,archive jsonb,inventory jsonb,stats jsonb,revision bigint,PRIMARY KEY(cohort,active,dense)) ON COMMIT PRESERVE ROWS');conn.execute('CREATE TEMP TABLE mature_context(first_index bigint,last_index bigint,anchor bigint,bundle_hash text,run_prefix text,definition_version int) ON COMMIT PRESERVE ROWS')
   conn.execute('INSERT INTO mature_context VALUES(0,0,%s,%s,%s,%s)',(profile['fixed_archetype_clock_seconds'],BUNDLE_SHA,cfg['run_id'][:16],defs.version))
@@ -212,20 +216,25 @@ def seed_mature_fixture(root,cfg,private,conn):
   columns=','.join('"'+key+'"'for key in keys);values=','.join('r."'+key+'"'for key in keys);stats_sql=STATS_SQL.replace('__COLUMNS__',columns).replace('__VALUES__',values)
   for first in range(0,cfg['accounts'],CHUNK):
    with conn.transaction():
-    conn.execute('UPDATE mature_context SET first_index=%s,last_index=%s',(first,min(first+CHUNK,cfg['accounts'])));conn.execute(stats_sql);_check_resources(root,conn,deadline)
+    conn.execute('UPDATE mature_context SET first_index=%s,last_index=%s',(first,min(first+CHUNK,cfg['accounts'])));conn.execute(stats_sql);_check_resources(root,conn,deadline,storage)
   for first in range(0,cfg['accounts'],500):
    with conn.transaction():
-    conn.execute('UPDATE mature_context SET first_index=%s,last_index=%s',(first,min(first+500,cfg['accounts'])));conn.execute(HISTORY_SQL);_check_resources(root,conn,deadline)
+    conn.execute('UPDATE mature_context SET first_index=%s,last_index=%s',(first,min(first+500,cfg['accounts'])));conn.execute(HISTORY_SQL);_check_resources(root,conn,deadline,storage)
   for first in range(0,cfg['active'],100):
    with conn.transaction():
-    conn.execute('UPDATE mature_context SET first_index=%s,last_index=%s',(first,min(first+100,cfg['active'])));conn.execute(GIFT_SQL);_check_resources(root,conn,deadline)
+    conn.execute('UPDATE mature_context SET first_index=%s,last_index=%s',(first,min(first+100,cfg['active'])));conn.execute(GIFT_SQL);_check_resources(root,conn,deadline,storage)
   expected={'public.player_gameplay_stats':cfg['accounts'],'public.reward_grants':4*cfg['active'],'public.out_of_match_reward_idempotency':4*cfg['active'],'public.player_effect_totals':cfg['active'],'public.online_time_idempotency':budget['completed_history_each_table'],'public.archive_online_outbox':budget['completed_history_each_table'],'public.archive_operations':budget['completed_history_each_table'],'public.online_time_sessions':0};after=_tables(conn);need(all(after.get(k)==v for k,v in expected.items()),'mature_final_counts_changed');need(sum(after.values())<=MAX_ROWS and all(after.get(name)==before[name]for name in PROTECTED),'mature_final_admission_or_protected_data_changed')
   need(conn.execute("SELECT count(*) FROM public.archive_online_outbox x LEFT JOIN public.archive_operations o ON o.account_id=x.account_id AND o.operation_id='online:'||x.request_id WHERE o.done IS DISTINCT FROM true OR o.error IS NOT NULL").fetchone()==(0,),'mature_unfinished_outbox');need(conn.execute('SELECT count(*) FROM public.reward_grants g LEFT JOIN mature_accounts m ON m.account_id=g.account_id WHERE m.active IS DISTINCT FROM true').fetchone()==(0,),'mature_reward_account_scope_invalid')
   samples=[]
   for c,a,d,identity in conn.execute('SELECT DISTINCT ON(cohort,active,dense)cohort,active,dense,account_id FROM mature_accounts ORDER BY cohort,active,dense,account_ordinal').fetchall():
    value=conn.execute('SELECT public.get_fishing_profile(%s)',(identity,)).fetchone()[0];need(type(value)is dict and value.get('account_id')==identity and value.get('schema_version')==1 and type(value.get('revision'))is int and type(value.get('save'))is dict and set(keys)<=set(value['save'].get('gameplay_stats',{})),'mature_profile_not_readable')
    need((value['save'].get('fishing_inventory',{}).get('star_blessing_005',0)==4)if a else not value['save'].get('fishing_inventory',{}),'mature_profile_grants_mismatch');samples.append({'cohort':c,'active':a,'dense':d,'bytes':len(canonical(value)),'sha256':_sha(canonical(value))})
-  size=_check_resources(root,conn,deadline);result={'id':'mature-v1','status':'MATURE_SYNTHETIC_FIXTURE_READY','profile':cfg['mature_fixture'],'actual_table_counts':after,'actual_row_admission':actual_admission,'temporary_tables_analyzed_once':True,'SQL_remaining_deadline_seconds':900,'failure_cleanup_timeout_seconds':5,'actual_database_bytes':size,'conservative_growth_pre_admission_bytes':conservative_growth,'actual_profile_samples':samples,'real_star_grants':4*cfg['active'],'real_startup_sync':True,'outbox_trigger_used':True,'completed_history_rows':budget['completed_history_each_table'],'temporary_mapping_rows':cfg['accounts'],'protected_transaction_tables_unchanged':True,'ANALYZE_executed_here':False,'requires_caller_final_ANALYZE_before_seeded_true':True,'partial_history_semantics':'Controlled partial completed online history with validwriter/triggerformat; snapshotsfromactualLua. Notallpriorlotterydrawoperationsorhistoricmilestonerequestsarecopied; fixture is notproductionbackup/replayparity.','initial_seed_row_byte_admission_only':True,'real_accounts_used':0}
+  size=_check_resources(root,conn,deadline,storage)
+  if storage is not None:
+   conn.commit();storage.finish();size=_check_resources(root,conn,deadline)
+  result={'id':'mature-v1','status':'MATURE_SYNTHETIC_FIXTURE_READY','profile':cfg['mature_fixture'],'actual_table_counts':after,'actual_row_admission':actual_admission,'temporary_tables_analyzed_once':True,'SQL_remaining_deadline_seconds':900,'failure_cleanup_timeout_seconds':5,'actual_database_bytes':size,'conservative_growth_pre_admission_bytes':conservative_growth,'actual_profile_samples':samples,'real_star_grants':4*cfg['active'],'real_startup_sync':True,'outbox_trigger_used':True,'completed_history_rows':budget['completed_history_each_table'],'temporary_mapping_rows':cfg['accounts'],'protected_transaction_tables_unchanged':True,'ANALYZE_executed_here':False,'requires_caller_final_ANALYZE_before_seeded_true':True,'partial_history_semantics':'Controlled partial completed online history with validwriter/triggerformat; snapshotsfromactualLua. Notallpriorlotterydrawoperationsorhistoricmilestonerequestsarecopied; fixture is notproductionbackup/replayparity.','initial_seed_row_byte_admission_only':True,'real_accounts_used':0}
+  if storage is not None:
+   result['seed_storage']=dict(storage.proof);result['failure_cleanup_timeout_seconds']=10
   conn.execute("UPDATE loadtest_lab.mature_seed SET status='complete',receipt=%s,completed_at=clock_timestamp() WHERE singleton",(Jsonb(result),));conn.execute('DROP TABLE mature_accounts,mature_templates,mature_context');conn.commit();return result
  except Exception:
   raw_conn.rollback()
@@ -235,8 +244,290 @@ def seed_mature_fixture(root,cfg,private,conn):
    except Exception:raw_conn.rollback()
   raise
  finally:
+  storage_cleanup_failed=False
+  if storage is not None:
+   try:storage.close()
+   except Exception:storage_cleanup_failed=True
   try:
    raw_conn.execute("SET LOCAL statement_timeout='5000'");raw_conn.execute('SELECT pg_advisory_unlock(124710,1)');raw_conn.commit()
   except Exception:
    raw_conn.rollback()
    if result is not None:raise ValueError('mature_seed_unlock_unconfirmed')from None
+  if storage_cleanup_failed:raise ValueError('seed_storage_restore_unconfirmed')from None
+
+
+# No request-path hook: only the explicitly selected fresh synthetic seed.
+SEED_STORAGE_PROFILE = {
+    'id': 'wal-checkpoint-v1', 'max_wal_size_mb': 128,
+    'checkpoint_timeout_seconds': 30, 'checkpoint_lsn_bytes': 32 * 1024 * 1024,
+    'checkpoint_interval_seconds': 10, 'minimum_host_free_bytes': 12000000000,
+    'restore_before_ready': True, 'fsync_required': True,
+    'synchronous_commit_required': True,
+}
+_PRISTINE_AUTO_CONF_SHA = '0874e665ecf5c0a6135a73158ea1b71a959dafb809574810da5c9cc28c0c63ed'
+_WAL_SETTING_NAMES = ('max_wal_size', 'checkpoint_timeout', 'min_wal_size',
+    'fsync', 'synchronous_commit', 'full_page_writes', 'wal_level',
+    'wal_keep_size', 'archive_mode')
+
+
+def validate_seed_storage_profile(cfg):
+    if 'seed_storage' not in cfg:
+        return None
+    value = cfg['seed_storage']
+    need(type(value) is dict and canonical(value) == canonical(SEED_STORAGE_PROFILE)
+         and cfg.get('purpose') == 'capacity' and cfg.get('schema') == 1
+         and type(cfg.get('mature_fixture')) is dict
+         and cfg['mature_fixture'].get('id') == 'mature-v1'
+         and cfg.get('kind') == 'SURVIVAL_ISOLATED_LOADTEST'
+         and cfg.get('account_start') == 4000000000,
+         'seed_storage_profile_invalid')
+    return dict(value)
+
+
+class _SeedWALStorage:
+    """O(J) bounded metadata for J seed batches, O(1) retained state.
+
+    One separate admin connection avoids CHECKPOINT inside a seed transaction.
+    Checkpoints follow32MiB WAL or10s real monotonic time; no player/scene scan.
+    Two bounded WAL-directory aggregate observations, zero runtime/monitor SQL.
+    """
+    def __init__(self, root, cfg, private, deadline):
+        self.root, self.cfg, self.private = Path(root), cfg, private
+        self.policy = validate_seed_storage_profile(cfg)
+        need(self.policy is not None, 'seed_storage_profile_required')
+        self.deadline, self.restore_deadline = deadline, None
+        self.conn = None
+        self.modified = self.active = False
+        self.original = self.proof = None
+        self.last_lsn = self.last_checkpoint = None
+        self.query_count = self.checkpoints = self.lsn_probes = 0
+        self.seed_queries = self.restore_queries = 0
+        self.statement_limits = {}
+        self.maximum_observed_lsn_delta = 0
+        self.statement_limit = None
+
+    def _remaining(self):
+        deadline = self.restore_deadline if self.restore_deadline is not None else self.deadline
+        remaining = math.floor((deadline - time.monotonic()) * 1000)
+        need(remaining >= 1, 'seed_storage_deadline')
+        return remaining
+
+    def _record_SQL(self):
+        if self.restore_deadline is not None:
+            need(self.restore_queries < 64, 'seed_storage_restore_query_budget')
+            self.restore_queries += 1
+        else:
+            need(self.seed_queries < 2000, 'seed_storage_query_budget')
+            self.seed_queries += 1
+        self.query_count += 1
+
+    def _execute_on(self, conn, sql, parameters=()):
+        need(conn is not None, 'seed_storage_connection_required')
+        milliseconds = min(5000 if self.restore_deadline is not None else 10000,
+                           self._remaining())
+        key = id(conn)
+        if self.statement_limits.get(key) != milliseconds:
+            self._record_SQL()
+            conn.execute("SELECT set_config('statement_timeout',%s,false)",
+                         (str(milliseconds),))
+            self._remaining()
+            self.statement_limits[key] = milliseconds
+        self._record_SQL()
+        cursor = conn.execute(sql, parameters)
+        self._remaining()
+        return cursor
+
+    def _call(self, sql, parameters=()):
+        return self._execute_on(self.conn, sql, parameters)
+
+    def _own_container(self):
+        import os, subprocess
+        from collections import defaultdict
+        from .monitor import _pm_inspect
+        need(os.name == 'posix' and self.root.parent == Path('/srv/survival-loadtest')
+             and self.root.name == self.cfg['run_id'] and self.root.resolve() == self.root,
+             'seed_storage_remote_lab_root_required')
+        data = self.root / 'pgdata'
+        need(data.is_dir() and not data.is_symlink() and data.resolve() == data,
+             'seed_storage_owned_data_required')
+        name = 'survival-loadtest-' + self.cfg['run_id'][:12]
+        self.container = _pm_inspect(name, self.cfg, defaultdict(int))
+        raw = subprocess.check_output(['/usr/bin/podman', 'container', 'inspect',
+            '--format', '{{json .Mounts}}', name], timeout=3)
+        need(len(raw) <= 32768, 'seed_storage_mount_budget')
+        mounts = json.loads(raw)
+        need(type(mounts) is list and len(mounts) <= 8, 'seed_storage_mount_shape')
+        found = [m for m in mounts if m.get('Destination') == '/var/lib/postgresql/data']
+        need(len(found) == 1 and Path(found[0]['Source']).resolve() == data,
+             'seed_storage_cluster_mount_mismatch')
+
+    def _auto_hash(self):
+        import stat
+        p = self.root / 'pgdata/postgresql.auto.conf'
+        st = p.lstat()
+        need(stat.S_ISREG(st.st_mode) and st.st_nlink == 1 and not p.is_symlink()
+             and p.resolve() == p and st.st_size <= 4096,
+             'seed_storage_auto_conf_path_invalid')
+        return _sha(p.read_bytes())
+
+    def _namespace(self, conn, require_started):
+        from .guard import PORTS
+        row = self._execute_on(conn, 'SELECT current_database(),host(inet_server_addr()),'
+                           'inet_server_port(),session_user,current_user').fetchone()
+        need(row == (self.cfg['database'], '127.0.0.1', PORTS['database'],
+                     'postgres', 'postgres'), 'seed_storage_namespace_mismatch')
+        row = self._execute_on(conn, 'SELECT run_id,proof,manifest_sha256,seeded '
+                           'FROM loadtest_lab.marker WHERE singleton').fetchone()
+        need(row == (self.cfg['run_id'], self.private['marker'],
+                     _sha(canonical(self.cfg)), False), 'seed_storage_unseeded_marker_required')
+        if require_started:
+            row = self._execute_on(conn, 'SELECT status FROM loadtest_lab.mature_seed '
+                'WHERE singleton AND run_id=%s AND manifest_sha256=%s',
+                (self.cfg['run_id'], _sha(canonical(self.cfg)))).fetchone()
+            need(row == ('started',), 'seed_storage_fresh_mature_seed_required')
+
+    def _settings_on(self, conn):
+        return {name: {'setting': value, 'unit': unit, 'source': source,
+                      'sourcefile': sourcefile, 'pending_restart': pending, 'context': context}
+            for name, value, unit, source, sourcefile, pending, context in self._execute_on(conn,
+                'SELECT name,setting,unit,source,sourcefile,pending_restart,context '
+                'FROM pg_settings WHERE name=ANY(%s)', (list(_WAL_SETTING_NAMES),)).fetchall()}
+
+    def _settings(self):
+        self._remaining()
+        return self._settings_on(self.conn)
+
+    def _await(self, expected):
+        limit = min(time.monotonic() + 3,
+                    self.restore_deadline if self.restore_deadline is not None else self.deadline)
+        while True:
+            actual = self._settings()
+            if all(actual.get(k, {}).get('setting') == v for k, v in expected.items()):
+                return actual
+            need(time.monotonic() < limit, 'seed_storage_reload_unconfirmed')
+            time.sleep(.05)
+
+    def _wal_bytes(self):
+        size, files = self._call('SELECT coalesce(sum(size),0)::bigint,count(*) '
+                                'FROM pg_ls_waldir()').fetchone()
+        need(type(size) is int and type(files) is int and 1 <= files <= 128,
+             'seed_storage_WAL_observation_budget')
+        return {'bytes': size, 'files': files}
+
+    def _checkpoint(self):
+        self._call('CHECKPOINT')
+        self.checkpoints += 1
+        self.last_lsn = self._call('SELECT pg_current_wal_insert_lsn()::text').fetchone()[0]
+        self.last_checkpoint = time.monotonic()
+
+    def start(self):
+        import psycopg
+        from .guard import dsn, production_host_guard
+        production_host_guard(self.cfg)
+        self._remaining()
+        self._own_container()
+        need(self._remaining() >= 1000, 'seed_storage_connection_budget')
+        self.conn = psycopg.connect(dsn(self.cfg, self.private, admin=True),
+            autocommit=True, connect_timeout=min(3, max(1, self._remaining() // 1000)))
+        self._call("SELECT set_config('lock_timeout','2000',false)")
+        self._namespace(self.conn, True)
+        self.auto_before = self._auto_hash()
+        need(self.auto_before == _PRISTINE_AUTO_CONF_SHA,
+             'seed_storage_auto_conf_not_pristine')
+        self.original = self._settings()
+        required = {'max_wal_size': '1024', 'checkpoint_timeout': '300',
+            'min_wal_size': '80', 'fsync': 'on', 'synchronous_commit': 'on',
+            'full_page_writes': 'on', 'wal_level': 'replica', 'wal_keep_size': '0',
+            'archive_mode': 'off'}
+        need(set(self.original) == set(required)
+             and all(self.original[k]['setting'] == v for k, v in required.items())
+             and all(not v['pending_restart'] for v in self.original.values()),
+             'seed_storage_original_settings_unreviewed')
+        need(all(self.original[k]['context'] == 'sighup'
+                 and not str(self.original[k]['sourcefile'] or '').endswith('postgresql.auto.conf')
+                 for k in ('max_wal_size', 'checkpoint_timeout')),
+             'seed_storage_original_source_unreviewed')
+        need(self._call('SELECT count(*) FROM pg_replication_slots').fetchone() == (0,),
+             'seed_storage_replication_slot_present')
+        self.initial_free_bytes = shutil.disk_usage(self.root).free
+        self.initial_wal = self._wal_bytes()
+        self.modified = True
+        self._call("ALTER SYSTEM SET max_wal_size='128MB'")
+        self._call("ALTER SYSTEM SET checkpoint_timeout='30s'")
+        need(self._call('SELECT pg_reload_conf()').fetchone() == (True,),
+             'seed_storage_reload_failed')
+        small = self._await({'max_wal_size': '128', 'checkpoint_timeout': '30'})
+        need(all(small[k] == value for k, value in self.original.items()
+                 if k not in ('max_wal_size', 'checkpoint_timeout')),
+             'seed_storage_durability_changed')
+        self.active = True
+        self._checkpoint()
+
+    def checkpoint_if_due(self):
+        need(self.active and self.conn is not None, 'seed_storage_not_active')
+        _, delta = self._call('SELECT pg_current_wal_insert_lsn()::text,'
+            'pg_wal_lsn_diff(pg_current_wal_insert_lsn(),%s::pg_lsn)',
+            (self.last_lsn,)).fetchone()
+        delta = int(delta)
+        need(delta >= 0, 'seed_storage_lsn_reversed')
+        self.lsn_probes += 1
+        self.maximum_observed_lsn_delta = max(self.maximum_observed_lsn_delta, delta)
+        if (delta >= self.policy['checkpoint_lsn_bytes']
+                or time.monotonic() - self.last_checkpoint >= self.policy['checkpoint_interval_seconds']):
+            self._checkpoint()
+
+    def _restore(self):
+        import psycopg
+        from .guard import dsn
+        self.restore_deadline = time.monotonic() + 5
+        self.statement_limits = {}
+        self._call('ALTER SYSTEM RESET max_wal_size')
+        self._call('ALTER SYSTEM RESET checkpoint_timeout')
+        need(self._call('SELECT pg_reload_conf()').fetchone() == (True,),
+             'seed_storage_restore_reload_failed')
+        restored = self._await({k: v['setting'] for k, v in self.original.items()})
+        need(restored == self.original and self._auto_hash() == self.auto_before,
+             'seed_storage_restore_not_exact')
+        need(self._remaining() >= 1000, 'seed_storage_restore_verification_budget')
+        with psycopg.connect(dsn(self.cfg, self.private, admin=True), autocommit=True,
+                              connect_timeout=min(3, max(1, self._remaining() // 1000))) as fresh:
+            self._namespace(fresh, False)
+            need(self._settings_on(fresh) == self.original,
+                 'seed_storage_new_connection_not_restored')
+        self.modified = self.active = False
+        return restored
+
+    def finish(self):
+        need(self.active and self.conn is not None, 'seed_storage_finish_not_active')
+        self._checkpoint()
+        after_wal = self._wal_bytes()
+        restored = self._restore()
+        restored_wal = self._wal_bytes()
+        self.proof = {'id': self.policy['id'], 'status': 'SEED_SETTINGS_RESTORED_BEFORE_READY',
+            'profile': dict(self.policy), 'initial_WAL': self.initial_wal,
+            'WAL_after_final_seed_checkpoint': after_wal,
+            'WAL_after_restore': restored_wal,
+            'initial_free_bytes': self.initial_free_bytes,
+            'free_bytes_after_restore': shutil.disk_usage(self.root).free,
+            'checkpoint_calls': self.checkpoints, 'lsn_probes': self.lsn_probes,
+            'maximum_observed_lsn_delta_bytes': self.maximum_observed_lsn_delta,
+            'counted_SQL_calls': self.query_count, 'seed_SQL_calls': self.seed_queries,
+            'restore_SQL_calls': self.restore_queries, 'original_settings': self.original,
+            'restored_settings': restored, 'auto_conf_original_and_restored_sha256': self.auto_before,
+            'exact_file_and_settings_restored': True, 'new_connection_verified': True,
+            'only_fresh_unseeded_cluster': True, 'minimum_host_free_bytes': 12000000000,
+            'no_manual_WAL_deletion': True, 'no_runtime_or_monitor_SQL_added': True,
+            'restore_cleanup_timeout_seconds': 5}
+        self.close()
+        return dict(self.proof)
+
+    def close(self):
+        if self.conn is None:
+            need(not self.modified, 'seed_storage_restore_unconfirmed')
+            return
+        try:
+            if self.modified:
+                self._restore()
+        finally:
+            self.conn.close()
+            self.conn = None

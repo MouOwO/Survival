@@ -284,6 +284,9 @@ def load(directory):
     validate_workload_profile(cfg, lambda name: (root / name).read_bytes())
     from .progress import validate_profile as validate_actor_progress
     validate_actor_progress(cfg)
+    if 'seed_storage' in cfg:
+        from .mature_fixture import validate_seed_storage_profile
+        validate_seed_storage_profile(cfg)
     client_recovery_policy(cfg)
     observation_mode(cfg)
     return root, cfg, private
