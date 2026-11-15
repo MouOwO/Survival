@@ -291,12 +291,19 @@ BUSY_RETRY_POLICY = {'id': 'admission-busy-v1', 'max_attempts': 3,
                      'max_delay_seconds': 1}
 
 
+BUSY_RETRY_POLICIES = {
+    BUSY_RETRY_POLICY['id']: BUSY_RETRY_POLICY,
+    'admission-busy-v2': {**BUSY_RETRY_POLICY, 'id': 'admission-busy-v2', 'total_seconds': 30},
+}
+
+
 def client_recovery_policy(cfg):
     value = cfg.get('client_recovery')
     if value is None:
         return None
-    need(type(value) is dict and value == BUSY_RETRY_POLICY
-         and all(type(value[k]) is type(v) for k, v in BUSY_RETRY_POLICY.items())
+    expected = BUSY_RETRY_POLICIES.get(value.get('id')) if type(value) is dict and type(value.get('id')) is str else None
+    need(expected is not None and value == expected
+         and all(type(value[k]) is type(v) for k, v in expected.items())
          and cfg.get('client_workload') == 'client-v3', 'client_recovery_policy_invalid')
     return dict(value)
 

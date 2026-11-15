@@ -22,9 +22,10 @@ class BusinessFailure(ValueError):
 
 
 class BusyRecoveryTimings:
-    """Five fixed categories and 23 buckets; no per-account retained state."""
+    """Five fixed categories and 26 buckets; no per-account retained state."""
     BUCKETS = (1, 2, 5, 10, 20, 50, 100, 200, 300, 400, 500, 650, 800,
-               1000, 1250, 1500, 2000, 3000, 5000, 7500, 10000, 15000, float('inf'))
+               1000, 1250, 1500, 2000, 3000, 5000, 7500, 10000, 15000,
+               20000, 25000, 30000, float('inf'))
     NAMES = ('profile', 'checkpoint_setup', 'checkpoint_periodic', 'checkpoint_final', 'other')
 
     def __init__(self):
@@ -79,7 +80,7 @@ class BusyRetryBudget:
     """O(1) per request; at most 3 HTTP attempts and 2 bounded jitter waits.
 
     No account scan, new ID, SQL retry, queue or background timer. HTTP timeout
-    and backoff share one monotonic 10s deadline, including the first attempt.
+    and backoff share one monotonic configured 10s/30s deadline, including the first attempt.
     Caller retains the exact method/path/body/token across attempts.
     """
     def __init__(self, cfg, *, clock=time.monotonic):

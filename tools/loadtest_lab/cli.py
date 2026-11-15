@@ -241,9 +241,9 @@ def prepare(args):
         cfg['workload_profile'] = build_workload_profile((root / CSV_SOURCE).read_bytes(),client_workload,compact_seed=compact_seed)
     recovery = getattr(args, 'client_recovery', 'baseline')
     if recovery != 'baseline':
-        from .guard import BUSY_RETRY_POLICY, client_recovery_policy
-        need(recovery == BUSY_RETRY_POLICY['id'], 'client_recovery_policy_invalid')
-        cfg['client_recovery'] = dict(BUSY_RETRY_POLICY)
+        from .guard import BUSY_RETRY_POLICIES, client_recovery_policy
+        need(recovery in BUSY_RETRY_POLICIES, 'client_recovery_policy_invalid')
+        cfg['client_recovery'] = dict(BUSY_RETRY_POLICIES[recovery])
         client_recovery_policy(cfg)
     actor_progress = getattr(args, 'actor_progress', 'baseline')
     if actor_progress != 'baseline':
@@ -431,7 +431,7 @@ def main(argv=None):
                       help='Opt-in bounded synthetic mature data; native2/40 validation required before large seed')
     init.add_argument('--client-workload', choices=('legacy-v1', 'client-v2', 'client-v3'), default='legacy-v1',
                       help='client-v2 includes grant-triggered profile refresh and complete workflow timing')
-    init.add_argument('--client-recovery', choices=('baseline', 'admission-busy-v1'), default='baseline',
+    init.add_argument('--client-recovery', choices=('baseline', 'admission-busy-v1', 'admission-busy-v2'), default='baseline',
                       help='Opt-in explicit HTTP503 admission busy retry; raw errors retained; no ambiguous mutation replay')
     init.add_argument('--backend-db-pool', choices=('baseline', 'bounded-v1', 'bounded-v2'), default='baseline',
                       help='Explicit reviewed DB pool overlay experiment; baseline keeps production transport bytes')
