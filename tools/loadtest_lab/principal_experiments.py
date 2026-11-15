@@ -1,7 +1,7 @@
 """Two fixed, opt-in post-G experiment factors for isolated labs only.
 
-Metadata restores a constant-size parent view without I/O. Startup reads at most
-seven fixed files, proves each child by replay and returns original parent bytes
+Metadata restores a constant-size parent view without I/O. Startup reads a fixed bounded
+set of files, proves each child by replay and returns original parent bytes
 for the earlier business validator. Preparation does bounded local Git reads;
 there is no database execution, request-time source I/O or authorization cache.
 """
@@ -67,9 +67,16 @@ SPECS['checkpoint-profile-drain-v1'] = {
     'parents': {SERVER: SPECS['ensure-scope-v1']['outputs'][SERVER], SERVICE: G_SOURCES[SERVICE]},
     'outputs': {SERVER: '1470ead7930e2f04279e7c9276023116e7cb7ffa9bb6dff72f763cc0b83ee90d',
                 SERVICE: G_SOURCES[SERVICE]}}
+PROFILE_CONTEXT_OPERATOR = PREFIX + 'profile_context_patch.py'
+PROFILE_CONTEXT_SQL_OPERATOR = PREFIX + 'profile_context.sql'
+SPECS['profile-context-idle-v1'] = {
+    'operators': {PROFILE_CONTEXT_OPERATOR: '313ce790f13c9471d3610ba0f610ec53e15646f41665bfe3e72bcae8933542a5',
+                  PROFILE_CONTEXT_SQL_OPERATOR: '2f17cfd40e32c7477aeedd9c7a76474b0f916b46f7f07569a8a6843cfe7e69b7'},
+    'parents': {'runtime/fishing_api/postgres.py': '688935869534c5b545cf8a73ee80292c537ad2b280ea9750b7258ac6316b288d', 'runtime/archive_backend/service.py': '672a1e845ec17093c755d7a724fcc4978f8cc008d935e763e7105f300b73e2f8'},
+    'outputs': {'runtime/fishing_api/postgres.py': '6de9219de5a011160d6a96b524f2f2fe45a775925d9a1510dd2646392c81ad9c', 'runtime/archive_backend/service.py': '58bd3bd39793a45d6ff9b5f003de436f32c5be41a7e64800f9f2a091ea682bfd'}}
 ORDER = ('transport-principal-v1', 'transport-reset-v1',
          'transport-reset-filtered-v1', 'transport-reset-filtered-combined-v1',
-         'ensure-scope-v1', 'checkpoint-profile-drain-v1')
+         'ensure-scope-v1', 'checkpoint-profile-drain-v1', 'profile-context-idle-v1')
 TRANSPORT_MODES = {'principal-v1': ORDER[0], 'reset-v1': ORDER[1],
                    'reset-filtered-v1': ORDER[2], 'reset-filtered-combined-v1': ORDER[3]}
 TRANSPORT_IDS = frozenset(TRANSPORT_MODES.values())
@@ -104,7 +111,7 @@ def _metadata(cfg):
     _need(type(cfg) is dict and type(cfg.get('sources')) is dict,
           'principal_experiment_manifest_invalid')
     rows = cfg.get('principal_experiments', [])
-    _need(type(rows) is list and len(rows) <= 3, 'principal_experiment_list_invalid')
+    _need(type(rows) is list and len(rows) <= 4, 'principal_experiment_list_invalid')
     selected = []
     for row in rows:
         _need(type(row) is dict and set(row) == ROW_KEYS,
@@ -226,7 +233,7 @@ def _full_proof(identity, operators, outputs):
 
 
 def validate_principal_experiments(cfg, read_source):
-    """Full startup proof after generic path/hash checks; at most seven reads."""
+    """Full startup proof after generic path/hash checks; a fixed bounded source set."""
     rows, unused = _metadata(cfg)
     if not rows:
         return {}
@@ -242,19 +249,25 @@ def validate_principal_experiments(cfg, read_source):
 
 
 def apply_principal_experiments(root, cfg, revision, *, transport='baseline',
-                                ensure_scope=False, checkpoint_drain='baseline', repository):
+                                ensure_scope=False, checkpoint_drain='baseline',
+                                profile_context='baseline', repository):
     """Transform new, unbound files only; no SQL or service operations."""
     _need(type(transport) is str and transport in ('baseline', *TRANSPORT_MODES)
           and type(ensure_scope) is bool
-          and checkpoint_drain in ('baseline', 'single-profile-v1'),
+          and checkpoint_drain in ('baseline', 'single-profile-v1')
+          and profile_context in ('baseline', 'idle-v1'),
           'principal_experiment_mode_invalid')
     _need('principal_experiments' not in cfg, 'principal_experiment_already_bound')
     _metadata(cfg)
     selected = ([TRANSPORT_MODES[transport]] if transport != 'baseline' else []) + (
         ['ensure-scope-v1'] if ensure_scope else []) + (
-        ['checkpoint-profile-drain-v1'] if checkpoint_drain == 'single-profile-v1' else [])
+        ['checkpoint-profile-drain-v1'] if checkpoint_drain == 'single-profile-v1' else []) + (
+        ['profile-context-idle-v1'] if profile_context == 'idle-v1' else [])
     _need(checkpoint_drain == 'baseline' or ensure_scope,
           'checkpoint_drain_initialization_scope_required')
+    _need(profile_context == 'baseline' or (transport == 'reset-filtered-combined-v1'
+          and ensure_scope and checkpoint_drain == 'single-profile-v1'),
+          'profile_context_reviewed_principal_chain_required')
     if not selected:
         return
     _gated(cfg, cfg['sources'])

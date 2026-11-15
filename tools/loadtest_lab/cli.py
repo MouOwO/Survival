@@ -217,7 +217,8 @@ def prepare(args):
     apply_principal_experiments(root, cfg, revision,
         transport=getattr(args, 'principal_transport', 'baseline'),
         ensure_scope=getattr(args, 'ensure_scope', False),
-        checkpoint_drain=getattr(args, 'checkpoint_drain', 'baseline'), repository=ROOT)
+        checkpoint_drain=getattr(args, 'checkpoint_drain', 'baseline'),
+        profile_context=getattr(args, 'profile_context', 'baseline'), repository=ROOT)
     from .frontend_experiments import apply_frontend_experiment
     apply_frontend_experiment(root, cfg, revision,
         mode=getattr(args, 'frontend_rate', 'baseline'), repository=ROOT,
@@ -271,6 +272,9 @@ def prepare(args):
     from .checkpoint_experiments import prepare as prepare_checkpoint_lifecycle
     prepare_checkpoint_lifecycle(root, cfg, revision,
         mode=getattr(args, 'checkpoint_lifecycle', 'baseline'), repository=ROOT)
+    from .profile_context_experiments import prepare as prepare_profile_context
+    prepare_profile_context(root, cfg, revision,
+        mode=getattr(args, 'profile_context', 'baseline'))
     cache_mode = getattr(args, 'settlement_cache', 'baseline')
     need(cache_mode in ('baseline', 'warm-v1'), 'settlement_cache_mode_invalid')
     if cache_mode == 'warm-v1':
@@ -343,6 +347,7 @@ def prepare(args):
         **({'sqlite_environment': cfg['sqlite_environment']} if 'sqlite_environment' in cfg else {}),
         **({'mature_fixture': cfg['mature_fixture']} if 'mature_fixture' in cfg else {}),
         **({'checkpoint_lifecycle': cfg['checkpoint_lifecycle']} if 'checkpoint_lifecycle' in cfg else {}),
+        **({'profile_context': cfg['profile_context']} if 'profile_context' in cfg else {}),
         'cloud_resources_created': 0, 'requests_sent': 0, 'production_rows_copied': 0})
     return {'status': 'LAB_PREPARED_NOT_STARTED', 'directory': str(root), 'run_id': run,
             'accounts': accounts, 'active': active, 'purpose': purpose,
@@ -487,6 +492,8 @@ def main(argv=None):
                       help='Opt-in same-checkpoint initialization proof; exact isolated G sources only')
     init.add_argument('--checkpoint-drain', choices=('baseline', 'single-profile-v1'), default='baseline',
                       help='Opt-in one durable outbox drain in checkpoint profile; requires ensure-scope')
+    init.add_argument('--profile-context', choices=('baseline', 'idle-v1'), default='baseline',
+                      help='Opt-in bounded idle profile RPC consolidation; exact reviewed principal/lifecycle chain only')
     init.add_argument('--frontend-rate', choices=('baseline', 'hot-rate-v1', 'hot-wal-full-v1'), default='baseline',
                       help='Opt-in exact observed SQLite housekeeping/WAL FULL with verified private library')
     init.add_argument('--private-sqlite-build-receipt',

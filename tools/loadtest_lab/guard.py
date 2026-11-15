@@ -264,6 +264,8 @@ def load(directory):
              and sha(path.read_bytes()) == digest, 'lab_source_changed:' + name)
     from .checkpoint_experiments import validate as validate_checkpoint_lifecycle
     validate_checkpoint_lifecycle(cfg, lambda name: (root / name).read_bytes())
+    from .profile_context_experiments import validate as validate_profile_context
+    validate_profile_context(cfg, lambda name: (root / name).read_bytes())
     from .leaderboard_experiments import validate_leaderboard_binding
     validate_leaderboard_binding(cfg, lambda name: (root / name).read_bytes())
     from .database_experiments import validate_schema_experiment
