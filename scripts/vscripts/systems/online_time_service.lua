@@ -36,6 +36,14 @@ local checkpoint
 local SESSION_ACTIVE = "ACTIVE"
 local SESSION_FINALIZING = "FINALIZING"
 local SESSION_CLOSED = "CLOSED"
+local MAX_CHECKPOINT_ATTEMPTS = 3
+local RETRYABLE_CHECKPOINT_ERRORS = {
+    backend_busy=true, frontend_busy=true, database_busy=true,
+    database_unavailable=true, database_timeout=true,
+    http_status_0=true, http_status_429=true, http_status_500=true,
+    http_status_502=true, http_status_503=true, http_status_504=true,
+    http_request_create_failed=true, http_json_invalid=true, business_wire_invalid=true,
+}
 
 local function fishing_mode()
     local setup = require("systems/match_setup_service")
@@ -130,6 +138,10 @@ end
 
 local function complete_checkpoint(player_id, state, final, current_request_id)
     state.in_flight = false
+    if state.retry_task then scheduler.cancel(state.retry_task) end
+    state.retry_task = nil
+    state.pending_checkpoint = nil
+    state.pending_attempts = 0
     if final then
         state.status = SESSION_CLOSED
         if sessions[player_id] == state then
@@ -157,6 +169,15 @@ local function publish_grants(player_id, state, grants, final, current_request_i
     print("[OnlineTime] profile_refresh_started player_id=" .. tostring(player_id)
         .. " grant_count=" .. tostring(#grants))
     profile_service.load_player(player_id, "star_blessing_grant", function()
+        if state.generation ~= generation or not state.pending_checkpoint
+            or state.pending_checkpoint.request_id ~= current_request_id then return end
+        local provider = profile_service.get_provider()
+        if not provider or tostring(provider.resolve_account_id(player_id) or "")
+            ~= tostring(state.pending_checkpoint.account_id)
+            or require("systems/match_setup_service").get_session_id() ~= state.match_binding then
+            complete_checkpoint(player_id, state, final, current_request_id)
+            return
+        end
         local permanent_effects = require("systems/permanent_reward_effect_service")
         print("[OnlineTime] profile_refresh_completed player_id=" .. tostring(player_id)
             .. " hero_all_attributes_flat="
@@ -173,6 +194,8 @@ local function publish_grants(player_id, state, grants, final, current_request_i
         end
         complete_checkpoint(player_id, state, final, current_request_id)
     end, function(error_code)
+        if state.generation ~= generation or not state.pending_checkpoint
+            or state.pending_checkpoint.request_id ~= current_request_id then return end
         print("[OnlineTime] profile_refresh_failed player_id=" .. tostring(player_id)
             .. " error=" .. tostring(error_code))
         complete_checkpoint(player_id, state, final, current_request_id)
@@ -191,6 +214,34 @@ local function request_id(player_id, state)
     return string.format("online-%s-%s-%d", tostring(player_id), state.session_id, state.sequence)
 end
 
+local function checkpoint_failed(player_id, state, payload, error_code)
+    state.in_flight = false
+    -- A failed HTTP exchange is not an acknowledgement of the durable final.
+    -- Keep the exact session/request/body for its bounded idempotent retry.
+    if payload.final or state.final_requested then state.status = SESSION_FINALIZING end
+    print("[OnlineTime] checkpoint_unconfirmed player_id=" .. tostring(player_id)
+        .. " request_id=" .. tostring(payload.request_id) .. " final=" .. tostring(payload.final)
+        .. " attempt=" .. tostring(state.pending_attempts) .. " error=" .. tostring(error_code))
+    if state.pending_attempts >= MAX_CHECKPOINT_ATTEMPTS then
+        if not payload.final and state.final_requested then
+            state.final_requested = false
+            checkpoint(player_id, true, state)
+        end
+        return
+    end
+    if not RETRYABLE_CHECKPOINT_ERRORS[tostring(error_code)] then return end
+    local id = "online_time_retry_" .. state.session_id
+    state.retry_task = id
+    -- N<=4 game players; one indexed one-shot task per failed session, at most
+    -- three attempts. No new frame/player scan or successful-request timer.
+    scheduler.after(state.pending_attempts, function()
+        if state.generation ~= generation or state.pending_checkpoint ~= payload
+            or state.status == SESSION_CLOSED then return end
+        state.retry_task = nil
+        checkpoint(player_id, payload.final, state)
+    end, id)
+end
+
 checkpoint = function(player_id, final, expected_state)
     player_id = tonumber(player_id)
     -- An old in-flight checkpoint must finalize its own session after a reconnect.
@@ -206,7 +257,7 @@ checkpoint = function(player_id, final, expected_state)
             .. tostring(player_id) .. " final=" .. tostring(final == true))
         return
     end
-    if state.in_flight then
+    if state.in_flight or state.retry_task then
         if final then
             state.final_requested = true
             state.status = SESSION_FINALIZING
@@ -221,30 +272,68 @@ checkpoint = function(player_id, final, expected_state)
             .. tostring(player_id) .. " final=" .. tostring(final == true))
         return
     end
-    if not final and state.fishing_binding
+    local match_binding = require("systems/match_setup_service").get_session_id()
+    if state.match_binding and state.match_binding ~= match_binding then
+        print("[OnlineTime] checkpoint_unconfirmed reason=match_changed player_id=" .. tostring(player_id))
+        return
+    end
+    state.match_binding = match_binding
+    if not final and not state.pending_checkpoint and state.fishing_binding
         and not same_binding(fishing_resume_binding(player_id), state.fishing_binding) then return end
-    local account_id = state.fishing_binding and state.fishing_binding.account
-        or provider.resolve_account_id(player_id)
+    local resolved_account = provider.resolve_account_id(player_id)
+    local account_id = state.pending_checkpoint and state.pending_checkpoint.account_id
+        or state.fishing_binding and state.fishing_binding.account or resolved_account
     if not account_id then
         print("[OnlineTime] checkpoint_skipped reason=account_id_unresolved player_id="
             .. tostring(player_id) .. " final=" .. tostring(final == true))
         return
+    end
+    if tostring(resolved_account or "") ~= tostring(account_id)
+        or state.pending_checkpoint and sessions[player_id] and sessions[player_id] ~= state then
+        print("[OnlineTime] checkpoint_unconfirmed reason=identity_changed player_id=" .. tostring(player_id))
+        return
+    end
+    if state.pending_checkpoint and state.pending_attempts >= MAX_CHECKPOINT_ATTEMPTS then
+        if not final or state.pending_checkpoint.final then return end
+        -- A separate final fences any delayed periodic request in the backend
+        -- lifecycle table. Never discard or replace an unconfirmed final.
+        state.pending_checkpoint = nil
+        state.pending_attempts = 0
     end
     state.in_flight = true
     if final then
         state.status = SESSION_FINALIZING
         finalizing_sessions[player_id] = state
     end
-    local payload = {
+    local payload = state.pending_checkpoint or {
         account_id = tostring(account_id),
         session_id = state.session_id,
         request_id = request_id(player_id, state),
         final = final == true,
     }
+    state.pending_checkpoint = payload
+    state.pending_attempts = (state.pending_attempts or 0) + 1
+    local attempt = state.pending_attempts
+    local function current_attempt()
+        return state.generation == generation and state.pending_checkpoint == payload
+            and state.pending_attempts == attempt and state.in_flight
+    end
     print("[OnlineTime] checkpoint_request_started player_id=" .. tostring(player_id) .. " session_id=" .. tostring(payload.session_id)
         .. " request_id=" .. tostring(payload.request_id)
         .. " final=" .. tostring(payload.final))
     provider.online_checkpoint(payload, function(response)
+        if not current_attempt() then return end
+        if type(response) ~= "table" or response.ok ~= true then
+            checkpoint_failed(player_id, state, payload,
+                type(response) == "table" and response.error or "online_checkpoint_not_confirmed")
+            return
+        end
+        final = payload.final
+        if tostring(provider.resolve_account_id(player_id) or "") ~= tostring(account_id)
+            or require("systems/match_setup_service").get_session_id() ~= state.match_binding then
+            complete_checkpoint(player_id, state, final, payload.request_id)
+            return
+        end
         if response and response.profile and tostring(response.profile.account_id) == tostring(account_id) then
             profile_service.apply_snapshot(player_id, response.profile, "archive_online_checkpoint")
         end
@@ -275,9 +364,10 @@ checkpoint = function(player_id, final, expected_state)
         end
         complete_checkpoint(player_id, state, final, payload.request_id)
     end, function(error_code)
+        if not current_attempt() then return end
         print("[OnlineTime] checkpoint_failed player_id=" .. tostring(player_id) .. " session_id=" .. tostring(payload.session_id) .. " request_id=" .. tostring(payload.request_id) .. " final=" .. tostring(payload.final)
             .. " error=" .. tostring(error_code))
-        complete_checkpoint(player_id, state, final, payload.request_id)
+        checkpoint_failed(player_id, state, payload, error_code)
     end)
 end
 

@@ -239,6 +239,8 @@ class Player:
         self.lease = secrets.token_hex(16)
         self.identity = self.token = self.config_hash = None
         self.session_logged_in = False
+        self._final_checkpoint_request = None
+        self._final_checkpoint_confirmed = False
         self.next_checkpoint = None
         self.last_profile = None
         self.catalog_md5 = cfg.get('lottery_catalog_md5')
@@ -308,8 +310,17 @@ class Player:
             self.workflow_observer(name, elapsed, error, counters)
 
     def checkpoint(self, final=False, request=None):
+        if final:
+            if self._final_checkpoint_request is None:
+                self._final_checkpoint_request = request or ('lt_checkpoint_' + secrets.token_hex(16))
+            need(request is None or request == self._final_checkpoint_request,
+                 'final_checkpoint_request_changed')
+            request = self._final_checkpoint_request
         if self.client_profile.mode in ('client-v2', 'client-v3'):
-            return self._checkpoint_v2(final, request)
+            value = self._checkpoint_v2(final, request)
+            if final:
+                self._final_checkpoint_confirmed = True
+            return value
         request = request or ('lt_checkpoint_' + secrets.token_hex(16))
         phase = 'final' if final else ('setup' if self.next_checkpoint is None else 'periodic')
         value = self.business('/v1/online-time/checkpoint',
@@ -318,6 +329,8 @@ class Player:
         if isinstance(value.get('profile'), dict):
             self.last_profile = profile(value, self.identity['account_id'])
         self.next_checkpoint = self.clock() + 60
+        if final:
+            self._final_checkpoint_confirmed = True
         return value
 
     def _checkpoint_v2(self, final, request):
@@ -523,17 +536,14 @@ class Player:
             self.token = None
             self.session_logged_in = False
             return
-        try:
-            # An issued identity is not yet a logged-in online-time session.
-            # Failed authentication/login must not invent a final checkpoint.
-            if self.session_logged_in:
-                self.checkpoint(final=True)
-        finally:
-            try:
-                self.admin('/_loadtest/release', {'run_id': self.cfg['run_id'], 'lease_id': self.lease})
-            finally:
-                self.identity = self.token = None
-                self.session_logged_in = False
+        # Preserve credentials and the exact final ID until its acknowledgement.
+        # Release must not revoke the only capability to retry an unknown final.
+        # Setup/healthy/failed paths all use O(1) per-user state, no user scan.
+        if self.session_logged_in and not self._final_checkpoint_confirmed:
+            self.checkpoint(final=True)
+        self.admin('/_loadtest/release', {'run_id': self.cfg['run_id'], 'lease_id': self.lease})
+        self.identity = self.token = None
+        self.session_logged_in = False
 
 
 class CompactRooms:

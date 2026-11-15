@@ -261,6 +261,9 @@ def prepare(args):
     from .database_experiments import apply_archive_validation
     apply_archive_validation(root, cfg, revision,
         mode=getattr(args, 'archive_validation', 'baseline'), repository=ROOT)
+    from .checkpoint_experiments import prepare as prepare_checkpoint_lifecycle
+    prepare_checkpoint_lifecycle(root, cfg, revision,
+        mode=getattr(args, 'checkpoint_lifecycle', 'baseline'), repository=ROOT)
     cache_mode = getattr(args, 'settlement_cache', 'baseline')
     need(cache_mode in ('baseline', 'warm-v1'), 'settlement_cache_mode_invalid')
     if cache_mode == 'warm-v1':
@@ -332,6 +335,7 @@ def prepare(args):
         **({'leaderboard_binding': cfg['leaderboard_binding']} if 'leaderboard_binding' in cfg else {}),
         **({'sqlite_environment': cfg['sqlite_environment']} if 'sqlite_environment' in cfg else {}),
         **({'mature_fixture': cfg['mature_fixture']} if 'mature_fixture' in cfg else {}),
+        **({'checkpoint_lifecycle': cfg['checkpoint_lifecycle']} if 'checkpoint_lifecycle' in cfg else {}),
         'cloud_resources_created': 0, 'requests_sent': 0, 'production_rows_copied': 0})
     return {'status': 'LAB_PREPARED_NOT_STARTED', 'directory': str(root), 'run_id': run,
             'accounts': accounts, 'active': active, 'purpose': purpose,
@@ -435,6 +439,8 @@ def main(argv=None):
                       help='Opt-in bounded synthetic mature data; native2/40 validation required before large seed')
     init.add_argument('--client-workload', choices=('legacy-v1', 'client-v2', 'client-v3'), default='legacy-v1',
                       help='client-v2 includes grant-triggered profile refresh and complete workflow timing')
+    init.add_argument('--checkpoint-lifecycle', choices=('baseline', 'lifecycle-v1'), default='baseline',
+                      help='New isolated labs only: indexed online-session closure and request binding SQL candidate')
     init.add_argument('--failure-mode', choices=('fail-fast', 'observe-overload-v1'), default='fail-fast',
                       help='Observe overload for the full duration; failed actors are quarantined, never counted as active business users.')
     init.add_argument('--client-recovery', choices=('baseline', 'admission-busy-v1', 'admission-busy-v2', 'admission-busy-v3'), default='baseline',

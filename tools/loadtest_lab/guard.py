@@ -262,6 +262,8 @@ def load(directory):
         path = root.joinpath(*relative(name).parts)
         need(path.resolve().is_relative_to(root) and not path.is_symlink() and path.is_file()
              and sha(path.read_bytes()) == digest, 'lab_source_changed:' + name)
+    from .checkpoint_experiments import validate as validate_checkpoint_lifecycle
+    validate_checkpoint_lifecycle(cfg, lambda name: (root / name).read_bytes())
     from .leaderboard_experiments import validate_leaderboard_binding
     validate_leaderboard_binding(cfg, lambda name: (root / name).read_bytes())
     from .database_experiments import validate_schema_experiment
@@ -409,6 +411,8 @@ def load_client(path):
          'lab_wire_mode_invalid')
     validate_postgres_image(cfg.get('postgres_image', DEFAULT_POSTGRES_IMAGE), allow_default=True)
     from .leaderboard_experiments import metadata as leaderboard_metadata
+    from .checkpoint_experiments import metadata as checkpoint_metadata
+    checkpoint_metadata(cfg)
     leaderboard_metadata(cfg)  # Client-only fixed metadata proof, no source reads.
     from .frontend_experiments import metadata_parent_sources as frontend_parent_sources
     frontend_parent_sources(cfg)  # Client-only metadata proof, no source reads.
