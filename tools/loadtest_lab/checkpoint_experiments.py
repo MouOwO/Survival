@@ -72,8 +72,11 @@ def prepare(root, cfg, revision, mode, repository):
           'checkpoint_new_lab_required')
     raw = subprocess.run(['git', '-C', str(repository), 'show', revision + ':' + SOURCE],
                          capture_output=True, check=True, timeout=20).stdout
-    _need(_sha(raw) == SQL_SHA256 and raw == (repository / SOURCE).read_bytes(),
-          'checkpoint_committed_SQL_required')
+    # Git's declared text conversion can materialize CRLF in this Windows
+    # worktree. Export only the exact pinned LF blob; no other rewrite allowed.
+    working = (repository / SOURCE).read_bytes().replace(b'\r\n', b'\n')
+    _need(b'\r' not in working and _sha(raw) == SQL_SHA256 and raw == working,
+          'checkpoint_committed_sql_required')
     path = root / TARGET
     _need(path.resolve().is_relative_to(root.resolve()), 'checkpoint_path_escape')
     with path.open('xb') as stream:
