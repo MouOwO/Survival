@@ -13,7 +13,8 @@ import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from loadtest_lab.guard import load_client, target_url, canonical, sha, write_new, register_storage
-from loadtest_lab.workload import Player, checked
+from loadtest_lab.workload import Player, checked, AdmissionBusy, BusyRetryBudget, BusyRetryDeadline, BusyRecoveryTimings
+from loadtest_lab.guard import client_recovery_policy
 from loadtest_lab.workload_profiles import COUNTERS as WORKLOAD_COUNTERS, WORKFLOWS, profile_for
 from loadtest_lab.wire_client import WireClient, WIRE_MODE, aggregate_reports, http_error_label, failure_label
 from locust import HttpUser, task, events
@@ -31,6 +32,11 @@ WIRE_WORKERS = {}
 WIRE_WORKERS_SEEN = set()
 WIRE_FINAL = False
 WIRE_REPORT_ERROR = None
+CLIENT_RECOVERY = client_recovery_policy(CFG)
+RECOVERY_TIMINGS = BusyRecoveryTimings() if CLIENT_RECOVERY is not None else None
+RECOVERY_COUNTS = dict.fromkeys(('logical_requests', 'logical_completed', 'logical_failed',
+    'http_attempts', 'requests_with_busy', 'busy_responses', 'retry_attempts',
+    'recovered_requests', 'exhausted_requests', 'backend_busy', 'frontend_busy'), 0)
 RUN_FAILED = False
 RUN_FIRST_FAILURE = None
 RUN_QUIT_REQUESTED = False
@@ -432,6 +438,51 @@ class SyntheticPlayer(HttpUser):
             context={'client_workload': CLIENT_PROFILE.mode})
 
     def exchange(self, method, path, body, authorization, name):
+        if CLIENT_RECOVERY is None or not WIRE.business(method, path):
+            return self._exchange_once(method, path, body, authorization, name)
+        import gevent
+        budget = BusyRetryBudget(CFG)
+        RECOVERY_COUNTS['logical_requests'] += 1
+        had_busy = False
+        logical_started, logical_succeeded = time.monotonic(), False
+        try:
+            with gevent.Timeout(budget.remaining(), BusyRetryDeadline()):
+                for _ in range(CLIENT_RECOVERY['max_attempts']):
+                    remaining = budget.begin()
+                    RECOVERY_COUNTS['http_attempts'] += 1
+                    RECOVERY_COUNTS['retry_attempts'] += int(budget.attempts > 1)
+                    try:
+                        value = self._exchange_once(method, path, body, authorization, name,
+                                                    busy_recovery=True, timeout=remaining)
+                    except AdmissionBusy as error:
+                        RECOVERY_COUNTS['requests_with_busy'] += int(not had_busy)
+                        had_busy = True
+                        RECOVERY_COUNTS['busy_responses'] += 1
+                        RECOVERY_COUNTS[error.code] += 1
+                        delay = budget.delay(random.random())
+                        if delay is None:
+                            RECOVERY_COUNTS['exhausted_requests'] += 1
+                            fail_run(self.environment, 'admission_retry_exhausted')
+                            raise StopUser() from None
+                        gevent.sleep(delay)
+                        continue
+                    logical_succeeded = True
+                    RECOVERY_COUNTS['logical_completed'] += 1
+                    RECOVERY_COUNTS['recovered_requests'] += int(had_busy)
+                    return value
+        except BusyRetryDeadline:
+            RECOVERY_COUNTS['logical_failed'] += 1
+            fail_run(self.environment, 'admission_retry_deadline')
+            raise StopUser() from None
+        except BaseException:
+            RECOVERY_COUNTS['logical_failed'] += 1
+            raise
+        finally:
+            RECOVERY_TIMINGS.observe(path, name, (time.monotonic() - logical_started) * 1000,
+                                     not logical_succeeded)
+
+    def _exchange_once(self, method, path, body, authorization, name,
+                       *, busy_recovery=False, timeout=35):
         if (getattr(self, '_finalizing', False)
                 and time.monotonic() >= getattr(self, '_cleanup_deadline', float('inf'))):
             raise CleanupTimeout()
@@ -444,12 +495,12 @@ class SyntheticPlayer(HttpUser):
                             and getattr(existing, 'grant_followup_final', False)))
             if not cleanup:
                 raise StopUser()
-        # One attempt, no redirect or retry; preserve incomplete HTTP accounting.
+        # Every attempt keeps its raw HTTP failure and wire accounting.
         headers = WIRE.headers(method, path, authorization)
         entered = False
         try:
             with self.client.request(method, path, json=body, headers=headers,
-                                     name=name, timeout=35, allow_redirects=False, catch_response=True) as response:
+                                     name=name, timeout=timeout, allow_redirects=False, catch_response=True) as response:
                 entered = True
                 try:
                     try:
@@ -458,9 +509,17 @@ class SyntheticPlayer(HttpUser):
                         if response.status_code != 200:
                             raise ValueError(http_error_label(response.status_code, None)) from None
                         raise
+                    if (busy_recovery and response.status_code == 503
+                            and type(value) is dict and set(value) == {'ok', 'error'}
+                            and value.get('ok') is False
+                            and value.get('error') in ('backend_busy', 'frontend_busy')):
+                        response.failure(http_error_label(503, value))
+                        raise AdmissionBusy(value['error'])
                     if response.status_code != 200:
                         raise ValueError(http_error_label(response.status_code, value))
                     value = checked(value)
+                except AdmissionBusy:
+                    raise
                 except Exception as error:
                     safe = failure_label(error)
                     response.failure(safe)
@@ -657,6 +716,10 @@ def exit_on_failure(environment, **kwargs):
             'requests': total.num_requests, 'failures': total.num_failures,
             'includes_user_finalization': True, 'capacity_certified': False,
             'business_wire': wire,
+            **({'client_recovery': {'policy': CLIENT_RECOVERY, 'counters': dict(RECOVERY_COUNTS),
+                'logical_latency': RECOVERY_TIMINGS.report(),
+                'scope': 'single local runner; explicit pre-dispatch HTTP503 busy only; raw failures retained',
+                'automatic_ambiguous_mutation_retries': False}} if CLIENT_RECOVERY is not None else {}),
             'run_state': run,
             'http_timing_scope': 'locust_http_time_excludes_client_wire_decode',
             **workload,

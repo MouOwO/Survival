@@ -13,12 +13,100 @@ import re
 import secrets
 import time
 
-from .guard import canonical, need, verify_attestation
+from .guard import canonical, need, verify_attestation, client_recovery_policy
 from .workload_profiles import COUNTERS, MAX_SEEN_GRANTS, profile_for
 
 
 class BusinessFailure(ValueError):
     pass
+
+
+class BusyRecoveryTimings:
+    """Five fixed categories and 23 buckets; no per-account retained state."""
+    BUCKETS = (1, 2, 5, 10, 20, 50, 100, 200, 300, 400, 500, 650, 800,
+               1000, 1250, 1500, 2000, 3000, 5000, 7500, 10000, 15000, float('inf'))
+    NAMES = ('profile', 'checkpoint_setup', 'checkpoint_periodic', 'checkpoint_final', 'other')
+
+    def __init__(self):
+        self.rows = {name: {'count': 0, 'failures': 0, 'max_ms': 0.0,
+                           'buckets': [0] * len(self.BUCKETS)} for name in self.NAMES}
+
+    def observe(self, path, label, elapsed_ms, failed):
+        from bisect import bisect_left
+        need(math.isfinite(elapsed_ms) and elapsed_ms >= 0, 'client_recovery_clock_invalid')
+        name = 'profile' if path == '/v1/profile' else 'other'
+        for phase in ('setup', 'periodic', 'final'):
+            if label.startswith('[checkpoint:' + phase + '] '):
+                name = 'checkpoint_' + phase
+                break
+        row = self.rows[name]
+        row['count'] += 1
+        row['failures'] += int(failed)
+        row['max_ms'] = max(row['max_ms'], elapsed_ms)
+        row['buckets'][bisect_left(self.BUCKETS, elapsed_ms)] += 1
+
+    def report(self):
+        result = {}
+        for name, row in self.rows.items():
+            seen = 0
+            p95 = None
+            if row['count']:
+                target = math.ceil(row['count'] * .95)
+                for bound, count in zip(self.BUCKETS, row['buckets']):
+                    seen += count
+                    if seen >= target:
+                        p95 = bound if math.isfinite(bound) else None
+                        break
+            result[name] = dict(requests=row['count'], failures=row['failures'],
+                                max_ms=row['max_ms'], p95_upper_bound_ms=p95)
+        return result
+
+
+class BusyRetryDeadline(TimeoutError):
+    pass
+
+
+class AdmissionBusy(Exception):
+    """Explicit admission rejection before business dispatch; not an IO timeout."""
+    def __init__(self, code):
+        if code not in ('backend_busy', 'frontend_busy'):
+            raise ValueError('unreviewed_admission_error')
+        self.code = code
+        super().__init__(code)
+
+
+class BusyRetryBudget:
+    """O(1) per request; at most 3 HTTP attempts and 2 bounded jitter waits.
+
+    No account scan, new ID, SQL retry, queue or background timer. HTTP timeout
+    and backoff share one monotonic 10s deadline, including the first attempt.
+    Caller retains the exact method/path/body/token across attempts.
+    """
+    def __init__(self, cfg, *, clock=time.monotonic):
+        self.policy = client_recovery_policy(cfg)
+        if self.policy is None:
+            raise ValueError('explicit_client_recovery_required')
+        self.clock = clock
+        self.deadline = clock() + self.policy['total_seconds']
+        self.attempts = 0
+
+    def remaining(self):
+        return max(0.0, self.deadline - self.clock())
+
+    def begin(self):
+        if self.attempts >= self.policy['max_attempts'] or self.remaining() <= 0:
+            raise ValueError('client_recovery_budget_exhausted')
+        self.attempts += 1
+        return self.remaining()
+
+    def delay(self, jitter):
+        if not 0 <= jitter <= 1 or self.attempts < 1:
+            raise ValueError('client_recovery_jitter_invalid')
+        if self.attempts >= self.policy['max_attempts']:
+            return None
+        base = self.policy['base_delay_seconds'] * 2 ** (self.attempts - 1)
+        delay = min(self.policy['max_delay_seconds'], base * (1 + jitter))
+        return delay if delay < self.remaining() else None
 
 
 def checked(value):

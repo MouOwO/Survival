@@ -282,7 +282,23 @@ def load(directory):
     validate_workload_profile(cfg, lambda name: (root / name).read_bytes())
     from .progress import validate_profile as validate_actor_progress
     validate_actor_progress(cfg)
+    client_recovery_policy(cfg)
     return root, cfg, private
+
+
+BUSY_RETRY_POLICY = {'id': 'admission-busy-v1', 'max_attempts': 3,
+                     'total_seconds': 10, 'base_delay_seconds': .25,
+                     'max_delay_seconds': 1}
+
+
+def client_recovery_policy(cfg):
+    value = cfg.get('client_recovery')
+    if value is None:
+        return None
+    need(type(value) is dict and value == BUSY_RETRY_POLICY
+         and all(type(value[k]) is type(v) for k, v in BUSY_RETRY_POLICY.items())
+         and cfg.get('client_workload') == 'client-v3', 'client_recovery_policy_invalid')
+    return dict(value)
 
 
 def account(cfg, index):
@@ -393,6 +409,7 @@ def load_client(path):
         validate_process_options(cfg)
     from .progress import validate_profile as validate_actor_progress
     validate_actor_progress(cfg)
+    client_recovery_policy(cfg)
     return cfg, controller
 
 
