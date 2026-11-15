@@ -60,8 +60,16 @@ SPECS['transport-reset-filtered-combined-v1'] = {
                   '65ae91d8c790254527823103a1f3c0c0fe732d38ce761e3a11a7b62c41f26c12'},
     'parents': {PG: G_SOURCES[PG]},
     'outputs': {PG: '688935869534c5b545cf8a73ee80292c537ad2b280ea9750b7258ac6316b288d'}}
+DRAIN_OPERATOR = PREFIX + 'checkpoint_profile_drain_patch.py'
+SPECS['checkpoint-profile-drain-v1'] = {
+    'operators': {DRAIN_OPERATOR:
+                  '5788c0f58351697fcc0c4e3c89bdb232552806379a6922b2377d26f3afa559d5'},
+    'parents': {SERVER: SPECS['ensure-scope-v1']['outputs'][SERVER], SERVICE: G_SOURCES[SERVICE]},
+    'outputs': {SERVER: '1470ead7930e2f04279e7c9276023116e7cb7ffa9bb6dff72f763cc0b83ee90d',
+                SERVICE: G_SOURCES[SERVICE]}}
 ORDER = ('transport-principal-v1', 'transport-reset-v1',
-         'transport-reset-filtered-v1', 'transport-reset-filtered-combined-v1', 'ensure-scope-v1')
+         'transport-reset-filtered-v1', 'transport-reset-filtered-combined-v1',
+         'ensure-scope-v1', 'checkpoint-profile-drain-v1')
 TRANSPORT_MODES = {'principal-v1': ORDER[0], 'reset-v1': ORDER[1],
                    'reset-filtered-v1': ORDER[2], 'reset-filtered-combined-v1': ORDER[3]}
 TRANSPORT_IDS = frozenset(TRANSPORT_MODES.values())
@@ -96,7 +104,7 @@ def _metadata(cfg):
     _need(type(cfg) is dict and type(cfg.get('sources')) is dict,
           'principal_experiment_manifest_invalid')
     rows = cfg.get('principal_experiments', [])
-    _need(type(rows) is list and len(rows) <= 2, 'principal_experiment_list_invalid')
+    _need(type(rows) is list and len(rows) <= 3, 'principal_experiment_list_invalid')
     selected = []
     for row in rows:
         _need(type(row) is dict and set(row) == ROW_KEYS,
@@ -122,6 +130,8 @@ def _metadata(cfg):
           'principal_experiment_order_or_duplicate_invalid')
     _need(sum(identity in TRANSPORT_IDS for identity in selected) <= 1,
           'principal_transport_modes_are_exclusive')
+    _need('checkpoint-profile-drain-v1' not in selected or 'ensure-scope-v1' in selected,
+          'checkpoint_drain_initialization_scope_required')
     restored = {}
     for row in reversed(rows):
         for name, digest in row['runtime_sha256'].items():
@@ -133,7 +143,11 @@ def _metadata(cfg):
         if identity not in selected:
             _need(not any(name in cfg['sources'] and name not in covered_operators
                           for name in spec['operators'])
-                  and not any(cfg['sources'].get(name) == digest
+                  # A byte-identical callee is an input dependency, not proof
+                  # that this optional transform was applied. Changed outputs
+                  # still require the explicit binding, as before.
+                  and not any(digest != spec['parents'].get(name)
+                              and cfg['sources'].get(name) == digest
                               for name, digest in spec['outputs'].items()),
                   'principal_experiment_binding_missing')
     if rows:
@@ -228,14 +242,19 @@ def validate_principal_experiments(cfg, read_source):
 
 
 def apply_principal_experiments(root, cfg, revision, *, transport='baseline',
-                                ensure_scope=False, repository):
+                                ensure_scope=False, checkpoint_drain='baseline', repository):
     """Transform new, unbound files only; no SQL or service operations."""
     _need(type(transport) is str and transport in ('baseline', *TRANSPORT_MODES)
-          and type(ensure_scope) is bool, 'principal_experiment_mode_invalid')
+          and type(ensure_scope) is bool
+          and checkpoint_drain in ('baseline', 'single-profile-v1'),
+          'principal_experiment_mode_invalid')
     _need('principal_experiments' not in cfg, 'principal_experiment_already_bound')
     _metadata(cfg)
     selected = ([TRANSPORT_MODES[transport]] if transport != 'baseline' else []) + (
-        ['ensure-scope-v1'] if ensure_scope else [])
+        ['ensure-scope-v1'] if ensure_scope else []) + (
+        ['checkpoint-profile-drain-v1'] if checkpoint_drain == 'single-profile-v1' else [])
+    _need(checkpoint_drain == 'baseline' or ensure_scope,
+          'checkpoint_drain_initialization_scope_required')
     if not selected:
         return
     _gated(cfg, cfg['sources'])

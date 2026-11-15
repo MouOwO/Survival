@@ -216,7 +216,8 @@ def prepare(args):
     from .principal_experiments import apply_principal_experiments
     apply_principal_experiments(root, cfg, revision,
         transport=getattr(args, 'principal_transport', 'baseline'),
-        ensure_scope=getattr(args, 'ensure_scope', False), repository=ROOT)
+        ensure_scope=getattr(args, 'ensure_scope', False),
+        checkpoint_drain=getattr(args, 'checkpoint_drain', 'baseline'), repository=ROOT)
     from .frontend_experiments import apply_frontend_experiment
     apply_frontend_experiment(root, cfg, revision,
         mode=getattr(args, 'frontend_rate', 'baseline'), repository=ROOT,
@@ -476,6 +477,8 @@ def main(argv=None):
                       help='Opt-in verified reset baseline with reviewed role filtering or merged guard; exact isolated G sources only')
     init.add_argument('--ensure-scope', action='store_true',
                       help='Opt-in same-checkpoint initialization proof; exact isolated G sources only')
+    init.add_argument('--checkpoint-drain', choices=('baseline', 'single-profile-v1'), default='baseline',
+                      help='Opt-in one durable outbox drain in checkpoint profile; requires ensure-scope')
     init.add_argument('--frontend-rate', choices=('baseline', 'hot-rate-v1', 'hot-wal-full-v1'), default='baseline',
                       help='Opt-in exact observed SQLite housekeeping/WAL FULL with verified private library')
     init.add_argument('--private-sqlite-build-receipt',
