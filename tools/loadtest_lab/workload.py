@@ -63,6 +63,100 @@ class BusyRecoveryTimings:
         return result
 
 
+class BusyRecoveryRoutes:
+    """O(1) indexed increments; at most64 fixed request labels, no identities."""
+    FIELDS = ('logical_requests', 'logical_completed', 'logical_failed',
+              'http_attempts', 'busy_responses', 'recovered_requests')
+
+    def __init__(self):
+        self.rows = {}
+
+    def begin(self, method, path, name):
+        need(type(method) is type(path) is type(name) is str
+             and len(method) <= 7 and len(path) <= 512 and len(name) <= 160,
+             'recovery_route_identity_invalid')
+        key = (method, path.partition('?')[0], name)
+        row = self.rows.get(key)
+        if row is None:
+            need(len(self.rows) < 64, 'recovery_route_budget_exceeded')
+            row = dict(method=key[0], path=key[1], name=key[2],
+                       **dict.fromkeys(self.FIELDS, 0))
+            self.rows[key] = row
+        row['logical_requests'] += 1
+        return row
+
+    def finish(self, row, completed, had_busy):
+        row['logical_completed' if completed else 'logical_failed'] += 1
+        row['recovered_requests'] += int(completed and had_busy)
+
+    def report(self):
+        return [dict(row) for row in self.rows.values()]
+
+
+def recovery_route_count_checks(final, cfg, users=None):
+    """Once-only O(routes<=64) proof; raw wire/error statistics never rewritten."""
+    policy = client_recovery_policy(cfg)
+    if policy is None or policy.get('retry_setup_control') != 1:
+        return {}
+    from .wire_client import WireClient
+    users = cfg['active'] if users is None else users
+    r = final.get('client_recovery', {})
+    rows, raw = r.get('route_counts'), final.get('routes')
+    gates = dict(route_ledger_valid=False, catalog_logical_reconciled=False,
+                 release_logical_complete=False)
+    if (type(rows) is not list or not 1 <= len(rows) <= 64 or type(raw) is not list
+            or r.get('policy') != policy):
+        return gates
+    methods = ('GET', 'POST', 'HEAD', 'PUT', 'PATCH', 'DELETE', 'OPTIONS')
+    raw_http = {(x.get('method'), x.get('name')): x for x in raw
+                if type(x) is dict and x.get('method') in methods}
+    if len(raw_http) != sum(type(x) is dict and x.get('method') in methods for x in raw):
+        return gates
+    found = set()
+    totals = {True: dict.fromkeys(BusyRecoveryRoutes.FIELDS, 0),
+              False: dict.fromkeys(BusyRecoveryRoutes.FIELDS, 0)}
+    for row in rows:
+        if (type(row) is not dict or set(row) != set(BusyRecoveryRoutes.FIELDS) | {'method','path','name'}
+                or any(type(row[k]) is not int or not 0 <= row[k] <= 10**12 for k in BusyRecoveryRoutes.FIELDS)
+                or any(type(row[k]) is not str for k in ('method','path','name'))):
+            return gates
+        key = row['method'], row['name']
+        if key in found or key not in raw_http:
+            return gates
+        found.add(key)
+        wire_row = raw_http[key]
+        if (wire_row.get('requests') != row['http_attempts']
+                or wire_row.get('failures') != row['busy_responses']
+                or row['logical_requests'] != row['logical_completed'] + row['logical_failed']
+                or not row['logical_requests'] <= row['http_attempts'] <= 3 * row['logical_requests']
+                or row['recovered_requests'] > row['busy_responses']):
+            return gates
+        target = totals[WireClient.business(row['method'], row['path'])]
+        for k in BusyRecoveryRoutes.FIELDS:
+            target[k] += row[k]
+    if found != set(raw_http):
+        return gates
+    for business, name in ((True, 'counters'), (False, 'control_counters')):
+        c = r.get(name)
+        if type(c) is not dict or any(c.get(k) != v for k, v in totals[business].items()):
+            return gates
+        if (c.get('retry_attempts') != c['http_attempts'] - c['logical_requests']
+                or c.get('backend_busy', 0) + c.get('frontend_busy', 0) != c['busy_responses']):
+            return gates
+    wire = final.get('business_wire', {}).get('counters', {})
+    if (wire.get('business_requests') != totals[True]['http_attempts']
+            or wire.get('control_requests') != totals[False]['http_attempts']):
+        return gates
+    compact = final.get('compact_client', {})
+    catalog = sum(x['logical_requests'] for x in rows if x['path'] == '/v1/lottery/catalog')
+    release = [x for x in rows if x['path'] == '/_loadtest/release']
+    gates.update(route_ledger_valid=True,
+        catalog_logical_reconciled=catalog == compact.get('room_startup_catalog_attempts', -1) + compact.get('room_periodic_catalog_attempts', -1),
+        release_logical_complete=sum(x['logical_completed'] for x in release) == users
+            and all(x['logical_failed'] == 0 for x in release))
+    return gates
+
+
 class BusyRetryDeadline(TimeoutError):
     pass
 

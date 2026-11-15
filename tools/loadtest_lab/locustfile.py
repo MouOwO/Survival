@@ -13,7 +13,7 @@ import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from loadtest_lab.guard import load_client, target_url, canonical, sha, write_new, register_storage
-from loadtest_lab.workload import Player, checked, AdmissionBusy, BusyRetryBudget, BusyRetryDeadline, BusyRecoveryTimings
+from loadtest_lab.workload import Player, checked, AdmissionBusy, BusyRetryBudget, BusyRetryDeadline, BusyRecoveryTimings, BusyRecoveryRoutes
 from loadtest_lab.guard import client_recovery_policy
 from loadtest_lab.workload_profiles import COUNTERS as WORKLOAD_COUNTERS, WORKFLOWS, profile_for
 from loadtest_lab.wire_client import WireClient, WIRE_MODE, aggregate_reports, http_error_label, failure_label
@@ -37,6 +37,9 @@ RECOVERY_TIMINGS = BusyRecoveryTimings() if CLIENT_RECOVERY is not None else Non
 RECOVERY_COUNTS = dict.fromkeys(('logical_requests', 'logical_completed', 'logical_failed',
     'http_attempts', 'requests_with_busy', 'busy_responses', 'retry_attempts',
     'recovered_requests', 'exhausted_requests', 'backend_busy', 'frontend_busy'), 0)
+CONTROL_RECOVERY_COUNTS = (dict.fromkeys(RECOVERY_COUNTS, 0)
+    if CLIENT_RECOVERY and CLIENT_RECOVERY.get('retry_setup_control') == 1 else None)
+RECOVERY_ROUTES = BusyRecoveryRoutes() if CONTROL_RECOVERY_COUNTS is not None else None
 RUN_FAILED = False
 RUN_FIRST_FAILURE = None
 RUN_QUIT_REQUESTED = False
@@ -438,48 +441,57 @@ class SyntheticPlayer(HttpUser):
             context={'client_workload': CLIENT_PROFILE.mode})
 
     def exchange(self, method, path, body, authorization, name):
-        if CLIENT_RECOVERY is None or not WIRE.business(method, path):
+        business = WIRE.business(method, path)
+        if (CLIENT_RECOVERY is None or not business
+                and CLIENT_RECOVERY.get('retry_setup_control') != 1):
             return self._exchange_once(method, path, body, authorization, name)
         import gevent
+        counters = RECOVERY_COUNTS if business else CONTROL_RECOVERY_COUNTS
         budget = BusyRetryBudget(CFG)
-        RECOVERY_COUNTS['logical_requests'] += 1
+        counters['logical_requests'] += 1
+        route = RECOVERY_ROUTES.begin(method, path, name) if RECOVERY_ROUTES is not None else None
         had_busy = False
         logical_started, logical_succeeded = time.monotonic(), False
         try:
             with gevent.Timeout(budget.remaining(), BusyRetryDeadline()):
                 for _ in range(CLIENT_RECOVERY['max_attempts']):
                     remaining = budget.begin()
-                    RECOVERY_COUNTS['http_attempts'] += 1
-                    RECOVERY_COUNTS['retry_attempts'] += int(budget.attempts > 1)
+                    counters['http_attempts'] += 1
+                    if route is not None: route['http_attempts'] += 1
+                    counters['retry_attempts'] += int(budget.attempts > 1)
                     try:
                         value = self._exchange_once(method, path, body, authorization, name,
                                                     busy_recovery=True, timeout=remaining)
                     except AdmissionBusy as error:
-                        RECOVERY_COUNTS['requests_with_busy'] += int(not had_busy)
+                        counters['requests_with_busy'] += int(not had_busy)
                         had_busy = True
-                        RECOVERY_COUNTS['busy_responses'] += 1
-                        RECOVERY_COUNTS[error.code] += 1
+                        counters['busy_responses'] += 1
+                        counters[error.code] += 1
+                        if route is not None: route['busy_responses'] += 1
                         delay = budget.delay(random.random())
                         if delay is None:
-                            RECOVERY_COUNTS['exhausted_requests'] += 1
+                            counters['exhausted_requests'] += 1
                             fail_run(self.environment, 'admission_retry_exhausted')
                             raise StopUser() from None
                         gevent.sleep(delay)
                         continue
                     logical_succeeded = True
-                    RECOVERY_COUNTS['logical_completed'] += 1
-                    RECOVERY_COUNTS['recovered_requests'] += int(had_busy)
+                    counters['logical_completed'] += 1
+                    counters['recovered_requests'] += int(had_busy)
                     return value
         except BusyRetryDeadline:
-            RECOVERY_COUNTS['logical_failed'] += 1
+            counters['logical_failed'] += 1
             fail_run(self.environment, 'admission_retry_deadline')
             raise StopUser() from None
         except BaseException:
-            RECOVERY_COUNTS['logical_failed'] += 1
+            counters['logical_failed'] += 1
             raise
         finally:
-            RECOVERY_TIMINGS.observe(path, name, (time.monotonic() - logical_started) * 1000,
-                                     not logical_succeeded)
+            if business:
+                RECOVERY_TIMINGS.observe(path, name, (time.monotonic() - logical_started) * 1000,
+                                         not logical_succeeded)
+            if route is not None:
+                RECOVERY_ROUTES.finish(route, logical_succeeded, had_busy)
 
     def _exchange_once(self, method, path, body, authorization, name,
                        *, busy_recovery=False, timeout=35):
@@ -718,6 +730,8 @@ def exit_on_failure(environment, **kwargs):
             'business_wire': wire,
             **({'client_recovery': {'policy': CLIENT_RECOVERY, 'counters': dict(RECOVERY_COUNTS),
                 'logical_latency': RECOVERY_TIMINGS.report(),
+                **({'control_counters': dict(CONTROL_RECOVERY_COUNTS),
+                    'route_counts': RECOVERY_ROUTES.report()} if RECOVERY_ROUTES is not None else {}),
                 'scope': 'single local runner; explicit pre-dispatch HTTP503 busy only; raw failures retained',
                 'automatic_ambiguous_mutation_retries': False}} if CLIENT_RECOVERY is not None else {}),
             'run_state': run,

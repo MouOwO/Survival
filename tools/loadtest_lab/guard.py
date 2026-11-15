@@ -294,6 +294,8 @@ BUSY_RETRY_POLICY = {'id': 'admission-busy-v1', 'max_attempts': 3,
 BUSY_RETRY_POLICIES = {
     BUSY_RETRY_POLICY['id']: BUSY_RETRY_POLICY,
     'admission-busy-v2': {**BUSY_RETRY_POLICY, 'id': 'admission-busy-v2', 'total_seconds': 30},
+    'admission-busy-v3': {**BUSY_RETRY_POLICY, 'id': 'admission-busy-v3',
+                          'total_seconds': 30, 'retry_setup_control': 1},
 }
 
 
