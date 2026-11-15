@@ -37,6 +37,7 @@ local SESSION_ACTIVE = "ACTIVE"
 local SESSION_FINALIZING = "FINALIZING"
 local SESSION_CLOSED = "CLOSED"
 local MAX_CHECKPOINT_ATTEMPTS = 3
+local MAX_BUSY_FINAL_ATTEMPTS = 6
 local RETRYABLE_CHECKPOINT_ERRORS = {
     backend_busy=true, frontend_busy=true, database_busy=true,
     database_unavailable=true, database_timeout=true,
@@ -142,6 +143,7 @@ local function complete_checkpoint(player_id, state, final, current_request_id)
     state.retry_task = nil
     state.pending_checkpoint = nil
     state.pending_attempts = 0
+    state.pending_attempt_limit = nil
     if final then
         state.status = SESSION_CLOSED
         if sessions[player_id] == state then
@@ -222,7 +224,9 @@ local function checkpoint_failed(player_id, state, payload, error_code)
     print("[OnlineTime] checkpoint_unconfirmed player_id=" .. tostring(player_id)
         .. " request_id=" .. tostring(payload.request_id) .. " final=" .. tostring(payload.final)
         .. " attempt=" .. tostring(state.pending_attempts) .. " error=" .. tostring(error_code))
-    if state.pending_attempts >= MAX_CHECKPOINT_ATTEMPTS then
+    local busy_final = payload.final and (error_code == "frontend_busy" or error_code == "backend_busy")
+    state.pending_attempt_limit = busy_final and MAX_BUSY_FINAL_ATTEMPTS or MAX_CHECKPOINT_ATTEMPTS
+    if state.pending_attempts >= state.pending_attempt_limit then
         if not payload.final and state.final_requested then
             state.final_requested = false
             checkpoint(player_id, true, state)
@@ -232,9 +236,11 @@ local function checkpoint_failed(player_id, state, payload, error_code)
     if not RETRYABLE_CHECKPOINT_ERRORS[tostring(error_code)] then return end
     local id = "online_time_retry_" .. state.session_id
     state.retry_task = id
-    -- N<=4 game players; one indexed one-shot task per failed session, at most
-    -- three attempts. No new frame/player scan or successful-request timer.
-    scheduler.after(state.pending_attempts, function()
+    -- N<=4; one indexed one-shot per failed session, at most 6 attempts for
+    -- explicit pre-dispatch busy finals, otherwise 3. No successful-request timer.
+    -- This is an attempt bound; scheduler game time may pause after match end.
+    local retry_delay = busy_final and math.min(state.pending_attempts, 1) or state.pending_attempts
+    scheduler.after(retry_delay, function()
         if state.generation ~= generation or state.pending_checkpoint ~= payload
             or state.status == SESSION_CLOSED then return end
         state.retry_task = nil
@@ -293,12 +299,13 @@ checkpoint = function(player_id, final, expected_state)
         print("[OnlineTime] checkpoint_unconfirmed reason=identity_changed player_id=" .. tostring(player_id))
         return
     end
-    if state.pending_checkpoint and state.pending_attempts >= MAX_CHECKPOINT_ATTEMPTS then
+    if state.pending_checkpoint and state.pending_attempts >= (state.pending_attempt_limit or MAX_CHECKPOINT_ATTEMPTS) then
         if not final or state.pending_checkpoint.final then return end
         -- A separate final fences any delayed periodic request in the backend
         -- lifecycle table. Never discard or replace an unconfirmed final.
         state.pending_checkpoint = nil
         state.pending_attempts = 0
+        state.pending_attempt_limit = nil
     end
     state.in_flight = true
     if final then

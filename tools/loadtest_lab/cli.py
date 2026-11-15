@@ -457,7 +457,7 @@ def main(argv=None):
                       help='New isolated labs only: indexed online-session closure and request binding SQL candidate')
     init.add_argument('--failure-mode', choices=('fail-fast', 'observe-overload-v1'), default='fail-fast',
                       help='Observe overload for the full duration; failed actors are quarantined, never counted as active business users.')
-    init.add_argument('--client-recovery', choices=('baseline', 'admission-busy-v1', 'admission-busy-v2', 'admission-busy-v3'), default='baseline',
+    init.add_argument('--client-recovery', choices=('baseline', 'admission-busy-v1', 'admission-busy-v2', 'admission-busy-v3', 'admission-busy-v4'), default='baseline',
                       help='Opt-in explicit HTTP503 admission busy retry; raw errors retained; no ambiguous mutation replay')
     init.add_argument('--backend-db-pool', choices=('baseline', 'bounded-v1', 'bounded-v2'), default='baseline',
                       help='Explicit reviewed DB pool overlay experiment; baseline keeps production transport bytes')

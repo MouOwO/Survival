@@ -304,6 +304,9 @@ BUSY_RETRY_POLICIES = {
     'admission-busy-v2': {**BUSY_RETRY_POLICY, 'id': 'admission-busy-v2', 'total_seconds': 30},
     'admission-busy-v3': {**BUSY_RETRY_POLICY, 'id': 'admission-busy-v3',
                           'total_seconds': 30, 'retry_setup_control': 1},
+    'admission-busy-v4': {**BUSY_RETRY_POLICY, 'id': 'admission-busy-v4',
+                          'total_seconds': 30, 'retry_setup_control': 1,
+                          'final_max_attempts': 6},
 }
 
 
@@ -323,7 +326,7 @@ def observation_mode(cfg):
     need(type(value) is str and value in ('fail-fast', 'observe-overload-v1'),
          'client_failure_mode_invalid')
     need(value == 'fail-fast' or cfg.get('client_workload') == 'client-v3'
-         and (cfg.get('client_recovery') or {}).get('id') == 'admission-busy-v3',
+         and (cfg.get('client_recovery') or {}).get('id') in ('admission-busy-v3', 'admission-busy-v4'),
          'observation_requires_client_v3_recovery')
     return value == 'observe-overload-v1'
 

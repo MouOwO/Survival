@@ -486,14 +486,17 @@ class SyntheticPlayer(HttpUser):
             return self._exchange_once(method, path, body, authorization, name)
         import gevent
         counters = RECOVERY_COUNTS if business else CONTROL_RECOVERY_COUNTS
-        budget = BusyRetryBudget(CFG)
+        final_checkpoint = (method == 'POST' and path == '/v1/online-time/checkpoint'
+                            and name == '[checkpoint:final] /v1/online-time/checkpoint'
+                            and type(body) is dict and body.get('final') is True)
+        budget = BusyRetryBudget(CFG, final_checkpoint=final_checkpoint)
         counters['logical_requests'] += 1
         route = RECOVERY_ROUTES.begin(method, path, name) if RECOVERY_ROUTES is not None else None
         had_busy = False
         logical_started, logical_succeeded = time.monotonic(), False
         try:
             with gevent.Timeout(budget.remaining(), BusyRetryDeadline()):
-                for _ in range(CLIENT_RECOVERY['max_attempts']):
+                for _ in range(budget.max_attempts):
                     remaining = budget.begin()
                     counters['http_attempts'] += 1
                     if route is not None: route['http_attempts'] += 1

@@ -63,6 +63,13 @@ class BusyRecoveryTimings:
         return result
 
 
+def recovery_attempt_limit(policy, method, path, name):
+    """O(1) final-only ceiling; ordinary and setup routes keep their old cap."""
+    final = (method == 'POST' and path == '/v1/online-time/checkpoint'
+             and name == '[checkpoint:final] /v1/online-time/checkpoint')
+    return policy.get('final_max_attempts', policy['max_attempts']) if final else policy['max_attempts']
+
+
 class BusyRecoveryRoutes:
     """O(1) indexed increments; at most64 fixed request labels, no identities."""
     FIELDS = ('logical_requests', 'logical_completed', 'logical_failed',
@@ -128,7 +135,7 @@ def recovery_route_count_checks(final, cfg, users=None):
         if (wire_row.get('requests') != row['http_attempts']
                 or wire_row.get('failures') != row['busy_responses']
                 or row['logical_requests'] != row['logical_completed'] + row['logical_failed']
-                or not row['logical_requests'] <= row['http_attempts'] <= 3 * row['logical_requests']
+                or not row['logical_requests'] <= row['http_attempts'] <= recovery_attempt_limit(policy, row['method'], row['path'], row['name']) * row['logical_requests']
                 or row['recovered_requests'] > row['busy_responses']):
             return gates
         target = totals[WireClient.business(row['method'], row['path'])]
@@ -171,16 +178,20 @@ class AdmissionBusy(Exception):
 
 
 class BusyRetryBudget:
-    """O(1) per request; at most 3 HTTP attempts and 2 bounded jitter waits.
+    """O(1) per request; ordinary attempts<=3, opt-in busy final attempts<=6.
 
     No account scan, new ID, SQL retry, queue or background timer. HTTP timeout
     and backoff share one monotonic configured 10s/30s deadline, including the first attempt.
     Caller retains the exact method/path/body/token across attempts.
     """
-    def __init__(self, cfg, *, clock=time.monotonic):
+    def __init__(self, cfg, *, clock=time.monotonic, final_checkpoint=False):
         self.policy = client_recovery_policy(cfg)
         if self.policy is None:
             raise ValueError('explicit_client_recovery_required')
+        if type(final_checkpoint) is not bool:
+            raise ValueError('final_checkpoint_flag_invalid')
+        self.max_attempts = (self.policy.get('final_max_attempts', self.policy['max_attempts'])
+                             if final_checkpoint else self.policy['max_attempts'])
         self.clock = clock
         self.deadline = clock() + self.policy['total_seconds']
         self.attempts = 0
@@ -189,7 +200,7 @@ class BusyRetryBudget:
         return max(0.0, self.deadline - self.clock())
 
     def begin(self):
-        if self.attempts >= self.policy['max_attempts'] or self.remaining() <= 0:
+        if self.attempts >= self.max_attempts or self.remaining() <= 0:
             raise ValueError('client_recovery_budget_exhausted')
         self.attempts += 1
         return self.remaining()
@@ -197,7 +208,7 @@ class BusyRetryBudget:
     def delay(self, jitter):
         if not 0 <= jitter <= 1 or self.attempts < 1:
             raise ValueError('client_recovery_jitter_invalid')
-        if self.attempts >= self.policy['max_attempts']:
+        if self.attempts >= self.max_attempts:
             return None
         base = self.policy['base_delay_seconds'] * 2 ** (self.attempts - 1)
         delay = min(self.policy['max_delay_seconds'], base * (1 + jitter))

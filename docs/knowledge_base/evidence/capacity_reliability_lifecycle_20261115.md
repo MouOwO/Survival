@@ -100,3 +100,16 @@
 候选实际类故障回归通过：35种篡改/孤立元数据拒绝、错误数据库/已seeded标记在ALTER前拒绝、非事务配置写入后失败恢复、查询前后截止、独立恢复查询预留、计数一致与baseline零额外SQL/原12GB门禁。真实10万存档接入仍待；这些结果不代表更高人数容量通过。为后续同源对照将重新绑定候选，不启动已过期的operator来源。`e8ff…/pgdata`回收仍未授权且原库保留，只有新导入模式实际满足余量后才能不依赖该授权继续测试。
 
 配置回收与恢复语义参照[PostgreSQL17 WAL配置](https://www.postgresql.org/docs/17/runtime-config-wal.html)、[ALTER SYSTEM](https://www.postgresql.org/docs/17/sql-altersystem.html)与[CHECKPOINT](https://www.postgresql.org/docs/17/sql-checkpoint.html)；此选项仅用于离线合成数据导入，压测阶段恢复原配置。
+
+
+## 16:45 UTC 前的后续实测与集中退出修正
+
+单次profile drain的旧500/1000短测及2000目标长测已完成并失败；2000阶段73445个完成HTTP中5582失败，另3个取消/未闭合交换单列，最大实际有效业务人数148、2000共同活跃0秒。CPU采样均86.35%，可用内存最低约6.23GiB、未见增量OOM；不能按启动用户数宣称容量，也不能把入口拒绝当作偶发网络丢包。所有隔离进程已正常关闭，失败数据经实际恢复核验后只回收已授权展开副本，备份与证据保留。见single2000_factual_01及closed_memory_CPU_evidence_03。
+
+默认关闭的idle-v1资料上下文候选保留完整每次权限检查、先online再normal待处理和实际profile流程，将健康资料4次RPC减为2次。独立真实PostgreSQL/HTTP/Lua两账号43HTTP/12项、ABBA160次直接profile对照通过；薄/密存档直接调用wall样本均值约降35%/33%，不是全HTTP或人数倍率。SQL计划实测按账号索引访问；密存档仍过滤该账号512条历史，不能把LIMIT64写成仅访问64行。运行来源3fcb0a2c。
+
+新100人/10万成熟存档短测2162HTTP零错、100完整退出、SQL50执行/24聚合全过；签名共同活跃185.865秒，profile/周期/final P95约220/370/7000ms，预算优先门通过、旧1.5秒final严格门仍失败。只是短测，不是长期2000容量。新200人5369完成HTTP/66个frontend_busy原始错误；196/200完成退出，残留4在线会话，SQL后验未完整通过；profile/周期HTTP P95约280/400ms，final工作流P95约12秒。37笔最终结算遇忙，33笔恢复，4笔在三次上限耗尽。失败原样保留，尚未启动500及更高人数的新上下文候选。
+
+新增可选admission-busy-v4只扩展final、确切frontend_busy/backend_busy的有界恢复，Locust最终请求最多6次，其他路由仍3次，共享30秒单调期限且保留所有原始失败、SQL和SLA。游戏调用方只对同类明确busy final扩为6次，同一payload/请求/账号/会话/代际保持；其他错误仍最多3次，忙碌退避每次1秒。健康路径新增HTTP/调度0，每会话O(1)，N≤4，每失败会话最多一个索引一次性任务，不扫描玩家或场景。游戏调度基于game time，不宣称进程外持久保证或整流程30秒墙钟截止。实际Lua13种场景、Locust实际方法12组和107项断言及5项路由账目上限/篡改检查通过，旧版第四次busy前耗尽的负对照复现；两次测试脚手架依赖错误保留。新候选真实200复验、后续阶梯及独立硬件对照仍待，未部署正式后台/游戏/游廊、未采购。
+
+用户所见“内存使用率”下安装插件按官方文档为云监控采集Agent；它采集内存/磁盘和告警，不增加算力。官方说明安装及基础监控免费、通常无需重启；本轮对照期间未安装。见https://help.aliyun.com/zh/cms/cloudmonitor-1-0/user-guide/install-and-uninstall-the-cloudmonitor-agent-for-cpp。
