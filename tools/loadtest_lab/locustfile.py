@@ -14,7 +14,7 @@ import time
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from loadtest_lab.guard import load_client, target_url, canonical, sha, write_new, register_storage
 from loadtest_lab.workload import Player, checked, AdmissionBusy, BusyRetryBudget, BusyRetryDeadline, BusyRecoveryTimings, BusyRecoveryRoutes
-from loadtest_lab.guard import client_recovery_policy
+from loadtest_lab.guard import client_recovery_policy, observation_mode
 from loadtest_lab.workload_profiles import COUNTERS as WORKLOAD_COUNTERS, WORKFLOWS, profile_for
 from loadtest_lab.wire_client import WireClient, WIRE_MODE, aggregate_reports, http_error_label, failure_label
 from locust import HttpUser, task, events
@@ -33,6 +33,9 @@ WIRE_WORKERS_SEEN = set()
 WIRE_FINAL = False
 WIRE_REPORT_ERROR = None
 CLIENT_RECOVERY = client_recovery_policy(CFG)
+OBSERVE_OVERLOAD = observation_mode(CFG)
+OBSERVATION_COUNTS = dict.fromkeys(('quarantined_actors', 'isolated_errors',
+    'cleanup_timeouts', 'failure_rate_windows'), 0)
 RECOVERY_TIMINGS = BusyRecoveryTimings() if CLIENT_RECOVERY is not None else None
 RECOVERY_COUNTS = dict.fromkeys(('logical_requests', 'logical_completed', 'logical_failed',
     'http_attempts', 'requests_with_busy', 'busy_responses', 'retry_attempts',
@@ -399,6 +402,10 @@ def validate_host(environment, **kwargs):
                 previous_requests, previous_failures = total.num_requests, total.num_failures
                 bad = bad + 1 if requests >= 100 and failures / requests > .05 else 0
                 if bad >= 2:
+                    if OBSERVE_OVERLOAD:
+                        OBSERVATION_COUNTS['failure_rate_windows'] += 1
+                        bad = 0
+                        continue
                     fail_run(environment, 'failure_rate_budget_exceeded')
                     return
         gevent.spawn(monitor)
@@ -422,10 +429,18 @@ class SyntheticPlayer(HttpUser):
     host = 'http://127.0.0.1:29567'
 
     def wait_time(self):
+        if getattr(self, '_isolated_failure', False):
+            return 30
         next_due = min(self.next_activity, self.player.next_checkpoint)
         if CLIENT_PROFILE.mode == 'client-v3':
             from loadtest_lab.workload import compact_rooms
-            next_due=min(next_due,compact_rooms().next_poll(self.player))
+            try:
+                next_due=min(next_due,compact_rooms().next_poll(self.player))
+            except ValueError as error:
+                if not self.isolate_dependency(error):
+                    fail_run(self.environment, 'workflow_invariant_failed')
+                    raise StopUser() from None
+                return 30
         return max(.05, next_due - time.monotonic())
 
     def record_workflow(self, name, elapsed_ms, error, counters):
@@ -439,6 +454,30 @@ class SyntheticPlayer(HttpUser):
         self.environment.events.request.fire(request_type='WORKFLOW', name=name,
             response_time=elapsed_ms, response_length=0, exception=safe,
             context={'client_workload': CLIENT_PROFILE.mode})
+
+    def fail_actor(self, reason, *, transport=False):
+        """O(1) quarantine; no replay, respawn, identity scan or hidden success.
+
+        Setup O(1), stable quarantined actors wake once per 30s without HTTP.
+        Genuine schema/source/integrity errors retain the global stop barrier.
+        """
+        if OBSERVE_OVERLOAD and transport:
+            OBSERVATION_COUNTS['isolated_errors'] += 1
+            if not getattr(self, '_isolated_failure', False):
+                OBSERVATION_COUNTS['quarantined_actors'] += 1
+            self._isolated_failure = True
+            self.environment.process_exit_code = 2
+        else:
+            fail_run(self.environment, reason)
+
+    def isolate_dependency(self, error):
+        if (OBSERVE_OVERLOAD and not RUN_FAILED and str(error) in
+                ('compact_room_startup_timeout', 'compact_room_catalog_unavailable')):
+            self.fail_actor(str(error), transport=True)
+            self.environment.events.request.fire(request_type='ASSERT', name='room_dependency_unavailable',
+                response_time=0, response_length=0, exception=ValueError(str(error)), context={})
+            return True
+        return False
 
     def exchange(self, method, path, body, authorization, name):
         business = WIRE.business(method, path)
@@ -471,7 +510,7 @@ class SyntheticPlayer(HttpUser):
                         delay = budget.delay(random.random())
                         if delay is None:
                             counters['exhausted_requests'] += 1
-                            fail_run(self.environment, 'admission_retry_exhausted')
+                            self.fail_actor('admission_retry_exhausted', transport=True)
                             raise StopUser() from None
                         gevent.sleep(delay)
                         continue
@@ -481,7 +520,7 @@ class SyntheticPlayer(HttpUser):
                     return value
         except BusyRetryDeadline:
             counters['logical_failed'] += 1
-            fail_run(self.environment, 'admission_retry_deadline')
+            self.fail_actor('admission_retry_deadline', transport=True)
             raise StopUser() from None
         except BaseException:
             counters['logical_failed'] += 1
@@ -535,7 +574,7 @@ class SyntheticPlayer(HttpUser):
                 except Exception as error:
                     safe = failure_label(error)
                     response.failure(safe)
-                    fail_run(getattr(self, 'environment', None), safe)
+                    self.fail_actor(safe, transport=response.status_code in (0, 429, 500, 502, 503, 504))
                     raise StopUser() from None
                 if (PROGRESS_INDEX is not None and WIRE.business(method, path)
                         and not getattr(self, '_finalizing', False) and not RUN_STOPPING):
@@ -578,10 +617,14 @@ class SyntheticPlayer(HttpUser):
                 self._progress_slot = slot
             self.next_activity = time.monotonic()
         except StopUser:
+            if OBSERVE_OVERLOAD and getattr(self, '_isolated_failure', False):
+                return
             if not RUN_FAILED:
                 fail_run(self.environment, 'workflow_start_stopped')
             raise
-        except Exception:
+        except Exception as error:
+            if self.isolate_dependency(error):
+                return
             self.environment.events.request.fire(request_type='ASSERT', name='workflow_start',
                 response_time=0, response_length=0, exception=ValueError('workflow_start_not_confirmed'), context={})
             fail_run(self.environment, 'workflow_start_not_confirmed')
@@ -590,6 +633,8 @@ class SyntheticPlayer(HttpUser):
     @task
     def activity(self):
         try:
+            if OBSERVE_OVERLOAD and getattr(self, '_isolated_failure', False):
+                return
             if RUN_FAILED:
                 raise StopUser()
             player = self.player
@@ -615,10 +660,14 @@ class SyntheticPlayer(HttpUser):
             else:
                 player.draw(replay=random.random() < .05)
         except StopUser:
+            if OBSERVE_OVERLOAD and getattr(self, '_isolated_failure', False):
+                return
             if not RUN_FAILED:
                 fail_run(self.environment, 'workflow_activity_stopped')
             raise
-        except Exception:
+        except Exception as error:
+            if self.isolate_dependency(error):
+                return
             self.environment.events.request.fire(request_type='ASSERT', name='workflow_state',
                 response_time=0, response_length=0, exception=ValueError('workflow_invariant_failed'), context={})
             fail_run(self.environment, 'workflow_invariant_failed')
@@ -645,7 +694,17 @@ class SyntheticPlayer(HttpUser):
                 RUN_COUNTERS['cleanup_interrupted'] += 1
                 self.environment.events.request.fire(request_type='ASSERT', name='final_checkpoint_or_release',
                     response_time=0, response_length=0, exception=ValueError('finalization_interrupted'), context={})
-                fail_run(self.environment, 'finalization_interrupted')
+                if OBSERVE_OVERLOAD:
+                    OBSERVATION_COUNTS['cleanup_timeouts'] += 1
+                    self.fail_actor('finalization_interrupted', transport=True)
+                else:
+                    fail_run(self.environment, 'finalization_interrupted')
+            except StopUser:
+                RUN_COUNTERS['cleanup_failed'] += 1
+                self.environment.events.request.fire(request_type='ASSERT', name='final_checkpoint_or_release',
+                    response_time=0, response_length=0, exception=ValueError('finalization_not_confirmed'), context={})
+                if not (OBSERVE_OVERLOAD and getattr(self, '_isolated_failure', False)):
+                    fail_run(self.environment, 'finalization_not_confirmed')
             except Exception:
                 RUN_COUNTERS['cleanup_failed'] += 1
                 self.environment.events.request.fire(request_type='ASSERT', name='final_checkpoint_or_release',
@@ -728,6 +787,10 @@ def exit_on_failure(environment, **kwargs):
             'requests': total.num_requests, 'failures': total.num_failures,
             'includes_user_finalization': True, 'capacity_certified': False,
             'business_wire': wire,
+            **({'overload_observation': {'mode': 'observe-overload-v1',
+                'counters': dict(OBSERVATION_COUNTS), 'capacity_certified': False,
+                'quarantined_users_are_not_active_business_users': True,
+                'automatic_respawn_or_ambiguous_replay': False}} if OBSERVE_OVERLOAD else {}),
             **({'client_recovery': {'policy': CLIENT_RECOVERY, 'counters': dict(RECOVERY_COUNTS),
                 'logical_latency': RECOVERY_TIMINGS.report(),
                 **({'control_counters': dict(CONTROL_RECOVERY_COUNTS),

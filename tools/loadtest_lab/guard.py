@@ -283,6 +283,7 @@ def load(directory):
     from .progress import validate_profile as validate_actor_progress
     validate_actor_progress(cfg)
     client_recovery_policy(cfg)
+    observation_mode(cfg)
     return root, cfg, private
 
 
@@ -308,6 +309,16 @@ def client_recovery_policy(cfg):
          and all(type(value[k]) is type(v) for k, v in expected.items())
          and cfg.get('client_workload') == 'client-v3', 'client_recovery_policy_invalid')
     return dict(value)
+
+
+def observation_mode(cfg):
+    value = cfg.get('failure_mode', 'fail-fast')
+    need(type(value) is str and value in ('fail-fast', 'observe-overload-v1'),
+         'client_failure_mode_invalid')
+    need(value == 'fail-fast' or cfg.get('client_workload') == 'client-v3'
+         and (cfg.get('client_recovery') or {}).get('id') == 'admission-busy-v3',
+         'observation_requires_client_v3_recovery')
+    return value == 'observe-overload-v1'
 
 
 def account(cfg, index):
@@ -419,6 +430,7 @@ def load_client(path):
     from .progress import validate_profile as validate_actor_progress
     validate_actor_progress(cfg)
     client_recovery_policy(cfg)
+    observation_mode(cfg)
     return cfg, controller
 
 
