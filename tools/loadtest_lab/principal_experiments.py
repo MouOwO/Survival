@@ -54,10 +54,16 @@ SPECS['transport-reset-filtered-v1'] = {
                   'a0308de046139287bfb253ff3807426178ac18c985a07224cf3b01d46f40fdc4'},
     'parents': {PG: G_SOURCES[PG]},
     'outputs': {PG: '894df9749b0dbe72f64d2c893587efb5248bfa7f2d0dbc534dbf015a624aafad'}}
+COMBINED_OPERATOR = PREFIX + 'combined_guard_patch.py'
+SPECS['transport-reset-filtered-combined-v1'] = {
+    'operators': {**SPECS['transport-reset-filtered-v1']['operators'], COMBINED_OPERATOR:
+                  '65ae91d8c790254527823103a1f3c0c0fe732d38ce761e3a11a7b62c41f26c12'},
+    'parents': {PG: G_SOURCES[PG]},
+    'outputs': {PG: '688935869534c5b545cf8a73ee80292c537ad2b280ea9750b7258ac6316b288d'}}
 ORDER = ('transport-principal-v1', 'transport-reset-v1',
-         'transport-reset-filtered-v1', 'ensure-scope-v1')
+         'transport-reset-filtered-v1', 'transport-reset-filtered-combined-v1', 'ensure-scope-v1')
 TRANSPORT_MODES = {'principal-v1': ORDER[0], 'reset-v1': ORDER[1],
-                   'reset-filtered-v1': ORDER[2]}
+                   'reset-filtered-v1': ORDER[2], 'reset-filtered-combined-v1': ORDER[3]}
 TRANSPORT_IDS = frozenset(TRANSPORT_MODES.values())
 ROW_KEYS = frozenset(('id', 'source_revision', 'operator_sources',
                       'parent_runtime_sha256', 'runtime_sha256'))
@@ -155,7 +161,7 @@ def _transport_output(identity, operators, parent):
     namespace = _namespace(operators[next(iter(SPECS[identity]['operators']))], identity)
     arm = 'principal-v1' if identity == 'transport-principal-v1' else 'reset-v1'
     result = namespace['patch_postgres'](parent.decode('utf8'), arm)
-    if identity == 'transport-reset-filtered-v1':
+    if identity in ('transport-reset-filtered-v1', 'transport-reset-filtered-combined-v1'):
         raw = operators[FILTERED_OPERATOR]
         _need(type(raw) is bytes and len(raw) <= 65536
               and _sha(raw) == SPECS[identity]['operators'][FILTERED_OPERATOR],
@@ -163,6 +169,15 @@ def _transport_output(identity, operators, parent):
         filtered = {'__name__': 'isolated_reviewed_filtered_role_experiment'}
         exec(compile(raw, FILTERED_OPERATOR, 'exec'), filtered)
         result = filtered['patch_postgres'](result)
+    if identity == 'transport-reset-filtered-combined-v1':
+        raw = operators[COMBINED_OPERATOR]
+        _need(type(raw) is bytes and len(raw) <= 65536
+              and _sha(raw) == SPECS[identity]['operators'][COMBINED_OPERATOR],
+              'principal_experiment_combined_operator_changed')
+        combined = {'__name__': 'isolated_reviewed_combined_guard_experiment'}
+        exec(compile(raw, COMBINED_OPERATOR, 'exec'), combined)
+        result = combined['patch_postgres'](result,
+            operators[PREFIX + 'principal_transport_patch.py'])
     return result.encode('utf8')
 
 

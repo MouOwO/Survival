@@ -326,6 +326,7 @@ class Player:
         value = self.business('/v1/online-time/checkpoint',
             {'session_id': self.identity['match_session_id'], 'request_id': request, 'final': final},
             label='[checkpoint:' + phase + '] /v1/online-time/checkpoint')
+        need(value.get('ok') is True, 'checkpoint_not_confirmed')
         if isinstance(value.get('profile'), dict):
             self.last_profile = profile(value, self.identity['account_id'])
         self.next_checkpoint = self.clock() + 60
@@ -343,6 +344,7 @@ class Player:
             value = self.business('/v1/online-time/checkpoint',
                 {'session_id': self.identity['match_session_id'], 'request_id': request, 'final': final},
                 label='[checkpoint:' + phase + '] /v1/online-time/checkpoint')
+            need(value.get('ok') is True, 'checkpoint_not_confirmed')
             need(isinstance(value.get('profile'), dict), 'checkpoint_profile_missing')
             self.last_profile = profile(value, self.identity['account_id'])
             grants = self.client_profile.grants(value.get('grants'))
