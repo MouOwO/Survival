@@ -51,6 +51,21 @@ def validate_fixture_profile(cfg,read_source=None):
  source_map=v['source_sha256'];need(type(source_map)is dict and len(source_map)==66 and sum(name.startswith('runtime/')for name in source_map)==30 and sum(name.startswith('addon/server/bundles/')for name in source_map)==36,'mature_archetype_sources_shape_invalid')
  from .leaderboard_experiments import validate_leaderboard_binding
  restored = validate_leaderboard_binding(cfg, read_source)
+ # Archetypes depend on settlement methods, unchanged by the fixed profile
+ # factor. Prove its entire reverse/forward chain before using parent digests;
+ # the loop below still checks each actual child byte against the live cfg.
+ rows=cfg.get('principal_experiments',[])
+ need(type(rows)is list and len(rows)<=4 and all(type(row)is dict for row in rows),'mature_principal_metadata_invalid')
+ if any(row.get('id')=='profile-context-idle-v1'for row in rows):
+  from .database_experiments import metadata_schema_parent_sources
+  from .principal_experiments import validate_principal_experiments
+  schema_parents=metadata_schema_parent_sources(cfg)
+  reviewed_cfg={**cfg,'sources':{**cfg['sources'],**schema_parents}}
+  principal_bytes=validate_principal_experiments(reviewed_cfg,read_source)
+  for name,raw in principal_bytes.items():
+   digest=_sha(raw)
+   need(name not in restored or restored[name]==digest,'mature_parent_proofs_conflict')
+   restored[name]=digest
  for name,digest in source_map.items():
   need(type(name)is str and (name.startswith('runtime/')or name.startswith('addon/server/bundles/'))and restored.get(name,cfg['sources'].get(name))==digest,'mature_archetype_source_binding_changed')
   actual=read_source(name);need(type(actual)is bytes and len(actual)<=4*1024*1024 and _sha(actual)==cfg['sources'].get(name),'mature_archetype_source_bytes_changed')
