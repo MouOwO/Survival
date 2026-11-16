@@ -25,4 +25,6 @@ class GradualProfileTests(unittest.TestCase):
  def test_one_hour_cannot_silently_change_exit_window(self):
   cfg=self.cfg(4000);cfg['exit_probe_common_seconds']=3600;cfg['exit_wave_seconds']=3600
   with self.assertRaises(ValueError):validate_exit_probe(cfg)
+ def test_hour4000_sixteen_transport_preserves_personal_exit(self):
+  cfg=self.cfg(4000);cfg['exit_probe_common_seconds']=3600;cfg['generator_transport']={'id':'ssh-16-v1','loopback_ports':list(range(29567,29583))};self.assertEqual(validate_exit_probe(cfg),dict(common_seconds=3600,mode='gradual120-v1',wave_seconds=120))
 if __name__=='__main__':unittest.main()

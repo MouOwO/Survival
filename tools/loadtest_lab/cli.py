@@ -152,11 +152,11 @@ def prepare(args):
     if pool_limits is not None:
         cfg['database_pool_limits'] = pool_limits
     transport=getattr(args,'generator_transport','baseline')
-    need(transport in ('baseline','ssh-quad-v1'),'generator_transport_option_invalid')
-    if transport=='ssh-quad-v1':
+    need(transport in ('baseline','ssh-quad-v1','ssh-16-v1'),'generator_transport_option_invalid')
+    if transport in ('ssh-quad-v1','ssh-16-v1'):
         need(purpose=='capacity'and getattr(args,'client_workload',None)=='client-v3'
              and getattr(args,'actor_progress',None)=='active-business-v1','generator_transport_requires_capacity_client_v3')
-        cfg['generator_transport']={'id':'ssh-quad-v1','loopback_ports':[29567,29568,29569,29570]}
+        cfg['generator_transport']={'id':transport,'loopback_ports':list(range(29567,29567+(4 if transport=='ssh-quad-v1'else 16)))}
     probe_seconds=getattr(args,'exit_probe_common_seconds',None)
     smoothing=getattr(args,'exit_smoothing','direct')
     if probe_seconds is not None:
@@ -166,7 +166,7 @@ def prepare(args):
         cfg['exit_probe_common_seconds']=probe_seconds
         cfg['exit_smoothing']=smoothing
         if smoothing=='gradual120-v1':
-            need(transport=='ssh-quad-v1','exit_wave_requires_quad_transport')
+            need(transport in ('ssh-quad-v1','ssh-16-v1'),'exit_wave_requires_supported_transport')
             cfg['exit_wave_seconds']=2 if args.active==2 else 120
     else:
         need(smoothing=='direct','exit_smoothing_requires_five_minute_probe')
@@ -488,7 +488,7 @@ def main(argv=None):
                       help='bounded-v2 only: bounded DB waiting queue, default 20; maximum 32')
     init.add_argument('--db-pool-wait-seconds', type=float,
                       help='bounded-v2 only: queue wait cap, default 2; maximum 5 and request remaining deadline')
-    init.add_argument('--generator-transport',choices=('baseline','ssh-quad-v1'),default='baseline',help='Explicit source-bound four-owned-loopback SSH generator transport; no business changes')
+    init.add_argument('--generator-transport',choices=('baseline','ssh-quad-v1','ssh-16-v1'),default='baseline',help='Explicit source-bound four or sixteen owned-loopback SSH generator transport; no business changes')
     init.add_argument('--exit-probe-common-seconds',type=int,choices=(60,300,3600),
                       help='Exit experiment: stop after all actors continuously ready for target plus proof margin; 60 only native2, otherwise300 or3600')
     init.add_argument('--exit-smoothing',choices=('direct','jitter3-v1','queue32-v1','queue64-v1','queue128-v1','gradual120-v1'),default='direct',

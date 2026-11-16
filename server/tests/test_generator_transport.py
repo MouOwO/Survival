@@ -28,4 +28,12 @@ class TransportTests(unittest.TestCase):
  def test_runtime_routes_once_before_player_and_no_request_rewrite(self):
   source=(Path(__file__).resolve().parents[2]/'tools/loadtest_lab/locustfile.py').read_text(encoding='utf8');tree=ast.parse(source);calls=[n for n in ast.walk(tree)if isinstance(n,ast.Call)and isinstance(n.func,ast.Name)and n.func.id=='generator_url'];self.assertEqual(len(calls),1)
   user=next(n for n in tree.body if isinstance(n,ast.ClassDef)and n.name=='SyntheticPlayer');start=next(n for n in user.body if isinstance(n,ast.FunctionDef)and n.name=='on_start');self.assertIn(calls[0],list(ast.walk(start)))
+ def test_sixteen_is_fixed_and_balanced_for4000(self):
+  cfg=self.cfg();cfg['generator_transport']={'id':'ssh-16-v1','loopback_ports':list(range(29567,29583))};before=copy.deepcopy(cfg);urls=[generator_url(cfg,i)for i in range(4000)]
+  for port in range(29567,29583):self.assertEqual(urls.count('http://127.0.0.1:'+str(port)),250)
+  self.assertEqual(cfg,before)
+ def test_sixteen_cannot_choose_other_ports_or_unbounded_count(self):
+  for ports in [list(range(29567,29582)),list(range(29567,29584)),list(reversed(range(29567,29583))),[443]+list(range(29568,29583)),[True]+list(range(29568,29583))]:
+   cfg=self.cfg();cfg['generator_transport']={'id':'ssh-16-v1','loopback_ports':ports}
+   with self.assertRaises(ValueError):generator_ports(cfg)
 if __name__=='__main__':unittest.main()
