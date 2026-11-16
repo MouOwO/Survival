@@ -330,6 +330,18 @@ class Backend:
         self.fixed(receipt, {'kind': 'PACKAGER_OFFICIAL_COMPILE_IMPORT_RECEIPT', 'status': 'IMPORTED_AFTER_DOTA_EXIT', 'backup_directory': str(backup), 'proof': self.pin(self.data['compiler']['proof']), 'sdk_calls': 0})
         self.ledger('record_compile_import', receipt)
         auth = copy.deepcopy(read(self.parent_authority))
+        # Bind the current requested name into this new release's own template.
+        # Old immutable templates/receipts remain the parent evidence.
+        listing = read(auth['listing_template_path'])
+        requested = json.loads(git(self.root, 'show', self.data['producer_pins']['game'] + ':publishing/workshop/test_listing.json'))
+        title = requested.get('title')
+        if not isinstance(title, str) or not title.strip() or len(title.encode('utf8')) > 128:
+            raise ValueError('游廊名称无效')
+        listing['title'] = title
+        listing_path = self.root / 'publishing/workshop' / ('packager_' + self.identity + '_listing.json')
+        self.fixed(listing_path, listing)
+        auth.update(listing_template_path=str(listing_path), listing_template_sha256=digest(listing_path.read_bytes()))
+        paths.append(listing_path.relative_to(self.root).as_posix())
         for prefix, name in [('recipe', 'pipeline_recipe'), ('validator', 'publication_validator'), ('rehearsal', 'rehearsal'), ('download', 'verify_download'), ('native_admission', 'native_admission'), ('baseline_completion', 'complete_baseline')]:
             target = self.root / 'tools' / self.family / (name + '.py')
             auth[prefix + '_path'] = str(target)
