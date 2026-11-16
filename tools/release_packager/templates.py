@@ -186,6 +186,9 @@ def render(project, revision, job, current):
             for node in ast.walk(tree):
                 if isinstance(node, ast.Attribute) and node.attr == 'KEEPER_PARTICLES':
                     node.attr = 'PARTICLE_AUTHORS'
+        elif name == 'localization_projection.py':
+            from release_packager.localization_text_review import extend
+            extend(tree, project)
         extend_business_wire_binding(tree, name)
         ast.fix_missing_locations(tree)
         source = (ast.unparse(tree) + '\n').encode()
