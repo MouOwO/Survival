@@ -38,3 +38,7 @@ C9不可变业务来源3f01c45d796e393dfc88bed91ed6f2056dadfa4c，145份源码�
 4. 当前queue64只是隔离客户端原型，尚未部署正式服务器全局队列。降低CPU、包体和RPC工作仍需依据四通道复测；不因内存面板插件或错误统计直接采购更大机器。
 
 原始证据均在树外capacity_parallel_wire_20261116_01：exit_probe_direct_factual_01、exit_probe_jitter02_factual_01、exit_probe_queue64_factual_01、ssh_payload_component_02。当前三组工作流与组件不能互相代替容量验收。
+
+## 四通道直接退出实际完成
+
+来源64bae8216在同一服务端运行字节上完成67494 HTTP/零失败，2000完整清理，无协程中断；SQL50执行/24聚合全部通过，在线/pending/outbox/errored全0。完整退出P95为31秒，最终存档工作流26秒；仍有5次原2秒监控探针失败，原阶段signed_status_collection_incomplete保留，不能写完整容量已通过。这分离了单SSH入口的空响应问题与真实结算排队成本。后续只读监控deadline改5秒，仍无重试、全额扣RTT，业务/SQL/延迟门槛未放宽。

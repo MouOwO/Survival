@@ -480,6 +480,7 @@ class DepartureWave:
         self.users=tuple(users);self.target=len(users);self.started_at=clock();self.task=None
         self.scheduled=self.finished_count=self.early_finished=0;self.cancelled=False
         self.first_offset_ms=self.last_offset_ms=None;self.max_lag_ms=0.0
+        self.early_timer_wakes=0;self.max_timer_early_ms=0.0
         for user in self.users:user._exit_wave_owner=self;user._exit_wave_finished=False
     def start(self):
         import gevent
@@ -492,8 +493,19 @@ class DepartureWave:
                 self.sleep(max(0,planned-self.clock()))
                 if RUN_STOPPING:self.cancelled=True;return
                 if user.greenlet.dead:continue
+                actual=self.clock()
+                if actual<planned:
+                    self.early_timer_wakes+=1
+                    self.max_timer_early_ms=max(self.max_timer_early_ms,(planned-actual)*1000)
+                    # libuv may wake a fractional millisecond before due time.
+                    # One bounded corrective wait, never a polling loop.
+                    self.sleep(planned-actual+.001)
+                    if RUN_STOPPING:self.cancelled=True;return
+                    if user.greenlet.dead:continue
+                    actual=self.clock()
+                if actual<planned:raise ValueError('departure_timer_still_early')
                 user._exit_wave_intent=planned
-                actual=self.clock();offset=(actual-self.started_at)*1000
+                offset=(actual-self.started_at)*1000
                 if self.first_offset_ms is None:self.first_offset_ms=offset
                 self.last_offset_ms=offset;self.max_lag_ms=max(self.max_lag_ms,max(0,(actual-planned)*1000));self.scheduled+=1
                 user.stop(force=False)
@@ -513,7 +525,8 @@ class DepartureWave:
         return dict(target=self.target,scheduled=self.scheduled,finished=self.finished_count,
             early_finished=self.early_finished,cancelled=self.cancelled,window_seconds=self.seconds,
             first_actual_intent_offset_ms=self.first_offset_ms,last_actual_intent_offset_ms=self.last_offset_ms,
-            max_intent_schedule_lag_ms=self.max_lag_ms,remaining_actors_keep_business=True,
+            max_intent_schedule_lag_ms=self.max_lag_ms,early_timer_wakes=self.early_timer_wakes,
+            max_timer_early_ms=self.max_timer_early_ms,remaining_actors_keep_business=True,
             per_actor_cleanup_deadline_seconds=45,whole_wave_is_not_one_simultaneous_intent=True)
 
 

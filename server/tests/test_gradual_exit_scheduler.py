@@ -1,10 +1,10 @@
-import ast,time,types,unittest
+import ast,time,types,unittest,os
 from pathlib import Path
 import server.tests.test_loadtest_normal_stop as support
 @unittest.skipIf(support.HttpUser is None,'Use fixed Locust interpreter')
 class GradualSchedulerTests(unittest.TestCase):
  def runtime(self,active):
-  ns,source=support.NormalStopTests().actual();path=Path(__file__).resolve().parents[2]/'tools/loadtest_lab/locustfile.py';tree=ast.parse(path.read_text(encoding='utf8'));nodes=[n for n in tree.body if isinstance(n,(ast.ClassDef,ast.FunctionDef))and n.name in ('DepartureWave','CleanupTimeout','cleanup_budget')];exec(compile(ast.fix_missing_locations(ast.Module(body=nodes,type_ignores=[])),str(path),'exec'),ns)
+  ns,source=support.NormalStopTests().actual();path=Path(os.environ.get('SURVIVAL_STOP_SOURCE',str(Path(__file__).resolve().parents[2]/'tools/loadtest_lab/locustfile.py')));tree=ast.parse(path.read_text(encoding='utf8'));nodes=[n for n in tree.body if isinstance(n,(ast.ClassDef,ast.FunctionDef))and n.name in ('DepartureWave','CleanupTimeout','cleanup_budget')];exec(compile(ast.fix_missing_locations(ast.Module(body=nodes,type_ignores=[])),str(path),'exec'),ns)
   ns.update(CFG={'active':active},EXIT_MODE='gradual120-v1',EXIT_SEMAPHORE=None,EXIT_METRICS=dict(active=0,peak=0,queued=0,completed=0,delay_ms=0),RUN_COUNTERS=dict.fromkeys(('start_attempts','start_blocked_after_failure','cleanup_attempts','cleanup_completed','cleanup_failed','cleanup_interrupted'),0),PROGRESS_INDEX=None,DEPARTURE_WAVE=None)
   return ns,source,ns['DepartureWave']
  def exercise(self,cancel=False):
@@ -59,4 +59,25 @@ class GradualSchedulerTests(unittest.TestCase):
   from locust.env import Environment
   from locust.event import Events
   ns,source,_=self.runtime(2);ns['OBSERVE_OVERLOAD']=True;ns['OBSERVATION_COUNTS']={'cleanup_timeouts':0,'isolated_errors':0,'quarantined_actors':0};called=[];obj=source.__new__(source);obj.environment=Environment(events=Events(),stop_timeout=45);obj.player=types.SimpleNamespace(stop=lambda **kw:called.append(kw));obj._exit_wave_intent=time.monotonic()-46;obj.on_stop();self.assertEqual(called,[]);self.assertEqual(ns['RUN_COUNTERS']['cleanup_interrupted'],1);self.assertEqual(ns['RUN_COUNTERS']['cleanup_completed'],0)
+ def early_clock(self,advances=True):
+  import gevent
+  from tools.loadtest_lab.workload import Player
+  ns,source,wave_type=self.runtime(2000);clock=types.SimpleNamespace(now=100.0);sleeps=[];users=[];writes=[];failures=[];ns['fail_run']=lambda environment,reason:failures.append(reason)
+  def sleep(seconds):
+   sleeps.append(seconds)
+   if advances:clock.now+=max(0,seconds-.0005)
+  runner=types.SimpleNamespace(user_greenlets=[],quit=lambda:None);env=types.SimpleNamespace(runner=runner)
+  for _ in range(2000):
+   user=source.__new__(source);user._greenlet=types.SimpleNamespace(args=(user,),dead=False);users.append(user);runner.user_greenlets.append(user._greenlet)
+  wave=wave_type(env,120,clock=lambda:clock.now,sleep=sleep);ns['DEPARTURE_WAVE']=wave
+  for user in users:
+   player=Player.__new__(Player);player.client_profile=types.SimpleNamespace(mode='client-v2');player.clock=lambda:clock.now;player._stop_session=lambda:True;player._workflow=lambda name,started,error,counters:writes.append((started,clock.now,error));user.player=player
+   def stop(force=False,user=user):
+    user.player.stop(intent_started=user._exit_wave_intent);wave.finished(user)
+   user.stop=stop
+  wave.run();gevent.sleep(0);return wave,sleeps,writes,failures
+ def test_real_player_never_receives_future_intent_when_timer_wakes_early(self):
+  wave,sleeps,writes,failures=self.early_clock();self.assertEqual(failures,[]);self.assertEqual(wave.scheduled,2000);self.assertEqual(wave.finished_count,2000);self.assertEqual(len(writes),2000);self.assertTrue(all(start<=now and error is None for start,now,error in writes));self.assertLessEqual(len(sleeps),4000);self.assertGreater(wave.early_timer_wakes,0);self.assertAlmostEqual(wave.max_timer_early_ms,.5,places=4);self.assertGreaterEqual(wave.last_offset_ms,120000)
+ def test_clock_that_does_not_advance_is_bounded_and_never_false_success(self):
+  wave,sleeps,writes,failures=self.early_clock(False);self.assertTrue(wave.cancelled);self.assertEqual(wave.scheduled,1);self.assertEqual(wave.finished_count,1);self.assertEqual(len(writes),1);self.assertLessEqual(len(sleeps),3);self.assertEqual(failures,['departure_wave_dispatch_failed'])
 if __name__=='__main__':unittest.main()
