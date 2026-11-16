@@ -457,3 +457,5 @@ publishing/workshop/packager_pack_2026111601_2963881f_authorization.json text eo
 tools/complete_delivery_pack_2026111602_238b7f/*.py text eol=lf
 publishing/workshop/packager_pack_2026111602_c3238b7f_authority.json text eol=lf
 publishing/workshop/packager_pack_2026111602_c3238b7f_authorization.json text eol=lf
+# Generated listing templates are hashed as physical UTF-8/LF bytes by authority.
+publishing/workshop/packager_*_listing.json text eol=lf
