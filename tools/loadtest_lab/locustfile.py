@@ -652,6 +652,10 @@ class SyntheticPlayer(HttpUser):
 
     @task
     def activity(self):
+        # Locust can wake a waiting user before its scheduled kill arrives.
+        # Finish existing workflows, but never begin a new one after quit intent.
+        if RUN_STOPPING:
+            raise StopUser()
         try:
             if OBSERVE_OVERLOAD and getattr(self, '_isolated_failure', False):
                 return
