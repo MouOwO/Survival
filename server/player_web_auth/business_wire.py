@@ -97,9 +97,32 @@ _SYMBOL_SAVINGS = {value: len(canonical(value)) - len(canonical([1, index]))
 _TEMPLATES = SCHEMA["templates"]
 
 
+def _scalar_json_bytes(value):
+    """Canonical scalar bytes without constructing a JSONEncoder per field.
+
+    Strings use the same standard-library C escaper; finite numbers retain
+    Python JSON's exact repr, including signed zero. Complex discriminators
+    retain the old canonical path. O(encoded scalar bytes), no global cache.
+    """
+    kind = type(value)
+    if value is None:
+        return b"null"
+    if kind is bool:
+        return b"true" if value else b"false"
+    if kind is str:
+        return json.encoder.encode_basestring(value).encode("utf8")
+    if kind is int:
+        return str(value).encode("ascii")
+    if kind is float:
+        if not math.isfinite(value):
+            raise ValueError("business_wire_nonfinite_number")
+        return repr(value).encode("ascii")
+    return canonical(value)
+
+
 def _typed(value):
     # Python considers False==0; default matching must preserve JSON types.
-    return type(value).__name__, canonical(value)
+    return type(value).__name__, _scalar_json_bytes(value)
 
 
 def _template_index():
@@ -236,7 +259,8 @@ def _encode(value, *, _retain=False):
             node = current
             if type(current) is str and _SYMBOL_SAVINGS.get(current, 0) > 0:
                 node = [1, _SYMBOL_IDS[current]]
-            raw = canonical(node)
+            raw = (b"[1," + str(node[1]).encode("ascii") + b"]"
+                   if type(node) is list else _scalar_json_bytes(node))
             result = node, intern(("scalar", type(current).__name__, raw)), len(raw)
             scalar_cache[cache_key] = result
             return result

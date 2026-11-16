@@ -65,3 +65,9 @@ SHA256 覆盖账号、会话、模式、完整 save、权益、日期等全部�
 压测按固定路由ID统计正文总字节、固定大小分桶、解码耗时和原始失败，不记录账号、令牌或正文。稳定记录 O(1)，汇总 O(工作进程数×路由数×固定桶数)，无场景扫描；另报 full/unchanged/seed/legacy/error 固定计数。请求头、响应头、TLS/SSH流量需另行统计，不把正文节省比例当作整机容量或真实账单节省比例。
 
 验收必须同时比较真实业务命中率、全量哈希开销、网络字节、完整结算与 SQL 一致性。组件快照命中省字节不代表长测已通过。可参考 [RFC9110 条件请求](https://www.rfc-editor.org/rfc/rfc9110.html#section-13.1.2)、[AWS 退避与抖动](https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/)及 [PostgreSQL EXPLAIN](https://www.postgresql.org/docs/17/using-explain.html)；网络重试不得掩盖原始失败或自动重放未知结果的写入。
+
+## 逐标量编码 CPU 候选（2026-11-16，未部署）
+
+完整 JSON 对象、版本封套、引用顺序、schema、展开预算和完整往返校验保持原合同。字符串使用标准库同一 JSON 转义器；整数、布尔、null及有限浮点直接生成与标准 JSON 相同的 UTF-8字节，浮点保留整数/浮点区别及正负零，复杂模板判别值继续规范JSON路径。不会改变传输格式，也不省略任何动态字段。
+
+初始化仍只建原有固定schema索引，无新增动态全局缓存。稳定编码复杂度仍 O(B + ΣK logK)、临时空间 O(B+N)；减少逐标量JSONEncoder对象构造。实测高状态夹具每次完整打包的 `canonical` 调用222→5，没有新增API、HTTP、SQL、线程或定时器。必须在Python3.12原生运行时验证字节、浮点和Unicode边界；组件CPU收益不代表业务延迟或在线容量。
