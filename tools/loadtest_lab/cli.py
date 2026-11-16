@@ -142,6 +142,8 @@ def prepare(args):
            'profile': ('baseline_limits' if (http_concurrency, args.db_concurrency,
                        args.web_concurrency, args.global_http_per_minute) == (8, 4, 24, 2400)
                        else 'parameter_experiment_not_production')}
+    if getattr(args, 'catalog_poll_recovery', 'baseline') != 'baseline':
+        cfg['catalog_poll_recovery'] = args.catalog_poll_recovery
     if getattr(args, 'profile_read_cache', 'baseline') != 'baseline':
         cfg['profile_read_cache'] = args.profile_read_cache
     if resource_profile is not None:
@@ -449,6 +451,8 @@ def main(argv=None):
     init.add_argument('--web-concurrency', type=int, default=24)
     init.add_argument('--global-http-per-minute', type=int, default=2400)
     init.add_argument('--wire-mode', choices=('business-wire-v1', 'legacy-json'), default='business-wire-v1')
+    init.add_argument('--catalog-poll-recovery', choices=('baseline', 'retain-v1'), default='baseline',
+                      help='Explicit model variant: retain a previously verified room catalogue after transient periodic read failures; raw errors remain counted.')
     init.add_argument('--profile-read-cache', choices=('baseline', 'unchanged-v1'), default='baseline',
                       help='Opt-in unchanged authenticated read-profile replies; writes and auth/SQL unchanged.')
     init.add_argument('--seed-storage', choices=('baseline', 'wal-checkpoint-v1'), default='baseline',

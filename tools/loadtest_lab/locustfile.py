@@ -764,7 +764,13 @@ def workload_statistics(environment, run):
                      'p95_ms': None if not count else entry.get_response_time_percentile(.95)})
     checkpoint_count = sum(row['requests'] for row in rows if row['name'].startswith('checkpoint_'))
     final_count = next(row['requests'] for row in rows if row['name'] == 'finalization')
-    return {**({'compact_client': __import__('loadtest_lab.workload',fromlist=['compact_rooms']).compact_rooms().report()} if CLIENT_PROFILE.mode == 'client-v3' else {}),
+    compact={}
+    if CLIENT_PROFILE.mode=='client-v3':
+        from loadtest_lab.workload import compact_rooms
+        rooms=compact_rooms();compact['compact_client']=rooms.report()
+        recovery=rooms.recovery_report()
+        if recovery is not None:compact['catalog_poll_recovery']=recovery
+    return {**compact,
             'client_workload': CLIENT_PROFILE.mode, 'workload_counters': counters,
             'workflow_statistics': rows,
             'workflow_statistics_complete': checkpoint_count == counters['checkpoint_attempts']

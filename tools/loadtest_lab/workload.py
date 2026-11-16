@@ -559,6 +559,13 @@ class Player:
         self.session_logged_in = False
 
 
+def _transient_catalog_read_failure(error):
+    # Only sanitized transport absence or explicit pre-dispatch admission busy.
+    # Protocol/schema/source/identity errors and cancellation remain fatal.
+    return type(error) is ValueError and str(error) in (
+        'http_0:error_unavailable', 'http_503:frontend_busy', 'http_503:backend_busy')
+
+
 class CompactRooms:
     """One LocalRunner's bounded room schedule, not an authorization/cache bypass.
     O(N/4) initialization/space; each join/tick/leave O(1), never scans users.
@@ -568,6 +575,7 @@ class CompactRooms:
     def __init__(self):
         import threading
         self.lock=threading.RLock();self.event_factory=threading.Event
+        self._catalog_recovery_mode=None;self._retained_poll_failures=0
         self.rooms={};self.counts=dict.fromkeys(('rooms_opened','rooms_closed','room_startup_catalog_attempts','room_startup_catalog','room_startup_catalog_failed','room_periodic_catalog_attempts','room_periodic_catalog','room_periodic_catalog_failed','catalog_hits','catalog_misses','room_failures','local_view_intents','legacy_snapshot_attempts'),0)
     @staticmethod
     def advance(previous,now):
@@ -578,6 +586,11 @@ class CompactRooms:
         index=int(player.identity['account_id'])-player.cfg['account_start'];room=index//4
         need(0<=index<player.cfg['accounts'],'compact_room_account_invalid')
         with self.lock:
+            from .guard import catalog_poll_recovery_mode
+            mode=catalog_poll_recovery_mode(player.cfg)
+            need(self._catalog_recovery_mode is None or self._catalog_recovery_mode==mode,
+                 'compact_room_recovery_mode_changed')
+            self._catalog_recovery_mode=mode
             state=self.rooms.get(room)
             owner=state is None
             if owner:
@@ -620,12 +633,23 @@ class CompactRooms:
             with self.lock:
                 state=self.rooms[room];state['next']=self.advance(state['next'],player.clock())
                 self.counts['room_periodic_catalog']+=1;self.counts['catalog_hits']+=1
-        except BaseException:
+        except BaseException as error:
+            retained=False
             with self.lock:
                 state=self.rooms.get(room)
-                if state is not None:state['error']=True;state['event'].set()
                 self.counts['room_failures']+=1;self.counts['room_periodic_catalog_failed']+=1
-            raise
+                if (self._catalog_recovery_mode=='retain-v1' and state is not None
+                        and state['ready'] and not state['error']
+                        and _transient_catalog_read_failure(error)):
+                    # Real Lua retains its already accepted static catalogue.
+                    # Keep the original30s cadence even after a slow failed
+                    # request: no immediate retry or added HTTP/timer. Raw HTTP
+                    # and the original failed-poll counters remain unchanged.
+                    state['next']=self.advance(state['next'],player.clock())
+                    self._retained_poll_failures+=1;retained=True
+                elif state is not None:
+                    state['error']=True;state['event'].set()
+            if not retained:raise
     def leave(self,player):
         if player._compact_room is None:return
         room,index=player._compact_room;player._compact_room=None
@@ -640,6 +664,13 @@ class CompactRooms:
             if not state['members']:del self.rooms[room];self.counts['rooms_closed']+=1
     def report(self):
         with self.lock:return dict(self.counts,rooms_remaining=len(self.rooms))
+    def recovery_report(self):
+        with self.lock:
+            if self._catalog_recovery_mode!='retain-v1':return None
+            return {'id':'retain-v1','retained_poll_failures':self._retained_poll_failures,
+                    'raw_failed_periodic_polls':self.counts['room_periodic_catalog_failed'],
+                    'raw_failed_startup_polls':self.counts['room_startup_catalog_failed']}
+
 
 COMPACT_ROOMS=None
 

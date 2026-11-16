@@ -156,3 +156,10 @@ python -X utf8 -B tools/release_storage_ledger.py record --receipt D:/Survival_�
 进程观测在服务就绪后启动，初始化一次索引最多4个 PID（相同 PID 的前后端角色只算一次）及4个设备；固定镜像/容器资源只 inspect 一次，不读取 Env/Args。初始化 O(P×E+D)，E 为最多64MiB的 executable；稳定每5秒 O(P+D)，split 正常夹具为26次 counter 文件读、10次 executable 元数据读和7次目录打开，输出 O(时长/间隔)。退出、PID 复用、计数重置和新设备保留 gap，不补0、不重绑定；CPU 自身与 waited-child 分开，RSS 合计含共享页，进程 IO 不能父子重复求和，不能替代公网峰值。原 host/PG/SQL 观测和业务门槛保持。夹具调用计数不代表 Linux 实耗、FPS 或容量通过。
 
 split 的 checkpoint/proxy 观测预算各属于实际进程，按角色保存 started/stopped；不能套用原单进程合计300条/60条每分钟的描述。最终判定仍使用全量 HTTP/工作流结果、HTML 的 P95、实际连续就绪时间、SQL 及清理证明；日常读档1000ms、周期1500ms、最终10000ms的既定目标不因拆分放宽。必须新同源候选完成两账号、40和100账号分层验收后再讨论更高人数或购买配置。
+
+
+### 周期性目录轮询故障模型（显式候选，默认关闭）
+
+`prepare --catalog-poll-recovery retain-v1` 仅配合 `client-v3`。真实 Lua 在后续目录轮询的传输失败后保留先前已验证的公共目录，并按原30秒周期继续；既有严格压测模型会让整个四人组永久失效。该选项只修正这项故障传播，不改变操作频率、共享房间大小或鉴权、写操作、正常读档及领取补读规则。
+
+只有已成功验证目录的房间，遇到无有效HTTP响应或明确的 frontend_busy/backend_busy 时才保留状态。启动时没有有效目录、MD5/版本/身份/来源/协议错误、取消及未知错误仍失败。原始HTTP、失败轮询、超时和旧严格门禁继续统计，`compact_client`结构不变，额外 `catalog_poll_recovery`报告保留次数；该模式本身不能把有错误实验标为通过。不增加即时重试、HTTP、SQL或新定时器，慢请求结束后跳过错过的周期，避免补发洪峰。
