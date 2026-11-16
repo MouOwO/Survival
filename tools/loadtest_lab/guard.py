@@ -232,15 +232,22 @@ def profile_read_cache_mode(cfg):
 
 def validate_exit_probe(cfg):
     if 'exit_probe_common_seconds' not in cfg:
-        need('exit_smoothing' not in cfg, 'exit_smoothing_requires_five_minute_probe')
+        need('exit_smoothing' not in cfg and 'exit_wave_seconds'not in cfg, 'exit_smoothing_requires_five_minute_probe')
         return None
     seconds=cfg['exit_probe_common_seconds']
     need(type(seconds)is int and seconds==(60 if cfg.get('active')==2 else 300), 'exit_probe_time_invalid')
     need(cfg.get('purpose')=='capacity' and cfg.get('client_workload')=='client-v3'
          and cfg.get('actor_progress')=={'id':'active-business-v1','ttl_seconds':120}, 'exit_probe_requires_active_business_proof')
     mode=cfg.get('exit_smoothing','direct')
-    need(mode in ('direct','jitter3-v1','queue32-v1','queue64-v1','queue128-v1'), 'exit_probe_policy_invalid')
-    return {'common_seconds':seconds,'mode':mode}
+    need(mode in ('direct','jitter3-v1','queue32-v1','queue64-v1','queue128-v1','gradual120-v1'), 'exit_probe_policy_invalid')
+    value={'common_seconds':seconds,'mode':mode}
+    if mode=='gradual120-v1':
+        wave=cfg.get('exit_wave_seconds')
+        need(type(wave)is int and wave==(2 if cfg.get('active')==2 else 120)
+             and generator_ports(cfg)==(29567,29568,29569,29570),'exit_wave_profile_invalid')
+        value['wave_seconds']=wave
+    else:need('exit_wave_seconds'not in cfg,'exit_wave_requires_gradual_policy')
+    return value
 
 
 def load(directory):

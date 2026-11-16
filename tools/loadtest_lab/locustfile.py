@@ -31,6 +31,7 @@ EXIT_MODE = 'direct' if EXIT_PROBE is None else EXIT_PROBE['mode']
 EXIT_SEMAPHORE = BoundedSemaphore(int(EXIT_MODE[5:-3])) if EXIT_MODE.startswith('queue') else None
 EXIT_METRICS = dict(active=0,peak=0,queued=0,completed=0,delay_ms=0)
 RUN_EXIT_PROBE_TRIGGERED = False
+DEPARTURE_WAVE = None
 PROGRESS_PROFILE = validate_actor_progress(CFG)
 PROGRESS_INDEX = PROGRESS_OBSERVER = None
 PROGRESS_FROZEN = False
@@ -87,6 +88,11 @@ def run_state():
         value.update(client_workload=CLIENT_PROFILE.mode, workload_counters=dict(WORKLOAD_COUNTS))
     if EXIT_PROBE is not None:
         value['exit_probe'] = dict(EXIT_PROBE,triggered=RUN_EXIT_PROBE_TRIGGERED,metrics=dict(EXIT_METRICS))
+        wave=globals().get('DEPARTURE_WAVE')
+        if wave is not None:
+            value['exit_probe']['departure_wave']=wave.report()
+            if wave.cancelled or wave.early_finished:
+                value['failed']=True;value['first_failure']=value['first_failure']or'departure_wave_incomplete'
     return value
 
 
@@ -399,7 +405,7 @@ def validate_host(environment, **kwargs):
             raise ValueError('loadtest_progress_observation_failed')
         import gevent
         def sample_progress():
-            global RUN_EXIT_PROBE_TRIGGERED
+            global RUN_EXIT_PROBE_TRIGGERED, DEPARTURE_WAVE
             while not RUN_STOPPING:
                 gevent.sleep(5)
                 if not RUN_STOPPING and not PROGRESS_OBSERVER.sample():
@@ -409,8 +415,14 @@ def validate_host(environment, **kwargs):
                     snap=PROGRESS_OBSERVER.last_snapshot
                     if snap is not None and snap['all_active'] and snap['best_seconds']>=EXIT_PROBE['common_seconds']+15:
                         RUN_EXIT_PROBE_TRIGGERED=True
-                        gevent.spawn(environment.runner.quit)
-                        return
+                        if EXIT_MODE=='gradual120-v1':
+                            try:
+                                DEPARTURE_WAVE=DepartureWave(environment,EXIT_PROBE['wave_seconds'])
+                                DEPARTURE_WAVE.start()
+                            except Exception:fail_run(environment,'departure_wave_start_failed');return
+                        else:
+                            gevent.spawn(environment.runner.quit)
+                            return
         gevent.spawn(sample_progress)
     if environment.parsed_options.num_users and environment.parsed_options.num_users > CFG['active']:
         raise ValueError('virtual_users_exceed_manifest_budget')
@@ -439,6 +451,8 @@ def validate_host(environment, **kwargs):
 def mark_stopping(environment, **kwargs):
     global RUN_STOPPING, RUN_STOPPING_AT, PROGRESS_FROZEN
     RUN_STOPPING = True
+    wave=globals().get('DEPARTURE_WAVE')
+    if wave is not None:wave.stop_dispatch()
     if CLIENT_PROFILE.mode in ('client-v2', 'client-v3') and RUN_STOPPING_AT is None:
         RUN_STOPPING_AT = time.monotonic()
     if PROGRESS_INDEX is not None and not PROGRESS_FROZEN:
@@ -447,6 +461,60 @@ def mark_stopping(environment, **kwargs):
             PROGRESS_FROZEN = True
         except Exception:
             fail_run(environment, 'actor_progress_not_confirmed')
+
+
+class DepartureWave:
+    """One O(N) owned-user snapshot, one coordinator, O(1) per departure.
+
+    Until each scheduled intent, that actor continues normal business. No
+    periodic user scan, replacement actor, hidden finalization wait or retry.
+    """
+    def __init__(self,environment,seconds,*,clock=time.monotonic,sleep=None):
+        import gevent
+        if type(seconds)not in(int,float)or seconds not in(2,120):raise ValueError('departure_wave_seconds_invalid')
+        users=[]
+        for item in environment.runner.user_greenlets:
+            if not item.dead and item.args and isinstance(item.args[0],SyntheticPlayer):users.append(item.args[0])
+        if len(users)!=CFG['active']or len(users)<2:raise ValueError('departure_wave_target_not_ready')
+        self.environment,self.seconds,self.clock,self.sleep=environment,float(seconds),clock,sleep or gevent.sleep
+        self.users=tuple(users);self.target=len(users);self.started_at=clock();self.task=None
+        self.scheduled=self.finished_count=self.early_finished=0;self.cancelled=False
+        self.first_offset_ms=self.last_offset_ms=None;self.max_lag_ms=0.0
+        for user in self.users:user._exit_wave_owner=self;user._exit_wave_finished=False
+    def start(self):
+        import gevent
+        if self.task is not None:raise ValueError('departure_wave_already_started')
+        self.task=gevent.spawn(self.run)
+    def run(self):
+        try:
+            for index,user in enumerate(self.users):
+                planned=self.started_at+self.seconds*index/(self.target-1)
+                self.sleep(max(0,planned-self.clock()))
+                if RUN_STOPPING:self.cancelled=True;return
+                if user.greenlet.dead:continue
+                user._exit_wave_intent=planned
+                actual=self.clock();offset=(actual-self.started_at)*1000
+                if self.first_offset_ms is None:self.first_offset_ms=offset
+                self.last_offset_ms=offset;self.max_lag_ms=max(self.max_lag_ms,max(0,(actual-planned)*1000));self.scheduled+=1
+                user.stop(force=False)
+        except Exception:
+            self.cancelled=True;fail_run(self.environment,'departure_wave_dispatch_failed')
+    def finished(self,user):
+        if getattr(user,'_exit_wave_owner',None)is not self or getattr(user,'_exit_wave_finished',False):return
+        user._exit_wave_finished=True;self.finished_count+=1
+        self.early_finished+=int(getattr(user,'_exit_wave_intent',None)is None)
+        if self.finished_count==self.target:
+            import gevent
+            gevent.spawn(self.environment.runner.quit)
+    def stop_dispatch(self):
+        if self.finished_count!=self.target:self.cancelled=True
+        if self.task is not None and not self.task.ready():self.task.kill(block=False)
+    def report(self):
+        return dict(target=self.target,scheduled=self.scheduled,finished=self.finished_count,
+            early_finished=self.early_finished,cancelled=self.cancelled,window_seconds=self.seconds,
+            first_actual_intent_offset_ms=self.first_offset_ms,last_actual_intent_offset_ms=self.last_offset_ms,
+            max_intent_schedule_lag_ms=self.max_lag_ms,remaining_actors_keep_business=True,
+            per_actor_cleanup_deadline_seconds=45,whole_wave_is_not_one_simultaneous_intent=True)
 
 
 class ExitCooperativeTaskSet(TaskSet):
@@ -468,7 +536,7 @@ class SyntheticPlayer(HttpUser):
         self._normal_stop_event = Event()
 
     def stop(self, force=False):
-        if not force and RUN_STOPPING:
+        if not force and (RUN_STOPPING or getattr(self,'_exit_wave_intent',None)is not None):
             self._state = LOCUST_STATE_STOPPING
             self._normal_stop_event.set()
             return False
@@ -759,7 +827,8 @@ class SyntheticPlayer(HttpUser):
             EXIT_METRICS['peak']=max(EXIT_METRICS['peak'],EXIT_METRICS['active'])
             try:
                 if CLIENT_PROFILE.mode in ('client-v2','client-v3'):
-                    self.player.stop(intent_started=RUN_STOPPING_AT)
+                    intent=getattr(self,'_exit_wave_intent',None)
+                    self.player.stop(intent_started=RUN_STOPPING_AT if intent is None else intent)
                 else:
                     self.player.stop()
                 EXIT_METRICS['completed']+=1
@@ -772,11 +841,14 @@ class SyntheticPlayer(HttpUser):
             self._finalizing = True
             import gevent
             budget = cleanup_budget(self.environment)
+            personal=getattr(self,'_exit_wave_intent',None)
+            if personal is not None:budget=max(0.0,min(budget,personal+45-time.monotonic()))
             self._cleanup_deadline = time.monotonic() + budget
             RUN_COUNTERS['cleanup_attempts'] += 1
             try:
                 # Locust's async stop of a waiting user joins on_stop before its
                 # stop-group timeout. Bound this multi-request cleanup itself.
+                if budget<=0:raise CleanupTimeout()
                 with gevent.Timeout(budget, CleanupTimeout()):
                     self._finish_with_exit_policy()
                 RUN_COUNTERS['cleanup_completed'] += 1
@@ -806,6 +878,8 @@ class SyntheticPlayer(HttpUser):
                 raise
             finally:
                 self._finalizing = False
+                wave=globals().get('DEPARTURE_WAVE')
+                if wave is not None:wave.finished(self)
                 slot = getattr(self, '_progress_slot', None)
                 if slot is not None:
                     self._progress_slot = None
@@ -839,7 +913,7 @@ def workload_statistics(environment, run):
             'workflow_statistics': rows,
             'workflow_statistics_complete': checkpoint_count == counters['checkpoint_attempts']
                 and final_count == counters['finalization_attempts'],
-            'workflow_timing_scope': 'WORKFLOW checkpoint includes grant followup profile; finalization starts at worker test_stopping intent before cleanup scheduling and includes checkpoint, followup, release. WORKFLOW is not HTTP.'}
+            'workflow_timing_scope': ('WORKFLOW finalization starts at EACH scheduled departure intent; actors keep business until own intent, personal45s deadline includes pending work/checkpoint/followup/release; 2s native or120s full cohort window is not simultaneous intent.'if EXIT_MODE=='gradual120-v1'else'WORKFLOW checkpoint includes grant followup profile; finalization starts at worker test_stopping intent before cleanup scheduling and includes checkpoint, followup, release. WORKFLOW is not HTTP.')}
 
 
 @events.quitting.add_listener

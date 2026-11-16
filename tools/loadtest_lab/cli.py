@@ -165,6 +165,9 @@ def prepare(args):
              and getattr(args,'actor_progress',None)=='active-business-v1', 'exit_probe_options_invalid')
         cfg['exit_probe_common_seconds']=probe_seconds
         cfg['exit_smoothing']=smoothing
+        if smoothing=='gradual120-v1':
+            need(transport=='ssh-quad-v1','exit_wave_requires_quad_transport')
+            cfg['exit_wave_seconds']=2 if args.active==2 else 120
     else:
         need(smoothing=='direct','exit_smoothing_requires_five_minute_probe')
     private = {key: secrets.token_hex(32) for key in
@@ -488,7 +491,7 @@ def main(argv=None):
     init.add_argument('--generator-transport',choices=('baseline','ssh-quad-v1'),default='baseline',help='Explicit source-bound four-owned-loopback SSH generator transport; no business changes')
     init.add_argument('--exit-probe-common-seconds',type=int,choices=(60,300),
                       help='Exit experiment: stop after all actors continuously ready for target plus proof margin; 60 only native2, otherwise300')
-    init.add_argument('--exit-smoothing',choices=('direct','jitter3-v1','queue32-v1','queue64-v1','queue128-v1'),default='direct',
+    init.add_argument('--exit-smoothing',choices=('direct','jitter3-v1','queue32-v1','queue64-v1','queue128-v1','gradual120-v1'),default='direct',
                       help='Explicit experimental client exit policy; queue/delay stays inside global exit latency')
     init.add_argument('--checkpoint-observation', action='store_true',
                       help='Opt-in exact-source checkpoint/proxy timing; isolated bounded-v2 labs only')
