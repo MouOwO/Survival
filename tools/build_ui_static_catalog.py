@@ -749,6 +749,60 @@ io.write(require_public("core/json_encoder").encode(result))
     return json.loads(result.stdout)
 
 
+def shop_preview_seed(source, lua):
+    """Project only public shelf metadata from the real immutable Lua catalogue.
+
+    No player context, evaluator, HTTP or game API is available. This is a
+    display seed; live availability and transactions remain server-owned.
+    """
+    pending = ["systems/shop_catalog", "core/json_encoder"]
+    rules = source.read("scripts/vscripts/config/generated/shop_aggregation_rules.lua").decode("utf-8-sig")
+    pending.extend("config/generated/" + name for name in re.findall(r'module_name\s*=\s*"([^"]+)"', rules))
+    sources = {}
+    while pending:
+        name = pending.pop()
+        if name in sources or name == "core/event_bus" or name.endswith("/"):
+            continue
+        need(len(sources) < 128, "shop_preview_dependency_budget_exceeded")
+        raw = source.read("scripts/vscripts/" + name + ".lua").decode("utf-8-sig")
+        sources[name] = raw
+        pending.extend(re.findall(r'\brequire\s*\(?\s*["\']([^"\']+)["\']', raw))
+    script = "local sources=" + lua_literal(sources) + r'''
+local function forbidden() error("shop_preview_runtime_api_forbidden") end
+local loaded={["core/event_bus"]={request=forbidden,emit=forbidden,subscribe=forbidden}}
+local env={assert=assert,error=error,ipairs=ipairs,pairs=pairs,next=next,pcall=pcall,select=select,
+ tonumber=tonumber,tostring=tostring,type=type,unpack=unpack,rawget=rawget,rawset=rawset,
+ setmetatable=setmetatable,getmetatable=getmetatable,math=math,string=string,table=table}
+env._G=env;env.package={loaded=loaded}
+local function public_require(name)
+ if loaded[name]~=nil then return loaded[name] end
+ local fn=assert(loadstring(assert(sources[name],"missing_shop_preview_source:"..name),"@immutable/"..name))
+ setfenv(fn,env);local value=fn();loaded[name]=value==nil and true or value;return loaded[name]
+end
+env.require=public_require
+local catalog=public_require("systems/shop_catalog")
+local result={entries={}}
+local mapping={entry_id="entryid",tooltip_id="tooltip_id",shop_id="shopid",content_type="contenttype",
+ content_id="contentid",grant_type="grant_type",name="name",description="description",icon="icon",
+ icon_type="icon_type",wood_cost="woodcost",gold_cost="goldcost",purchase_condition_text="condition_text",
+ purchase_limit="purchase_limit",sort_order="order",fields="fields"}
+for _,entry in ipairs(catalog.entries()) do
+ if catalog.allowed_in_mode(entry,"shop") then
+  local item={visible=1,purchasable=0,preview_only=1,disabled_reason="",disabled_reason_code="state_pending"}
+  for target,key in pairs(mapping) do item[target]=entry[key] end
+  result.entries[#result.entries+1]=item
+ end
+end
+io.write(public_require("core/json_encoder").encode(result))
+'''
+    result = subprocess.run([lua, "-"], input=script.encode(), stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                            timeout=20, check=True, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+    need(len(result.stdout) <= 2 * 1024 * 1024, "shop_preview_output_budget_exceeded")
+    value = json.loads(result.stdout)
+    need(bool(value["entries"]), "shop_preview_empty")
+    return value
+
+
 def archive_templates(seed, tables):
     """Compile immutable real projector output into display-only templates.
 
@@ -1010,6 +1064,7 @@ def make_catalog(source, lua, operator=None, atlas_reference=None):
     auxiliary["daily_text"] = daily_text
     seed = archive_projection_seed(source, lua)
     auxiliary["archive_projection"] = archive_templates(seed, tables)
+    auxiliary["shop_preview"] = shop_preview_seed(source, lua)
     title_source = source.read("scripts/vscripts/systems/title_presentation_service.lua").decode("utf8")
     need("测试试穿 · 正式条件待开放" in title_source, "title_preview_public_condition_changed")
     points = {row["id"]: row for row in seed["pages"]["points"]["rows"]}
