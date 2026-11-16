@@ -10,6 +10,19 @@ local function send(id,result)
     local player=PlayerResource:GetPlayer(id)
     if player then CustomGameEventManager:Send_ServerToPlayer(player,'survival_commerce_result',result) end
 end
+local function purchase_state(profile,sku)
+    -- Display-only source binding. Transactions still use the authenticated
+    -- provider. The committed canonical key is a direct lookup, not an
+    -- inventory/alias scan or another full catalogue/HTTP request.
+    local lookup=require('config/generated/ui_static_catalog_lookup')
+    local rule=lookup.commerce_receipts and lookup.commerce_receipts[sku]
+    local inventory=profile and profile.save and profile.save.content_inventory
+    if not rule or not inventory then return nil end
+    local owned=tonumber(inventory[rule.ownership_id])
+    if not owned or owned<0 or owned~=owned or owned>9007199254740991 or owned~=math.floor(owned) then return nil end
+    return {sku=sku,owned=owned,purchase_limit=rule.purchase_limit,
+        completed=rule.purchase_limit>0 and owned>=rule.purchase_limit and 1 or 0}
+end
 function M.handle(payload)
     local id=tonumber(payload.PlayerID)
     if not id or not PlayerResource:IsValidPlayerID(id) or PlayerResource:IsFakeClient(id) then return end
@@ -58,9 +71,14 @@ function M.handle(payload)
             reply({ok=true,part='end'})
         else
             local response=result.response or {}
+            local product_state
+            if action=='purchase' and result.ok then
+                product_state=purchase_state(profiles.get_profile(id),command.sku)
+            end
             reply({ok=result.ok==true,terminal=result.terminal==true or result.done==true,
                 sku=command.sku,error=result.error,title=response.title,price=response.price,
-                currency=response.currency,balance=response.balance,granted=response.granted,skipped=response.skipped})
+                currency=response.currency,balance=response.balance,granted=response.granted,skipped=response.skipped,
+                product_state=product_state})
         end
     end
     local function attempt()

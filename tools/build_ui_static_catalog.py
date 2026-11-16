@@ -1065,6 +1065,18 @@ def make_catalog(source, lua, operator=None, atlas_reference=None):
     seed = archive_projection_seed(source, lua)
     auxiliary["archive_projection"] = archive_templates(seed, tables)
     auxiliary["shop_preview"] = shop_preview_seed(source, lua)
+    # Successful exchange receipts need only one canonical ownership lookup.
+    # These public bindings never authorize a purchase or apply a reward.
+    commerce_rows = csv_table(source.read("data/csv/商城兑换系统/commerce_products.csv"))
+    # Bundle compilation may enable a reviewed root whose raw row is disabled.
+    # Retain every identity; none of these display bindings grants eligibility.
+    need(len({row["sku"] for row in commerce_rows}) == len(commerce_rows), "duplicate_commerce_receipt_sku")
+    for row in commerce_rows:
+        need(isinstance(row["ownership_id"], str) and bool(row["ownership_id"])
+             and isinstance(row["purchase_limit"], (int, float)) and 0 <= row["purchase_limit"] <= 9007199254740991
+             and int(row["purchase_limit"]) == row["purchase_limit"], "invalid_commerce_receipt_binding")
+    auxiliary["commerce_receipts"] = {row["sku"]: dict(ownership_id=row["ownership_id"], purchase_limit=row["purchase_limit"])
+                                     for row in commerce_rows}
     title_source = source.read("scripts/vscripts/systems/title_presentation_service.lua").decode("utf8")
     need("测试试穿 · 正式条件待开放" in title_source, "title_preview_public_condition_changed")
     points = {row["id"]: row for row in seed["pages"]["points"]["rows"]}
@@ -1246,6 +1258,7 @@ def build(game, content_revision, lua, previous=None, operator=None, atlas_refer
                   field_by_name={row["name"]: row["id"] for row in registry["fields"]},
                    archive_projection=auxiliary["archive_projection"], grid=auxiliary["grid"], selected=auxiliary["selected"],
                    production=auxiliary["production"], public_beta=auxiliary["public_beta"],
+                   commerce_receipts=auxiliary["commerce_receipts"],
                    lottery_receipt=dict(wire_version=auxiliary["lottery_receipt_wire_version"],
                        pools=[dict(id=s["selected_pool_id"], items=[i["id"] for i in s["items"]])
                               for s in auxiliary["lottery_public"]["snapshots"]],

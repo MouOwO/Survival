@@ -1365,6 +1365,9 @@ local function purchase(payload)
         ok = true,
         entry_id = entry.entryid,
         grant_result = granted,
+        remove_from_shop = catalog.allowed_in_mode(entry, "shop") == true
+            and (tonumber(entry.purchase_limit) or 0) > 0
+            and counts[entry.entryid] >= tonumber(entry.purchase_limit),
     }
     remember_result(player_id, request_id, result)
     return result

@@ -673,6 +673,7 @@ local function register_shop_purchase_request()
             success = result and result.ok and 1 or 0,
             operation = "shop_purchase",
             entry_id = payload.entry_id or "",
+            remove_from_shop = result and result.ok and result.remove_from_shop and 1 or 0,
             error = result and result.error or "unknown_error",
             close_shop_and_focus_hero = encounter_started and 1 or 0,
             focus_hero_entindex = focus_hero_entindex,
