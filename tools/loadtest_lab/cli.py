@@ -498,10 +498,10 @@ def main(argv=None):
                       help='Opt-in one durable outbox drain in checkpoint profile; requires ensure-scope')
     init.add_argument('--profile-context', choices=('baseline', 'idle-v1'), default='baseline',
                       help='Opt-in bounded idle profile RPC consolidation; exact reviewed principal/lifecycle chain only')
-    init.add_argument('--frontend-rate', choices=('baseline', 'hot-rate-v1', 'hot-wal-full-v1'), default='baseline',
+    init.add_argument('--frontend-rate', choices=('baseline', 'hot-rate-v1', 'hot-wal-full-v1', 'hot-wal-reserved-v1'), default='baseline',
                       help='Opt-in exact observed SQLite housekeeping/WAL FULL with verified private library')
     init.add_argument('--private-sqlite-build-receipt',
-                      help='Verified build02 public outer JSON; required only for hot-wal-full-v1')
+                      help='Verified build02 public outer JSON; required for WAL FULL frontend modes')
     init.add_argument('--actor-progress', choices=('baseline', 'active-business-v1'),
                       default='baseline', help='Track every active actor successful business without extra HTTP')
     init.add_argument('--database-resource-profile',
