@@ -9,12 +9,13 @@ TEMPLATE_PARENT = 2026110804
 TEMPLATE_REPORT = 'output/complete_delivery_release_20261109_v01'
 PROGRAM_AUTH = '用户通过专用打包工具明确执行发布测试包'
 LOTTERY_CSV_OUTPUTS = {
+    'data/csv/建筑与工人系统/防御塔/tower_skill_definitions.csv': 'scripts/vscripts/config/generated/tower_skill_definitions.lua',
     'data/csv/抽奖系统/' + name + '.csv': 'scripts/vscripts/config/generated/' + name + '.lua'
     for name in ('lottery_pity_rules', 'lottery_pool_definitions', 'lottery_pool_updates', 'lottery_quality_weights')
 }
 
 def extend_lottery_csv_review(tree):
-    """Add four exact generator projections without modifying frozen operators.
+    """Add reviewed exact generator projections without changing frozen operators.
 
     The existing review still executes the pinned build() on immutable inputs
     and checks every output byte. Unknown paths remain blocking.
