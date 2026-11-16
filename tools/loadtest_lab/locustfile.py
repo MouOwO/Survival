@@ -14,15 +14,23 @@ import time
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from loadtest_lab.guard import load_client, target_url, canonical, sha, write_new, register_storage
 from loadtest_lab.workload import Player, checked, AdmissionBusy, BusyRetryBudget, BusyRetryDeadline, BusyRecoveryTimings, BusyRecoveryRoutes
-from loadtest_lab.guard import client_recovery_policy, observation_mode
+from loadtest_lab.guard import client_recovery_policy, observation_mode, validate_exit_probe
 from loadtest_lab.workload_profiles import COUNTERS as WORKLOAD_COUNTERS, WORKFLOWS, profile_for
 from loadtest_lab.wire_client import WireClient, WIRE_MODE, aggregate_reports, http_error_label, failure_label, profile_cache_header
-from locust import HttpUser, task, events
+from locust import HttpUser, TaskSet, task, events
+from locust.user.task import LOCUST_STATE_STOPPING
+from gevent.event import Event
+from gevent.lock import BoundedSemaphore
 from locust.exception import StopUser
 from loadtest_lab.progress import validate_profile as validate_actor_progress, ProgressIndex, ProgressObservation
 
 CFG, CONTROLLER = load_client(os.environ['LOADTEST_CLIENT'])
 CLIENT_PROFILE = profile_for(CFG)
+EXIT_PROBE = validate_exit_probe(CFG)
+EXIT_MODE = 'direct' if EXIT_PROBE is None else EXIT_PROBE['mode']
+EXIT_SEMAPHORE = BoundedSemaphore(int(EXIT_MODE[5:-3])) if EXIT_MODE.startswith('queue') else None
+EXIT_METRICS = dict(active=0,peak=0,queued=0,completed=0,delay_ms=0)
+RUN_EXIT_PROBE_TRIGGERED = False
 PROGRESS_PROFILE = validate_actor_progress(CFG)
 PROGRESS_INDEX = PROGRESS_OBSERVER = None
 PROGRESS_FROZEN = False
@@ -77,6 +85,8 @@ def run_state():
             'counters': dict(RUN_COUNTERS)}
     if CLIENT_PROFILE.mode in ('client-v2', 'client-v3'):
         value.update(client_workload=CLIENT_PROFILE.mode, workload_counters=dict(WORKLOAD_COUNTS))
+    if EXIT_PROBE is not None:
+        value['exit_probe'] = dict(EXIT_PROBE,triggered=RUN_EXIT_PROBE_TRIGGERED,metrics=dict(EXIT_METRICS))
     return value
 
 
@@ -182,6 +192,13 @@ def validate_run_state(state):
         if state.get('client_workload') != CLIENT_PROFILE.mode:
             raise ValueError('loadtest_worker_workload_mismatch')
         validate_workload_counters(state.get('workload_counters'))
+    if EXIT_PROBE is not None:
+        policy=state.get('exit_probe',{})
+        if (policy.get('common_seconds')!=EXIT_PROBE['common_seconds'] or policy.get('mode')!=EXIT_MODE
+                or type(policy.get('triggered'))is not bool or set(policy.get('metrics',{}))!=set(EXIT_METRICS)
+                or any(type(v)is not int or v<0 for v in policy['metrics'].values())):
+            raise ValueError('loadtest_exit_probe_report_invalid')
+
 
 
 def final_run_state(environment):
@@ -382,11 +399,18 @@ def validate_host(environment, **kwargs):
             raise ValueError('loadtest_progress_observation_failed')
         import gevent
         def sample_progress():
+            global RUN_EXIT_PROBE_TRIGGERED
             while not RUN_STOPPING:
                 gevent.sleep(5)
                 if not RUN_STOPPING and not PROGRESS_OBSERVER.sample():
                     fail_run(environment, 'actor_progress_not_confirmed')
                     return
+                if EXIT_PROBE is not None and not RUN_STOPPING and not RUN_EXIT_PROBE_TRIGGERED:
+                    snap=PROGRESS_OBSERVER.last_snapshot
+                    if snap is not None and snap['all_active'] and snap['best_seconds']>=EXIT_PROBE['common_seconds']+15:
+                        RUN_EXIT_PROBE_TRIGGERED=True
+                        gevent.spawn(environment.runner.quit)
+                        return
         gevent.spawn(sample_progress)
     if environment.parsed_options.num_users and environment.parsed_options.num_users > CFG['active']:
         raise ValueError('virtual_users_exceed_manifest_budget')
@@ -425,8 +449,31 @@ def mark_stopping(environment, **kwargs):
             fail_run(environment, 'actor_progress_not_confirmed')
 
 
+class ExitCooperativeTaskSet(TaskSet):
+    @task
+    def activity(self):
+        self.user.activity()
+
+    def _sleep(self, seconds):
+        # Reuse one per-user Event; normal quit wakes waits without injecting a kill.
+        self.user._normal_stop_event.wait(timeout=seconds)
+
+
 class SyntheticPlayer(HttpUser):
     host = 'http://127.0.0.1:29567'
+    tasks = [ExitCooperativeTaskSet]
+
+    def __init__(self, environment):
+        super().__init__(environment)
+        self._normal_stop_event = Event()
+
+    def stop(self, force=False):
+        if not force and RUN_STOPPING:
+            self._state = LOCUST_STATE_STOPPING
+            self._normal_stop_event.set()
+            return False
+        return super().stop(force=force)
+
 
     def wait_time(self):
         if getattr(self, '_isolated_failure', False):
@@ -650,7 +697,6 @@ class SyntheticPlayer(HttpUser):
             fail_run(self.environment, 'workflow_start_not_confirmed')
             raise StopUser() from None
 
-    @task
     def activity(self):
         # Locust can wake a waiting user before its scheduled kill arrives.
         # Finish existing workflows, but never begin a new one after quit intent.
@@ -697,6 +743,27 @@ class SyntheticPlayer(HttpUser):
             fail_run(self.environment, 'workflow_invariant_failed')
             raise StopUser() from None
 
+    def _finish_with_exit_policy(self):
+        import gevent
+        from contextlib import nullcontext
+        if EXIT_MODE=='jitter3-v1':
+            delay_ms=(int(self.player.identity['account_id'])%61)*50
+            EXIT_METRICS['delay_ms']+=delay_ms
+            gevent.sleep(delay_ms/1000)
+        if EXIT_SEMAPHORE is not None and EXIT_SEMAPHORE.locked():
+            EXIT_METRICS['queued']+=1
+        with EXIT_SEMAPHORE if EXIT_SEMAPHORE is not None else nullcontext():
+            EXIT_METRICS['active']+=1
+            EXIT_METRICS['peak']=max(EXIT_METRICS['peak'],EXIT_METRICS['active'])
+            try:
+                if CLIENT_PROFILE.mode in ('client-v2','client-v3'):
+                    self.player.stop(intent_started=RUN_STOPPING_AT)
+                else:
+                    self.player.stop()
+                EXIT_METRICS['completed']+=1
+            finally:
+                EXIT_METRICS['active']-=1
+
     def on_stop(self):
         if hasattr(self, 'player') and not getattr(self, '_cleanup_started', False):
             self._cleanup_started = True
@@ -709,10 +776,7 @@ class SyntheticPlayer(HttpUser):
                 # Locust's async stop of a waiting user joins on_stop before its
                 # stop-group timeout. Bound this multi-request cleanup itself.
                 with gevent.Timeout(budget, CleanupTimeout()):
-                    if CLIENT_PROFILE.mode in ('client-v2', 'client-v3'):
-                        self.player.stop(intent_started=RUN_STOPPING_AT)
-                    else:
-                        self.player.stop()
+                    self._finish_with_exit_policy()
                 RUN_COUNTERS['cleanup_completed'] += 1
             except CleanupTimeout:
                 RUN_COUNTERS['cleanup_interrupted'] += 1

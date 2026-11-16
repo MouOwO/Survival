@@ -230,6 +230,19 @@ def profile_read_cache_mode(cfg):
     return mode
 
 
+def validate_exit_probe(cfg):
+    if 'exit_probe_common_seconds' not in cfg:
+        need('exit_smoothing' not in cfg, 'exit_smoothing_requires_five_minute_probe')
+        return None
+    seconds=cfg['exit_probe_common_seconds']
+    need(type(seconds)is int and seconds==(60 if cfg.get('active')==2 else 300), 'exit_probe_time_invalid')
+    need(cfg.get('purpose')=='capacity' and cfg.get('client_workload')=='client-v3'
+         and cfg.get('actor_progress')=={'id':'active-business-v1','ttl_seconds':120}, 'exit_probe_requires_active_business_proof')
+    mode=cfg.get('exit_smoothing','direct')
+    need(mode in ('direct','jitter3-v1','queue32-v1','queue64-v1','queue128-v1'), 'exit_probe_policy_invalid')
+    return {'common_seconds':seconds,'mode':mode}
+
+
 def load(directory):
     root = Path(directory).resolve()
     need(not Path(directory).is_symlink(), 'lab_symlink_refused')
@@ -250,6 +263,7 @@ def load(directory):
     need(cfg.get('wire_mode', 'business-wire-v1') in ('business-wire-v1', 'legacy-json'),
          'lab_wire_mode_invalid')
     profile_read_cache_mode(cfg)
+    validate_exit_probe(cfg)
     validate_postgres_image(cfg.get('postgres_image', DEFAULT_POSTGRES_IMAGE), allow_default=True)
     catalog_md5 = cfg.get('lottery_catalog_md5')
     need(catalog_md5 is None or type(catalog_md5) is str and re.fullmatch('[a-f0-9]{32}', catalog_md5),
@@ -429,6 +443,7 @@ def load_client(path):
     need(cfg.get('wire_mode', 'business-wire-v1') in ('business-wire-v1', 'legacy-json'),
          'lab_wire_mode_invalid')
     profile_read_cache_mode(cfg)
+    validate_exit_probe(cfg)
     validate_postgres_image(cfg.get('postgres_image', DEFAULT_POSTGRES_IMAGE), allow_default=True)
     from .leaderboard_experiments import metadata as leaderboard_metadata
     from .checkpoint_experiments import metadata as checkpoint_metadata

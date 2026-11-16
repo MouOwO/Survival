@@ -329,6 +329,7 @@ class ProgressObservation:
         self.path = folder / 'client_progress.jsonl'
         self._file = self.path.open('xb')
         self._sequence, self._bytes, self._error, self._result = 0, 0, None, None
+        self.last_snapshot = None
 
     def sample(self, *, final=False):
         if self._result is not None or self._error is not None:
@@ -349,6 +350,7 @@ class ProgressObservation:
                 raise ValueError('limit')
             self._file.write(raw)
             self._file.flush()
+            self.last_snapshot = snapshot
             self._sequence += 1
             self._bytes += len(raw)
             return True

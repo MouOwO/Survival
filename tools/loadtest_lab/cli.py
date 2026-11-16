@@ -151,6 +151,16 @@ def prepare(args):
         cfg['database_resource_profile'] = resource_profile
     if pool_limits is not None:
         cfg['database_pool_limits'] = pool_limits
+    probe_seconds=getattr(args,'exit_probe_common_seconds',None)
+    smoothing=getattr(args,'exit_smoothing','direct')
+    if probe_seconds is not None:
+        need(type(probe_seconds)is int and probe_seconds==(60 if args.active==2 else 300)
+             and args.purpose=='capacity' and getattr(args,'client_workload',None)=='client-v3'
+             and getattr(args,'actor_progress',None)=='active-business-v1', 'exit_probe_options_invalid')
+        cfg['exit_probe_common_seconds']=probe_seconds
+        cfg['exit_smoothing']=smoothing
+    else:
+        need(smoothing=='direct','exit_smoothing_requires_five_minute_probe')
     private = {key: secrets.token_hex(32) for key in
                ('controller', 'backend', 'auth_secret', 'pepper', 'database_admin', 'database_app', 'marker')}
     root.mkdir(parents=True, mode=0o700)
@@ -469,6 +479,10 @@ def main(argv=None):
                       help='bounded-v2 only: bounded DB waiting queue, default 20; maximum 32')
     init.add_argument('--db-pool-wait-seconds', type=float,
                       help='bounded-v2 only: queue wait cap, default 2; maximum 5 and request remaining deadline')
+    init.add_argument('--exit-probe-common-seconds',type=int,choices=(60,300),
+                      help='Exit experiment: stop after all actors continuously ready for target plus proof margin; 60 only native2, otherwise300')
+    init.add_argument('--exit-smoothing',choices=('direct','jitter3-v1','queue32-v1','queue64-v1','queue128-v1'),default='direct',
+                      help='Explicit experimental client exit policy; queue/delay stays inside global exit latency')
     init.add_argument('--checkpoint-observation', action='store_true',
                       help='Opt-in exact-source checkpoint/proxy timing; isolated bounded-v2 labs only')
     init.add_argument('--http-admission', choices=('baseline', 'bounded-v1', 'bounded-v2', 'bounded-v3', 'bounded-v4', 'bounded-v5', 'bounded-v6', 'bounded-v7'), default='baseline',
