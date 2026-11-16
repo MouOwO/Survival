@@ -34,11 +34,12 @@ SPECS['http-admission-v2'] = SPECS['http-admission-v1']
 SPECS['http-admission-v3'] = SPECS['http-admission-v1']
 SPECS['http-admission-v4'] = SPECS['http-admission-v1']
 SPECS['http-admission-v5'] = SPECS['http-admission-v1']
+SPECS['http-admission-v6'] = SPECS['http-admission-v1']
 SPECS['pool-notify-v1'] = (
     ('db_pool_notify_patch.py', 'bounded_pool_notify.py'),
     frozenset(('fishing_api/_bounded_pool.py',)),
     frozenset(('fishing_api/_bounded_pool.py',)))
-ADMISSION_IDS = ('http-admission-v1', 'http-admission-v2', 'http-admission-v3', 'http-admission-v4', 'http-admission-v5')
+ADMISSION_IDS = ('http-admission-v1', 'http-admission-v2', 'http-admission-v3', 'http-admission-v4', 'http-admission-v5', 'http-admission-v6')
 ORDER = ('checkpoint-observation-v1', *ADMISSION_IDS, 'pool-notify-v1')
 ROW_KEYS = frozenset(('id', 'source_revision', 'operator_sources',
                       'parent_runtime_sha256', 'runtime_sha256'))
@@ -58,6 +59,9 @@ DB8_RESOURCE_PROFILES = {
 }
 
 
+DB16_RESOURCE_PROFILES = {'db16-4cpu-4g-v1': (4, 4096)}
+DATABASE_RESOURCE_PROFILES = {**DB8_RESOURCE_PROFILES, **DB16_RESOURCE_PROFILES}
+
 def resolve_database_resources(purpose, *, profile=None, memory=None, cpu=None):
     if profile is None:
         return (memory if memory is not None else
@@ -65,9 +69,9 @@ def resolve_database_resources(purpose, *, profile=None, memory=None, cpu=None):
                 cpu if cpu is not None else
                 .5 if purpose == 'functional-smoke' else 1)
     _need(purpose == 'capacity', 'db8_resource_profile_requires_capacity')
-    _need(type(profile) is str and profile in DB8_RESOURCE_PROFILES,
+    _need(type(profile) is str and profile in DATABASE_RESOURCE_PROFILES,
           'db8_resource_profile_invalid')
-    expected_cpu, expected_memory = DB8_RESOURCE_PROFILES[profile]
+    expected_cpu, expected_memory = DATABASE_RESOURCE_PROFILES[profile]
     _need(memory is None or type(memory) is int and memory == expected_memory,
           'db8_resource_profile_memory_conflict')
     _need(cpu is None or type(cpu) in (int, float) and cpu == expected_cpu,
@@ -96,7 +100,7 @@ def apply_experiments(root, cfg, revision, *, observation=False, admission=False
                       pool_notify=False, repository):
     """Apply reviewed transformations in order, before the lab manifest exists."""
     admission = ('bounded-v1' if admission is True else 'baseline' if admission is False else admission)
-    admission_modes = dict(zip(('bounded-v1', 'bounded-v2', 'bounded-v3', 'bounded-v4', 'bounded-v5'), ADMISSION_IDS))
+    admission_modes = dict(zip(('bounded-v1', 'bounded-v2', 'bounded-v3', 'bounded-v4', 'bounded-v5', 'bounded-v6'), ADMISSION_IDS))
     _need(admission == 'baseline' or admission in admission_modes, 'http_admission_mode_invalid')
     selected = ([ORDER[0]] if observation else []) + (
         [admission_modes[admission]]
@@ -202,8 +206,10 @@ def validate_experiments(cfg):
         for target in row['runtime_sha256']:
             restored[target] = row['parent_runtime_sha256'].get(target)
     if 'database_resource_profile' in cfg:
-        _need(ADMISSION_IDS[4] in identities,
-              'db8_resource_profile_requires_admission_v5')
+        profile=cfg['database_resource_profile']
+        _need(type(profile)is str and profile in DATABASE_RESOURCE_PROFILES,'db8_resource_profile_invalid')
+        required=ADMISSION_IDS[5] if profile in DB16_RESOURCE_PROFILES else ADMISSION_IDS[4]
+        _need(required in identities, 'db16_resource_profile_requires_admission_v6' if required==ADMISSION_IDS[5] else 'db8_resource_profile_requires_admission_v5')
     if any(name in identities for name in ADMISSION_IDS):
         # A waiter remains counted until it gets the mutex after notify. Even
         # with idle connections, all HTTP workers can briefly be queued. V2
@@ -211,16 +217,18 @@ def validate_experiments(cfg):
         workers = 8 if ADMISSION_IDS[2] in identities else 32
         waiting = 8 if ADMISSION_IDS[2] in identities else 28 if ADMISSION_IDS[0] in identities else 32
         frontend = 128 if any(name in identities for name in ADMISSION_IDS[3:]) else 48
-        connections = 8 if ADMISSION_IDS[4] in identities else 4
-        if ADMISSION_IDS[4] in identities:
+        connections = 16 if ADMISSION_IDS[5] in identities else 8 if ADMISSION_IDS[4] in identities else 4
+        if ADMISSION_IDS[5] in identities:
+            _need(cfg.get('database_resource_profile') in DB16_RESOURCE_PROFILES,'db16_explicit_resource_profile_required')
+        if ADMISSION_IDS[4] in identities or ADMISSION_IDS[5] in identities:
             expected_cpu, expected_memory = 2, 2048
             if 'database_resource_profile' in cfg:
                 profile = cfg['database_resource_profile']
                 _need(cfg.get('purpose') == 'capacity',
                       'db8_resource_profile_requires_capacity')
-                _need(type(profile) is str and profile in DB8_RESOURCE_PROFILES,
+                _need(type(profile) is str and profile in DATABASE_RESOURCE_PROFILES,
                       'db8_resource_profile_invalid')
-                expected_cpu, expected_memory = DB8_RESOURCE_PROFILES[profile]
+                expected_cpu, expected_memory = DATABASE_RESOURCE_PROFILES[profile]
             _need(cfg.get('database_cpu_limit') == expected_cpu
                   and cfg.get('database_memory_mib') == expected_memory,
                   'reviewed_db8_postgres_resources_required')

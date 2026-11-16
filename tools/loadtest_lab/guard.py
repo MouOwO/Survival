@@ -83,9 +83,9 @@ def resolve_database_pool(mode, *, http_concurrency=None, db_concurrency=4,
                           pool_wait_seconds=None, admission_mode='baseline'):
     """Resolve explicit inputs once; baseline/v1 retain their historical defaults."""
     need(mode in ('baseline', 'bounded-v1', 'bounded-v2'), 'lab_database_pool_mode_invalid')
-    need(admission_mode in ('baseline', 'bounded-v1', 'bounded-v2', 'bounded-v3', 'bounded-v4', 'bounded-v5'),
+    need(admission_mode in ('baseline', 'bounded-v1', 'bounded-v2', 'bounded-v3', 'bounded-v4', 'bounded-v5', 'bounded-v6'),
          'lab_http_admission_mode_invalid')
-    if admission_mode == 'bounded-v5':
+    if admission_mode in ('bounded-v5', 'bounded-v6'):
         need(mode == 'bounded-v2', 'db8_profile_requires_bounded_v2')
     requested = {'http_concurrency': http_concurrency, 'db_concurrency': db_concurrency,
                  'web_concurrency': web_concurrency, 'pool_max_waiters': pool_max_waiters,
@@ -95,8 +95,11 @@ def resolve_database_pool(mode, *, http_concurrency=None, db_concurrency=4,
         need(type(value) is int and 1 <= value <= maximum, 'lab_concurrency_budget_invalid')
     limits = None
     if mode != 'baseline':
-        if admission_mode == 'bounded-v5':
-            need(db_concurrency == 8, 'reviewed_db8_profile_requires_eight_connections')
+        if admission_mode in ('bounded-v5', 'bounded-v6'):
+            if admission_mode == 'bounded-v6':
+                need(db_concurrency == 16, 'reviewed_db16_profile_requires_sixteen_connections')
+            else:
+                need(db_concurrency == 8, 'reviewed_db8_profile_requires_eight_connections')
         else:
             need(db_concurrency == 4, 'reviewed_database_pool_requires_four_connections')
         if mode == 'bounded-v1':
@@ -110,8 +113,8 @@ def resolve_database_pool(mode, *, http_concurrency=None, db_concurrency=4,
             need(type(wait) in (int, float) and math.isfinite(wait) and 0 < wait <= 5,
                  'lab_database_pool_wait_invalid')
             need(http <= db_concurrency + waiting, 'http_exceeds_database_pool_admission_budget')
-        if admission_mode == 'bounded-v5':
-            need((http, web_concurrency, db_concurrency, waiting, wait) == (32, 128, 8, 32, 2),
+        if admission_mode in ('bounded-v5', 'bounded-v6'):
+            need((http, web_concurrency, db_concurrency, waiting, wait) == (32, 128, 16 if admission_mode == 'bounded-v6' else 8, 32, 2),
                  'reviewed_db8_profile_budgets_required')
         limits = {'connections': db_concurrency, 'waiting': waiting, 'wait_seconds': wait}
     else:
@@ -161,7 +164,7 @@ def validate_database_pool(cfg):
              and type(parameters['effective']) is dict and set(parameters['effective']) == keys,
              'database_pool_parameter_audit_invalid')
         # Only a validated runtime certificate enables the new DB8 profile.
-        admission_mode = ('bounded-v5' if any(row['id'] == 'http-admission-v5'
+        admission_mode = ('bounded-v6' if any(row['id'] == 'http-admission-v6' for row in cfg.get('runtime_experiments', ())) else 'bounded-v5' if any(row['id'] == 'http-admission-v5'
                            for row in cfg.get('runtime_experiments', ())) else 'baseline')
         resolved, limits = resolve_database_pool(mode, admission_mode=admission_mode,
                                                  **parameters['requested'])

@@ -10,7 +10,7 @@ import time
 from .guard import (PORTS, ACCOUNT_START, canonical, sha, need, relative, read_json,
                     write_new, load, dsn, marker_guard, DEFAULT_POSTGRES_IMAGE, validate_postgres_image,
                     resolve_database_pool)
-from .experiments import DB8_RESOURCE_PROFILES, resolve_database_resources
+from .experiments import DB8_RESOURCE_PROFILES, DB16_RESOURCE_PROFILES, DATABASE_RESOURCE_PROFILES, resolve_database_resources
 
 ROOT = Path(__file__).resolve().parents[2]
 CSVS = ('star_blessing_reward_definitions', 'fishing_system_rules', 'player_gameplay_stats')
@@ -145,9 +145,9 @@ def prepare(args):
     if getattr(args, 'profile_read_cache', 'baseline') != 'baseline':
         cfg['profile_read_cache'] = args.profile_read_cache
     if resource_profile is not None:
-        need(getattr(args, 'http_admission', 'baseline') == 'bounded-v5'
-             and backend_db_pool == 'bounded-v2',
-             'db8_resource_profile_requires_admission_v5')
+        expected_admission='bounded-v6' if resource_profile in DB16_RESOURCE_PROFILES else 'bounded-v5'
+        need(getattr(args, 'http_admission', 'baseline') == expected_admission
+             and backend_db_pool == 'bounded-v2', 'db16_resource_profile_requires_admission_v6' if expected_admission=='bounded-v6' else 'db8_resource_profile_requires_admission_v5')
         cfg['database_resource_profile'] = resource_profile
     if pool_limits is not None:
         cfg['database_pool_limits'] = pool_limits
@@ -471,7 +471,7 @@ def main(argv=None):
                       help='bounded-v2 only: queue wait cap, default 2; maximum 5 and request remaining deadline')
     init.add_argument('--checkpoint-observation', action='store_true',
                       help='Opt-in exact-source checkpoint/proxy timing; isolated bounded-v2 labs only')
-    init.add_argument('--http-admission', choices=('baseline', 'bounded-v1', 'bounded-v2', 'bounded-v3', 'bounded-v4', 'bounded-v5'), default='baseline',
+    init.add_argument('--http-admission', choices=('baseline', 'bounded-v1', 'bounded-v2', 'bounded-v3', 'bounded-v4', 'bounded-v5', 'bounded-v6'), default='baseline',
                       help='Reviewed wait2; v1-v4 DB4 unchanged; v5 DB8/PG2CPU2048MiB/web128/HTTP32/Q32/backlog128')
     init.add_argument('--targeted-pool-notify', action='store_true',
                       help='Opt-in exact-source FIFO head notification experiment; requires HTTP admission v2/v3/v4')
@@ -505,7 +505,7 @@ def main(argv=None):
     init.add_argument('--actor-progress', choices=('baseline', 'active-business-v1'),
                       default='baseline', help='Track every active actor successful business without extra HTTP')
     init.add_argument('--database-resource-profile',
-                      choices=tuple(DB8_RESOURCE_PROFILES),
+                      choices=tuple(DATABASE_RESOURCE_PROFILES),
                       help='Explicit reviewed DB8 CPU/memory budget; overrides must match')
     init.add_argument('--database-memory-mib', type=int,
                       help='Isolated local database memory cap; default 2048 MiB (smoke: 256)')
