@@ -287,6 +287,15 @@ REPLACEMENTS={'archive_backend/command_timing.py': [('                          
                                  '        except (ValueError, UnicodeError):\n'
                                  '            raise AuthError("upstream_response_invalid", 502) from None\n')]}
 
+
+_PROFILE_CACHE_PROXY_SHA256 = '6c19b4e55c2e942099ed6128265aaf3f38e3a1395f53e901582a650fdb4b86e8'
+_PROFILE_CACHE_PROXY_REPLACEMENTS = [('from .business_wire import pack_bytes, _pack_decoded_bytes\n', 'from .business_wire import pack_bytes, _pack_decoded_bytes\n# SURVIVAL_CHECKPOINT_OBSERVATION_V1\nfrom archive_backend._checkpoint_observation import (proxy_span as _observation_proxy_span, identify as _observation_identify, sent as _observation_sent, measure as _observation_measure)\n'), ('        def do_POST(self):\n', '        @_observation_proxy_span\n        def do_POST(self):\n'), ('                payload = self.body()\n', '                with _observation_measure("pwa_body"):\n                    payload = self.body()\n                _observation_identify(payload)\n'), ('                    profile_value = None\n                    if status == 200 and path in ("/v1/profile", "/v1/online-time/checkpoint"):\n                        profile_versions = self.headers.get_all(PROFILE_CACHE_HEADER, [])\n                        if len(profile_versions) == 1:\n                            prepare_profile = (prepare_profile_cache if path == "/v1/profile"\n                                               else prepare_checkpoint_seed)\n                            body, profile_value = prepare_profile(body, profile_versions[0])\n                    if status == 200 and path in BUSINESS_WIRE_PATHS:\n                        versions = self.headers.get_all("X-Survival-Wire", [])\n                        # Duplicate/unknown headers select the original reply.\n                        # Packing happens after the real business result and\n                        # adds no RPC, transaction, timer or mutation retry.\n                        if len(versions) == 1:\n                            body = (_pack_decoded_bytes(body, profile_value, versions[0])\n                                    if profile_value is not None else pack_bytes(body, versions[0]))\n', '                    with _observation_measure("pwa_pack"):\n                        profile_value = None\n                        if status == 200 and path in ("/v1/profile", "/v1/online-time/checkpoint"):\n                            profile_versions = self.headers.get_all(PROFILE_CACHE_HEADER, [])\n                            if len(profile_versions) == 1:\n                                prepare_profile = (prepare_profile_cache if path == "/v1/profile"\n                                                   else prepare_checkpoint_seed)\n                                body, profile_value = prepare_profile(body, profile_versions[0])\n                        if status == 200 and path in BUSINESS_WIRE_PATHS:\n                            versions = self.headers.get_all("X-Survival-Wire", [])\n                            # Duplicate/unknown headers select the original reply.\n                            # Packing happens after the real business result and\n                            # adds no RPC, transaction, timer or mutation retry.\n                            if len(versions) == 1:\n                                body = (_pack_decoded_bytes(body, profile_value, versions[0])\n                                        if profile_value is not None else pack_bytes(body, versions[0]))\n'), ('            if not isinstance(body, bytes):\n                body = json.dumps(body, separators=(",", ":")).encode()\n', '            with _observation_measure("pwa_serialize"):\n                if not isinstance(body, bytes):\n                    body = json.dumps(body, separators=(",", ":")).encode()\n'), ('            self.wfile.write(body)\n', '            _observation_sent(status, len(body))\n            with _observation_measure("pwa_write"):\n                self.wfile.write(body)\n')]
+
+def _pairs_for(name, source):
+    if name == "player_web_auth/http_api.py" and 'from .business_wire import pack_bytes, _pack_decoded_bytes' in source:
+        return _PROFILE_CACHE_PROXY_REPLACEMENTS
+    return REPLACEMENTS[name]
+
 PREFIX=SCHEMA['prefix']
 KINDS=frozenset(SCHEMA['kinds'])
 STAGES=frozenset(SCHEMA['stages'])
@@ -306,6 +315,7 @@ def _sha(source):return hashlib.sha256(source.encode('utf8')).hexdigest()
 
 def _parent_sha_matches(name,digest):
     if name=='player_web_auth/service.py':return digest in _SERVICE_PARENT_SHA256
+    if name=='player_web_auth/http_api.py':return digest in (PARENT_SHA256[name],_PROFILE_CACHE_PROXY_SHA256)
     return digest==PARENT_SHA256[name]
 
 
@@ -330,7 +340,7 @@ def patch_sources(sources):
         raise ValueError('checkpoint_observation_helper_changed')
     outputs={}
     for name in PARENT_SHA256:
-        source=_normalized(sources[name]);pairs=REPLACEMENTS[name]
+        source=_normalized(sources[name]);pairs=_pairs_for(name,source)
         if MARKER in source:
             if not already or source.count(MARKER)!=1:raise ValueError('checkpoint_observation_partial_patch')
             original=_replace(source,pairs,True)
