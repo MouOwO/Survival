@@ -16,7 +16,7 @@ from loadtest_lab.guard import load_client, target_url, canonical, sha, write_ne
 from loadtest_lab.workload import Player, checked, AdmissionBusy, BusyRetryBudget, BusyRetryDeadline, BusyRecoveryTimings, BusyRecoveryRoutes
 from loadtest_lab.guard import client_recovery_policy, observation_mode
 from loadtest_lab.workload_profiles import COUNTERS as WORKLOAD_COUNTERS, WORKFLOWS, profile_for
-from loadtest_lab.wire_client import WireClient, WIRE_MODE, aggregate_reports, http_error_label, failure_label
+from loadtest_lab.wire_client import WireClient, WIRE_MODE, aggregate_reports, http_error_label, failure_label, profile_cache_header
 from locust import HttpUser, task, events
 from locust.exception import StopUser
 from loadtest_lab.progress import validate_profile as validate_actor_progress, ProgressIndex, ProgressObservation
@@ -27,7 +27,7 @@ PROGRESS_PROFILE = validate_actor_progress(CFG)
 PROGRESS_INDEX = PROGRESS_OBSERVER = None
 PROGRESS_FROZEN = False
 WORKLOAD_COUNTS = dict.fromkeys(WORKLOAD_COUNTERS, 0)
-WIRE = WireClient(CFG.get('wire_mode', WIRE_MODE))
+WIRE = WireClient(CFG.get('wire_mode', WIRE_MODE), measure_routes=True)
 WIRE_WORKERS = {}
 WIRE_WORKERS_SEEN = set()
 WIRE_FINAL = False
@@ -551,6 +551,13 @@ class SyntheticPlayer(HttpUser):
                 raise StopUser()
         # Every attempt keeps its raw HTTP failure and wire accounting.
         headers = WIRE.headers(method, path, authorization)
+        profile_context = profile_scope = None
+        if CFG.get('profile_read_cache') == 'unchanged-v1' and method == 'POST' and path in ('/v1/profile', '/v1/online-time/checkpoint'):
+            profile_scope = (authorization, body.get('account_id'), body.get('match_session_id'))
+            saved = getattr(self, '_profile_read_baseline', None)
+            baseline = saved[1] if saved is not None and saved[0] == profile_scope else None
+            profile_context = {'baseline': baseline if path == '/v1/profile' else None}
+            headers['X-Survival-Profile-Cache'] = profile_cache_header(baseline if path == '/v1/profile' else None)
         entered = False
         try:
             with self.client.request(method, path, json=body, headers=headers,
@@ -558,7 +565,17 @@ class SyntheticPlayer(HttpUser):
                 entered = True
                 try:
                     try:
-                        value = WIRE.decode(method, path, response.content, response.status_code, request_body=body)
+                        value = WIRE.decode(method, path, response.content, response.status_code, request_body=body,
+                                            profile_context=profile_context if response.status_code == 200 else None)
+                        if profile_context is not None and response.status_code == 200:
+                            # This cache belongs to this single synthetic actor. The
+                            # ordinary profile identity/session checks remain below.
+                            snapshot = value if path == '/v1/profile' else value.get('profile')
+                            if (type(snapshot) is not dict or snapshot.get('account_id') != body.get('account_id')
+                                    or snapshot.get('match_session_id') != body.get('match_session_id')):
+                                raise ValueError('loadtest_profile_cache_identity_mismatch')
+                            if path == '/v1/profile' or profile_context.get('next_state') is not None:
+                                self._profile_read_baseline = (profile_scope, profile_context.get('next_state'))
                     except Exception:
                         if response.status_code != 200:
                             raise ValueError(http_error_label(response.status_code, None)) from None
@@ -592,7 +609,7 @@ class SyntheticPlayer(HttpUser):
                 return value
         except BaseException as error:
             if not entered:
-                WIRE.note_incomplete(error)
+                WIRE.note_incomplete(error, method, path)
             raise
 
     def on_start(self):

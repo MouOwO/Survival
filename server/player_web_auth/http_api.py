@@ -8,7 +8,8 @@ import threading
 from urllib.parse import parse_qsl, urlsplit
 
 from .service import AuthError, BODY_LIMIT
-from .business_wire import pack_bytes
+from .business_wire import pack_bytes, _pack_decoded_bytes
+from .profile_cache import HEADER as PROFILE_CACHE_HEADER, prepare as prepare_profile_cache, prepare_checkpoint_seed
 
 
 # A transport-only, exact catalog digest. Kept out of JSON so old gateways can
@@ -206,13 +207,21 @@ def handler(service, lobby=None):
                     header = self.headers.get("Authorization", "")
                     bearer = header[7:] if header.startswith("Bearer ") else ""
                     status, body = service.proxy(path, bearer, payload, peer)
+                    profile_value = None
+                    if status == 200 and path in ("/v1/profile", "/v1/online-time/checkpoint"):
+                        profile_versions = self.headers.get_all(PROFILE_CACHE_HEADER, [])
+                        if len(profile_versions) == 1:
+                            prepare_profile = (prepare_profile_cache if path == "/v1/profile"
+                                               else prepare_checkpoint_seed)
+                            body, profile_value = prepare_profile(body, profile_versions[0])
                     if status == 200 and path in BUSINESS_WIRE_PATHS:
                         versions = self.headers.get_all("X-Survival-Wire", [])
                         # Duplicate/unknown headers select the original reply.
                         # Packing happens after the real business result and
                         # adds no RPC, transaction, timer or mutation retry.
                         if len(versions) == 1:
-                            body = pack_bytes(body, versions[0])
+                            body = (_pack_decoded_bytes(body, profile_value, versions[0])
+                                    if profile_value is not None else pack_bytes(body, versions[0]))
                     self.reply(status, body)
             except lobby_errors as error:
                 self.reply(error.status, {"ok": False, "error": error.code, **(error.context or lobby.response_context())})

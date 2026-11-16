@@ -11,12 +11,7 @@ from pathlib import Path
 KEYS = ('fishing_api/server.py', 'player_web_auth/http_api.py')
 HELPER_PATH = 'survival_http_admission.py'
 HELPER_SHA256 = 'f5470dcd73a2ff29379351aab78b9f1000e89c774ec84f85c446021e162652b8'
-PARENT_PAIRS = frozenset((
-    ('e49e903ff7abe51c333d2715f35911ae5b0ed2afea55867f5304a837b19ceb32',
-     '138de5c50bc71f0861ed6f85f4d3d6d0a3d6399e17ff39d93f228383ae687dc2'),
-    ('b04f363b3b603895a44c45e1f9b316b2ed204da1b1f11be4e713a517c94710b6',
-     '66137f76d4b2eb6cfe00076714718489abdcd5375f9da81b472de6bae34eef5b'),
-))
+PARENT_PAIRS = frozenset((('e49e903ff7abe51c333d2715f35911ae5b0ed2afea55867f5304a837b19ceb32', '138de5c50bc71f0861ed6f85f4d3d6d0a3d6399e17ff39d93f228383ae687dc2'), ('b04f363b3b603895a44c45e1f9b316b2ed204da1b1f11be4e713a517c94710b6', '66137f76d4b2eb6cfe00076714718489abdcd5375f9da81b472de6bae34eef5b'), ('e49e903ff7abe51c333d2715f35911ae5b0ed2afea55867f5304a837b19ceb32', '6c19b4e55c2e942099ed6128265aaf3f38e3a1395f53e901582a650fdb4b86e8'), ('b04f363b3b603895a44c45e1f9b316b2ed204da1b1f11be4e713a517c94710b6', '6c19b4e55c2e942099ed6128265aaf3f38e3a1395f53e901582a650fdb4b86e8')))
 MARKER = '# SURVIVAL_BOUNDED_HTTP_ADMISSION_V1'
 IMPORT_ANCHOR = 'from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer\n'
 IMPORT_NEW = IMPORT_ANCHOR + MARKER + '\nfrom survival_http_admission import BoundedAdmissionMixin\n'

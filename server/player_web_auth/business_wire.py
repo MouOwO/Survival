@@ -438,27 +438,37 @@ def _decode(value, *, _writer=None):
     return result
 
 
-def pack_bytes(body, advertised_hash):
-    """Return original bytes unless exact negotiation and a smaller valid pack.
+def _pack_decoded_bytes(body, value, advertised_hash):
+    """Private original-writer fast path, with complete round-trip validation.
 
-    A transport failure must not turn a committed reward into a failed business
-    transaction. This function never retries or modifies a business request.
+    Caller must own a strict JSON decode of body (or its exact transport-only
+    augmentation). This avoids decoding the same authenticated response twice;
+    never use a client-supplied object as a substitute for body. The HTTP cache
+    prepare() returns the paired bytes/object together. All representation,
+    expansion, equality, negotiation and smaller-than-original gates remain.
     """
     if (type(body) is not bytes or len(body) > MAX_BYTES
             or type(advertised_hash) is not str or advertised_hash != SCHEMA_HASH):
         return body
     try:
-        value = _loads(body)
         if type(value) is not dict or MARKER in value:
             return body
         writer = _encode(value, _retain=True)
         envelope = writer.value
-        # An optional pack must never produce a representation that exceeds
-        # the consumer's expansion/depth budget. This one local pass also
-        # verifies exact default types and reference reconstruction.
         if canonical(_decode(envelope, _writer=writer)) != canonical(value):
             return body
         packed = writer.raw if writer.raw is not None else canonical(envelope)
         return packed if len(packed) < len(body) else body
+    except (ValueError, TypeError, OverflowError, RecursionError, UnicodeError):
+        return body
+
+
+def pack_bytes(body, advertised_hash):
+    """Original raw-input API: strict parse, then the same lossless packing."""
+    if (type(body) is not bytes or len(body) > MAX_BYTES
+            or type(advertised_hash) is not str or advertised_hash != SCHEMA_HASH):
+        return body
+    try:
+        return _pack_decoded_bytes(body, _loads(body), advertised_hash)
     except (ValueError, TypeError, OverflowError, RecursionError, UnicodeError):
         return body

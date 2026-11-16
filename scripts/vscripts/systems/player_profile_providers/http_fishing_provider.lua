@@ -6,10 +6,13 @@ local workshop = require("systems/workshop_connection")
 local web_auth = require("systems/player_web_auth")
 local profile_wire = require("systems/http_profile_wire")
 local business_wire = require("systems/business_wire")
+local profile_cache = require("systems/http_profile_cache")
 
 local M = {}
 local active_rule = nil
 local logged_in = {}
+local profile_caches,profile_cache_count,profile_cache_session = {},0,nil
+local MAX_PROFILE_CACHE_ACCOUNTS=16
 local endless_batch_capability
 local operation_timing_serial=0
 local timed_commands={lottery_draw=true,daily_claim=true,benefit_claim=true,vip_claim=true,
@@ -131,7 +134,13 @@ local function request(path, payload, on_success, on_error)
         and logged_in[tostring(body.account_id)]~=session then
         on_error("match_profile_not_ready") return
     end
-    local function send(url, token)
+    local cache_deadline
+    local function cache_clock()
+        if type(GetSystemTimeMS)~='function'then return nil end
+        local ok,value=pcall(GetSystemTimeMS)
+        if ok and type(value)=='number'and value==value and value>=0 and value~=math.huge then return value end
+    end
+    local function send(url, token, cache_recovery)
         if trace then trace.resolved()end
         if setup.get_session_id() ~= session then on_error("match_session_changed") return end
         if token == "" then on_error("fishing_api_token_missing") return end
@@ -140,17 +149,49 @@ local function request(path, payload, on_success, on_error)
         if path=="/v1/lottery/catalog" and logged_in[tostring(body.account_id)]~=session then
             on_error("match_profile_not_ready") return
         end
+        local cache_remaining=30000
+        if cache_recovery then
+            local now=cache_clock()
+            if not now or not cache_deadline or now>=cache_deadline then
+                on_error('http_profile_cache_recovery_timeout');return
+            end
+            cache_remaining=math.max(1,math.floor(cache_deadline-now))
+        end
         local http = CreateHTTPRequestScriptVM("POST", tostring(url) .. path)
         if not http then on_error("http_request_create_failed") return end
         http:SetHTTPRequestHeaderValue("Authorization", "Bearer " .. token)
         local wire_hash = business_wire.schema_hash()
         if wire_hash then http:SetHTTPRequestHeaderValue("X-Survival-Wire", wire_hash) end
+        local cache_box,cache_baseline,cache_serial,cache_account,cache_mode,cache_game_mode
+        if (path=="/v1/profile"or path=="/v1/online-time/checkpoint")and body.account_id~=nil then
+            cache_account,cache_mode=tostring(body.account_id),profile_mode(setup)
+            cache_game_mode=setup.get_mode()
+            if profile_cache_session~=session then
+                profile_caches,profile_cache_count,profile_cache_session={},0,session
+            end
+            cache_box=profile_caches[cache_account]
+            if not cache_box or cache_box.mode~=cache_mode or cache_box.game_mode~=cache_game_mode or cache_box.url~=url or cache_box.token~=token then
+                if cache_box or profile_cache_count<MAX_PROFILE_CACHE_ACCOUNTS then
+                    if not cache_box then profile_cache_count=profile_cache_count+1 end
+                    cache_box={mode=cache_mode,game_mode=cache_game_mode,url=url,token=token,serial=0,applied=0}
+                    profile_caches[cache_account]=cache_box
+                else cache_box=nil end
+            end
+            if cache_box then
+                if path=="/v1/profile"and not cache_recovery then
+                    local now=cache_clock();cache_deadline=now and now+30000 or nil
+                end
+                cache_box.serial=cache_box.serial+1;cache_serial=cache_box.serial
+                cache_baseline=path=="/v1/profile"and not cache_recovery and cache_box.value or nil
+                http:SetHTTPRequestHeaderValue("X-Survival-Profile-Cache",profile_cache.header(cache_baseline))
+            end
+        end
         local encode_started=trace and trace.clock()
         local encoded=json_encoder.encode(body)
         if trace then trace.encoded(encode_started,#encoded)end
         http:SetHTTPRequestRawPostBody("application/json; charset=utf-8", encoded)
         if type(http.SetHTTPRequestAbsoluteTimeoutMS) == "function" then
-            http:SetHTTPRequestAbsoluteTimeoutMS(30000)
+            http:SetHTTPRequestAbsoluteTimeoutMS(cache_remaining)
         end
         if trace then trace.sent()end
         http:Send(function(response)
@@ -192,6 +233,31 @@ local function request(path, payload, on_success, on_error)
                 end
                 return
             end
+            if path=="/v1/profile"or path=="/v1/online-time/checkpoint"then
+                local restored,next_cache,cache_error
+                if path=="/v1/profile"then restored,next_cache,cache_error=profile_cache.decode(decoded,cache_baseline)
+                else restored,next_cache=profile_cache.seed(decoded)end
+                if not restored then
+                    if cache_error=='http_profile_cache_miss'and not cache_recovery then
+                        -- Explicit representation miss on a read only. No write replay.
+                        send(url,token,true);return
+                    end
+                    if trace then trace.decoded()end
+                    on_error(cache_error or 'http_profile_cache_invalid',status);return
+                end
+                decoded=restored
+                local cache_snapshot=path=="/v1/profile"and decoded or decoded.profile
+                if cache_box and type(cache_snapshot)=='table'and profile_caches[cache_account]==cache_box
+                    and setup.get_session_id()==session and profile_mode(setup)==cache_mode
+                    and setup.get_mode()==cache_game_mode
+                    and (cache_game_mode~='rich'and cache_game_mode~='cold'and cache_game_mode~='scourge'
+                         or cache_snapshot.game_mode==cache_game_mode)
+                    and cache_serial>=cache_box.applied and cache_snapshot.account_id==cache_account
+                    and cache_snapshot.match_session_id==session and cache_snapshot.mode==cache_mode then
+                    cache_box.applied=cache_serial
+                    if path=="/v1/profile"or next_cache then cache_box.value=next_cache end
+                end
+            end
             if path=='/v1/archive/command'then
                 decoded=profile_wire.decode(decoded)
                 if not decoded then
@@ -227,6 +293,7 @@ end
 function M.init()
     active_rule = nil
     logged_in = {}
+    profile_caches,profile_cache_count,profile_cache_session={},0,nil
     endless_batch_capability = nil
     for _, row in ipairs(rules.rows or {}) do
         if row.enabled ~= false then active_rule = row break end

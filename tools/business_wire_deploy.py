@@ -26,6 +26,7 @@ OVERLAY = (
     "player_web_auth/http_api.py",
     "player_web_auth/business_wire.py",
     "player_web_auth/business_wire_schema.json",
+    "player_web_auth/profile_cache.py",
 )
 SELF = "tools/business_wire_deploy.py"
 TRANSPORT = "tools/archive_caps_20261020/remote_driver.py"

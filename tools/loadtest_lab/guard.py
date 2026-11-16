@@ -220,6 +220,13 @@ def validate_database_pool(cfg):
     return mode
 
 
+def profile_read_cache_mode(cfg):
+    mode = cfg.get('profile_read_cache', 'baseline')
+    need(type(mode) is str and mode in ('baseline', 'unchanged-v1'),
+         'lab_profile_read_cache_invalid')
+    return mode
+
+
 def load(directory):
     root = Path(directory).resolve()
     need(not Path(directory).is_symlink(), 'lab_symlink_refused')
@@ -239,6 +246,7 @@ def load(directory):
              'functional_smoke_budget_exceeded')
     need(cfg.get('wire_mode', 'business-wire-v1') in ('business-wire-v1', 'legacy-json'),
          'lab_wire_mode_invalid')
+    profile_read_cache_mode(cfg)
     validate_postgres_image(cfg.get('postgres_image', DEFAULT_POSTGRES_IMAGE), allow_default=True)
     catalog_md5 = cfg.get('lottery_catalog_md5')
     need(catalog_md5 is None or type(catalog_md5) is str and re.fullmatch('[a-f0-9]{32}', catalog_md5),
@@ -417,6 +425,7 @@ def load_client(path):
          'invalid_lab_client_namespace')
     need(cfg.get('wire_mode', 'business-wire-v1') in ('business-wire-v1', 'legacy-json'),
          'lab_wire_mode_invalid')
+    profile_read_cache_mode(cfg)
     validate_postgres_image(cfg.get('postgres_image', DEFAULT_POSTGRES_IMAGE), allow_default=True)
     from .leaderboard_experiments import metadata as leaderboard_metadata
     from .checkpoint_experiments import metadata as checkpoint_metadata
