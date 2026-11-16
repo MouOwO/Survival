@@ -29,6 +29,10 @@ RUNTIME_ROOTS = frozenset(('scripts', 'panorama', 'materials', 'models', 'partic
                            'sounds', 'soundevents', 'resource', 'maps', 'data', 'art'))
 COMPILED_SUFFIXES = frozenset(('.vjs_c', '.vcss_c', '.vxml_c', '.vtex_c', '.vsvg_c', '.vmdl_c',
                                '.vpcf_c', '.vsnd_c', '.vmat_c', '.vsndevts_c', '.vpk'))
+PARTICLE_AUTHOR_MIRRORS = {
+    'particles/survival/skills/void_cyclone_smooth.vpcf_c':
+        'art/effects/void_smooth/source/particles/survival/skills/void_cyclone_smooth.vpcf',
+}
 POINTER = re.compile(rb'version https://git-lfs.github.com/spec/v1\r?\n'
                      rb'oid sha256:([a-f0-9]{64})\r?\nsize ([0-9]{1,16})\r?\n?\Z')
 SHA256 = re.compile(r'[a-f0-9]{64}\Z')
@@ -77,6 +81,10 @@ LOADING_COVER_GAME_AUTHORS = frozenset(LOADING_COVER_AUTHORS.values())
 def _resource(role, path, parent_rows):
     """Return a candidate mapping, not proof of compilation or production fit."""
     suffix = PurePosixPath(path).suffix.lower()
+    if role == 'game':
+        for resource, author in PARTICLE_AUTHOR_MIRRORS.items():
+            if path == author:
+                return resource, 'author'
     if ((role == 'content' and path in LOADING_COVER_AUTHORS)
             or (role == 'game' and path in LOADING_COVER_GAME_AUTHORS)):
         return LOADING_COVER_RESOURCE, 'author'

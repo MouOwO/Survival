@@ -42,6 +42,10 @@ def extend_native_music_scope(tree):
                        "    return [('content', 'soundevents/survival_background_music.vsndevts')]\n").body[0]
     offset = 1 if function.body and isinstance(function.body[0], ast.Expr) and isinstance(function.body[0].value, ast.Constant) and isinstance(function.body[0].value.value, str) else 0
     function.body.insert(offset, branch)
+    particle = ast.parse("if resource == 'particles/survival/skills/void_cyclone_smooth.vpcf_c':\n"
+                         "    return [('content', 'particles/survival/skills/void_cyclone_smooth.vpcf'), "
+                         "('game', 'art/effects/void_smooth/source/particles/survival/skills/void_cyclone_smooth.vpcf')]\n").body[0]
+    function.body.insert(offset, particle)
 
 
 def extend_business_wire_binding(tree, name):
@@ -178,6 +182,10 @@ def render(project, revision, job, current):
             extend_lottery_csv_review(tree)
         elif name == 'scope_review.py':
             extend_native_music_scope(tree)
+        elif name == 'compile_scope.py':
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Attribute) and node.attr == 'KEEPER_PARTICLES':
+                    node.attr = 'PARTICLE_AUTHORS'
         extend_business_wire_binding(tree, name)
         ast.fix_missing_locations(tree)
         source = (ast.unparse(tree) + '\n').encode()

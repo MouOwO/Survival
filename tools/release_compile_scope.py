@@ -32,6 +32,7 @@ inventory=importlib.util.module_from_spec(spec)
 _inventory_bytes=Path(spec.origin).read_bytes()
 EXECUTED_INVENTORY_LF_SHA256=hashlib.sha256(_inventory_bytes.replace(b'\r\n',b'\n')).hexdigest()
 exec(compile(_inventory_bytes,spec.origin,'exec'),inventory.__dict__)
+PARTICLE_AUTHORS = {**KEEPER_PARTICLES, **inventory.PARTICLE_AUTHOR_MIRRORS}
 
 def sha(raw):return hashlib.sha256(raw).hexdigest()
 def checks(raw):return dict(bytes=len(raw),sha256=sha(raw),md5=hashlib.md5(raw).hexdigest())
@@ -130,7 +131,7 @@ def content_source(resource):
     safe(resource)
     if resource == 'soundevents/survival_background_music.vsndevts_c':
         return resource[:-2]
-    if resource in KEEPER_PARTICLES:
+    if resource in PARTICLE_AUTHORS:
         return resource[:-2]
     suffix=PurePosixPath(resource).suffix
     mapping={'.vjs_c':'.js','.vcss_c':'.css','.vxml_c':'.xml','.vsvg_c':'.svg','.vtex_c':'.vtex'}
@@ -139,7 +140,7 @@ def content_source(resource):
 def artifact_for(source):
     if source == 'soundevents/survival_background_music.vsndevts':
         return source + '_c'
-    if source + '_c' in KEEPER_PARTICLES:
+    if source + '_c' in PARTICLE_AUTHORS:
         return source + '_c'
     path=PurePosixPath(safe(source));mapping={'.js':'.vjs_c','.css':'.vcss_c','.xml':'.vxml_c','.svg':'.vsvg_c','.vtex':'.vtex_c'}
     need(path.suffix in mapping,'unsupported_compiler_source_type');return str(path.with_suffix(mapping[path.suffix]))
@@ -181,8 +182,11 @@ def dependencies(path,raw):
                                  'sounds/music/jboberg_01/music/'))
                  and ref.endswith('.vsnd'), 'unreviewed_native_music_dependency')
         return [], sorted({'s2r://' + ref for ref in refs})
-    if path + '_c' in KEEPER_PARTICLES:
+    if path + '_c' in PARTICLE_AUTHORS:
         refs = sorted(set(re.findall(r'resource:"([^"\r\n]+)"', raw.decode('utf8'))))
+        if path + '_c' in inventory.PARTICLE_AUTHOR_MIRRORS:
+            need(refs == ['particles/items_fx/cyclone.vpcf'], 'unreviewed_smooth_cyclone_dependency')
+            return [], ['s2r://particles/items_fx/cyclone.vpcf']
         local, engine = [], []
         for ref in refs:
             safe(ref)
@@ -254,7 +258,7 @@ def make_plan(scope,scope_sha,revisions,roots=None,operator_revision=None):
         payload,normalization=compiler_bytes(value['raw'],PurePosixPath(path).suffix in TEXT)
         pin={k:v for k,v in value.items()if k!='raw'};pin.update(source_revision=revisions['content'],compiler_input=checks(payload),normalization=normalization)
         cover_author=inventory.LOADING_COVER_AUTHORS.get(path)
-        particle_author = KEEPER_PARTICLES.get(path + '_c')
+        particle_author = PARTICLE_AUTHORS.get(path + '_c')
         mirror=cover_author or particle_author or (path if runtime_raw_dependency(path) else 'panorama/src/'+path[len('panorama/'):]if path.startswith('panorama/')else None)
         if particle_author:need(mirror in trees['game'],'keeper_particle_game_author_missing:'+path)
         if cover_author:need(mirror in trees['game'],'loading_cover_game_author_missing:'+path)
