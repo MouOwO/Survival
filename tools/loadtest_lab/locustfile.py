@@ -493,16 +493,19 @@ class DepartureWave:
                 self.sleep(max(0,planned-self.clock()))
                 if RUN_STOPPING:self.cancelled=True;return
                 if user.greenlet.dead:continue
-                actual=self.clock()
-                if actual<planned:
+                # A sleep is only a wakeup hint. The monotonic deadline is
+                # authoritative, including after repeated coarse libuv wakes.
+                # At most eight corrective yields; no user collection scan.
+                for correction in range(8):
+                    actual=self.clock()
+                    if actual>=planned:break
                     self.early_timer_wakes+=1
                     self.max_timer_early_ms=max(self.max_timer_early_ms,(planned-actual)*1000)
-                    # libuv may wake a fractional millisecond before due time.
-                    # One bounded corrective wait, never a polling loop.
-                    self.sleep(planned-actual+.001)
+                    self.sleep(max(.010,planned-actual+.002))
                     if RUN_STOPPING:self.cancelled=True;return
-                    if user.greenlet.dead:continue
-                    actual=self.clock()
+                    if user.greenlet.dead:break
+                if user.greenlet.dead:continue
+                actual=self.clock()
                 if actual<planned:raise ValueError('departure_timer_still_early')
                 user._exit_wave_intent=planned
                 offset=(actual-self.started_at)*1000

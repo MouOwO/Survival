@@ -59,13 +59,13 @@ class GradualSchedulerTests(unittest.TestCase):
   from locust.env import Environment
   from locust.event import Events
   ns,source,_=self.runtime(2);ns['OBSERVE_OVERLOAD']=True;ns['OBSERVATION_COUNTS']={'cleanup_timeouts':0,'isolated_errors':0,'quarantined_actors':0};called=[];obj=source.__new__(source);obj.environment=Environment(events=Events(),stop_timeout=45);obj.player=types.SimpleNamespace(stop=lambda **kw:called.append(kw));obj._exit_wave_intent=time.monotonic()-46;obj.on_stop();self.assertEqual(called,[]);self.assertEqual(ns['RUN_COUNTERS']['cleanup_interrupted'],1);self.assertEqual(ns['RUN_COUNTERS']['cleanup_completed'],0)
- def early_clock(self,advances=True):
+ def early_clock(self,advances=True,early_seconds=.0005):
   import gevent
   from tools.loadtest_lab.workload import Player
   ns,source,wave_type=self.runtime(2000);clock=types.SimpleNamespace(now=100.0);sleeps=[];users=[];writes=[];failures=[];ns['fail_run']=lambda environment,reason:failures.append(reason)
   def sleep(seconds):
    sleeps.append(seconds)
-   if advances:clock.now+=max(0,seconds-.0005)
+   if advances:clock.now+=max(0,seconds-early_seconds)
   runner=types.SimpleNamespace(user_greenlets=[],quit=lambda:None);env=types.SimpleNamespace(runner=runner)
   for _ in range(2000):
    user=source.__new__(source);user._greenlet=types.SimpleNamespace(args=(user,),dead=False);users.append(user);runner.user_greenlets.append(user._greenlet)
@@ -79,5 +79,22 @@ class GradualSchedulerTests(unittest.TestCase):
  def test_real_player_never_receives_future_intent_when_timer_wakes_early(self):
   wave,sleeps,writes,failures=self.early_clock();self.assertEqual(failures,[]);self.assertEqual(wave.scheduled,2000);self.assertEqual(wave.finished_count,2000);self.assertEqual(len(writes),2000);self.assertTrue(all(start<=now and error is None for start,now,error in writes));self.assertLessEqual(len(sleeps),4000);self.assertGreater(wave.early_timer_wakes,0);self.assertAlmostEqual(wave.max_timer_early_ms,.5,places=4);self.assertGreaterEqual(wave.last_offset_ms,120000)
  def test_clock_that_does_not_advance_is_bounded_and_never_false_success(self):
-  wave,sleeps,writes,failures=self.early_clock(False);self.assertTrue(wave.cancelled);self.assertEqual(wave.scheduled,1);self.assertEqual(wave.finished_count,1);self.assertEqual(len(writes),1);self.assertLessEqual(len(sleeps),3);self.assertEqual(failures,['departure_wave_dispatch_failed'])
+  wave,sleeps,writes,failures=self.early_clock(False);self.assertTrue(wave.cancelled);self.assertEqual(wave.scheduled,1);self.assertEqual(wave.finished_count,1);self.assertEqual(len(writes),1);self.assertLessEqual(len(sleeps),10);self.assertEqual(failures,['departure_wave_dispatch_failed'])
+ def test_repeated_1point6ms_early_wakes_use_monotonic_deadlines(self):
+  wave,sleeps,writes,failures=self.early_clock(early_seconds=.0016);self.assertEqual(failures,[]);self.assertEqual(wave.scheduled,2000);self.assertEqual(wave.finished_count,2000);self.assertEqual(len(writes),2000);self.assertTrue(all(start<=now and error is None for start,now,error in writes));self.assertLessEqual(len(sleeps),4000);self.assertGreater(wave.early_timer_wakes,0);self.assertAlmostEqual(wave.max_timer_early_ms,1.6,places=4);self.assertGreaterEqual(wave.last_offset_ms,120000)
+ def test_two_thousand_real_windows_timers_complete_without_future_intent(self):
+  import gevent
+  from tools.loadtest_lab.workload import Player
+  ns,source,wave_type=self.runtime(2000);users=[];writes=[];failures=[];ns['fail_run']=lambda environment,reason:failures.append(reason)
+  runner=types.SimpleNamespace(user_greenlets=[],quit=lambda:None);env=types.SimpleNamespace(runner=runner)
+  for _ in range(2000):
+   user=source.__new__(source);user._greenlet=types.SimpleNamespace(args=(user,),dead=False);users.append(user);runner.user_greenlets.append(user._greenlet)
+  wave=wave_type(env,2);ns['DEPARTURE_WAVE']=wave
+  for user in users:
+   player=Player.__new__(Player);player.client_profile=types.SimpleNamespace(mode='client-v2');player.clock=time.monotonic;player._stop_session=lambda:True;player._workflow=lambda name,started,error,counters:writes.append((started,time.monotonic(),error));user.player=player
+   def stop(force=False,user=user):user.player.stop(intent_started=user._exit_wave_intent);wave.finished(user)
+   user.stop=stop
+  wave.start()
+  with gevent.Timeout(5):wave.task.join()
+  self.assertEqual(failures,[]);self.assertEqual(wave.scheduled,2000);self.assertEqual(wave.finished_count,2000);self.assertTrue(all(start<=now and error is None for start,now,error in writes));self.assertGreaterEqual(wave.last_offset_ms,2000);self.assertFalse(wave.cancelled)
 if __name__=='__main__':unittest.main()
