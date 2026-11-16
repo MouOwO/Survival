@@ -63,6 +63,18 @@ class ReservedServiceTests(unittest.TestCase):
         with self.assertRaises(ValueError):fe.validate_frontend_experiment(c,read)
         c=deepcopy(cfg);c["sources"][fe.RESERVED_TARGET]=fe.RESERVED_OPERATOR_SHA256
         with self.assertRaises(ValueError):fe.metadata_parent_sources(c)
+    def test_waiting_across_bucket_boundary_uses_lock_time(self):
+        service=self.f.service;original=service.lock;service._rate_reservations._highest_bucket=self.f.now//60+1
+        fixture=self.f
+        class AdvanceLock:
+            def __enter__(self):original.acquire();fixture.now+=60
+            def __exit__(self,*args):original.release()
+        service.lock=AdvanceLock()
+        try:service.rate("proxy","synthetic-lock-boundary",10)
+        finally:service.lock=original
+    def test_real_backwards_clock_still_denied(self):
+        service=self.f.service;service.rate("proxy","synthetic-clock-rollback",10);self.f.now-=60
+        with self.assertRaises(mod.AuthError):service.rate("proxy","synthetic-clock-rollback",10)
     def test_wal_full_required(self):
         self.assertEqual(self.f.service.db.execute("PRAGMA journal_mode").fetchone()[0],"wal")
         self.assertEqual(self.f.service.db.execute("PRAGMA synchronous").fetchone()[0],2)
