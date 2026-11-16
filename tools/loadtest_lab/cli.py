@@ -160,7 +160,7 @@ def prepare(args):
     probe_seconds=getattr(args,'exit_probe_common_seconds',None)
     smoothing=getattr(args,'exit_smoothing','direct')
     if probe_seconds is not None:
-        need(type(probe_seconds)is int and probe_seconds==(60 if args.active==2 else 300)
+        need(type(probe_seconds)is int and probe_seconds in ((60,) if args.active==2 else (300,3600))
              and args.purpose=='capacity' and getattr(args,'client_workload',None)=='client-v3'
              and getattr(args,'actor_progress',None)=='active-business-v1', 'exit_probe_options_invalid')
         cfg['exit_probe_common_seconds']=probe_seconds
@@ -489,8 +489,8 @@ def main(argv=None):
     init.add_argument('--db-pool-wait-seconds', type=float,
                       help='bounded-v2 only: queue wait cap, default 2; maximum 5 and request remaining deadline')
     init.add_argument('--generator-transport',choices=('baseline','ssh-quad-v1'),default='baseline',help='Explicit source-bound four-owned-loopback SSH generator transport; no business changes')
-    init.add_argument('--exit-probe-common-seconds',type=int,choices=(60,300),
-                      help='Exit experiment: stop after all actors continuously ready for target plus proof margin; 60 only native2, otherwise300')
+    init.add_argument('--exit-probe-common-seconds',type=int,choices=(60,300,3600),
+                      help='Exit experiment: stop after all actors continuously ready for target plus proof margin; 60 only native2, otherwise300 or3600')
     init.add_argument('--exit-smoothing',choices=('direct','jitter3-v1','queue32-v1','queue64-v1','queue128-v1','gradual120-v1'),default='direct',
                       help='Explicit experimental client exit policy; queue/delay stays inside global exit latency')
     init.add_argument('--checkpoint-observation', action='store_true',

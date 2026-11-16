@@ -235,7 +235,7 @@ def validate_exit_probe(cfg):
         need('exit_smoothing' not in cfg and 'exit_wave_seconds'not in cfg, 'exit_smoothing_requires_five_minute_probe')
         return None
     seconds=cfg['exit_probe_common_seconds']
-    need(type(seconds)is int and seconds==(60 if cfg.get('active')==2 else 300), 'exit_probe_time_invalid')
+    need(type(seconds)is int and seconds in ((60,) if cfg.get('active')==2 else (300,3600)), 'exit_probe_time_invalid')
     need(cfg.get('purpose')=='capacity' and cfg.get('client_workload')=='client-v3'
          and cfg.get('actor_progress')=={'id':'active-business-v1','ttl_seconds':120}, 'exit_probe_requires_active_business_proof')
     mode=cfg.get('exit_smoothing','direct')
