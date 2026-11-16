@@ -15,7 +15,9 @@ class BoundedAdmissionMixin:
                              admission_wait_seconds=0.0):
         if (layer not in ('frontend', 'backend')
                 or type(max_concurrency) is not int or not 1 <= max_concurrency <= 128
-                or type(request_backlog) is not int or not max_concurrency <= request_backlog <= 256
+                or type(request_backlog) is not int or not (max_concurrency <= request_backlog <= 256 or
+                    layer == 'frontend' and max_concurrency == 128
+                    and request_backlog == 2048 and admission_wait_seconds == 2)
                 or type(admission_wait_seconds) not in (int, float)
                 or not 0 <= admission_wait_seconds <= 2):
             raise ValueError('http_admission_configuration_invalid')

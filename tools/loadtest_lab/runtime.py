@@ -151,14 +151,14 @@ def checked_database_pool_stats(client, cfg):
 
 def checked_http_admission_stats(server, layer, cfg):
     """Read fixed counters once at startup/shutdown, with effective limits."""
-    from .experiments import has_http_admission, http_admission_backlog
+    from .experiments import has_http_admission, http_admission_backlog, http_admission_wait
     if not has_http_admission(cfg):
         return None
     stats = server.admission_stats()
     need(type(stats) is dict and stats.get('layer') == layer
          and stats.get('max_concurrency') == cfg['web_concurrency' if layer == 'frontend' else 'http_concurrency']
-         and stats.get('backlog') == http_admission_backlog(cfg)
-         and stats.get('accept_wait_seconds') == (0 if layer == 'frontend' else 2),
+         and stats.get('backlog') == http_admission_backlog(cfg, layer=layer)
+         and stats.get('accept_wait_seconds') == http_admission_wait(cfg, layer=layer),
          'actual_http_admission_budget_mismatch')
     return stats
 
@@ -279,7 +279,7 @@ def serve(directory, *, lua_executable=None):
         raise
     stop = threading.Event()
     pending = threading.Condition(); pending.inflight = 0
-    from .experiments import has_http_admission, http_admission_backlog
+    from .experiments import has_http_admission, http_admission_backlog, http_admission_wait
     admission_mode = has_http_admission(cfg)
     admission_backlog = http_admission_backlog(cfg)
     backend_admission = ({'request_backlog': admission_backlog, 'admission_wait_seconds': 2.0}
@@ -292,7 +292,9 @@ def serve(directory, *, lua_executable=None):
     web = None
     running = []
     try:
-        frontend_admission = ({'max_concurrency': cfg['web_concurrency'], 'request_backlog': admission_backlog}
+        frontend_admission = ({'max_concurrency': cfg['web_concurrency'],
+                               'request_backlog': http_admission_backlog(cfg, layer='frontend'),
+                               'admission_wait_seconds': http_admission_wait(cfg, layer='frontend')}
                               if admission_mode else {})
         web = BoundedServer(('127.0.0.1', PORTS['web']),
                             frontend_handler(service, cfg, private, stop, pending), **frontend_admission)

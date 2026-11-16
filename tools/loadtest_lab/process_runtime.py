@@ -146,7 +146,7 @@ def _backend_setup(root, cfg, private, lua):
         warm = shared.warm_settlement_cache(root, cfg, app, lua)
         base = make_handler(app, client_timeout=settings.http_client_timeout_seconds,
                             request_deadline=settings.http_request_deadline_seconds)
-        from .experiments import has_http_admission, http_admission_backlog
+        from .experiments import has_http_admission, http_admission_backlog, http_admission_wait
         options = ({'request_backlog': http_admission_backlog(cfg), 'admission_wait_seconds': 2.0}
                    if has_http_admission(cfg) else {})
         server = BoundedThreadingHTTPServer(('127.0.0.1', PORTS['backend']), base,
@@ -486,9 +486,11 @@ def serve_split(directory, *, lua_executable=None, _loaded=None):
         from player_web_auth.http_api import BoundedServer
         service = IdentityService(root, cfg, private, lambda path, raw: shared.forward(private, path, raw))
         sqlite_dependency = checked_sqlite_connection(service, sqlite_dependency)
-        from .experiments import has_http_admission, http_admission_backlog
+        from .experiments import has_http_admission, http_admission_backlog, http_admission_wait
         admission = has_http_admission(cfg)
-        options = ({'max_concurrency': cfg['web_concurrency'], 'request_backlog': http_admission_backlog(cfg)}
+        options = ({'max_concurrency': cfg['web_concurrency'],
+                    'request_backlog': http_admission_backlog(cfg, layer='frontend'),
+                    'admission_wait_seconds': http_admission_wait(cfg, layer='frontend')}
                    if admission else {})
         web = BoundedServer(('127.0.0.1', PORTS['web']),
                     shared.frontend_handler(service, cfg, private, stop, pending), **options)
