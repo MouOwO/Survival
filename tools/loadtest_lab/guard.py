@@ -264,6 +264,7 @@ def load(directory):
          'lab_wire_mode_invalid')
     profile_read_cache_mode(cfg)
     validate_exit_probe(cfg)
+    generator_ports(cfg)
     validate_postgres_image(cfg.get('postgres_image', DEFAULT_POSTGRES_IMAGE), allow_default=True)
     catalog_md5 = cfg.get('lottery_catalog_md5')
     need(catalog_md5 is None or type(catalog_md5) is str and re.fullmatch('[a-f0-9]{32}', catalog_md5),
@@ -365,6 +366,25 @@ def database_account(private, raw_account):
     return hmac.new(private['pepper'].encode('ascii'), raw_account.encode('ascii'), hashlib.sha256).hexdigest()
 
 
+def generator_ports(cfg):
+    """Explicit synthetic transport only; O(1), at most four owned loopbacks."""
+    value=cfg.get('generator_transport')
+    if value is None:return (PORTS['web'],)
+    expected={'id':'ssh-quad-v1','loopback_ports':[29567,29568,29569,29570]}
+    need(type(value)is dict and value==expected
+         and all(type(port)is int for port in value.get('loopback_ports',()))
+         and cfg.get('purpose')=='capacity' and cfg.get('client_workload')=='client-v3'
+         and cfg.get('actor_progress')=={'id':'active-business-v1','ttl_seconds':120},
+         'generator_transport_invalid')
+    return tuple(value['loopback_ports'])
+
+
+def generator_url(cfg,index):
+    need(type(index)is int and 0<=index<=1000000,'generator_actor_index_invalid')
+    ports=generator_ports(cfg)
+    return 'http://127.0.0.1:'+str(ports[index%len(ports)])
+
+
 def target_url(value):
     p = urlsplit(value)
     need(value == 'http://127.0.0.1:' + str(PORTS['web']) and p.hostname == '127.0.0.1',
@@ -444,6 +464,7 @@ def load_client(path):
          'lab_wire_mode_invalid')
     profile_read_cache_mode(cfg)
     validate_exit_probe(cfg)
+    generator_ports(cfg)
     validate_postgres_image(cfg.get('postgres_image', DEFAULT_POSTGRES_IMAGE), allow_default=True)
     from .leaderboard_experiments import metadata as leaderboard_metadata
     from .checkpoint_experiments import metadata as checkpoint_metadata

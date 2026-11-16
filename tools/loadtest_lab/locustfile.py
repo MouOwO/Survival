@@ -12,7 +12,7 @@ import sys
 import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from loadtest_lab.guard import load_client, target_url, canonical, sha, write_new, register_storage
+from loadtest_lab.guard import load_client, target_url, canonical, sha, write_new, register_storage, generator_url
 from loadtest_lab.workload import Player, checked, AdmissionBusy, BusyRetryBudget, BusyRetryDeadline, BusyRecoveryTimings, BusyRecoveryRoutes
 from loadtest_lab.guard import client_recovery_policy, observation_mode, validate_exit_probe
 from loadtest_lab.workload_profiles import COUNTERS as WORKLOAD_COUNTERS, WORKFLOWS, profile_for
@@ -666,6 +666,8 @@ class SyntheticPlayer(HttpUser):
             raise StopUser()
         try:
             target_url(self.environment.host or self.host)
+            if 'generator_transport'in CFG:
+                self.client.base_url=generator_url(CFG,RUN_COUNTERS['start_attempts']-1)
             if CLIENT_PROFILE.mode == 'client-v3':
                 from locust.runners import LocalRunner
                 if not isinstance(self.environment.runner, LocalRunner):
