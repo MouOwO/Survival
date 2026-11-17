@@ -37,10 +37,14 @@ def _decode(job):
 def install(wire,path):
     """Original validation in native children;atomic counter merge,one pure fallback."""
     from loadtest_lab import wire_client as wc
-    original=wire.decode;counts={'calls':0,'worker_used':0,'fallback':0,'remote_errors':0}
+    original=wire.decode;counts={'calls':0,'worker_used':0,'inline_small':0,'fallback':0,'remote_errors':0}
     def decode(method,route,raw,status=200,*,request_body=None,profile_context=None):
         import socket
-        counts['calls']+=1;began=time.perf_counter_ns()
+        counts['calls']+=1
+        if type(raw)is bytes and len(raw)<512:
+            counts['inline_small']+=1
+            return original(method,route,raw,status,request_body=request_body,profile_context=profile_context)
+        began=time.perf_counter_ns()
         try:
             job={'mode':wire.mode,'routes':wire._routes is not None,'method':method,'path':route,'raw':raw,'status':status,'request_body':request_body,'context':profile_context}
             with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)as sock:
@@ -74,7 +78,7 @@ def install(wire,path):
         counts['worker_used']+=1
         if not v['ok']:counts['remote_errors']+=1;raise ValueError(v['error'])
         return v['value']
-    wire.decode=decode;wire._decode_offload_snapshot=lambda:dict(counts,mode='original-WireClient-private-Unix-process2-data-v2',HTTP_replays=0,pure_fallback_only=True)
+    wire.decode=decode;wire._decode_offload_snapshot=lambda:dict(counts,mode='original-WireClient-private-Unix-process2-selective-data-v3',HTTP_replays=0,pure_fallback_only=True)
 
 class Decoder:
     def __init__(self,spec,digest,stage):self.spec=Path(spec);self.digest=digest;self.stage=stage;self.proc=None;self.handles={};self.ready=None;self.terminal=None;self.forced=False;self.path=None
