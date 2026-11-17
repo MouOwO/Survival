@@ -134,6 +134,30 @@ def resolve_database_pool(mode, *, http_concurrency=None, db_concurrency=4,
     return {'requested': requested, 'effective': effective}, limits
 
 
+POSTGRES_CACHE_PROFILE={'id':'buffers1g-v1','shared_buffers_mib':1024}
+
+
+def validate_postgres_cache(cfg):
+    """One fixed startup-only memory profile within the existing4GiB cgroup."""
+    row=cfg.get('postgres_cache')
+    if row is None:return None
+    need(type(row)is dict and row==POSTGRES_CACHE_PROFILE
+         and type(row.get('shared_buffers_mib'))is int
+         and cfg.get('purpose')=='capacity'
+         and type(cfg.get('database_memory_mib'))is int and cfg['database_memory_mib']==4096
+         and type(cfg.get('database_cpu_limit'))in(int,float)and cfg['database_cpu_limit']==4
+         and cfg.get('database_resource_profile')in('db16-4cpu-4g-v1','db32-4cpu-4g-v1'),
+         'postgres_cache_fixed_capacity_profile_required')
+    return row
+
+
+def postgres_command(cfg):
+    row=validate_postgres_cache(cfg)
+    command=['postgres','-p','25432','-c','listen_addresses=127.0.0.1']
+    if row is not None:command+=['-c','shared_buffers=1024MB']
+    return command
+
+
 def _validate_concurrency_budgets(cfg):
     """Constant-size startup guard; smaller DB profiles never imply HTTP64."""
     reduced=type(cfg.get('backend_process_pool'))is dict and cfg['backend_process_pool'].get('id')=='full-business-four-db16-v1'
@@ -321,6 +345,7 @@ def load(directory):
     need(type(cpu) in (int, float) and .25 <= cpu <= 16, 'lab_database_cpu_budget_invalid')
     if cfg['purpose'] == 'functional-smoke':
         need(memory <= 512 and cpu <= 1, 'functional_smoke_database_budget_exceeded')
+    validate_postgres_cache(cfg)
     for key in ('controller', 'backend', 'auth_secret', 'pepper', 'database_admin', 'database_app', 'marker'):
         need(bool(re.fullmatch('[a-f0-9]{64}', private.get(key, ''))), 'independent_lab_secret_required')
     need(len(set(private.values())) == 7, 'lab_secrets_must_be_independent')

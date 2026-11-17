@@ -9,7 +9,7 @@ import time
 
 from .guard import (PORTS, ACCOUNT_START, canonical, sha, need, relative, read_json,
                     write_new, load, dsn, marker_guard, DEFAULT_POSTGRES_IMAGE, validate_postgres_image,
-                    resolve_database_pool)
+                    resolve_database_pool, validate_postgres_cache, postgres_command)
 from .experiments import DB8_RESOURCE_PROFILES, DB16_RESOURCE_PROFILES, DB32_RESOURCE_PROFILES, DATABASE_RESOURCE_PROFILES, resolve_database_resources
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -152,6 +152,11 @@ def prepare(args):
         cfg['database_resource_profile'] = resource_profile
     if pool_limits is not None:
         cfg['database_pool_limits'] = pool_limits
+    cache_mode=getattr(args,'postgres_cache','baseline')
+    need(cache_mode in('baseline','buffers1g-v1'),'postgres_cache_option_invalid')
+    if cache_mode!='baseline':
+        cfg['postgres_cache']={'id':'buffers1g-v1','shared_buffers_mib':1024}
+        validate_postgres_cache(cfg)
     transport=getattr(args,'generator_transport','baseline')
     need(transport in ('baseline','ssh-quad-v1','ssh-16-v1','linux-loopback-v1'),'generator_transport_option_invalid')
     if transport in ('ssh-quad-v1','ssh-16-v1','linux-loopback-v1'):
@@ -373,7 +378,7 @@ def prepare(args):
         + '\n    cpus: ' + str(database_cpu_limit)
         + '\n    environment:\n      PGPORT: "25432"\n      POSTGRES_DB: ' + cfg['database']
         + '\n      POSTGRES_PASSWORD: ' + private['database_admin']
-        + '\n    command: ["postgres", "-p", "25432", "-c", "listen_addresses=127.0.0.1"]'
+        + '\n    command: ' + json.dumps(postgres_command(cfg))
         + '\n    volumes:\n      - ./pgdata:/var/lib/postgresql/data\n      - ./database:/docker-entrypoint-initdb.d:ro\n')
     (root / 'compose.yaml').write_text(compose, encoding='utf8'); (root / 'compose.yaml').chmod(0o600)
     write_new(root / 'prepare_receipt.json', {'kind': 'ISOLATED_LOADTEST_PREPARATION_RECEIPT',
@@ -381,6 +386,7 @@ def prepare(args):
         'manifest_sha256': sha(canonical(cfg)), 'sources': cfg['sources'],
         'backend_db_pool': backend_db_pool, 'backend_overlay': cfg.get('backend_overlay'),
         'database_pool_parameters': pool_parameters,
+        **({'postgres_cache':cfg['postgres_cache'],'postgres_launch_command':postgres_command(cfg)}if 'postgres_cache'in cfg else {}),
         'runtime_experiments': cfg.get('runtime_experiments', []),
         **({'schema_experiment': cfg['schema_experiment']} if 'schema_experiment' in cfg else {}),
         **({'archive_validation': cfg['archive_validation']} if 'archive_validation' in cfg else {}),
@@ -564,6 +570,8 @@ def main(argv=None):
                       help='Isolated local database memory cap; default 2048 MiB (smoke: 256)')
     init.add_argument('--database-cpu-limit', type=float,
                       help='Isolated local database CPU cap; default 1 CPU (smoke: 0.5)')
+    init.add_argument('--postgres-cache',choices=('baseline','buffers1g-v1'),default='baseline',
+                      help='Isolated4GiB database only: opt-in fixed1GiB shared buffers; no live reload')
     init.add_argument('--postgres-image',
                       help='Official PostgreSQL image pinned by sha256 digest; omitted: postgres:17')
     init.add_argument('--lottery-catalog-md5', help='Verified public client-local catalog seed MD5; otherwise startup is cold')
