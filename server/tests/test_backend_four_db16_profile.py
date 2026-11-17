@@ -33,6 +33,19 @@ class BackendFourDB16Tests(unittest.TestCase):
   args=http_tests.HTTP64Profile().args();args.update(db_concurrency=16,backend_profile=FOUR_DB16_PROFILE['id'])
   for key,value in [('db_concurrency',32),('pool_max_waiters',32),('pool_max_waiters',65),('http_concurrency',32),('admission_mode','bounded-v7'),('backend_profile','other')]:
    with self.subTest(key=key),self.assertRaises(ValueError):resolve_database_pool('bounded-v2',**{**args,key:value})
+ def test_manifest_load_budget_accepts_only_complete_db16_profile(self):
+  from tools.loadtest_lab.guard import _validate_concurrency_budgets
+  cfg=self.cfg();cfg['global_http_per_minute']=1000000;_validate_concurrency_budgets(cfg)
+  cfg.pop('backend_process_pool')
+  with self.assertRaises(ValueError):_validate_concurrency_budgets(cfg)
+ def test_manifest_load_budget_rejects_forged_or_excess_values(self):
+  from tools.loadtest_lab.guard import _validate_concurrency_budgets
+  for key,value in [('http_concurrency',65),('db_concurrency',True),('global_http_per_minute',1000001),('global_http_per_minute',False)]:
+   cfg=self.cfg();cfg['global_http_per_minute']=1000000;cfg[key]=value
+   with self.subTest(key=key),self.assertRaises(ValueError):_validate_concurrency_budgets(cfg)
+ def test_manifest_load_old_http64_db32_remains_valid(self):
+  from tools.loadtest_lab.guard import _validate_concurrency_budgets
+  cfg=http_tests.HTTP64Profile().cfg();cfg['global_http_per_minute']=1000000;_validate_concurrency_budgets(cfg)
  def test_unclosed_fourth_node_is_not_hidden(self):
   from tools.loadtest_lab.process_runtime import _aggregate_counters
   rows=[dict(max_size=4,closed=True,wait_timeout=2)for _ in range(4)];rows[-1]['closed']=False

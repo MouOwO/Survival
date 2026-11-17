@@ -134,6 +134,19 @@ def resolve_database_pool(mode, *, http_concurrency=None, db_concurrency=4,
     return {'requested': requested, 'effective': effective}, limits
 
 
+def _validate_concurrency_budgets(cfg):
+    """Constant-size startup guard; smaller DB profiles never imply HTTP64."""
+    reduced=type(cfg.get('backend_process_pool'))is dict and cfg['backend_process_pool'].get('id')=='full-business-four-db16-v1'
+    if reduced:
+        from .process_runtime import validate_backend_pair
+        validate_backend_pair(cfg)
+    expanded=cfg.get('database_resource_profile')=='db32-4cpu-4g-v1'and any(row.get('id')=='http-admission-v8'for row in cfg.get('runtime_experiments',()))
+    for key,limit in (('http_concurrency',64 if reduced or expanded else 32),
+                      ('db_concurrency',32 if cfg.get('database_resource_profile')=='db32-4cpu-4g-v1'else 16),
+                      ('web_concurrency',128),('global_http_per_minute',1000000)):
+        need(type(cfg.get(key))is int and 1<=cfg[key]<=limit,'lab_concurrency_budget_invalid')
+
+
 def validate_response_encoding_pool(cfg):
     value=cfg.get('response_encoding_pool')
     if value is None:return None
@@ -311,9 +324,7 @@ def load(directory):
     for key in ('controller', 'backend', 'auth_secret', 'pepper', 'database_admin', 'database_app', 'marker'):
         need(bool(re.fullmatch('[a-f0-9]{64}', private.get(key, ''))), 'independent_lab_secret_required')
     need(len(set(private.values())) == 7, 'lab_secrets_must_be_independent')
-    for key, limit in (('http_concurrency', 64 if cfg.get('database_resource_profile')=='db32-4cpu-4g-v1'and any(row.get('id')=='http-admission-v8'for row in cfg.get('runtime_experiments',()))else 32), ('db_concurrency', 32 if cfg.get('database_resource_profile')=='db32-4cpu-4g-v1'else 16), ('web_concurrency', 128),
-                       ('global_http_per_minute', 1000000)):
-        need(type(cfg.get(key)) is int and 1 <= cfg[key] <= limit, 'lab_concurrency_budget_invalid')
+    _validate_concurrency_budgets(cfg)
     validate_database_pool(cfg)
     from .lottery_cache_experiments import validate as validate_lottery_cache
     validate_lottery_cache(cfg,lambda name:(root/name).read_bytes())
