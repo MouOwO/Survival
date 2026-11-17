@@ -37,6 +37,9 @@ PROGRESS_INDEX = PROGRESS_OBSERVER = None
 PROGRESS_FROZEN = False
 WORKLOAD_COUNTS = dict.fromkeys(WORKLOAD_COUNTERS, 0)
 WIRE = WireClient(CFG.get('wire_mode', WIRE_MODE), measure_routes=True)
+if os.environ.get('LOADTEST_DECODE_SOCKET'):
+    from decode_service import install as _install_decode_processes
+    _install_decode_processes(WIRE,os.environ['LOADTEST_DECODE_SOCKET'])
 WIRE_WORKERS = {}
 WIRE_WORKERS_SEEN = set()
 WIRE_FINAL = False
@@ -967,6 +970,7 @@ def exit_on_failure(environment, **kwargs):
             'requests': total.num_requests, 'failures': total.num_failures,
             'includes_user_finalization': True, 'capacity_certified': False,
             'business_wire': wire,
+            'client_decode_offload':None if not hasattr(WIRE,'_decode_offload_snapshot')else WIRE._decode_offload_snapshot(),
             **({'overload_observation': {'mode': 'observe-overload-v1',
                 'counters': dict(OBSERVATION_COUNTS), 'capacity_certified': False,
                 'quarantined_users_are_not_active_business_users': True,
