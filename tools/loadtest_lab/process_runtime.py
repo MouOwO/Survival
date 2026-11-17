@@ -122,6 +122,18 @@ def publish_same_scope(root, cfg):
     return publish_scope(root, cfg, [_identity(os.getpid(), ['frontend', 'backend'])])
 
 
+def _retire_original_pool(original):
+    """The original builder performs real readiness/sync RPCs before returning.
+    Close those startup connections before any distributed workers are opened.
+    """
+    original.close()
+    stats=original.pool_stats()
+    need(type(stats)is dict and stats.get('closed')is True
+         and all(stats.get(k)==0 for k in ('total','waiting','in_use','connecting','closing','quarantined')),
+         'original_bootstrap_pool_not_fully_closed')
+    return stats
+
+
 def _backend_setup(root, cfg, private, lua):
     """The original Settings/constructor/preflight calls, in a fresh process."""
     sys.path.insert(0, str(root / 'runtime'))
@@ -146,8 +158,7 @@ def _backend_setup(root, cfg, private, lua):
         if rpc_profile(cfg)is not None:
             original=app.rpc_client
             if cfg['rpc_process_pool']['workers']==32:
-                need(original.pool_stats()['total']==0,'db32_bootstrap_client_must_be_unused')
-                original.close()
+                _retire_original_pool(original)
             parallel=RpcProcesses(root,settings.postgres_dsn,workers=cfg['rpc_process_pool']['workers'],
                 connect_timeout=settings.postgres_connect_timeout_seconds,
                 statement_timeout_ms=settings.postgres_statement_timeout_ms,

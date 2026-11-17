@@ -33,4 +33,21 @@ class ThirtyTwoRPCProfile(unittest.TestCase):
  def test_matching_legacy_profile_does_not_accept_new_flag(self):
   cfg=self.cfg();cfg.update(db_concurrency=16,database_pool_limits={'connections':16,'waiting':32,'wait_seconds':2});cfg['rpc_process_pool']={'id':'driver-process16-v1','workers':16,'max_pending':24,'queue_seconds':2}
   with self.assertRaises(ValueError):validate_profile(cfg)
+class OriginalBootstrapRetirement(unittest.TestCase):
+ def test_a_real_startup_connection_is_closed_before_testing_zero(self):
+  from tools.loadtest_lab.process_runtime import _retire_original_pool
+  class Original:
+   closed=False
+   def close(self):self.closed=True
+   def pool_stats(self):return dict(closed=self.closed,total=0 if self.closed else 1,waiting=0,in_use=0,connecting=0,closing=0,quarantined=0)
+  client=Original();result=_retire_original_pool(client);self.assertTrue(client.closed);self.assertEqual(result['total'],0)
+ def test_deferred_or_quarantined_closure_cannot_start_the_new_pool(self):
+  from tools.loadtest_lab.process_runtime import _retire_original_pool
+  class Original:
+   def __init__(self,key):self.key=key
+   def close(self):pass
+   def pool_stats(self):
+    value=dict(closed=True,total=0,waiting=0,in_use=0,connecting=0,closing=0,quarantined=0);value[self.key]=False if self.key=='closed'else 1;return value
+  for key in ['closed','total','waiting','in_use','connecting','closing','quarantined']:
+   with self.subTest(key=key),self.assertRaises(ValueError):_retire_original_pool(Original(key))
 if __name__=='__main__':unittest.main()
