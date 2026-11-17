@@ -2,7 +2,25 @@
 
 状态：仅隔离试机候选。正式后台、游廊未变，没有采购或升配服务器。4000账号共同业务在线一小时目标仍未通过；当前新一轮正在执行，后续以原生、HTTP、HMAC、SQL和正常关闭的全套证据为准。
 
-## 当前真实运行
+## 当前真实运行F167
+
+F167：c9i_rpcthirtytwo_linux4000_slowhour_20261117_05，run 7cad98d105428bfb745867f3f1b06e60。13:38:52UTC在F166已确认物理关闭后启动，13:41:18开始原生阶段；10万成熟合成存档已初始化。源码仍163fe5cae366acb5a16ede4cbeca944fac21a06d，149份源摘要与F166逐一相同；lab配置只变runID、隔离数据库身份和时长，实际加入率从3/秒改为1/秒。PG4CPU/4GiB、32原驱动连接、每账号业务节奏、权限/SQL、旧BW1与同机原样解码不变。全部4000共同持续3600秒及120秒渐退要求保留，不能用“慢登录没有错误”替代该目标。
+
+实际发压PID3637085、starttime_ticks13360497已与该run的原生expected_argv核对；原PID3139577只属于已关闭F166，不能复用。当前会话runner72220、只读观察80109、采样14541；本地核验器verify_goal_4000_rpc32_slow_05.py。状态以真实运行记录为准，不凭文件存在判断存活。
+
+最新观察：2026-11-17T13:46:55.872179+00:00，330活跃，混合事件6611、失败0；共同4000一小时尚未形成。
+
+## F166的最终失败证据
+
+F166在约3171活跃时先出现69个混合错误；停止前一份原观测248错误。13:37:33UTC核对唯一发压进程身份后SIGINT，正常收尾并确认case_complete与physical_stop_confirmed为true，不代表业务验收通过。
+
+最终CSV含HTTP152242/失败1707，WORKFLOW42462/失败2710，ASSERT1401/失败1401，混合196105/失败5818。全窗包含停止后的集中收尾，不能把全部错误归为稳定在线阶段错误。客户端回执较早记录HTTP142471/185，run_state.collection_complete=false，不能用该部分回执较小错误数代替最终CSV；原生正确报final_statistics_mismatch。所有原始回执、CSV、HTML及错误日志保留，没有重写它们来使报告通过。
+
+原只读SQL04执行13条、完成6个聚合后因online_sessions=1207拒绝；pending_operations、pending_outbox、errored_operations均0，但后续奖励关联完整审计未执行，整体NOT_CONFIRMED。原分析器因所需完整路由缺失拒绝，目标核验器明确NOT_PASSED。此失败库仍隔离保留，不操作正式账号。
+
+新增证据：rpc32_failed_case_terminal_counts_04_receipt.json、rpc32_slowhour_current_identity_07_receipt.json、rpc32_slow_goal_verifier_coverage_01_receipt.json。当前验收器保留16个原基础门禁及其扩展核验，原生/HTTP/签名共同活动/SQL/清理都须完整；旧时延预算仍独立报告，不静默放宽。用户工作最迟16:18:42UTC的本轮边界不变，新场景按1/秒预计约14:48达到4000，再共同一小时及正常收尾；当前未宣称通过。
+
+## 历史运行F166（已失败并正常关闭）
 
 F166：c9i_rpcthirtytwo_linux4000_hour_20261117_04，run a6c85a89db132ea8a6d52ba153138815。源码163fe5cae366acb5a16ede4cbeca944fac21a06d（capacity/rpc-thirtytwo-20261117），149份来源完整绑定，工作树保持冻结。13:14:40UTC启动，10万合成存档已实际初始化，13:17后原生业务发压开始；13:21:06UTC采样690活跃、零混合失败，不能据此称4000验收通过。
 
