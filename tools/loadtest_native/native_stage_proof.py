@@ -31,7 +31,7 @@ def read_public_json(path):
     return value
 
 _OPERATOR_NAMES = ('__init__', 'business_experiments', 'checkpoint_experiments', 'cli', 'database_experiments',
-    'experiments', 'frontend_experiments', 'guard', 'identity', 'leaderboard_experiments', 'locustfile', 'monitor',
+    'experiments', 'frontend_experiments', 'guard', 'identity', 'leaderboard_experiments', 'lottery_cache_experiments', 'locustfile', 'monitor',
     'principal_experiments', 'profile_context_experiments', 'process_runtime', 'progress', 'runtime', 'smoke', 'snapshot', 'status',
     'wire_client', 'workload', 'workload_profiles')
 
@@ -64,6 +64,8 @@ def bindings_for(cfg):
         result += (('server/player_web_auth/response_pool.py','runtime/player_web_auth/response_pool.py'),)
     if 'operator/loadtest_lab/rpc_process_pool.py'in cfg.get('sources',{}):
         result += (('tools/loadtest_lab/rpc_process_pool.py','operator/loadtest_lab/rpc_process_pool.py'),)
+    if 'lottery_static_cache'in cfg:
+        result += (('server/fishing_api_overrides/lottery_revision_cache.py','operator/runtime_experiments/lottery_revision_cache.py'),)
     return result
 
 def validate_all_prepared_sources(lab,cfg):
