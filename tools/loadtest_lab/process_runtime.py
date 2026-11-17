@@ -441,6 +441,8 @@ def serve_split(directory, *, lua_executable=None, _loaded=None):
     pending = threading.Condition(); pending.inflight = 0
     owner = None
     service = web = None
+    response_encoder = None
+    response_terminal = None
     web_running = False
     started = terminal = None
     child_identity = None
@@ -492,8 +494,9 @@ def serve_split(directory, *, lua_executable=None, _loaded=None):
                     'request_backlog': http_admission_backlog(cfg, layer='frontend'),
                     'admission_wait_seconds': http_admission_wait(cfg, layer='frontend')}
                    if admission else {})
+        response_encoder = shared.prepare_response_encoder(cfg)
         web = BoundedServer(('127.0.0.1', PORTS['web']),
-                    shared.frontend_handler(service, cfg, private, stop, pending), **options)
+                    shared.frontend_handler(service, cfg, private, stop, pending, response_encoder), **options)
         web.block_on_close = False
         if not admission: web.slots = threading.BoundedSemaphore(cfg['web_concurrency'])
         scope = publish_scope(root, cfg, [own, child_identity])
@@ -525,6 +528,7 @@ def serve_split(directory, *, lua_executable=None, _loaded=None):
             'process_topology': 'split-v1', 'processes': scope,
             'backend_process': {'child_identity': child_identity,
                 'start_receipt_sha256': sha((root / 'backend_started_receipt.json').read_bytes())},
+            'response_encoding_pool': None if response_encoder is None else response_encoder.snapshot(),
             'steam_calls_enabled': False, 'payment_calls_enabled': False, 'public_listener': False})
         threading.Thread(target=web.serve_forever, daemon=True).start(); web_running = True
         startup_complete.set()
@@ -556,6 +560,13 @@ def serve_split(directory, *, lua_executable=None, _loaded=None):
             except BaseException:
                 _safe_error(errors, 'frontend_pending_drain_failed')
         finally:
+            if response_encoder is not None:
+                _best_effort(errors,'response_encoder_close_failed',lambda:response_encoder.close(deadline=deadline))
+                response_terminal = _best_effort(errors,'response_encoder_snapshot_failed',response_encoder.snapshot,{'pending':1,'forced_workers':1})
+                if (response_terminal['pending'] or response_terminal['forced_workers']
+                    or not response_terminal.get('manager_joined')
+                    or not all(response_terminal.get('worker_exit_confirmed',[]))):
+                    _safe_error(errors,'response_encoder_not_cleanly_closed')
             expected_exit.set()
             # This block cannot be skipped by FE shutdown/tracking/publication
             # errors. The hard watchdog covers blocking calls and disk IO.
@@ -654,6 +665,7 @@ def serve_split(directory, *, lua_executable=None, _loaded=None):
                             if (root / 'backend_started_receipt.json').is_file() else None,
                         'stop_receipt_sha256': sha((root / 'backend_stopped_receipt.json').read_bytes())
                             if (root / 'backend_stopped_receipt.json').is_file() else None},
+                    'response_encoding_pool': response_terminal,
                     'account_state_modified_only_in_lab': True, 'capacity_certified': False}
                 write_new(root / 'stopped_receipt.json', stopped)
             except BaseException:

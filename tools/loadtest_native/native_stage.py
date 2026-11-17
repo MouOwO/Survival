@@ -90,7 +90,7 @@ def run(spec_path,spec_sha):
     finally:
         if proc is not None and proc.poll()is None:
             try:
-                proof.need(handle.create_time()==created,'owned_child_identity_changed');proc.send_signal(signal.SIGINT);proc.wait(timeout=STOP_SECONDS+5)
+                proof.need(handle.create_time()==created,'owned_child_identity_changed');proc.send_signal(signal.SIGTERM);proc.wait(timeout=STOP_SECONDS+5)
             except Exception:
                 error=error or'native_child_graceful_stop_failed'
                 if proc.poll()is None:

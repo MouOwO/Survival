@@ -127,9 +127,25 @@ def resolve_database_pool(mode, *, http_concurrency=None, db_concurrency=4,
     return {'requested': requested, 'effective': effective}, limits
 
 
+def validate_response_encoding_pool(cfg):
+    value=cfg.get('response_encoding_pool')
+    if value is None:return None
+    need(type(value)is dict and set(value)=={'id','workers','max_pending','wait_seconds'}
+         and value['id']=='pure-process-v1'and type(value['workers'])is int
+         and value['workers']in(2,3)and type(value['max_pending'])is int
+         and value['max_pending']==value['workers']*8
+         and type(value['wait_seconds'])in(int,float)and value['wait_seconds']==2
+         and cfg.get('purpose')=='capacity'and cfg.get('process_topology')=='split-v1'
+         and cfg.get('process_observation')=='pid-v1'
+         and type(cfg.get('sources',{}).get('runtime/player_web_auth/response_pool.py'))is str
+         and re.fullmatch('[a-f0-9]{64}',cfg['sources']['runtime/player_web_auth/response_pool.py']),'response_encoding_pool_profile_invalid')
+    return value
+
+
 def validate_database_pool(cfg):
     """Fixed reviewed experiment budgets and source bindings, once per load."""
     validate_settlement_cache(cfg)
+    validate_response_encoding_pool(cfg)
     if 'process_topology' in cfg or 'process_observation' in cfg:
         from .process_runtime import validate_process_options
         validate_process_options(cfg)
@@ -493,6 +509,7 @@ def load_client(path):
     from .workload_profiles import validate_workload_profile
     validate_workload_profile(cfg)
     validate_settlement_cache(cfg)
+    validate_response_encoding_pool(cfg)
     if 'process_topology' in cfg or 'process_observation' in cfg:
         from .process_runtime import validate_process_options
         validate_process_options(cfg)

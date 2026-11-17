@@ -37,7 +37,17 @@ def forward(private, path, raw):
         conn.close()
 
 
-def frontend_handler(service, cfg, private, stop, pending):
+def prepare_response_encoder(cfg):
+    from .guard import validate_response_encoding_pool
+    value=validate_response_encoding_pool(cfg)
+    if value is None:return None
+    from player_web_auth.response_pool import ResponseEncoderPool
+    return ResponseEncoderPool(workers=value['workers'],pending=value['max_pending'],wait_seconds=value['wait_seconds'])
+
+
+def frontend_handler(service, cfg, private, stop, pending, response_encoder=None):
+    from player_web_auth import http_api
+    if response_encoder is not None:response_encoder.install(http_api)
     from player_web_auth.http_api import handler
     from player_web_auth.service import AuthError
     base = handler(service)
