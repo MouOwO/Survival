@@ -306,7 +306,7 @@ def load(directory):
     for key in ('controller', 'backend', 'auth_secret', 'pepper', 'database_admin', 'database_app', 'marker'):
         need(bool(re.fullmatch('[a-f0-9]{64}', private.get(key, ''))), 'independent_lab_secret_required')
     need(len(set(private.values())) == 7, 'lab_secrets_must_be_independent')
-    for key, limit in (('http_concurrency', 32), ('db_concurrency', 32 if cfg.get('database_resource_profile')=='db32-4cpu-4g-v1'else 16), ('web_concurrency', 128),
+    for key, limit in (('http_concurrency', 64 if cfg.get('database_resource_profile')=='db32-4cpu-4g-v1'and any(row.get('id')=='http-admission-v8'for row in cfg.get('runtime_experiments',()))else 32), ('db_concurrency', 32 if cfg.get('database_resource_profile')=='db32-4cpu-4g-v1'else 16), ('web_concurrency', 128),
                        ('global_http_per_minute', 1000000)):
         need(type(cfg.get(key)) is int and 1 <= cfg[key] <= limit, 'lab_concurrency_budget_invalid')
     validate_database_pool(cfg)
