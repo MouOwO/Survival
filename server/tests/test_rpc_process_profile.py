@@ -86,4 +86,34 @@ class RpcProfileTests(unittest.TestCase):
   cfg=self.cfg();cfg['rpc_process_pool'].update(id='driver-process12-v1',workers=12);before=copy.deepcopy(cfg);self.assertEqual(validate_profile(cfg),cfg['rpc_process_pool']);self.assertEqual(cfg,before)
   cfg['rpc_process_pool']['id']='driver-process3-v1'
   with self.assertRaises(ValueError):validate_profile(cfg)
+
+ def test_actual_monitor_constructor_indexes_twenty_fixed_processes(self):
+  from pathlib import Path
+  from types import SimpleNamespace
+  from tools.loadtest_lab import monitor as m
+  from tools.loadtest_lab.guard import canonical,sha
+  cfg=self.cfg();cfg['run_id']='a'*32;cfg['rpc_process_pool'].update(id='driver-process16-v1',workers=16)
+  roles=('frontend','backend',*('rpc'+str(i)for i in range(16)))
+  rows=[{'pid':i+10,'starttime_ticks':100+i,'boot_id_sha256':'b'*64,'exe_sha256':'c'*64,'roles':[role]}for i,role in enumerate(roles)]
+  scope={'schema':1,'id':'pid-v1','run_id':cfg['run_id'],'manifest_sha256':sha(canonical(cfg)),'postgres_container_name':'survival-loadtest-'+cfg['run_id'][:12],'processes':rows};raw=canonical(scope)
+  def identity(pid):return {'pid':pid,'starttime_ticks':100,'boot_id_sha256':'b'*64,'exe_sha256':'c'*64}
+  with patch.object(Path,'is_file',return_value=True),patch.object(Path,'is_symlink',return_value=False),patch.object(Path,'stat',return_value=SimpleNamespace(st_size=len(raw))),patch.object(Path,'read_bytes',return_value=raw),patch.object(m,'_pm_boot_hash',return_value='b'*64),patch.object(m.os,'sysconf',return_value=100,create=True),patch.object(m,'_pm_capture',side_effect=[(identity(999),None),(identity(998),None)]),patch.object(m,'_pm_inspect',return_value={'pid':998}),patch.object(m,'_ObservedProcess')as process,patch.object(m,'_ObservedCgroup')as group:
+   group.return_value.public={};observer=m._ProcessObservation(Path('rpc-monitor-fixture'),cfg)
+  self.assertEqual(process.call_count,20);self.assertEqual(len(observer.header['processes']),20)
+  self.assertEqual({r for row in observer.header['processes']for r in row['roles']},set(roles)|{'monitor','postgres_init'})
+
+ def test_sixteen_workers_retains_exact_configured_connection_and_waiter_budget(self):
+  cfg=self.cfg();cfg['rpc_process_pool'].update(id='driver-process16-v1',workers=16)
+  self.assertEqual(validate_profile(cfg),cfg['rpc_process_pool'])
+  self.assertEqual(sum(16//16+int(i<16%16)for i in range(16)),16)
+  self.assertEqual(sum(32//16+int(i<32%16)for i in range(16)),32)
+  for workers in (0,False,4,8,15,17,24,128):
+   bad=copy.deepcopy(cfg);bad['rpc_process_pool'].update(id='driver-process'+str(workers)+'-v1',workers=workers)
+   with self.assertRaises(ValueError):validate_profile(bad)
+ def test_cli_sixteen_workers_explicit_opt_in(self):
+  from tools.loadtest_lab import cli
+  with patch.object(cli,'prepare',return_value={'ok':True})as call,redirect_stdout(io.StringIO()):
+   self.assertEqual(cli.main(['prepare','--directory','fixture','--source-receipt','fixture.json','--rpc-processes','driver-process16-v1']),0)
+  self.assertEqual(call.call_args.args[0].rpc_processes,'driver-process16-v1')
+
 if __name__=='__main__':unittest.main()

@@ -312,7 +312,7 @@ def _pm_scope(cfg,value):
     need(value['manifest_sha256']==manifest,'process_scope_manifest_mismatch')
     need(value['postgres_container_name']=='survival-loadtest-'+cfg['run_id'][:12],'process_scope_container_name_invalid')
     parallel=cfg.get('rpc_process_pool',{}).get('workers',0)
-    need(type(parallel)is int and parallel in(0,3,6,12),'process_scope_rpc_budget_invalid')
+    need(type(parallel)is int and parallel in(0,3,6,12,16),'process_scope_rpc_budget_invalid')
     rows=value['processes'];need(type(rows)is list and 1<=len(rows)<=(2+parallel if parallel else 2),'process_scope_count_invalid');roles=[];pids=[]
     for row in rows:
         need(type(row)is dict and set(row)==PID_ID_KEYS|{'roles'},'process_scope_process_invalid')
