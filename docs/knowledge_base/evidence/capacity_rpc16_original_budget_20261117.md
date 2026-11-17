@@ -32,3 +32,20 @@
 `sql_guard_cached_old179_01/{preparation,execution}_receipt.json`、`rpc_sixteen_component_old179_01/{preparation,upload,execution}_receipt.json`、`rpc_sixteen_preparation_01_receipt.json`、`rpc_sixteen_git_sync_01_receipt.json`、`rpc_sixteen_case_preparation_01_receipt.json`；全部历史失败及原始回执保留。
 
 二进制小测试另在`capacity/binary-frame-20261117`候选，默认关闭；当前及新16进程容量候选均使用旧BW1协议，不把包体变化混入进程对照。
+
+
+## LuaJIT实验拒绝采用（同日后续）
+
+2000账号的只读采样中，FE约0.293核、BE约0.474核；另一个监控窗口BE每5秒回收的结算子进程累计CPU约5.06秒，约一个核。该成本不应遗漏为“后端自身CPU很低”。
+
+为核对结算开销，在47.116.11.179树外独立目录从官方LuaJIT提交`63c8f1a9b479ba5518cf6a170ff7729178bc3cfd`构建CLI，未make install、未替换系统Lua。二进制SHA256 `8c1dbc040cf102757a77f08860c749384e20a8eccc957f47bb43c18891391812`。构建警告无法从归档git log确定rolling版本号，因此依赖身份以官方提交、原始归档摘要和真实二进制摘要绑定，不伪造版本日期。
+
+首次组件01使用旧实验源码摘要，在任何结算执行前失败。已核对当前与旧隔离库三个实际运行文件均一致：结算器`61c51346fc526a76816810469b6a8f82e1fe9b0a548628e0d18d9ac897421234`、worker `4a85d79d97599f44bc5026bad154f0f2ffbe35b024151ca327a30625716d20b4`、Bundle `b2753aaba9b6138a1708a77dca3ef09e130f10e9920c5010245b8903453b4caa`。
+
+组件02四项真实动作/种子回归及102个比较通过，六轮AB/BA的子进程CPU约1.848倍、墙钟约1.825倍；但其中额外online输入缺真实字段，两端都拒绝；只读snapshot的大数检查也不能证明可变状态保持。这些初步PASS不足以采用。
+
+补强组件03强制有效在线结算成功并返回gameplay_stats；19次有效在线状态比较通过，随后第98个比较在大整数边界的在线结算返回值不同，整体`REJECTED_PARITY`。两个真实CLI对字面整数9007199254740991的输出分别为Lua5.3 `9007199254740991`、LuaJIT `9.007199254741e+15`。因此当前实现不能无损替换，**拒绝LuaJIT候选，不以更快为由放宽数据一致性**。当前F144和后续F147/F148均继续`/usr/bin/lua5.3`。
+
+可选CLI曾复制到C9I独立目录，但上传器保留了禁止执行权限，版本探针返回PermissionError而未通过。旧`installation_receipt.json`的kind含verified字样，实际verification失败结果才是权威；`luajit_rejection_and_dependency_status_01_receipt.json`已明确更正，未修权限、未激活、未装系统组件。保留全部源包、失败及回执。
+
+证据：`slow_case_profiles/near2000_receipt.json`、`luajit_native_tool_01/*receipt.json`、`luajit_settlement_component_01/02/03`、`luajit_numeric_boundary_diagnosis_01_receipt.json`。另一个`slow_trace_stage_diagnostics/near2500_receipt.json`为空诊断尾样本，其active_annotation误继承旧局，已用`slow_trace_annotation_correction_01_receipt.json`作废该显示字段；不据此推算当前人数或零耗时，原始绑定未改。
