@@ -278,6 +278,8 @@ def prepare(args):
         need(actor_progress == PROFILE_ID, 'loadtest_actor_progress_profile_invalid')
         cfg['actor_progress'] = {'id': PROFILE_ID, 'ttl_seconds': TTL_SECONDS}
         validate_profile(cfg)
+    from .lottery_cache_experiments import prepare as prepare_lottery_cache
+    prepare_lottery_cache(root,cfg,revision,getattr(args,'lottery_static_cache','baseline'),ROOT)
     mature_mode = getattr(args, 'mature_fixture', None)
     if mature_mode is not None:
         _prepare_mature_fixture(root, cfg, revision, mature_mode)
@@ -308,8 +310,10 @@ def prepare(args):
         need(sha(bundle_raw) == SETTLEMENT_BUNDLE_MANIFEST_SHA256
              and json.loads(bundle_raw).get('hash') == SETTLEMENT_BUNDLE_HASH,
              'settlement_cache_bundle_manifest_changed')
+        from .lottery_cache_experiments import OUTPUTS as lottery_outputs
+        runner_digest = lottery_outputs['runtime/archive_backend/settlement_runner.py'] if 'lottery_static_cache'in cfg else SETTLEMENT_RUNNER_SHA256
         cfg['settlement_cache'] = {'id': 'warm-v1', 'source_revision': revision,
-            'runner_sha256': SETTLEMENT_RUNNER_SHA256, 'bundle_hash': SETTLEMENT_BUNDLE_HASH,
+            'runner_sha256': runner_digest, 'bundle_hash': SETTLEMENT_BUNDLE_HASH,
             'bundle_manifest_sha256': SETTLEMENT_BUNDLE_MANIFEST_SHA256}
         validate_settlement_cache(cfg)
     process_topology = getattr(args, 'process_topology', None)
@@ -374,6 +378,7 @@ def prepare(args):
         **({'schema_experiment': cfg['schema_experiment']} if 'schema_experiment' in cfg else {}),
         **({'archive_validation': cfg['archive_validation']} if 'archive_validation' in cfg else {}),
         **({'settlement_cache': cfg['settlement_cache']} if 'settlement_cache' in cfg else {}),
+        **({'lottery_static_cache':cfg['lottery_static_cache']}if 'lottery_static_cache'in cfg else {}),
         **({'business_experiment': cfg['business_experiment']} if 'business_experiment' in cfg else {}),
         **({'principal_experiments': cfg['principal_experiments']} if 'principal_experiments' in cfg else {}),
         **({'frontend_experiment': cfg['frontend_experiment']} if 'frontend_experiment' in cfg else {}),
@@ -518,6 +523,7 @@ def main(argv=None):
                       help='Opt-in same-process baseline or fresh-exec backend process; synthetic lab only')
     init.add_argument('--process-observation', choices=('pid-v1',),
                       help='Fixed-identity process CPU/RSS/IO observation; no process-list refresh')
+    init.add_argument('--lottery-static-cache',choices=('baseline','pool-revisions-v1'),default='baseline')
     init.add_argument('--settlement-cache', choices=('baseline', 'warm-v1'), default='baseline',
                       help='Prebuild the fixed observed bundle configuration cache before opening listeners')
     init.add_argument('--archive-validation', choices=('baseline', 'indexed-v1'), default='baseline',

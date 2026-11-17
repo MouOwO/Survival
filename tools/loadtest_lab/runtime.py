@@ -199,9 +199,12 @@ def warm_settlement_cache(root,cfg,app,lua):
     validate_settlement_cache(cfg)
     from pathlib import Path
     from archive_backend import settlement_runner
+    from .lottery_cache_experiments import validate as validate_lottery_cache
+    validate_lottery_cache(cfg,lambda name:(Path(root)/name).read_bytes())
+    runner_digest=cfg['settlement_cache']['runner_sha256']
     root=Path(root).resolve();path=root/SETTLEMENT_RUNNER_TARGET
     need(Path(settlement_runner.__file__).resolve()==path.resolve()
-         and sha(path.read_bytes())==SETTLEMENT_RUNNER_SHA256,'settlement_cache_imported_runner_changed')
+         and sha(path.read_bytes())==runner_digest,'settlement_cache_imported_runner_changed')
     bundle=app.archive.bundle
     need(bundle.hash==SETTLEMENT_BUNDLE_HASH
          and Path(bundle.directory).resolve()==(root/'addon/server/bundles'/SETTLEMENT_BUNDLE_HASH).resolve()
@@ -209,15 +212,17 @@ def warm_settlement_cache(root,cfg,app,lua):
     before=_checked_settlement_cache_info(settlement_runner);started=time.monotonic()
     with settlement_runner._cache(bundle,app.archive.lua) as entry:
         tables,source_bytes=entry.tables,entry.source_bytes
+        if 'lottery_static_cache'in cfg: need(entry.lottery_revision_cached is True,'lottery_static_cache_warm_fell_back')
         need(type(tables)is int and 1<=tables<=512 and type(source_bytes)is int
              and 1<=source_bytes<=16*1024*1024,'settlement_cache_entry_invalid')
         # No run(), worker(), settlement or command is executed by this context.
     elapsed=(time.monotonic()-started)*1000;after=_checked_settlement_cache_info(settlement_runner)
     need(elapsed>=0 and after['retained']>=1 and after['retained_source_bytes']>=source_bytes
          and after['builds']>=before['builds'],'settlement_cache_warm_not_retained')
-    return {'id':'warm-v1','elapsed_ms':round(elapsed,3),'runner_sha256':SETTLEMENT_RUNNER_SHA256,
+    return {'id':'warm-v1','elapsed_ms':round(elapsed,3),'runner_sha256':runner_digest,
         'bundle_hash':bundle.hash,'tables':tables,'source_bytes':source_bytes,
-        'cache_info_before':before,'cache_info_after':after,'business_commands_executed':0}
+        'cache_info_before':before,'cache_info_after':after,'business_commands_executed':int('lottery_static_cache'in cfg),
+        **({'lottery_static_cache':{'id':'pool-revisions-v1','cached':True,'readonly_catalog_precomputations':1}}if 'lottery_static_cache'in cfg else {})}
 
 def settlement_cache_snapshot(cfg):
     # Terminal observation happens after HTTP drain; no source/binary reread.

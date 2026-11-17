@@ -307,6 +307,8 @@ def load(directory):
                        ('global_http_per_minute', 1000000)):
         need(type(cfg.get(key)) is int and 1 <= cfg[key] <= limit, 'lab_concurrency_budget_invalid')
     validate_database_pool(cfg)
+    from .lottery_cache_experiments import validate as validate_lottery_cache
+    validate_lottery_cache(cfg,lambda name:(root/name).read_bytes())
     sources = cfg.get('sources')
     need(isinstance(sources, dict) and 1 <= len(sources) <= 300, 'pinned_lab_sources_required')
     for name, digest in sources.items():
@@ -533,15 +535,20 @@ SETTLEMENT_CACHE_ROW_KEYS = frozenset(('id','source_revision','runner_sha256','b
 
 def validate_settlement_cache(cfg):
     """Fixed metadata only, zero reads/imports for an unselected cache recipe."""
-    if 'settlement_cache'not in cfg:return None
+    if 'settlement_cache'not in cfg:
+        need('lottery_static_cache'not in cfg,'lottery_cache_requires_explicit_warmup')
+        return None
     need(cfg.get('schema')==1 and cfg.get('kind')=='SURVIVAL_ISOLATED_LOADTEST'
          and cfg.get('purpose')in('capacity','functional-smoke')and cfg.get('backend_db_pool')=='bounded-v2','settlement_cache_requires_isolated_bounded_v2')
+    from .lottery_cache_experiments import metadata as lottery_metadata, OUTPUTS as lottery_outputs
+    parent=lottery_metadata(cfg)
+    runner_digest=lottery_outputs[SETTLEMENT_RUNNER_TARGET] if parent else SETTLEMENT_RUNNER_SHA256
     row=cfg['settlement_cache'];revision=cfg.get('csv_source_revision')
     need(type(row)is dict and set(row)==SETTLEMENT_CACHE_ROW_KEYS and row['id']=='warm-v1','settlement_cache_binding_invalid')
     need(type(revision)is str and re.fullmatch('[a-f0-9]{40}',revision)and row['source_revision']==revision,'settlement_cache_revision_mismatch')
-    need(row['runner_sha256']==SETTLEMENT_RUNNER_SHA256 and row['bundle_hash']==SETTLEMENT_BUNDLE_HASH
+    need(row['runner_sha256']==runner_digest and row['bundle_hash']==SETTLEMENT_BUNDLE_HASH
          and row['bundle_manifest_sha256']==SETTLEMENT_BUNDLE_MANIFEST_SHA256,'settlement_cache_exact_binding_required')
     sources=cfg.get('sources',{})
-    need(type(sources)is dict and sources.get(SETTLEMENT_RUNNER_TARGET)==SETTLEMENT_RUNNER_SHA256
+    need(type(sources)is dict and sources.get(SETTLEMENT_RUNNER_TARGET)==runner_digest
          and sources.get(SETTLEMENT_BUNDLE_TARGET)==SETTLEMENT_BUNDLE_MANIFEST_SHA256,'settlement_cache_source_map_mismatch')
     return row

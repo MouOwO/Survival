@@ -66,6 +66,10 @@ def validate_fixture_profile(cfg,read_source=None):
    digest=_sha(raw)
    need(name not in restored or restored[name]==digest,'mature_parent_proofs_conflict')
    restored[name]=digest
+ from .lottery_cache_experiments import validate as lottery_cache_parents
+ for name,digest in lottery_cache_parents(cfg,read_source).items():
+  need(name not in restored or restored[name]==digest,'mature_lottery_parent_proofs_conflict')
+  restored[name]=digest
  for name,digest in _trace_observation_parent(cfg,read_source,source_map).items():
   need(name not in restored or restored[name]==digest,'mature_trace_parent_proofs_conflict')
   restored[name]=digest

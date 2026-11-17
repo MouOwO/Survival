@@ -170,6 +170,9 @@ def apply_experiments(root, cfg, revision, *, observation=False, admission=False
 
 def validate_experiments(cfg):
     """Return restored parent digests; final bytes remain guarded by load()."""
+    from .lottery_cache_experiments import metadata as lottery_parents
+    parent = lottery_parents(cfg)
+    if parent: cfg={**cfg,'sources':{**cfg['sources'],**parent}}
     rows = cfg.get('runtime_experiments', [])
     _need(type(rows) is list and len(rows) <= 3, 'runtime_experiment_list_invalid')
     if not rows:
