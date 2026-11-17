@@ -224,6 +224,18 @@ def prepare(args):
     if backend_db_pool in ('bounded-v1', 'bounded-v2'):
         apply_db_pool_overlay(root, cfg, revision)
     cfg['csv_source_revision'] = revision
+    backend_mode=getattr(args,'backend_processes','baseline')
+    if backend_mode!='baseline':
+        from .process_runtime import PAIR_PROFILE,FOUR_PROFILE,FOUR_DB16_PROFILE
+        profiles={row['id']:row for row in(PAIR_PROFILE,FOUR_PROFILE,FOUR_DB16_PROFILE)}
+        need(backend_mode in profiles,'backend_process_profile_invalid')
+        cfg['backend_process_pool']=dict(profiles[backend_mode])
+    process_topology = getattr(args, 'process_topology', None)
+    process_observation = getattr(args, 'process_observation', None)
+    if process_topology is not None:
+        cfg['process_topology'] = process_topology
+    if process_observation is not None:
+        cfg['process_observation'] = process_observation
     from .experiments import apply_experiments
     apply_experiments(root, cfg, revision,
         observation=getattr(args, 'checkpoint_observation', False),
@@ -317,18 +329,6 @@ def prepare(args):
             'runner_sha256': runner_digest, 'bundle_hash': SETTLEMENT_BUNDLE_HASH,
             'bundle_manifest_sha256': SETTLEMENT_BUNDLE_MANIFEST_SHA256}
         validate_settlement_cache(cfg)
-    backend_mode=getattr(args,'backend_processes','baseline')
-    if backend_mode!='baseline':
-        from .process_runtime import PAIR_PROFILE,FOUR_PROFILE,FOUR_DB16_PROFILE
-        profiles={row['id']:row for row in(PAIR_PROFILE,FOUR_PROFILE,FOUR_DB16_PROFILE)}
-        need(backend_mode in profiles,'backend_process_profile_invalid')
-        cfg['backend_process_pool']=dict(profiles[backend_mode])
-    process_topology = getattr(args, 'process_topology', None)
-    process_observation = getattr(args, 'process_observation', None)
-    if process_topology is not None:
-        cfg['process_topology'] = process_topology
-    if process_observation is not None:
-        cfg['process_observation'] = process_observation
     if process_topology is not None or process_observation is not None:
         from .process_runtime import validate_process_options
         validate_process_options(cfg)
