@@ -125,7 +125,7 @@ class ResponseEncoderPool:
 
     def _transform(self,kind,body,value,advertised):
         from .business_wire import SCHEMA_HASH
-        if type(body)is not bytes or not self.MIN_BODY<=len(body)<=self.MAX_BODY or advertised!=SCHEMA_HASH:
+        if type(body)is not bytes or not self.MIN_BODY<=len(body)<=self.MAX_BODY or advertised not in (SCHEMA_HASH,SCHEMA_HASH+";b2"):
             return self._inline(kind,body,value,advertised)
         deadline=time.monotonic()+self._wait
         if not self._slots.acquire(timeout=self._wait):return self._inline(kind,body,value,advertised,fallback=True)

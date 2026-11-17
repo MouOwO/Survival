@@ -78,10 +78,20 @@ end
 -- Missing/corrupt catalogue disables negotiation; legacy JSON remains usable.
 if not pcall(load_catalog) then catalog, fields, symbols, templates, field_index = nil, nil, nil, nil, nil end
 
-function M.schema_hash() return catalog and catalog.hash or nil end
+function M.schema_hash(binary)
+    return catalog and (catalog.hash .. (binary == true and ';b2' or '')) or nil
+end
 
 function M.decode(value)
     if not object(value) then return nil, 'business_wire_invalid' end
+    if value._bb ~= nil then
+        local ok, envelope = pcall(function()
+            need(catalog ~= nil)
+            return require('systems/business_binary_wire').unwrap(value,catalog)
+        end)
+        if not ok then return nil, 'business_wire_invalid' end
+        value = envelope
+    end
     if value._bw == nil then return value end
     local ok, result = pcall(function()
         need(catalog ~= nil)

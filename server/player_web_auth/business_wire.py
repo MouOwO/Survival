@@ -471,6 +471,9 @@ def _pack_decoded_bytes(body, value, advertised_hash):
     prepare() returns the paired bytes/object together. All representation,
     expansion, equality, negotiation and smaller-than-original gates remain.
     """
+    if type(advertised_hash) is str and advertised_hash == SCHEMA_HASH + ";b2":
+        from .business_binary_wire import pack_decoded_bytes
+        return pack_decoded_bytes(body, value, advertised_hash)
     if (type(body) is not bytes or len(body) > MAX_BYTES
             or type(advertised_hash) is not str or advertised_hash != SCHEMA_HASH):
         return body
@@ -489,6 +492,13 @@ def _pack_decoded_bytes(body, value, advertised_hash):
 
 def pack_bytes(body, advertised_hash):
     """Original raw-input API: strict parse, then the same lossless packing."""
+    if type(advertised_hash) is str and advertised_hash == SCHEMA_HASH + ";b2":
+        if type(body) is not bytes or len(body) > MAX_BYTES:
+            return body
+        try:
+            return _pack_decoded_bytes(body, _loads(body), advertised_hash)
+        except (ValueError, TypeError, OverflowError, RecursionError, UnicodeError):
+            return body
     if (type(body) is not bytes or len(body) > MAX_BYTES
             or type(advertised_hash) is not str or advertised_hash != SCHEMA_HASH):
         return body
