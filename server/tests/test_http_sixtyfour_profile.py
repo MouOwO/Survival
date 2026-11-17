@@ -3,7 +3,7 @@ from copy import deepcopy
 import unittest
 from tools.loadtest_lab.guard import resolve_database_pool
 from tools.loadtest_lab.experiments import SPECS,validate_experiments,http_admission_backlog,http_admission_wait
-from server.fishing_api_overrides.http_admission64_patch import patch_sources
+from tools.loadtest_lab.process_runtime import _http64_server_class
 class HTTP64Profile(unittest.TestCase):
  def args(self):return dict(http_concurrency=64,db_concurrency=32,web_concurrency=128,pool_max_waiters=64,pool_wait_seconds=2,admission_mode='bounded-v8')
  def cfg(self):
@@ -28,7 +28,18 @@ class HTTP64Profile(unittest.TestCase):
    cfg={'runtime_experiments':[{'id':identity}]}
    self.assertEqual(http_admission_backlog(cfg,layer='frontend'),2048);self.assertEqual(http_admission_backlog(cfg,layer='backend'),128)
    self.assertEqual(http_admission_wait(cfg,layer='frontend'),2);self.assertEqual(http_admission_wait(cfg,layer='backend'),2)
- def test_unknown_source_or_wrong_config_never_patches(self):
-  with self.assertRaises(ValueError):patch_sources({})
-  with self.assertRaisesRegex(ValueError,'exact_config_parent'):patch_sources(dict.fromkeys(['fishing_api/server.py','player_web_auth/http_api.py','fishing_api/config.py'],''))
+ def test_legacy_factory_stays_original(self):
+  original=type('Original',(),{});self.assertIs(_http64_server_class(original,{'http_concurrency':32}),original)
+ def test_factory_rejects_unselected64(self):
+  with self.assertRaises(ValueError):_http64_server_class(object,{'http_concurrency':64})
+ def test_actual_extended_constructor_stays_loopback_and_bounded(self):
+  from http.server import ThreadingHTTPServer,BaseHTTPRequestHandler
+  from server.fishing_api_overrides.http_admission import BoundedAdmissionMixin
+  class Original(BoundedAdmissionMixin,ThreadingHTTPServer):pass
+  cfg=self.cfg();cfg['rpc_process_pool']={'id':'driver-process32-v1'};kind=_http64_server_class(Original,cfg)
+  for address,slots in [(('0.0.0.0',0),64),(('127.0.0.1',0),True),(('127.0.0.1',0),65)]:
+   with self.subTest(address=address,slots=slots),self.assertRaises(ValueError):kind(address,BaseHTTPRequestHandler,max_concurrency=slots)
+  server=kind(('127.0.0.1',0),BaseHTTPRequestHandler)
+  try:self.assertEqual(server.admission_stats()['max_concurrency'],64);self.assertEqual(server.admission_stats()['active'],0)
+  finally:server.server_close()
 if __name__=='__main__':unittest.main()

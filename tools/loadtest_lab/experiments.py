@@ -36,7 +36,7 @@ SPECS['http-admission-v4'] = SPECS['http-admission-v1']
 SPECS['http-admission-v5'] = SPECS['http-admission-v1']
 SPECS['http-admission-v6'] = SPECS['http-admission-v1']
 SPECS['http-admission-v7'] = SPECS['http-admission-v1']
-SPECS['http-admission-v8'] = (('http_admission64_patch.py','http_admission_patch.py','http_admission.py'),frozenset(('fishing_api/server.py','player_web_auth/http_api.py','fishing_api/config.py')),frozenset(('fishing_api/server.py','player_web_auth/http_api.py','fishing_api/config.py','survival_http_admission.py')))
+SPECS['http-admission-v8'] = SPECS['http-admission-v1']
 SPECS['pool-notify-v1'] = (
     ('db_pool_notify_patch.py', 'bounded_pool_notify.py'),
     frozenset(('fishing_api/_bounded_pool.py',)),

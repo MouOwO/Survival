@@ -134,6 +134,31 @@ def _retire_original_pool(original):
     return stats
 
 
+def _http64_server_class(original,cfg):
+    """Explicit lab-only aggregate admission. Original server/defaults stay32.
+
+    Initial metadata O(1); each accepted socket O(1),64 fixed active sockets,
+    <=2s admission and unchanged50ms rejection. Once-only shutdown O(64).
+    No account scan, database call, permission cache or request replay.
+    """
+    if cfg.get('http_concurrency')!=64:return original
+    selected=any(row.get('id')=='http-admission-v8'for row in cfg.get('runtime_experiments',()))
+    if not(selected and cfg.get('db_concurrency')==32 and cfg.get('database_resource_profile')=='db32-4cpu-4g-v1'and cfg.get('rpc_process_pool',{}).get('id')=='driver-process32-v1'):
+        raise ValueError('http64_requires_explicit_reviewed_profile')
+    from http.server import ThreadingHTTPServer
+    class ExplicitHTTP64(original):
+        def __init__(self,address,handler,*,max_concurrency=64,request_backlog=128,admission_wait_seconds=2):
+            if address[0]not in('127.0.0.1','localhost','::1')or type(max_concurrency)is not int or max_concurrency!=64 or request_backlog!=128 or admission_wait_seconds!=2:
+                raise ValueError('http64_fixed_loopback_admission_required')
+            if address[0]=='::1':
+                import socket
+                self.address_family=socket.AF_INET6
+            self._configure_admission(layer='backend',max_concurrency=64,request_backlog=128,admission_wait_seconds=2)
+            self._worker_limit=64;self._workers=self._admission_slots
+            ThreadingHTTPServer.__init__(self,address,handler)
+    return ExplicitHTTP64
+
+
 def _backend_setup(root, cfg, private, lua):
     """The original Settings/constructor/preflight calls, in a fresh process."""
     sys.path.insert(0, str(root / 'runtime'))
@@ -145,7 +170,7 @@ def _backend_setup(root, cfg, private, lua):
         rule_csv=root / 'addon/data/csv/玩家档案系统/fishing_system_rules.csv',
         gameplay_stats_csv=root / 'addon/data/csv/玩家档案系统/player_gameplay_stats.csv',
         request_timeout_seconds=20, database_backend='postgres', postgres_dsn=dsn(cfg, private),
-        postgres_max_concurrency=min(16,cfg['db_concurrency']), http_max_concurrency=cfg['http_concurrency'],
+        postgres_max_concurrency=min(16,cfg['db_concurrency']), http_max_concurrency=min(32,cfg['http_concurrency']),
         payment_mode='test', archive_http=True, addon_root=root / 'addon', archive_lua_path=lua)
     os.environ.pop('SURVIVAL_TEST_STEAM_IDS64', None)
     # This unused bootstrap client retains original per-client limits. Actual
@@ -177,7 +202,11 @@ def _backend_setup(root, cfg, private, lua):
         from .experiments import has_http_admission, http_admission_backlog, http_admission_wait
         options = ({'request_backlog': http_admission_backlog(cfg), 'admission_wait_seconds': 2.0}
                    if has_http_admission(cfg) else {})
-        server = BoundedThreadingHTTPServer(('127.0.0.1', PORTS['backend']), base,
+        # Settings retains its original constructor/default-factory cap. The
+        # explicit lab HTTP64 class below owns the actual independently audited
+        # admission budget; application/SQL/permissions and original files stay unchanged.
+        server_type = _http64_server_class(BoundedThreadingHTTPServer,cfg)
+        server = server_type(('127.0.0.1', PORTS['backend']), base,
                     max_concurrency=cfg['http_concurrency'], **options)
         server.block_on_close = False
         return app, server, pool, warm
