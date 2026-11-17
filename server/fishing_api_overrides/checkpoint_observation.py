@@ -357,3 +357,26 @@ def patch_sources(sources):
     compile(HELPER_SOURCE,HELPER_PATH,'exec')
     outputs[HELPER_PATH]=HELPER_SOURCE
     return outputs
+
+
+# Exact reverse/replay proof for unchanged mature settlement archetypes.
+TRACE_HELPER_PARENT_SHA256='ff942f2aa953f17577957fb8196fa6854bd710ae0d237366fc771b3be19f5444'
+TRACE_HELPER_OUTPUT_SHA256='ad1d9cead77b522bde59b0d5af0c6fecb03a10712212ffe8f712ddaf1dea4a26'
+TRACE_HELPER_REPLACEMENTS=(("'other':Budget(records=150,per_minute=10)", "'other':Budget(records=150,per_minute=5)"), ("def _emit(record):\n    budget=_budget(record['kind']);taken=False;emitted=False\n    try:\n        taken=budget.take()", "def _emit(record,reservation=None):\n    budget=reservation if reservation is not None else _budget(record['kind'])\n    taken=reservation is not None;emitted=False\n    try:\n        if not taken:taken=budget.take()"), ("        self.stages={};self.rpcs={};self.outcome='ok'\n    def finish(self):\n        if self.kind not in KINDS:return\n", "        self.stages={};self.rpcs={};self.outcome='ok'\n        self._selection_made=False;self._reservation=None;self._finished=False\n    def select(self):\n        # Identify has read only the normal request body. Reserve diagnostic\n        # capacity BEFORE RPC/settlement, so unsampled requests send no nested\n        # timing dictionaries across the existing process boundary. O(1), no\n        # account scan, extra RPC, callback, timer, authorization or replay.\n        if self._selection_made:return\n        self._selection_made=True\n        if self.kind in KINDS:\n            budget=_budget(self.kind)\n            if budget.take():self._reservation=budget;return\n        _ACTIVE.set(None)\n    def finish(self):\n        if self._finished:return\n        self._finished=True\n        if self.kind not in KINDS:\n            if self._reservation is not None:self._reservation.finish(False)\n            return\n        if self._selection_made and self._reservation is None:return\n"), ('                total_ms=round(_elapsed(self.started),3),stages=self.stages,rpcs=self.rpcs))', '                total_ms=round(_elapsed(self.started),3),stages=self.stages,rpcs=self.rpcs),self._reservation)'), ("            trace.kind=('checkpoint_proxy_' if trace.proxy else 'checkpoint_')+('final' if final else 'regular')\n        return", "            trace.kind=('checkpoint_proxy_' if trace.proxy else 'checkpoint_')+('final' if final else 'regular')\n        trace.select()\n        return"), ("        trace.count=count if kind=='lottery_draw' and type(count)is int and count in (1,10) else 0\n", "        trace.count=count if kind=='lottery_draw' and type(count)is int and count in (1,10) else 0\n    trace.select()\n"))
+
+def restore_helper_source(source):
+    source=_normalized(source)
+    if source!=HELPER_SOURCE or _sha(source)!=TRACE_HELPER_OUTPUT_SHA256:
+        raise ValueError('trace_helper_exact_output_required')
+    parent=source
+    for old,new in reversed(TRACE_HELPER_REPLACEMENTS):
+        if parent.count(new)!=1:raise ValueError('trace_helper_reverse_anchor_changed')
+        parent=parent.replace(new,old,1)
+    if _sha(parent)!=TRACE_HELPER_PARENT_SHA256:
+        raise ValueError('trace_helper_parent_changed')
+    replay=parent
+    for old,new in TRACE_HELPER_REPLACEMENTS:
+        if replay.count(old)!=1:raise ValueError('trace_helper_forward_anchor_changed')
+        replay=replay.replace(old,new,1)
+    if replay!=source:raise ValueError('trace_helper_replay_changed')
+    return parent

@@ -66,6 +66,9 @@ def validate_fixture_profile(cfg,read_source=None):
    digest=_sha(raw)
    need(name not in restored or restored[name]==digest,'mature_parent_proofs_conflict')
    restored[name]=digest
+ for name,digest in _trace_observation_parent(cfg,read_source,source_map).items():
+  need(name not in restored or restored[name]==digest,'mature_trace_parent_proofs_conflict')
+  restored[name]=digest
  for name,digest in source_map.items():
   need(type(name)is str and (name.startswith('runtime/')or name.startswith('addon/server/bundles/'))and restored.get(name,cfg['sources'].get(name))==digest,'mature_archetype_source_binding_changed')
   actual=read_source(name);need(type(actual)is bytes and len(actual)<=4*1024*1024 and _sha(actual)==cfg['sources'].get(name),'mature_archetype_source_bytes_changed')
@@ -546,3 +549,28 @@ class _SeedWALStorage:
         finally:
             self.conn.close()
             self.conn = None
+
+
+def _trace_observation_parent(cfg,read_source,archetype_sources):
+ """O(1) startup proof of one exact diagnostic-only helper; no runtime hook.
+
+ Actual helper bytes, recipe bytes, experiment row and immutable manifest are
+ all checked. Reverse/replay proves the original archetype helper digest;
+ every other archetype source and every current output byte is still checked.
+ """
+ target='runtime/archive_backend/_checkpoint_observation.py'
+ operator='operator/runtime_experiments/checkpoint_observation.py'
+ current=cfg.get('sources',{}).get(target)
+ if current==archetype_sources.get(target):return {}
+ need(cfg.get('kind')=='SURVIVAL_ISOLATED_LOADTEST'and cfg.get('purpose')=='capacity','mature_trace_isolation_required')
+ need(current=='ad1d9cead77b522bde59b0d5af0c6fecb03a10712212ffe8f712ddaf1dea4a26' and archetype_sources.get(target)=='ff942f2aa953f17577957fb8196fa6854bd710ae0d237366fc771b3be19f5444','mature_trace_exact_helper_pair_required')
+ rows=[r for r in cfg.get('runtime_experiments',[])if type(r)is dict and r.get('id')=='checkpoint-observation-v1']
+ need(len(rows)==1 and rows[0].get('source_revision')==cfg.get('csv_source_revision')and rows[0].get('operator_sources')=={operator:'e4ff2b4a609457dd223cc1a9e7365dac2e8cfe3b4b219afc8f11525be54cb8c6'}and rows[0].get('runtime_sha256',{}).get(target)==current,'mature_trace_exact_experiment_required')
+ raw=read_source(operator);output=read_source(target)
+ need(type(raw)is bytes and len(raw)<=65536 and _sha(raw)=='e4ff2b4a609457dd223cc1a9e7365dac2e8cfe3b4b219afc8f11525be54cb8c6' and cfg['sources'].get(operator)=='e4ff2b4a609457dd223cc1a9e7365dac2e8cfe3b4b219afc8f11525be54cb8c6','mature_trace_recipe_bytes_changed')
+ need(type(output)is bytes and len(output)<=16384 and _sha(output)==current,'mature_trace_helper_bytes_changed')
+ namespace={'__name__':'mature_reviewed_trace_parent'}
+ exec(compile(raw,operator,'exec'),namespace)
+ parent=namespace['restore_helper_source'](output.decode('utf8'))
+ need(type(parent)is str and _sha(parent.encode('utf8'))==archetype_sources[target],'mature_trace_parent_replay_failed')
+ return {target:archetype_sources[target]}

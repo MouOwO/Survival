@@ -104,4 +104,48 @@ class TraceAdmissionTests(unittest.TestCase):
         self.assertEqual(results[0]['ok'],results[1]['ok'])
 
 
+class MatureTraceProofTests(unittest.TestCase):
+    def fixture(self):
+        import hashlib
+        p=Path(__file__).parents[1]/'fishing_api_overrides/checkpoint_observation.py'
+        raw=p.read_bytes().replace(b'\r\n',b'\n');recipe=runpy.run_path(str(p))
+        target='runtime/archive_backend/_checkpoint_observation.py';operator='operator/runtime_experiments/checkpoint_observation.py'
+        output=recipe['helper_source']().encode('utf8');digest=lambda b:hashlib.sha256(b).hexdigest()
+        cfg={'kind':'SURVIVAL_ISOLATED_LOADTEST','purpose':'capacity','csv_source_revision':'a'*40,'sources':{target:digest(output),operator:digest(raw)},'runtime_experiments':[{'id':'checkpoint-observation-v1','source_revision':'a'*40,'operator_sources':{operator:digest(raw)},'runtime_sha256':{target:digest(output)}}]}
+        sources={operator:raw,target:output};parent={target:recipe['TRACE_HELPER_PARENT_SHA256']}
+        return recipe,cfg,sources,parent
+
+    def test_exact_helper_reverse_matches_original_and_rejects_unrelated_edit(self):
+        import hashlib
+        recipe,cfg,sources,parent=self.fixture();output=recipe['helper_source']();old=recipe['restore_helper_source'](output)
+        self.assertEqual(hashlib.sha256(old.encode()).hexdigest(),recipe['TRACE_HELPER_PARENT_SHA256'])
+        compile(old,'original_helper','exec')
+        with self.assertRaises(ValueError):recipe['restore_helper_source'](output+'\n# unrelated change\n')
+
+    def test_mature_proof_reads_two_fixed_sources_and_preserves_manifest(self):
+        import copy
+        from tools.loadtest_lab.mature_fixture import _trace_observation_parent
+        recipe,cfg,sources,parent=self.fixture();before=copy.deepcopy(cfg);reads=[]
+        def read(name):reads.append(name);return sources[name]
+        self.assertEqual(_trace_observation_parent(cfg,read,parent),parent)
+        self.assertEqual(cfg,before);self.assertEqual(len(reads),2)
+
+    def test_mature_proof_rejects_changed_recipe_output_or_binding(self):
+        import copy
+        from tools.loadtest_lab.mature_fixture import _trace_observation_parent
+        recipe,cfg,sources,parent=self.fixture()
+        for path in sources:
+            bad=dict(sources);bad[path]+=b'\n'
+            with self.assertRaises(ValueError):_trace_observation_parent(cfg,bad.__getitem__,parent)
+        for mutate in ('revision','operator','runtime','purpose'):
+            bad=copy.deepcopy(cfg)
+            if mutate=='revision':bad['runtime_experiments'][0]['source_revision']='b'*40
+            elif mutate=='operator':bad['runtime_experiments'][0]['operator_sources']={}
+            elif mutate=='runtime':bad['sources']['runtime/archive_backend/_checkpoint_observation.py']='b'*64
+            else:bad['purpose']='production'
+            with self.assertRaises(ValueError):_trace_observation_parent(bad,sources.__getitem__,parent)
+        oldcfg=copy.deepcopy(cfg);oldcfg['sources']['runtime/archive_backend/_checkpoint_observation.py']=next(iter(parent.values()))
+        self.assertEqual(_trace_observation_parent(oldcfg,lambda _:self.fail('legacy proof must not read new source'),parent),{})
+
+
 if __name__=='__main__':unittest.main()
