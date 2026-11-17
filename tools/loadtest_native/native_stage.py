@@ -95,7 +95,8 @@ def run(spec_path,spec_sha):
         initial=reader.observe('before_locust_start');proof.need(initial['proof_valid']is True,'signed_status_initial_probe_failed')
         proof.need(initial['proof']['stats']['business_remaining_seconds']>=duration+90,'native_api_remaining_lifetime_insufficient')
         env=dict(os.environ);env.update(LOADTEST_CLIENT=str(lab/'client.json'),LOADTEST_REPORT_DIRECTORY=str(stage),PYTHONPATH=os.pathsep.join([str(lab/'operator'),str(lab/'runtime')]),PYTHONDONTWRITEBYTECODE='1',HTTP_PROXY='',HTTPS_PROXY='',ALL_PROXY='',NO_PROXY='127.0.0.1,localhost');env.pop('LOCUST_SKIP_MONKEY_PATCH',None)
-        if decoder is not None:env.update(LOADTEST_DECODE_SOCKET=decoder.path,PYTHONPATH=env['PYTHONPATH']+os.pathsep+str(spec_path.parent))
+        if decoder is not None:env['LOADTEST_DECODE_SOCKET']=decoder.path
+        if decoder is not None or fast:env['PYTHONPATH']+=os.pathsep+str(spec_path.parent)
         if fast:env['LOADTEST_FAST_HTTP']='1'
         argv=[str(python),'-X','utf8','-B','-m','locust','-f',str(lab/'operator/loadtest_lab/locustfile.py'),'--headless','--host','http://127.0.0.1:29567','--users',str(cfg['active']),'--spawn-rate',str(spawn),'--run-time',str(duration)+'s','--stop-timeout',str(STOP_SECONDS),'--only-summary','--loglevel','INFO','--csv',str(stage/'locust'),'--html',str(stage/'locust.html')]
         with(stage/'locust_stdout.log').open('xb')as out:
