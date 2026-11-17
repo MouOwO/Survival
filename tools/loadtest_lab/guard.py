@@ -278,11 +278,11 @@ def validate_exit_probe(cfg):
     need(cfg.get('purpose')=='capacity' and cfg.get('client_workload')=='client-v3'
          and cfg.get('actor_progress')=={'id':'active-business-v1','ttl_seconds':120}, 'exit_probe_requires_active_business_proof')
     mode=cfg.get('exit_smoothing','direct')
-    need(mode in ('direct','jitter3-v1','queue32-v1','queue64-v1','queue128-v1','gradual120-v1'), 'exit_probe_policy_invalid')
+    need(mode in ('direct','jitter3-v1','queue32-v1','queue64-v1','queue128-v1','gradual120-v1','gradual240-v1'), 'exit_probe_policy_invalid')
     value={'common_seconds':seconds,'mode':mode}
-    if mode=='gradual120-v1':
+    if mode in('gradual120-v1','gradual240-v1'):
         wave=cfg.get('exit_wave_seconds')
-        need(type(wave)is int and wave==(2 if cfg.get('active')==2 else 120)
+        need(type(wave)is int and wave==(2 if cfg.get('active')==2 else (120 if mode=='gradual120-v1'else 240))
              and (len(generator_ports(cfg))in(4,16)or cfg.get('generator_transport')=={'id':'linux-loopback-v1','loopback_ports':[29567]}),'exit_wave_profile_invalid')
         value['wave_seconds']=wave
     else:need('exit_wave_seconds'not in cfg,'exit_wave_requires_gradual_policy')

@@ -418,7 +418,7 @@ def validate_host(environment, **kwargs):
                     snap=PROGRESS_OBSERVER.last_snapshot
                     if snap is not None and snap['all_active'] and snap['best_seconds']>=EXIT_PROBE['common_seconds']+15:
                         RUN_EXIT_PROBE_TRIGGERED=True
-                        if EXIT_MODE=='gradual120-v1':
+                        if EXIT_MODE in('gradual120-v1','gradual240-v1'):
                             try:
                                 DEPARTURE_WAVE=DepartureWave(environment,EXIT_PROBE['wave_seconds'])
                                 DEPARTURE_WAVE.start()
@@ -474,7 +474,7 @@ class DepartureWave:
     """
     def __init__(self,environment,seconds,*,clock=time.monotonic,sleep=None):
         import gevent
-        if type(seconds)not in(int,float)or seconds not in(2,120):raise ValueError('departure_wave_seconds_invalid')
+        if type(seconds)not in(int,float)or seconds not in(2,120,240):raise ValueError('departure_wave_seconds_invalid')
         users=[]
         for item in environment.runner.user_greenlets:
             if not item.dead and item.args and isinstance(item.args[0],SyntheticPlayer):users.append(item.args[0])
@@ -936,7 +936,7 @@ def workload_statistics(environment, run):
             'workflow_statistics': rows,
             'workflow_statistics_complete': checkpoint_count == counters['checkpoint_attempts']
                 and final_count == counters['finalization_attempts'],
-            'workflow_timing_scope': ('WORKFLOW finalization starts at EACH scheduled departure intent; actors keep business until own intent, personal45s deadline includes pending work/checkpoint/followup/release; 2s native or120s full cohort window is not simultaneous intent.'if EXIT_MODE=='gradual120-v1'else'WORKFLOW checkpoint includes grant followup profile; finalization starts at worker test_stopping intent before cleanup scheduling and includes checkpoint, followup, release. WORKFLOW is not HTTP.')}
+            'workflow_timing_scope': ('WORKFLOW finalization starts at EACH scheduled departure intent; actors keep business until own intent, personal45s deadline includes pending work/checkpoint/followup/release; 2s native or explicit120s/240s full cohort window is not simultaneous intent.'if EXIT_MODE in('gradual120-v1','gradual240-v1')else'WORKFLOW checkpoint includes grant followup profile; finalization starts at worker test_stopping intent before cleanup scheduling and includes checkpoint, followup, release. WORKFLOW is not HTTP.')}
 
 
 @events.quitting.add_listener

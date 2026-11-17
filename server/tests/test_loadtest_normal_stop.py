@@ -18,7 +18,7 @@ class NormalStopTests(unittest.TestCase):
   path=Path(os.environ.get('SURVIVAL_STOP_SOURCE',str(Path(__file__).resolve().parents[2]/'tools/loadtest_lab/locustfile.py')));assert path.name=='locustfile.py'and path.is_file()
   tree=ast.parse(path.read_text(encoding='utf8'));nodes=[n for n in tree.body if isinstance(n,ast.ClassDef)and n.name in ('ExitCooperativeTaskSet','SyntheticPlayer')]
   import random
-  ns=dict(RUN_STOPPING=False,RUN_FAILED=False,RUN_STOPPING_AT=None,OBSERVE_OVERLOAD=False,CLIENT_PROFILE=types.SimpleNamespace(mode='client-v2'),time=time,random=random,StopUser=StopUser,HttpUser=HttpUser,TaskSet=TaskSet,task=task,Event=Event,BoundedSemaphore=BoundedSemaphore,LOCUST_STATE_STOPPING=LOCUST_STATE_STOPPING,EXIT_PROBE=None)
+  ns=dict(RUN_STOPPING=False,RUN_FAILED=False,RUN_STOPPING_AT=None,OBSERVE_OVERLOAD=False,CLIENT_PROFILE=types.SimpleNamespace(mode='client-v2'),time=time,random=random,StopUser=StopUser,_HTTPBase=HttpUser,HttpUser=HttpUser,TaskSet=TaskSet,task=task,Event=Event,BoundedSemaphore=BoundedSemaphore,LOCUST_STATE_STOPPING=LOCUST_STATE_STOPPING,EXIT_PROBE=None)
   def unexpected(*a,**kw):raise AssertionError('normal stop must not abort run')
   ns['fail_run']=unexpected;exec(compile(ast.fix_missing_locations(ast.Module(body=nodes,type_ignores=[])),str(path),'exec'),ns);return ns,ns['SyntheticPlayer']
  def test_normal_stop_does_not_start_another_activity(self):
