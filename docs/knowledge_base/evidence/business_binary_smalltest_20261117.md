@@ -46,6 +46,14 @@ Linux Python3.12.3、六轮AB/BA交替、32存档×20次/轮：旧编码均值3.
 - 前几次测试脚本因Windows Lua中文路径加载、根节点合同不匹配而失败，均保留；修正测试使用原样源码字节预加载，并把标量装进真实HTTP对象根。没有削弱协议检查。
 - 第一版双重完整比较额外增加约五成CPU，已改为仅比较最终选中表示一次；旧测量不冒充最终候选结果。
 
+## 最终固定来源复核
+
+运行候选已提交并推送`79dd672a9554ee2b1b15e9f95254d0756283d948`，分支`capacity/binary-frame-20261117`；主工作区119份其他窗口改动原样保留。content/master `a2e21731b64208ba6a0ba44759ecd294421e758a`已核对、pull/push，干净无空提交。
+
+拉取后36项永久回归通过；`binary_frame_component_07/result_receipt.json`重跑1473项Python断言、三种Lua各627往返和70非法包。随后从该不可变Git提交逐文件导出最终源码，在`binary_frame_linux_component_02`独立目录重测：102次回环HTTP零失败并正常关闭，32存档实际body合计仍为55,338→44,880 B，Linux编码CPU比值1.196975。上传压缩包35,783 B、5文件，业务API请求和数据库调用仍为0。见该目录`preparation_receipt.json`、原字节`linux_result_receipt.json`及`collection_receipt.json`；旧测试和旧回执未覆盖。
+
+后续条目1已完成，条目2—4仍待真实业务/容量证据。
+
 ## 后续门禁
 
 1. 最终固定Git来源、永久回归和三种Lua重跑；保留组件来源摘要，不改旧回执。
