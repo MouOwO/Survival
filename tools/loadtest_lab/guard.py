@@ -83,21 +83,23 @@ def resolve_database_pool(mode, *, http_concurrency=None, db_concurrency=4,
                           pool_wait_seconds=None, admission_mode='baseline'):
     """Resolve explicit inputs once; baseline/v1 retain their historical defaults."""
     need(mode in ('baseline', 'bounded-v1', 'bounded-v2'), 'lab_database_pool_mode_invalid')
-    need(admission_mode in ('baseline', 'bounded-v1', 'bounded-v2', 'bounded-v3', 'bounded-v4', 'bounded-v5', 'bounded-v6', 'bounded-v7'),
+    need(admission_mode in ('baseline', 'bounded-v1', 'bounded-v2', 'bounded-v3', 'bounded-v4', 'bounded-v5', 'bounded-v6', 'bounded-v7', 'bounded-v8'),
          'lab_http_admission_mode_invalid')
-    if admission_mode in ('bounded-v5', 'bounded-v6', 'bounded-v7'):
+    if admission_mode in ('bounded-v5', 'bounded-v6', 'bounded-v7', 'bounded-v8'):
         need(mode == 'bounded-v2', 'db8_profile_requires_bounded_v2')
     requested = {'http_concurrency': http_concurrency, 'db_concurrency': db_concurrency,
                  'web_concurrency': web_concurrency, 'pool_max_waiters': pool_max_waiters,
                  'pool_wait_seconds': pool_wait_seconds}
     http = (24 if mode == 'bounded-v2' else 8) if http_concurrency is None else http_concurrency
-    expanded=(admission_mode=='bounded-v7'and type(db_concurrency)is int and db_concurrency==32)
-    for value, maximum in ((http, 32), (db_concurrency, 32 if expanded else 16), (web_concurrency, 128)):
+    if admission_mode=='bounded-v8':
+        need(mode=='bounded-v2'and type(db_concurrency)is int and db_concurrency==32,'http64_requires_explicit_db32')
+    expanded=(admission_mode in ('bounded-v7','bounded-v8')and type(db_concurrency)is int and db_concurrency==32)
+    for value, maximum in ((http, 64 if admission_mode=='bounded-v8' else 32), (db_concurrency, 32 if expanded else 16), (web_concurrency, 128)):
         need(type(value) is int and 1 <= value <= maximum, 'lab_concurrency_budget_invalid')
     limits = None
     if mode != 'baseline':
-        if admission_mode in ('bounded-v5', 'bounded-v6', 'bounded-v7'):
-            if admission_mode in ('bounded-v6', 'bounded-v7'):
+        if admission_mode in ('bounded-v5', 'bounded-v6', 'bounded-v7', 'bounded-v8'):
+            if admission_mode in ('bounded-v6', 'bounded-v7', 'bounded-v8'):
                 need(db_concurrency == (32 if expanded else 16), 'reviewed_db16_profile_requires_sixteen_connections')
             else:
                 need(db_concurrency == 8, 'reviewed_db8_profile_requires_eight_connections')
@@ -114,8 +116,8 @@ def resolve_database_pool(mode, *, http_concurrency=None, db_concurrency=4,
             need(type(wait) in (int, float) and math.isfinite(wait) and 0 < wait <= 5,
                  'lab_database_pool_wait_invalid')
             need(http <= db_concurrency + waiting, 'http_exceeds_database_pool_admission_budget')
-        if admission_mode in ('bounded-v5', 'bounded-v6', 'bounded-v7'):
-            need((http, web_concurrency, db_concurrency, waiting, wait) == (32, 128, 32 if expanded else 16 if admission_mode in ('bounded-v6', 'bounded-v7') else 8, 64 if expanded else 32, 2),
+        if admission_mode in ('bounded-v5', 'bounded-v6', 'bounded-v7', 'bounded-v8'):
+            need((http, web_concurrency, db_concurrency, waiting, wait) == (64 if admission_mode=='bounded-v8' else 32, 128, 32 if expanded else 16 if admission_mode in ('bounded-v6', 'bounded-v7', 'bounded-v8') else 8, 64 if expanded else 32, 2),
                  'reviewed_db8_profile_budgets_required')
         limits = {'connections': db_concurrency, 'waiting': waiting, 'wait_seconds': wait}
     else:
@@ -183,7 +185,7 @@ def validate_database_pool(cfg):
              and type(parameters['effective']) is dict and set(parameters['effective']) == keys,
              'database_pool_parameter_audit_invalid')
         # Only a validated runtime certificate enables the new DB8 profile.
-        admission_mode = ('bounded-v7' if any(row['id'] == 'http-admission-v7' for row in cfg.get('runtime_experiments', ())) else 'bounded-v6' if any(row['id'] == 'http-admission-v6' for row in cfg.get('runtime_experiments', ())) else 'bounded-v5' if any(row['id'] == 'http-admission-v5'
+        admission_mode = ('bounded-v8' if any(row['id'] == 'http-admission-v8' for row in cfg.get('runtime_experiments', ())) else 'bounded-v7' if any(row['id'] == 'http-admission-v7' for row in cfg.get('runtime_experiments', ())) else 'bounded-v6' if any(row['id'] == 'http-admission-v6' for row in cfg.get('runtime_experiments', ())) else 'bounded-v5' if any(row['id'] == 'http-admission-v5'
                            for row in cfg.get('runtime_experiments', ())) else 'baseline')
         resolved, limits = resolve_database_pool(mode, admission_mode=admission_mode,
                                                  **parameters['requested'])

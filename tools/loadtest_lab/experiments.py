@@ -2,7 +2,7 @@
 
 Preparation reads each reviewed operator source from the immutable Git binding
 once and compiles the resulting files. Startup validates at most three overlays
-and ten touched files: O(S) hashing belongs to the existing source guard, with
+and eleven touched files: O(S) hashing belongs to the existing source guard, with
 O(1) binding work and no extra request-time source reads or database calls.
 """
 from __future__ import annotations
@@ -36,11 +36,12 @@ SPECS['http-admission-v4'] = SPECS['http-admission-v1']
 SPECS['http-admission-v5'] = SPECS['http-admission-v1']
 SPECS['http-admission-v6'] = SPECS['http-admission-v1']
 SPECS['http-admission-v7'] = SPECS['http-admission-v1']
+SPECS['http-admission-v8'] = (('http_admission64_patch.py','http_admission_patch.py','http_admission.py'),frozenset(('fishing_api/server.py','player_web_auth/http_api.py','fishing_api/config.py')),frozenset(('fishing_api/server.py','player_web_auth/http_api.py','fishing_api/config.py','survival_http_admission.py')))
 SPECS['pool-notify-v1'] = (
     ('db_pool_notify_patch.py', 'bounded_pool_notify.py'),
     frozenset(('fishing_api/_bounded_pool.py',)),
     frozenset(('fishing_api/_bounded_pool.py',)))
-ADMISSION_IDS = ('http-admission-v1', 'http-admission-v2', 'http-admission-v3', 'http-admission-v4', 'http-admission-v5', 'http-admission-v6', 'http-admission-v7')
+ADMISSION_IDS = ('http-admission-v1', 'http-admission-v2', 'http-admission-v3', 'http-admission-v4', 'http-admission-v5', 'http-admission-v6', 'http-admission-v7', 'http-admission-v8')
 ORDER = ('checkpoint-observation-v1', *ADMISSION_IDS, 'pool-notify-v1')
 ROW_KEYS = frozenset(('id', 'source_revision', 'operator_sources',
                       'parent_runtime_sha256', 'runtime_sha256'))
@@ -96,21 +97,21 @@ def has_http_admission(cfg):
 def http_admission_backlog(cfg, *, layer='backend'):
     """One fixed queue per layer; no player scan or caller queue override."""
     _need(layer in ('frontend', 'backend'), 'http_admission_layer_invalid')
-    if layer == 'frontend' and has_experiment(cfg, 'http-admission-v7'):
+    if layer == 'frontend' and any(has_experiment(cfg,name)for name in ('http-admission-v7','http-admission-v8')):
         return 2048
     return 128 if any(has_experiment(cfg, name) for name in ADMISSION_IDS[3:]) else 64
 
 
 def http_admission_wait(cfg, *, layer):
     _need(layer in ('frontend', 'backend'), 'http_admission_layer_invalid')
-    return 2.0 if layer == 'backend' or has_experiment(cfg, 'http-admission-v7') else 0.0
+    return 2.0 if layer == 'backend' or any(has_experiment(cfg,name)for name in ('http-admission-v7','http-admission-v8')) else 0.0
 
 
 def apply_experiments(root, cfg, revision, *, observation=False, admission=False,
                       pool_notify=False, repository):
     """Apply reviewed transformations in order, before the lab manifest exists."""
     admission = ('bounded-v1' if admission is True else 'baseline' if admission is False else admission)
-    admission_modes = dict(zip(('bounded-v1', 'bounded-v2', 'bounded-v3', 'bounded-v4', 'bounded-v5', 'bounded-v6', 'bounded-v7'), ADMISSION_IDS))
+    admission_modes = dict(zip(('bounded-v1', 'bounded-v2', 'bounded-v3', 'bounded-v4', 'bounded-v5', 'bounded-v6', 'bounded-v7', 'bounded-v8'), ADMISSION_IDS))
     _need(admission == 'baseline' or admission in admission_modes, 'http_admission_mode_invalid')
     selected = ([ORDER[0]] if observation else []) + (
         [admission_modes[admission]]
@@ -221,19 +222,21 @@ def validate_experiments(cfg):
     if 'database_resource_profile' in cfg:
         profile=cfg['database_resource_profile']
         _need(type(profile)is str and profile in DATABASE_RESOURCE_PROFILES,'db8_resource_profile_invalid')
-        required=(ADMISSION_IDS[6],) if profile in DB32_RESOURCE_PROFILES else (ADMISSION_IDS[5], ADMISSION_IDS[6]) if profile in DB16_RESOURCE_PROFILES else (ADMISSION_IDS[4],)
+        required=(ADMISSION_IDS[6],ADMISSION_IDS[7]) if profile in DB32_RESOURCE_PROFILES else (ADMISSION_IDS[5], ADMISSION_IDS[6]) if profile in DB16_RESOURCE_PROFILES else (ADMISSION_IDS[4],)
         _need(any(name in identities for name in required), 'db16_resource_profile_requires_admission_v6' if profile in DB16_RESOURCE_PROFILES else 'db8_resource_profile_requires_admission_v5')
     if any(name in identities for name in ADMISSION_IDS):
         # A waiter remains counted until it gets the mutex after notify. Even
         # with idle connections, all HTTP workers can briefly be queued. V2
         # reserves one waiting place per HTTP worker; connection count stays 4.
-        workers = 8 if ADMISSION_IDS[2] in identities else 32
+        if ADMISSION_IDS[7]in identities:
+            _need(cfg.get('database_resource_profile')in DB32_RESOURCE_PROFILES,'http64_requires_db32_profile')
+        workers = 64 if ADMISSION_IDS[7] in identities else 8 if ADMISSION_IDS[2] in identities else 32
         waiting = 8 if ADMISSION_IDS[2] in identities else 28 if ADMISSION_IDS[0] in identities else 32
         frontend = 128 if any(name in identities for name in ADMISSION_IDS[3:]) else 48
         connections = 16 if any(name in identities for name in ADMISSION_IDS[5:]) else 8 if ADMISSION_IDS[4] in identities else 4
         if cfg.get('database_resource_profile')in DB32_RESOURCE_PROFILES:
             connections,waiting=32,64
-            _need(ADMISSION_IDS[6]in identities,'db32_admission_v7_required')
+            _need(any(name in identities for name in ADMISSION_IDS[6:]),'db32_admission_v7_or_v8_required')
         if any(name in identities for name in ADMISSION_IDS[5:]):
             _need(cfg.get('database_resource_profile') in {**DB16_RESOURCE_PROFILES,**DB32_RESOURCE_PROFILES},'db16_explicit_resource_profile_required')
         if any(name in identities for name in ADMISSION_IDS[4:]):
