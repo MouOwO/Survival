@@ -61,7 +61,8 @@ DB8_RESOURCE_PROFILES = {
 
 
 DB16_RESOURCE_PROFILES = {'db16-4cpu-4g-v1': (4, 4096)}
-DATABASE_RESOURCE_PROFILES = {**DB8_RESOURCE_PROFILES, **DB16_RESOURCE_PROFILES}
+DB32_RESOURCE_PROFILES = {'db32-4cpu-4g-v1': (4,4096)}
+DATABASE_RESOURCE_PROFILES = {**DB8_RESOURCE_PROFILES, **DB16_RESOURCE_PROFILES, **DB32_RESOURCE_PROFILES}
 
 def resolve_database_resources(purpose, *, profile=None, memory=None, cpu=None):
     if profile is None:
@@ -220,7 +221,7 @@ def validate_experiments(cfg):
     if 'database_resource_profile' in cfg:
         profile=cfg['database_resource_profile']
         _need(type(profile)is str and profile in DATABASE_RESOURCE_PROFILES,'db8_resource_profile_invalid')
-        required=(ADMISSION_IDS[5], ADMISSION_IDS[6]) if profile in DB16_RESOURCE_PROFILES else (ADMISSION_IDS[4],)
+        required=(ADMISSION_IDS[6],) if profile in DB32_RESOURCE_PROFILES else (ADMISSION_IDS[5], ADMISSION_IDS[6]) if profile in DB16_RESOURCE_PROFILES else (ADMISSION_IDS[4],)
         _need(any(name in identities for name in required), 'db16_resource_profile_requires_admission_v6' if profile in DB16_RESOURCE_PROFILES else 'db8_resource_profile_requires_admission_v5')
     if any(name in identities for name in ADMISSION_IDS):
         # A waiter remains counted until it gets the mutex after notify. Even
@@ -230,8 +231,11 @@ def validate_experiments(cfg):
         waiting = 8 if ADMISSION_IDS[2] in identities else 28 if ADMISSION_IDS[0] in identities else 32
         frontend = 128 if any(name in identities for name in ADMISSION_IDS[3:]) else 48
         connections = 16 if any(name in identities for name in ADMISSION_IDS[5:]) else 8 if ADMISSION_IDS[4] in identities else 4
+        if cfg.get('database_resource_profile')in DB32_RESOURCE_PROFILES:
+            connections,waiting=32,64
+            _need(ADMISSION_IDS[6]in identities,'db32_admission_v7_required')
         if any(name in identities for name in ADMISSION_IDS[5:]):
-            _need(cfg.get('database_resource_profile') in DB16_RESOURCE_PROFILES,'db16_explicit_resource_profile_required')
+            _need(cfg.get('database_resource_profile') in {**DB16_RESOURCE_PROFILES,**DB32_RESOURCE_PROFILES},'db16_explicit_resource_profile_required')
         if any(name in identities for name in ADMISSION_IDS[4:]):
             expected_cpu, expected_memory = 2, 2048
             if 'database_resource_profile' in cfg:

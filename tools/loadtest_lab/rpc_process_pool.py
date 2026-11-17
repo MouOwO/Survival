@@ -1,9 +1,9 @@
 """Opt-in isolated RPC processes;original driver/SQL/commit,never replay.
 
-Startup O(W*S),W in(3,6,12,16) immutable workers;each RPC O(payload bytes+fixed stages),
-no account scans or authority cache. At most24 in-flight calls;queue-start
+Startup O(W*S),W in(3,6,12,16,32) immutable workers;each RPC O(payload bytes+fixed stages),
+no account scans or authority cache. At most24 legacy or48 explicit DB32 in-flight calls;queue-start
 wait<=2s and original HTTP absolute deadline includes IPC. Driver pools have
-a total of16 configured connections and32 waiter slots;serial workers use
+a total of16 legacy or32 explicit DB32 connections and32 or64 waiter slots;serial workers use
 W actual connections. Snapshot visits W fixed records,not players.
 Parent-death/pidfd shutdown is shared with the proven pure-worker lifecycle.
 """
@@ -72,12 +72,19 @@ def _finish(root):
 
 def validate_profile(cfg):
     value=cfg.get('rpc_process_pool')
-    if value is None:return None
+    if value is None:
+        if cfg.get('database_resource_profile')=='db32-4cpu-4g-v1':raise ValueError('db32_requires_explicit_rpc32')
+        return None
     workers=value.get('workers')if type(value)is dict else None
-    if (type(workers)is not int or workers not in(3,6,12,16)or value!={'id':'driver-process'+str(workers)+'-v1','workers':workers,'max_pending':24,'queue_seconds':2}
+    expanded=type(workers)is int and workers==32
+    connections,waiting,pending=(32,64,48)if expanded else(16,32,24)
+    if (type(workers)is not int or workers not in(3,6,12,16,32)
+        or value!={'id':'driver-process'+str(workers)+'-v1','workers':workers,'max_pending':pending,'queue_seconds':2}
         or cfg.get('purpose')!='capacity'or cfg.get('process_topology')!='split-v1'
-        or cfg.get('process_observation')!='pid-v1'or cfg.get('db_concurrency')!=16
-        or cfg.get('database_pool_limits')!={'connections':16,'waiting':32,'wait_seconds':2.0}
+        or cfg.get('process_observation')!='pid-v1'or cfg.get('db_concurrency')!=connections
+        or cfg.get('database_pool_limits')!={'connections':connections,'waiting':waiting,'wait_seconds':2.0}
+        or expanded and cfg.get('database_resource_profile')!='db32-4cpu-4g-v1'
+        or not expanded and cfg.get('database_resource_profile')=='db32-4cpu-4g-v1'
         or 'operator/loadtest_lab/rpc_process_pool.py'not in cfg.get('sources',{})
         or 'runtime/player_web_auth/response_pool.py'not in cfg.get('sources',{})):
         raise ValueError('rpc_process_profile_invalid')
@@ -87,18 +94,19 @@ def validate_profile(cfg):
 class RpcProcesses:
     def __init__(self,root,dsn,*,workers=3,connect_timeout,statement_timeout_ms,lock_timeout_ms):
         from player_web_auth.response_pool import ResponseEncoderPool
-        if type(workers)is not int or workers not in(3,6,12,16):raise ValueError('rpc_worker_budget_invalid')
+        if type(workers)is not int or workers not in(3,6,12,16,32):raise ValueError('rpc_worker_budget_invalid')
         self._workers=workers
+        self._connections,self._waiting,self._pending_limit=(32,64,48)if workers==32 else(16,32,24)
         self._root=Path(root)/'rpc_process_controls';self._root.mkdir(mode=0o700)
         self._lock=threading.RLock();self._closed=False;self._closing=False
         self._stats={};self._calls=self._errors=self._used=self._queue_rejected=0
         self._boot_records=[];self._terminal=None
         self._lifecycle=ResponseEncoderPool(workers=workers,pending=workers*8)
-        # Warmup has completed;all later RPC jobs share the same24-slot bound.
-        self._lifecycle._maximum=24;self._lifecycle._slots=threading.BoundedSemaphore(24)
+        # Warmup is complete;later jobs share24 legacy or48 explicit DB32 slots.
+        self._lifecycle._maximum=self._pending_limit;self._lifecycle._slots=threading.BoundedSemaphore(self._pending_limit)
         self._pids=sorted(r['pid']for r in self._lifecycle.snapshot()['worker_identities'])
-        self._allocations={pid:{'max_concurrency':16//workers+int(index<16%workers),
-                               'pool_max_waiters':32//workers+int(index<32%workers),'pool_wait_timeout':2}
+        self._allocations={pid:{'max_concurrency':self._connections//workers+int(index<self._connections%workers),
+                               'pool_max_waiters':self._waiting//workers+int(index<self._waiting%workers),'pool_wait_timeout':2}
                            for index,pid in enumerate(self._pids)}
         options={'connect_timeout':connect_timeout,'statement_timeout_ms':statement_timeout_ms,
                  'lock_timeout_ms':lock_timeout_ms}
@@ -189,7 +197,7 @@ class RpcProcesses:
         return result
 
     def snapshot(self):
-        with self._lock:return {'kind':'ISOLATED_ORIGINAL_DRIVER_PROCESS_POOL_V1','workers':self._workers,'max_pending':24,
+        with self._lock:return {'kind':'ISOLATED_ORIGINAL_DRIVER_PROCESS_POOL_V1','workers':self._workers,'max_pending':self._pending_limit,
             'configured_connection_allocations':[self._allocations[pid]for pid in self._pids],
             'original_driver_boot_records':self._boot_records,'calls':self._calls,'results_used':self._used,
             'errors':self._errors,'queue_rejected_before_dispatch':self._queue_rejected,

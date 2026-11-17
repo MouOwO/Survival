@@ -133,16 +133,21 @@ def _backend_setup(root, cfg, private, lua):
         rule_csv=root / 'addon/data/csv/玩家档案系统/fishing_system_rules.csv',
         gameplay_stats_csv=root / 'addon/data/csv/玩家档案系统/player_gameplay_stats.csv',
         request_timeout_seconds=20, database_backend='postgres', postgres_dsn=dsn(cfg, private),
-        postgres_max_concurrency=cfg['db_concurrency'], http_max_concurrency=cfg['http_concurrency'],
+        postgres_max_concurrency=min(16,cfg['db_concurrency']), http_max_concurrency=cfg['http_concurrency'],
         payment_mode='test', archive_http=True, addon_root=root / 'addon', archive_lua_path=lua)
     os.environ.pop('SURVIVAL_TEST_STEAM_IDS64', None)
-    options = {'pool_max_waiters': cfg['database_pool_limits']['waiting'],
+    # This unused bootstrap client retains original per-client limits. Actual
+    # DB32 uses32 separate original validated one-connection clients.
+    options = {'pool_max_waiters': min(32,cfg['database_pool_limits']['waiting']),
                'pool_wait_timeout': cfg['database_pool_limits']['wait_seconds']}
     app = build_application(settings, **options)
     try:
         from .rpc_process_pool import validate_profile as rpc_profile, RpcProcesses
         if rpc_profile(cfg)is not None:
             original=app.rpc_client
+            if cfg['rpc_process_pool']['workers']==32:
+                need(original.pool_stats()['total']==0,'db32_bootstrap_client_must_be_unused')
+                original.close()
             parallel=RpcProcesses(root,settings.postgres_dsn,workers=cfg['rpc_process_pool']['workers'],
                 connect_timeout=settings.postgres_connect_timeout_seconds,
                 statement_timeout_ms=settings.postgres_statement_timeout_ms,

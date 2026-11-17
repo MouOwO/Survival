@@ -10,7 +10,7 @@ import time
 from .guard import (PORTS, ACCOUNT_START, canonical, sha, need, relative, read_json,
                     write_new, load, dsn, marker_guard, DEFAULT_POSTGRES_IMAGE, validate_postgres_image,
                     resolve_database_pool)
-from .experiments import DB8_RESOURCE_PROFILES, DB16_RESOURCE_PROFILES, DATABASE_RESOURCE_PROFILES, resolve_database_resources
+from .experiments import DB8_RESOURCE_PROFILES, DB16_RESOURCE_PROFILES, DB32_RESOURCE_PROFILES, DATABASE_RESOURCE_PROFILES, resolve_database_resources
 
 ROOT = Path(__file__).resolve().parents[2]
 CSVS = ('star_blessing_reward_definitions', 'fishing_system_rules', 'player_gameplay_stats')
@@ -145,7 +145,7 @@ def prepare(args):
     if getattr(args, 'profile_read_cache', 'baseline') != 'baseline':
         cfg['profile_read_cache'] = args.profile_read_cache
     if resource_profile is not None:
-        expected_admissions=('bounded-v6', 'bounded-v7') if resource_profile in DB16_RESOURCE_PROFILES else ('bounded-v5',)
+        expected_admissions=('bounded-v7',) if resource_profile in DB32_RESOURCE_PROFILES else ('bounded-v6', 'bounded-v7') if resource_profile in DB16_RESOURCE_PROFILES else ('bounded-v5',)
         need(getattr(args, 'http_admission', 'baseline') in expected_admissions
              and backend_db_pool == 'bounded-v2', 'db16_resource_profile_requires_admission_v6' if resource_profile in DB16_RESOURCE_PROFILES else 'db8_resource_profile_requires_admission_v5')
         cfg['database_resource_profile'] = resource_profile
@@ -333,9 +333,9 @@ def prepare(args):
         from .guard import validate_response_encoding_pool
         validate_response_encoding_pool(cfg)
     rpc_mode=getattr(args,'rpc_processes','baseline')
-    need(rpc_mode in('baseline','driver-process3-v1','driver-process6-v1','driver-process12-v1','driver-process16-v1'),'rpc_process_option_invalid')
+    need(rpc_mode in('baseline','driver-process3-v1','driver-process6-v1','driver-process12-v1','driver-process16-v1','driver-process32-v1'),'rpc_process_option_invalid')
     if rpc_mode!='baseline':
-        cfg['rpc_process_pool']={'id':rpc_mode,'workers':{'driver-process3-v1':3,'driver-process6-v1':6,'driver-process12-v1':12,'driver-process16-v1':16}[rpc_mode],'max_pending':24,'queue_seconds':2}
+        cfg['rpc_process_pool']={'id':rpc_mode,'workers':{'driver-process3-v1':3,'driver-process6-v1':6,'driver-process12-v1':12,'driver-process16-v1':16,'driver-process32-v1':32}[rpc_mode],'max_pending':48 if rpc_mode=='driver-process32-v1'else 24,'queue_seconds':2}
         from .rpc_process_pool import validate_profile as validate_rpc_profile
         validate_rpc_profile(cfg)
     runner = b"import sys\nfrom pathlib import Path\nsys.path[:0]=[str(Path(__file__).parent/'operator'),str(Path(__file__).parent/'runtime')]\nfrom loadtest_lab.cli import entry\nif __name__ == '__main__':\n    raise SystemExit(entry())\n"
@@ -506,7 +506,7 @@ def main(argv=None):
                       help='bounded-v2 only: bounded DB waiting queue, default 20; maximum 32')
     init.add_argument('--db-pool-wait-seconds', type=float,
                       help='bounded-v2 only: queue wait cap, default 2; maximum 5 and request remaining deadline')
-    init.add_argument('--rpc-processes',choices=('baseline','driver-process3-v1','driver-process6-v1','driver-process12-v1','driver-process16-v1'),default='baseline',help='Isolated original-driver processes;no RPC replay')
+    init.add_argument('--rpc-processes',choices=('baseline','driver-process3-v1','driver-process6-v1','driver-process12-v1','driver-process16-v1','driver-process32-v1'),default='baseline',help='Isolated original-driver processes;no RPC replay')
     init.add_argument('--response-encoding',choices=('baseline','pool2-v1','pool3-v1'),default='baseline',help='Opt-in pure response encoding workers;no business orRPC replay')
     init.add_argument('--generator-transport',choices=('baseline','ssh-quad-v1','ssh-16-v1','linux-loopback-v1'),default='baseline',help='Source-bound SSH4/16 or co-located Linux loopback generator; no business changes')
     init.add_argument('--exit-probe-common-seconds',type=int,choices=(60,300,3600),

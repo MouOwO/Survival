@@ -91,13 +91,14 @@ def resolve_database_pool(mode, *, http_concurrency=None, db_concurrency=4,
                  'web_concurrency': web_concurrency, 'pool_max_waiters': pool_max_waiters,
                  'pool_wait_seconds': pool_wait_seconds}
     http = (24 if mode == 'bounded-v2' else 8) if http_concurrency is None else http_concurrency
-    for value, maximum in ((http, 32), (db_concurrency, 16), (web_concurrency, 128)):
+    expanded=(admission_mode=='bounded-v7'and type(db_concurrency)is int and db_concurrency==32)
+    for value, maximum in ((http, 32), (db_concurrency, 32 if expanded else 16), (web_concurrency, 128)):
         need(type(value) is int and 1 <= value <= maximum, 'lab_concurrency_budget_invalid')
     limits = None
     if mode != 'baseline':
         if admission_mode in ('bounded-v5', 'bounded-v6', 'bounded-v7'):
             if admission_mode in ('bounded-v6', 'bounded-v7'):
-                need(db_concurrency == 16, 'reviewed_db16_profile_requires_sixteen_connections')
+                need(db_concurrency == (32 if expanded else 16), 'reviewed_db16_profile_requires_sixteen_connections')
             else:
                 need(db_concurrency == 8, 'reviewed_db8_profile_requires_eight_connections')
         else:
@@ -109,12 +110,12 @@ def resolve_database_pool(mode, *, http_concurrency=None, db_concurrency=4,
         else:
             waiting = 20 if pool_max_waiters is None else pool_max_waiters
             wait = 2 if pool_wait_seconds is None else pool_wait_seconds
-            need(type(waiting) is int and 0 <= waiting <= 32, 'lab_database_pool_queue_invalid')
+            need(type(waiting) is int and 0 <= waiting <= (64 if expanded else 32), 'lab_database_pool_queue_invalid')
             need(type(wait) in (int, float) and math.isfinite(wait) and 0 < wait <= 5,
                  'lab_database_pool_wait_invalid')
             need(http <= db_concurrency + waiting, 'http_exceeds_database_pool_admission_budget')
         if admission_mode in ('bounded-v5', 'bounded-v6', 'bounded-v7'):
-            need((http, web_concurrency, db_concurrency, waiting, wait) == (32, 128, 16 if admission_mode in ('bounded-v6', 'bounded-v7') else 8, 32, 2),
+            need((http, web_concurrency, db_concurrency, waiting, wait) == (32, 128, 32 if expanded else 16 if admission_mode in ('bounded-v6', 'bounded-v7') else 8, 64 if expanded else 32, 2),
                  'reviewed_db8_profile_budgets_required')
         limits = {'connections': db_concurrency, 'waiting': waiting, 'wait_seconds': wait}
     else:
@@ -303,7 +304,7 @@ def load(directory):
     for key in ('controller', 'backend', 'auth_secret', 'pepper', 'database_admin', 'database_app', 'marker'):
         need(bool(re.fullmatch('[a-f0-9]{64}', private.get(key, ''))), 'independent_lab_secret_required')
     need(len(set(private.values())) == 7, 'lab_secrets_must_be_independent')
-    for key, limit in (('http_concurrency', 32), ('db_concurrency', 16), ('web_concurrency', 128),
+    for key, limit in (('http_concurrency', 32), ('db_concurrency', 32 if cfg.get('database_resource_profile')=='db32-4cpu-4g-v1'else 16), ('web_concurrency', 128),
                        ('global_http_per_minute', 1000000)):
         need(type(cfg.get(key)) is int and 1 <= cfg[key] <= limit, 'lab_concurrency_budget_invalid')
     validate_database_pool(cfg)
