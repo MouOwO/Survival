@@ -546,7 +546,11 @@ class ExitCooperativeTaskSet(TaskSet):
         self.user._normal_stop_event.wait(timeout=seconds)
 
 
-class SyntheticPlayer(HttpUser):
+_HTTPBase=HttpUser
+if os.environ.get('LOADTEST_FAST_HTTP')=='1':
+    from fast_transport import BudgetFastHttpUser as _HTTPBase
+
+class SyntheticPlayer(_HTTPBase):
     host = 'http://127.0.0.1:29567'
     tasks = [ExitCooperativeTaskSet]
 
