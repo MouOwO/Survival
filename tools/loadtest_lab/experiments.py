@@ -97,6 +97,10 @@ def has_http_admission(cfg):
 def http_admission_backlog(cfg, *, layer='backend'):
     """One fixed queue per layer; no player scan or caller queue override."""
     _need(layer in ('frontend', 'backend'), 'http_admission_layer_invalid')
+    if layer=='backend'and cfg.get('backend_process_pool'):
+        from .process_runtime import validate_backend_pair
+        validate_backend_pair(cfg)
+        return 256  # Two independent128-socket listener queues, not a shared128.
     if layer == 'frontend' and any(has_experiment(cfg,name)for name in ('http-admission-v7','http-admission-v8')):
         return 2048
     return 128 if any(has_experiment(cfg, name) for name in ADMISSION_IDS[3:]) else 64

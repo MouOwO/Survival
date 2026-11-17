@@ -73,7 +73,9 @@ def _finish(root):
 def validate_profile(cfg):
     value=cfg.get('rpc_process_pool')
     if value is None:
-        if cfg.get('database_resource_profile')=='db32-4cpu-4g-v1':raise ValueError('db32_requires_explicit_rpc32')
+        if cfg.get('database_resource_profile')=='db32-4cpu-4g-v1':
+            from .process_runtime import validate_backend_pair
+            if validate_backend_pair(cfg)is None:raise ValueError('db32_requires_explicit_rpc32_or_full_pair')
         return None
     workers=value.get('workers')if type(value)is dict else None
     expanded=type(workers)is int and workers==32

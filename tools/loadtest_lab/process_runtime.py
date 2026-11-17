@@ -42,6 +42,7 @@ def validate_process_options(cfg):
     if mode is not None or obs is not None:
         need('operator/loadtest_lab/process_runtime.py' in cfg.get('sources', {}),
              'process_runtime_source_binding_required')
+    validate_backend_pair(cfg)
     return mode
 
 
@@ -141,6 +142,10 @@ def _http64_server_class(original,cfg):
     <=2s admission and unchanged50ms rejection. Once-only shutdown O(64).
     No account scan, database call, permission cache or request replay.
     """
+    if cfg.get('_backend_pair_node'):
+        class SharedPortBackend(original):
+            allow_reuse_port=True
+        return SharedPortBackend
     if cfg.get('http_concurrency')!=64:return original
     selected=any(row.get('id')=='http-admission-v8'for row in cfg.get('runtime_experiments',()))
     if not(selected and cfg.get('db_concurrency')==32 and cfg.get('database_resource_profile')=='db32-4cpu-4g-v1'and cfg.get('rpc_process_pool',{}).get('id')=='driver-process32-v1'):
@@ -161,6 +166,7 @@ def _http64_server_class(original,cfg):
 
 def _backend_setup(root, cfg, private, lua):
     """The original Settings/constructor/preflight calls, in a fresh process."""
+    cfg=_node_cfg(cfg)
     sys.path.insert(0, str(root / 'runtime'))
     from fishing_api.config import Settings
     from fishing_api.server import build_application, make_handler, BoundedThreadingHTTPServer
@@ -245,11 +251,14 @@ def _backend_watchdog(stop, complete, own_pid):
         _kill_own_session(own_pid)
 
 
-def backend_worker(directory, *, lua_executable=None):
+def backend_worker(directory, *, lua_executable=None, backend_index=None):
     _linux()
     root, cfg, private = load(directory)
     need(validate_process_options(cfg) == 'split-v1', 'split_backend_mode_required')
     production_host_guard(cfg)
+    pair=validate_backend_pair(cfg)
+    need((type(backend_index)is int and backend_index in(0,1))if pair else backend_index is None,'backend_index_not_bound')
+    limits_cfg=_node_cfg(cfg)
     boot = _read(root / 'process_parent_boot.json')
     nonce = boot.get('startup_nonce')
     need(type(nonce) is str and re.fullmatch('[a-f0-9]{32}', nonce), 'process_nonce_invalid')
@@ -258,7 +267,7 @@ def backend_worker(directory, *, lua_executable=None):
     need(type(parent) is dict and parent.get('pid') == os.getppid(), 'backend_parent_mismatch')
     need(os.getpgrp() == os.getpid() and os.getsid(0) == os.getpid(), 'backend_owned_session_required')
     own_pid = os.getpid()
-    own = _identity(own_pid, ['backend'])
+    own = _identity(own_pid, ['backend1'if backend_index==1 else'backend'])
     stop, complete = threading.Event(), threading.Event()
     prior = signal.signal(signal.SIGTERM, lambda *_: stop.set())
     threading.Thread(target=_backend_watchdog, args=(stop, complete, own_pid), daemon=True).start()
@@ -270,7 +279,7 @@ def backend_worker(directory, *, lua_executable=None):
     frontend_quiescent = False
     common = {'run_id': cfg['run_id'], 'manifest_sha256': sha(canonical(cfg)),
               'startup_nonce': nonce, 'process_identity': own, 'process_group': own_pid}
-    drain = {'drained': False, 'worker_slots_not_drained': cfg['http_concurrency']}
+    drain = {'drained': False, 'worker_slots_not_drained': limits_cfg['http_concurrency']}
     closed = False
     close_error = None
     stats = None
@@ -288,11 +297,11 @@ def backend_worker(directory, *, lua_executable=None):
         need(not stop.is_set() and os.getppid() == parent['pid'], 'parent_lost_during_backend_startup')
         thread = threading.Thread(target=server.serve_forever, daemon=True)
         thread.start(); running = True
-        publish(root / 'backend_started_receipt.json', {**common,
+        publish(_node_path(root,'backend_started_receipt.json',backend_index), {**common,
             'kind': 'ISOLATED_BACKEND_PROCESS_STARTED', 'database_pool_started': pool,
             'rpc_process_pool_started': app.rpc_client.snapshot()if cfg.get('rpc_process_pool')else None,
             'actual_database_pool_limits_verified': True,
-            'http_admission_started': shared.checked_http_admission_stats(server, 'backend', cfg),
+            'http_admission_started': shared.checked_http_admission_stats(server, 'backend', limits_cfg),
             'settlement_cache_warmup': warm, 'actual_catalog_preflight_passed': True,
             'lua_executable': lua, 'lua_sha256': lua_sha, 'lua_version': lua_version,
             'checkpoint_observation_started': shared.checkpoint_observation_stats(cfg)})
@@ -330,7 +339,7 @@ def backend_worker(directory, *, lua_executable=None):
             _best_effort(errors, 'backend_listener_shutdown_failed', server.shutdown)
         if server is not None:
             drain = _best_effort(errors, 'backend_drain_failed', lambda:
-                shared.drain_server_workers(server, '_workers', cfg['http_concurrency'], deadline), drain)
+                shared.drain_server_workers(server, '_workers', limits_cfg['http_concurrency'], deadline), drain)
             _best_effort(errors, 'backend_server_close_failed', server.server_close)
         else:
             # No backend listeners/app were constructed; this cannot certify a
@@ -340,14 +349,14 @@ def backend_worker(directory, *, lua_executable=None):
             if drain.get('drained') is True:
                 try:
                     app.rpc_client.close()
-                    stats = shared.checked_database_pool_stats(app.rpc_client, cfg)
+                    stats = shared.checked_database_pool_stats(app.rpc_client, limits_cfg)
                     closed = (stats.get('closed') is True
                               and stats.get('total') == stats.get('waiting') == 0)
                 except BaseException:
                     _safe_error(errors, 'database_pool_close_not_completed')
             else:
                 stats = _best_effort(errors, 'database_pool_terminal_stats_failed', lambda:
-                    shared.checked_database_pool_stats(app.rpc_client, cfg))
+                    shared.checked_database_pool_stats(app.rpc_client, limits_cfg))
             if not closed:
                 close_error = 'database_pool_close_not_completed'
         if not frontend_quiescent:
@@ -360,7 +369,7 @@ def backend_worker(directory, *, lua_executable=None):
             'stop_reason': reason, 'control_error': control_error,
             'backend_drain': drain,
             'http_admission_stopped': _best_effort(errors, 'backend_admission_stats_failed', lambda:
-                shared.checked_http_admission_stats(server, 'backend', cfg)) if server is not None else None,
+                shared.checked_http_admission_stats(server, 'backend', limits_cfg)) if server is not None else None,
             'database_pool_closed': closed, 'database_pool_close_deferred': not drain.get('drained', False),
             'database_pool_close_error': close_error, 'database_pool_stopped': stats,
             'rpc_process_pool_stopped': _best_effort(errors,'rpc_process_snapshot_failed',app.rpc_client.snapshot)if cfg.get('rpc_process_pool')and app is not None else None,
@@ -374,7 +383,7 @@ def backend_worker(directory, *, lua_executable=None):
         clean = clean and not errors
         terminal['descendant_cleanup_required'] = not clean
         try:
-            publish(root / 'backend_stopped_receipt.json', terminal)
+            publish(_node_path(root,'backend_stopped_receipt.json',backend_index), terminal)
             terminal_written = True
         except BaseException:
             _safe_error(errors, 'backend_terminal_publication_failed')
@@ -452,6 +461,161 @@ class _OwnedChild:
                 self.pidfd = None
 
 
+
+PAIR_PROFILE={'id':'full-business-pair-v1','workers':2,'per_worker_http':32,
+              'per_worker_connections':16,'per_worker_waiters':32,'wait_seconds':2}
+
+def validate_backend_pair(cfg):
+    row=cfg.get('backend_process_pool')
+    if row is None:return None
+    need(row==PAIR_PROFILE and cfg.get('purpose')=='capacity'
+         and cfg.get('process_topology')=='split-v1'and cfg.get('process_observation')=='pid-v1'
+         and cfg.get('backend_db_pool')=='bounded-v2'and 'rpc_process_pool'not in cfg
+         and cfg.get('db_concurrency')==32 and cfg.get('http_concurrency')==64
+         and cfg.get('database_resource_profile')=='db32-4cpu-4g-v1'
+         and cfg.get('database_pool_limits')=={'connections':32,'waiting':64,'wait_seconds':2}
+         and any(r.get('id')=='http-admission-v8'for r in cfg.get('runtime_experiments',()))
+         and 'operator/loadtest_lab/process_runtime.py'in cfg.get('sources',{}),
+         'full_backend_pair_fixed_profile_required')
+    return row
+
+def _node_cfg(cfg):
+    if not cfg.get('backend_process_pool'):return cfg
+    validate_backend_pair(cfg)
+    return {**{k:v for k,v in cfg.items()if k!='backend_process_pool'},
+            'db_concurrency':16,'http_concurrency':32,'database_resource_profile':'db16-4cpu-4g-v1',
+            'database_pool_limits':{'connections':16,'waiting':32,'wait_seconds':2},
+            '_backend_pair_node':True}
+
+def _node_path(root,name,index):
+    return root/(name if index is None else name.replace('_receipt.json','_node'+str(index)+'_receipt.json'))
+
+def _aggregate_counters(rows,fixed):
+    need(len(rows)==2 and all(type(r)is dict and set(r)==set(rows[0])for r in rows),'pair_counter_shape')
+    result={}
+    for key in rows[0]:
+        values=[r[key]for r in rows]
+        if key in fixed:
+            need(values[0]==values[1],'pair_fixed_counter_mismatch');result[key]=values[0]
+        elif all(type(x)is bool for x in values):result[key]=all(values)
+        else:
+            need(all(type(x)in(int,float)and math.isfinite(x)for x in values),'pair_counter_not_numeric')
+            result[key]=sum(values)
+    return result
+
+def _aggregate_backend(root,cfg,nonce,identities,terminal=False):
+    name='backend_stopped_receipt.json'if terminal else'backend_started_receipt.json'
+    kind='ISOLATED_BACKEND_PROCESS_STOPPED'if terminal else'ISOLATED_BACKEND_PROCESS_STARTED'
+    nodes=[]
+    for i,ident in enumerate(identities):
+        path=_node_path(root,name,i);row=_bound(_read(path),cfg,nonce,kind)
+        need(row['process_identity']==ident and row['process_group']==ident['pid'],'pair_node_identity_changed')
+        nodes.append(row)
+    result=dict(nodes[0],backend_nodes=nodes,backend_node_receipt_sha256=[sha(_node_path(root,name,i).read_bytes())for i in range(2)],
+                backend_process_pool=dict(PAIR_PROFILE),aggregate_counters_are_sum_of_two_owned_nodes=True)
+    pool_key='database_pool_stopped'if terminal else'database_pool_started'
+    adm_key='http_admission_stopped'if terminal else'http_admission_started'
+    result[pool_key]=_aggregate_counters([r[pool_key]for r in nodes],{'wait_timeout'})
+    result[adm_key]=_aggregate_counters([r[adm_key]for r in nodes],{'layer','accept_wait_seconds'})
+    # Cache and trace snapshots remain per-process raw facts. They are not
+    # collapsed into a fictitious single cache or a single trace budget.
+    if terminal:
+        result['backend_drain']={'drained':all(r['backend_drain']['drained']for r in nodes),
+            'worker_slots_not_drained':sum(r['backend_drain']['worker_slots_not_drained']for r in nodes)}
+        for key in('database_pool_closed','frontend_quiescent'):result[key]=all(r[key]is True for r in nodes)
+        for key in('database_pool_close_deferred','descendant_cleanup_required'):result[key]=any(r[key]is True for r in nodes)
+        result['cleanup_errors']=list(dict.fromkeys(x for r in nodes for x in r['cleanup_errors']))
+        for key in('database_pool_close_error','control_error'):
+            result[key]=next((r[key]for r in nodes if r[key]is not None),None)
+        need(all(r['stop_reason']=='parent_requested'for r in nodes),'pair_node_stop_reason_not_normal')
+    return result
+
+class _OwnedBackendPair:
+    """Two fresh-exec complete apps, fixed W=2, no account scans or IPC RPC.
+
+    Startup O(2*S); stable HTTP dispatch stays in the kernel (SO_REUSEPORT).
+    Every accepted HTTP request has one original handler and one original SQL
+    path. No extra business/database/network call; shutdown/snapshot O(2).
+    Both owned pidfds remain unreaped until all group cleanup has completed.
+    """
+    def __init__(self,root,cfg,lua,nonce):
+        validate_backend_pair(cfg)
+        self.root,self.cfg,self.nonce=root,cfg,nonce
+        self.nodes=[];self.identities=[];self.lock=threading.RLock()
+        self.ending=False;self.event=threading.Event();self.ready_complete=threading.Event();self.ready_error=None
+        try:
+            for index in range(2):
+                child=subprocess.Popen(_backend_argv(root,lua)+['--backend-index',str(index)],
+                                       stdin=subprocess.DEVNULL,start_new_session=True)
+                node=_OwnedChild(child);self.nodes.append(node)
+                node.pidfd=os.pidfd_open(child.pid,0)
+                node.group_verified=os.getpgid(child.pid)==child.pid and os.getsid(child.pid)==child.pid
+                need(node.group_verified,'pair_node_session_not_owned')
+                ident=_identity(child.pid,['backend'if index==0 else'backend1']);self.identities.append(ident)
+                def watch(fd=node.pidfd):
+                    try:_not_reaped_exit(fd,block=True)
+                    finally:self.event.set()
+                threading.Thread(target=watch,daemon=True).start()
+        except BaseException:
+            for node in self.nodes:
+                try:node.force()
+                except BaseException:pass
+            for node in self.nodes:
+                try:node.reap(3);node.close_fd()
+                except BaseException:pass
+            raise
+        self.child=self.nodes[0].child;self.pidfd=self.nodes[0].pidfd
+        threading.Thread(target=self._publish_ready,daemon=True).start()
+    def _publish_ready(self):
+        try:
+            deadline=time.monotonic()+STARTUP_SECONDS
+            for index in range(2):
+                path=_node_path(self.root,'backend_started_receipt.json',index)
+                while not path.is_file():
+                    need(not self.event.is_set()and not self.ending and time.monotonic()<deadline,'pair_node_not_ready')
+                    self.event.wait(.05)
+            publish(self.root/'backend_started_receipt.json',_aggregate_backend(self.root,self.cfg,self.nonce,self.identities))
+        except BaseException as error:
+            self.ready_error=type(error).__name__;self.event.set()
+        finally:self.ready_complete.set()
+    @property
+    def reserved(self):return any(n.reserved for n in self.nodes)
+    @property
+    def forced(self):return any(n.forced for n in self.nodes)
+    @property
+    def exit_code(self):
+        if any(n.exit_code is None for n in self.nodes):return None
+        return next((n.exit_code for n in self.nodes if n.exit_code!=0),0)
+    def exit_info(self):
+        need(self.ready_error is None,'pair_ready_publication_failed')
+        values=[n.exit_info()for n in self.nodes]
+        if not self.ending:
+            need(not any(v is not None for v in values),'pair_node_exited_before_shutdown')
+            return None
+        if any(v is None for v in values):return None
+        path=self.root/'backend_stopped_receipt.json'
+        if not path.exists():
+            need(all(v.si_code==os.CLD_EXITED and v.si_status==0 for v in values),'pair_node_abnormal_exit')
+            publish(path,_aggregate_backend(self.root,self.cfg,self.nonce,self.identities,terminal=True))
+        return values[0]
+    def wait_exit(self):self.event.wait()
+    def term(self):
+        with self.lock:
+            self.ending=True
+            for n in self.nodes:n.term()
+    def force(self):
+        with self.lock:
+            self.ending=True
+            for n in self.nodes:n.force()
+    def reap(self,timeout):
+        with self.lock:
+            deadline=time.monotonic()+timeout
+            for n in self.nodes:n.reap(max(0,deadline-time.monotonic()))
+            return self.exit_code
+    def close_fd(self):
+        for n in self.nodes:n.close_fd()
+
+
 def _parent_hard_watchdog(complete, owner_box, deadline):
     if complete.wait(max(0, deadline - time.monotonic())):
         return
@@ -512,13 +676,17 @@ def serve_split(directory, *, lua_executable=None, _loaded=None):
     backend_drain = {'drained': False, 'worker_slots_not_drained': cfg['http_concurrency']}
     old_sigterm = signal.signal(signal.SIGTERM, lambda *_: stop.set())
     try:
-        child = subprocess.Popen(_backend_argv(root, lua), stdin=subprocess.DEVNULL,
-                                 start_new_session=True)
-        owner = _OwnedChild(child); owner_box[0] = owner
-        owner.group_verified = os.getpgid(child.pid) == child.pid and os.getsid(child.pid) == child.pid
-        need(owner.group_verified, 'backend_session_not_owned')
-        owner.pidfd = os.pidfd_open(child.pid, 0)
-        child_identity = _identity(child.pid, ['backend'])
+        if cfg.get('backend_process_pool'):
+            owner=_OwnedBackendPair(root,cfg,lua,nonce);child=owner.child
+            owner_box[0]=owner;child_identity=owner.identities[0]
+        else:
+            child = subprocess.Popen(_backend_argv(root, lua), stdin=subprocess.DEVNULL,
+                                     start_new_session=True)
+            owner = _OwnedChild(child); owner_box[0] = owner
+            owner.group_verified = os.getpgid(child.pid) == child.pid and os.getsid(child.pid) == child.pid
+            need(owner.group_verified, 'backend_session_not_owned')
+            owner.pidfd = os.pidfd_open(child.pid, 0)
+            child_identity = _identity(child.pid, ['backend'])
         deadline = time.monotonic() + STARTUP_SECONDS
         while not (root / 'backend_started_receipt.json').exists():
             need(owner.exit_info() is None, 'backend_exited_before_ready')
@@ -535,7 +703,7 @@ def serve_split(directory, *, lua_executable=None, _loaded=None):
         need(owner.exit_info() is None, 'backend_exited_at_ready')
         def watch():
             try:
-                _not_reaped_exit(owner.pidfd, block=True)
+                owner.wait_exit()if cfg.get('backend_process_pool')else _not_reaped_exit(owner.pidfd, block=True)
             except BaseException:
                 pass
             finally:
@@ -559,6 +727,7 @@ def serve_split(directory, *, lua_executable=None, _loaded=None):
         web.block_on_close = False
         if not admission: web.slots = threading.BoundedSemaphore(cfg['web_concurrency'])
         scope_rows=[own,child_identity]
+        if cfg.get('backend_process_pool'):scope_rows.extend(owner.identities[1:])
         if cfg.get('rpc_process_pool'):
             workers=started['rpc_process_pool_started']['worker_lifecycle']['worker_identities']
             need(len(workers)==cfg['rpc_process_pool']['workers'],'rpc_owned_worker_count_mismatch')
@@ -654,7 +823,7 @@ def serve_split(directory, *, lua_executable=None, _loaded=None):
                         _best_effort(errors, 'backend_term_signal_failed', owner.term)
                         try:
                             while owner.exit_info() is None and time.monotonic() < deadline:
-                                exited.wait(min(.1, max(0, deadline - time.monotonic())))
+                                time.sleep(min(.05,max(0,deadline-time.monotonic())))if cfg.get('backend_process_pool')else exited.wait(min(.1, max(0, deadline - time.monotonic())))
                         except BaseException:
                             _safe_error(errors, 'backend_exit_observation_failed')
                         stop_path = root / 'backend_stopped_receipt.json'

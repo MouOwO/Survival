@@ -316,6 +316,10 @@ def prepare(args):
             'runner_sha256': runner_digest, 'bundle_hash': SETTLEMENT_BUNDLE_HASH,
             'bundle_manifest_sha256': SETTLEMENT_BUNDLE_MANIFEST_SHA256}
         validate_settlement_cache(cfg)
+    backend_mode=getattr(args,'backend_processes','baseline')
+    if backend_mode!='baseline':
+        from .process_runtime import PAIR_PROFILE
+        cfg['backend_process_pool']=dict(PAIR_PROFILE)
     process_topology = getattr(args, 'process_topology', None)
     process_observation = getattr(args, 'process_observation', None)
     if process_topology is not None:
@@ -506,6 +510,7 @@ def main(argv=None):
                       help='bounded-v2 only: bounded DB waiting queue, default 20; maximum 32')
     init.add_argument('--db-pool-wait-seconds', type=float,
                       help='bounded-v2 only: queue wait cap, default 2; maximum 5 and request remaining deadline')
+    init.add_argument('--backend-processes',choices=('baseline','full-business-pair-v1'),default='baseline')
     init.add_argument('--rpc-processes',choices=('baseline','driver-process3-v1','driver-process6-v1','driver-process12-v1','driver-process16-v1','driver-process32-v1'),default='baseline',help='Isolated original-driver processes;no RPC replay')
     init.add_argument('--response-encoding',choices=('baseline','pool2-v1','pool3-v1'),default='baseline',help='Opt-in pure response encoding workers;no business orRPC replay')
     init.add_argument('--generator-transport',choices=('baseline','ssh-quad-v1','ssh-16-v1','linux-loopback-v1'),default='baseline',help='Source-bound SSH4/16 or co-located Linux loopback generator; no business changes')
@@ -566,6 +571,7 @@ def main(argv=None):
     serve.add_argument('--lua-executable', help='Explicit Lua executable; otherwise detect lua5.1/lua')
     worker = subs.add_parser('serve-backend'); worker.add_argument('--directory', required=True)
     worker.add_argument('--lua-executable')
+    worker.add_argument('--backend-index',type=int,choices=(0,1))
     test = subs.add_parser('smoke'); test.add_argument('--directory', required=True)
     test.add_argument('--stop-lab', action='store_true')
     stop = subs.add_parser('stop'); stop.add_argument('--client', required=True)
@@ -588,7 +594,7 @@ def main(argv=None):
         result = stop_lab(args.client)
     elif args.action == 'serve-backend':
         from .process_runtime import backend_worker
-        return backend_worker(args.directory, lua_executable=args.lua_executable)
+        return backend_worker(args.directory, lua_executable=args.lua_executable,backend_index=args.backend_index)
     elif args.action == 'monitor':
         from .monitor import monitor
         result = monitor(args.directory, duration_seconds=args.duration, interval_seconds=args.interval)
