@@ -468,15 +468,22 @@ PAIR_PROFILE={'id':'full-business-pair-v1','workers':2,'per_worker_http':32,
 FOUR_PROFILE={'id':'full-business-four-v1','workers':4,'per_worker_http':16,
               'per_worker_connections':8,'per_worker_waiters':16,'wait_seconds':2}
 
+# Fewer connections only: same four apps,64 HTTP workers and64 waiters.
+FOUR_DB16_PROFILE={'id':'full-business-four-db16-v1','workers':4,'per_worker_http':16,
+                   'per_worker_connections':4,'per_worker_waiters':16,'wait_seconds':2}
+
 def validate_backend_pair(cfg):
     row=cfg.get('backend_process_pool')
     if row is None:return None
-    need(row in(PAIR_PROFILE,FOUR_PROFILE) and cfg.get('purpose')=='capacity'
+    need(row in(PAIR_PROFILE,FOUR_PROFILE,FOUR_DB16_PROFILE),
+         'full_backend_pair_fixed_profile_required')
+    connections=row['workers']*row['per_worker_connections']
+    need(cfg.get('purpose')=='capacity'
          and cfg.get('process_topology')=='split-v1'and cfg.get('process_observation')=='pid-v1'
          and cfg.get('backend_db_pool')=='bounded-v2'and 'rpc_process_pool'not in cfg
-         and cfg.get('db_concurrency')==32 and cfg.get('http_concurrency')==64
-         and cfg.get('database_resource_profile')=='db32-4cpu-4g-v1'
-         and cfg.get('database_pool_limits')=={'connections':32,'waiting':64,'wait_seconds':2}
+         and cfg.get('db_concurrency')==connections and cfg.get('http_concurrency')==64
+         and cfg.get('database_resource_profile')==('db16-4cpu-4g-v1'if connections==16 else'db32-4cpu-4g-v1')
+         and cfg.get('database_pool_limits')=={'connections':connections,'waiting':64,'wait_seconds':2}
          and any(r.get('id')=='http-admission-v8'for r in cfg.get('runtime_experiments',()))
          and 'operator/loadtest_lab/process_runtime.py'in cfg.get('sources',{}),
          'full_backend_pair_fixed_profile_required')

@@ -223,17 +223,21 @@ def validate_experiments(cfg):
                   'runtime_experiment_output_hash_mismatch')
         for target in row['runtime_sha256']:
             restored[target] = row['parent_runtime_sha256'].get(target)
+    reduced=type(cfg.get('backend_process_pool'))is dict and cfg['backend_process_pool'].get('id')=='full-business-four-db16-v1'
     if 'database_resource_profile' in cfg:
         profile=cfg['database_resource_profile']
         _need(type(profile)is str and profile in DATABASE_RESOURCE_PROFILES,'db8_resource_profile_invalid')
-        required=(ADMISSION_IDS[6],ADMISSION_IDS[7]) if profile in DB32_RESOURCE_PROFILES else (ADMISSION_IDS[5], ADMISSION_IDS[6]) if profile in DB16_RESOURCE_PROFILES else (ADMISSION_IDS[4],)
+        required=(ADMISSION_IDS[7],) if reduced else (ADMISSION_IDS[6],ADMISSION_IDS[7]) if profile in DB32_RESOURCE_PROFILES else (ADMISSION_IDS[5], ADMISSION_IDS[6]) if profile in DB16_RESOURCE_PROFILES else (ADMISSION_IDS[4],)
         _need(any(name in identities for name in required), 'db16_resource_profile_requires_admission_v6' if profile in DB16_RESOURCE_PROFILES else 'db8_resource_profile_requires_admission_v5')
     if any(name in identities for name in ADMISSION_IDS):
         # A waiter remains counted until it gets the mutex after notify. Even
         # with idle connections, all HTTP workers can briefly be queued. V2
         # reserves one waiting place per HTTP worker; connection count stays 4.
+        if reduced:
+            from .process_runtime import validate_backend_pair
+            validate_backend_pair(cfg)
         if ADMISSION_IDS[7]in identities:
-            _need(cfg.get('database_resource_profile')in DB32_RESOURCE_PROFILES,'http64_requires_db32_profile')
+            _need(cfg.get('database_resource_profile')in DB32_RESOURCE_PROFILES or reduced and cfg.get('database_resource_profile')=='db16-4cpu-4g-v1','http64_requires_db32_profile')
         workers = 64 if ADMISSION_IDS[7] in identities else 8 if ADMISSION_IDS[2] in identities else 32
         waiting = 8 if ADMISSION_IDS[2] in identities else 28 if ADMISSION_IDS[0] in identities else 32
         frontend = 128 if any(name in identities for name in ADMISSION_IDS[3:]) else 48
@@ -241,6 +245,7 @@ def validate_experiments(cfg):
         if cfg.get('database_resource_profile')in DB32_RESOURCE_PROFILES:
             connections,waiting=32,64
             _need(any(name in identities for name in ADMISSION_IDS[6:]),'db32_admission_v7_or_v8_required')
+        if reduced:connections,waiting=16,64
         if any(name in identities for name in ADMISSION_IDS[5:]):
             _need(cfg.get('database_resource_profile') in {**DB16_RESOURCE_PROFILES,**DB32_RESOURCE_PROFILES},'db16_explicit_resource_profile_required')
         if any(name in identities for name in ADMISSION_IDS[4:]):

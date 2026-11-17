@@ -122,7 +122,8 @@ def prepare(args):
         db_concurrency=args.db_concurrency, web_concurrency=args.web_concurrency,
         pool_max_waiters=getattr(args, 'db_pool_max_waiters', None),
         pool_wait_seconds=getattr(args, 'db_pool_wait_seconds', None),
-        admission_mode=getattr(args, 'http_admission', 'baseline'))
+        admission_mode=getattr(args, 'http_admission', 'baseline'),
+        backend_profile=('full-business-four-db16-v1'if getattr(args,'backend_processes','baseline')=='full-business-four-db16-v1'else None))
     http_concurrency = pool_parameters['effective']['http_concurrency']
     run = secrets.token_hex(16)
     cfg = {'schema': 1, 'kind': 'SURVIVAL_ISOLATED_LOADTEST', 'run_id': run,
@@ -318,8 +319,10 @@ def prepare(args):
         validate_settlement_cache(cfg)
     backend_mode=getattr(args,'backend_processes','baseline')
     if backend_mode!='baseline':
-        from .process_runtime import PAIR_PROFILE,FOUR_PROFILE
-        cfg['backend_process_pool']=dict(FOUR_PROFILE if backend_mode=='full-business-four-v1'else PAIR_PROFILE)
+        from .process_runtime import PAIR_PROFILE,FOUR_PROFILE,FOUR_DB16_PROFILE
+        profiles={row['id']:row for row in(PAIR_PROFILE,FOUR_PROFILE,FOUR_DB16_PROFILE)}
+        need(backend_mode in profiles,'backend_process_profile_invalid')
+        cfg['backend_process_pool']=dict(profiles[backend_mode])
     process_topology = getattr(args, 'process_topology', None)
     process_observation = getattr(args, 'process_observation', None)
     if process_topology is not None:
@@ -510,7 +513,7 @@ def main(argv=None):
                       help='bounded-v2 only: bounded DB waiting queue, default 20; maximum 32')
     init.add_argument('--db-pool-wait-seconds', type=float,
                       help='bounded-v2 only: queue wait cap, default 2; maximum 5 and request remaining deadline')
-    init.add_argument('--backend-processes',choices=('baseline','full-business-pair-v1','full-business-four-v1'),default='baseline')
+    init.add_argument('--backend-processes',choices=('baseline','full-business-pair-v1','full-business-four-v1','full-business-four-db16-v1'),default='baseline')
     init.add_argument('--rpc-processes',choices=('baseline','driver-process3-v1','driver-process6-v1','driver-process12-v1','driver-process16-v1','driver-process32-v1'),default='baseline',help='Isolated original-driver processes;no RPC replay')
     init.add_argument('--response-encoding',choices=('baseline','pool2-v1','pool3-v1'),default='baseline',help='Opt-in pure response encoding workers;no business orRPC replay')
     init.add_argument('--generator-transport',choices=('baseline','ssh-quad-v1','ssh-16-v1','linux-loopback-v1'),default='baseline',help='Source-bound SSH4/16 or co-located Linux loopback generator; no business changes')
