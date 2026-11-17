@@ -505,7 +505,7 @@ class _ProcessObservation:
         else:need({k:match[k]for k in PID_ID_KEYS}==own,'process_monitor_identity_mismatch');match['roles'].append('monitor')
         inspection=_pm_inspect(value['postgres_container_name'],cfg,self.counts);pg=_pm_capture(inspection['pid'],boot,self.counts)[0]
         need(not any(row['pid']==pg['pid']for row in descriptors),'process_container_init_duplicate_pid');descriptors.append({**pg,'roles':['postgres_init']})
-        need(len(descriptors)<=4,'process_observer_budget_exceeded')
+        need(len(descriptors)<=(7 if cfg.get('rpc_process_pool')else 4),'process_observer_budget_exceeded')
         self.processes=[_ObservedProcess(row,boot,self.counts)for row in descriptors];init=self.processes[-1];self.cgroup=_ObservedCgroup(inspection,init,cfg,self.counts)
         self.header={'schema':1,'id':'pid-v1','scope_raw_sha256':self.scope_sha256,'scope_file':'process_scope.json','processes':descriptors,
             'clock_ticks_per_second':self.ticks,'host_cpu_count':os.cpu_count(),'cgroup':self.cgroup.public,'initialization_ms':(time.monotonic()-began)*1000,

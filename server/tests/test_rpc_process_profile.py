@@ -36,4 +36,18 @@ class RpcProfileTests(unittest.TestCase):
   with self.assertRaises(ValueError):_pm_scope(cfg,bad)
   del cfg['rpc_process_pool'];scope['manifest_sha256']=sha(canonical(cfg))
   with self.assertRaises(ValueError):_pm_scope(cfg,scope)
+ def test_actual_monitor_constructor_indexes_seven_fixed_processes(self):
+  from pathlib import Path
+  from types import SimpleNamespace
+  from tools.loadtest_lab import monitor as m
+  from tools.loadtest_lab.guard import canonical,sha
+  cfg=self.cfg();cfg['run_id']='a'*32
+  roles=('frontend','backend','rpc0','rpc1','rpc2')
+  rows=[{'pid':i+10,'starttime_ticks':100+i,'boot_id_sha256':'b'*64,'exe_sha256':'c'*64,'roles':[role]}for i,role in enumerate(roles)]
+  scope={'schema':1,'id':'pid-v1','run_id':cfg['run_id'],'manifest_sha256':sha(canonical(cfg)),'postgres_container_name':'survival-loadtest-'+cfg['run_id'][:12],'processes':rows};raw=canonical(scope)
+  def identity(pid):return {'pid':pid,'starttime_ticks':100,'boot_id_sha256':'b'*64,'exe_sha256':'c'*64}
+  with patch.object(Path,'is_file',return_value=True),patch.object(Path,'is_symlink',return_value=False),patch.object(Path,'stat',return_value=SimpleNamespace(st_size=len(raw))),patch.object(Path,'read_bytes',return_value=raw),patch.object(m,'_pm_boot_hash',return_value='b'*64),patch.object(m.os,'sysconf',return_value=100,create=True),patch.object(m,'_pm_capture',side_effect=[(identity(999),None),(identity(998),None)]),patch.object(m,'_pm_inspect',return_value={'pid':998}),patch.object(m,'_ObservedProcess')as process,patch.object(m,'_ObservedCgroup')as group:
+   group.return_value.public={};observer=m._ProcessObservation(Path('rpc-monitor-fixture'),cfg)
+  self.assertEqual(process.call_count,7);self.assertEqual(len(observer.header['processes']),7)
+  self.assertEqual({r for row in observer.header['processes']for r in row['roles']},set(roles)|{'monitor','postgres_init'})
 if __name__=='__main__':unittest.main()
