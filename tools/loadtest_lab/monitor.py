@@ -312,14 +312,14 @@ def _pm_scope(cfg,value):
     need(value['manifest_sha256']==manifest,'process_scope_manifest_mismatch')
     need(value['postgres_container_name']=='survival-loadtest-'+cfg['run_id'][:12],'process_scope_container_name_invalid')
     parallel=cfg.get('rpc_process_pool',{}).get('workers',0)
-    need(type(parallel)is int and parallel in(0,3,6),'process_scope_rpc_budget_invalid')
+    need(type(parallel)is int and parallel in(0,3,6,12),'process_scope_rpc_budget_invalid')
     rows=value['processes'];need(type(rows)is list and 1<=len(rows)<=(2+parallel if parallel else 2),'process_scope_count_invalid');roles=[];pids=[]
     for row in rows:
         need(type(row)is dict and set(row)==PID_ID_KEYS|{'roles'},'process_scope_process_invalid')
         _pm_validate_identity({k:row[k]for k in PID_ID_KEYS});r=row['roles']
         need(type(r)is list and 1<=len(r)<=2 and all(x in((('frontend','backend')+tuple('rpc'+str(i)for i in range(parallel)))if parallel else('frontend','backend'))for x in r)and len(r)==len(set(r)),'process_scope_roles_invalid')
         roles+=r;pids.append(row['pid'])
-    need(sorted(roles)==((['backend','frontend']+['rpc'+str(i)for i in range(parallel)])if parallel else['backend','frontend'])and len(pids)==len(set(pids)),'process_scope_duplicate_roles_or_pids')
+    need(sorted(roles)==sorted((['backend','frontend']+['rpc'+str(i)for i in range(parallel)])if parallel else['backend','frontend'])and len(pids)==len(set(pids)),'process_scope_duplicate_roles_or_pids')
     topology=cfg.get('process_topology');topology='same-v1'if topology is None else topology
     need(topology in('same-v1','split-v1'),'process_scope_topology_required')
     need(len(rows)==(2+parallel if parallel else 1 if topology=='same-v1'else 2),'process_scope_topology_pid_count_mismatch')

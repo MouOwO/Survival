@@ -329,9 +329,9 @@ def prepare(args):
         from .guard import validate_response_encoding_pool
         validate_response_encoding_pool(cfg)
     rpc_mode=getattr(args,'rpc_processes','baseline')
-    need(rpc_mode in('baseline','driver-process3-v1','driver-process6-v1'),'rpc_process_option_invalid')
+    need(rpc_mode in('baseline','driver-process3-v1','driver-process6-v1','driver-process12-v1'),'rpc_process_option_invalid')
     if rpc_mode!='baseline':
-        cfg['rpc_process_pool']={'id':rpc_mode,'workers':3 if rpc_mode=='driver-process3-v1'else 6,'max_pending':24,'queue_seconds':2}
+        cfg['rpc_process_pool']={'id':rpc_mode,'workers':3 if rpc_mode=='driver-process3-v1'else 6 if rpc_mode=='driver-process6-v1'else 12,'max_pending':24,'queue_seconds':2}
         from .rpc_process_pool import validate_profile as validate_rpc_profile
         validate_rpc_profile(cfg)
     runner = b"import sys\nfrom pathlib import Path\nsys.path[:0]=[str(Path(__file__).parent/'operator'),str(Path(__file__).parent/'runtime')]\nfrom loadtest_lab.cli import entry\nif __name__ == '__main__':\n    raise SystemExit(entry())\n"
@@ -501,7 +501,7 @@ def main(argv=None):
                       help='bounded-v2 only: bounded DB waiting queue, default 20; maximum 32')
     init.add_argument('--db-pool-wait-seconds', type=float,
                       help='bounded-v2 only: queue wait cap, default 2; maximum 5 and request remaining deadline')
-    init.add_argument('--rpc-processes',choices=('baseline','driver-process3-v1','driver-process6-v1'),default='baseline',help='Isolated original-driver processes;no RPC replay')
+    init.add_argument('--rpc-processes',choices=('baseline','driver-process3-v1','driver-process6-v1','driver-process12-v1'),default='baseline',help='Isolated original-driver processes;no RPC replay')
     init.add_argument('--response-encoding',choices=('baseline','pool2-v1','pool3-v1'),default='baseline',help='Opt-in pure response encoding workers;no business orRPC replay')
     init.add_argument('--generator-transport',choices=('baseline','ssh-quad-v1','ssh-16-v1','linux-loopback-v1'),default='baseline',help='Source-bound SSH4/16 or co-located Linux loopback generator; no business changes')
     init.add_argument('--exit-probe-common-seconds',type=int,choices=(60,300,3600),

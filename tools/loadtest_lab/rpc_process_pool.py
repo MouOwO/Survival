@@ -1,6 +1,6 @@
 """Opt-in isolated RPC processes;original driver/SQL/commit,never replay.
 
-Startup O(W*S),W in(3,6) immutable workers;each RPC O(payload bytes+fixed stages),
+Startup O(W*S),W in(3,6,12) immutable workers;each RPC O(payload bytes+fixed stages),
 no account scans or authority cache. At most24 in-flight calls;queue-start
 wait<=2s and original HTTP absolute deadline includes IPC. Driver pools have
 a total of16 configured connections and32 waiter slots;serial workers use
@@ -74,7 +74,7 @@ def validate_profile(cfg):
     value=cfg.get('rpc_process_pool')
     if value is None:return None
     workers=value.get('workers')if type(value)is dict else None
-    if (type(workers)is not int or workers not in(3,6)or value!={'id':'driver-process'+str(workers)+'-v1','workers':workers,'max_pending':24,'queue_seconds':2}
+    if (type(workers)is not int or workers not in(3,6,12)or value!={'id':'driver-process'+str(workers)+'-v1','workers':workers,'max_pending':24,'queue_seconds':2}
         or cfg.get('purpose')!='capacity'or cfg.get('process_topology')!='split-v1'
         or cfg.get('process_observation')!='pid-v1'or cfg.get('db_concurrency')!=16
         or cfg.get('database_pool_limits')!={'connections':16,'waiting':32,'wait_seconds':2.0}
@@ -87,7 +87,7 @@ def validate_profile(cfg):
 class RpcProcesses:
     def __init__(self,root,dsn,*,workers=3,connect_timeout,statement_timeout_ms,lock_timeout_ms):
         from player_web_auth.response_pool import ResponseEncoderPool
-        if type(workers)is not int or workers not in(3,6):raise ValueError('rpc_worker_budget_invalid')
+        if type(workers)is not int or workers not in(3,6,12):raise ValueError('rpc_worker_budget_invalid')
         self._workers=workers
         self._root=Path(root)/'rpc_process_controls';self._root.mkdir(mode=0o700)
         self._lock=threading.RLock();self._closed=False;self._closing=False
