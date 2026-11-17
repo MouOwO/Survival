@@ -33,6 +33,16 @@ class BackendFourDB16Tests(unittest.TestCase):
   args=http_tests.HTTP64Profile().args();args.update(db_concurrency=16,backend_profile=FOUR_DB16_PROFILE['id'])
   for key,value in [('db_concurrency',32),('pool_max_waiters',32),('pool_max_waiters',65),('http_concurrency',32),('admission_mode','bounded-v7'),('backend_profile','other')]:
    with self.subTest(key=key),self.assertRaises(ValueError):resolve_database_pool('bounded-v2',**{**args,key:value})
+ def test_frozen_metadata_package_needs_no_runtime_owner_import(self):
+  import sys,types
+  from pathlib import Path
+  from unittest.mock import patch
+  from tools.loadtest_lab import experiments,lottery_cache_experiments
+  name='_db16_metadata_only_projection';package=types.ModuleType(name);package.__path__=[]
+  module=types.ModuleType(name+'.experiments');module.__package__=name
+  with patch.dict(sys.modules,{name:package,name+'.lottery_cache_experiments':lottery_cache_experiments}):
+   exec(compile(Path(experiments.__file__).read_bytes(),experiments.__file__,'exec'),module.__dict__)
+   self.assertTrue(module.validate_experiments(self.cfg()))
  def test_manifest_load_budget_accepts_only_complete_db16_profile(self):
   from tools.loadtest_lab.guard import _validate_concurrency_budgets
   cfg=self.cfg();cfg['global_http_per_minute']=1000000;_validate_concurrency_budgets(cfg)

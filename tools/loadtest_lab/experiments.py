@@ -234,8 +234,13 @@ def validate_experiments(cfg):
         # with idle connections, all HTTP workers can briefly be queued. V2
         # reserves one waiting place per HTTP worker; connection count stays 4.
         if reduced:
-            from .process_runtime import validate_backend_pair
-            validate_backend_pair(cfg)
+            # This metadata helper is also loaded in a minimal frozen package.
+            # Keep its fixed topology contract pure; do not import runtime owners.
+            _need(cfg['backend_process_pool']=={'id':'full-business-four-db16-v1','workers':4,'per_worker_http':16,'per_worker_connections':4,'per_worker_waiters':16,'wait_seconds':2}
+                  and cfg.get('purpose')=='capacity'and cfg.get('process_topology')=='split-v1'
+                  and cfg.get('process_observation')=='pid-v1'and 'rpc_process_pool'not in cfg
+                  and 'operator/loadtest_lab/process_runtime.py'in cfg.get('sources',{}),
+                  'full_backend_pair_fixed_profile_required')
         if ADMISSION_IDS[7]in identities:
             _need(cfg.get('database_resource_profile')in DB32_RESOURCE_PROFILES or reduced and cfg.get('database_resource_profile')=='db16-4cpu-4g-v1','http64_requires_db32_profile')
         workers = 64 if ADMISSION_IDS[7] in identities else 8 if ADMISSION_IDS[2] in identities else 32
