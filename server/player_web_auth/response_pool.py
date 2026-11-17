@@ -1,10 +1,10 @@
 """Bounded pure response encoding in fresh processes;no business/RPC replay.
 
-Cold: W<=3 spawned workers import the immutable codec once,O(W*schema).
+Cold: W<=6 spawned workers import the immutable codec once,O(W*schema).
 Each response: O(B) IPC plus exactly the original codec work,one fixed slot
-and one future;pending<=24. No account index,DB/network call or periodic scan.
+and one future;pending<=48. No account index,DB/network call or periodic scan.
 Small/large bodies,overload and worker faults retain the original inline path.
-Close visits only W fixed children and <=24 futures under a real deadline.
+Close visits only W fixed children and <=48 futures under a real deadline.
 """
 from __future__ import annotations
 import hashlib
@@ -48,7 +48,7 @@ class ResponseEncoderPool:
     MIN_BODY=2048
     MAX_BODY=256*1024
     def __init__(self,*,workers=3,pending=24,wait_seconds=2):
-        if (not sys.platform.startswith('linux') or type(workers)is not int or workers not in(2,3)
+        if (not sys.platform.startswith('linux') or type(workers)is not int or workers not in(2,3,6)
                 or type(pending)is not int or pending!=workers*8
                 or type(wait_seconds)not in(int,float)or wait_seconds!=2):
             raise ValueError('response_encoder_configuration_invalid')

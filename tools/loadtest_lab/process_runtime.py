@@ -143,7 +143,7 @@ def _backend_setup(root, cfg, private, lua):
         from .rpc_process_pool import validate_profile as rpc_profile, RpcProcesses
         if rpc_profile(cfg)is not None:
             original=app.rpc_client
-            parallel=RpcProcesses(root,settings.postgres_dsn,
+            parallel=RpcProcesses(root,settings.postgres_dsn,workers=cfg['rpc_process_pool']['workers'],
                 connect_timeout=settings.postgres_connect_timeout_seconds,
                 statement_timeout_ms=settings.postgres_statement_timeout_ms,
                 lock_timeout_ms=settings.postgres_lock_timeout_ms)
@@ -516,7 +516,7 @@ def serve_split(directory, *, lua_executable=None, _loaded=None):
         scope_rows=[own,child_identity]
         if cfg.get('rpc_process_pool'):
             workers=started['rpc_process_pool_started']['worker_lifecycle']['worker_identities']
-            need(len(workers)==3,'rpc_owned_worker_count_mismatch')
+            need(len(workers)==cfg['rpc_process_pool']['workers'],'rpc_owned_worker_count_mismatch')
             for index,worker in enumerate(workers):
                 descriptor=_identity(worker['pid'],['rpc'+str(index)])
                 need(descriptor['starttime_ticks']==worker['starttime_ticks'],'rpc_owned_worker_identity_changed')

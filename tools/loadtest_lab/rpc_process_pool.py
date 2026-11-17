@@ -1,10 +1,10 @@
 """Opt-in isolated RPC processes;original driver/SQL/commit,never replay.
 
-Startup O(W*S),W=3 immutable workers;each RPC O(payload bytes+fixed stages),
+Startup O(W*S),W in(3,6) immutable workers;each RPC O(payload bytes+fixed stages),
 no account scans or authority cache. At most24 in-flight calls;queue-start
 wait<=2s and original HTTP absolute deadline includes IPC. Driver pools have
-6+5+5 configured connections and11+11+10 waiter slots;actual serial workers
-normally use3 connections. Snapshot visits3 fixed records,not players.
+a total of16 configured connections and32 waiter slots;serial workers use
+W actual connections. Snapshot visits W fixed records,not players.
 Parent-death/pidfd shutdown is shared with the proven pure-worker lifecycle.
 """
 from __future__ import annotations
@@ -73,7 +73,8 @@ def _finish(root):
 def validate_profile(cfg):
     value=cfg.get('rpc_process_pool')
     if value is None:return None
-    if (value!={'id':'driver-process3-v1','workers':3,'max_pending':24,'queue_seconds':2}
+    workers=value.get('workers')if type(value)is dict else None
+    if (type(workers)is not int or workers not in(3,6)or value!={'id':'driver-process'+str(workers)+'-v1','workers':workers,'max_pending':24,'queue_seconds':2}
         or cfg.get('purpose')!='capacity'or cfg.get('process_topology')!='split-v1'
         or cfg.get('process_observation')!='pid-v1'or cfg.get('db_concurrency')!=16
         or cfg.get('database_pool_limits')!={'connections':16,'waiting':32,'wait_seconds':2.0}
@@ -84,16 +85,20 @@ def validate_profile(cfg):
 
 
 class RpcProcesses:
-    def __init__(self,root,dsn,*,connect_timeout,statement_timeout_ms,lock_timeout_ms):
+    def __init__(self,root,dsn,*,workers=3,connect_timeout,statement_timeout_ms,lock_timeout_ms):
         from player_web_auth.response_pool import ResponseEncoderPool
+        if type(workers)is not int or workers not in(3,6):raise ValueError('rpc_worker_budget_invalid')
+        self._workers=workers
         self._root=Path(root)/'rpc_process_controls';self._root.mkdir(mode=0o700)
         self._lock=threading.RLock();self._closed=False;self._closing=False
         self._stats={};self._calls=self._errors=self._used=self._queue_rejected=0
         self._boot_records=[];self._terminal=None
-        self._lifecycle=ResponseEncoderPool(workers=3,pending=24)
+        self._lifecycle=ResponseEncoderPool(workers=workers,pending=workers*8)
+        # Warmup has completed;all later RPC jobs share the same24-slot bound.
+        self._lifecycle._maximum=24;self._lifecycle._slots=threading.BoundedSemaphore(24)
         self._pids=sorted(r['pid']for r in self._lifecycle.snapshot()['worker_identities'])
-        self._allocations={pid:{'max_concurrency':6 if index==0 else 5,
-                               'pool_max_waiters':10 if index==2 else 11,'pool_wait_timeout':2}
+        self._allocations={pid:{'max_concurrency':16//workers+int(index<16%workers),
+                               'pool_max_waiters':32//workers+int(index<32%workers),'pool_wait_timeout':2}
                            for index,pid in enumerate(self._pids)}
         options={'connect_timeout':connect_timeout,'statement_timeout_ms':statement_timeout_ms,
                  'lock_timeout_ms':lock_timeout_ms}
@@ -174,7 +179,7 @@ class RpcProcesses:
 
     def pool_stats(self):
         with self._lock:rows=list(self._stats.values())
-        if len(rows)!=3:raise RuntimeError('rpc_pool_statistics_not_complete')
+        if len(rows)!=self._workers:raise RuntimeError('rpc_pool_statistics_not_complete')
         keys=set(rows[0])
         if any(set(row)!=keys for row in rows):raise RuntimeError('rpc_pool_statistics_shape_changed')
         result={}
@@ -184,13 +189,13 @@ class RpcProcesses:
         return result
 
     def snapshot(self):
-        with self._lock:return {'kind':'ISOLATED_ORIGINAL_DRIVER_PROCESS_POOL_V1','workers':3,'max_pending':24,
+        with self._lock:return {'kind':'ISOLATED_ORIGINAL_DRIVER_PROCESS_POOL_V1','workers':self._workers,'max_pending':24,
             'configured_connection_allocations':[self._allocations[pid]for pid in self._pids],
             'original_driver_boot_records':self._boot_records,'calls':self._calls,'results_used':self._used,
             'errors':self._errors,'queue_rejected_before_dispatch':self._queue_rejected,
             'RPC_replays':0,'closed':self._closed,'closing':self._closing,
             'worker_lifecycle':self._lifecycle.snapshot(),
-            'pool_snapshot_scope':'latest completed original-driver snapshot per each of3 fixed workers;exact at ready and drained close;not live per-connection telemetry'}
+            'pool_snapshot_scope':'last parent-collected original-driver snapshot for each fixed worker;exact at ready and drained close;not live per-connection telemetry'}
 
     def close(self):
         with self._lock:
@@ -211,6 +216,6 @@ class RpcProcesses:
             if not(self._root/'closed.gate').exists():_publish(self._root/'closed.gate',{'released_on_failure':True})
             pool.close(deadline=deadline)
         state=pool.snapshot()
-        if state['pending']or state['forced_workers']or not state['manager_joined']or len(state['worker_exit_confirmed'])!=3 or not all(state['worker_exit_confirmed']):
+        if state['pending']or state['forced_workers']or not state['manager_joined']or len(state['worker_exit_confirmed'])!=self._workers or not all(state['worker_exit_confirmed']):
             raise RuntimeError('rpc_owned_workers_not_closed')
         with self._lock:self._closed=True
