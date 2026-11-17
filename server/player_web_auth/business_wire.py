@@ -212,15 +212,23 @@ def _original_key(key):
     return key
 
 
+# Immutable schema layouts built once; no account state or runtime scans.
+_TEMPLATE_LAYOUTS = {}
+for _keys in _TEMPLATE_INDEX:
+    _layout = tuple((key, _key(key), _encoded_key_json_size(_key(key))) for key in sorted(_keys))
+    _TEMPLATE_LAYOUTS[_keys] = (_layout, 2 + sum(size + 2 for _, _, size in _layout) - bool(_layout))
+
+
 _PACK_RETAIN_BYTES = 64 * 1024
 
 
 class _EncodedEnvelope:
     """One pack call's original-writer bytes; never an account/global cache."""
-    __slots__ = ("value", "raw")
+    __slots__ = ("value", "raw", "decoded_raw")
 
     def __init__(self, value, raw):
         self.value, self.raw = value, raw
+        self.decoded_raw = None
 
 
 def encode(value):
@@ -270,32 +278,40 @@ def _encode(value, *, _retain=False):
             digest = intern(("array", tuple(child[1] for child in children)))
             size = 3 + sum(child[2] + 1 for child in children)
         elif type(current) is dict:
-            # Dict semantics do not depend on input insertion order. Sorting
-            # only K short field names yields deterministic exact duplicates.
-            # Total sorting is O(sum K log K), K is bounded by input node budget.
-            children = [(key, visit(child, depth + 1)) for key, child in current.items()]
-            encoded, encoded_sizes = {}, {}
-            for key, child in children:
-                encoded_key = _key(key)
-                encoded[encoded_key] = child[0]
-                encoded_sizes[encoded_key] = child[2]
-            node = encoded
-            size = 2 + sum(_encoded_key_json_size(key) + child_size + 2
-                           for key, child_size in encoded_sizes.items()) - bool(encoded)
-            group = _TEMPLATE_INDEX.get(frozenset(current))
-            if group:
-                entry = _select_template(current, group)
-                if entry:
-                    index, defaults = entry
-                    patch = {_key(key): child[0] for key, child in children
-                             if not (type(current[key]) is type(defaults[key]) and current[key] == defaults[key])}
-                    patch_size = 2 + sum(_encoded_key_json_size(key) + encoded_sizes[key] + 2
-                                         for key in patch) - bool(patch)
-                    template_size = 5 + len(str(index)) + patch_size
-                    if template_size < size:
-                        node, size = [2, index, patch], template_size
-            digest = intern(("object", tuple((key, child[1]) for key, child in
-                                               sorted(children, key=lambda entry: entry[0]))))
+            keys = frozenset(current)
+            layout_info = _TEMPLATE_LAYOUTS.get(keys)
+            if layout_info is None:
+                children = [(key, visit(child, depth + 1)) for key, child in current.items()]
+                encoded, encoded_sizes = {}, {}
+                for key, child in children:
+                    encoded_key = _key(key)
+                    encoded[encoded_key] = child[0]
+                    encoded_sizes[encoded_key] = child[2]
+                node = encoded
+                size = 2 + sum(_encoded_key_json_size(key) + child_size + 2
+                               for key, child_size in encoded_sizes.items()) - bool(encoded)
+                digest = intern(("object", tuple((key, child[1]) for key, child in
+                                                   sorted(children, key=lambda entry: entry[0]))))
+            else:
+                layout, key_bytes = layout_info
+                # Same scalar/subtree visits and budgets. Static key ordering
+                # avoids two full maps and sorting these immutable field names.
+                children = [(key, visit(current[key], depth + 1)) for key, _, _ in layout]
+                size = key_bytes + sum(child[2] for _, child in children)
+                index, defaults = _select_template(current, _TEMPLATE_INDEX[keys])
+                patch = {}
+                patch_size = 2
+                for (key, encoded_key, encoded_size), (_, child) in zip(layout, children):
+                    if not (type(current[key]) is type(defaults[key]) and current[key] == defaults[key]):
+                        patch[encoded_key] = child[0]
+                        patch_size += encoded_size + child[2] + 2
+                patch_size -= bool(patch)
+                template_size = 5 + len(str(index)) + patch_size
+                if template_size < size:
+                    node, size = [2, index, patch], template_size
+                else:
+                    node = {encoded_key: child[0] for (_, encoded_key, _), (_, child) in zip(layout, children)}
+                digest = intern(("object", tuple((key, child[1]) for key, child in children)))
         else:
             raise ValueError("business_wire_value_invalid")
         occurrences[digest] = occurrences.get(digest, 0) + 1
@@ -457,8 +473,13 @@ def _decode(value, *, _writer=None):
 
     result = visit(value[MARKER][2], 0)
     # Expansion (including reference copies) is bounded independently of input.
-    if len(canonical(result)) > MAX_BYTES:
+    decoded_raw = canonical(result)
+    if len(decoded_raw) > MAX_BYTES:
         raise ValueError("business_wire_expansion_budget_exceeded")
+    # Only this invocation's exact original writer can retain <=64KiB.
+    # Public decode always recomputes; never retain any account/global value.
+    if type(_writer) is _EncodedEnvelope and _writer.value is value:
+        _writer.decoded_raw = decoded_raw if len(decoded_raw) <= _PACK_RETAIN_BYTES else None
     return result
 
 
@@ -479,7 +500,9 @@ def _pack_decoded_bytes(body, value, advertised_hash):
             return body
         writer = _encode(value, _retain=True)
         envelope = writer.value
-        if canonical(_decode(envelope, _writer=writer)) != canonical(value):
+        decoded = _decode(envelope, _writer=writer)
+        decoded_raw = writer.decoded_raw if writer.decoded_raw is not None else canonical(decoded)
+        if decoded_raw != canonical(value):
             return body
         packed = writer.raw if writer.raw is not None else canonical(envelope)
         return packed if len(packed) < len(body) else body
