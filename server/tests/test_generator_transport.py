@@ -36,4 +36,26 @@ class TransportTests(unittest.TestCase):
   for ports in [list(range(29567,29582)),list(range(29567,29584)),list(reversed(range(29567,29583))),[443]+list(range(29568,29583)),[True]+list(range(29568,29583))]:
    cfg=self.cfg();cfg['generator_transport']={'id':'ssh-16-v1','loopback_ports':ports}
    with self.assertRaises(ValueError):generator_ports(cfg)
+ def test_native_loopback_is_explicit_fixed_and_full_actor_safe(self):
+  cfg=self.cfg();cfg['generator_transport']={'id':'linux-loopback-v1','loopback_ports':[29567]};before=copy.deepcopy(cfg)
+  self.assertEqual(generator_ports(cfg),(29567,))
+  for actor in (0,1,3999,1000000):self.assertEqual(generator_url(cfg,actor),'http://127.0.0.1:29567')
+  self.assertEqual(cfg,before)
+ def test_native_loopback_cannot_redirect_or_create_extra_listeners(self):
+  for ports in ([443],[29568],[29567,29568],['29567'],[True],[]):
+   cfg=self.cfg();cfg['generator_transport']={'id':'linux-loopback-v1','loopback_ports':ports}
+   with self.assertRaises(ValueError):generator_ports(cfg)
+ def test_native_gradual_exit_retains_120s_and_requires_explicit_profile(self):
+  from tools.loadtest_lab.guard import validate_exit_probe
+  cfg=self.cfg();cfg.update(active=4000,exit_probe_common_seconds=3600,exit_smoothing='gradual120-v1',exit_wave_seconds=120,generator_transport={'id':'linux-loopback-v1','loopback_ports':[29567]})
+  self.assertEqual(validate_exit_probe(cfg),dict(common_seconds=3600,mode='gradual120-v1',wave_seconds=120))
+  for key,value in [('exit_wave_seconds',2),('generator_transport',None),('purpose','functional-smoke')]:
+   bad=copy.deepcopy(cfg);bad[key]=value
+   with self.assertRaises(ValueError):validate_exit_probe(bad)
+ def test_actual_CLI_parses_explicit_native_transport(self):
+  from unittest.mock import patch
+  from tools.loadtest_lab import cli
+  with patch.object(cli,'prepare',return_value={'ok':True})as prepare,patch('builtins.print'):
+   self.assertEqual(cli.main(['prepare','--directory','fixture-native-output','--source-receipt','fixture-public-source.json','--generator-transport','linux-loopback-v1']),0)
+   self.assertEqual(prepare.call_args.args[0].generator_transport,'linux-loopback-v1')
 if __name__=='__main__':unittest.main()

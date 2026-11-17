@@ -244,7 +244,7 @@ def validate_exit_probe(cfg):
     if mode=='gradual120-v1':
         wave=cfg.get('exit_wave_seconds')
         need(type(wave)is int and wave==(2 if cfg.get('active')==2 else 120)
-             and len(generator_ports(cfg))in(4,16),'exit_wave_profile_invalid')
+             and (len(generator_ports(cfg))in(4,16)or cfg.get('generator_transport')=={'id':'linux-loopback-v1','loopback_ports':[29567]}),'exit_wave_profile_invalid')
         value['wave_seconds']=wave
     else:need('exit_wave_seconds'not in cfg,'exit_wave_requires_gradual_policy')
     return value
@@ -377,7 +377,7 @@ def generator_ports(cfg):
     """Explicit synthetic transport; fixed bound of sixteen owned loopbacks."""
     value=cfg.get('generator_transport')
     if value is None:return (PORTS['web'],)
-    profiles={'ssh-quad-v1':list(range(29567,29571)),'ssh-16-v1':list(range(29567,29583))}
+    profiles={'ssh-quad-v1':list(range(29567,29571)),'ssh-16-v1':list(range(29567,29583)),'linux-loopback-v1':[29567]}
     expected=profiles.get(value.get('id'))if type(value)is dict and type(value.get('id'))is str else None
     need(expected is not None and set(value)=={'id','loopback_ports'}
          and type(value['loopback_ports'])is list and value['loopback_ports']==expected
