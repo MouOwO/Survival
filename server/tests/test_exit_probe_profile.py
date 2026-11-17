@@ -15,4 +15,9 @@ class ExitProbeTests(unittest.TestCase):
    with self.subTest(change=change),self.assertRaises(ValueError):validate_exit_probe(self.cfg(**change))
  def test_smoothing_cannot_be_silent_legacy_change(self):
   with self.assertRaises(ValueError):validate_exit_probe({'exit_smoothing':'queue64-v1'})
+ def test_one_hour_explicit_large_cohort_preserves_window(self):
+  for active in [2000,4000]:self.assertEqual(validate_exit_probe(self.cfg(active=active,exit_probe_common_seconds=3600)),dict(common_seconds=3600,mode='direct'))
+ def test_hour_window_requires_exact_integer_and_not_native2(self):
+  for change in [dict(exit_probe_common_seconds=3600.0),dict(exit_probe_common_seconds=3599),dict(exit_probe_common_seconds=3601),dict(active=2,exit_probe_common_seconds=3600)]:
+   with self.subTest(change=change),self.assertRaises(ValueError):validate_exit_probe(self.cfg(**change))
 if __name__=='__main__':unittest.main()

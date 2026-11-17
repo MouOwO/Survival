@@ -20,4 +20,11 @@ class GradualProfileTests(unittest.TestCase):
   with self.assertRaises(ValueError):validate_exit_probe(cfg)
  def test_legacy_probe_unchanged_and_cfg_not_mutated(self):
   cfg=self.cfg();cfg['exit_smoothing']='direct';cfg.pop('exit_wave_seconds');old=copy.deepcopy(cfg);self.assertEqual(validate_exit_probe(cfg),{'common_seconds':300,'mode':'direct'});self.assertEqual(cfg,old)
+ def test_one_hour4000_keeps120_second_exit(self):
+  cfg=self.cfg(4000);cfg['exit_probe_common_seconds']=3600;self.assertEqual(validate_exit_probe(cfg),dict(common_seconds=3600,mode='gradual120-v1',wave_seconds=120))
+ def test_one_hour_cannot_silently_change_exit_window(self):
+  cfg=self.cfg(4000);cfg['exit_probe_common_seconds']=3600;cfg['exit_wave_seconds']=3600
+  with self.assertRaises(ValueError):validate_exit_probe(cfg)
+ def test_hour4000_sixteen_transport_preserves_personal_exit(self):
+  cfg=self.cfg(4000);cfg['exit_probe_common_seconds']=3600;cfg['generator_transport']={'id':'ssh-16-v1','loopback_ports':list(range(29567,29583))};self.assertEqual(validate_exit_probe(cfg),dict(common_seconds=3600,mode='gradual120-v1',wave_seconds=120))
 if __name__=='__main__':unittest.main()

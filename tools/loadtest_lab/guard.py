@@ -235,7 +235,7 @@ def validate_exit_probe(cfg):
         need('exit_smoothing' not in cfg and 'exit_wave_seconds'not in cfg, 'exit_smoothing_requires_five_minute_probe')
         return None
     seconds=cfg['exit_probe_common_seconds']
-    need(type(seconds)is int and seconds==(60 if cfg.get('active')==2 else 300), 'exit_probe_time_invalid')
+    need(type(seconds)is int and seconds in ((60,) if cfg.get('active')==2 else (300,3600)), 'exit_probe_time_invalid')
     need(cfg.get('purpose')=='capacity' and cfg.get('client_workload')=='client-v3'
          and cfg.get('actor_progress')=={'id':'active-business-v1','ttl_seconds':120}, 'exit_probe_requires_active_business_proof')
     mode=cfg.get('exit_smoothing','direct')
@@ -244,7 +244,7 @@ def validate_exit_probe(cfg):
     if mode=='gradual120-v1':
         wave=cfg.get('exit_wave_seconds')
         need(type(wave)is int and wave==(2 if cfg.get('active')==2 else 120)
-             and generator_ports(cfg)==(29567,29568,29569,29570),'exit_wave_profile_invalid')
+             and len(generator_ports(cfg))in(4,16),'exit_wave_profile_invalid')
         value['wave_seconds']=wave
     else:need('exit_wave_seconds'not in cfg,'exit_wave_requires_gradual_policy')
     return value
@@ -374,12 +374,14 @@ def database_account(private, raw_account):
 
 
 def generator_ports(cfg):
-    """Explicit synthetic transport only; O(1), at most four owned loopbacks."""
+    """Explicit synthetic transport; fixed bound of sixteen owned loopbacks."""
     value=cfg.get('generator_transport')
     if value is None:return (PORTS['web'],)
-    expected={'id':'ssh-quad-v1','loopback_ports':[29567,29568,29569,29570]}
-    need(type(value)is dict and value==expected
-         and all(type(port)is int for port in value.get('loopback_ports',()))
+    profiles={'ssh-quad-v1':list(range(29567,29571)),'ssh-16-v1':list(range(29567,29583))}
+    expected=profiles.get(value.get('id'))if type(value)is dict and type(value.get('id'))is str else None
+    need(expected is not None and set(value)=={'id','loopback_ports'}
+         and type(value['loopback_ports'])is list and value['loopback_ports']==expected
+         and all(type(port)is int for port in value['loopback_ports'])
          and cfg.get('purpose')=='capacity' and cfg.get('client_workload')=='client-v3'
          and cfg.get('actor_progress')=={'id':'active-business-v1','ttl_seconds':120},
          'generator_transport_invalid')
