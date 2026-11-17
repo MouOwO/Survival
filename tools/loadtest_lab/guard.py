@@ -146,6 +146,8 @@ def validate_database_pool(cfg):
     """Fixed reviewed experiment budgets and source bindings, once per load."""
     validate_settlement_cache(cfg)
     validate_response_encoding_pool(cfg)
+    from .rpc_process_pool import validate_profile as validate_rpc_process_profile
+    validate_rpc_process_profile(cfg)
     if 'process_topology' in cfg or 'process_observation' in cfg:
         from .process_runtime import validate_process_options
         validate_process_options(cfg)
@@ -510,6 +512,8 @@ def load_client(path):
     validate_workload_profile(cfg)
     validate_settlement_cache(cfg)
     validate_response_encoding_pool(cfg)
+    from .rpc_process_pool import validate_profile as validate_rpc_process_profile
+    validate_rpc_process_profile(cfg)
     if 'process_topology' in cfg or 'process_observation' in cfg:
         from .process_runtime import validate_process_options
         validate_process_options(cfg)

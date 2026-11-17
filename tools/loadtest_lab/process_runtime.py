@@ -140,6 +140,18 @@ def _backend_setup(root, cfg, private, lua):
                'pool_wait_timeout': cfg['database_pool_limits']['wait_seconds']}
     app = build_application(settings, **options)
     try:
+        from .rpc_process_pool import validate_profile as rpc_profile, RpcProcesses
+        if rpc_profile(cfg)is not None:
+            original=app.rpc_client
+            parallel=RpcProcesses(root,settings.postgres_dsn,
+                connect_timeout=settings.postgres_connect_timeout_seconds,
+                statement_timeout_ms=settings.postgres_statement_timeout_ms,
+                lock_timeout_ms=settings.postgres_lock_timeout_ms)
+            try:
+                original.close();need(original.pool_stats()['total']==0,'original_startup_pool_not_closed')
+                app.rpc_client=parallel
+            except BaseException:
+                parallel.close();raise
         pool = shared.checked_database_pool_stats(app.rpc_client, cfg)
         from archive_backend.lottery_catalog import catalog_document
         catalog_document(app.archive.bundle, lua)
@@ -233,6 +245,7 @@ def backend_worker(directory, *, lua_executable=None):
         thread.start(); running = True
         publish(root / 'backend_started_receipt.json', {**common,
             'kind': 'ISOLATED_BACKEND_PROCESS_STARTED', 'database_pool_started': pool,
+            'rpc_process_pool_started': app.rpc_client.snapshot()if cfg.get('rpc_process_pool')else None,
             'actual_database_pool_limits_verified': True,
             'http_admission_started': shared.checked_http_admission_stats(server, 'backend', cfg),
             'settlement_cache_warmup': warm, 'actual_catalog_preflight_passed': True,
@@ -305,6 +318,7 @@ def backend_worker(directory, *, lua_executable=None):
                 shared.checked_http_admission_stats(server, 'backend', cfg)) if server is not None else None,
             'database_pool_closed': closed, 'database_pool_close_deferred': not drain.get('drained', False),
             'database_pool_close_error': close_error, 'database_pool_stopped': stats,
+            'rpc_process_pool_stopped': _best_effort(errors,'rpc_process_snapshot_failed',app.rpc_client.snapshot)if cfg.get('rpc_process_pool')and app is not None else None,
             'settlement_cache_stopped': _best_effort(errors, 'backend_cache_stats_failed', lambda:
                 shared.settlement_cache_snapshot(cfg)),
             'checkpoint_observation_stopped': _best_effort(errors, 'backend_observation_stats_failed', lambda:
@@ -499,7 +513,15 @@ def serve_split(directory, *, lua_executable=None, _loaded=None):
                     shared.frontend_handler(service, cfg, private, stop, pending, response_encoder), **options)
         web.block_on_close = False
         if not admission: web.slots = threading.BoundedSemaphore(cfg['web_concurrency'])
-        scope = publish_scope(root, cfg, [own, child_identity])
+        scope_rows=[own,child_identity]
+        if cfg.get('rpc_process_pool'):
+            workers=started['rpc_process_pool_started']['worker_lifecycle']['worker_identities']
+            need(len(workers)==3,'rpc_owned_worker_count_mismatch')
+            for index,worker in enumerate(workers):
+                descriptor=_identity(worker['pid'],['rpc'+str(index)])
+                need(descriptor['starttime_ticks']==worker['starttime_ticks'],'rpc_owned_worker_identity_changed')
+                scope_rows.append(descriptor)
+        scope = publish_scope(root, cfg, scope_rows)
         write_new(root / 'started_receipt.json', {'kind': 'ISOLATED_REAL_API_LAB_STARTED',
             'artifact_root': str(root), 'run_id': cfg['run_id'], 'purpose': cfg['purpose'],
             'http_concurrency': cfg['http_concurrency'], 'database_concurrency': cfg['db_concurrency'],
@@ -515,6 +537,7 @@ def serve_split(directory, *, lua_executable=None, _loaded=None):
             'checkpoint_observation_by_process': {'frontend': shared.checkpoint_observation_stats(cfg),
                                                   'backend': started['checkpoint_observation_started']},
             'actual_database_pool_limits_verified': True, 'database_pool_started': started['database_pool_started'],
+            'rpc_process_pool_started': started.get('rpc_process_pool_started'),
             'requested_postgres_image': cfg.get('postgres_image', 'postgres:17'),
             'topology': cfg.get('topology', 'same_host_database_diagnostic'),
             'requested_local_database_limits': {'memory_mib': cfg['database_memory_mib'],
@@ -652,6 +675,7 @@ def serve_split(directory, *, lua_executable=None, _loaded=None):
                     'database_pool_closed': value.get('database_pool_closed', False),
                     'database_pool_close_error': value.get('database_pool_close_error', errors[0] if errors else None),
                     'database_pool_stopped': value.get('database_pool_stopped'),
+                    'rpc_process_pool_stopped': value.get('rpc_process_pool_stopped'),
                     **({'settlement_cache_warmup': started['settlement_cache_warmup'],
                         'settlement_cache_stopped': value.get('settlement_cache_stopped')}
                        if started is not None and started.get('settlement_cache_warmup') is not None else {}),

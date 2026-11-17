@@ -62,6 +62,8 @@ def bindings_for(cfg):
         result += (('server/player_web_auth_overrides/sqlite_reserved_rate_patch.py','operator/frontend_experiments/sqlite_reserved_rate_patch.py'),('server/player_web_auth/rate_reservations.py','runtime/player_web_auth/rate_reservations.py'))
     if 'runtime/player_web_auth/response_pool.py' in cfg.get('sources',{}):
         result += (('server/player_web_auth/response_pool.py','runtime/player_web_auth/response_pool.py'),)
+    if 'operator/loadtest_lab/rpc_process_pool.py'in cfg.get('sources',{}):
+        result += (('tools/loadtest_lab/rpc_process_pool.py','operator/loadtest_lab/rpc_process_pool.py'),)
     return result
 
 def validate_all_prepared_sources(lab,cfg):
