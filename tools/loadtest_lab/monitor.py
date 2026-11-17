@@ -311,6 +311,18 @@ def _pm_scope(cfg,value):
     manifest=_pm_digest(json.dumps(cfg,sort_keys=True,separators=(',',':'),ensure_ascii=True).encode())
     need(value['manifest_sha256']==manifest,'process_scope_manifest_mismatch')
     need(value['postgres_container_name']=='survival-loadtest-'+cfg['run_id'][:12],'process_scope_container_name_invalid')
+    if cfg.get('backend_process_pool'):
+        from .process_runtime import validate_backend_pair
+        profile=validate_backend_pair(cfg);workers=profile['workers'];rows=value['processes']
+        need(type(rows)is list and len(rows)==1+workers,'full_backend_fixed_process_count')
+        expected={'frontend','backend'}|{'backend'+str(i)for i in range(1,workers)};roles=[];pids=[]
+        for row in rows:
+            need(type(row)is dict and set(row)==PID_ID_KEYS|{'roles'},'process_scope_process_invalid')
+            _pm_validate_identity({k:row[k]for k in PID_ID_KEYS});r=row['roles']
+            need(type(r)is list and len(r)==1 and r[0]in expected,'full_backend_scope_role_invalid')
+            roles+=r;pids.append(row['pid'])
+        need(set(roles)==expected and len(roles)==len(set(roles))and len(pids)==len(set(pids)),'full_backend_scope_duplicate_or_missing')
+        return value
     parallel=cfg.get('rpc_process_pool',{}).get('workers',0)
     pair=bool(cfg.get('backend_process_pool'))
     if pair:
@@ -510,7 +522,7 @@ class _ProcessObservation:
         else:need({k:match[k]for k in PID_ID_KEYS}==own,'process_monitor_identity_mismatch');match['roles'].append('monitor')
         inspection=_pm_inspect(value['postgres_container_name'],cfg,self.counts);pg=_pm_capture(inspection['pid'],boot,self.counts)[0]
         need(not any(row['pid']==pg['pid']for row in descriptors),'process_container_init_duplicate_pid');descriptors.append({**pg,'roles':['postgres_init']})
-        need(len(descriptors)<=(5 if cfg.get('backend_process_pool')else 4+cfg['rpc_process_pool']['workers']if cfg.get('rpc_process_pool')else 4),'process_observer_budget_exceeded')
+        need(len(descriptors)<=(cfg['backend_process_pool']['workers']+3 if cfg.get('backend_process_pool')else 4+cfg['rpc_process_pool']['workers']if cfg.get('rpc_process_pool')else 4),'process_observer_budget_exceeded')
         self.processes=[_ObservedProcess(row,boot,self.counts)for row in descriptors];init=self.processes[-1];self.cgroup=_ObservedCgroup(inspection,init,cfg,self.counts)
         self.header={'schema':1,'id':'pid-v1','scope_raw_sha256':self.scope_sha256,'scope_file':'process_scope.json','processes':descriptors,
             'clock_ticks_per_second':self.ticks,'host_cpu_count':os.cpu_count(),'cgroup':self.cgroup.public,'initialization_ms':(time.monotonic()-began)*1000,

@@ -257,7 +257,7 @@ def backend_worker(directory, *, lua_executable=None, backend_index=None):
     need(validate_process_options(cfg) == 'split-v1', 'split_backend_mode_required')
     production_host_guard(cfg)
     pair=validate_backend_pair(cfg)
-    need((type(backend_index)is int and backend_index in(0,1))if pair else backend_index is None,'backend_index_not_bound')
+    need((type(backend_index)is int and 0<=backend_index<pair['workers'])if pair else backend_index is None,'backend_index_not_bound')
     limits_cfg=_node_cfg(cfg)
     boot = _read(root / 'process_parent_boot.json')
     nonce = boot.get('startup_nonce')
@@ -267,7 +267,7 @@ def backend_worker(directory, *, lua_executable=None, backend_index=None):
     need(type(parent) is dict and parent.get('pid') == os.getppid(), 'backend_parent_mismatch')
     need(os.getpgrp() == os.getpid() and os.getsid(0) == os.getpid(), 'backend_owned_session_required')
     own_pid = os.getpid()
-    own = _identity(own_pid, ['backend1'if backend_index==1 else'backend'])
+    own = _identity(own_pid, ['backend'if backend_index in(None,0)else'backend'+str(backend_index)])
     stop, complete = threading.Event(), threading.Event()
     prior = signal.signal(signal.SIGTERM, lambda *_: stop.set())
     threading.Thread(target=_backend_watchdog, args=(stop, complete, own_pid), daemon=True).start()
@@ -465,10 +465,13 @@ class _OwnedChild:
 PAIR_PROFILE={'id':'full-business-pair-v1','workers':2,'per_worker_http':32,
               'per_worker_connections':16,'per_worker_waiters':32,'wait_seconds':2}
 
+FOUR_PROFILE={'id':'full-business-four-v1','workers':4,'per_worker_http':16,
+              'per_worker_connections':8,'per_worker_waiters':16,'wait_seconds':2}
+
 def validate_backend_pair(cfg):
     row=cfg.get('backend_process_pool')
     if row is None:return None
-    need(row==PAIR_PROFILE and cfg.get('purpose')=='capacity'
+    need(row in(PAIR_PROFILE,FOUR_PROFILE) and cfg.get('purpose')=='capacity'
          and cfg.get('process_topology')=='split-v1'and cfg.get('process_observation')=='pid-v1'
          and cfg.get('backend_db_pool')=='bounded-v2'and 'rpc_process_pool'not in cfg
          and cfg.get('db_concurrency')==32 and cfg.get('http_concurrency')==64
@@ -481,22 +484,22 @@ def validate_backend_pair(cfg):
 
 def _node_cfg(cfg):
     if not cfg.get('backend_process_pool'):return cfg
-    validate_backend_pair(cfg)
+    row=validate_backend_pair(cfg)
     return {**{k:v for k,v in cfg.items()if k!='backend_process_pool'},
-            'db_concurrency':16,'http_concurrency':32,'database_resource_profile':'db16-4cpu-4g-v1',
-            'database_pool_limits':{'connections':16,'waiting':32,'wait_seconds':2},
+            'db_concurrency':row['per_worker_connections'],'http_concurrency':row['per_worker_http'],'database_resource_profile':'db16-4cpu-4g-v1',
+            'database_pool_limits':{'connections':row['per_worker_connections'],'waiting':row['per_worker_waiters'],'wait_seconds':2},
             '_backend_pair_node':True}
 
 def _node_path(root,name,index):
     return root/(name if index is None else name.replace('_receipt.json','_node'+str(index)+'_receipt.json'))
 
 def _aggregate_counters(rows,fixed):
-    need(len(rows)==2 and all(type(r)is dict and set(r)==set(rows[0])for r in rows),'pair_counter_shape')
+    need(len(rows)in(2,4)and all(type(r)is dict and set(r)==set(rows[0])for r in rows),'pair_counter_shape')
     result={}
     for key in rows[0]:
         values=[r[key]for r in rows]
         if key in fixed:
-            need(values[0]==values[1],'pair_fixed_counter_mismatch');result[key]=values[0]
+            need(all(v==values[0]for v in values),'pair_fixed_counter_mismatch');result[key]=values[0]
         elif all(type(x)is bool for x in values):result[key]=all(values)
         else:
             need(all(type(x)in(int,float)and math.isfinite(x)for x in values),'pair_counter_not_numeric')
@@ -511,8 +514,8 @@ def _aggregate_backend(root,cfg,nonce,identities,terminal=False):
         path=_node_path(root,name,i);row=_bound(_read(path),cfg,nonce,kind)
         need(row['process_identity']==ident and row['process_group']==ident['pid'],'pair_node_identity_changed')
         nodes.append(row)
-    result=dict(nodes[0],backend_nodes=nodes,backend_node_receipt_sha256=[sha(_node_path(root,name,i).read_bytes())for i in range(2)],
-                backend_process_pool=dict(PAIR_PROFILE),aggregate_counters_are_sum_of_two_owned_nodes=True)
+    result=dict(nodes[0],backend_nodes=nodes,backend_node_receipt_sha256=[sha(_node_path(root,name,i).read_bytes())for i in range(len(identities))],
+                backend_process_pool=dict(cfg['backend_process_pool']),aggregate_counters_are_sum_of_two_owned_nodes=True)
     pool_key='database_pool_stopped'if terminal else'database_pool_started'
     adm_key='http_admission_stopped'if terminal else'http_admission_started'
     result[pool_key]=_aggregate_counters([r[pool_key]for r in nodes],{'wait_timeout'})
@@ -531,11 +534,11 @@ def _aggregate_backend(root,cfg,nonce,identities,terminal=False):
     return result
 
 class _OwnedBackendPair:
-    """Two fresh-exec complete apps, fixed W=2, no account scans or IPC RPC.
+    """Two or four fresh-exec complete apps, fixed reviewed W, no account scans or IPC RPC.
 
-    Startup O(2*S); stable HTTP dispatch stays in the kernel (SO_REUSEPORT).
+    Startup O(W*S); stable HTTP dispatch stays in the kernel (SO_REUSEPORT).
     Every accepted HTTP request has one original handler and one original SQL
-    path. No extra business/database/network call; shutdown/snapshot O(2).
+    path. No extra business/database/network call; shutdown/snapshot O(W).
     Both owned pidfds remain unreaped until all group cleanup has completed.
     """
     def __init__(self,root,cfg,lua,nonce):
@@ -544,14 +547,14 @@ class _OwnedBackendPair:
         self.nodes=[];self.identities=[];self.lock=threading.RLock()
         self.ending=False;self.event=threading.Event();self.ready_complete=threading.Event();self.ready_error=None
         try:
-            for index in range(2):
+            for index in range(cfg['backend_process_pool']['workers']):
                 child=subprocess.Popen(_backend_argv(root,lua)+['--backend-index',str(index)],
                                        stdin=subprocess.DEVNULL,start_new_session=True)
                 node=_OwnedChild(child);self.nodes.append(node)
                 node.pidfd=os.pidfd_open(child.pid,0)
                 node.group_verified=os.getpgid(child.pid)==child.pid and os.getsid(child.pid)==child.pid
                 need(node.group_verified,'pair_node_session_not_owned')
-                ident=_identity(child.pid,['backend'if index==0 else'backend1']);self.identities.append(ident)
+                ident=_identity(child.pid,['backend'if index==0 else'backend'+str(index)]);self.identities.append(ident)
                 def watch(fd=node.pidfd):
                     try:_not_reaped_exit(fd,block=True)
                     finally:self.event.set()
@@ -569,7 +572,7 @@ class _OwnedBackendPair:
     def _publish_ready(self):
         try:
             deadline=time.monotonic()+STARTUP_SECONDS
-            for index in range(2):
+            for index in range(self.cfg['backend_process_pool']['workers']):
                 path=_node_path(self.root,'backend_started_receipt.json',index)
                 while not path.is_file():
                     need(not self.event.is_set()and not self.ending and time.monotonic()<deadline,'pair_node_not_ready')
