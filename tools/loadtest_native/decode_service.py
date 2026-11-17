@@ -4,27 +4,35 @@ Pending<=32;all PID samples O(W). No actor scan,authority cache or request retry
 The caller owns its counters and cache;only pure parsed results cross this socket.
 """
 from __future__ import annotations
-import argparse,base64,ctypes,hashlib,json,os,re,signal,socket,struct,subprocess,sys,threading,time
+import argparse,ctypes,hashlib,io,json,os,pickle,re,signal,socket,struct,subprocess,sys,threading,time
 from pathlib import Path
 MAX_FRAME=32*1024*1024
 
 def need(v,c):
     if not v:raise ValueError(c)
 def packet(value):
-    raw=json.dumps(value,ensure_ascii=False,allow_nan=False,separators=(',',':')).encode('utf8');need(len(raw)<=MAX_FRAME,'decode_IPC_frame_budget');return struct.pack('!I',len(raw))+raw
+    raw=pickle.dumps(value,protocol=5);need(len(raw)<=MAX_FRAME,'decode_IPC_frame_budget');return struct.pack('!I',len(raw))+raw
 def read_exact(sock,n):
     parts=[];left=n
     while left:
         value=sock.recv(left);need(value,'decode_IPC_EOF');parts.append(value);left-=len(value)
     return b''.join(parts)
 def receive(sock):
-    n=struct.unpack('!I',read_exact(sock,4))[0];need(0<n<=MAX_FRAME,'decode_IPC_frame_budget');return json.loads(read_exact(sock,n))
+    n=struct.unpack('!I',read_exact(sock,4))[0];need(0<n<=MAX_FRAME,'decode_IPC_frame_budget');return data_only(read_exact(sock,n))
+class DataOnlyUnpickler(pickle.Unpickler):
+    def find_class(self,module,name):raise ValueError('decode_IPC_globals_forbidden')
+    def persistent_load(self,pid):raise ValueError('decode_IPC_persistent_objects_forbidden')
+def data_only(raw):
+    stream=io.BytesIO(raw);value=DataOnlyUnpickler(stream).load();need(stream.read(1)==b'','decode_IPC_trailing_data');return value
 def _decode(job):
     from loadtest_lab.wire_client import WireClient
     wire=WireClient(job['mode'],measure_routes=job['routes']);ctx=job['context'];error=None;value=None
-    try:value=wire.decode(job['method'],job['path'],base64.b64decode(job['raw'],validate=True),job['status'],request_body=job['request_body'],profile_context=ctx)
+    try:value=wire.decode(job['method'],job['path'],job['raw'],job['status'],request_body=job['request_body'],profile_context=ctx)
     except Exception as e:error=str(e)if isinstance(e,ValueError)and re.fullmatch('[a-zA-Z0-9_]{1,100}',str(e))else'loadtest_remote_decode_failed'
-    return {'ok':error is None,'error':error,'value':value,'context':ctx,'report':wire.report()}
+    updates=None if ctx is None else{k:ctx[k]for k in ('next_state','kind')if k in ctx}
+    if ctx is not None and ctx.get('next_state')is not None and ctx.get('next_state')is ctx.get('baseline'):
+        updates.pop('next_state');updates['reuse_baseline']=True
+    return {'ok':error is None,'error':error,'value':value,'context':updates,'report':wire.report()}
 
 def install(wire,path):
     """Original validation in native children;atomic counter merge,one pure fallback."""
@@ -34,7 +42,7 @@ def install(wire,path):
         import socket
         counts['calls']+=1;began=time.perf_counter_ns()
         try:
-            job={'mode':wire.mode,'routes':wire._routes is not None,'method':method,'path':route,'raw':base64.b64encode(raw).decode('ascii'),'status':status,'request_body':request_body,'context':profile_context}
+            job={'mode':wire.mode,'routes':wire._routes is not None,'method':method,'path':route,'raw':raw,'status':status,'request_body':request_body,'context':profile_context}
             with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)as sock:
                 sock.settimeout(20);sock.connect(path);sock.sendall(packet(job));v=receive(sock)
             r=v['report'];c=r['counters'];need(set(c)==set(wire._counts)and all(type(x)is int and x>=0 for x in c.values()),'decode_IPC_counters_invalid')
@@ -59,12 +67,14 @@ def install(wire,path):
             for key in wc._ROUTE_MAX_FIELDS:target[key]=max(target[key],delta[key])
             for i,value in enumerate(delta['body_histogram']):target['body_histogram'][i]+=value
         if profile_context is not None and type(v['context'])is dict:
+            if v['context'].get('reuse_baseline')is True:
+                need(type(profile_context.get('baseline'))is dict and v['context'].get('kind')=='unchanged','decode_IPC_baseline_invalid');profile_context['next_state']=profile_context['baseline']
             for key in ('next_state','kind'):
                 if key in v['context']:profile_context[key]=v['context'][key]
         counts['worker_used']+=1
         if not v['ok']:counts['remote_errors']+=1;raise ValueError(v['error'])
         return v['value']
-    wire.decode=decode;wire._decode_offload_snapshot=lambda:dict(counts,mode='original-WireClient-private-Unix-process2-v1',HTTP_replays=0,pure_fallback_only=True)
+    wire.decode=decode;wire._decode_offload_snapshot=lambda:dict(counts,mode='original-WireClient-private-Unix-process2-data-v2',HTTP_replays=0,pure_fallback_only=True)
 
 class Decoder:
     def __init__(self,spec,digest,stage):self.spec=Path(spec);self.digest=digest;self.stage=stage;self.proc=None;self.handles={};self.ready=None;self.terminal=None;self.forced=False;self.path=None
@@ -125,7 +135,7 @@ def serve(args):
             try:super().process_request(request,address)
             except BaseException:slots.release();raise
     server=Server(args.socket,Handler);os.chmod(args.socket,0o600)
-    ready={'kind':'PURE_ORIGINAL_DECODER_SERVICE_READY','pid':os.getpid(),'run_id':spec['run_id'],'lifecycle':pool.snapshot(),'server_business_requests':0}
+    ready={'kind':'PURE_ORIGINAL_DECODER_SERVICE_READY','pid':os.getpid(),'run_id':spec['run_id'],'lifecycle':pool.snapshot(),'server_business_requests':0,'private_IPC':'restricted-data-only-pickle5-v2'}
     with(stage/'decode_service_ready_receipt.json').open('x')as f:json.dump(ready,f)
     def stop(signum,frame):threading.Thread(target=server.shutdown,daemon=True).start()
     signal.signal(signal.SIGTERM,stop)
