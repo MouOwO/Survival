@@ -3,8 +3,8 @@
 Two O(S) public source passes; steady monitoring reads only the known child PID
 and one bounded signed status request per5s, O(1) with respect to actors.
 The existing workload maintains its own indexed O(log N) activity deadlines.
-The generator shares the measured host: its actual CPU and memory are included.
-No data SSH, production endpoint, actor scan, replay, load reduction or new port.
+Loopback mode includes generator resources in host;peer mode measures them separately.
+Peer mode has one pinned,restricted,owned Linux SSH forward;no production endpoint.
 """
 from __future__ import annotations
 import argparse,hashlib,json,os,re,signal,subprocess,sys,time
@@ -25,7 +25,7 @@ def save(path,value):
 def code(exc):
     v=str(exc)
     return v if isinstance(exc,ValueError)and re.fullmatch('[a-z0-9_]{1,100}',v)else type(exc).__name__
-def owned_sample(proc,handle,created,started,final=False):
+def owned_sample(proc,handle,created,started,final=False,forward=None):
     row={'elapsed_seconds':round(time.monotonic()-started,3),'processes':[],'worker_discovery_status':'ACTUAL_WORKER_IDENTIFIED','actual_locust_worker_observed':False,'generator_measurement_status':'ACTUAL_WORKER_NOT_OBSERVED'}
     alive=proc.poll()is None
     value={'role':'locust_worker','pid':proc.pid,'running':alive}
@@ -34,6 +34,7 @@ def owned_sample(proc,handle,created,started,final=False):
         value.update(cpu_percent_one_core_scale=handle.cpu_percent(None),rss_bytes=handle.memory_info().rss)
         row.update(actual_locust_worker_observed=True,generator_measurement_status='ACTUAL_WORKER_OBSERVED')
     row['processes']=[value]
+    if forward is not None:row['processes'].append(forward.sample())
     if final:row['final']=True
     return row
 
@@ -48,7 +49,10 @@ def run(spec_path,spec_sha):
     proof.need(manifest==spec['manifest_sha256']and cfg['csv_source_revision']==spec['source_commit'],'native_manifest_binding_invalid')
     proof.need(cfg.get('generator_transport')=={'id':'linux-loopback-v1','loopback_ports':[29567]},'native_loopback_profile_required')
     proof.need(cfg.get('actor_progress')=={'id':'active-business-v1','ttl_seconds':120}and cfg['active']==spec['users'],'native_full_business_target_required')
-    proof.need(set(spec['tools'])==set(TOOL_NAMES)and all(sha(spec_path.parent/name)==expected for name,expected in spec['tools'].items()),'native_tool_binding_changed')
+    peer=spec.get('execution_mode')=='linux-peer-ssh-v1'
+    names=TOOL_NAMES+('peer_forward.py',)if peer else TOOL_NAMES
+    proof.need(spec.get('execution_mode','linux-loopback-v1')in('linux-loopback-v1','linux-peer-ssh-v1'),'native_execution_mode_invalid')
+    proof.need(set(spec['tools'])==set(names)and all(sha(spec_path.parent/name)==expected for name,expected in spec['tools'].items()),'native_tool_binding_changed')
     for port in (15432,18765,18767,18769):
         import socket
         with socket.socket()as sock:
@@ -61,9 +65,12 @@ def run(spec_path,spec_sha):
     python=Path(spec['locust_python']);proof.need(python==ROOT/'native_generator_20261117_01/venv/bin/python'and python.is_file(),'native_generator_interpreter_invalid')
     from importlib.metadata import version
     proof.need(version('locust')=='2.47.0'and version('gevent')=='26.9.0','native_dependency_version_mismatch')
-    reader=None;proc=handle=None;created=None;error=None;locust_code=None;final=html=None;checks={};status=activity=http=None;started=time.monotonic()
+    forward=None;reader=None;proc=handle=None;created=None;error=None;locust_code=None;final=html=None;checks={};status=activity=http=None;started=time.monotonic()
     discovery={'status':'LOCUST_NOT_STARTED','worker_pid':None,'snapshot_calls':0,'stable_snapshot_calls':0,'indexed_processes':[]}
     try:
+        if peer:
+            from peer_forward import PeerForward
+            forward=PeerForward(spec_path,spec_sha,stage);forward.start()
         reader=SignedStatusReader(lab/'client.json',cfg,stage/'signed_status_samples.jsonl')
         initial=reader.observe('before_locust_start');proof.need(initial['proof_valid']is True,'signed_status_initial_probe_failed')
         proof.need(initial['proof']['stats']['business_remaining_seconds']>=duration+90,'native_api_remaining_lifetime_insufficient')
@@ -74,16 +81,17 @@ def run(spec_path,spec_sha):
         handle=psutil.Process(proc.pid);created=handle.create_time();proof.need(handle.cmdline()==argv,'native_child_command_mismatch');handle.cpu_percent(None)
         discovery.update(status='ACTUAL_WORKER_IDENTIFIED',launcher_pid=proc.pid,worker_pid=proc.pid,indexed_processes=[{'pid':proc.pid,'create_time':created,'depth':0}],indexed_process_count=1,launcher_and_worker_same_native_process=True)
         with(stage/'process_samples.jsonl').open('x',encoding='utf-8')as samples:
-            samples.write(json.dumps(owned_sample(proc,handle,created,started))+chr(10));samples.flush()
+            samples.write(json.dumps(owned_sample(proc,handle,created,started,forward=forward))+chr(10));samples.flush()
             planned=time.monotonic()+duration;deadline=planned+STOP_SECONDS+45;next_sample=next_status=time.monotonic()+5;pre=False
             while proc.poll()is None:
                 now=time.monotonic();proof.need(now<deadline,'native_stage_exceeded_deadline')
+                if forward is not None:forward.require_alive()
                 if not pre and(now>=planned-5 or now>=next_status and proof.exit_probe_pre_stop_due(stage,cfg)):
                     reader.observe('pre_planned_stop');pre=True;next_status=time.monotonic()+5
                 elif now>=next_status:
                     reader.observe('periodic');next_status=time.monotonic()+5
                 if time.monotonic()>=next_sample:
-                    samples.write(json.dumps(owned_sample(proc,handle,created,started))+chr(10));samples.flush();next_sample=time.monotonic()+5
+                    samples.write(json.dumps(owned_sample(proc,handle,created,started,forward=forward))+chr(10));samples.flush();next_sample=time.monotonic()+5
                 time.sleep(.2)
             locust_code=proc.returncode
     except BaseException as exc:error=code(exc)
@@ -98,11 +106,14 @@ def run(spec_path,spec_sha):
                     try:proc.wait(timeout=10)
                     except subprocess.TimeoutExpired:proc.kill();proc.wait(timeout=10)
         if proc is not None and handle is not None:
-            with(stage/'process_samples.jsonl').open('a',encoding='utf-8')as samples:samples.write(json.dumps(owned_sample(proc,handle,created,started,final=True))+chr(10))
+            with(stage/'process_samples.jsonl').open('a',encoding='utf-8')as samples:samples.write(json.dumps(owned_sample(proc,handle,created,started,final=True,forward=forward))+chr(10))
         if reader is not None:
             try:reader.observe('after_locust_exit')
             except Exception as exc:error=error or code(exc)
             finally:reader.close()
+        if forward is not None:
+            try:forward.close()
+            except Exception as exc:error=error or code(exc)
     try:
         files=list(stage.glob('locust_final_*_receipt.json'));proof.need(len(files)==1,'one_native_final_required');final=proof.read_public_json(files[0]);proof.need(final['run_id']==cfg['run_id']and final['manifest_sha256']==manifest and not final['reset_stats_requested'],'native_final_binding_invalid')
         html=proof.parse_final_html(stage/'locust.html');checks={'final_html_requests_match':html['requests']==final['requests'],'final_html_failures_match':html['failures']==final['failures'],'wire_collection_complete':final['business_wire']['collection_complete']is True};checks.update(proof.complete_final_counts(final,html,cfg,cfg['active']));proof.need(all(checks.values()),'final_statistics_mismatch')
@@ -122,7 +133,7 @@ def run(spec_path,spec_sha):
         proof.need(proof.validate_prepared_sources(lab,cfg,spec['source_commit'],spec['git_consumer_lf_sha256'])==source_proof,'native_sources_changed_during_stage');proof.need(all(sha(spec_path.parent/name)==expected for name,expected in spec['tools'].items())and sha(spec_path)==spec_sha,'native_control_changed_during_stage')
     except Exception as exc:error=error or code(exc)
     success=error is None and locust_code==0 and final is not None and final.get('failures')==0 and final.get('requests',0)>0
-    r={'kind':'ISOLATED_CAPACITY_LINUX_NATIVE_STAGE_V1_RECEIPT','artifact_root':str(stage),'source_root':str(lab),'status':'DIAGNOSTIC_STAGE_FINISHED'if success else'DIAGNOSTIC_STAGE_NOT_CONFIRMED','error':error,'run_id':cfg['run_id'],'operator_commit':spec['source_commit'],'source_sha256s':spec['source_sha256s'],'prepared_source_binding':source_proof,'source_origin':'controller Git-verified export plus native physical before/after source verification;no native Git checkout claimed','driver_source_sha256s':{str(spec_path.parent/n):h for n,h in spec['tools'].items()},'native_spec_sha256':spec_sha,'signed_status_summary':status,'actor_progress':activity,'required_active_seconds':required,'extra_status_control_counts':None if reader is None else reader.counts(),'http_request_statistics_window':http,'requested_users':cfg['active'],'requested_duration_seconds':duration,'spawn_rate':spawn,'api_declared_duration_seconds':cfg['duration_seconds'],'locust_exit_code':locust_code,'final_statistics':html,'final_count_checks':checks,'periodic_csv_requests':proof.periodic_csv_count(stage/'locust_stats.csv'),'periodic_csv_is_final':False,'final_locust_receipt_requests':None if final is None else final['requests'],'business_wire':None if final is None else final['business_wire'],'owned_process_discovery':discovery,'actual_generator_measurements_available':discovery['status']=='ACTUAL_WORKER_IDENTIFIED','monitor_interval_seconds':5,'generator_colocated_with_backend':True,'generator_CPU_and_memory_in_host_aggregates':True,'data_ssh_processes':0,'scope':'Linux loopback server business capacity;generator resource cost included;public Nginx/TLS/WAN,real Steam/payment excluded','capacity_certified':False,'owned_processes_remaining':[]if proc is None or proc.poll()is not None else['locust_worker']}
+    r={'kind':'ISOLATED_CAPACITY_LINUX_PEER_NATIVE_STAGE_V1_RECEIPT'if peer else'ISOLATED_CAPACITY_LINUX_NATIVE_STAGE_V1_RECEIPT','artifact_root':str(stage),'source_root':str(lab),'status':'DIAGNOSTIC_STAGE_FINISHED'if success else'DIAGNOSTIC_STAGE_NOT_CONFIRMED','error':error,'run_id':cfg['run_id'],'operator_commit':spec['source_commit'],'source_sha256s':spec['source_sha256s'],'prepared_source_binding':source_proof,'source_origin':'controller Git-verified export plus native physical before/after source verification;no native Git checkout claimed','driver_source_sha256s':{str(spec_path.parent/n):h for n,h in spec['tools'].items()},'native_spec_sha256':spec_sha,'signed_status_summary':status,'actor_progress':activity,'required_active_seconds':required,'extra_status_control_counts':None if reader is None else reader.counts(),'http_request_statistics_window':http,'requested_users':cfg['active'],'requested_duration_seconds':duration,'spawn_rate':spawn,'api_declared_duration_seconds':cfg['duration_seconds'],'locust_exit_code':locust_code,'final_statistics':html,'final_count_checks':checks,'periodic_csv_requests':proof.periodic_csv_count(stage/'locust_stats.csv'),'periodic_csv_is_final':False,'final_locust_receipt_requests':None if final is None else final['requests'],'business_wire':None if final is None else final['business_wire'],'owned_process_discovery':discovery,'actual_generator_measurements_available':discovery['status']=='ACTUAL_WORKER_IDENTIFIED','monitor_interval_seconds':5,'generator_colocated_with_backend':not peer,'generator_CPU_and_memory_in_host_aggregates':not peer,'data_ssh_processes':int(peer),'peer_forward':None if forward is None else forward.receipt(),'generator_host':'47.116.11.179'if peer else'47.111.16.128','backend_host':'47.111.16.128','scope':'Linux peer SSH loopback business capacity;generator and forwarding client measured separately from backend host;public Nginx/TLS,real Steam/payment excluded'if peer else'Linux loopback server business capacity;generator resource cost included;public Nginx/TLS/WAN,real Steam/payment excluded','capacity_certified':False,'owned_processes_remaining':([]if proc is None or proc.poll()is not None else['locust_worker'])+([]if forward is None or forward.closed()else['data_ssh_tunnel'])}
     save(stage/'stage_receipt.json',r)
     print(json.dumps({'status':r['status'],'stage_directory':str(stage),'error':error,'locust_exit_code':locust_code,'common_seconds':None if activity is None else activity['shared_activity']['common_seconds']}),flush=True)
     return 0 if success else 2
