@@ -19,6 +19,18 @@ Steam manifest `6295798134948076528`。当前普通客户端的直接失败条�
 保存在 `publishing/workshop/native_arcade_cloud_20261027.json` 的 native08_acceptance 中。
 这不是用 Tools 离线测试推断历史正常。
 
+用户随后补充：最近一次正常是在“压测之前”，没有确认具体日期或当时启动入口。
+因此故障时间窗口应记为压测前最后正常至当前，不能因 11 月 17 日恰有更新就锁定当天。
+此补充不改变当前原生返回分支的实际证据，但限制历史因果归因。
+
+对压测残留补查：当前 PID 35652 无 Tools/dev/addon、离线测试1或 HTTP关闭0启动开关；
+该用户 Steam app570 没有持久 LaunchOptions，指定 convars 文件没有对应残留项，
+用户/系统 SteamAppId、SteamGameId 均未设置。已查 tools/loadtest_lab 没有写入 Steam
+启动选项、Dota 配置或本机离线/HTTP开关的入口；其身份入口/业务/数据库固定隔离回环
+29567/29565/25432。Git 中压测前至首次故障的正式认证配置、release_profile、
+workshop_connection 和 native_cloud_handoff 也没有差异。以上没有发现直接改写正式
+客户端的路径，不把源码检查当成已证明所有历史机器状态或完全排除压测间接影响。
+
 逐字节核对 1106、1607、1803、1806 四份真实发行候选中的 24 个文件，并与各自不可变
 签包 manifest SHA256 对上。前三版下面六个文件**全部一致**：
 
