@@ -338,6 +338,13 @@ class Backend:
         if not isinstance(title, str) or not title.strip() or len(title.encode('utf8')) > 128:
             raise ValueError('游廊名称无效')
         listing['title'] = title
+        # Keep future package uploads aligned with the reviewed public copy.
+        description_path = 'publishing/workshop/public_description_20261118.json'
+        available = git(self.root, 'ls-tree', '--name-only', self.data['producer_pins']['game'], description_path)
+        if available.strip():
+            from release_description import validate_text
+            public_copy = json.loads(git(self.root, 'show', self.data['producer_pins']['game'] + ':' + description_path))
+            listing['description'] = validate_text(public_copy, auth['workshop_id'])
         listing_path = self.root / 'publishing/workshop' / ('packager_' + self.identity + '_listing.json')
         self.fixed(listing_path, listing)
         auth.update(listing_template_path=str(listing_path), listing_template_sha256=digest(listing_path.read_bytes()))

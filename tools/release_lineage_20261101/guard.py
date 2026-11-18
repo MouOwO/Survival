@@ -434,6 +434,85 @@ def preflight_release(authority, request):
         return copy.deepcopy(validated)
 
 
+class _DescriptionLease(_Lease):
+    """An existing published package may receive exactly one text-only update."""
+
+    def finish_description(self, receipt, receipt_path):
+        self.check()
+        need(self.submit_started and self.inflight is None
+             and receipt.get('status') == 'DESCRIPTION_VERIFIED_OFFICIAL'
+             and receipt.get('submit_result') == 1
+             and receipt.get('description_sha256') == self.validated['description_sha256'],
+             'verified_description_submission_required')
+        saved, raw = read_json(receipt_path)
+        need(saved == receipt, 'description_receipt_changed')
+        result = copy.deepcopy(self.state)
+        result.update(generation=self.state['pending']['generation'], pending=None,
+                      last_description_receipt={'path': str(receipt_path), 'sha256': sha(raw)})
+        atomic_json(self.authority.policy['lineage_state'], result)
+        self.completed = True
+
+
+@contextmanager
+def description_lease(authority, request):
+    """Share the item-wide lock and SDK boundary; never rewrite package history."""
+    from release_packager.core import baseline
+    need(_ACTIVE.get() is None, 'nested_release_lease_refused')
+    with exclusive_lock(authority.policy['publication_lock']):
+        project = Path(authority.policy['repositories']['game'])
+        current = baseline(project)
+        state, _ = read_json(authority.policy['lineage_state'])
+        parent, raw = read_json(authority.policy['canonical_journal'])
+        _identity(authority, parent)
+        need(state.get('pending') is None, 'pending_publication_requires_separate_reconciliation')
+        need(request['parent_journal_sha256'] == sha(raw) == state['head']['canonical_journal_sha256']
+             and request['generation'] == state['generation'] + 1
+             and request['release_sequence'] == state['head']['sequence']
+             and request['baseline_sha256'] == current['cursor']['baseline_sha256']
+             and request['steam_manifest'] == current['baseline']['official_parent_manifest'],
+             'stale_description_parent_cas')
+        need(sha(authority.policy_path.read_bytes()) == authority.digest == request['authority_sha256'],
+             'description_authority_changed')
+        description = request['description']
+        need(isinstance(description, str) and 0 < len(description.encode('utf8')) < 8000
+             and sha(description.encode('utf8')) == checked_sha(request['description_sha256']),
+             'bounded_exact_description_required')
+        need(set(request['operator_files']) == {
+            'tools/release_pipeline.py', 'tools/release_description.py',
+            'tools/release_lineage_20261101/guard.py', 'tools/release_sdk_lineage_hook.py',
+            'tools/steam_workshop_upload.py', 'tools/release_packager/core.py'
+        } and len(request['operator_files']) == 6, 'complete_description_operator_binding_required')
+        # Every executed publication module and the text must match one Git commit.
+        for relative in request['operator_files']:
+            need(relative in ('tools/release_pipeline.py', 'tools/release_description.py',
+                              'tools/release_lineage_20261101/guard.py',
+                              'tools/release_sdk_lineage_hook.py', 'tools/steam_workshop_upload.py',
+                              'tools/release_packager/core.py'), 'unreviewed_description_operator_file')
+            need((project / relative).read_bytes() == _git(project, 'show',
+                 revision(request['source_revisions']['game']) + ':' + relative),
+                 'description_operator_differs_from_commit:' + relative)
+        text = json.loads(_git(project, 'show', request['source_revisions']['game']
+                               + ':publishing/workshop/public_description_20261118.json'))
+        need(text == {'schema': 1, 'workshop_id': authority.policy['workshop_id'],
+                      'description': description}, 'description_differs_from_committed_source')
+        need(_git(authority.policy['repositories']['content'], 'rev-parse', 'HEAD').decode().strip()
+             == request['source_revisions']['content'], 'description_content_source_changed')
+        pending = dict(kind='DESCRIPTION_ONLY', generation=request['generation'],
+                       release_sequence=request['release_sequence'],
+                       parent_journal_sha256=sha(raw), description_sha256=request['description_sha256'],
+                       status='INTENT_PRESERVED_UNTIL_VERIFIED_OR_EXPLICIT_RECONCILIATION')
+        state = {**state, 'pending': pending}
+        atomic_json(authority.policy['lineage_state'], state)
+        lease = _DescriptionLease(_SEAL, authority, request, state, sha(raw), parent)
+        token = _ACTIVE.set(lease)
+        try:
+            yield lease
+            need(lease.completed, 'description_outcome_unknown_pending_preserved')
+        finally:
+            lease.alive = False
+            _ACTIVE.reset(token)
+
+
 class _Permit:
     def __init__(self, lease, suffix):
         self.lease, self.suffix, self.used = lease, suffix, False
@@ -450,6 +529,8 @@ class _Permit:
             raise Refused('sdk_mutation_failed_pending_preserved')
         if self.suffix == 'StartItemUpdate':
             lease.handle = result
+        if isinstance(lease, _DescriptionLease) and self.suffix == 'SetItemDescription':
+            lease.description_set = True
         lease.inflight = None
 
 
@@ -463,6 +544,15 @@ def require_sdk_mutation(suffix, args, *, authority_sha256):
     need(isinstance(lease, _Lease) and lease.authority.digest == authority_sha256,
          'reviewed_release_lease_required_before_sdk_mutation')
     lease.check()
+    if isinstance(lease, _DescriptionLease):
+        need(suffix in ('StartItemUpdate', 'SetItemDescription', 'SubmitItemUpdate'),
+             'description_only_sdk_setters_required')
+        if suffix == 'SetItemDescription':
+            need(len(args) == 2 and args[1] == lease.validated['description'].encode('utf8'),
+                 'description_setter_differs_from_reviewed_text')
+            need(not getattr(lease, 'description_set', False), 'description_setter_already_used')
+        if suffix == 'SubmitItemUpdate':
+            need(getattr(lease, 'description_set', False), 'description_must_be_set_before_submit')
     need(lease.inflight is None, 'prior_native_call_outcome_unknown_pending_preserved')
     need(not lease.submit_started, 'no_mutations_after_submit')
     if suffix in ('CreateItem','DeleteItem'):
@@ -501,6 +591,7 @@ def before_journal_write(path, value, *, authority_sha256=None):
         return False
     need(isinstance(lease, _Lease) and lease.authority.digest == authority_sha256,
          'release_lease_required_before_canonical_journal_write')
+    need(not isinstance(lease, _DescriptionLease), 'description_cannot_rewrite_package_journal')
     lease.check()
     _identity(lease.authority, value)
     need(value.get('release_sequence') in (lease.state['head']['sequence'], lease.validated['release_sequence']),

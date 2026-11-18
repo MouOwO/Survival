@@ -169,6 +169,11 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     actions = parser.add_subparsers(dest='command')
     actions.add_parser('status')
+    action = actions.add_parser('description')
+    action.add_argument('action', choices=['plan', 'publish'])
+    action.add_argument('--source-revision')
+    action.add_argument('--report', type=Path, required=True)
+    action.add_argument('--request-sha')
     for name in ('pending', 'delivery-status', 'retire-plan'):
         action = actions.add_parser(name)
         action.add_argument('--full', action='store_true')
@@ -220,6 +225,16 @@ def main(argv=None):
                 delegated += ['--' + name.replace('_', '-'), str(getattr(args, name))]
         return diagnostics.main(delegated)
     auth = authority()
+    if args.command == 'description':
+        import release_description
+        if args.action == 'plan':
+            guard.need(args.source_revision is not None, 'committed_description_source_required')
+            result = release_description.plan(auth, args.source_revision, args.report)
+        else:
+            guard.need(args.request_sha is not None, 'explicit_description_request_sha_required')
+            result = release_description.publish(auth, args.report, args.request_sha)
+        print(json.dumps(result, ensure_ascii=False), flush=True)
+        return 0
     if args.command == 'rehearsal':
         ops = pinned_module(auth, 'rehearsal')
         delegated = [args.action]
