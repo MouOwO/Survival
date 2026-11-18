@@ -1,4 +1,9 @@
-"""Run the reviewed test-host operator using pinned SSH and sealed artifacts."""
+"""Run reviewed backend operators against the current pinned production host.
+
+Production was consolidated onto the 8-core host on 2026-11-18. Historical
+release checkouts retain their original binding; this working-tree entry is
+also used by the current Steam login repair and database maintenance tools.
+"""
 from __future__ import annotations
 import argparse
 import hashlib
@@ -11,12 +16,12 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = ROOT / "tmp/archive_caps_20261020/release_candidate"
 ARCHIVE = PACKAGE / "archive_caps_review_ecf55dd6.tar.gz"
 OPERATOR = Path(__file__).with_name("deploy_remote.py")
-HOST = "root@47.110.238.248"
+HOST = "root@47.111.16.128"
 OPTIONS = ["-F", "none", "-o", "BatchMode=yes", "-o", "StrictHostKeyChecking=yes",
            "-o", "UserKnownHostsFile=tools/deploy/goufayu_test_known_hosts",
            "-o", "GlobalKnownHostsFile=none", "-o", "HostKeyAlgorithms=ssh-ed25519",
            "-o", "IdentitiesOnly=yes", "-o", "ConnectTimeout=10", "-i",
-           "C:/Users/Administrator/.ssh/goufayu_ecs_ed25519_v2"]
+           "C:/Users/Administrator/.ssh/goufayu_backend_20261118_ed25519"]
 
 
 def sha(path):

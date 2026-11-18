@@ -91,7 +91,7 @@ class TemporaryRelayTest(unittest.TestCase):
     def test_fixed_forward_and_pinned_ssh_have_no_general_proxy(self):
         args = relay.arguments()
         self.assertEqual(args[args.index("-R") + 1], "127.0.0.1:18768:steamcommunity.com:443")
-        self.assertEqual(args[-1], "root@47.110.238.248")
+        self.assertEqual(args[-1], "root@47.111.16.128")
         self.assertIn("StrictHostKeyChecking=yes", args)
         self.assertIn("ExitOnForwardFailure=yes", args)
         self.assertIn("-N", args)

@@ -1,0 +1,14 @@
+[Unit]
+Description=Local consolidated PostgreSQL and authentication snapshot (offsite separate)
+Requires=goufayu-db.service goufayu-ws4-db.service
+After=goufayu-db.service goufayu-ws4-db.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3.12 -B /opt/survival-operations/consolidated_backup.py
+UMask=0077
+TimeoutStartSec=1800
+Nice=19
+IOSchedulingClass=idle
+CPUQuota=100%
+MemoryMax=512M

@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily local consolidated snapshot; no retention deletion or offsite claim
+
+[Timer]
+OnCalendar=*-*-* 03:15:00
+RandomizedDelaySec=15m
+Persistent=true
+Unit=survival-consolidated-backup.service
+
+[Install]
+WantedBy=timers.target
