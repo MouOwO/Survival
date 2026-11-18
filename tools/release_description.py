@@ -39,6 +39,8 @@ def plan(auth, source, report):
     raw = git(project, 'show', source + ':' + TEXT)
     guard.need((project / TEXT).read_bytes() == raw, 'uncommitted_description_refused')
     description = validate_text(json.loads(raw), auth.policy['workshop_id'])
+    title = json.loads(git(project, 'show', source + ':publishing/workshop/test_listing.json'))['title']
+    guard.need(title == '我在dota2苟发育', 'preserve_existing_game_title_required')
     for relative in OPERATORS:
         guard.need((project / relative).read_bytes() == git(project, 'show', source + ':' + relative),
                    'uncommitted_description_operator:' + relative)
@@ -52,7 +54,7 @@ def plan(auth, source, report):
                    source_revisions={'game': source, 'content': git(
                        auth.policy['repositories']['content'], 'rev-parse', 'HEAD').decode().strip()},
                    operator_files=list(OPERATORS), description=description,
-                   description_sha256=guard.sha(description.encode('utf8')),
+                   description_sha256=guard.sha(description.encode('utf8')), title=title,
                    description_source_sha256=guard.sha(raw))
     report = guard.regular(report)
     report.mkdir(parents=True, exist_ok=False)
@@ -108,9 +110,10 @@ def fresh_item(steam, item, sdk, language='schinese'):
         steam.ug('ReleaseQueryUGCRequest', C.c_bool, [C.c_uint64], query)
 
 
-def verify_snapshots(before, after, description):
+def verify_snapshots(before, after, description, title=None):
     guard.need(after['description'] == description, 'official_description_differs_from_committed_text')
-    guard.need(all(before[key] == after[key] for key in PROTECTED),
+    guard.need(all(before[key] == after[key] for key in PROTECTED if key != 'title' or title is None)
+               and (title is None or after['title'] == title),
                'description_update_changed_protected_fields')
 
 
@@ -135,6 +138,9 @@ def publish(auth, report, request_sha):
                               sdk.APP, int(auth.policy['workshop_id']))
             guard.need(steam.ug('SetItemUpdateLanguage', C.c_bool, [C.c_uint64, C.c_char_p],
                                handle, b'schinese'), 'description_language_setter_rejected')
+            # Steam replaces the localized title/description pair together.
+            guard.need(steam.ug('SetItemTitle', C.c_bool, [C.c_uint64, C.c_char_p],
+                               handle, request['title'].encode('utf8')), 'preserved_title_setter_rejected')
             guard.need(steam.ug('SetItemDescription', C.c_bool, [C.c_uint64, C.c_char_p],
                                handle, request['description'].encode('utf8')), 'description_setter_rejected')
             call = steam.ug('SubmitItemUpdate', C.c_uint64, [C.c_uint64, C.c_char_p], handle, b'')
@@ -144,12 +150,13 @@ def publish(auth, report, request_sha):
             write_new(report / 'submitted.json', {'submit_result': response.result, 'item': str(response.item)})
             after = fresh_item(steam, auth.policy['workshop_id'], sdk)
             write_new(report / 'after.json', after)
-            verify_snapshots(before, after, request['description'])
+            verify_snapshots(before, after, request['description'], request['title'])
         receipt = dict(status='DESCRIPTION_VERIFIED_OFFICIAL', submit_result=1,
                        workshop_id=auth.policy['workshop_id'], description_sha256=request['description_sha256'],
                        request_sha256=request_sha, source_revisions=request['source_revisions'],
                        release_sequence=request['release_sequence'], steam_manifest=request['steam_manifest'],
-                       protected_fields_unchanged=list(PROTECTED), content_upload_performed=False,
+                       protected_fields_unchanged=[k for k in PROTECTED if before[k] == after[k]],
+                       title=after['title'], title_restored=before['title'] != after['title'], content_upload_performed=False,
                        canonical_package_journal_changed=False)
         write_new(report / 'verification.json', receipt)
         lease.finish_description(receipt, report / 'verification.json')
@@ -170,13 +177,17 @@ def verify(auth, report, request_sha):
         with sdk.Steam() as steam:
             chinese = fresh_item(steam, auth.policy['workshop_id'], sdk, 'schinese')
             english = fresh_item(steam, auth.policy['workshop_id'], sdk, 'english')
-        guard.need(all(before[key] == chinese[key] for key in PROTECTED),
+        missing_title = (request.get('language') == 'schinese' and chinese['title'] == ''
+                         and before['title'] == '我在dota2苟发育')
+        guard.need(all(before[key] == chinese[key] for key in PROTECTED if key != 'title' or not missing_title),
                    'description_recovery_protected_chinese_fields_changed')
         guard.need(all(chinese[key] == english[key] for key in PROTECTED if key != 'title'),
                    'description_recovery_shared_fields_changed')
-        guard.need(english['description'] == request['description'], 'official_default_description_not_verified')
+        target = chinese if request.get('language') == 'schinese' else english
+        guard.need(target['description'] == request['description'], 'official_target_description_not_verified')
         write_new(report / 'verified_languages.json', {'schinese': chinese, 'english': english})
-        receipt = dict(status='DESCRIPTION_VERIFIED_OFFICIAL', language='english', submit_result=1,
+        receipt = dict(status='DESCRIPTION_VERIFIED_TITLE_RESTORE_REQUIRED' if missing_title else 'DESCRIPTION_VERIFIED_OFFICIAL',
+                       language=request.get('language', 'english'), submit_result=1,
                        description_sha256=request['description_sha256'], request_sha256=request_sha,
                        release_sequence=request['release_sequence'], steam_manifest=request['steam_manifest'],
                        content_upload_performed=False, canonical_package_journal_changed=False)

@@ -525,7 +525,7 @@ def reconcile_description(authority, request, receipt_path):
          and state['head']['canonical_journal_sha256'] == request['parent_journal_sha256']
          and sha(Path(authority.policy['canonical_journal']).read_bytes()) == request['parent_journal_sha256']
          and state['head']['sequence'] == request['release_sequence'], 'exact_description_reconciliation_cas_required')
-    need(receipt.get('status') == 'DESCRIPTION_VERIFIED_OFFICIAL'
+    need(receipt.get('status') in ('DESCRIPTION_VERIFIED_OFFICIAL', 'DESCRIPTION_VERIFIED_TITLE_RESTORE_REQUIRED')
          and receipt.get('submit_result') == 1
          and receipt.get('description_sha256') == request['description_sha256'],
          'fresh_description_reconciliation_receipt_required')
@@ -567,11 +567,14 @@ def require_sdk_mutation(suffix, args, *, authority_sha256):
          'reviewed_release_lease_required_before_sdk_mutation')
     lease.check()
     if isinstance(lease, _DescriptionLease):
-        need(suffix in ('StartItemUpdate', 'SetItemUpdateLanguage', 'SetItemDescription', 'SubmitItemUpdate'),
+        need(suffix in ('StartItemUpdate', 'SetItemUpdateLanguage', 'SetItemTitle', 'SetItemDescription', 'SubmitItemUpdate'),
              'description_only_sdk_setters_required')
         if suffix == 'SetItemUpdateLanguage':
             need(len(args) == 2 and args[1] == b'schinese'
                  and not getattr(lease, 'description_set', False), 'fixed_description_language_required')
+        if suffix == 'SetItemTitle':
+            need(len(args) == 2 and args[1] == lease.validated.get('title', '').encode('utf8')
+                 and lease.validated.get('title') == '我在dota2苟发育', 'preserved_committed_title_required')
         if suffix == 'SetItemDescription':
             need(len(args) == 2 and args[1] == lease.validated['description'].encode('utf8'),
                  'description_setter_differs_from_reviewed_text')
