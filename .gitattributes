@@ -504,3 +504,8 @@ tools/release_description.py text eol=lf
 tools/complete_delivery_pack_2026111802_bc09dc/*.py text eol=lf
 publishing/workshop/packager_pack_2026111802_ebbc09dc_authority.json text eol=lf
 publishing/workshop/packager_pack_2026111802_ebbc09dc_authorization.json text eol=lf
+
+# Packager pack_2026111803_37bd1629
+tools/complete_delivery_pack_2026111803_bd1629/*.py text eol=lf
+publishing/workshop/packager_pack_2026111803_37bd1629_authority.json text eol=lf
+publishing/workshop/packager_pack_2026111803_37bd1629_authorization.json text eol=lf
