@@ -177,6 +177,8 @@ def render(project, revision, job, current):
             values = {'BASELINE': 'ROOT / ' + repr(current['cursor']['baseline']), 'BASELINE_SHA256': repr(current['cursor']['baseline_sha256']), 'PARENT_MANIFEST': 'Path(' + repr(str(Path(report['candidate']) / '_release_manifest.json')) + ')', 'PARENT_AUTHORITY_SHA256': repr(current['cursor']['authority_sha256']), 'JOURNAL_RECORD': 'ROOT / ' + repr(relative + '/parent_journal.json'), 'JOURNAL_RECORD_SHA256': repr(current['journal_sha256'])}
             for key, value in values.items():
                 set_assignment(tree, key, value)
+        elif name == 'rehearsal.py':
+            set_assignment(tree, 'BASE_MANIFEST', repr(base['official_parent_manifest']))
         elif name == 'publication_validator.py':
             set_assignment(tree, 'ONLINE_TEST_POLICY', repr(job['authorization_relative']))
         elif name == 'exact_review.py':
