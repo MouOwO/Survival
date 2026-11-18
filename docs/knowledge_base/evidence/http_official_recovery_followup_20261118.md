@@ -152,5 +152,10 @@ dota_play_custom_server、dota_play_custom_server_name、dota_server_allow_custo
 d5f0a0241aa3a41f642286fe9f15bd32dd6ed972c99666c55b17a28b7f8a8299。
 
 已向用户请求另一台现有测试电脑、已有获准测试账号从正常Steam/正式游廊进入一次，
-只反馈是否仍为start/create/0及F:nn/H:l。此对照尚无结果，不能写成第二台机器已验证。
+只反馈是否仍为start/create/0及F:nn/H:l。用户随后明确反馈另一台也是F:nn/H:l；
+这是用户实测反馈，另机未采集原始日志/引擎版本，不能冒充独立机器二进制采样。
 不因此购机、升级、额外公开或伪造名单；正式联网仍未恢复，尚无经过验证的新恢复方案。
+
+后续用户接受完整联网辅助程序，并要求优先脱离游廊作同代码HTTP对照。
+实际本机HTTPS可往返，本地Dota Tools VM也为nn/Send0；详见
+[三层环境对照及诊断恢复](http_environment_control_20261118.md)。没有把Tools诊断当作离线玩法或正式联网验收。
