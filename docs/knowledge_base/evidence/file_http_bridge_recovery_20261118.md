@@ -107,3 +107,31 @@ FILETIME134394970002519557，Tools=false/cheats0，两原生HTTP工厂nn；实�
 正常退出后原入口按原SHA恢复，所属KV文件清理。准备/往返/恢复登记
 dea65b6c…/1f3265b4…/e4303f40…；Lua25项、Python9项与原工厂43项通过。
 正式签包、真实Steam授权和云档案仍待，不能把本地匿名实证称为已修复正式登录。
+
+## 1903正式游廊传输通过；等待玩家Steam网页确认
+
+1903已完整同步：任务pack_2026111903_9c093551，7065资源/5个VPK，官方完整下载
+逐文件一致、完整待发0，Steam manifest5892770527169450733。运行来源game=
+f778a51f67d6895a2cd373bf217e8af8b9c007bc、content=903da853570c6076da0ff2a86a9abf48e0580da1；
+发布operator=3e1e729952d10b01fb23efc435bf67312d56fbfe，双仓已推送。后台本轮未部署。
+
+正式普通客户端PID27496/FILETIME134394980788961131，无Tools/dev/addon参数；
+从原游廊条目默认ws4_entry房间进入。协议2在真实房间完成ready、POST
+/v1/player-auth/start实际200/240字节、后续poll持续200/48字节，并有游戏ack。
+界面已显示有效授权码并等待网页确认，原生工厂仍nn，传输由已获用户接受的本机
+助手承担。助手当前源码与签包Git来源匹配，SHA6a497514fa0120afde2c30a82a347f4c13ea8d2991f4fc946f737edc07b40da7。
+这是正式传输通过；尚未观察到Steam approved，云档案读取/保存和多人验收不能算通过。
+已向用户请求在当前客户端完成网页Steam确认，客户端与助手保持运行；不要自动代兑、
+购买、清档或用虚构凭据放行。原生HTTP限制的具体官方变更仍未获确认。
+
+真实脱敏回执formal_file_bridge_1903_attempt01/transport_verified_auth_pending_receipt.json，
+登记7598da1d…；不把授权码、真实设备码/访问令牌或业务原文加入Git。
+桌面“我在dota2苟发育-联网助手.lnk”已建立，当前指向树外
+D:/Survival_本地工具/runs/online_helper_entry_20261119_v2/start_online.ps1。
+先正常退出Dota再双击；入口核对当前已验证正式版本和助手Git字节后，启动普通Steam
+客户端与助手，仍由玩家从原游廊进入。入口跟随当前已验证版本，避免固定旧版陷阱。
+v1及快捷方式原备份保留；v2登记a108f5a2…，安装动作没有另开游戏或打断当前局。
+
+当前验收使用已发布官方下载包，没有候选暂装、keeper或待恢复事务；安装未切换。
+本节只记录已发生的正式传输结果，运行资源和助手不改；后续收到用户Steam确认后
+继续观察approved、session/authenticate与云档案，不能将“已同步游廊”当作完整登录验收。
