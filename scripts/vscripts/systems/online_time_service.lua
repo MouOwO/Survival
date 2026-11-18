@@ -167,10 +167,8 @@ local function complete_checkpoint(player_id, state, final, current_request_id)
     end
 end
 
-local function publish_grants(player_id, state, grants, final, current_request_id)
-    print("[OnlineTime] profile_refresh_started player_id=" .. tostring(player_id)
-        .. " grant_count=" .. tostring(#grants))
-    profile_service.load_player(player_id, "star_blessing_grant", function()
+local function publish_grants(player_id, state, grants, final, current_request_id, profile_already_applied)
+    local function applied()
         if state.generation ~= generation or not state.pending_checkpoint
             or state.pending_checkpoint.request_id ~= current_request_id then return end
         local provider = profile_service.get_provider()
@@ -181,7 +179,8 @@ local function publish_grants(player_id, state, grants, final, current_request_i
             return
         end
         local permanent_effects = require("systems/permanent_reward_effect_service")
-        print("[OnlineTime] profile_refresh_completed player_id=" .. tostring(player_id)
+        print((profile_already_applied and "[OnlineTime] final_profile_applied player_id="
+            or "[OnlineTime] profile_refresh_completed player_id=") .. tostring(player_id)
             .. " hero_all_attributes_flat="
             .. tostring(permanent_effects.value(player_id, "hero_all_attributes_flat")))
         for _, grant in ipairs(grants) do
@@ -195,7 +194,11 @@ local function publish_grants(player_id, state, grants, final, current_request_i
             end
         end
         complete_checkpoint(player_id, state, final, current_request_id)
-    end, function(error_code)
+    end
+    if profile_already_applied then applied(); return end
+    print("[OnlineTime] profile_refresh_started player_id=" .. tostring(player_id)
+        .. " grant_count=" .. tostring(#grants))
+    profile_service.load_player(player_id, "star_blessing_grant", applied, function(error_code)
         if state.generation ~= generation or not state.pending_checkpoint
             or state.pending_checkpoint.request_id ~= current_request_id then return end
         print("[OnlineTime] profile_refresh_failed player_id=" .. tostring(player_id)
@@ -317,6 +320,7 @@ checkpoint = function(player_id, final, expected_state)
         session_id = state.session_id,
         request_id = request_id(player_id, state),
         final = final == true,
+        response_capabilities = final == true and { final_profile_committed_v1 = true } or nil,
     }
     state.pending_checkpoint = payload
     state.pending_attempts = (state.pending_attempts or 0) + 1
@@ -341,8 +345,14 @@ checkpoint = function(player_id, final, expected_state)
             complete_checkpoint(player_id, state, final, payload.request_id)
             return
         end
+        local final_profile_applied = false
         if response and response.profile and tostring(response.profile.account_id) == tostring(account_id) then
-            profile_service.apply_snapshot(player_id, response.profile, "archive_online_checkpoint")
+            local applied = profile_service.apply_snapshot(player_id, response.profile, "archive_online_checkpoint")
+            final_profile_applied = payload.final == true
+                and type(payload.response_capabilities) == "table"
+                and payload.response_capabilities.final_profile_committed_v1 == true
+                and response.final_profile_committed_v1 == 1
+                and type(applied) == "table" and applied.ok == true
         end
         state.last_success = GameRules:GetGameTime()
         local grants = {}
@@ -366,7 +376,7 @@ checkpoint = function(player_id, final, expected_state)
             .. " grant_count=" .. tostring(#raw_grants)
             .. " validated_grant_count=" .. tostring(#grants))
         if #grants > 0 then
-            publish_grants(player_id, state, grants, final, payload.request_id)
+            publish_grants(player_id, state, grants, final, payload.request_id, final_profile_applied)
             return
         end
         complete_checkpoint(player_id, state, final, payload.request_id)

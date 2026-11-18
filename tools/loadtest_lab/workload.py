@@ -12,9 +12,21 @@ import math
 import re
 import secrets
 import time
+import threading
 
 from .guard import canonical, need, verify_attestation, client_recovery_policy
 from .workload_profiles import COUNTERS, MAX_SEEN_GRANTS, profile_for
+
+
+_INLINE_FINAL_LOCK=threading.Lock()
+_INLINE_FINAL_COUNTS=dict(final_responses=0,marker_validated=0,eligible=0,inline_applied=0,fallback_HTTP=0)
+
+def _inline_final_note(**counts):
+    with _INLINE_FINAL_LOCK:
+        for name,count in counts.items():_INLINE_FINAL_COUNTS[name]+=count
+
+def inline_final_profile_report():
+    with _INLINE_FINAL_LOCK:return {'v':1,**_INLINE_FINAL_COUNTS}
 
 
 class BusinessFailure(ValueError):
@@ -300,7 +312,7 @@ class Player:
             limit = capabilities.get('endless_batch_limit')
             need(type(limit) is int and 1 <= limit <= 32, 'invalid_endless_batch_limit')
             self.endless_batch_limit = limit
-        if self.client_profile.mode == 'client-v3':
+        if self.client_profile.mode in ('client-v3','client-v4'):
             need(self.config_hash == self.client_profile.compact['config_hash'], 'compact_game_bundle_changed')
             compact_rooms().join(self)
         else:self.catalog(label='[setup] lottery/catalog')
@@ -327,7 +339,7 @@ class Player:
             need(request is None or request == self._final_checkpoint_request,
                  'final_checkpoint_request_changed')
             request = self._final_checkpoint_request
-        if self.client_profile.mode in ('client-v2', 'client-v3'):
+        if self.client_profile.mode in ('client-v2', 'client-v3', 'client-v4'):
             value = self._checkpoint_v2(final, request)
             if final:
                 self._final_checkpoint_confirmed = True
@@ -352,24 +364,42 @@ class Player:
         phase = 'final' if final else ('setup' if self.next_checkpoint is None else 'periodic')
         try:
             request = request or ('lt_checkpoint_' + secrets.token_hex(16))
-            value = self.business('/v1/online-time/checkpoint',
-                {'session_id': self.identity['match_session_id'], 'request_id': request, 'final': final},
+            checkpoint_payload={'session_id':self.identity['match_session_id'],'request_id':request,'final':final}
+            if final and self.client_profile.mode=='client-v4':checkpoint_payload['response_capabilities']={'final_profile_committed_v1':True}
+            value = self.business('/v1/online-time/checkpoint',checkpoint_payload,
                 label='[checkpoint:' + phase + '] /v1/online-time/checkpoint')
             need(value.get('ok') is True, 'checkpoint_not_confirmed')
-            need(isinstance(value.get('profile'), dict), 'checkpoint_profile_missing')
-            self.last_profile = profile(value, self.identity['account_id'])
+            if self.client_profile.mode!='client-v4':
+                need(isinstance(value.get('profile'), dict), 'checkpoint_profile_missing')
+            previous_revision=None if self.last_profile is None else self.last_profile['revision']
+            try:
+                applied_profile=profile(value,self.identity['account_id'])
+            except ValueError:
+                if self.client_profile.mode!='client-v4':raise
+                applied_profile=None
+            profile_applied=(applied_profile is not None and(previous_revision is None or applied_profile['revision']>=previous_revision))
+            if profile_applied or self.client_profile.mode!='client-v4':self.last_profile=applied_profile
+            inline_final=(self.client_profile.mode=='client-v4'and final and profile_applied
+                and type(value.get('final_profile_committed_v1'))is int and value['final_profile_committed_v1']==1)
+            if self.client_profile.mode=='client-v4'and final:_inline_final_note(final_responses=1,marker_validated=int(inline_final))
             grants = self.client_profile.grants(value.get('grants'))
             counters['grants_validated'] = len(grants)
             if grants:
                 counters['grant_responses'] = 1
                 unseen = {grant for grant in grants if grant not in self._seen_grants}
                 need(len(self._seen_grants) + len(unseen) <= MAX_SEEN_GRANTS, 'grant_history_budget_exceeded')
-                # Real Lua refreshes even if a repeated response contains an
-                # already seen grant. Publishing/deduplication follows refresh.
+                # V2/V3 refresh even for an already seen grant. V4 may apply the
+                # post-drain final snapshot instead; this is a real logical profile
+                # validation, separately reconciled against actual HTTP below.
+                # Grant publication/deduplication always follows application.
                 self.grant_followup_final = bool(final)
                 counters['grant_followup_attempts'] = 1
                 try:
-                    self.read_profile(label='[grant-followup] /v1/profile')
+                    if self.client_profile.mode=='client-v4'and final:
+                        _inline_final_note(eligible=1,inline_applied=int(inline_final),fallback_HTTP=int(not inline_final))
+                    if not inline_final:self.read_profile(label='[grant-followup] /v1/profile')
+                    if self.client_profile.mode=='client-v4':
+                        need(previous_revision is None or self.last_profile['revision']>=previous_revision,'final_profile_revision_stale')
                 except BaseException:
                     counters['grant_followup_failed'] = 1
                     raise
@@ -377,6 +407,7 @@ class Player:
                     self.grant_followup_final = False
                 counters['grant_followup_completed'] = 1
                 self._seen_grants.update(grants)
+            if not grants:need(profile_applied or self.client_profile.mode!='client-v4','checkpoint_profile_not_applied')
             self.next_checkpoint = self.clock() + 60
             counters['checkpoint_completed'] = 1
             return value
@@ -388,14 +419,14 @@ class Player:
             self._workflow('checkpoint_' + phase, started, error, counters)
 
     def local_view(self):
-        need(self.client_profile.mode == 'client-v3' and self.last_profile is not None and self.identity is not None, 'compact_local_profile_required')
+        need(self.client_profile.mode in ('client-v3','client-v4') and self.last_profile is not None and self.identity is not None, 'compact_local_profile_required')
         need(self.last_profile.get('account_id') == self.identity['account_id'] and self.config_hash == self.client_profile.compact['config_hash'], 'compact_local_view_identity_changed')
         rooms=compact_rooms()
         with rooms.lock:rooms.counts['local_view_intents'] += 1
         return {'local_intent': True, 'http_requests': 0}
 
     def snapshot(self):
-        if self.client_profile.mode == 'client-v3':
+        if self.client_profile.mode in ('client-v3','client-v4'):
             rooms=compact_rooms()
             with rooms.lock:rooms.counts['legacy_snapshot_attempts'] += 1
             raise ValueError('legacy_snapshot_forbidden_for_compact_client')
@@ -522,7 +553,7 @@ class Player:
         return result
 
     def stop(self, *, intent_started=None):
-        if self.client_profile.mode not in ('client-v2', 'client-v3'):
+        if self.client_profile.mode not in ('client-v2', 'client-v3', 'client-v4'):
             return self._stop_session()
         now = self.clock()
         started = now if intent_started is None else intent_started
@@ -542,7 +573,7 @@ class Player:
         finally:
             try:self._workflow('finalization', started, error, counters)
             finally:
-                if self.client_profile.mode == 'client-v3':compact_rooms().leave(self)
+                if self.client_profile.mode in ('client-v3','client-v4'):compact_rooms().leave(self)
 
     def _stop_session(self):
         if self.identity is None:

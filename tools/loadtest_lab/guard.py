@@ -275,7 +275,7 @@ def validate_exit_probe(cfg):
         return None
     seconds=cfg['exit_probe_common_seconds']
     need(type(seconds)is int and seconds in ((60,) if cfg.get('active')==2 else (300,3600)), 'exit_probe_time_invalid')
-    need(cfg.get('purpose')=='capacity' and cfg.get('client_workload')=='client-v3'
+    need(cfg.get('purpose')=='capacity' and cfg.get('client_workload')in('client-v3','client-v4')
          and cfg.get('actor_progress')=={'id':'active-business-v1','ttl_seconds':120}, 'exit_probe_requires_active_business_proof')
     mode=cfg.get('exit_smoothing','direct')
     need(mode in ('direct','jitter3-v1','queue32-v1','queue64-v1','queue128-v1','gradual120-v1','gradual240-v1'), 'exit_probe_policy_invalid')
@@ -389,7 +389,7 @@ def client_recovery_policy(cfg):
     expected = BUSY_RETRY_POLICIES.get(value.get('id')) if type(value) is dict and type(value.get('id')) is str else None
     need(expected is not None and value == expected
          and all(type(value[k]) is type(v) for k, v in expected.items())
-         and cfg.get('client_workload') == 'client-v3', 'client_recovery_policy_invalid')
+         and cfg.get('client_workload') in ('client-v3','client-v4'), 'client_recovery_policy_invalid')
     return dict(value)
 
 
@@ -397,7 +397,7 @@ def observation_mode(cfg):
     value = cfg.get('failure_mode', 'fail-fast')
     need(type(value) is str and value in ('fail-fast', 'observe-overload-v1'),
          'client_failure_mode_invalid')
-    need(value == 'fail-fast' or cfg.get('client_workload') == 'client-v3'
+    need(value == 'fail-fast' or cfg.get('client_workload') in ('client-v3','client-v4')
          and (cfg.get('client_recovery') or {}).get('id') in ('admission-busy-v3', 'admission-busy-v4'),
          'observation_requires_client_v3_recovery')
     return value == 'observe-overload-v1'
@@ -421,7 +421,7 @@ def generator_ports(cfg):
     need(expected is not None and set(value)=={'id','loopback_ports'}
          and type(value['loopback_ports'])is list and value['loopback_ports']==expected
          and all(type(port)is int for port in value['loopback_ports'])
-         and cfg.get('purpose')=='capacity' and cfg.get('client_workload')=='client-v3'
+         and cfg.get('purpose')=='capacity' and cfg.get('client_workload')in('client-v3','client-v4')
          and cfg.get('actor_progress')=={'id':'active-business-v1','ttl_seconds':120},
          'generator_transport_invalid')
     return tuple(value['loopback_ports'])

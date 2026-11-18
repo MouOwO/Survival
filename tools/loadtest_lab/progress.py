@@ -24,7 +24,7 @@ def validate_profile(cfg):
             or row['id'] != PROFILE_ID or type(row['ttl_seconds']) is not int
             or row['ttl_seconds'] != TTL_SECONDS
             or cfg.get('purpose') != 'capacity'
-            or cfg.get('client_workload') != 'client-v3'
+            or cfg.get('client_workload') not in ('client-v3','client-v4')
             or type(cfg.get('active')) is not int
             or not 1 <= cfg['active'] <= MAX_ACTORS
             or type(cfg.get('accounts')) is not int

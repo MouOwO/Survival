@@ -190,6 +190,23 @@ def full_workload_count_checks(final):
         'workload_workflow_counts_reconciled':(c['checkpoint_attempts'],c['checkpoint_failed'],c['finalization_attempts'],c['finalization_failed'])==(attempted,failed,flow['finalization']['requests'],flow['finalization']['failures']),
         'grant_followups_not_skipped':c['grant_responses']==c['grant_followup_attempts']==c['grant_followup_completed']and c['grant_followup_failed']==0 and c['grant_responses']<=c['grants_validated']<=128*c['checkpoint_attempts']}
 
+def inline_final_profile_count_checks(final,cfg):
+    value=final.get('inline_final_profile');c=final.get('run_state',{}).get('workload_counters',{})
+    names={'v','final_responses','marker_validated','eligible','inline_applied','fallback_HTTP'}
+    valid=(type(value)is dict and set(value)==names and type(value.get('v'))is int and value['v']==1
+           and all(type(v)is int and 0<=v<=10**12 for k,v in value.items()if k!='v'))
+    if not valid:return {'inline_final_transport_reconciled':False,'inline_final_server_proof_observed':False}
+    routes=final.get('routes',[])
+    actual_HTTP=sum(r.get('requests',0)for r in routes if r.get('method')=='POST'and r.get('name')=='[grant-followup] /v1/profile')
+    flow=next((r for r in final.get('workflow_statistics',[])if r.get('name')=='checkpoint_final'),{})
+    return {'inline_final_transport_reconciled':(value['eligible']==value['inline_applied']+value['fallback_HTTP']
+                and value['inline_applied']<=value['marker_validated']<=value['final_responses']
+                and c.get('grant_followup_attempts')==actual_HTTP+value['inline_applied']),
+            'inline_final_server_proof_observed':(value['final_responses']==value['marker_validated']==flow.get('requests')
+                and value['final_responses']>0 and (cfg.get('active',0)<=2 or value['inline_applied']>0)
+                and cfg.get('workload_profile',{}).get('final_profile',{}).get('id')=='post-drain-final-profile-v1')}
+
+
 def complete_final_counts(final, html, cfg, users=None):
     wire=final.get('business_wire',{})
     counters=wire.get('counters',{})
@@ -206,8 +223,8 @@ def complete_final_counts(final, html, cfg, users=None):
             'cleanup_outcomes_settled':valid_cleanup and cleanup['cleanup_attempts']==sum(cleanup[name] for name in names[1:]),
             'run_state_collection_complete':state.get('collection_complete')is True}
     mode=cfg.get('client_workload','legacy-v1')
-    checks['client_workload_bound']=mode in ('legacy-v1','client-v2','client-v3')and final.get('client_workload','legacy-v1')==mode
-    if mode in ('client-v2','client-v3'):
+    checks['client_workload_bound']=mode in ('legacy-v1','client-v2','client-v3','client-v4')and final.get('client_workload','legacy-v1')==mode
+    if mode in ('client-v2','client-v3','client-v4'):
         workflow = final.get('workflow_statistics')
         expected = {'checkpoint_setup', 'checkpoint_periodic', 'checkpoint_final', 'finalization'}
         valid = (type(workflow) is list and len(workflow) == 4
@@ -226,8 +243,9 @@ def complete_final_counts(final, html, cfg, users=None):
                         for row in workflow),
             known_event_methods_only=valid_routes and all(row.get('method') in
                 ('GET','POST','HEAD','PUT','PATCH','DELETE','OPTIONS','ASSERT','WORKFLOW') for row in routes))
-    if mode in ('client-v2','client-v3'):checks.update(full_workload_count_checks(final))
-    if mode=='client-v3':checks.update(compact_final_count_checks(final,cfg,users))
+    if mode in ('client-v2','client-v3','client-v4'):checks.update(full_workload_count_checks(final))
+    if mode in ('client-v3','client-v4'):checks.update(compact_final_count_checks(final,cfg,users))
+    if mode=='client-v4':checks.update(inline_final_profile_count_checks(final,cfg))
     if (cfg.get('client_recovery') or {}).get('retry_setup_control') == 1:
         if str(PROJECT) not in sys.path: sys.path.insert(0, str(PROJECT))
         from loadtest_lab.workload import recovery_route_count_checks

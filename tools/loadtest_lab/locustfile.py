@@ -87,7 +87,7 @@ def run_state():
             'quit_requested': RUN_QUIT_REQUESTED, 'notification_failed': RUN_NOTIFICATION_FAILED,
             'stopping': RUN_STOPPING, 'stopped': RUN_STOPPED,
             'counters': dict(RUN_COUNTERS)}
-    if CLIENT_PROFILE.mode in ('client-v2', 'client-v3'):
+    if CLIENT_PROFILE.mode in ('client-v2', 'client-v3', 'client-v4'):
         value.update(client_workload=CLIENT_PROFILE.mode, workload_counters=dict(WORKLOAD_COUNTS))
     if EXIT_PROBE is not None:
         value['exit_probe'] = dict(EXIT_PROBE,triggered=RUN_EXIT_PROBE_TRIGGERED,metrics=dict(EXIT_METRICS))
@@ -197,7 +197,7 @@ def validate_run_state(state):
             or state.get('first_failure') is not None
             and failure_label(state['first_failure'], 'invalid_worker_failure') != state['first_failure']):
         raise ValueError('loadtest_worker_run_state_invalid')
-    if CLIENT_PROFILE.mode in ('client-v2', 'client-v3'):
+    if CLIENT_PROFILE.mode in ('client-v2', 'client-v3', 'client-v4'):
         if state.get('client_workload') != CLIENT_PROFILE.mode:
             raise ValueError('loadtest_worker_workload_mismatch')
         validate_workload_counters(state.get('workload_counters'))
@@ -226,12 +226,12 @@ def final_run_state(environment):
         if state is not None:
             for name in counters:
                 counters[name] += state['counters'][name]
-            if CLIENT_PROFILE.mode in ('client-v2', 'client-v3'):
+            if CLIENT_PROFILE.mode in ('client-v2', 'client-v3', 'client-v4'):
                 for name in workload:
                     workload[name] += state['workload_counters'][name]
     value = run_state() | {'scope': 'latest_cumulative_worker_snapshots',
                           'counters': counters, 'collection_complete': complete}
-    if CLIENT_PROFILE.mode in ('client-v2', 'client-v3'):
+    if CLIENT_PROFILE.mode in ('client-v2', 'client-v3', 'client-v4'):
         value['workload_counters'] = workload
     return value
 
@@ -456,7 +456,7 @@ def mark_stopping(environment, **kwargs):
     RUN_STOPPING = True
     wave=globals().get('DEPARTURE_WAVE')
     if wave is not None:wave.stop_dispatch()
-    if CLIENT_PROFILE.mode in ('client-v2', 'client-v3') and RUN_STOPPING_AT is None:
+    if CLIENT_PROFILE.mode in ('client-v2', 'client-v3', 'client-v4') and RUN_STOPPING_AT is None:
         RUN_STOPPING_AT = time.monotonic()
     if PROGRESS_INDEX is not None and not PROGRESS_FROZEN:
         try:
@@ -570,7 +570,7 @@ class SyntheticPlayer(_HTTPBase):
         if getattr(self, '_isolated_failure', False):
             return 30
         next_due = min(self.next_activity, self.player.next_checkpoint)
-        if CLIENT_PROFILE.mode == 'client-v3':
+        if CLIENT_PROFILE.mode in ('client-v3','client-v4'):
             from loadtest_lab.workload import compact_rooms
             try:
                 next_due=min(next_due,compact_rooms().next_poll(self.player))
@@ -683,7 +683,7 @@ class SyntheticPlayer(_HTTPBase):
             cleanup = (getattr(self, '_finalizing', False) and existing is not None
                        and existing.identity is not None and method == 'POST'
                        and (path in ('/v1/online-time/checkpoint', '/_loadtest/release')
-                            or CLIENT_PROFILE.mode in ('client-v2', 'client-v3') and path == '/v1/profile'
+                            or CLIENT_PROFILE.mode in ('client-v2', 'client-v3', 'client-v4') and path == '/v1/profile'
                             and getattr(existing, 'grant_followup_final', False)))
             if not cleanup:
                 raise StopUser()
@@ -759,13 +759,13 @@ class SyntheticPlayer(_HTTPBase):
             target_url(self.environment.host or self.host)
             if 'generator_transport'in CFG:
                 self.client.base_url=generator_url(CFG,RUN_COUNTERS['start_attempts']-1)
-            if CLIENT_PROFILE.mode == 'client-v3':
+            if CLIENT_PROFILE.mode in ('client-v3','client-v4'):
                 from locust.runners import LocalRunner
                 if not isinstance(self.environment.runner, LocalRunner):
                     raise ValueError('compact_client_requires_single_local_worker')
             self._finalizing = False
             self._progress_slot = self._progress_last_success = None
-            if CLIENT_PROFILE.mode in ('client-v2', 'client-v3'):
+            if CLIENT_PROFILE.mode in ('client-v2', 'client-v3', 'client-v4'):
                 self.player = Player(self.exchange, CFG, CONTROLLER,
                                      workflow_observer=self.record_workflow)
             else:
@@ -803,7 +803,7 @@ class SyntheticPlayer(_HTTPBase):
             player = self.player
             if player.clock() >= player.next_checkpoint:
                 player.checkpoint()
-            if CLIENT_PROFILE.mode == 'client-v3':
+            if CLIENT_PROFILE.mode in ('client-v3','client-v4'):
                 from loadtest_lab.workload import compact_rooms
                 compact_rooms().tick(player)
             if time.monotonic() < self.next_activity:
@@ -815,9 +815,9 @@ class SyntheticPlayer(_HTTPBase):
             elif draw < .45:
                 player.read_profile()
             elif draw < .65:
-                player.local_view() if CLIENT_PROFILE.mode == 'client-v3' else player.snapshot()
+                player.local_view() if CLIENT_PROFILE.mode in ('client-v3','client-v4') else player.snapshot()
             elif draw < .75:
-                player.local_view() if CLIENT_PROFILE.mode == 'client-v3' else player.catalog()
+                player.local_view() if CLIENT_PROFILE.mode in ('client-v3','client-v4') else player.catalog()
             elif draw < .90:
                 player.endless_batch(1)
             else:
@@ -849,7 +849,7 @@ class SyntheticPlayer(_HTTPBase):
             EXIT_METRICS['active']+=1
             EXIT_METRICS['peak']=max(EXIT_METRICS['peak'],EXIT_METRICS['active'])
             try:
-                if CLIENT_PROFILE.mode in ('client-v2','client-v3'):
+                if CLIENT_PROFILE.mode in ('client-v2','client-v3','client-v4'):
                     intent=getattr(self,'_exit_wave_intent',None)
                     self.player.stop(intent_started=RUN_STOPPING_AT if intent is None else intent)
                 else:
@@ -913,7 +913,7 @@ class SyntheticPlayer(_HTTPBase):
 
 
 def workload_statistics(environment, run):
-    if CLIENT_PROFILE.mode not in ('client-v2', 'client-v3'):
+    if CLIENT_PROFILE.mode not in ('client-v2', 'client-v3', 'client-v4'):
         return {}
     counters = run['workload_counters']
     entries = {entry.name: entry for entry in environment.stats.entries.values()
@@ -931,7 +931,8 @@ def workload_statistics(environment, run):
                      'p95_ms': None if not count else entry.get_response_time_percentile(.95)})
     checkpoint_count = sum(row['requests'] for row in rows if row['name'].startswith('checkpoint_'))
     final_count = next(row['requests'] for row in rows if row['name'] == 'finalization')
-    return {**({'compact_client': __import__('loadtest_lab.workload',fromlist=['compact_rooms']).compact_rooms().report()} if CLIENT_PROFILE.mode == 'client-v3' else {}),
+    return {**({'compact_client': __import__('loadtest_lab.workload',fromlist=['compact_rooms']).compact_rooms().report()} if CLIENT_PROFILE.mode in ('client-v3','client-v4') else {}),
+            **({'inline_final_profile':__import__('loadtest_lab.workload',fromlist=['inline_final_profile_report']).inline_final_profile_report()}if CLIENT_PROFILE.mode=='client-v4'else{}),
             'client_workload': CLIENT_PROFILE.mode, 'workload_counters': counters,
             'workflow_statistics': rows,
             'workflow_statistics_complete': checkpoint_count == counters['checkpoint_attempts']
@@ -992,7 +993,7 @@ def exit_on_failure(environment, **kwargs):
             **({'http_requests': http_requests,
                 'http_failures': sum(entry.num_failures for entry in environment.stats.entries.values()
                     if entry.method in ('GET', 'POST', 'HEAD', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'))}
-               if CLIENT_PROFILE.mode in ('client-v2', 'client-v3') else {}),
+               if CLIENT_PROFILE.mode in ('client-v2', 'client-v3', 'client-v4') else {}),
             'reset_stats_requested': bool(getattr(environment.parsed_options, 'reset_stats', False)),
             'routes': [{'method': entry.method, 'name': entry.name,
                         'requests': entry.num_requests, 'failures': entry.num_failures}

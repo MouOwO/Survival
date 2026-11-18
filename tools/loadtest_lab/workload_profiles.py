@@ -20,7 +20,7 @@ from types import MappingProxyType
 
 from .guard import canonical, need
 
-MODES = frozenset(('legacy-v1', 'client-v2', 'client-v3'))
+MODES = frozenset(('legacy-v1', 'client-v2', 'client-v3', 'client-v4'))
 CSV_SOURCE = 'addon/data/csv/玩家档案系统/star_blessing_reward_definitions.csv'
 MAX_DEFINITIONS = 256
 MAX_GRANTS = MAX_SEEN_GRANTS = 128
@@ -61,7 +61,7 @@ def _rule(row):
     return identity, (row['definition_version'], row['enabled'], row['effect_scope'], low, high)
 
 
-def build_workload_profile(csv_bytes, mode='client-v2', *, compact_seed=None):
+def build_workload_profile(csv_bytes, mode='client-v2', *, compact_seed=None, final_consumer=None):
     """Prepare public metadata from the actual exported reward CSV bytes."""
     need(type(csv_bytes) is bytes and 1 <= len(csv_bytes) <=256*1024,
          'workload_csv_budget_invalid')
@@ -94,8 +94,9 @@ def build_workload_profile(csv_bytes, mode='client-v2', *, compact_seed=None):
     result = {'id': mode, 'source': CSV_SOURCE,
               'source_sha256': hashlib.sha256(csv_bytes).hexdigest(),
               'rules': sorted(rows, key=lambda row: row['reward_id'])}
-    need(mode in ('client-v2', 'client-v3'), 'client_profile_mode_invalid')
-    if mode == 'client-v3':result['compact'] = compact_contract(compact_seed)
+    need(mode in ('client-v2', 'client-v3', 'client-v4'), 'client_profile_mode_invalid')
+    if mode in ('client-v3','client-v4'):result['compact'] = compact_contract(compact_seed)
+    if mode == 'client-v4':result['final_profile'] = final_profile_contract(final_consumer)
     return result
 
 
@@ -137,7 +138,8 @@ def validate_workload_profile(cfg, read_source=None):
         need('workload_profile' not in cfg, 'legacy_workload_metadata_unexpected')
         return _LEGACY
     value = cfg.get('workload_profile')
-    keys = {'id', 'source', 'source_sha256', 'rules'} | ({'compact'} if mode == 'client-v3' else set())
+    keys = {'id', 'source', 'source_sha256', 'rules'} | ({'compact'} if mode in ('client-v3','client-v4') else set())
+    if mode == 'client-v4':keys.add('final_profile')
     need(type(value) is dict and set(value) == keys
          and value.get('id') == mode and value.get('source') == CSV_SOURCE,
          'workload_profile_binding_invalid')
@@ -155,14 +157,22 @@ def validate_workload_profile(cfg, read_source=None):
     need(order == sorted(order), 'workload_rule_order_invalid')
     if read_source is not None:
         raw = read_source(CSV_SOURCE)
-        need(type(raw) is bytes and canonical(build_workload_profile(raw, mode, compact_seed=read_source(COMPACT_TARGET) if mode == 'client-v3' else None)) == canonical(value),
+        need(type(raw) is bytes and canonical(build_workload_profile(raw, mode, compact_seed=read_source(COMPACT_TARGET) if mode in ('client-v3','client-v4') else None,final_consumer=read_source(FINAL_CONSUMER_TARGET) if mode=='client-v4'else None)) == canonical(value),
              'workload_csv_rules_mismatch')
     compact = None
-    if mode == 'client-v3':
+    if mode in ('client-v3','client-v4'):
         compact = value['compact']
         need(type(compact) is dict and canonical(compact) == canonical(COMPACT_METADATA), 'compact_client_metadata_changed')
         need(cfg.get('sources', {}).get(COMPACT_TARGET) == COMPACT_SEED_SHA and cfg.get('lottery_catalog_md5') == compact['catalog_md5'], 'compact_seed_source_binding_changed')
         compact = MappingProxyType(dict(compact))
+    if mode=='client-v4':
+        proof=value['final_profile']
+        need(type(proof)is dict and set(proof)=={'id','source','source_sha256','capability','marker_value'}
+             and proof.get('id')=='post-drain-final-profile-v1'and proof.get('source')==FINAL_CONSUMER_TARGET
+             and type(proof.get('source_sha256'))is str and re.fullmatch('[a-f0-9]{64}',proof['source_sha256'])
+             and cfg.get('sources',{}).get(FINAL_CONSUMER_TARGET)==proof['source_sha256']
+             and proof.get('capability')=='final_profile_committed_v1'and type(proof.get('marker_value'))is int and proof['marker_value']==1
+             and cfg.get('generator_transport')=={'id':'linux-loopback-v1','loopback_ports':[29567]},'final_profile_contract_binding_invalid')
     return ClientProfile(mode, MappingProxyType(rules), compact)
 
 
@@ -195,3 +205,12 @@ def compact_contract(raw):
     need(data.get('schema')==1 and type(data.get('snapshots'))is list and len(data['snapshots'])==4,'compact_catalog_shape_invalid')
     need({s['selected_pool_id']:s['selected_pool']['revision']for s in data['snapshots']}==COMPACT_METADATA['pool_revisions'],'compact_pool_revision_changed')
     return dict(COMPACT_METADATA)
+
+# Explicit V4-only consumer binding; V2/V3 metadata and paths remain unchanged.
+FINAL_CONSUMER_TARGET = 'addon/scripts/vscripts/systems/online_time_service.lua'
+
+def final_profile_contract(raw):
+    need(type(raw)is bytes and 1<=len(raw)<=128*1024,'final_profile_consumer_source_invalid')
+    return {'id':'post-drain-final-profile-v1','source':FINAL_CONSUMER_TARGET,
+            'source_sha256':hashlib.sha256(raw).hexdigest(),
+            'capability':'final_profile_committed_v1','marker_value':1}

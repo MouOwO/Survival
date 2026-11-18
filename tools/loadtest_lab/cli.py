@@ -155,14 +155,14 @@ def prepare(args):
     transport=getattr(args,'generator_transport','baseline')
     need(transport in ('baseline','ssh-quad-v1','ssh-16-v1','linux-loopback-v1'),'generator_transport_option_invalid')
     if transport in ('ssh-quad-v1','ssh-16-v1','linux-loopback-v1'):
-        need(purpose=='capacity'and getattr(args,'client_workload',None)=='client-v3'
+        need(purpose=='capacity'and getattr(args,'client_workload',None)in('client-v3','client-v4')
              and getattr(args,'actor_progress',None)=='active-business-v1','generator_transport_requires_capacity_client_v3')
         cfg['generator_transport']={'id':transport,'loopback_ports':list(range(29567,29567+(1 if transport=='linux-loopback-v1'else 4 if transport=='ssh-quad-v1'else 16)))}
     probe_seconds=getattr(args,'exit_probe_common_seconds',None)
     smoothing=getattr(args,'exit_smoothing','direct')
     if probe_seconds is not None:
         need(type(probe_seconds)is int and probe_seconds in ((60,) if args.active==2 else (300,3600))
-             and args.purpose=='capacity' and getattr(args,'client_workload',None)=='client-v3'
+             and args.purpose=='capacity' and getattr(args,'client_workload',None)in('client-v3','client-v4')
              and getattr(args,'actor_progress',None)=='active-business-v1', 'exit_probe_options_invalid')
         cfg['exit_probe_common_seconds']=probe_seconds
         cfg['exit_smoothing']=smoothing
@@ -260,7 +260,7 @@ def prepare(args):
     from .leaderboard_experiments import apply_leaderboard_binding
     apply_leaderboard_binding(root, cfg, revision,
         mode=getattr(args, 'leaderboard_binding', 'baseline'), repository=ROOT)
-    from .workload_profiles import build_workload_profile, CSV_SOURCE, COMPACT_TARGET, COMPACT_SEED_SHA
+    from .workload_profiles import build_workload_profile, CSV_SOURCE, COMPACT_TARGET, COMPACT_SEED_SHA, FINAL_CONSUMER_TARGET
     client_workload = getattr(args, 'client_workload', 'legacy-v1')
     if client_workload != 'legacy-v1':
         cfg['client_workload'] = client_workload
@@ -274,7 +274,13 @@ def prepare(args):
             from .workload_profiles import COMPACT_METADATA
             need(cfg.get('lottery_catalog_md5')in(None,COMPACT_METADATA['catalog_md5']),'compact_catalog_argument_mismatch')
             cfg['lottery_catalog_md5']=COMPACT_METADATA['catalog_md5']
-        cfg['workload_profile'] = build_workload_profile((root / CSV_SOURCE).read_bytes(),client_workload,compact_seed=compact_seed)
+        final_consumer=None
+        if client_workload=='client-v4':
+            source='scripts/vscripts/systems/online_time_service.lua'
+            final_consumer=subprocess.run(['git','-C',str(ROOT),'show',revision+':'+source],capture_output=True,check=True,timeout=20).stdout
+            need(final_consumer.replace(b'\r\n',b'\n')==(ROOT/source).read_bytes().replace(b'\r\n',b'\n'),'final_consumer_must_match_committed_source')
+            target=root/FINAL_CONSUMER_TARGET;need(not target.exists(),'final_consumer_target_exists');target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(final_consumer);cfg['sources'][FINAL_CONSUMER_TARGET]=sha(final_consumer)
+        cfg['workload_profile'] = build_workload_profile((root / CSV_SOURCE).read_bytes(),client_workload,compact_seed=compact_seed,final_consumer=final_consumer)
     recovery = getattr(args, 'client_recovery', 'baseline')
     if recovery != 'baseline':
         from .guard import BUSY_RETRY_POLICIES, client_recovery_policy
@@ -499,7 +505,7 @@ def main(argv=None):
                       help='Fresh mature synthetic seed only: bounded WAL/checkpoints; exact original settings restored before ready')
     init.add_argument('--mature-fixture', choices=('mature-v1',),
                       help='Opt-in bounded synthetic mature data; native2/40 validation required before large seed')
-    init.add_argument('--client-workload', choices=('legacy-v1', 'client-v2', 'client-v3'), default='legacy-v1',
+    init.add_argument('--client-workload', choices=('legacy-v1', 'client-v2', 'client-v3', 'client-v4'), default='legacy-v1',
                       help='client-v2 includes grant-triggered profile refresh and complete workflow timing')
     init.add_argument('--checkpoint-lifecycle', choices=('baseline', 'lifecycle-v1'), default='baseline',
                       help='New isolated labs only: indexed online-session closure and request binding SQL candidate')
