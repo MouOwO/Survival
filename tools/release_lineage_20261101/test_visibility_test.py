@@ -47,6 +47,7 @@ class VisibilityTests(unittest.TestCase):
         self.request = dict(parent_journal_sha256=self.f.parent_sha, generation=1,
             release_sequence=104, baseline_sha256='6' * 64, steam_manifest='123',
             authority_sha256=self.f.pin, operator_files=list(v.OPERATORS), approval=approval,
+            authorization_budget={'previous_receipt': None, 'public_seconds_before': 0.0},
             source_revisions={'game': 'c' * 40, 'content': 'd' * 40}, request_sha256='7' * 64)
 
     def call(self, suffix, args, result):
@@ -131,10 +132,13 @@ class VisibilityTests(unittest.TestCase):
         (report / 'request.json').write_bytes(g.canonical(request))
         request_sha = g.sha((report / 'request.json').read_bytes())
         calls = []
+        active = [0]
         outer = self
         class FakeSteam:
-            def __enter__(self): return self
-            def __exit__(self, *args): pass
+            def __enter__(self):
+                active[0] += 1
+                return self
+            def __exit__(self, *args): active[0] -= 1
             def ug(self, suffix, result_type, arg_types, *args):
                 calls.append((suffix, args))
                 result = len(calls) + 100 if suffix != 'SetItemVisibility' else True
@@ -149,8 +153,11 @@ class VisibilityTests(unittest.TestCase):
         results = [snapshot, snapshot, TimeoutError('simulated readback failure')
                    if public_query_error else dict(snapshot, visibility=0), snapshot, snapshot]
         sdk = SimpleNamespace(Steam=FakeSteam, APP=570, Submitted=object())
+        def stop_after_sdk_shutdown(*args):
+            self.assertEqual(active[0], 0, 'SDK must be released during observation')
+            return True
         with patch.dict(sys.modules, steam_workshop_upload=sdk), patch.object(v, 'fresh_item',
-                side_effect=results), patch.object(v, 'early_restore', return_value=True):
+                side_effect=results), patch.object(v, 'early_restore', side_effect=stop_after_sdk_shutdown):
             receipt = v.run(self.f.authority, report, request_sha)
         self.assertEqual([args[1] for suffix, args in calls if suffix == 'SetItemVisibility'], [0, 3])
         self.assertIsNone(g.read_json(self.f.state)[0]['pending'])
@@ -165,6 +172,19 @@ class VisibilityTests(unittest.TestCase):
         receipt = self.run_mock_sdk(public_query_error=True)
         self.assertIn('TimeoutError', receipt['test_error'])
         self.assertEqual(receipt['status'], 'VISIBILITY_TEST_RESTORED_UNLISTED')
+
+    def test_retest_carries_prior_exposure_and_closed_authorization_refuses_reuse(self):
+        receipt = self.run_mock_sdk()
+        state, _ = g.read_json(self.f.state)
+        budget = v.authorization_budget(state)
+        self.assertEqual(budget['public_seconds_before'], receipt['public_to_verified_restore_seconds'])
+        self.assertEqual(budget['previous_receipt'], state['last_visibility_test_receipt'])
+        path = Path(state['last_visibility_test_receipt']['path'])
+        receipt['authorization_closed'] = True
+        path.write_bytes(g.canonical(receipt))
+        state['last_visibility_test_receipt']['sha256'] = g.sha(path.read_bytes())
+        with self.assertRaisesRegex(g.Refused, 'authorization_already_closed'):
+            v.authorization_budget(state)
 
 
 if __name__ == '__main__':

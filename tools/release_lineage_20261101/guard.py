@@ -579,7 +579,7 @@ class _VisibilityTestLease(_Lease):
 @contextmanager
 def visibility_test_lease(authority, request):
     from release_packager.core import baseline
-    from release_visibility_test import OPERATORS, APPROVAL, validate_approval
+    from release_visibility_test import OPERATORS, APPROVAL, validate_approval, authorization_budget
     need(_ACTIVE.get() is None, 'nested_release_lease_refused')
     with exclusive_lock(authority.policy['publication_lock']):
         project = Path(authority.policy['repositories']['game'])
@@ -588,6 +588,8 @@ def visibility_test_lease(authority, request):
         parent, raw = read_json(authority.policy['canonical_journal'])
         _identity(authority, parent)
         need(state.get('pending') is None, 'pending_publication_requires_separate_reconciliation')
+        need(request['authorization_budget'] == authorization_budget(state),
+             'visibility_authorization_budget_changed')
         need(request['parent_journal_sha256'] == sha(raw) == state['head']['canonical_journal_sha256']
              and request['generation'] == state['generation'] + 1
              and request['release_sequence'] == state['head']['sequence']

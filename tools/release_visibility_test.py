@@ -33,6 +33,26 @@ def validate_approval(value, item):
     guard.need(item == '3824360109', 'only_original_authorized_item')
 
 
+def authorization_budget(state):
+    """Carry the first, verified failed-environment window into one final retest."""
+    prior = state.get('last_visibility_test_receipt')
+    if prior is None:
+        return dict(previous_receipt=None, public_seconds_before=0.0)
+    receipt, raw = guard.read_json(prior['path'])
+    guard.need(guard.sha(raw) == prior['sha256']
+               and receipt.get('status') == 'VISIBILITY_TEST_RESTORED_UNLISTED'
+               and receipt.get('final_visibility') == 3
+               and not receipt.get('authorization_closed', False), 'visibility_authorization_already_closed')
+    request, request_raw = guard.read_json(Path(prior['path']).parent / 'request.json')
+    guard.need(guard.sha(request_raw) == receipt['request_sha256']
+               and request['approval']['proposal_sha256'] == PROPOSAL_SHA,
+               'same_authorization_verified_prior_window_required')
+    spent = receipt['public_to_verified_restore_seconds']
+    guard.need(type(spent) in (int, float) and 0 <= spent <= 300,
+               'insufficient_authorized_time_for_final_retest')
+    return dict(previous_receipt=prior, public_seconds_before=spent)
+
+
 def plan(auth, source, report):
     project = Path(auth.policy['repositories']['game'])
     guard.revision(source)
@@ -49,6 +69,7 @@ def plan(auth, source, report):
         release_sequence=current['baseline']['parent_sequence'],
         steam_manifest=current['baseline']['official_parent_manifest'],
         baseline_sha256=current['cursor']['baseline_sha256'], approval=approval,
+        authorization_budget=authorization_budget(current['lineage']),
         source_revisions={'game': source, 'content': git(auth.policy['repositories']['content'],
             'rev-parse', 'HEAD').decode().strip()}, operator_files=list(OPERATORS))
     report = guard.regular(report)
@@ -112,32 +133,49 @@ def run(auth, report, request_sha):
                 public = fresh_item(steam, auth.policy['workshop_id'], sdk, timeout=30)
                 write_new(report / 'public.json', public)
                 verify_snapshot(before['schinese'], public, 0)
-                print(json.dumps(dict(status='PUBLIC_VERIFIED_TEST_WINDOW', restore_after_seconds=180,
-                                      request_sha256=request_sha)), flush=True)
-                while time.monotonic() - started < 180 and not early_restore(report, request_sha):
-                    time.sleep(0.25)
             except Exception as error:
                 test_error = type(error).__name__ + ':' + str(error)
                 write_new(report / 'test_error.json', dict(error=test_error, restore_required=True))
-            # Always restore after a public submission, even if its readback/test
-            # failed. This is the separately authorized inverse update, never a
-            # replay of an unknown public submission. A fresh query was attempted.
+        # SteamAPI_Shutdown runs before the observation window. The publication
+        # lock/lease remains held; the client already exists before public submit.
+        try:
+            if test_error is None:
+                print(json.dumps(dict(status='PUBLIC_VERIFIED_SDK_RELEASED_TEST_WINDOW',
+                    restore_after_seconds=180, request_sha256=request_sha)), flush=True)
+                while time.monotonic() - started < 180 and not early_restore(report, request_sha):
+                    time.sleep(0.25)
+        except Exception as error:
+            test_error = type(error).__name__ + ':' + str(error)
+            write_new(report / 'window_error.json', dict(error=test_error, restore_required=True))
+        finally:
             lease.prepare_restore_attempt(public, query_attempted=True)
-            _, restore_result = update(steam, sdk, auth.policy['workshop_id'], 3, report, 'restore')
-            after = {language: fresh_item(steam, auth.policy['workshop_id'], sdk, language,
-                     timeout=30) for language in ('schinese', 'english')}
-            write_new(report / 'after.json', after)
-            for language in after:
-                verify_snapshot(before[language], after[language], 3)
-            elapsed = time.monotonic() - started
-            receipt = dict(status='VISIBILITY_TEST_RESTORED_UNLISTED', request_sha256=request_sha,
-                final_visibility=3, public_to_verified_restore_seconds=elapsed,
-                maximum_public_seconds=600, within_authorized_window=elapsed <= 600,
-                public_callback=public_result, restore_callback=restore_result,
-                test_error=test_error, release_sequence=request['release_sequence'],
-                steam_manifest=request['steam_manifest'], source_revisions=request['source_revisions'],
-                protected_fields_unchanged=True, content_upload_performed=False,
-                canonical_package_journal_changed=False, backend_changed=False)
-            write_new(report / 'verification.json', receipt)
-            lease.finish_visibility_test(report / 'verification.json')
-            return receipt
+            with sdk.Steam() as steam:
+                receipt = restore(steam, sdk, auth, report, request, request_sha, lease,
+                                  before, started, public_result, test_error)
+        return receipt
+
+
+def restore(steam, sdk, auth, report, request, request_sha, lease, before, started,
+            public_result, test_error):
+    _, restore_result = update(steam, sdk, auth.policy['workshop_id'], 3, report, 'restore')
+    after = {language: fresh_item(steam, auth.policy['workshop_id'], sdk, language,
+             timeout=30) for language in ('schinese', 'english')}
+    write_new(report / 'after.json', after)
+    for language in after:
+        verify_snapshot(before[language], after[language], 3)
+    elapsed = time.monotonic() - started
+    receipt = dict(status='VISIBILITY_TEST_RESTORED_UNLISTED', request_sha256=request_sha,
+        final_visibility=3, public_to_verified_restore_seconds=elapsed,
+        maximum_public_seconds=600,
+        cumulative_public_seconds=request['authorization_budget']['public_seconds_before'] + elapsed,
+        within_authorized_window=request['authorization_budget']['public_seconds_before'] + elapsed <= 600,
+        authorization_closed=request['authorization_budget']['previous_receipt'] is not None,
+        authorization_budget=request['authorization_budget'],
+        public_callback=public_result, restore_callback=restore_result,
+        test_error=test_error, release_sequence=request['release_sequence'],
+        steam_manifest=request['steam_manifest'], source_revisions=request['source_revisions'],
+        protected_fields_unchanged=True, content_upload_performed=False,
+        canonical_package_journal_changed=False, backend_changed=False)
+    write_new(report / 'verification.json', receipt)
+    lease.finish_visibility_test(report / 'verification.json')
+    return receipt
