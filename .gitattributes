@@ -535,3 +535,8 @@ scripts/vscripts/tests/test_file_http_bridge.lua text eol=lf
 tools/workshop_test/file_http_bridge.py text eol=lf
 tools/workshop_test/test_file_http_bridge.py text eol=lf
 tools/workshop_test/FILE_HTTP_BRIDGE.md text eol=lf
+
+# Packager pack_2026111807_52398505
+tools/complete_delivery_pack_2026111807_398505/*.py text eol=lf
+publishing/workshop/packager_pack_2026111807_52398505_authority.json text eol=lf
+publishing/workshop/packager_pack_2026111807_52398505_authorization.json text eol=lf
