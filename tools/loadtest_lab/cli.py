@@ -265,7 +265,7 @@ def prepare(args):
     if client_workload != 'legacy-v1':
         cfg['client_workload'] = client_workload
         compact_seed = None
-        if client_workload == 'client-v3':
+        if client_workload in ('client-v3','client-v4'):
             source = 'data/ui/lottery_catalog.json'
             compact_seed = subprocess.run(['git','-C',str(ROOT),'show',revision+':'+source],capture_output=True,check=True,timeout=20).stdout
             need(sha(compact_seed)==COMPACT_SEED_SHA and compact_seed.replace(b'\r\n',b'\n')==(ROOT/source).read_bytes().replace(b'\r\n',b'\n'),'compact_catalog_must_match_committed_source')
