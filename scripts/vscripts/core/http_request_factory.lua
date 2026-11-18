@@ -22,9 +22,17 @@ function M.create(method, url)
     if request then return request, "os", true end
     local second
     request, second = attempt(legacy, method, url)
+    if not request then
+        local ok, bridge = pcall(require, "core/file_http_bridge")
+        if ok and type(bridge) == "table" and type(bridge.create) == "function" then
+            local created, fallback = pcall(bridge.create, method, url)
+            if created then request = fallback end
+        end
+    end
     return request, first .. second, type(primary) == "function" or type(legacy) == "function"
 end
 
 -- No startup work, scans, timers or HTTP. Per request: at most two native
 -- creations, then exactly the caller's existing Send path for one object.
+-- A closed-test helper object is considered only after both native failures.
 return M

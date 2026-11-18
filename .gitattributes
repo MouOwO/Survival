@@ -527,3 +527,11 @@ publishing/workshop/packager_pack_2026111805_7c0a5980_authorization.json text eo
 tools/complete_delivery_pack_2026111806_376c35/*.py text eol=lf
 publishing/workshop/packager_pack_2026111806_0f376c35_authority.json text eol=lf
 publishing/workshop/packager_pack_2026111806_0f376c35_authorization.json text eol=lf
+
+# Closed-test HTTPS file transport
+scripts/vscripts/config/file_http_bridge.lua text eol=lf
+scripts/vscripts/core/file_http_bridge.lua text eol=lf
+scripts/vscripts/tests/test_file_http_bridge.lua text eol=lf
+tools/workshop_test/file_http_bridge.py text eol=lf
+tools/workshop_test/test_file_http_bridge.py text eol=lf
+tools/workshop_test/FILE_HTTP_BRIDGE.md text eol=lf

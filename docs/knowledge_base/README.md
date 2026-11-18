@@ -1,5 +1,7 @@
 # 我在dota2苟发育／Survival 统一知识库
 
+**2026-11-18 完整临时HTTP适配层已实现，普通引擎匿名往返真实通过。** 两原生工厂nn时，固定文件桥→助手一次HTTPS GET→Lua收到200/119字节/health_ok=true；Tools=false、sv_cheats0。7项Python、24项Lua及原工厂/PWA/在线支付回归通过，临时入口及cfg已恢复。真实Steam授权、云档案及正式签包/游廊验证尚待；1806及后台未改，Steam验签READY。见[实现、真实失败与成功、成本和待办](evidence/file_http_bridge_recovery_20261118.md)。
+
 **2026-11-18 普通引擎匿名文件往返已打通，尚未恢复正式登录。** 本地非Tools、sv_cheats0的开发诊断入口请求→助手HTTPS GET200→脚本解析119字节健康响应/ok=true实际成功；1次请求、51次固定小文件轮询、完成后停止。用户已接受辅助程序。通用适配、Steam授权、云档案和正式签包验证仍待，不把匿名nonce当登录凭证。临时源码/cfg及端口规则已恢复，正式1806与后台未改。见[真实证据、限制和下一步](evidence/native_file_bridge_proof_20261118.md)。
 
 **2026-11-18 不经游廊的本地Dota脚本也无法创建HTTP，正式联网仍未恢复。** 本机直连HTTPS GET200/POST403均有响应；同写法本地Tools VM GET/POST均nn、Send0，与正式游廊及用户另一台F:nn/H:l相符，不能只归因游廊包。未启用离线玩法或重发运行包。用户接受联网辅助，但普通客户端两轮未开放VConsole，转发方案尚未验证。Tools已正常退出、助手及临时端口规则恢复，100项生成缓存备份/stash保留。见[真实三层对照及范围](evidence/http_environment_control_20261118.md)。
