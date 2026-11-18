@@ -29,6 +29,11 @@ local function fixture()
         check(name == "survival_workshop_network_probe" and default == "0" and flags == 0, "inert diagnostic default only")
         state.registrations = state.registrations + 1
         if state.probe_value == nil then state.probe_value = default end
+    end, RegisterCommand = function(_, name, callback, description, flags)
+        check(name == "survival_workshop_network_probe_start" and type(callback) == "function" and flags == 0,
+            "one parameter-free guarded diagnostic command")
+        state.command_registrations = (state.command_registrations or 0) + 1
+        state.probe_command = callback
     end, GetStr = function(_, name)
         if name == "survival_workshop_network_probe" then return state.probe_value end
         if name == "sv_cheats" then return state.cheats end
@@ -364,3 +369,28 @@ do
     check(state.registrations==1,"new world reuses registration while lifecycle remains separate")
 end
 print("EXPLICIT_PROBE_GATE_PASS: default 0 HTTP/0 timers/0 policy reads; explicit original flow; off/reload/context-safe; simulation only")
+
+-- Operator opt-in after ordinary map initialization must be reachable without
+-- cheats, source reload, another room, arbitrary arguments or additional HTTP.
+do
+ local env,state,probe=fixture();state.probe_value="0"
+ check(probe.activate()==false and state.schedules==0 and #state.requests==0,"default stays inert")
+ check(type(state.probe_command)=="function" and state.command_registrations==1,"late opt-in has an explicit entry")
+ check(state.probe_command("survival_workshop_network_probe_start")==false and state.schedules==0 and #state.requests==0,"command cannot enable opt-in")
+ local before=#state.logs
+ check(state.probe_command("survival_workshop_network_probe_start","PRIVATE")==false and #state.logs==before,"arguments cannot trigger or leak")
+ state.probe_value="1"
+ check(state.probe_command("survival_workshop_network_probe_start")==true and state.schedules==1,"explicit late command starts real probe")
+ state.advance(1);check(#state.requests==2,"late path retains fixed anonymous pair")
+ check(state.probe_command("survival_workshop_network_probe_start")==true and state.schedules==1,"repeat command cannot restart")
+ state.advance(301);local requests=#state.requests
+ state.probe_command("survival_workshop_network_probe_start");state.advance(301)
+ check(#state.requests==requests and requests<=16 and state.schedules==1,"finished run cannot exceed original limits")
+ check(state.command_registrations==1,"command binding remains one per VM")
+end
+do
+ local env,state,probe=fixture();state.probe_value="0";probe.activate();state.probe_value="1";state.admitted=false
+ check(state.probe_command("survival_workshop_network_probe_start")==false and #state.requests==0 and state.schedules==0,"manual command preserves admission policy")
+end
+for _,item in ipairs(fixtures) do check(item.bad_logs==0,"manual and original output remain anonymous bounded JSON") end
+print("LATE_MANUAL_PROBE_PASS checks="..checks.."; default zero HTTP/timers; guarded late start; one latch; original budget")

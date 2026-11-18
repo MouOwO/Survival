@@ -6,6 +6,9 @@ local PREFIX = "[WS4-MP-10] "
 local LATCH = "__survival_ws4_mp10_network_probe"
 local OPT_IN = "survival_workshop_network_probe"
 local REGISTERED = "__survival_ws4_mp10_probe_convar_registered"
+local START_COMMAND = "survival_workshop_network_probe_start"
+local COMMAND_REGISTERED = "__survival_ws4_mp10_probe_command_registered"
+local emit, requested_command
 local MAX_SAMPLES, MAX_SECONDS, TIMEOUT = 8, 300, 8
 local DELAYS = { 5, 30, 120, 240 }
 local FIELDS = { "event", "api", "sample", "trigger", "elapsed", "phase", "state", "map",
@@ -31,11 +34,17 @@ end
 -- registers one inert default, then returns without a timer, access scan or HTTP.
 -- Match changes do not register the same native convar twice in one Lua VM.
 local function register_opt_in()
-    if rawget(_G, REGISTERED) or boolean_api("IsServer") ~= "true" then return end
-    if Convars and type(Convars.RegisterConvar) == "function" then
+    if boolean_api("IsServer") ~= "true" then return end
+    if not rawget(_G, REGISTERED) and Convars and type(Convars.RegisterConvar) == "function" then
         local ok, accepted = pcall(Convars.RegisterConvar, Convars, OPT_IN, "0",
             "Opt-in anonymous Workshop transport health diagnostics", 0)
         if ok and accepted ~= false then rawset(_G, REGISTERED, true) end
+    end
+    if not rawget(_G, COMMAND_REGISTERED) and Convars and type(Convars.RegisterCommand) == "function" then
+        local ok, accepted = pcall(Convars.RegisterCommand, Convars, START_COMMAND, function(...)
+            if requested_command then return requested_command(...) end
+        end, "Start the explicitly enabled bounded anonymous transport probe", 0)
+        if ok and accepted ~= false then rawset(_G, COMMAND_REGISTERED, true) end
     end
 end
 
@@ -101,7 +110,7 @@ local function json_value(value)
     return '"' .. value .. '"'
 end
 
-local function emit(run, fields)
+emit = function(run, fields)
     fields.phase, fields.state = phase()
     fields.elapsed = math.min(MAX_SECONDS, math.max(0, math.floor((clock() or run.started) - run.started)))
     fields.map, fields.server = "template_map", true
@@ -111,6 +120,20 @@ local function emit(run, fields)
         if fields[name] ~= nil then encoded[#encoded + 1] = '"' .. name .. '":' .. json_value(fields[name]) end
     end
     pcall(print, PREFIX .. "{" .. table.concat(encoded, ",") .. "}")
+end
+
+-- The first Activate may precede an operator's opt-in. This parameter-free
+-- command starts the same guarded/latching probe later, without another map.
+requested_command = function(command, ...)
+    if (command ~= nil and command ~= START_COMMAND) or select("#", ...) ~= 0 then return false end
+    if boolean_api("IsServer") ~= "true" or type(GetMapName) ~= "function"
+        or GetMapName() ~= "template_map" then return false end
+    local called, started, reason = pcall(M.activate)
+    local run = rawget(_G, LATCH)
+    if type(run) ~= "table" then run = { started = clock() or 0, samples = 0 } end
+    emit(run, { event = "command", trigger = "console", sample = run.samples or 0,
+        present = called and started == true, reason = called and (reason or "unknown") or "internal" })
+    return called and started == true
 end
 
 local function complete_sample(run, sample, available)
@@ -218,11 +241,13 @@ end
 
 function M.activate()
     register_opt_in()
-    if not requested() or not permitted() then return false end
+    if not requested() then return false, "not_requested" end
+    if not permitted() then return false, "not_permitted" end
     local started, mode = clock(), context()
-    if not started or not mode or type(mode.SetContextThink) ~= "function" then return false end
+    if not started then return false, "clock" end
+    if not mode or type(mode.SetContextThink) ~= "function" then return false, "mode" end
     local previous = rawget(_G, LATCH)
-    if type(previous) == "table" and previous.mode == mode then return true end
+    if type(previous) == "table" and previous.mode == mode then return true, "already_started" end
     if type(previous) == "table" and previous.live == true then stop(previous, "context") end
     local run = { mode = mode, started = started, live = true, ticks = 0, samples = 0, status = "probing",
         pending = {}, phases = {}, delay = 1 }
@@ -270,10 +295,10 @@ function M.activate()
         -- No run started. A transient scheduling failure must not leave a
         -- same-context latch that reports success while no timer exists.
         if rawget(_G, LATCH) == run then rawset(_G, LATCH, nil) end
-        return false
+        return false, "schedule"
     end
     emit(run, { event = "start", sample = 0, limit_samples = MAX_SAMPLES, limit_seconds = MAX_SECONDS })
-    return true
+    return true, "started"
 end
 
 return M
