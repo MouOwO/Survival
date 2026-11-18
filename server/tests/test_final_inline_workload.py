@@ -27,6 +27,29 @@ class FinalInlineWorkloadTests(unittest.TestCase):
    if path=='/_loadtest/release':return {'ok':True}
    raise AssertionError(path)
   p=Player(transport,cfg,'synthetic-controller');p.identity={'account_id':'123','match_session_id':'synthetic-session'};p.token='synthetic-token';p.session_logged_in=True;p.last_profile=profile(5);return p,calls
+ def test_final_profile_owned_single_and_quad_exact_transport(self):
+  from loadtest_lab.workload_profiles import validate_workload_profile
+  p,_=self.player()
+  for transport in ({'id':'linux-loopback-v1','loopback_ports':[29567]},
+                    {'id':'ssh-quad-v1','loopback_ports':[29567,29568,29569,29570]}):
+   cfg=copy.deepcopy(p.cfg);cfg['generator_transport']=transport;before=copy.deepcopy(cfg)
+   result=validate_workload_profile(cfg);self.assertEqual(result.mode,'client-v4');self.assertEqual(cfg,before)
+ def test_final_profile_transport_cannot_redirect_or_expand(self):
+  from loadtest_lab.workload_profiles import validate_workload_profile
+  p,_=self.player()
+  values=[None,{'id':'linux-loopback-v1','loopback_ports':[29567.0]},
+          {'id':'ssh-quad-v1','loopback_ports':[29567.0,29568,29569,29570]},
+          {'id':'ssh-quad-v1','loopback_ports':[29567,29568,29569,True]},
+          {'id':'ssh-quad-v1','loopback_ports':[29567]*4},
+          {'id':'ssh-quad-v1','loopback_ports':[29567,29568,29569,443]},
+          {'id':'ssh-quad-v1','loopback_ports':[29570,29569,29568,29567]},
+          {'id':'ssh-16-v1','loopback_ports':list(range(29567,29583))},
+          {'id':'unknown','loopback_ports':[29567,29568,29569,29570]},
+          {'id':'ssh-quad-v1','loopback_ports':[29567,29568,29569,29570],'host':'remote'}]
+  for transport in values:
+   cfg=copy.deepcopy(p.cfg);cfg['generator_transport']=transport
+   with self.subTest(transport=transport),self.assertRaisesRegex(ValueError,'final_profile_contract_binding_invalid'):
+    validate_workload_profile(cfg)
  def test_confirmed_final_saves_one_actual_HTTP(self):
   p,calls=self.player();p.checkpoint(final=True);self.assertEqual([x[0]for x in calls],['/v1/online-time/checkpoint']);self.assertTrue(calls[0][1]['response_capabilities']['final_profile_committed_v1']);self.assertTrue(p._final_checkpoint_confirmed);self.assertEqual(p.workload_counters['grant_followup_completed'],1);self.assertEqual(inline_final_profile_report()['inline_applied'],1)
  def test_legacy_v3_still_refreshes(self):

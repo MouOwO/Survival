@@ -172,7 +172,11 @@ def validate_workload_profile(cfg, read_source=None):
              and type(proof.get('source_sha256'))is str and re.fullmatch('[a-f0-9]{64}',proof['source_sha256'])
              and cfg.get('sources',{}).get(FINAL_CONSUMER_TARGET)==proof['source_sha256']
              and proof.get('capability')=='final_profile_committed_v1'and type(proof.get('marker_value'))is int and proof['marker_value']==1
-             and cfg.get('generator_transport')=={'id':'linux-loopback-v1','loopback_ports':[29567]},'final_profile_contract_binding_invalid')
+             and type(cfg.get('generator_transport'))is dict
+             and cfg['generator_transport']in({'id':'linux-loopback-v1','loopback_ports':[29567]},
+                 {'id':'ssh-quad-v1','loopback_ports':[29567,29568,29569,29570]})
+             and all(type(port)is int for port in cfg['generator_transport']['loopback_ports']),
+             'final_profile_contract_binding_invalid')
     return ClientProfile(mode, MappingProxyType(rules), compact)
 
 
