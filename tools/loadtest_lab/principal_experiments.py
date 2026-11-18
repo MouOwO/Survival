@@ -63,9 +63,9 @@ SPECS['transport-reset-filtered-combined-v1'] = {
 DRAIN_OPERATOR = PREFIX + 'checkpoint_profile_drain_patch.py'
 SPECS['checkpoint-profile-drain-v1'] = {
     'operators': {DRAIN_OPERATOR:
-                  '5788c0f58351697fcc0c4e3c89bdb232552806379a6922b2377d26f3afa559d5'},
+                  '0cdcd47c70eceec906baaf133c7bbe69696a8131b01682873dbc22191fa02671'},
     'parents': {SERVER: SPECS['ensure-scope-v1']['outputs'][SERVER], SERVICE: G_SOURCES[SERVICE]},
-    'outputs': {SERVER: '1470ead7930e2f04279e7c9276023116e7cb7ffa9bb6dff72f763cc0b83ee90d',
+    'outputs': {SERVER: 'ef26ace9502091a501912c19886496c9b2bdd3b17509cc5d976fc05994386749',
                 SERVICE: G_SOURCES[SERVICE]}}
 PROFILE_CONTEXT_OPERATOR = PREFIX + 'profile_context_patch.py'
 PROFILE_CONTEXT_SQL_OPERATOR = PREFIX + 'profile_context.sql'
