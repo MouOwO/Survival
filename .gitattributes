@@ -498,3 +498,8 @@ publishing/workshop/packager_pack_2026111801_c038514a_authorization.json text eo
 # Description publication binds exact committed operator bytes.
 tools/steam_workshop_upload.py text eol=lf
 publishing/workshop/public_description_20261118.json text eol=lf
+
+# Packager pack_2026111802_ebbc09dc
+tools/complete_delivery_pack_2026111802_bc09dc/*.py text eol=lf
+publishing/workshop/packager_pack_2026111802_ebbc09dc_authority.json text eol=lf
+publishing/workshop/packager_pack_2026111802_ebbc09dc_authorization.json text eol=lf
