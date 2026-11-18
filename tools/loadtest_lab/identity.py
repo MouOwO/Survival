@@ -185,7 +185,9 @@ class IdentityService(Service):
                 or not re.fullmatch('[a-f0-9]{32}', payload['lease_id'])):
             raise AuthError('invalid_lab_lease', 400)
         lease = payload['lease_id']
-        with self.lease_lock:
+        # Wait for the real SQLite lock before taking the synthetic lease lock.
+        # Budget/status readers must not queue behind a pending database owner.
+        with self.lock, self.lease_lock:
             self._require_business_live()
             old = self.leases.get(lease)
             if old:
@@ -216,7 +218,9 @@ class IdentityService(Service):
         if (not isinstance(payload, dict) or set(payload) != {'run_id', 'lease_id'}
                 or payload.get('run_id') != self.cfg['run_id']):
             raise AuthError('invalid_lab_lease', 400)
-        with self.lease_lock:
+        # Wait for the real SQLite lock before taking the synthetic lease lock.
+        # Budget/status readers must not queue behind a pending database owner.
+        with self.lock, self.lease_lock:
             _, end, _ = self._advance_ready()
             value = self.leases.get(payload.get('lease_id'))
             if value is None:
@@ -306,7 +310,9 @@ class IdentityService(Service):
                 self._closed_at = end
 
     def close(self):
-        with self.lease_lock:
+        # Wait for the real SQLite lock before taking the synthetic lease lock.
+        # Budget/status readers must not queue behind a pending database owner.
+        with self.lock, self.lease_lock:
             self.end_tracking()
             if not self._database_closed:
                 super().close()
