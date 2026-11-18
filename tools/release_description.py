@@ -64,7 +64,7 @@ def plan(auth, source, report):
                 description=description, release_sequence=request['release_sequence'])
 
 
-def fresh_item(steam, item, sdk, language='schinese'):
+def fresh_item(steam, item, sdk, language='schinese', *, timeout=90):
     ids = (C.c_uint64 * 1)(int(item))
     query = steam.ug('CreateQueryUGCDetailsRequest', C.c_uint64,
                      [C.POINTER(C.c_uint64), C.c_uint32], ids, 1)
@@ -77,7 +77,7 @@ def fresh_item(steam, item, sdk, language='schinese'):
                 ('SetReturnLongDescription', [C.c_uint64, C.c_bool], True)):
             guard.need(steam.ug(name, C.c_bool, types, query, argument), 'description_query_setting_rejected')
         call = steam.ug('SendQueryUGCRequest', C.c_uint64, [C.c_uint64], query)
-        response = steam.wait(call, sdk.Queried, 3401, timeout=90)
+        response = steam.wait(call, sdk.Queried, 3401, timeout=timeout)
         guard.need(response.result == 1 and response.handle == query and response.returned == 1
                    and not response.cached, 'fresh_official_description_query_required')
         raw = C.create_string_buffer(9784)

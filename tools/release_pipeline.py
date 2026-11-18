@@ -169,6 +169,11 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     actions = parser.add_subparsers(dest='command')
     actions.add_parser('status')
+    visibility = actions.add_parser('visibility-test')
+    visibility.add_argument('action', choices=['plan', 'run'])
+    visibility.add_argument('--source-revision')
+    visibility.add_argument('--report', type=Path, required=True)
+    visibility.add_argument('--request-sha')
     action = actions.add_parser('description')
     action.add_argument('action', choices=['plan', 'publish', 'verify'])
     action.add_argument('--source-revision')
@@ -225,6 +230,16 @@ def main(argv=None):
                 delegated += ['--' + name.replace('_', '-'), str(getattr(args, name))]
         return diagnostics.main(delegated)
     auth = authority()
+    if args.command == 'visibility-test':
+        import release_visibility_test
+        if args.action == 'plan':
+            guard.need(args.source_revision is not None, 'committed_visibility_source_required')
+            result = release_visibility_test.plan(auth, args.source_revision, args.report)
+        else:
+            guard.need(args.request_sha is not None, 'explicit_visibility_request_sha_required')
+            result = release_visibility_test.run(auth, args.report, args.request_sha)
+        print(json.dumps(result, ensure_ascii=False), flush=True)
+        return 0
     if args.command == 'description':
         import release_description
         if args.action == 'plan':

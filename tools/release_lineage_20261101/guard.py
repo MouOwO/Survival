@@ -535,6 +535,92 @@ def reconcile_description(authority, request, receipt_path):
     atomic_json(authority.policy['lineage_state'], result)
 
 
+class _VisibilityTestLease(_Lease):
+    """One authorized public experiment followed by a verified unlisted restore."""
+    stage = 'PUBLIC'
+    visibility_set = False
+
+    def prepare_restore_attempt(self, public_snapshot, *, query_attempted):
+        # Fresh official state reconciles a missing callback; never replay public.
+        need(self.stage == 'PUBLIC' and self.submit_started and query_attempted is True,
+             'public_submission_and_fresh_query_required_before_inverse_update')
+        # An invalid public Submit handle also has no replay permission. The
+        # explicitly authorized inverse update is the sole new capability.
+        was_failed = self.failed
+        self.failed = False
+        try:
+            self.check()
+        except Exception:
+            self.failed = was_failed
+            raise
+        if public_snapshot is not None:
+            need(public_snapshot.get('item') == self.authority.policy['workshop_id'],
+                 'original_item_readback_required')
+        self.stage = 'RESTORE'
+        self.handle = None
+        self.submit_started = False
+        self.visibility_set = False
+        self.inflight = None
+
+    def finish_visibility_test(self, receipt_path):
+        self.check()
+        receipt, raw = read_json(receipt_path)
+        need(self.stage == 'RESTORE' and self.submit_started
+             and receipt.get('status') == 'VISIBILITY_TEST_RESTORED_UNLISTED'
+             and receipt.get('request_sha256') == self.validated['request_sha256']
+             and receipt.get('final_visibility') == 3, 'verified_unlisted_restore_required')
+        result = copy.deepcopy(self.state)
+        result.update(generation=self.state['pending']['generation'], pending=None,
+                      last_visibility_test_receipt={'path': str(receipt_path), 'sha256': sha(raw)})
+        atomic_json(self.authority.policy['lineage_state'], result)
+        self.completed = True
+
+
+@contextmanager
+def visibility_test_lease(authority, request):
+    from release_packager.core import baseline
+    from release_visibility_test import OPERATORS, APPROVAL, validate_approval
+    need(_ACTIVE.get() is None, 'nested_release_lease_refused')
+    with exclusive_lock(authority.policy['publication_lock']):
+        project = Path(authority.policy['repositories']['game'])
+        current = baseline(project)
+        state, _ = read_json(authority.policy['lineage_state'])
+        parent, raw = read_json(authority.policy['canonical_journal'])
+        _identity(authority, parent)
+        need(state.get('pending') is None, 'pending_publication_requires_separate_reconciliation')
+        need(request['parent_journal_sha256'] == sha(raw) == state['head']['canonical_journal_sha256']
+             and request['generation'] == state['generation'] + 1
+             and request['release_sequence'] == state['head']['sequence']
+             and request['baseline_sha256'] == current['cursor']['baseline_sha256']
+             and request['steam_manifest'] == current['baseline']['official_parent_manifest'],
+             'stale_visibility_test_parent_cas')
+        need(sha(authority.policy_path.read_bytes()) == authority.digest == request['authority_sha256'],
+             'visibility_test_authority_changed')
+        need(request['operator_files'] == list(OPERATORS), 'complete_visibility_operator_binding_required')
+        source = revision(request['source_revisions']['game'])
+        for relative in (*OPERATORS, APPROVAL):
+            need((project / relative).read_bytes() == _git(project, 'show', source + ':' + relative),
+                 'visibility_operator_differs_from_commit:' + relative)
+        approval = json.loads(_git(project, 'show', source + ':' + APPROVAL))
+        validate_approval(approval, authority.policy['workshop_id'])
+        need(approval == request['approval'], 'visibility_approval_changed')
+        need(_git(authority.policy['repositories']['content'], 'rev-parse', 'HEAD').decode().strip()
+             == request['source_revisions']['content'], 'visibility_content_source_changed')
+        state = {**state, 'pending': dict(kind='TEMPORARY_VISIBILITY_TEST',
+                 generation=request['generation'], parent_journal_sha256=sha(raw),
+                 request_sha256=request['request_sha256'], final_visibility=3,
+                 status='INTENT_PRESERVED_RESTORE_UNLISTED_REQUIRED')}
+        atomic_json(authority.policy['lineage_state'], state)
+        lease = _VisibilityTestLease(_SEAL, authority, request, state, sha(raw), parent)
+        token = _ACTIVE.set(lease)
+        try:
+            yield lease
+            need(lease.completed, 'visibility_test_pending_restore_required')
+        finally:
+            lease.alive = False
+            _ACTIVE.reset(token)
+
+
 class _Permit:
     def __init__(self, lease, suffix):
         self.lease, self.suffix, self.used = lease, suffix, False
@@ -553,6 +639,8 @@ class _Permit:
             lease.handle = result
         if isinstance(lease, _DescriptionLease) and self.suffix == 'SetItemDescription':
             lease.description_set = True
+        if isinstance(lease, _VisibilityTestLease) and self.suffix == 'SetItemVisibility':
+            lease.visibility_set = True
         lease.inflight = None
 
 
@@ -566,6 +654,13 @@ def require_sdk_mutation(suffix, args, *, authority_sha256):
     need(isinstance(lease, _Lease) and lease.authority.digest == authority_sha256,
          'reviewed_release_lease_required_before_sdk_mutation')
     lease.check()
+    if isinstance(lease, _VisibilityTestLease):
+        need(suffix in ('StartItemUpdate', 'SetItemVisibility', 'SubmitItemUpdate'),
+             'visibility_only_sdk_setters_required')
+        if suffix == 'SetItemVisibility':
+            need(not lease.visibility_set, 'visibility_already_set')
+        if suffix == 'SubmitItemUpdate':
+            need(lease.visibility_set, 'visibility_required_before_submit')
     if isinstance(lease, _DescriptionLease):
         need(suffix in ('StartItemUpdate', 'SetItemUpdateLanguage', 'SetItemTitle', 'SetItemDescription', 'SubmitItemUpdate'),
              'description_only_sdk_setters_required')
@@ -595,7 +690,8 @@ def require_sdk_mutation(suffix, args, *, authority_sha256):
             supplied = args[1].decode('utf8') if isinstance(args[1], bytes) else str(args[1])
             need(Path(supplied).resolve() == Path(lease.validated['package_dir']).resolve(), 'unvalidated_upload_directory')
         if suffix == 'SetItemVisibility':
-            need(len(args) >= 2 and type(args[1]) is int and args[1] == 3,
+            expected = (0 if lease.stage == 'PUBLIC' else 3) if isinstance(lease, _VisibilityTestLease) else 3
+            need(len(args) == 2 and type(args[1]) is int and args[1] == expected,
                  'reviewed_unlisted_visibility_required')
         if suffix == 'SubmitItemUpdate':
             lease.submit_started = True  # Unknown/exception is deliberately not replayable.
@@ -619,7 +715,7 @@ def before_journal_write(path, value, *, authority_sha256=None):
         return False
     need(isinstance(lease, _Lease) and lease.authority.digest == authority_sha256,
          'release_lease_required_before_canonical_journal_write')
-    need(not isinstance(lease, _DescriptionLease), 'description_cannot_rewrite_package_journal')
+    need(not isinstance(lease, (_DescriptionLease, _VisibilityTestLease)), 'metadata_cannot_rewrite_package_journal')
     lease.check()
     _identity(lease.authority, value)
     need(value.get('release_sequence') in (lease.state['head']['sequence'], lease.validated['release_sequence']),

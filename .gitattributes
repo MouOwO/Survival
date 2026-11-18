@@ -1,6 +1,9 @@
 *.vmap binary -text
 *.vmap_c binary -text
 *.vpk binary -text
+tools/release_visibility_test.py text eol=lf
+tools/release_lineage_20261101/test_visibility_test.py text eol=lf
+publishing/workshop/visibility_hosting_test_20261118.json text eol=lf
 *.vmat_c binary -text
 *.vtex_c binary -text
 # Texture dependency CRCs include line endings; keep recipes identical across PCs.

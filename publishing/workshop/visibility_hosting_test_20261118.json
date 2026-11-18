@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "workshop_id": "3824360109",
+  "authorization_question": "call_06c1964f80c9482f927728908c92dbfe",
+  "authorization_answer": "授权临时公开并恢复",
+  "proposal_sha256": "3a53333eed71d26365bbef942c7b38fa926ac4a1287fba5d99f4bed521f402d3",
+  "initial_visibility": 3,
+  "test_visibility": 0,
+  "final_visibility": 3,
+  "maximum_public_seconds": 600,
+  "restore_start_after_seconds": 180,
+  "preserve_runtime_backend_and_five_account_admission": true
+}
