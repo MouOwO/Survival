@@ -2,7 +2,7 @@
 -- This does not authenticate players; the original PWA/backend checks remain.
 return {
     enabled = true,
-    protocol = 1,
+    protocol = 2,
     base_url = "https://pay.xiaofengnet.com/ws4-web",
     maximum_pending = 16,
     maximum_request_bytes = 262144,

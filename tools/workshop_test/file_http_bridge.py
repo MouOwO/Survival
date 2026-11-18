@@ -39,6 +39,7 @@ ACCOUNTS = frozenset(str(int(s) - 76561197960265728) for s in (
 MAX_PENDING, MAX_REQUEST, MAX_RESPONSE = 16, 262144, 8388608
 OUT_CHUNK, IN_CHUNK, BLOCK_CHUNKS = 1024, 192, 16
 PREFIX = "[SFB1] "
+PROTOCOL = 2
 EPOCH = re.compile(r"[A-Za-z0-9_]{1,24}\Z")
 SESSION = re.compile(r"[A-Za-z0-9_.:-]{8,200}\Z")
 
@@ -51,6 +52,24 @@ def integer(value, low, high):
     if type(value) is not int or not low <= value <= high:
         raise ValueError("invalid_integer")
     return value
+
+
+def keyvalues(kind, values=None, parts=None):
+    """Bounded data serialization only; values cannot contain console/Lua code."""
+    def quote(value):
+        value = str(value)
+        if not re.fullmatch(r"[A-Za-z0-9_+/=.\-]*", value):
+            raise ValueError("kv_field_invalid")
+        return '"' + value + '"'
+    lines = ['"SurvivalFileHttp"', '{', '"protocol" "2"', '"kind" ' + quote(kind)]
+    for key, value in (values or {}).items():
+        lines.append(quote(key) + ' ' + quote(value))
+    if parts:
+        lines.extend(['"parts"', '{'])
+        lines.extend(quote('p' + str(index)) + ' ' + quote('b' + data) for index, data in enumerate(parts, 1))
+        lines.append('}')
+    lines.extend(['}', ''])
+    return '\n'.join(lines).encode('ascii')
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -283,17 +302,17 @@ class Files:
     def __init__(self, cfg, nonce):
         self.cfg, self.nonce, self.owned = Path(cfg).resolve(strict=True), nonce, {}
         self.directory = self.cfg / "survival_ws4_http_bridge"
-        self.bootstrap = self.cfg / "survival_ws4_http_bridge_bootstrap.cfg"
-        self.cursor = self.cfg / "survival_ws4_http_bridge_cursor.cfg"
+        self.bootstrap = self.cfg / "survival_ws4_http_bridge_bootstrap.txt"
+        self.cursor = self.cfg / "survival_ws4_http_bridge_cursor.txt"
         if self.directory.exists() or self.bootstrap.exists() or self.cursor.exists():
             raise ValueError("bridge_files_already_exist")
         self.directory.mkdir()
         private_acl(self.directory)
-        self.write(self.cursor, b"// No completed reply.\n")
+        self.write(self.cursor, keyvalues("idle"))
         self.arm(nonce)
 
     def arm(self, nonce):
-        self.write(self.bootstrap, f"survival_sfb_begin {nonce} 1\n".encode("ascii"))
+        self.write(self.bootstrap, keyvalues("bootstrap", {"nonce": nonce}))
 
     def write(self, path, body):
         if path.exists() and (path not in self.owned or hashlib.sha256(path.read_bytes()).hexdigest() != self.owned[path]):
@@ -310,19 +329,20 @@ class Files:
         blocks = max(1, math.ceil(chunks / BLOCK_CHUNKS))
         paths = []
         for block in range(1, blocks + 1):
-            lines = []
+            parts = []
             for index in range((block - 1) * BLOCK_CHUNKS + 1, min(chunks, block * BLOCK_CHUNKS) + 1):
                 data = base64.b64encode(raw[(index - 1) * IN_CHUNK:index * IN_CHUNK]).decode("ascii")
-                lines.append(f"survival_sfb_chunk {self.nonce} {job.epoch} {serial} {index} {data}\n")
-            lines.append(f"survival_sfb_block {self.nonce} {job.epoch} {serial} {block}\n")
-            path = self.directory / f"b_{self.nonce}_{job.epoch}_{serial}_{block}.cfg"
-            self.write(path, "".join(lines).encode("ascii"))
+                parts.append(data)
+            path = self.directory / f"b_{self.nonce}_{job.epoch}_{serial}_{block}.txt"
+            self.write(path, keyvalues("block", {"nonce": self.nonce, "epoch": job.epoch,
+                "serial": serial, "block": block, "chunks": len(parts)}, parts))
             paths.append(path)
-        self.write(self.cursor, f"survival_sfb_reply {self.nonce} {job.epoch} {serial} {job.id} {status} {len(raw)} {chunks} {blocks}\n".encode("ascii"))
+        self.write(self.cursor, keyvalues("reply", {"nonce": self.nonce, "epoch": job.epoch,
+            "serial": serial, "id": job.id, "status": status, "bytes": len(raw), "chunks": chunks, "blocks": blocks}))
         return paths
 
     def retire(self, paths):
-        self.write(self.cursor, b"// No completed reply.\n")
+        self.write(self.cursor, keyvalues("idle"))
         for path in paths:
             self.remove(path)
 
@@ -344,8 +364,8 @@ class Files:
 class Engine:
     """Incremental log consumer: O(new bytes), <=16 jobs, four HTTPS workers.
 
-    Completed futures enqueue once. Expiry is an indexed-id check after heap pop;
-    stale bounded entries disappear by deadline. Never scans pending per poll.
+    Completed futures enqueue once. Indexed deadlines are removed on completion.
+    Never scans pending per poll. Replies use native KV data, never console code.
     """
     def __init__(self, nonce, files, transport=None, clock=time.monotonic):
         self.nonce, self.files, self.clock = nonce, files, clock
@@ -366,7 +386,7 @@ class Engine:
             return
         kind = event.get("event")
         if kind == "ready":
-            if event.get("nonce") != self.next_nonce or event.get("protocol") != 1 or event.get("tools") is not False:
+            if event.get("nonce") != self.next_nonce or event.get("protocol") != PROTOCOL or event.get("tools") is not False:
                 return
             if self.active:
                 self.files.retire(self.active[3])
@@ -377,7 +397,7 @@ class Engine:
             # DoUniqueString can repeat after a VM reload. A fresh bootstrap
             # challenge, consumed once, distinguishes worlds even if epoch/id
             # counters repeat. Late ready/ack/body messages cannot reset it.
-            self.next_nonce = secrets.token_hex(16)
+            self.next_nonce = 'n' + secrets.token_hex(16)
             self.files.arm(self.next_nonce)
             return
         if event.get("nonce") != self.nonce or epoch != self.epoch:
@@ -544,7 +564,7 @@ def main():
             private_acl(state_dir / "console_acl.before.json")
             private_acl(log)
             stream.seek(0, 2)
-            files = Files(cfg, secrets.token_hex(16))
+            files = Files(cfg, 'n' + secrets.token_hex(16))
             engine = Engine(files.nonce, files)
             partial = b""
             print("[SFB_HELPER] ready; enter the original Workshop game", flush=True)

@@ -3,6 +3,7 @@ import base64
 import json
 from pathlib import Path
 import random
+import re
 import sys
 import time
 import unittest
@@ -99,7 +100,7 @@ class Tests(unittest.TestCase):
         def event(kind, **fields):
             engine.event({"nonce": "a" * 32, "epoch": "sfb_1", "event": kind, **fields})
         try:
-            event("ready", protocol=1, tools=False)
+            event("ready", protocol=2, tools=False)
             metadata = dict(id=1, method="GET", path="/health", headers=[], bytes=0, chunks=0, timeout_ms=1000)
             event("request", **metadata); event("request", **metadata)
             for _ in range(100):
@@ -124,7 +125,7 @@ class Tests(unittest.TestCase):
         engine = bridge.Engine("a" * 32, Files(), mock.Mock(), self.clock)
         base = {"nonce": "a" * 32, "epoch": "sfb_1"}
         try:
-            engine.event({**base, "event": "ready", "protocol": 1, "tools": False})
+            engine.event({**base, "event": "ready", "protocol": 2, "tools": False})
             engine.event({**base, "event": "request", "id": 1, "method": "POST", "path": "/v1/../admin",
                           "headers": {}, "bytes": 0, "chunks": 0, "timeout_ms": 1000})
             self.assertFalse(engine.jobs)
@@ -142,7 +143,7 @@ class Tests(unittest.TestCase):
     def test_world_reload_with_identical_epoch_gets_fresh_nonce(self):
         files = Files()
         engine = bridge.Engine("a" * 32, files, mock.Mock(), self.clock)
-        ready = {"nonce": "a" * 32, "epoch": "same_epoch", "event": "ready", "protocol": 1, "tools": False}
+        ready = {"nonce": "a" * 32, "epoch": "same_epoch", "event": "ready", "protocol": 2, "tools": False}
         try:
             engine.event(ready)
             next_nonce = files.next_nonce
@@ -173,7 +174,7 @@ class Tests(unittest.TestCase):
             self.assertEqual(len(deadlines.heap), len(expected))
         self.assertEqual(list(deadlines.expired(100)), [key for key, at in sorted(expected.items(), key=lambda item: (item[1], item[0]))])
 
-    def test_response_blocks_bound_console_lines(self):
+    def test_keyvalues_response_blocks_bound_parts_and_bytes(self):
         # Exercise actual file serialization without touching a Dota installation.
         files = bridge.Files.__new__(bridge.Files)
         files.nonce, files.directory, files.cursor = "a" * 32, Path("virtual"), Path("cursor")
@@ -185,13 +186,22 @@ class Tests(unittest.TestCase):
         decoded = []
         for path in paths:
             lines = writes[path].decode().splitlines()
-            self.assertLessEqual(len(lines), 17)
+            self.assertLessEqual(len(lines), 33)
             for line in lines:
                 self.assertLess(len(line), 390)
-                if line.startswith("survival_sfb_chunk "):
-                    decoded.append(base64.b64decode(line.split()[-1], validate=True))
+                match = re.fullmatch(r'"p[0-9]+" "b([A-Za-z0-9+/=]+)"', line)
+                if match:
+                    decoded.append(base64.b64decode(match[1], validate=True))
         self.assertEqual(b"".join(decoded), raw)
         self.assertEqual(len(paths), 6)
+
+    def test_keyvalues_cannot_embed_commands_or_includes(self):
+        for value in ('x";quit', 'x\n#include', 'x\\secret'):
+            with self.assertRaises(ValueError):
+                bridge.keyvalues('reply', {'epoch': value})
+        raw = bridge.keyvalues('block', {'serial': 1}, ['0000'])
+        self.assertIn(b'"p1" "b0000"', raw)
+        self.assertNotIn(b'survival_sfb_', raw)
 
 
 if __name__ == "__main__":
