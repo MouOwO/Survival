@@ -116,6 +116,21 @@ const failed = {...pending, status: "failed", diagnostic_revision: "WS4-WEB-04",
 diagnostic.personal(failed);
 assert.strictEqual(diagnostic.shown(), true);
 assert(diagnostic.nodes.PlayerWebAuthStatus.text.endsWith("(WS4-WEB-04 / start / http / 0)"));
+diagnostic.personal({...failed, diagnostic_factory: "nn"});
+assert(diagnostic.nodes.PlayerWebAuthStatus.text.endsWith("(WS4-WEB-04 / start / http / 0 / F:nn)"));
+diagnostic.personal({...failed, diagnostic_factory: "nn", diagnostic_host: "l"});
+assert(diagnostic.nodes.PlayerWebAuthStatus.text.endsWith("(WS4-WEB-04 / start / http / 0 / F:nn / H:l)"));
+for (const bad of ["private-host", "d\n", {}, 0]) {
+    diagnostic.personal({...failed, diagnostic_host: bad});
+    assert(!diagnostic.nodes.PlayerWebAuthStatus.text.includes("H:"));
+    assert(!diagnostic.texts().includes("private-"));
+}
+for (const bad of ["private-native-error", "nn\nsecret", "nn\n", "NN", "nnn", {}, 17, null]) {
+    diagnostic.personal({...failed, diagnostic_factory: bad});
+    assert(!diagnostic.nodes.PlayerWebAuthStatus.text.includes("F:"));
+    assert(!diagnostic.texts().includes("private-"));
+}
+diagnostic.personal(failed);
 assert.strictEqual(diagnostic.nodes.PlayerWebAuthCode.text, "");
 assert.strictEqual(diagnostic.nodes.PlayerWebAuthOpen.enabled, false);
 diagnostic.nodes.PlayerWebAuthOpen.events.onactivate();

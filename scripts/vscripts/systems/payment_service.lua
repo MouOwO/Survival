@@ -7,6 +7,7 @@ local events = require("core/events")
 local scheduler = require("core/scheduler")
 local cash_policy = require("core/commerce_release_policy")
 local web_auth = require("systems/player_web_auth")
+local http_factory = require("core/http_request_factory")
 local M = {}
 local busy, orders, catalogs, bindings = {}, {}, {}, {}
 local serial, initialized = 0, false
@@ -278,8 +279,8 @@ local function request(id, action, sku, channel, request_id, quantity)
             or not player_token:match("^pwa1_[a-f0-9]+$")) then
             fail_transport(); return
         end
-        local created,http=pcall(CreateHTTPRequestScriptVM,"POST",base.."/v1/payments/"..action)
-        if not created or not http then fail_transport(); return end
+        local http=http_factory.create("POST",base.."/v1/payments/"..action)
+        if not http then fail_transport(); return end
         local submitted,send_result=pcall(function()
         http:SetHTTPRequestHeaderValue("Authorization","Bearer "..player_token)
         http:SetHTTPRequestRawPostBody("application/json; charset=utf-8",encoder.encode(body))

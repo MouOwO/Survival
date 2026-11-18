@@ -1,4 +1,5 @@
 local json_decoder = require("core/json_decoder")
+local http_factory = require("core/http_request_factory")
 local json_encoder = require("core/json_encoder")
 local rules = require("config/generated/fishing_system_rules")
 local mode_test = require("debug/mode_unlock_test")
@@ -140,7 +141,7 @@ local function request(path, payload, on_success, on_error)
         if path=="/v1/lottery/catalog" and logged_in[tostring(body.account_id)]~=session then
             on_error("match_profile_not_ready") return
         end
-        local http = CreateHTTPRequestScriptVM("POST", tostring(url) .. path)
+        local http = http_factory.create("POST", tostring(url) .. path)
         if not http then on_error("http_request_create_failed") return end
         http:SetHTTPRequestHeaderValue("Authorization", "Bearer " .. token)
         local wire_hash = business_wire.schema_hash()

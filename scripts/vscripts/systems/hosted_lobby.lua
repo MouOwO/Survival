@@ -5,6 +5,7 @@ local access = require("core/test_access_policy")
 local auth = require("systems/player_web_auth")
 local encoder = require("core/json_encoder")
 local decoder = require("core/json_decoder")
+local http_factory = require("core/http_request_factory")
 local M = {}
 local BASE = "https://pay.xiaofengnet.com/ws4-web"
 local initialized, session, record, serial = false, nil, nil, 0
@@ -76,9 +77,8 @@ local function request_id()
 end
 local function post(owner,action,data,complete)
     if not current(owner) or owner.inflight or not owner.token then return false end
-    if type(CreateHTTPRequestScriptVM)~="function" then owner.service_ready=false;publish(owner,"service_unavailable") return false end
-    local ok,http=pcall(CreateHTTPRequestScriptVM,"POST",BASE.."/v1/lobby/"..action)
-    if not ok or not http then owner.service_ready=false;publish(owner,"service_unavailable") return false end
+    local http=http_factory.create("POST",BASE.."/v1/lobby/"..action)
+    if not http then owner.service_ready=false;publish(owner,"service_unavailable") return false end
     data.account_id,data.match_session_id=owner.account,session
     if action~="rooms" and action~="room" then data.request_id=request_id() end
     local generation=(owner.generation or 0)+1

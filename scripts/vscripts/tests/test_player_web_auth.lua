@@ -344,5 +344,39 @@ CreateHTTPRequestScriptVM = function() return nil end
 clock = clock + 3; resolve()
 expect_diagnostic("start", "create", 0)
 assert(#diagnostics == 3, "a changed failure stage is immediately distinguishable")
+-- The fallback is before creation only; no Send failure can submit another
+-- request. Both constructor outcomes reach only the existing private tuple.
+reset_diagnostic()
+CreateHTTPRequestScriptVM = function() return nil end
+CreateHTTPRequest = function(method, url) return native_http(method, url) end
+resolve()
+assert(#requests == 1 and #errors == 0, "legacy factory continues the original one-request approval flow")
+reply(1, pending()); clock = clock + 3; resolve(); reply(2, approved())
+assert(#successes == 1 and events[#events].body.status == "approved")
+CreateHTTPRequest = nil
+reset_diagnostic(); CreateHTTPRequestScriptVM = function() return nil end
+CreateHTTPRequest = function() return nil end
+IsDedicatedServer = function() return false end
+resolve(); expect_diagnostic("start", "create", 0)
+assert(events[#events].body.diagnostic_factory == "nn", "both native empty returns have a private, enum-only UI result")
+assert(events[#events].body.diagnostic_host == "l", "listen-host context is observed without a console")
+local prior_context_events = #events
+IsDedicatedServer = function() return true end
+clock = clock + 3; resolve()
+assert(#events == prior_context_events + 2 and events[#events].body.diagnostic_host == "d",
+    "retry preserves requesting/failure transitions and reports the current hosting context")
+IsDedicatedServer = nil
+CreateHTTPRequest = nil
+reset_diagnostic(); CreateHTTPRequestScriptVM = nil
+CreateHTTPRequest = native_http
+resolve(); assert(#requests == 1, "missing primary API may use the other official API")
+CreateHTTPRequest = nil
+reset_diagnostic()
+local legacy_after_send = 0
+CreateHTTPRequest = function() legacy_after_send = legacy_after_send + 1; return native_http("POST", config.base_url) end
+send_behavior(function() return false end); resolve(); expect_diagnostic("start", "send", 0)
+assert(legacy_after_send == 0 and #requests == 1 and events[#events].body.diagnostic_factory == "os",
+    "a created object's rejected Send never falls back or duplicates a transaction")
+CreateHTTPRequest = nil
 CreateHTTPRequestScriptVM, print = native_http, ordinary_print
 print("PLAYER_WEB_AUTH_PASS: asynchronous approval, private state, provider routing, epochs and bounded WS4-WEB-04 diagnostics")

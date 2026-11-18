@@ -4,6 +4,7 @@ local config = require("config/player_web_auth")
 local encoder = require("core/json_encoder")
 local decoder = require("core/json_decoder")
 local access = require("core/test_access_policy")
+local http_factory = require("core/http_request_factory")
 local M = {}
 local BASE = "https://pay.xiaofengnet.com/ws4-web"
 local DIAGNOSTIC_REVISION = "WS4-WEB-04"
@@ -79,11 +80,13 @@ local function public_state(record, explicit_snapshot)
     local phase = diagnostic and diagnostic.phase or ""
     local stage = diagnostic and diagnostic.stage or ""
     local diagnostic_status = diagnostic and diagnostic.status or 0
+    local factory = diagnostic and diagnostic.factory or ""
+    local host = diagnostic and diagnostic.host or ""
     local last = record.last_public_state
     local same = last and last.status == status and last.error == error
         and last.code == code and last.uri == uri and last.expiry == expiry
         and last.revision == revision and last.phase == phase and last.stage == stage
-        and last.diagnostic_status == diagnostic_status
+        and last.diagnostic_status == diagnostic_status and last.factory == factory and last.host == host
     local explicit_stamp
     if same then
         if not explicit_snapshot then return end
@@ -95,7 +98,7 @@ local function public_state(record, explicit_snapshot)
         explicit_stamp = stamp
     end
     local published = {status=status,error=error,code=code,uri=uri,
-        expiry=expiry,revision=revision,phase=phase,stage=stage,diagnostic_status=diagnostic_status}
+        expiry=expiry,revision=revision,phase=phase,stage=stage,diagnostic_status=diagnostic_status,factory=factory,host=host}
     -- One sparse, non-sensitive marker per actual native send, so native
     -- review can distinguish recovery input from unsolicited state repeats.
     print("[PLAYER_WEB_AUTH_PUBLIC] reason=" .. (same and "explicit_snapshot" or "state_change")
@@ -107,6 +110,8 @@ local function public_state(record, explicit_snapshot)
         diagnostic_revision = revision,
         diagnostic_phase = phase, diagnostic_stage = stage,
         diagnostic_status = diagnostic_status,
+        diagnostic_factory = factory,
+        diagnostic_host = host,
     })
     -- The native API accepts a void return. A thrown send cannot poison the
     -- memo or consume the explicit recovery allowance.
@@ -147,7 +152,14 @@ local function fail(record, code, callback, phase, stage, status)
     record.diagnostic = nil
     if DIAGNOSTIC_PHASES[phase] and DIAGNOSTIC_STAGES[stage] then
         status = http_status(status)
-        record.diagnostic = { phase = phase, stage = stage, status = status }
+        local factory = record.factory_outcome
+        if type(factory) ~= "string" or not factory:match("^[mnotis][mnotis]$") then factory = "" end
+        local host = "u"
+        if type(IsDedicatedServer) == "function" then
+            local ok, dedicated = pcall(IsDedicatedServer)
+            if ok and dedicated == true then host = "d" elseif ok and dedicated == false then host = "l" end
+        end
+        record.diagnostic = { phase = phase, stage = stage, status = status, factory = factory, host = host }
         local key = phase .. ":" .. stage .. ":" .. tostring(status)
         if record.diagnostic_log_key ~= key or now() - (record.diagnostic_log_at or -100) >= 30 then
             record.diagnostic_log_key, record.diagnostic_log_at = key, now()
@@ -161,11 +173,11 @@ end
 local function request(record, path, payload, success, failure)
     local phase = path == "/v1/player-auth/start" and "start" or "poll"
     record.request_phase = phase
-    if type(CreateHTTPRequestScriptVM) ~= "function" then
-        fail(record, "player_web_auth_unavailable", failure, phase, "API", 0) return
+    local http, outcome, available = http_factory.create("POST", BASE .. path)
+    record.factory_outcome = outcome
+    if not http then
+        fail(record, "player_web_auth_unavailable", failure, phase, available and "create" or "API", 0) return
     end
-    local created, http = pcall(CreateHTTPRequestScriptVM, "POST", BASE .. path)
-    if not created or not http then fail(record, "player_web_auth_unavailable", failure, phase, "create", 0) return end
     record.serial = (record.serial or 0) + 1
     local serial = record.serial
     record.inflight, record.deadline = true, now() + 15
