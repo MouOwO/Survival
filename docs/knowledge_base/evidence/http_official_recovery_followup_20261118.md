@@ -82,7 +82,7 @@ yadongji 按上述摘要的原文提交一次，官方 API 返回201，随后通
 正常发行仍拒绝公开，不能把此一次授权沿用为正式开放。
 
 执行前7项隔离可见性/恢复测试和18项既有门禁测试通过；均无真实SDK或网络写入。
-测试覆盖未知回调、查询异常、外国句柄、非可见性字段、过期父代际以及普通发行仍拒绝公开。
+测试覆盖未知回调、查询异常、非本轮句柄、非可见性字段、过期父代际以及普通发行仍拒绝公开。
 等待为树外单文件4Hz检查，至多180秒，O(1)空间；无游戏循环、场景扫描或游戏内原生调用。
 第一窗口已实际完成3→0→3：公开/恢复两次SDK回调均result1，中英文官方受保护字段
 均未变，包journal未变，公开提交至恢复回读156.466秒。实际回执位于树外
@@ -96,9 +96,38 @@ yadongji 按上述摘要的原文提交一次，官方 API 返回201，随后通
 补测修正为**先正常启动Steam客户端，再切公开；观察等待期间SteamAPI_Shutdown，
 同一发行lease/全局锁仍持有，恢复时重新初始化SDK**。公开时间按同一授权累计，
 先扣除156.466秒；补测回执关闭本次授权，禁止反复复用。补测前8项可见性/累计时长
-隔离测试与18项既有门禁通过，无真实SDK调用；尚待补测实际结果。
+隔离测试与18项既有门禁通过，无真实SDK调用。
+
+补测实际已完成，使用从Steam标准applaunch启动的普通客户端PID16288 / FILETIME
+134394787318110308。公开回读确认且SDK释放后，原生创建1/4房间、开始、接受均正常，
+未再出现VAC提示，但界面仍明确显示**本地房间**，没有分配到官方独立服务器。
+45.026秒只读采样411次、模块扫描1次、ReadProcessMemory4041次；每次只看固定字段
+和第一个备用槽，容量>1会标待人工复核，不全量扫描。游戏函数/内存写入/HTTP发送均0。
+入口ws4_entry主房间及备用槽先后均有正确3824360109，仍不满足当前二进制允许表；
+换到template_map后房间消失，实际界面再次显示WS4-WEB-04/start/create/0/F:nn/H:l。
+
+确认结果后提前恢复。本轮公开提交到恢复官方回读114.915秒；两轮累计271.381秒
+（约4分31秒），低于600秒。四次公开/恢复提交回调全部result1、legal=false；
+中英文官方最终visibility均3，标题、完整介绍、资源字段、标签、封面均与各自之前一致。
+补测回执authorization_closed=true，后续计划拒绝复用此临时授权。lineage代际29、
+pending=null；canonical包journal逐字节未改。
+
+因此目前只能结论为：**短时公开未解决本地托管或HTTP创建空值，登录仍未恢复**。
+未取得Linux专服，不能写成“专服HTTP实测也失败”；长时间公开的缓存/审核影响未验证，
+不擅自延长公开。当前官方Windows接口的阻断已确认，是否Valve回归或有意规则、
+何时首次引入及支持的合法恢复方式，仍待官方确认；不保证当天可修复平台限制。
+
+收口复核：1806、manifest6295798134948076528，完整pending_sources/dirty_runtime均空，
+published_route恢复ok，实际安装ACF仍为同一manifest；后台验签check再次READY，
+未重启中转或部署。原15项用户改动逐文件SHA256保持，真实交易0，五账号准入未改。
+补测回执已登记e2bd3afd42474c367066eef245de3f1438562a959f4e7a2724c9a633ec1a10e6，
+只读采样已登记20e0710a8dc3f56d76831024650cb042090cd36121fee43fcdf381edc9ac3415。
+第一轮纯元数据verification缺少登记工具已知存储绑定，record明确拒绝；原始回执保留，
+没有伪造生成日期、改名或补假字段规避，补测回执保留对它的原路径和SHA依赖。
 
 实际回执根为 `D:/Survival_本地工具/runs/login_create_failure_20261118`：
 `native1806_retention02_watch_receipt.json`、`native1806_retention02_after_handoff_gate_receipt.json`、
-`current_readonly_ugc_status_receipt.json`、`valve_report_preparation_receipt.json`。
+`current_readonly_ugc_status_receipt.json`、`valve_report_preparation_receipt.json`、
+`valve_comment_submission_receipt.json`、`valve_public_comment_verification_receipt.json`、
+`native1806_public_test02_receipt.json`及两轮public_visibility_hosting_test_actual*/verification.json。
 当前客户端留在授权失败界面；采样已自然结束，无新的本机签包暂装/恢复事务。
