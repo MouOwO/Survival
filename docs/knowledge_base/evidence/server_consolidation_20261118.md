@@ -67,7 +67,14 @@ PostgreSQL全集群均已迁移。原域名、订单及存档保持；本轮未�
 
 上海压测历史已完整压缩并验证为8306510761字节，摘要
 `74e22c152ac8c064575cbdadb5989140aaa732659e408f16f5e62de07cfd1bbf`。
-本机加密归档仍在传输，以最终解密回执为准；源文件保留，完成前不能释放欠费旧机。
+后续于 2026-11-18 18:04 CST 实际完成本机加密传输与解密摘要核验：
+`old_loadtest_encrypted_backup_receipt.json` 状态为
+`HISTORICAL_FULL_ARCHIVE_OFFSITE_ROUNDTRIP_VERIFIED`，明文 8306510761 字节，
+SHA256 `74e22c152ac8c064575cbdadb5989140aaa732659e408f16f5e62de07cfd1bbf`。
+密文为树外 `D:/Survival_加密备份/server_consolidation_20261118/old_loadtest_full_01.tar.zst.dpapi`，
+SHA256 `a2aca1d366a93bd6198096d455cabe59bbcfe368b82104d6b1b1f6d92de6b51b`；
+登记号 `7011f411e55fd15c6e7ca880906e94b64bd4594dfe4eb7b801f04af5fcb2e338`。
+源文件和旧实例保留；此完成状态不构成删除数据或释放旧实例授权。
 一次性完成登记器绑定原传输进程创建时间，用系统进程事件等待，不扫描或定时巡检；
 仅原任务成功退出、完整解密回执真实通过后才登记，状态见树外
 `history_completion_watcher_state.json`，不能把等待状态写成归档已完成。
@@ -111,5 +118,5 @@ Steam中转测试文件只提交新目标IP这一行，其余原有修改保留�
 数据库运行，全部业务、证书和本地备份定时器active且enabled，health200。
 
 本轮SDK调用0，游廊仍沿用已核验1803／manifest `5596135512120850642`，没有新游戏资源
-上传。当前待办是客户端刷新授权验证、历史压测归档收尾、独立自动异地备份配置，以及
+上传。历史压测归档后续已收尾；当前待办是客户端登录故障、独立自动异地备份配置，以及
 磁盘扩容或按引用复核历史产物；3000在线容量没有因迁机而通过。
