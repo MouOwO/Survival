@@ -84,6 +84,10 @@ local function finish(run,job,status,body)
     run.pending[job.id]=nil;run.count=run.count-1;run.deadlines:remove(job.id)
     if run.incoming and run.incoming.id==job.id then run.incoming=nil end
     if run.count==0 then run.outgoing={};run.first,run.last=1,0 end
+    if status==0 then
+        print('[SFB_STATUS] timeout ticks='..tostring(run.tick_count)..' execs='..tostring(run.exec_count)
+            ..' armed='..tostring(run.nonce~=nil)..' seconds='..tostring((clock() or job.started)-job.started))
+    end
     if current(run) then pcall(job.callback,{StatusCode=status,Body=body or ""}) end
 end
 local function callbacks()
@@ -173,6 +177,7 @@ local function permitted()
 end
 local function tick(run)
     if not current(run) or run.count==0 then run.polling=false;return nil end
+    run.tick_count=run.tick_count+1
     local now=clock()
     if not now then run.polling=false;return nil end
     local first=run.deadlines:peek()
@@ -186,6 +191,7 @@ local function tick(run)
     if not run.nonce then
         if now>=run.next_bootstrap then
             run.next_bootstrap=now+2
+            run.exec_count=run.exec_count+1
             SendToServerConsole("exec "..BOOTSTRAP)
         end
         return 0.2
@@ -212,8 +218,10 @@ local function tick(run)
     local reply=run.incoming
     if reply and reply.expected_block==0 and reply.next_block<=reply.blocks then
         reply.expected_block=reply.next_block;reply.next_block=reply.next_block+1
+        run.exec_count=run.exec_count+1
         SendToServerConsole("exec "..DIRECTORY.."b_"..run.nonce.."_"..run.epoch.."_"..reply.serial.."_"..reply.expected_block..".cfg")
     elseif not reply then
+        run.exec_count=run.exec_count+1
         SendToServerConsole("exec "..CURSOR)
     end
     return (run.incoming or run.first<=run.last) and 0.02 or 0.2
@@ -228,7 +236,7 @@ function M.create(method,url)
         local epoch=DoUniqueString("sfb")
         if type(epoch)~="string" or #epoch>24 or not epoch:match('^[A-Za-z0-9_]+$') then return nil end
         state={world=world,epoch=epoch,pending={},count=0,serial=0,last_reply=0,deadlines=Queue.new(),
-            outgoing={},first=1,last=0,next_bootstrap=0,polling=false}
+            outgoing={},first=1,last=0,next_bootstrap=0,polling=false,tick_count=0,exec_count=0}
     end
     local run=state
     local request={headers={},body="",timeout_ms=30000,sent=false}
@@ -253,12 +261,22 @@ function M.create(method,url)
         self.sent=true
         run.serial=run.serial+1
         local job={id=run.serial,method=method,path=path,headers=self.headers,body=self.body,
-            timeout_ms=self.timeout_ms,callback=callback,offset=1,chunk=1}
+            timeout_ms=self.timeout_ms,callback=callback,offset=1,chunk=1,started=now}
         run.pending[job.id]=job;run.count=run.count+1;run.last=run.last+1;run.outgoing[run.last]=job
         run.deadlines:put(job.id,{run_at=now+self.timeout_ms/1000})
         if not run.polling then
             run.polling=true
-            run.world:SetContextThink("SurvivalFileHttpBridge",function() return tick(run) end,0)
+            if not run.started_diagnostic then
+                run.started_diagnostic=true
+                print('[SFB_STATUS] started protocol=1')
+            end
+            -- As with startup_loading_service: perform the first bounded step
+            -- synchronously, then schedule a positive delay. Never defer the
+            -- initial handshake behind a zero-time think during custom setup.
+            local delay=tick(run)
+            if delay then
+                run.world:SetContextThink("SurvivalFileHttpBridge",function() return tick(run) end,delay)
+            end
         end
         return true
     end

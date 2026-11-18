@@ -1,7 +1,7 @@
 package.path="scripts/vscripts/?.lua;"..package.path
-local checks,commands,output,execs,now,think=0,{},{},{},1,nil
+local checks,commands,output,execs,now,think,scheduled_delay=0,{},{},{},1,nil,nil
 local function check(value,message) checks=checks+1;assert(value,message) end
-local world={SetContextThink=function(_,name,callback) think=callback end}
+local world={SetContextThink=function(_,name,callback,delay) think=callback;scheduled_delay=delay end}
 GameRules={GetGameModeEntity=function() return world end}
 IsServer=function() return true end
 IsInToolsMode=function() return false end
@@ -14,7 +14,7 @@ PlayerResource={GetSteamAccountID=function() return 1 end}
 Convars={RegisterCommand=function(_,name,callback) commands[name]=callback end,GetCommandClient=function() return nil end}
 SendToServerConsole=function(value) execs[#execs+1]=value end
 local original_print=print
-print=function(value) output[#output+1]=value end
+print=function(value) if value:sub(1,7)=='[SFB1] ' then output[#output+1]=value end end
 package.loaded['config/release_profile']={channel='production'}
 package.loaded['config/player_web_auth']={enabled=true}
 local bridge=require('core/file_http_bridge')
@@ -29,6 +29,7 @@ IsInToolsMode=function() return false end
 local request=assert(bridge.create('GET',base..'/health'))
 local results={}
 check(request:Send(function(value) results[#results+1]=value end),'Send accepted')
+check(#execs==1 and scheduled_delay==0.2,'handshake starts synchronously before positive-delay think')
 check(not request:Send(function() end),'Send not retried')
 check(think()==0.2 and #execs==1,'one bootstrap while waiting')
 local nonce=string.rep('a',32)
