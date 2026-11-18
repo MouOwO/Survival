@@ -42,7 +42,7 @@ def plan(auth, source, report):
     for relative in OPERATORS:
         guard.need((project / relative).read_bytes() == git(project, 'show', source + ':' + relative),
                    'uncommitted_description_operator:' + relative)
-    request = dict(schema=1, kind='COMMITTED_DESCRIPTION_ONLY',
+    request = dict(schema=1, kind='COMMITTED_DESCRIPTION_ONLY', language='schinese',
                    authority_sha256=auth.digest,
                    parent_journal_sha256=current['journal_sha256'],
                    generation=current['lineage']['generation'] + 1,
@@ -62,7 +62,7 @@ def plan(auth, source, report):
                 description=description, release_sequence=request['release_sequence'])
 
 
-def fresh_item(steam, item, sdk):
+def fresh_item(steam, item, sdk, language='schinese'):
     ids = (C.c_uint64 * 1)(int(item))
     query = steam.ug('CreateQueryUGCDetailsRequest', C.c_uint64,
                      [C.POINTER(C.c_uint64), C.c_uint32], ids, 1)
@@ -70,6 +70,7 @@ def fresh_item(steam, item, sdk):
     try:
         for name, types, argument in (
                 ('SetAllowCachedResponse', [C.c_uint64, C.c_uint32], 0),
+                ('SetLanguage', [C.c_uint64, C.c_char_p], language.encode('ascii')),
                 ('SetReturnMetadata', [C.c_uint64, C.c_bool], True),
                 ('SetReturnLongDescription', [C.c_uint64, C.c_bool], True)):
             guard.need(steam.ug(name, C.c_bool, types, query, argument), 'description_query_setting_rejected')
@@ -132,6 +133,8 @@ def publish(auth, report, request_sha):
             guard.need(before['visibility'] == 3, 'preserve_original_unlisted_item_required')
             handle = steam.ug('StartItemUpdate', C.c_uint64, [C.c_uint32, C.c_uint64],
                               sdk.APP, int(auth.policy['workshop_id']))
+            guard.need(steam.ug('SetItemUpdateLanguage', C.c_bool, [C.c_uint64, C.c_char_p],
+                               handle, b'schinese'), 'description_language_setter_rejected')
             guard.need(steam.ug('SetItemDescription', C.c_bool, [C.c_uint64, C.c_char_p],
                                handle, request['description'].encode('utf8')), 'description_setter_rejected')
             call = steam.ug('SubmitItemUpdate', C.c_uint64, [C.c_uint64, C.c_char_p], handle, b'')
@@ -150,4 +153,33 @@ def publish(auth, report, request_sha):
                        canonical_package_journal_changed=False)
         write_new(report / 'verification.json', receipt)
         lease.finish_description(receipt, report / 'verification.json')
+        return receipt
+
+
+def verify(auth, report, request_sha):
+    """Reconcile a successful default-language submit without replaying it."""
+    import steam_workshop_upload as sdk
+    report = guard.regular(report)
+    request, raw = guard.read_json(report / 'request.json')
+    guard.need(guard.sha(raw) == guard.checked_sha(request_sha), 'exact_description_request_sha_required')
+    with guard.exclusive_lock(auth.policy['publication_lock']):
+        submitted = read(report / 'submitted.json')
+        guard.need(submitted == {'item': auth.policy['workshop_id'], 'submit_result': 1},
+                   'preserved_successful_description_callback_required')
+        before = read(report / 'before.json')
+        with sdk.Steam() as steam:
+            chinese = fresh_item(steam, auth.policy['workshop_id'], sdk, 'schinese')
+            english = fresh_item(steam, auth.policy['workshop_id'], sdk, 'english')
+        guard.need(all(before[key] == chinese[key] for key in PROTECTED),
+                   'description_recovery_protected_chinese_fields_changed')
+        guard.need(all(chinese[key] == english[key] for key in PROTECTED if key != 'title'),
+                   'description_recovery_shared_fields_changed')
+        guard.need(english['description'] == request['description'], 'official_default_description_not_verified')
+        write_new(report / 'verified_languages.json', {'schinese': chinese, 'english': english})
+        receipt = dict(status='DESCRIPTION_VERIFIED_OFFICIAL', language='english', submit_result=1,
+                       description_sha256=request['description_sha256'], request_sha256=request_sha,
+                       release_sequence=request['release_sequence'], steam_manifest=request['steam_manifest'],
+                       content_upload_performed=False, canonical_package_journal_changed=False)
+        write_new(report / 'verification.json', receipt)
+        guard.reconcile_description(auth, request, report / 'verification.json')
         return receipt

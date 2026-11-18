@@ -170,7 +170,7 @@ def main(argv=None):
     actions = parser.add_subparsers(dest='command')
     actions.add_parser('status')
     action = actions.add_parser('description')
-    action.add_argument('action', choices=['plan', 'publish'])
+    action.add_argument('action', choices=['plan', 'publish', 'verify'])
     action.add_argument('--source-revision')
     action.add_argument('--report', type=Path, required=True)
     action.add_argument('--request-sha')
@@ -232,7 +232,8 @@ def main(argv=None):
             result = release_description.plan(auth, args.source_revision, args.report)
         else:
             guard.need(args.request_sha is not None, 'explicit_description_request_sha_required')
-            result = release_description.publish(auth, args.report, args.request_sha)
+            action = release_description.verify if args.action == 'verify' else release_description.publish
+            result = action(auth, args.report, args.request_sha)
         print(json.dumps(result, ensure_ascii=False), flush=True)
         return 0
     if args.command == 'rehearsal':
