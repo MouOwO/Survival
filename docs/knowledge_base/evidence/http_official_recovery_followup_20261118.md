@@ -131,3 +131,26 @@ published_route恢复ok，实际安装ACF仍为同一manifest；后台验签chec
 `valve_comment_submission_receipt.json`、`valve_public_comment_verification_receipt.json`、
 `native1806_public_test02_receipt.json`及两轮public_visibility_hosting_test_actual*/verification.json。
 当前客户端留在授权失败界面；采样已自然结束，无新的本机签包暂装/恢复事务。
+
+## 用户收窄目标：只接受正式游廊完整联网
+
+用户在call_a87ffac5dbca42fca1f7f178d1137c0c明确回复“只接受正式游廊完整联网”。
+后续验收须从正式游廊进入、真实Steam授权并正常使用云端功能；离线Tools、当局内存档、
+关闭授权放行和只验证后台health均不满足。未启动已做入口检查的离线模式，不扩大收费授权。
+
+再次核对真实1806候选的addoninfo.txt：maps=ws4_entry、IsPlayable=1，入口和正式地图
+MaxPlayers均为4。279字节、SHA256
+fc4af019c3bd208e37566d8c0f68cdd38f34396bcb570ba9dae82d3e2a554c85，
+与1806真实full_manifest的对应资源完全一致。工作区的旧入口人数1不是当前正式包内容，
+不能把它当根因盲改重发；此次已检查配置未发现强制本地托管字段，不等于证明所有GC策略。
+
+仅读安装的client/server/engine2三个官方二进制，候选配置名含
+dota_play_custom_server、dota_play_custom_server_name、dota_server_allow_custom_games等。
+仅出现字符串不构成可用的强制专服开关，未更改它们、执行未知控制台命令或改引擎。
+本轮是一次约193MiB文件扫描，O(文件字节数)，无游戏定时器/场景扫描、SDK写入、
+引擎函数或内存写入。实际回执formal_online_config_candidates_receipt.json已登记
+d5f0a0241aa3a41f642286fe9f15bd32dd6ed972c99666c55b17a28b7f8a8299。
+
+已向用户请求另一台现有测试电脑、已有获准测试账号从正常Steam/正式游廊进入一次，
+只反馈是否仍为start/create/0及F:nn/H:l。此对照尚无结果，不能写成第二台机器已验证。
+不因此购机、升级、额外公开或伪造名单；正式联网仍未恢复，尚无经过验证的新恢复方案。
