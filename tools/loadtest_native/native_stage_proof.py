@@ -58,7 +58,7 @@ def bindings_for(cfg):
                    ('server/fishing_api_overrides/profile_context.sql','operator/principal_experiments/profile_context.sql'),
                    ('server/fishing_api_overrides/profile_context.sql','database/21_profile_context.sql'))
     if cfg.get('frontend_experiment',{}).get('id')=='hot-wal-reserved-v1':
-        need(cfg['sources'].get('operator/frontend_experiments/sqlite_reserved_rate_patch.py')=='a40ea4760631f0b5cb911cbb2f574e6f488f4f092a5db97c281ca8464c4b234c','reserved_operator_binding_required')
+        need(cfg['sources'].get('operator/frontend_experiments/sqlite_reserved_rate_patch.py')=='8a9e1a91a9220493ba37706311bb77afd4750c131ca3e96bf47e9ede0c0ad325','reserved_operator_binding_required')
         result += (('server/player_web_auth_overrides/sqlite_reserved_rate_patch.py','operator/frontend_experiments/sqlite_reserved_rate_patch.py'),('server/player_web_auth/rate_reservations.py','runtime/player_web_auth/rate_reservations.py'))
     if 'runtime/player_web_auth/response_pool.py' in cfg.get('sources',{}):
         result += (('server/player_web_auth/response_pool.py','runtime/player_web_auth/response_pool.py'),)
