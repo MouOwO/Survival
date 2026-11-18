@@ -22,6 +22,8 @@ class Files:
         self.retired.append(paths)
     def close(self):
         pass
+    def arm(self, nonce):
+        self.next_nonce = nonce
 
 
 class Tests(unittest.TestCase):
@@ -134,6 +136,26 @@ class Tests(unittest.TestCase):
             engine.tick()
             self.assertFalse(engine.jobs)
             self.assertEqual(engine.http_count, 0)
+        finally:
+            engine.close()
+
+    def test_world_reload_with_identical_epoch_gets_fresh_nonce(self):
+        files = Files()
+        engine = bridge.Engine("a" * 32, files, mock.Mock(), self.clock)
+        ready = {"nonce": "a" * 32, "epoch": "same_epoch", "event": "ready", "protocol": 1, "tools": False}
+        try:
+            engine.event(ready)
+            next_nonce = files.next_nonce
+            engine.highest = 33
+            engine.event(ready)
+            self.assertEqual(engine.highest, 33, "duplicate ready must not reset the replay fence")
+            engine.event({**ready, "nonce": next_nonce})
+            self.assertEqual(engine.highest, 0)
+            self.assertNotEqual(files.next_nonce, next_nonce)
+            engine.event({**ready, "event": "request", "id": 1, "method": "GET", "path": "/health",
+                          "headers": [], "bytes": 0, "chunks": 0, "timeout_ms": 1000})
+            self.assertEqual(engine.http_count, 0, "previous world's nonce cannot send in the new world")
+            self.assertEqual(engine.nonce, next_nonce)
         finally:
             engine.close()
 

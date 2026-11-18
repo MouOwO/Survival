@@ -290,6 +290,9 @@ class Files:
         self.directory.mkdir()
         private_acl(self.directory)
         self.write(self.cursor, b"// No completed reply.\n")
+        self.arm(nonce)
+
+    def arm(self, nonce):
         self.write(self.bootstrap, f"survival_sfb_begin {nonce} 1\n".encode("ascii"))
 
     def write(self, path, body):
@@ -346,6 +349,7 @@ class Engine:
     """
     def __init__(self, nonce, files, transport=None, clock=time.monotonic):
         self.nonce, self.files, self.clock = nonce, files, clock
+        self.next_nonce = nonce
         self.transport = transport or Transport(clock=clock)
         self.pool = ThreadPoolExecutor(max_workers=4, thread_name_prefix="sfb_https")
         self.done, self.waiting = queue.SimpleQueue(), deque()
@@ -355,22 +359,28 @@ class Engine:
         self.running = 0
 
     def event(self, event):
-        if not isinstance(event, dict) or event.get("nonce") != self.nonce:
+        if not isinstance(event, dict):
             return
         epoch = event.get("epoch")
         if not isinstance(epoch, str) or not EPOCH.fullmatch(epoch):
             return
         kind = event.get("event")
         if kind == "ready":
-            if event.get("protocol") != 1 or event.get("tools") is not False:
+            if event.get("nonce") != self.next_nonce or event.get("protocol") != 1 or event.get("tools") is not False:
                 return
-            if self.epoch != epoch:
-                if self.active:
-                    self.files.retire(self.active[3])
-                self.epoch, self.highest, self.active = epoch, 0, None
-                self.jobs.clear(); self.expiries = Deadlines(); self.waiting.clear()
+            if self.active:
+                self.files.retire(self.active[3])
+            self.epoch, self.highest, self.active = epoch, 0, None
+            self.jobs.clear(); self.expiries = Deadlines(); self.waiting.clear()
+            self.nonce = event["nonce"]
+            self.files.nonce = self.nonce
+            # DoUniqueString can repeat after a VM reload. A fresh bootstrap
+            # challenge, consumed once, distinguishes worlds even if epoch/id
+            # counters repeat. Late ready/ack/body messages cannot reset it.
+            self.next_nonce = secrets.token_hex(16)
+            self.files.arm(self.next_nonce)
             return
-        if epoch != self.epoch:
+        if event.get("nonce") != self.nonce or epoch != self.epoch:
             return
         if kind == "ack":
             if self.active and event.get("serial") == self.active[0] and event.get("id") == self.active[1].id:
@@ -446,8 +456,10 @@ class Engine:
                 continue
             try:
                 status, raw = future.result()
-            except Exception:
+            except Exception as error:
                 status, raw = 0, b""  # Never print exceptions containing credentials.
+                code = str(error) if isinstance(error, ValueError) and re.fullmatch(r"[a-z_]{3,64}", str(error)) else "transport_error"
+                print(f"[SFB_HELPER] failed id={job.id} type={type(error).__name__} code={code}", flush=True)
             self.waiting.append((job, status, raw))
         while not self.active and self.waiting:
             job, status, raw = self.waiting.popleft()
