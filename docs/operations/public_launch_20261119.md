@@ -69,3 +69,10 @@ content/master无未提交改动。财务与正常退出的用户回答、真实
 最终界面核对发现game/content两份授权UI仍写“独立测试存档”，已配套改为“云存档”，仅一条文字，Node语法及双份源码一致性通过；对应JS官方编译仍待，不能把旧编译资源当成交付。此前1908任务在构建前建立，UI补充改变运行指纹，后续须新建来源绑定任务并在1908状态中标注替代关系，保留原job.json；实际任务以树外package_job.json为准，不改旧不可变源。
 
 `final_preparation_checks01` 的旧1907 full pending检查返回 `reviewed_projection_differs_from_fresh_collection`，退出2，未生成“完整待发0”证明。原7项公开lease复验通过。新候选必须完成新的全量收集/审计，不能修改旧投影或直接复用旧通过回执。当前正式版本仍1907、不列出、5账号；未清档、未停服、未换正式包。
+
+
+## 正常退出后实际构建
+
+用户在call_a27e5da355874e8a989aecaefa4707b9确认“我会正常退出，继续上线”。本机已检查Dota进程0，旧v2状态为game_exited_helper_cleaned；真实退出回执见树外client_exit01。1909开始后两项官方编译已通过，生产导出发生Git进程等待超时，尚未签包或改正式数据。
+
+archive_pipe_diagnostic01实测相同17f1efbb不可变提交：Git正常导出21975040字节/1306个tar成员只需0.145秒，tar读取器留下10240字节全0结束填充，超过Windows管道容量。旧代码先wait而未排空，导致实际30秒超时。只为新family在结束处先communicate排空再检查退出码；保留所有blob OID、路径/大小、名单与总预算。archive_export_fix_tests01真实导出1283个Lua并全部OID一致，约0.614秒；3种非零/超长尾部及超量stderr负例拒绝。旧1909family、失败源码导出和编译证据保留，不改旧回执。

@@ -105,6 +105,38 @@ def expression(source):
     return ast.parse(source, mode='eval').body
 
 
+def extend_archive_completion(tree, name):
+    """Drain the bounded tar trailer before waiting; preserve frozen families."""
+    if name != 'production.py':
+        return
+    functions = [node for node in tree.body if isinstance(node, ast.FunctionDef)
+                 and node.name == 'export_lua']
+    if len(functions) != 1:
+        raise ValueError('exact immutable Lua export template changed')
+    changed = 0
+    for block in ast.walk(functions[0]):
+        if not isinstance(block, ast.Try):
+            continue
+        for index, node in enumerate(block.body):
+            if (isinstance(node, ast.Expr) and isinstance(node.value, ast.Call)
+                    and isinstance(node.value.func, ast.Name) and node.value.func.id == 'need'
+                    and len(node.value.args) == 2 and isinstance(node.value.args[1], ast.Constant)
+                    and node.value.args[1].value == 'immutable_lua_archive_incomplete'):
+                waits = [call for call in ast.walk(node.value.args[0]) if isinstance(call, ast.Call)
+                         and isinstance(call.func, ast.Attribute) and call.func.attr == 'wait']
+                if len(waits) != 1 or ast.unparse(waits[0]) != 'process.wait(timeout=30)':
+                    raise ValueError('exact archive process wait changed')
+                node.value.args[0] = expression('process.returncode == 0 and set(records) == allowed')
+                block.body[index:index] = ast.parse(
+                    "archive_tail, archive_errors = process.communicate(timeout=30)\n"
+                    "need(len(archive_tail) <= 10240 and not archive_tail.strip(b'\\x00') "
+                    "and len(archive_errors) <= 65536, 'immutable_lua_archive_trailer_invalid')\n").body
+                changed += 1
+                break
+    if changed != 1:
+        raise ValueError('exact archive completion anchor changed')
+
+
 def extend_public_admission(tree, name):
     """New families bind one exact policy extension; frozen families stay intact."""
     if name == 'package.py':
@@ -285,6 +317,7 @@ def render(project, revision, job, current):
             from release_packager.localization_text_review import extend
             extend(tree, project)
         extend_business_wire_binding(tree, name)
+        extend_archive_completion(tree, name)
         extend_public_admission(tree, name)
         ast.fix_missing_locations(tree)
         source = (ast.unparse(tree) + '\n').encode()
