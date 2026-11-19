@@ -129,7 +129,7 @@ MESSAGES = {
     "READY": "验签通路正常，无需重启。请从游戏重新打开授权页，重新点击 Steam 登录。",
     "RELAY_RESTORED": "Steam 验签通路已恢复。请从游戏重新打开授权页，重新点击 Steam 登录；不要刷新旧错误页。",
     "RELAY_REPAIR_REQUIRED": "验签通路不可用。请运行项目根目录的“修复Steam登录.cmd”。",
-    "STEAM_TRANSPORT_UNAVAILABLE": "中转已启动，但仍无法连接 Steam。请检查或切换可用网络／加速节点，再运行一次。",
+    "STEAM_TRANSPORT_UNAVAILABLE": "中转已启动，但仍无法连接 Steam。请确认飞鸟代理正在运行并能访问 Steam 社区，再运行一次。",
     "CLOUD_RELAY_DISABLED": "云端未启用该中转。工具不会修改开关，请保留此结果交给维护者。",
     "CLOUD_AUTH_UNHEALTHY": "云端登录服务不可用。工具不会重启后台服务，请保留此结果交给维护者。",
     "REMOTE_LISTENER_NOT_OWNED": "云端已有无法对应本机回执的中转。为避免影响其他进程，本次停止操作。",
@@ -155,7 +155,8 @@ def main(argv=None):
     except Exception as error:
         safe = {"repair_already_running", "relay_process_identity_changed", "relay_process_is_not_owned_forward",
                 "relay_process_access_failed", "relay_receipt_invalid", "relay_ssh_start_failed",
-                "relay_receipt_exists_review_before_start", "reviewed_remote_action_failed", "remote_check_invalid"}
+                "relay_receipt_exists_review_before_start", "relay_bridge_start_failed",
+                "relay_bridge_listener_not_owned", "reviewed_remote_action_failed", "remote_check_invalid"}
         code = str(error) if isinstance(error, RuntimeError) and str(error) in safe else "manual_login_check_failed"
         result = {"ok": False, "status": "REPAIR_BUSY" if code == "repair_already_running" else "CHECK_FAILED", "error": code}
     print(MESSAGES[result["status"]])

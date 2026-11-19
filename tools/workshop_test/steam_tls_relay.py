@@ -1,8 +1,8 @@
-"""Explicit, temporary four-account test transport; default is a read-only plan.
+"""Temporary four-account Steam transport through a fixed local TLS bridge.
 
-Forward encrypted Steam TLS through this PC's existing connection. The cloud
-still verifies the official Steam certificate. No local HTTP proxy, account
-password, callback replay, or general-purpose remote destination is provided.
+The loopback bridge discovers the current FeiNiao HTTP CONNECT port. The cloud
+still verifies Steam's official certificate. No account password, callback
+replay, alternate destination or general-purpose remote proxy is provided.
 """
 from __future__ import annotations
 
@@ -18,11 +18,15 @@ import re
 import shutil
 import stat
 import subprocess
+import sys
 import time
 
 ROOT = Path(__file__).resolve().parents[2]
 RECEIPT = ROOT / "output/workshop_web_auth_20261024/steam_tls_relay_process.json"
-FORWARD = "127.0.0.1:18768:steamcommunity.com:443"
+BRIDGE_RECEIPT = ROOT / "output/workshop_web_auth_20261024/steam_proxy_bridge_process.json"
+BRIDGE = Path(__file__).with_name("steam_proxy_bridge.py")
+FORWARD = "127.0.0.1:18768:127.0.0.1:18770"
+LEGACY_FORWARD = "127.0.0.1:18768:steamcommunity.com:443"
 
 
 def transport():
@@ -44,6 +48,21 @@ def arguments():
         ROOT / "tools/deploy/goufayu_test_known_hosts").resolve().as_posix() + '"'
     return ["ssh.exe", "-N", "-T", *options, "-o", "ExitOnForwardFailure=yes",
             "-o", "ServerAliveInterval=15", "-o", "ServerAliveCountMax=3", "-R", FORWARD, pinned.HOST]
+
+
+def bridge_arguments():
+    # Windows venv python.exe is a launcher: its child owns the listener and
+    # survives terminating the launcher. Spawn the real interpreter so the
+    # receipt and held native process handle identify the listener itself.
+    executable = str(Path(getattr(sys, "_base_executable", sys.executable)).resolve())
+    return [executable, "-B", str(BRIDGE.resolve()), "--serve"]
+
+
+def bridge_module():
+    spec = importlib.util.spec_from_file_location("ws4_steam_proxy_bridge", BRIDGE)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def command_line(pid):
@@ -97,7 +116,8 @@ def split_command_line(value):
 
 
 def process_identity(pid, *, terminate=False, expected=None, kernel=None,
-                     last_error=None, command_reader=None, argv_parser=None):
+                     last_error=None, command_reader=None, argv_parser=None,
+                     expected_argv=None, expected_name="ssh.exe"):
     """Hold a process handle and check creation time before stopping our SSH."""
     if (os.name != "nt" and kernel is None) or type(pid) is not int or not 0 < pid < 2**32:
         raise RuntimeError("relay_windows_process_required")
@@ -135,16 +155,21 @@ def process_identity(pid, *, terminate=False, expected=None, kernel=None,
             raise RuntimeError("relay_process_identity_unavailable")
         identity = {"pid": pid, "created": values[0].dwHighDateTime * 2**32 + values[0].dwLowDateTime,
                     "executable": str(Path(path.value).resolve())}
-        if Path(identity["executable"]).name.lower() != "ssh.exe":
+        if Path(identity["executable"]).name.lower() != expected_name.lower():
             raise RuntimeError("relay_process_is_not_ssh")
         if terminate and (not isinstance(expected, dict)
                           or any(expected.get(key) != value for key, value in identity.items())):
             raise RuntimeError("relay_process_identity_changed")
         argv = (argv_parser or split_command_line)((command_reader or command_line)(pid))
-        fixed = [identity["executable"], *arguments()[1:]]
+        allowed = [expected_argv] if expected_argv is not None else [arguments()]
+        if expected_argv is None:
+            legacy = list(allowed[0]); legacy[legacy.index(FORWARD)] = LEGACY_FORWARD
+            allowed.append(legacy)
+        matching = next((command for command in allowed if argv and argv[1:] == command[1:]), None)
         if (not argv or str(Path(argv[0]).resolve()).casefold() != identity["executable"].casefold()
-                or argv[1:] != fixed[1:]):
+                or matching is None):
             raise RuntimeError("relay_process_is_not_owned_forward")
+        fixed = [identity["executable"], *matching[1:]]
         identity["command_sha256"] = hashlib.sha256(
             json.dumps(fixed, ensure_ascii=True, separators=(",", ":")).encode("ascii")).hexdigest()
         if terminate:
@@ -159,6 +184,77 @@ def process_identity(pid, *, terminate=False, expected=None, kernel=None,
         kernel.CloseHandle(handle)
 
 
+def read_receipt(path):
+    metadata = path.lstat()
+    if (not stat.S_ISREG(metadata.st_mode) or metadata.st_size > 4096 or path.is_symlink()
+            or getattr(metadata, "st_file_attributes", 0) & 0x400):
+        raise RuntimeError("relay_receipt_invalid")
+    identity = json.loads(path.read_text(encoding="utf-8"))
+    if (not isinstance(identity, dict) or set(identity) != {"pid", "created", "executable", "command_sha256"}
+            or type(identity["pid"]) is not int or not 0 < identity["pid"] < 2**32
+            or type(identity["created"]) is not int or identity["created"] <= 0
+            or not isinstance(identity["executable"], str) or not Path(identity["executable"]).is_absolute()
+            or not isinstance(identity["command_sha256"], str)
+            or not re.fullmatch(r"[a-f0-9]{64}", identity["command_sha256"])):
+        raise RuntimeError("relay_receipt_invalid")
+    return identity
+
+
+def start_bridge():
+    bridge = bridge_module()
+    command = bridge_arguments()
+    if BRIDGE_RECEIPT.exists():
+        receipt = read_receipt(BRIDGE_RECEIPT)
+        try:
+            actual = process_identity(receipt["pid"], expected_argv=command,
+                                      expected_name=Path(command[0]).name)
+        except RuntimeError as error:
+            if str(error) != "relay_process_not_found":
+                raise
+            BRIDGE_RECEIPT.unlink()
+        else:
+            if actual != receipt or not bridge.probe():
+                raise RuntimeError("relay_process_identity_changed")
+            return
+    if bridge.probe():
+        raise RuntimeError("relay_bridge_listener_not_owned")
+    with open(os.devnull, "wb") as silent:
+        process = subprocess.Popen(command, cwd=ROOT, stdin=subprocess.DEVNULL,
+                                   stdout=silent, stderr=silent,
+                                   creationflags=subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP)
+    try:
+        for _ in range(15):
+            if process.poll() is not None:
+                raise RuntimeError("relay_bridge_start_failed")
+            if bridge.probe():
+                break
+            time.sleep(0.2)
+        else:
+            raise RuntimeError("relay_bridge_start_failed")
+        identity = process_identity(process.pid, expected_argv=command,
+                                    expected_name=Path(command[0]).name)
+        BRIDGE_RECEIPT.parent.mkdir(parents=True, exist_ok=True)
+        with BRIDGE_RECEIPT.open("x", encoding="utf-8") as stream:
+            json.dump(identity, stream)
+    except Exception:
+        process.terminate(); process.wait(timeout=10)
+        raise
+
+
+def stop_bridge():
+    if not BRIDGE_RECEIPT.exists():
+        return
+    receipt = read_receipt(BRIDGE_RECEIPT)
+    command = bridge_arguments()
+    try:
+        process_identity(receipt["pid"], terminate=True, expected=receipt,
+                         expected_argv=command, expected_name=Path(command[0]).name)
+    except RuntimeError as error:
+        if str(error) != "relay_process_not_found":
+            raise
+    BRIDGE_RECEIPT.unlink()
+
+
 def start():
     if os.name != "nt":
         raise RuntimeError("relay_windows_process_required")
@@ -166,6 +262,7 @@ def start():
         # Even a stale receipt requires an explicit stop/review, never a second
         # forward racing the first one for the same loopback listener.
         raise RuntimeError("relay_receipt_exists_review_before_start")
+    start_bridge()
     args = arguments()
     executable = shutil.which(args[0])
     if not executable:
@@ -192,24 +289,14 @@ def start():
 
 
 def stop():
-    metadata = RECEIPT.lstat()
-    if (not stat.S_ISREG(metadata.st_mode) or metadata.st_size > 4096 or RECEIPT.is_symlink()
-            or getattr(metadata, "st_file_attributes", 0) & 0x400):
-        raise RuntimeError("relay_receipt_invalid")
-    identity = json.loads(RECEIPT.read_text(encoding="utf-8"))
-    if (not isinstance(identity, dict) or set(identity) != {"pid", "created", "executable", "command_sha256"}
-            or type(identity["pid"]) is not int or not 0 < identity["pid"] < 2**32
-            or type(identity["created"]) is not int or identity["created"] <= 0
-            or not isinstance(identity["executable"], str) or not Path(identity["executable"]).is_absolute()
-            or not isinstance(identity["command_sha256"], str)
-            or not re.fullmatch(r"[a-f0-9]{64}", identity["command_sha256"])):
-        raise RuntimeError("relay_receipt_invalid")
+    identity = read_receipt(RECEIPT)
     try:
         process_identity(identity["pid"], terminate=True, expected=identity)
     except RuntimeError as error:
         if str(error) != "relay_process_not_found":
             raise
     RECEIPT.unlink()
+    stop_bridge()
     return {"ok": True, "status": "TEST_SSH_STOPPED", "cloud_transport_changed": False}
 
 
@@ -228,6 +315,7 @@ def main():
             "ok": True, "status": "READ_ONLY_PLAN", "fixed_remote_listener": "127.0.0.1:18768",
             "fixed_destination": "steamcommunity.com:443", "ssh_host_key_pinned": True,
             "official_tls_verified_by_cloud": True, "pc_must_remain_online": True,
+            "local_bridge": "127.0.0.1:18770", "dynamic_core_proxy_discovery": True,
             "process_started": False, "cloud_transport_enabled": False}
     except (OSError, ValueError, KeyError, RuntimeError):
         result = {"ok": False, "error": "temporary_steam_relay_action_failed"}

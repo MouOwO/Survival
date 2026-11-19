@@ -60,6 +60,13 @@ class KernelFixture:
 
 
 class TemporaryRelayTest(unittest.TestCase):
+    def test_bridge_spawn_uses_real_interpreter_instead_of_venv_launcher(self):
+        base = str(Path("C:/Python314/python.exe").resolve())
+        with patch.object(relay.sys, "_base_executable", base), \
+             patch.object(relay.sys, "executable", "D:/venv/Scripts/python.exe"):
+            self.assertEqual(relay.bridge_arguments()[0], base)
+            self.assertEqual(relay.bridge_arguments()[1:], ["-B", str(relay.BRIDGE.resolve()), "--serve"])
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
@@ -90,7 +97,7 @@ class TemporaryRelayTest(unittest.TestCase):
 
     def test_fixed_forward_and_pinned_ssh_have_no_general_proxy(self):
         args = relay.arguments()
-        self.assertEqual(args[args.index("-R") + 1], "127.0.0.1:18768:steamcommunity.com:443")
+        self.assertEqual(args[args.index("-R") + 1], "127.0.0.1:18768:127.0.0.1:18770")
         self.assertEqual(args[-1], "root@47.111.16.128")
         self.assertIn("StrictHostKeyChecking=yes", args)
         self.assertIn("ExitOnForwardFailure=yes", args)
@@ -98,6 +105,20 @@ class TemporaryRelayTest(unittest.TestCase):
         self.assertNotIn("-D", args)
         self.assertNotIn("ProxyCommand", " ".join(args))
         self.assertIn('UserKnownHostsFile="' + (relay.ROOT / "tools/deploy/goufayu_test_known_hosts").resolve().as_posix() + '"', args)
+
+    def test_old_exact_forward_remains_stoppable_during_migration(self):
+        old = list(self.argv)
+        old[old.index(relay.FORWARD)] = relay.LEGACY_FORWARD
+        kernel = KernelFixture(self.executable)
+        receipt, identity = self.prepared_stop(kernel, argv=old)
+        old_identity = relay.process_identity(
+            42424, kernel=KernelFixture(self.executable),
+            command_reader=lambda pid: "fixture-command", argv_parser=lambda raw: old)
+        self.receipt.write_text(json.dumps(old_identity), encoding="utf-8")
+        with receipt, identity:
+            self.assertTrue(relay.stop()["ok"])
+        self.assertFalse(self.receipt.exists())
+        self.assertIn(("terminate", kernel.handle), kernel.calls)
 
     def test_start_and_stop_are_mutually_exclusive(self):
         with self.assertRaises(SystemExit), patch("sys.stderr"):
