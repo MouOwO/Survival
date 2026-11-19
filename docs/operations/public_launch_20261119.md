@@ -36,3 +36,14 @@
 当前线上仍为1907不列出/5账号、v2登录器和原测试数据。正式维护、清档、公开开关、新游廊包、新EXE及永久公开均未执行，不得宣称上线完成。
 
 `public_lease_tests02`新增7项永久公开门禁通过；原lineage18项、临时公开8项回归通过。初轮新fixture因未mock合成Git来源而失败，修正fixture后通过，原失败保留。`production_projection_tests02`以最终公开配置重验8项通过。相关源码备份与9份验证回执已登记，见树外ledger_registration01。正式Dota PID16940仍在运行，已按AGENTS请求用户正常退出，未强制关闭。
+
+
+## 已提交与已暂存（尚未切换）
+
+- game/dev `3e21e38528793694993e1591745215c602cebb41` 已push；content/master `03195789d4dca2798fd1e364f748bff924297868` 已核对push一致，无空提交。固定stash→pull→pop→commit→push已执行，原8项用户改动逐字保留。
+- 5文件后台候选112640字节，SHA256 `aae340af8bcde223df5f00641819b5bc94c5374d3807417cf0e3c21a3647ac0e`，manifest `25f827601a30bd61ab35ac4a3fb6d0040989b90220a1a31ad88883e901025b4c`；已登记。用户先前明确迁移全部后台到本机并授权本轮上线，具体非密钥生产补丁的暂存通过审批；先前被拒的隔离测试源码包没有上传。
+- `backend_stage01/stage_receipt.json`：候选已暂存 `/root/goufayu_upload/public_launch/candidate_3e21e385_03628864b0`；5份源字节、现役父文件及Python语法全部验证。没有改服务、支付配置或数据库。
+- 已建立不可变双仓来源任务 `pack_2026111908_c7aef399`，版本1908，runtime game绑定3e21e385、content03195789。状态created，尚未构建/安装/上传；Dota仍运行，按固定打包工具的require_idle等待正常退出，未绕过。
+- 维护编排 `tools/public_launch/maintenance.py` prepare只生成独立硬链接副本和未激活服务片段，替换源码使用新inode，禁止写穿父硬链接；父发行继续保留。apply要求精确prepare摘要和用户确认正常退出的独立回执，先停写、完整备份、事务清档，再激活服务。
+- `maintenance_tests02`六种隔离故障注入通过：正常切换、COMMIT回执丢失但已成功只读确认、未知事务保持停写、清档异常回滚、提交后启动失败只恢复服务、缺少正常退出不能停服。这里的服务/SQL为模拟，真实金融保留另由postgres_lab07证明。首次fixture缺少服务片段并暴露SQLite连接未显式关闭，已补齐fixture并在生产工具中显式关闭连接，失败证据保留。
+- 一次维护最多5账号，逐账号扫描已审阅35表、每账号最多10万行/100MB的既有安全预算；103初始属性只在本次状态重建时校验。正常运行无后台扫描、轮询或新增游戏帧工作。健康验证最多30次固定回环请求，仅在切换时执行；公开身份稳定校验O(1)，名单初始化最多5项。上述上限和fixture计数属于代码/模拟成本，不能写成原生FPS或3000并发验收。
