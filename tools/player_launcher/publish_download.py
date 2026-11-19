@@ -107,16 +107,17 @@ print(json.dumps({'stage_created':True}))
     (out / 'intent.json').write_text(json.dumps(dict(payload=payload, upload_started=True))+'\n')
     for name, path in files.items():
         driver.run(['scp.exe', *driver.OPTIONS, str(path), driver.HOST + ':' + REMOTE + '/' + version + '/' + name], timeout=120)
-    driver.run(['scp.exe', *driver.OPTIONS, str(page), driver.HOST + ':' + REMOTE + '/index.html.pending'], timeout=60)
+    driver.run(['scp.exe', *driver.OPTIONS, str(page), driver.HOST + ':' + REMOTE + '/index.' + version + '.pending'], timeout=60)
     check = '''from pathlib import Path
 import hashlib,json,os,fcntl
 p=Path(P['root']);v=p/P['version']
 assert {f.name for f in v.iterdir()}==set(P['files'])
 for name,f in P['files'].items():
  q=v/name; assert not q.is_symlink() and q.stat().st_size==f['bytes'] and hashlib.sha256(q.read_bytes()).hexdigest()==f['sha256'];q.chmod(0o644)
-q=p/'index.html.pending';assert hashlib.sha256(q.read_bytes()).hexdigest()==P['index_sha256'];q.chmod(0o644)
+q=p/('index.'+P['version']+'.pending')
 with open('/var/lock/goufayu-launcher-publication.lock','a') as lock:
  fcntl.flock(lock,fcntl.LOCK_EX)
+ assert not q.is_symlink() and hashlib.sha256(q.read_bytes()).hexdigest()==P['index_sha256'];q.chmod(0o644)
  if P['previous_index_sha256'] is not None:
   assert hashlib.sha256((p/'index.html').read_bytes()).hexdigest()==P['previous_index_sha256'], 'parent_index_changed_during_upload'
  else:assert not (p/'index.html').exists(), 'new_index_appeared_during_upload'
