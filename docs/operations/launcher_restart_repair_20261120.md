@@ -1,6 +1,6 @@
 # 2026-11-20 正式登录器文件占用及二次启动修复
 
-状态：修正版EXE2026.11.20.1已构建、安装并发布，6项公网完整下载一致；实际新进程已备份隔离旧残留、助手ready并显示有效授权码，start/poll真实200及游戏ACK已验证。本人Steam确认后的入局仍待；正式游廊1910保持公开，后台本轮无部署、清档0。
+状态：修正版EXE2026.11.20.1已构建、安装并发布，6项公网完整下载一致；用户已确认完成授权并入局，同一实际进程的局内画面、会话登录、云档案及在线时长HTTP200/游戏ACK均已核对，FULL_GAMEPLAY验收补齐。正式游廊1910保持公开，后台本轮无部署、清档0；跨局重载及余额权益界面尚未验收。
 
 用户报告“launchur_failed／联网准备未完成”，反复刷新验证码后仍回到原错误。本机新局Dota16996，登录器34712；20261119T230031Z_9fb304ef的failure.json为FileExistsError，helper.log为0字节，尚未ready。旧20261119T133937Z_93b8550b曾正常ready及2091条响应，随后PermissionError；cfg遗留199字节survival_ws4_http_bridge_cursor.sfbtmp。旧write使用固定临时名，os.replace占用失败后不清理这个未登记临时文件，下一次open(xb)直接FileExistsError。旧status仍停在waiting_for_log/ready，进一步误导诊断。
 
@@ -35,3 +35,13 @@
 download_publication01已将同一稳定地址https://xiaofengnet.com/launcher/切换到2026.11.20.1，旧首页备份及旧版本保留。download_https01直接公网TLS校验、忽略环境代理、禁用缓存，完整读取EXE/ZIP/说明/版本/摘要/首页共6项26196677字节，全部长度和SHA一致。新首页SHA1d9bff527fc6cdb6580f5594eed97a0ab25455f923fc7e05d6f848f33e6a8295；原游廊介绍已经链接这个稳定地址，所以本轮无SDK内容上传。
 
 最终Git提交和远端状态以本轮final_receipt及双仓同步回执为准。实际游廊包仍为1910；本轮source_state核对双仓pending_sources和dirty_runtime均空，后台保持已有公开服务。本轮没有支付、兑换、福利消耗或存档重置。
+
+## 本人确认后的入局验收补齐
+
+用户在call_45313464adde4496ab5a3e0fda42644b回复“已完成授权并进入游戏”。已核对仍为Dota10644/Filetime134396037422349910和实际新EXE37748；ingame_confirmed01.png显示正常局内主城、训练队列及波次HUD，未操作用户正在游玩的界面。
+
+full_acceptance02通过已提交acceptance.verify，阶段FULL_GAMEPLAY。匿名网络记录按helper全局发布serial与请求ID、world精确匹配161条回包及161条游戏ACK，未匹配0：Steam授权start2/poll144、session/authenticate1、session/login1、archive/command4、lottery/catalog5、online-time/checkpoint3及payments/catalog1均HTTP200并已ACK。首次档案快照通过session/login加载，源码fetch_snapshot明确首次选择该路由，并非必须另发profile。只检查路由、状态、长度与确认，不读取或保存档案、令牌或账号内容。
+
+full_acceptance01首次诊断保留：原始helper日志为Windows CRLF，过严行尾正则识别到0条响应，且错误地要求独立profile路由；这不是新游戏故障。第二份证明改为splitlines并核对实际session/login路径，没有改写旧诊断或此前AUTHORIZATION_READY/下载/最终回执。本人确认、局内截图、实际启动及161条回包的原始摘要均独立绑定在新证明。
+
+本次确认覆盖新EXE的授权、档案加载和实际入局；未将其扩大为跨局保存再载入、付费权益界面、真实购买或3000同时在线验收。实际玩家行为产生的正常存档/在线请求仅只读观察，本轮未代点购买、兑换或福利。
