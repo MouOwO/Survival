@@ -438,7 +438,14 @@ assert(own[2].unit.base_min==(own[2].base_damage_min+0.75+9)*1.25)
 assert(own[1].unit.survival_attack_min==first_before)
 -- Unscoped research still changes speed/range/modifiers.
 bus.emit(events.TECHNOLOGY_STATS_CHANGED,{player_id=0,reason="research_completed"})
-assert(range_writes>0 and modifier_lookups>0)
+assert(range_writes==0 and modifier_lookups>0,"unchanged research keeps native cadence/range intact")
+reward_speed=20
+bus.emit(events.TECHNOLOGY_STATS_CHANGED,{player_id=0,reason="research_completed"})
+assert(range_writes>0 and math.abs(own[1].unit.survival_attack_interval-1.25)<0.00001,
+    "a real speed change still reaches the native worker immediately")
+reward_speed=0
+bus.emit(events.TECHNOLOGY_STATS_CHANGED,{player_id=0,reason="research_completed"})
+assert(own[1].unit.survival_attack_interval==1.5,"removing the bonus restores native cadence")
 assert(own[1].unit.survival_attack_min==first_before,"technology refresh retains private growth")
 assert(own[2].unit.base_min==(own[2].base_damage_min+0.75+9)*1.25)
 assert(train(0,3).ok);tick(3.2)

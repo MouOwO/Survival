@@ -19,6 +19,8 @@ local M = {}
 local training_queue
 local disconnected_players = {}
 local workers = {}
+local workers_by_player = {}
+local EMPTY_WORKERS = {}
 local cheer_targets_by_player = {}
 local cheer_projection_owner = setmetatable({}, {__mode = "k"})
 local pending_growth_ui = {}
@@ -55,6 +57,23 @@ end)
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
+end
+
+local function set_worker(entindex, state)
+    local previous = workers[entindex]
+    if previous and previous.player_id ~= nil then
+        local owned = workers_by_player[previous.player_id]
+        if owned then
+            owned[entindex] = nil
+            if next(owned) == nil then workers_by_player[previous.player_id] = nil end
+        end
+    end
+    workers[entindex] = state
+    if state and state.player_id ~= nil then
+        local owned = workers_by_player[state.player_id]
+        if not owned then owned = {}; workers_by_player[state.player_id] = owned end
+        owned[entindex] = state
+    end
 end
 
 local function add_training_abilities(worker, training)
@@ -99,7 +118,7 @@ end
 
 local function leader_bonuses_for(player_id)
     local total, by_state = 0, {}
-    for _, other in pairs(workers) do
+    for _, other in pairs(workers_by_player[player_id] or EMPTY_WORKERS) do
         if other.player_id == player_id
             and valid_entity(other.unit)
             and personality_has(other.unit, "lumberjack_personality_leader") then
@@ -443,6 +462,15 @@ local function record_population_training_success(team, training_id)
     return population_training_state(key)
 end
 
+local function native_attack_values(state)
+    local values = state.native_attack_values
+    if not values or values.unit ~= state.unit then
+        values = {unit = state.unit}
+        state.native_attack_values = values
+    end
+    return values
+end
+
 local function apply_lumberjack_attack(state, technology_attack)
     local base_min = tonumber(state.base_damage_min)
     local base_max = tonumber(state.base_damage_max)
@@ -454,9 +482,20 @@ local function apply_lumberjack_attack(state, technology_attack)
     local attack_pct = 1 + (tonumber(state.personality_attack_pct) or 0) / 100
     local minimum = (base_min + total_growth) * attack_pct
     local maximum = (base_max + total_growth) * attack_pct
-    state.unit:SetBaseDamageMin(minimum)
-    state.unit:SetBaseDamageMax(maximum)
-    if state.unit.CalculateStatBonus then state.unit:CalculateStatBonus(true) end
+    -- A tree hit changes this worker's damage, not its attributes or attack
+    -- cadence. Native creature damage setters take effect directly; a forced
+    -- full stat recalculation here can disturb the in-flight melee animation.
+    -- Keep the cache on the owning state, so in-place fusion (a new state for
+    -- the same unit) and unit replacement both perform a fresh application.
+    local native = native_attack_values(state)
+    if native.minimum ~= minimum then
+        state.unit:SetBaseDamageMin(minimum)
+        native.minimum = minimum
+    end
+    if native.maximum ~= maximum then
+        state.unit:SetBaseDamageMax(maximum)
+        native.maximum = maximum
+    end
     state.unit.survival_attack_min = minimum
     state.unit.survival_attack_max = maximum
 end
@@ -528,7 +567,7 @@ local function refresh_worker_technology(player_id, refresh_reason)
     -- Leaders affect every other owned lumberjack, regardless of distance.
     -- Aggregate once per synchronous refresh and exclude each leader itself.
     local leader_total, leader_bonuses = leader_bonuses_for(player_id)
-    for entindex, state in pairs(workers) do
+    for entindex, state in pairs(workers_by_player[player_id] or EMPTY_WORKERS) do
         if state.worker_type == "lumberjack"
             and state.player_id == player_id and valid_entity(state.unit) then
             local multiplier = tonumber(state.technology_multiplier) or 1
@@ -546,17 +585,23 @@ local function refresh_worker_technology(player_id, refresh_reason)
                  {label="性格",value=state.personality_attack_speed_pct or 0},
                  {label="领袖",value=leader_total - (leader_bonuses[state] or 0)}})
             state.unit.survival_attack_cadence = cadence
-            state.unit:SetBaseAttackTime(final_attack_interval)
+            local native = native_attack_values(state)
+            if native.interval ~= final_attack_interval then
+                state.unit:SetBaseAttackTime(final_attack_interval)
+                native.interval = final_attack_interval
+            end
             state.unit.survival_attack_speed = 1 / final_attack_interval
             state.unit.survival_attack_interval = final_attack_interval
             local range = math.max(0, (tonumber(state.base_attack_range)
                 or tonumber(state.unit.survival_attack_range) or 400)
                 + lumberjack_attack_range)
-            if state.unit.Script_SetAttackRange then
+            if state.unit.Script_SetAttackRange and native.range ~= range then
                 state.unit:Script_SetAttackRange(range)
+                native.range = range
             end
-            if state.unit.SetAcquisitionRange then
+            if state.unit.SetAcquisitionRange and native.acquisition ~= range then
                 state.unit:SetAcquisitionRange(range)
+                native.acquisition = range
             end
             state.unit.survival_attack_range = range
             state.unit.survival_gameplay_final_damage_pct =
@@ -620,7 +665,7 @@ local function on_technology_stats_changed(payload)
         -- Flat technology/reward attack bonuses still apply to owned workers.
         -- Per-hit growth is individual and never writes this shared stat pool.
         local attack = technology_stat_manager.get(player_id).final.lumberjack.attack_flat or 0
-        for entindex, state in pairs(workers) do
+        for entindex, state in pairs(workers_by_player[player_id] or EMPTY_WORKERS) do
             if state.worker_type == "lumberjack" and state.player_id == player_id
                 and valid_entity(state.unit) then
                 apply_lumberjack_attack(state, attack)
@@ -712,7 +757,7 @@ local function update_worker_efficiency(player_id)
                 end
             end
         else
-            workers[entindex] = nil
+            set_worker(entindex, nil)
         end
     end
 end
@@ -730,7 +775,7 @@ local function update_worker_targets(player_id)
                 end
             end
         else
-            workers[entindex] = nil
+            set_worker(entindex, nil)
         end
     end
 end
@@ -1028,7 +1073,7 @@ local function train_worker_one(payload)
         })
     end
 
-    workers[worker:entindex()] = {
+    set_worker(worker:entindex(), {
         unit = worker,
         team = city_state.team,
         player_id = city_state.player_id,
@@ -1045,7 +1090,7 @@ local function train_worker_one(payload)
         lumber_efficiency = (tonumber(training.wood_per_hit) or 0)
             + player_tree(city_state.player_id).lumber_efficiency_buff
             + technology_efficiency,
-    }
+    })
     if not is_repairer then
         refresh_worker_technology(city_state.player_id)
         refresh_cheer_buffs(city_state.player_id)
@@ -1365,7 +1410,7 @@ function M.register_fused_lumberjack(worker, data)
         tree_damage_chance_pct = personality_tree_damage_chance,
         personality_attack_growth_per_hit = personality_attack_growth_per_hit,
     })
-    workers[worker:entindex()] = {
+    set_worker(worker:entindex(), {
         unit = worker,
         team = team,
         player_id = player_id,
@@ -1390,7 +1435,7 @@ function M.register_fused_lumberjack(worker, data)
         personality_wood_per_hit_flat = personality_wood_flat,
         lumber_efficiency = wood_per_hit + player_tree(player_id).lumber_efficiency_buff * fusion_count
             + technology_efficiency + personality_wood_flat,
-    }
+    })
     refresh_worker_technology(player_id)
     refresh_cheer_buffs(player_id)
     return { ok = true, entindex = worker:entindex() }
@@ -1430,7 +1475,7 @@ function M.commit_lumberjack_fusion(materials, target, data)
     for _, state in ipairs(states) do
         if state.unit:entindex() ~= target_entindex then
             removed_entindexes[#removed_entindexes + 1] = state.unit:entindex()
-            workers[state.unit:entindex()] = nil
+            set_worker(state.unit:entindex(), nil)
             state.unit:ForceKill(false)
         end
     end
@@ -1520,7 +1565,7 @@ function M.rollback_fused_lumberjack(target)
     local entindex = target:entindex()
     local state = workers[entindex]
     if not state or not target.survival_super_lumberjack then return false end
-    workers[entindex] = nil
+    set_worker(entindex, nil)
     refresh_worker_technology(state.player_id)
     refresh_cheer_buffs(state.player_id)
     return true
@@ -1560,7 +1605,7 @@ local function remove_worker(worker, entindex, reason)
     if not state then return end
 
     require("systems/worker_visual_service").cleanup(worker or state.unit)
-    workers[entindex] = nil
+    set_worker(entindex, nil)
     if state.worker_type == "lumberjack" then
         refresh_worker_technology(state.player_id)
     end
@@ -1707,6 +1752,7 @@ function M.init()
     end
     pending_growth_ui = {}
     workers = {}
+    workers_by_player = {}
     trees_by_player = {}
     population_training_counts = {}
     lumberjack_training:reset()

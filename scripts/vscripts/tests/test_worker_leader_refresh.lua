@@ -159,7 +159,8 @@ end
 reset_counters()
 for id = 0, 3 do full_refresh(id) end
 for id = 0, 3 do
-    assert(lookups[id] == 26 and writes[id] == 26, "four owner refreshes each touch only their 26 workers")
+    assert(lookups[id] == 26 and writes[id] == 0 and range_writes[id] == 0,
+        "unchanged owner refreshes inspect only their workers without resetting native damage/cadence/range")
 end
 reset_counters()
 stats_by_owner[0].attack_flat = 50
@@ -220,9 +221,9 @@ assert(writes[0] == 25 and lookups[0] == 0 and range_writes[0] == 0 and modifier
 for id = 1, 3 do assert(writes[id] == 0) end
 reset_counters(); full_refresh(0)
 close(ordinary.unit.damage, ordinary.base_damage_min + 75.5, "full research refresh retains personal growth")
-assert(writes[0] == 25)
+assert(writes[0] == 0, "unchanged full refresh must preserve the existing attack cycle")
 bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {player_id = 0, changed_section = "tower"})
-assert(writes[0] == 25, "unrelated scoped rewards cannot refresh worker stats")
+assert(writes[0] == 0, "unrelated scoped rewards cannot refresh worker stats")
 second.unit.abilities[leader_name] = nil
 full_refresh(0)
 close(ordinary.unit.interval, 1.5, "removing a leader is observed on the next refresh without cache invalidation")
