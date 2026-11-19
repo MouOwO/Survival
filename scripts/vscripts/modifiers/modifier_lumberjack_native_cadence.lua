@@ -23,6 +23,11 @@ function M:OnCreated()
     local parent = self:GetParent()
     local cheer = parent:FindModifierByName("modifier_lumberjack_cheer")
     if cheer then self.sources[cheer] = cheer:GetStackCount(); self.source_total = self.source_total + self.sources[cheer] end
+    local rogue = parent:FindModifierByName("modifier_rogue_lumberjack_attack_speed")
+    if rogue then
+        self.sources[rogue] = finite(rogue.value) or 0
+        self.source_total = self.source_total + self.sources[rogue]
+    end
     if parent.FindAllModifiersByName then
         for _, modifier in ipairs(parent:FindAllModifiersByName("modifier_survival_managed_buff") or {}) do
             if modifier.definition and modifier.definition.effect_type == "attack_speed_pct" then

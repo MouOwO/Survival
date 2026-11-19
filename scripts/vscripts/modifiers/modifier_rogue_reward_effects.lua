@@ -108,8 +108,16 @@ function modifier_rogue_lumberjack_attack_speed:IsPurgable() return false end
 function modifier_rogue_lumberjack_attack_speed:RemoveOnDeath() return true end
 function modifier_rogue_lumberjack_attack_speed:OnCreated(params)
     self.value = tonumber(params and params.value) or 100
+    if IsServer() then
+        require("systems/lumberjack_native_cadence").percentage_changed(self:GetParent(), self, self.value)
+    end
 end
 function modifier_rogue_lumberjack_attack_speed:OnRefresh(params) self:OnCreated(params) end
+function modifier_rogue_lumberjack_attack_speed:OnDestroy()
+    if IsServer() then
+        require("systems/lumberjack_native_cadence").percentage_changed(self:GetParent(), self, nil)
+    end
+end
 function modifier_rogue_lumberjack_attack_speed:DeclareFunctions()
     return { MODIFIER_PROPERTY_ATTACKSPEED_PERCENTAGE }
 end
