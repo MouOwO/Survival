@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 import hashlib
 import json
 from pathlib import Path
+import re
 import subprocess
 import sys
 
@@ -36,6 +37,7 @@ def main():
     parser.add_argument('--acceptance-sha', required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--apply', action='store_true')
+    parser.add_argument('--expected-index-sha', help='Exact current index SHA256 required for a later version')
     args = parser.parse_args()
     build = json.loads(args.build_receipt.read_bytes())
     acceptance = json.loads(args.acceptance_receipt.read_bytes())
@@ -44,7 +46,10 @@ def main():
             acceptance.get('exe_sha256') != build['exe_sha256']):
         raise RuntimeError('accepted_exact_exe_required')
     version = build['binding']['version']
-    if version != '2026.11.19.1': raise RuntimeError('reviewed_version_required')
+    if not re.fullmatch(r'[0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,4}', version):
+        raise RuntimeError('reviewed_version_required')
+    if args.expected_index_sha is not None and not re.fullmatch(r'[a-f0-9]{64}', args.expected_index_sha):
+        raise RuntimeError('explicit_parent_index_sha_required')
     revision, template = committed('tools/player_launcher/download.html')
     committed('tools/player_launcher/publish_download.py')
     out = args.output.resolve()
@@ -60,7 +65,7 @@ def main():
         files[file.name] = file
     files[archive.name] = archive
     text = template.decode('utf-8')
-    for key, value in {'VERSION':version, 'EXE':exe.name, 'SIZE':f'{exe.stat().st_size/1000000:.1f}',
+    for key, value in {'VERSION':version, 'EXE':exe.name, 'ZIP':archive.name, 'SIZE':f'{exe.stat().st_size/1000000:.1f}',
                        'SHA256':build['exe_sha256']}.items():
         text = text.replace('@@' + key + '@@', value)
     if '@@' in text: raise RuntimeError('page_placeholder_unfilled')
@@ -69,6 +74,7 @@ def main():
                    at_utc=datetime.now(timezone.utc).isoformat(), operator_revision=revision,
                    build_receipt_sha256=sha(args.build_receipt), acceptance_sha256=args.acceptance_sha,
                    version=version, exe_sha256=build['exe_sha256'], url=URL,
+                   expected_parent_index_sha256=args.expected_index_sha,
                    files={name:dict(sha256=sha(path), bytes=path.stat().st_size) for name,path in files.items()},
                    index_sha256=sha(page), api_code_changed=False, nginx_reloaded=False)
     (out / 'plan.json').write_text(json.dumps(planned, sort_keys=True)+'\n')
@@ -77,13 +83,24 @@ def main():
     sys.path.insert(0, str(ROOT/'tools/archive_caps_20261020'))
     import remote_driver as driver
     # Refuse overwrites. An interrupted publication must be reconciled explicitly.
-    payload = dict(root=REMOTE, version=version, files=planned['files'], index_sha256=sha(page))
+    payload = dict(root=REMOTE, version=version, files=planned['files'], index_sha256=sha(page),
+                   previous_index_sha256=args.expected_index_sha)
     setup = '''from pathlib import Path
-import json,os
+import hashlib,json,os
 p=Path(P['root']);v=p/P['version']
 assert p.parent==Path('/var/www/xiaofengnet.com')
-assert not p.is_symlink() and not p.exists(), 'existing_download_requires_review'
-p.mkdir(mode=0o755);v.mkdir(mode=0o755)
+assert not p.is_symlink() and not v.exists(), 'immutable_version_already_present'
+if p.exists():
+ assert P['previous_index_sha256'] is not None, 'reviewed_parent_index_required'
+ old=p/'index.html';raw=old.read_bytes()
+ assert not old.is_symlink() and hashlib.sha256(raw).hexdigest()==P['previous_index_sha256'], 'parent_index_changed'
+ backup=Path('/var/backups/goufayu-launcher')/P['version'];backup.mkdir(parents=True,exist_ok=False,mode=0o700)
+ with (backup/'index.html').open('xb') as stream:stream.write(raw)
+ (backup/'index.html').chmod(0o600)
+else:
+ assert P['previous_index_sha256'] is None, 'expected_parent_index_missing'
+ p.mkdir(mode=0o755)
+v.mkdir(mode=0o755)
 print(json.dumps({'stage_created':True}))
 '''
     driver.remote('P='+repr(payload)+'\n'+setup)
@@ -92,13 +109,18 @@ print(json.dumps({'stage_created':True}))
         driver.run(['scp.exe', *driver.OPTIONS, str(path), driver.HOST + ':' + REMOTE + '/' + version + '/' + name], timeout=120)
     driver.run(['scp.exe', *driver.OPTIONS, str(page), driver.HOST + ':' + REMOTE + '/index.html.pending'], timeout=60)
     check = '''from pathlib import Path
-import hashlib,json,os
+import hashlib,json,os,fcntl
 p=Path(P['root']);v=p/P['version']
 assert {f.name for f in v.iterdir()}==set(P['files'])
 for name,f in P['files'].items():
  q=v/name; assert not q.is_symlink() and q.stat().st_size==f['bytes'] and hashlib.sha256(q.read_bytes()).hexdigest()==f['sha256'];q.chmod(0o644)
 q=p/'index.html.pending';assert hashlib.sha256(q.read_bytes()).hexdigest()==P['index_sha256'];q.chmod(0o644)
-os.rename(q,p/'index.html')
+with open('/var/lock/goufayu-launcher-publication.lock','a') as lock:
+ fcntl.flock(lock,fcntl.LOCK_EX)
+ if P['previous_index_sha256'] is not None:
+  assert hashlib.sha256((p/'index.html').read_bytes()).hexdigest()==P['previous_index_sha256'], 'parent_index_changed_during_upload'
+ else:assert not (p/'index.html').exists(), 'new_index_appeared_during_upload'
+ os.rename(q,p/'index.html')
 print(json.dumps({'all_remote_bytes_verified':True,'index_published':True}))
 '''
     result = json.loads(driver.remote('P='+repr(payload)+'\n'+check))

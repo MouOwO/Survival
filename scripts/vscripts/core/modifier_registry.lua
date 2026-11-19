@@ -159,6 +159,10 @@ local modifiers = {
         path = "modifiers/modifier_debug_attack_cap",
     },
     {
+        name = "modifier_lumberjack_native_cadence",
+        path = "modifiers/modifier_lumberjack_native_cadence",
+    },
+    {
         name = "modifier_debug_move_speed_cap",
         path = "modifiers/modifier_debug_move_speed_cap",
     },

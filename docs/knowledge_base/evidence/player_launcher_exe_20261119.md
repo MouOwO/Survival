@@ -33,3 +33,15 @@
 下载页及发布器为tools/player_launcher/download.html与publish_download.py，计划地址https://xiaofengnet.com/launcher/。只写既有nginx静态目录下全新launcher子目录，按固定版本、完整哈希与已验收EXE绑定，拒绝覆盖未知旧目录；不改API、数据库、证书或重启服务。游廊正文顶部增加“先运行登录器，等待联网完成再进游廊”、下载链接、运行期间保留窗口和当前测试资格说明，保留原玩法介绍、11月20日计划、测试档不继承及QQ群1098603739，不含付费/问题反馈文字。
 
 此节是准备状态，实际HTTPS下载和Steam SDK语言回读完成后另补证据。当前资源仍1905/manifest6306865332807022551；没有新的运行包上传。旧8项工作区改动逐字节保留，git_code01在提交前因新增文本CRLF规范化停止，stash已恢复；git_code02只对新增文本规范化LF，原8项仍按原始SHA检查，两仓成功推送。
+
+## 下载和双语言介绍已正式完成
+
+https://xiaofengnet.com/launcher/已上线，既有nginx静态目录全新launcher子目录含精确EXE、ZIP、使用说明、SHA256和version.json；未改业务API、数据库、证书或重启服务。公网HTTPS完整下载13,178,697字节EXE耗时8.933秒，SHA256与本机实机验收完全一致；下载页全文摘要和版本元数据也一致，public_https_verification_receipt.json保留。桌面三个入口已备份并统一指向独立EXE，运行中的客户端未被快捷方式操作干扰。
+
+简体中文SDK提交后，官方回读发现默认语言仍为旧正文。为避免默认页遗漏入口，统一description plan增加schinese/english二选一，lease只允许请求绑定的精确语言，不允许未审语言或跨语言setter；10项说明定向及18项既有发行门禁通过。19682de571974790eaef62314a46b59fdac2d41d已推送dev，随后独立默认语言请求只提交一次并收口。两个语言的最新官方无缓存回读均为标题“我在dota2苟发育”、正文SHA256 d2beb158179d257ef4ba7f0e37197b7af46f065a41f3c6937881bdec35b7c4ea、visibility3，正文含下载链接与QQ群；lineage pending为null，游戏包journal原始字节保持。
+
+完整发行检查首次未指定官方下载回执，报告缺少验证输入；保留该失败，不当漏发或通过。显式给定1905真实官方完整下载回执后，delivery_status_with_official1905.stdout.json返回WORKSHOP_SYNCED、完整待发/历史/阻断/dirty runtime均0。该观察发生于语言工具修正前，后续资源发行需重新检查，不能把它视作未来版本验收。
+
+build、真实入局、桌面备份、静态发布、公网下载和双语言回读回执均已登记，清单在ledger_registration01.json。安装启动回执gui_launch_receipt.json指向D:/Survival_玩家登录器而被账本拒绝，原回执完整保留；不伪造已登记或改写真实路径。
+
+随后用户新增“合成伐木工动作仍重置，修改并发布”要求，并同意正常退出当前Dota做隔离动画对照。该EXE严格绑定1905；下次运行包更新后，必须同时准备并验收匹配的新EXE、更新下载页和桌面入口，不能让1905下载入口成为新包的登录阻断。当前下载与介绍完成不等于新伐木工修复已交付。

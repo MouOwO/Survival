@@ -3,6 +3,7 @@ local events = require("core/events")
 local model_scale = require("visual/model_scale")
 local config = require("config/workers_config")
 local worker_attack_cap = require("systems/worker_native_attack_cap")
+local native_lumberjack_cadence = require("systems/lumberjack_native_cadence")
 local training_definitions = require("config/generated/training_definitions")
 local global_rules = require("config/global_rules")
 local technology_stat_manager = require("systems/technology_stat_manager")
@@ -586,9 +587,14 @@ local function refresh_worker_technology(player_id, refresh_reason)
                  {label="领袖",value=leader_total - (leader_bonuses[state] or 0)}})
             state.unit.survival_attack_cadence = cadence
             local native = native_attack_values(state)
-            if native.interval ~= final_attack_interval then
-                state.unit:SetBaseAttackTime(final_attack_interval)
-                native.interval = final_attack_interval
+            local native_interval = final_attack_interval
+            if state.unit.survival_super_lumberjack == true then
+                native_interval = native_lumberjack_cadence.apply(state,
+                    1 / (tonumber(state.base_attack_speed) or (2 / 3)), final_attack_interval)
+            end
+            if native.interval ~= native_interval then
+                state.unit:SetBaseAttackTime(native_interval)
+                native.interval = native_interval
             end
             state.unit.survival_attack_speed = 1 / final_attack_interval
             state.unit.survival_attack_interval = final_attack_interval
@@ -1324,6 +1330,10 @@ function M.register_fused_lumberjack(worker, data)
     if not worker_attack_cap.restore(worker) then
         return { ok = false, error = "fused_worker_attack_cap_unavailable" }
     end
+    local native_cadence_modifier = native_lumberjack_cadence.ensure(worker)
+    if not native_cadence_modifier or type(native_cadence_modifier.SetCadence) ~= "function" then
+        return { ok = false, error = "fused_worker_native_cadence_unavailable" }
+    end
     local level = tonumber(data.level) or 0
     local player_id = tonumber(data.player_id) or -1
     local team = tonumber(data.team) or worker:GetTeamNumber()
@@ -1353,10 +1363,7 @@ function M.register_fused_lumberjack(worker, data)
     worker:SetBaseMaxHealth(health)
     worker:SetMaxHealth(health)
     worker:SetHealth(health)
-    worker:SetBaseAttackTime(math.max(
-        0.05,
-        1 / attack_speed - (tonumber(data.fusion_interval_reduction) or 0)
-    ))
+    worker:SetBaseAttackTime(1 / attack_speed)
     worker:SetBaseMoveSpeed(tonumber(data.move_speed) or 300)
     worker:SetPhysicalArmorBaseValue(tonumber(data.engine_armor) or 0)
     if worker.Script_SetAttackRange then
@@ -1421,6 +1428,7 @@ function M.register_fused_lumberjack(worker, data)
         base_damage_max = inherited_base_attack,
         base_attack_speed = attack_speed,
         base_attack_range = tonumber(data.attack_range) or 400,
+        native_cadence_modifier = native_cadence_modifier,
         fusion_interval_reduction = tonumber(data.fusion_interval_reduction) or 0,
         technology_multiplier = fusion_count,
         base_lumber_efficiency = wood_per_hit,

@@ -103,6 +103,9 @@ end
 function modifier_survival_managed_buff:OnDestroy()
     if not IsServer() then return end
     local parent = self:GetParent()
+    if self.definition and self.definition.effect_type == "attack_speed_pct" then
+        require("systems/lumberjack_native_cadence").percentage_changed(parent, self, nil)
+    end
     if self.active_sound_name then
         parent:StopSound(self.active_sound_name)
         self.active_sound_name = nil
@@ -155,6 +158,11 @@ function modifier_survival_managed_buff:ApplyManaged(value, duration, max_stacks
     else
         self:SetStackCount(1)
         if duration > 0 then self:SetDuration(duration, true) end
+    end
+    if self.definition and self.definition.effect_type == "attack_speed_pct"
+        and self.native_cadence_notified_value ~= self.value then
+        self.native_cadence_notified_value = self.value
+        require("systems/lumberjack_native_cadence").percentage_changed(self:GetParent(), self, self.value)
     end
 end
 

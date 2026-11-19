@@ -1,4 +1,7 @@
 package.path = "scripts/vscripts/?.lua;" .. package.path
+class = class or function(value) return value end
+IsServer = IsServer or function() return true end
+local cadence_definition = assert(loadfile("scripts/vscripts/modifiers/modifier_lumberjack_native_cadence.lua"))()
 local definitions = require("config/generated/training_definitions")
 package.loaded["systems/technology_stat_manager"] = {get = function() return {final = {lumberjack = {}}} end}
 package.loaded["systems/player_profile_service"] = {get_profile = function() return nil end}
@@ -96,7 +99,7 @@ local function reset(fusion_test)
     FindClearSpaceForUnit = function() end
     CreateUnitByName = function(name, position)
         if not create_ok then return nil end
-        local id, unit = 100 + #spawned, {name = name, position = position, abilities = {}}
+        local id, unit = 100 + #spawned, {name = name, position = position, abilities = {}, native_modifiers = {}}
         function unit:IsNull() return false end
         function unit:IsAlive() return not self.killed end
         function unit:entindex() return id end
@@ -105,7 +108,25 @@ local function reset(fusion_test)
         function unit:Script_SetAttackRange(value) self.attack_range = value end
         function unit:SetModel(value) self.model = value end
         function unit:HasModifier() return false end
-        function unit:FindModifierByName() return nil end
+        function unit:FindModifierByName(modifier_name) return self.native_modifiers[modifier_name] end
+        function unit:SetBaseAttackTime(value) self.native_bat = value end
+        function unit:GetSecondsPerAttack()
+            local modifier = self.native_modifiers.modifier_lumberjack_native_cadence
+            return (self.native_bat or 1.5) / (1 + (modifier and modifier.extra_percentage or 0) / 100)
+        end
+        function unit:AddNewModifier(_, _, modifier_name)
+            if modifier_name ~= "modifier_lumberjack_native_cadence" then return nil end
+            local modifier = setmetatable({parent = self, stack = 0}, {__index = cadence_definition})
+            function modifier:GetParent() return self.parent end
+            function modifier:IsNull() return false end
+            function modifier:GetStackCount() return self.stack end
+            function modifier:SetStackCount(value) self.stack = value end
+            function modifier:SetHasCustomTransmitterData(value) self.transmitter = value end
+            function modifier:SendBuffRefreshToClients() end
+            self.native_modifiers[modifier_name] = modifier
+            modifier:OnCreated()
+            return modifier
+        end
         function unit:GetTeamNumber() return 2 end
         function unit:FindAbilityByName(ability_name) return self.abilities[ability_name] end
         function unit:AddAbility(ability_name)
@@ -356,10 +377,15 @@ print("LUMBERJACK_MODEL_ATTACK_PASS: actual LV4 melee model, direct native attac
 assert(workers.register_fused_lumberjack(spawned[1], {
     player_id = 0, team = 2, level = 4, population = 2, base_attack = 1500,
     wood_per_hit = 15, attack_speed = 0.67, attack_range = 400, fusion_count = 3,
+    fusion_interval_reduction = 0.5,
 }).ok)
 assert(spawned[1].survival_super_lumberjack and spawned[1].attack_capability == DOTA_UNIT_CAP_MELEE_ATTACK
     and spawned[1].attack_range == 400, "fusion must not restore the invalid ranged projectile mode")
 print("SUPER_LUMBERJACK_ATTACK_PASS: fused registration retains direct attacks and configured range")
+assert(math.abs(spawned[1]:GetSecondsPerAttack() - spawned[1].survival_attack_interval) < 0.000001,
+    "fused final cadence must reach native IAS while retaining the ordinary base attack time")
+assert(math.abs(spawned[1].native_bat - 1 / 0.67) < 0.000001,
+    "fusion preserves the ordinary model animation reference")
 
 -- Harvest growth exercises the real stat manager with the real worker subscriber.
 local stub_manager = package.loaded["systems/technology_stat_manager"]

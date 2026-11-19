@@ -12,3 +12,12 @@ end
 function modifier_lumberjack_cheer:GetModifierAttackSpeedPercentage()
     return self:GetStackCount()
 end
+function modifier_lumberjack_cheer:OnStackCountChanged()
+    if not IsServer() then return end
+    require("systems/lumberjack_native_cadence").percentage_changed(
+        self:GetParent(), self, self:GetStackCount())
+end
+function modifier_lumberjack_cheer:OnDestroy()
+    if not IsServer() then return end
+    require("systems/lumberjack_native_cadence").percentage_changed(self:GetParent(), self, nil)
+end
