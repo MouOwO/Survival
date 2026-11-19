@@ -30,7 +30,8 @@ def validate_text(value, item):
     return text
 
 
-def plan(auth, source, report):
+def plan(auth, source, report, *, language='schinese'):
+    guard.need(language in ('schinese', 'english'), 'reviewed_description_language_required')
     project = Path(auth.policy['repositories']['game'])
     current = baseline(project)
     guard.revision(source)
@@ -44,7 +45,7 @@ def plan(auth, source, report):
     for relative in OPERATORS:
         guard.need((project / relative).read_bytes() == git(project, 'show', source + ':' + relative),
                    'uncommitted_description_operator:' + relative)
-    request = dict(schema=1, kind='COMMITTED_DESCRIPTION_ONLY', language='schinese',
+    request = dict(schema=1, kind='COMMITTED_DESCRIPTION_ONLY', language=language,
                    authority_sha256=auth.digest,
                    parent_journal_sha256=current['journal_sha256'],
                    generation=current['lineage']['generation'] + 1,
@@ -124,6 +125,8 @@ def publish(auth, report, request_sha):
     request, raw = guard.read_json(path)
     guard.need(guard.sha(raw) == guard.checked_sha(request_sha), 'exact_description_request_sha_required')
     guard.need(request.get('operator_files') == list(OPERATORS), 'complete_description_operator_binding_required')
+    language = request.get('language', 'schinese')
+    guard.need(language in ('schinese', 'english'), 'reviewed_description_language_required')
     validate_text({'schema': 1, 'workshop_id': auth.policy['workshop_id'],
                    'description': request['description']}, auth.policy['workshop_id'])
     guard.need(not (report / 'intent.json').exists(), 'existing_description_intent_requires_verification_not_resubmit')
@@ -131,13 +134,13 @@ def publish(auth, report, request_sha):
         write_new(report / 'intent.json', {'request_sha256': request_sha, 'kind': 'DESCRIPTION_ONLY',
                                           'generation': request['generation']})
         with sdk.Steam() as steam:
-            before = fresh_item(steam, auth.policy['workshop_id'], sdk)
+            before = fresh_item(steam, auth.policy['workshop_id'], sdk, language)
             write_new(report / 'before.json', before)
             guard.need(before['visibility'] == 3, 'preserve_original_unlisted_item_required')
             handle = steam.ug('StartItemUpdate', C.c_uint64, [C.c_uint32, C.c_uint64],
                               sdk.APP, int(auth.policy['workshop_id']))
             guard.need(steam.ug('SetItemUpdateLanguage', C.c_bool, [C.c_uint64, C.c_char_p],
-                               handle, b'schinese'), 'description_language_setter_rejected')
+                               handle, language.encode('ascii')), 'description_language_setter_rejected')
             # Steam replaces the localized title/description pair together.
             guard.need(steam.ug('SetItemTitle', C.c_bool, [C.c_uint64, C.c_char_p],
                                handle, request['title'].encode('utf8')), 'preserved_title_setter_rejected')
@@ -148,10 +151,10 @@ def publish(auth, report, request_sha):
             guard.need(response.result == 1 and str(response.item) == auth.policy['workshop_id']
                        and not response.legal, 'successful_description_sdk_receipt_required')
             write_new(report / 'submitted.json', {'submit_result': response.result, 'item': str(response.item)})
-            after = fresh_item(steam, auth.policy['workshop_id'], sdk)
+            after = fresh_item(steam, auth.policy['workshop_id'], sdk, language)
             write_new(report / 'after.json', after)
             verify_snapshots(before, after, request['description'], request['title'])
-        receipt = dict(status='DESCRIPTION_VERIFIED_OFFICIAL', submit_result=1,
+        receipt = dict(status='DESCRIPTION_VERIFIED_OFFICIAL', submit_result=1, language=language,
                        workshop_id=auth.policy['workshop_id'], description_sha256=request['description_sha256'],
                        request_sha256=request_sha, source_revisions=request['source_revisions'],
                        release_sequence=request['release_sequence'], steam_manifest=request['steam_manifest'],

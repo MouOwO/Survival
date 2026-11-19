@@ -474,6 +474,8 @@ def description_lease(authority, request):
         need(sha(authority.policy_path.read_bytes()) == authority.digest == request['authority_sha256'],
              'description_authority_changed')
         description = request['description']
+        need(request.get('language', 'schinese') in ('schinese', 'english'),
+             'reviewed_description_language_required')
         need(isinstance(description, str) and 0 < len(description.encode('utf8')) < 8000
              and sha(description.encode('utf8')) == checked_sha(request['description_sha256']),
              'bounded_exact_description_required')
@@ -667,7 +669,7 @@ def require_sdk_mutation(suffix, args, *, authority_sha256):
         need(suffix in ('StartItemUpdate', 'SetItemUpdateLanguage', 'SetItemTitle', 'SetItemDescription', 'SubmitItemUpdate'),
              'description_only_sdk_setters_required')
         if suffix == 'SetItemUpdateLanguage':
-            need(len(args) == 2 and args[1] == b'schinese'
+            need(len(args) == 2 and args[1] == lease.validated.get('language', 'schinese').encode('ascii')
                  and not getattr(lease, 'description_set', False), 'fixed_description_language_required')
         if suffix == 'SetItemTitle':
             need(len(args) == 2 and args[1] == lease.validated.get('title', '').encode('utf8')

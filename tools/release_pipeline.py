@@ -179,6 +179,8 @@ def main(argv=None):
     action.add_argument('--source-revision')
     action.add_argument('--report', type=Path, required=True)
     action.add_argument('--request-sha')
+    action.add_argument('--language', choices=('schinese', 'english'), default='schinese',
+                        help='Language for description plan; publish uses its bound request')
     for name in ('pending', 'delivery-status', 'retire-plan'):
         action = actions.add_parser(name)
         action.add_argument('--full', action='store_true')
@@ -244,7 +246,7 @@ def main(argv=None):
         import release_description
         if args.action == 'plan':
             guard.need(args.source_revision is not None, 'committed_description_source_required')
-            result = release_description.plan(auth, args.source_revision, args.report)
+            result = release_description.plan(auth, args.source_revision, args.report, language=args.language)
         else:
             guard.need(args.request_sha is not None, 'explicit_description_request_sha_required')
             action = release_description.verify if args.action == 'verify' else release_description.publish
