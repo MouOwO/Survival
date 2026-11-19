@@ -14,6 +14,9 @@ OPERATORS = ('tools/release_pipeline.py', 'tools/release_public_launch.py',
              'tools/release_description.py', 'tools/release_lineage_20261101/guard.py',
              'tools/release_sdk_lineage_hook.py', 'tools/steam_workshop_upload.py',
              'tools/release_packager/core.py')
+BACKEND_SOURCES = ('server/archive_backend/test_access.py', 'server/player_web_auth/service.py',
+                   'server/player_web_auth/run.py', 'server/payment_backend/service.py',
+                   'server/payment_backend/endpoints.py')
 
 
 def proof(path, expected):
@@ -21,6 +24,13 @@ def proof(path, expected):
     value, raw = guard.read_json(path, limit=1024 * 1024)
     guard.need(guard.sha(raw) == guard.checked_sha(expected), 'launch_proof_changed')
     return value
+
+
+def backend_source_matches(project, deployed, published):
+    """Later compiler/operator commits may retain identical deployed backend bytes."""
+    guard.require_ancestor(project, guard.revision(deployed), guard.revision(published))
+    return all(git(project, 'show', deployed + ':' + path)
+               == git(project, 'show', published + ':' + path) for path in BACKEND_SOURCES)
 
 
 def validate_request(auth, request, current):
@@ -49,7 +59,8 @@ def validate_request(auth, request, current):
     guard.need(backend.get('status') == 'PUBLIC_BACKEND_ACTIVE_PAID_PRESERVED'
                and backend.get('host') == '47.111.16.128' and backend.get('database') == 'goufayu_ws4'
                and backend.get('public_admission') == {'api': True, 'web': True, 'payment': True}
-               and backend.get('source_revision') == current['report']['source_revisions']['game']
+               and backend_source_matches(project, backend.get('source_revision'),
+                                          current['report']['source_revisions']['game'])
                and all(backend.get(key) is True for key in ('financial_history_preserved',
                    'paid_inventory_preserved', 'balances_preserved', 'full_backup_verified',
                    'old_auth_revoked', 'fresh_health_verified')),

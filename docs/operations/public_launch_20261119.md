@@ -47,3 +47,25 @@
 - 维护编排 `tools/public_launch/maintenance.py` prepare只生成独立硬链接副本和未激活服务片段，替换源码使用新inode，禁止写穿父硬链接；父发行继续保留。apply要求精确prepare摘要和用户确认正常退出的独立回执，先停写、完整备份、事务清档，再激活服务。
 - `maintenance_tests02`六种隔离故障注入通过：正常切换、COMMIT回执丢失但已成功只读确认、未知事务保持停写、清档异常回滚、提交后启动失败只恢复服务、缺少正常退出不能停服。这里的服务/SQL为模拟，真实金融保留另由postgres_lab07证明。首次fixture缺少服务片段并暴露SQLite连接未显式关闭，已补齐fixture并在生产工具中显式关闭连接，失败证据保留。
 - 一次维护最多5账号，逐账号扫描已审阅35表、每账号最多10万行/100MB的既有安全预算；103初始属性只在本次状态重建时校验。正常运行无后台扫描、轮询或新增游戏帧工作。健康验证最多30次固定回环请求，仅在切换时执行；公开身份稳定校验O(1)，名单初始化最多5项。上述上限和fixture计数属于代码/模拟成本，不能写成原生FPS或3000并发验收。
+
+维护operator已提交047f9f55并push双仓；`maintenance_candidate01`的92160字节正式维护输入（不含测试脚本/密钥/玩家数据）已暂存。三个独立后台candidate已创建，使用实际服务解释器导入成功，prepared SHA `9df2276368195ca43a86aaf60eda2d7983168d381fdba0aef2ece1e76d525c7a`。当前服务和数据库均未切换。后续编译/operator提交可改变game提交号，公开门禁对此要求已部署提交为祖先且5份后台源逐字节相同，不用相同标签冒充相同源码；已验证同字节通过/旧后台字节拒绝。
+
+## 保留的用户原有8项改动
+
+本轮提交没有包含以下game工作区文件：
+
+- `docs/knowledge_base/00_START_HERE.md`
+- `docs/knowledge_base/evidence/ice_cone_hail_20261113.md`
+- `server/archive_backend/__pycache__/match_modes.cpython-314.pyc`
+- `server/bundles/current.json`
+- `server/player_web_auth/README.txt`
+- `tools/monster_portrait_release_20261030/finalize_package.py`
+- `tools/monster_portrait_release_20261030/verify_download.py`
+- `tools/prepare_delivery_operator_20261103.py`
+
+content/master无未提交改动。财务与正常退出的用户回答、真实发行/应用回执继续作为实际切换依据；本记录不代替服务激活、官方完整下载或新EXE入局验收。
+
+
+最终界面核对发现game/content两份授权UI仍写“独立测试存档”，已配套改为“云存档”，仅一条文字，Node语法及双份源码一致性通过；对应JS官方编译仍待，不能把旧编译资源当成交付。此前1908任务在构建前建立，UI补充改变运行指纹，后续须新建来源绑定任务并在1908状态中标注替代关系，保留原job.json；实际任务以树外package_job.json为准，不改旧不可变源。
+
+`final_preparation_checks01` 的旧1907 full pending检查返回 `reviewed_projection_differs_from_fresh_collection`，退出2，未生成“完整待发0”证明。原7项公开lease复验通过。新候选必须完成新的全量收集/审计，不能修改旧投影或直接复用旧通过回执。当前正式版本仍1907、不列出、5账号；未清档、未停服、未换正式包。
