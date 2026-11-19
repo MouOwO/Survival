@@ -37,3 +37,13 @@
 第二次独立Windows事件探针真实匹配cmd PID12744、退出0且事件订阅完整移除，native_event_probe02_receipt保留；游戏启动/输入均0。第一次探针退出1记录不覆盖。
 
 已请用户正常退出PID1888，以便带consolelog及助手从新入口重新启动。本轮没有正式资源切换；重启的技术原因是当前客户端启动日志没有启用，并非引用AGENTS扩包规则追加新的发布许可。当前尚未重启客户端、尚未观察新局start/poll或approved，不能报告此轮登录恢复。后台代码和Steam中转未改，源/快捷方式检查、后台健康和验签READY也不能代替真实游戏登录。
+
+## 新入口实际重启、授权与入局已通过
+
+随后用户明确确认正常退出并继续验证。观察时PID1888已消失，原生退出码未捕获/null，不伪造为0；没有强杀。通过实际桌面“游戏入口.lnk”启动，starter PID10912仅为启动器，不当作助手身份。新普通Dota PID26000/FILETIME134395487420866168，consolelog=true，正式1905/manifest6306865332807022551，安装未切换。实际管理进程18004、真实基础Python助手4980，入口观察到ready后才记录成功并保持双句柄监督；启动operator为69b209eb0c6a493baeecb6a6946c687e81a071dd（工具内容来自fa3f0412d），不是旧1904回执。
+
+新PID的日志确已更新，当前world只有一次ready。真实player-auth/start200/240字节、pending poll200/48字节均有游戏ack，用户确认本局出现授权码。之后用户确认“已完成授权并进入游戏”，同一进程新日志观察到approved；批准poll200/293、session/authenticate200/22846、session/login200/39316、online-time/checkpoint200/50576及50577均由游戏ack。payments/catalog200/92319也收到ack，只证明该请求传输，不代表真实购买；不将catalog HTTP200单独当业务语义完整验收。本轮未观察archive/command，不把登录/在线同步当跨局存档持久化证明；未代抽奖或交易。
+
+正式客户端和助手保持运行供用户继续内测，没有为收口记录退出游戏。入口仍必须使用；直接Steam启动不包含本机助手，原生工厂nn没有因此恢复。status.json是阶段记录，失败应优先看failure.json，本轮匿名观察器检查二者并以新PID/FILETIME/日志新字节约束，不仅凭旧ready。入口closed_normally阶段本身也不能替代Dota原生退出码/转储的崩溃分类。
+
+会话回执D:/Survival_本地工具/runs/online_helper_sessions/20261119T075857Z_4a93434e/launch_receipt.json登记28bc3bd7…；先前传输成功但Steam未确认的独立回执登记e203d34b…并保持原状。最终匿名confirmed_auth_snapshot.json及login_recovered_receipt.json记录本次真实批准与会话ack，不记录授权码/账号/nonce/令牌或业务正文。后台代码部署0、Steam中转重启0、工坊上传0，游戏包仍1905。
