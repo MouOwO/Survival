@@ -135,3 +135,14 @@ v1及快捷方式原备份保留；v2登记a108f5a2…，安装动作没有另�
 当前验收使用已发布官方下载包，没有候选暂装、keeper或待恢复事务；安装未切换。
 本节只记录已发生的正式传输结果，运行资源和助手不改；后续收到用户Steam确认后
 继续观察approved、session/authenticate与云档案，不能将“已同步游廊”当作完整登录验收。
+
+## 2026-11-19 用户完成正式授权并进入游戏
+
+用户确认“已完成授权并进入游戏”。随后脱敏原生日志确认状态approved；协议2助手
+收到批准poll200/292字节，session/authenticate200/22841、session/login200/38759、
+archive/command200/14468均由游戏ack，真实http_fishing公开档案投影发布。
+本轮未重打包、上传、切换安装或部署后台代码。1903及manifest5892770527169450733保持；
+助手和Steam固定中转需要继续在线，原生工厂nn没有因此修复。
+Steam DNS和中转恢复另见steam_verification_dns_recovery_20261119.md；
+真实脱敏回执位于树外login_web_error_20261119/player_login_confirmed01，已登记3beca941…。
+本次确认登录/入局和档案加载；未验证跨局保存、多人或3000在线，不自动执行真人购买和抽奖。

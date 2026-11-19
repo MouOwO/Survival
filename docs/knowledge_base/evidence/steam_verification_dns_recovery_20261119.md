@@ -1,6 +1,6 @@
 # 2026-11-19 Steam官方验签反复不可用与恢复
 
-本轮只更新作者端Steam验签辅助工具，未更换后台代码或游廊包。现役游廊仍为2026111903，manifest5892770527169450733。新版接入后云端返回RELAY_RESTORED，web健康、中转监听、Steam传输和官方拒绝无效断言均为true。已请用户重新发起授权；这不能代替真实approved、云档案和进入游戏验收。
+本轮只更新作者端Steam验签辅助工具，未更换后台代码或游廊包。现役游廊仍为2026111903，manifest5892770527169450733。新版接入后云端返回RELAY_RESTORED，web健康、中转监听、Steam传输和官方拒绝无效断言均为true。2026-11-19用户确认“已完成授权并进入游戏”；随后本机日志确认approved、会话认证/登录200及游戏ack，登录与入局恢复。云档案请求返回200并ack，公开档案投影使用真实http_fishing提供者；跨局持久化与多人仍未验证。
 
 ## 原因
 
@@ -24,5 +24,7 @@
 树外D:/Survival_本地工具/runs/login_web_error_20261119中：network_direct_control01保留临时ActiveStore /32路由准备/恢复证据，路由已移除；steam_relay_recovery01保留第一次精确子进程迁移及当时失败探针；steam_dns_repair01保留逐文件源码备份、stash OID、失败结果和真正成功的activation_verified_receipt.json。不覆盖前次失败证据，不记录授权码、回调或密钥。
 
 当前仍依赖作者电脑、飞鸟出口及SSH在线，没有新增驻守或定时任务。上线前须部署并验证长期在线、独立于作者电脑的Steam官方可达出口，验证无VPN浏览器、服务器重启恢复和并发登录；本轮不代表3000在线验收。用户需从游戏重新打开授权，刷新旧失败回调不能作为新结果。
+
+用户确认回执：D:/Survival_本地工具/runs/login_web_error_20261119/player_login_confirmed01/player_login_confirmed_receipt.json，登记3beca9413694128f8302a3e765278bd8d5082da27acb18f16b06b66d24b87121。仅保存白名单路径/状态/字节数/ack：poll批准200/292字节，session/authenticate200/22841，session/login200/38759，archive/command200/14468，均有游戏ack。payments/catalog200/92319在采集时未见ack，不能据此宣称商城完整验收。未代替用户执行购买、抽奖或存档操作，未输出请求正文、令牌、账号或回调。
 
 协议参考：https://developers.google.com/speed/public-dns/docs/doh/json
