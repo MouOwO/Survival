@@ -45,3 +45,14 @@ https://xiaofengnet.com/launcher/已上线，既有nginx静态目录全新launch
 build、真实入局、桌面备份、静态发布、公网下载和双语言回读回执均已登记，清单在ledger_registration01.json。安装启动回执gui_launch_receipt.json指向D:/Survival_玩家登录器而被账本拒绝，原回执完整保留；不伪造已登记或改写真实路径。
 
 随后用户新增“合成伐木工动作仍重置，修改并发布”要求，并同意正常退出当前Dota做隔离动画对照。该EXE严格绑定1905；下次运行包更新后，必须同时准备并验收匹配的新EXE、更新下载页和桌面入口，不能让1905下载入口成为新包的登录阻断。当前下载与介绍完成不等于新伐木工修复已交付。
+## 1907配套2026.11.19.2：实际EXE已就绪，等待本局授权
+
+合成伐木工修正已正式同步1907，Steam manifest `7948611742745795863`。登录器按新官方五包重新绑定，版本 `2026.11.19.2`，文件 `GoufayuLauncher-20261119.2.exe`，13,177,166字节，SHA256 `7be9c1f468af07c5d6c28d01e8c21fe6897871666049e68306733cd867614e7d`，工具源码提交 `a5989cc1aebcd35224695d4d72ba3423fa7d8b23`。构建回执 `D:/Survival_本地工具/runs/player_launcher_20261119/build02/build_receipt.json`。
+
+实际冻结EXE在中文空格路径、移除外部Python/Git/Pwsh7的PATH中完成Tk自检，0 HTTP，退出0。新程序已装入独立 `D:/Survival_玩家登录器/2026.11.19.2`，旧版保留；三个桌面入口逐一备份后更新。实际GUI22876由EXE启动正式Dota16940，五个官方VPK共3,812,596,637字节全SHA通过，原生进程身份核验通过，助手真实ready；单次进程快照、2次窗口事件/2次身份读取。最新状态与本次匿名观察在 `v2_online_acceptance`，不包含凭据。
+
+截至本节记录，用户尚未回传本局授权结果，观察到0个本局入房/授权事件。不能把V1的用户确认或V2的ready写成V2已完成真实登录。保留Dota与登录器等待用户从原游廊进入并完成本局网页登录，之后生成独立实际接受回执，才切换公开下载页；公开页面当前仍是绑定1905的V1，尚未声称已提供1907新版。
+
+下载页后续版本工具已提交：显式父index摘要、旧index树外云端备份、独立版本目录及暂存文件、锁内再次复核父页与新页SHA后原子切换，历史EXE不覆盖；7项隔离文件系统门禁通过。Windows测试模拟fcntl，不能当Linux锁实测；真正发布后仍须公开HTTPS全文件回读。1907上传后又通过官方SDK只读复核中英文：标题、全文、稳定下载URL和不列出状态均正确。
+
+本轮所有Git同步保留以下原有8项改动：`docs/knowledge_base/00_START_HERE.md`、`docs/knowledge_base/evidence/ice_cone_hail_20261113.md`、`server/archive_backend/__pycache__/match_modes.cpython-314.pyc`、`server/bundles/current.json`、`server/player_web_auth/README.txt`，以及未跟踪的 `tools/monster_portrait_release_20261030/finalize_package.py`、`tools/monster_portrait_release_20261030/verify_download.py`、`tools/prepare_delivery_operator_20261103.py`。content无未提交改动。后台业务未部署；新版EXE切页仍为后续待办。
