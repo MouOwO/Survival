@@ -1,6 +1,6 @@
 # 2026-11-20 正式登录器文件占用及二次启动修复
 
-状态：修复源码和隔离回归已完成，新EXE构建、实际启动、下载发布及授权入局仍待。正式游廊1910保持公开，后台本轮尚未修改，不重复清档。
+状态：修正版EXE2026.11.20.1已构建、安装并发布，6项公网完整下载一致；实际新进程已备份隔离旧残留、助手ready并显示有效授权码，start/poll真实200及游戏ACK已验证。本人Steam确认后的入局仍待；正式游廊1910保持公开，后台本轮无部署、清档0。
 
 用户报告“launchur_failed／联网准备未完成”，反复刷新验证码后仍回到原错误。本机新局Dota16996，登录器34712；20261119T230031Z_9fb304ef的failure.json为FileExistsError，helper.log为0字节，尚未ready。旧20261119T133937Z_93b8550b曾正常ready及2091条响应，随后PermissionError；cfg遗留199字节survival_ws4_http_bridge_cursor.sfbtmp。旧write使用固定临时名，os.replace占用失败后不清理这个未登记临时文件，下一次open(xb)直接FileExistsError。旧status仍停在waiting_for_log/ready，进一步误导诊断。
 
@@ -23,3 +23,15 @@
 2500次真实Windows文件更新时显式禁止glob/iterdir，目录扫描0、replace2502次（含初始化2次），未诱发占用时重试0；实际耗时见regression03回执。这是树外文件IO计数，不冒充游戏FPS或长期联网验证。另12项登录器流程、9项既有HTTP桥接合同通过，生产请求/交易/存档写入0。
 
 微软文件共享说明：[CreateFile的FILE_SHARE_DELETE同时影响删除和重命名](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilea)，[共享/访问错误定义](https://learn.microsoft.com/en-us/windows/win32/debug/system-error-codes--0-499-)。历史现场未记录WinError，现场原因以临时文件、异常序列和真实负对照共同定位，不宣称已确认是哪一个外部进程持锁。
+
+## 实际EXE与发布
+
+修复源码game a78320144d0b815ae5b669986af13d50ae1d8d24，content34a43d745b2703d747b1e9199d5d1600a8ba4634未改。build01的EXE13186872字节，SHA d9d96841c3bb01c652ebfc374c07040351f047279cf9fdf41a4ee5f462003ecf；storage SHA4a2b8d5181307b4db6337774208daa5eff72f9a537575b7528039316a3ca861a。已用实际frozen EXE初始化GUI自检，绑定公开1910/manifest2486294026793872721及原helper205e3837，免装Python。安装到独立D:/Survival_玩家登录器/2026.11.20.1，旧版保留，3个桌面快捷方式经CAS和备份更新。
+
+用户确认正常退出后，已观察旧Dota及旧GUI均结束，再从实际新GUI启动。新manager37748、Dota10644/Filetime134396037422349910；真实5包全SHA启动核验完成。recovery自动备份原199字节临时文件，备份SHA与diagnostic01事先观察一致，随后才移除源和空目录。原备份留在此Windows用户AppData本次session/recovered_bridge，回执仅引用路径与摘要，不导出认证内容。实际启动回执在actual01，失败文件未出现。
+
+已从普通正式Dota的原游廊库创建默认ws4_entry房间、作弊关闭、接受就绪并加载；属于玩家电脑主机，未宣称Valve专服或原生HTTP恢复。实际授权画面authorization11.png有私有ACL。authorization_ready01截至记录start1/1 ACK、poll21/21 ACK，全部HTTP200；后续助手57条响应仍正常。已打开本局网页登录供本人确认，不能把此前旧EXE的成功回复或仅有效授权码冒称为本次完整入局。
+
+download_publication01已将同一稳定地址https://xiaofengnet.com/launcher/切换到2026.11.20.1，旧首页备份及旧版本保留。download_https01直接公网TLS校验、忽略环境代理、禁用缓存，完整读取EXE/ZIP/说明/版本/摘要/首页共6项26196677字节，全部长度和SHA一致。新首页SHA1d9bff527fc6cdb6580f5594eed97a0ab25455f923fc7e05d6f848f33e6a8295；原游廊介绍已经链接这个稳定地址，所以本轮无SDK内容上传。
+
+最终Git提交和远端状态以本轮final_receipt及双仓同步回执为准。实际游廊包仍为1910；本轮source_state核对双仓pending_sources和dirty_runtime均空，后台保持已有公开服务。本轮没有支付、兑换、福利消耗或存档重置。
