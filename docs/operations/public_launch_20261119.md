@@ -1,6 +1,6 @@
 # 2026-11-19 正式公开上线切换
 
-状态：1910已同步原游廊但仍不列出，manifest2486294026793872721；后台公开准入和保留已支付余额/权益的玩法清档已完成，实际v3 EXE已从Steam启动并显示有效授权码。永久公开可见性、v3下载发布和本人Steam授权后的完整入局验收仍待完成。
+状态：1910已同步原游廊并永久公开，manifest2486294026793872721；后台公开准入和保留已支付余额/权益的玩法清档已完成，EXE2026.11.19.3已发布且6项公网完整下载一致。最终只读完整验收WORKSHOP_SYNCED，运行待发/阻断0；实际客户端已显示有效授权码，本人Steam授权后的完整入局和余额权益界面仍待验。
 
 用户已确认“伐木工问题已解决，现在可以直接上线了”，作为本轮正式公开上线指令，替代此前仅不列出的测试范围。此前计划11月20日开放；本轮按用户最新“现在”准备立即开放，不建立未经请求的定时任务。现有介绍、下载页中“内测、仅获准账号、计划11月20日”的文字须在真正开放时一致更新，继续不写付费宣传，QQ1098603739。
 
@@ -104,3 +104,17 @@ activation_failure_readonly02定位支付服务为200/CHDIR：copytree复制了�
 本轮上线指令已明确授权立即公开，不能把额外的本人Steam点击确认误当成新的公开授权要求。发行工具增加明确的AUTHORIZATION_READY证据阶段：绑定真实冷启动EXE、5包完整SHA、实际游戏进程/创建时间、有效授权码画面，以及同一epoch的请求/HTTP200/游戏ACK交集；不冒称已完成本人Steam授权或加载档案。authorization_ready_evidence01实际观察start 3次、poll 320次均200且已ACK，读取上限16MiB，一次性离线O(B+R)分析，无游戏循环或新增网络调用。10项验证通过，错误版本、错误进程、截图摘要变化、伪本人确认和缺少start ACK均拒绝。公开下载与可见性发布可使用这个真实阶段，post_authorization_gameplay_verified和user_confirmed_entered_game明确为false；本人后续入局、余额/权益显示仍保留待验。
 
 两语言正式介绍已从Steam新鲜回读一致，下载链接及QQ1098603739正确，无收费描述。v3下载页候选已生成，旧公开v2首页SHA仍1ac9e006...；没有用虚假的EXE验收记录提前发布v3。最终公开提交另绑定正式开放更新说明，避免最新更新页继续只显示历史Restricted four-account test说明；这只是新元数据说明，不改历史回执或旧更新记录。
+
+## 最终公开与完整验收
+
+download_publication03已在原静态站点发布2026.11.19.3，旧首页按CAS摘要备份、旧版本保留。download_https03从公网直接HTTPS完整读取6项文件，共26180698字节，EXE/ZIP/说明/版本/摘要/首页均匹配，TLS校验开启，未使用环境代理。稳定入口https://xiaofengnet.com/launcher/。
+
+public_visibility01通过release_pipeline.py public-launch同一全局lease正式公开原条目3824360109；SDK结果1、legal=false，双语言新鲜回读visibility=0，标题、介绍与5包内容保持。新提交说明为正式开放及专用登录器提示，QQ群1098603739，无付费宣传。公开回执SHA5849cffa6a911795103e55c3534317374d0837bfcd5c4013d17045d140af5489，lineage generation40/pending=null。正式后台API、web、payment最终均/health 200/ok=true。
+
+final_delivery01旧命令先因Windows LF检出形成3个非运行dirty记录而拒绝；只恢复原CRLF检出形式后，final_delivery02继续明确拒绝complete_baseline_pending_or_changed_generation。原因是旧检查把包发行generation38固定为当前代际，而正式英文介绍和公开可见性分别通过合法lease推进39/40；canonical包journal和签名资源没有变化。两份失败与projection_diagnostic01均保留，没有把旧命令标成通过或重写检查点。
+
+树外一次性verify_public_delivery_20261119.py完成独立只读最终审核，final_public_audit01真实返回WORKSHOP_SYNCED：验证两次元数据请求/SDK回执/前后保护字段和38→39→40连续代际；3个错误代际/未收口/摘要负例拒绝。调用原builder.load_package(full=True)复验全部源码、原编译证据、签名树及VPK，使用原advance逻辑重现原不可变完整源码检查点；再次流式SHA核对实际官方安装5文件3812492764字节。随后使用原完整分类器重新索引当前双仓，pending/dirty_runtime/blocking/pending_resources均0，原有dirty_total8原样保留；原delivery_status使用这份真实完整清单返回WORKSHOP_SYNCED。最后再向Steam新鲜查询两语言公开状态、保护字段和介绍，并核对journal/lineage操作期间未变。后台数据库、安装包、SDK修改次数均0。旧通用delivery-status的代际限制仍保留，后续应使用明确的元数据连续性审核，不能简单放宽generation。
+
+旧英文verification.json本身缺少存储绑定，ledger_registration04如实记录首次登记拒绝；新增verification_storage_receipt.json只登记本次观察，引用原路径和原始SHA，原件保持。其余本轮真实回执均登记到树外清理账本，失败记录和备份继续保留。
+
+验收边界：本轮新EXE达到有效授权码且start/poll真实200/ACK，尚未取得本人Steam确认后的新游戏档案画面；未自动购买、兑换或消耗福利。3000同时在线未验收，Steam官方验签仍依赖现有中转，ISOLATED_LOCAL_PROGRESS=1仍限制不可信主机进度进入公共排名。公开不代表这些范围已通过。
