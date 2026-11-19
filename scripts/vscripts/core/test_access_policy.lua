@@ -3,6 +3,7 @@
 local config = require("config/test_access")
 local M = {}
 local initialized, initialization_error = false, nil
+local public_access = false
 local allowed_accounts, disconnect_requested = {}, {}
 local BASE = "76561197960265728"
 local MAXIMUM = "76561202255233023"
@@ -38,6 +39,10 @@ function M.enabled()
     return type(config) ~= "table" or config.enabled ~= false
 end
 
+function M.is_public()
+    return initialized and initialization_error == nil and public_access == true
+end
+
 function M.init()
     if initialized then return initialization_error == nil, initialization_error end
     initialized = true
@@ -48,6 +53,15 @@ function M.init()
     end
     if type(config) ~= "table" or config.enabled ~= true or type(config.allowed_steamids) ~= "table" then
         return fail("test_access_configuration_invalid")
+    end
+    if config.public_release ~= nil and type(config.public_release) ~= "boolean" then
+        return fail("public_access_configuration_invalid")
+    end
+    if config.public_release == true then
+        local ok, profile = pcall(require, "config/release_profile")
+        if not ok or type(profile) ~= "table" or profile.channel ~= "production" then
+            return fail("public_access_production_required")
+        end
     end
     local count, highest_index = 0, 0
     for key, steam in pairs(config.allowed_steamids) do
@@ -70,6 +84,7 @@ function M.init()
     if not resource_method("GetSteamAccountID") and not resource_method("GetSteamID") then
         return fail("test_access_identity_api_missing")
     end
+    public_access = config.public_release == true
     return true
 end
 
@@ -104,7 +119,7 @@ function M.allowed(player_id)
         account = ok and account_from_steamid64(value) or nil
         if not account then return false, "test_access_identity_unavailable" end
     end
-    if not allowed_accounts[account] then return false, "test_access_account_not_allowed" end
+    if not public_access and not allowed_accounts[account] then return false, "test_access_account_not_allowed" end
     return true
 end
 

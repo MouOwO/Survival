@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "workshop_id": "3824360109",
+  "authorization_statement": "伐木工问题已解决，现在可以直接上线了",
+  "authorization_date": "2026-11-19",
+  "initial_visibility": 3,
+  "final_visibility": 0,
+  "financial_scope_answer": "保留已支付余额和权益，仅重置玩法进度",
+  "financial_scope_question_id": "call_775c28e30a99470dbe2da2dac365aaa7",
+  "require_fresh_verified_public_package": true,
+  "require_backend_public_activation": true,
+  "require_paid_preservation_verified": true,
+  "require_compatible_verified_launcher": true,
+  "keep_steam_verification": true,
+  "qq_group": "1098603739"
+}

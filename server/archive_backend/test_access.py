@@ -21,13 +21,19 @@ MAX_ACCOUNT_ID = 4294967295
 @dataclass(frozen=True)
 class TestAccountPolicy:
     account_ids: frozenset[str]
+    public_release: bool = False
 
     @classmethod
     def from_environment(cls, environ: Mapping[str, str]):
+        mode = environ.get("SURVIVAL_ACCESS_MODE", "test")
+        if mode not in ("test", "public"):
+            raise ValueError("account_access_mode_invalid")
         value = environ.get(ENVIRONMENT_NAME, "")
         if not isinstance(value, str):
             raise ValueError("test_access_configuration_invalid")
         if not value.strip():
+            if mode == "public":
+                raise ValueError("public_access_reviewed_roster_required")
             return None  # Explicit opt-in: existing production access is unchanged.
         identities = [part.strip() for part in value.split(",")]
         if len(identities) not in (4, 5) or len(set(identities)) != len(identities):
@@ -40,11 +46,14 @@ class TestAccountPolicy:
             if not 1 <= account <= MAX_ACCOUNT_ID:
                 raise ValueError("test_access_steam_id_invalid")
             accounts.add(str(account))
-        return cls(frozenset(accounts))
+        return cls(frozenset(accounts), public_release=mode == "public")
 
     def permits(self, account):
         # The game uses GetSteamAccountID, not SteamID64, as the archive key.
         # Do not normalize caller input or change the existing HMAC/database key.
+        if self.public_release:
+            return (isinstance(account, str) and re.fullmatch(r"[1-9][0-9]{0,9}", account) is not None
+                    and int(account) <= MAX_ACCOUNT_ID)
         return isinstance(account, str) and account in self.account_ids
 
 

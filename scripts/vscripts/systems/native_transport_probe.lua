@@ -42,7 +42,6 @@ local function actor(source)
     if type(account) ~= "number" or account ~= account or account < 1 or account > 4294967295
         or account ~= math.floor(account) then return nil end
     account = string.format("%.0f", account)
-    if not ACCOUNTS[account] then return nil end
     local permitted, allowed = pcall(function()
         local config, access = require("config/test_access"), require("core/test_access_policy")
         if type(config) ~= "table" or config.enabled ~= true or type(config.allowed_steamids) ~= "table" then return false end
@@ -54,6 +53,7 @@ local function actor(source)
         end
         return (count == 4 or count == #ROSTER) and highest_index == count
             and access.enabled() == true and access.init() == true and access.allowed(id) == true
+            and (ACCOUNTS[account] == true or access.is_public and access.is_public() == true)
     end)
     if permitted and allowed then return entity, id, account end
 end

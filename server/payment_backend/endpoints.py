@@ -52,6 +52,9 @@ def runtime_binding(config_path, port, config):
     if type(config_path) is not str or type(port) is not int:
         raise ValueError('payment_runtime_binding_invalid')
     endpoints = PaymentEndpoints(config.get('public_base', DEFAULT_PUBLIC_BASE))
+    access_mode = config.get('access_mode', 'test')
+    if access_mode not in ('test', 'public') or access_mode == 'public' and not endpoints.isolated:
+        raise ValueError('payment_public_access_mode_invalid')
     allowed = (LEGACY_CONFIG, 8766, DEFAULT_PUBLIC_BASE), (WS4_CONFIG, 18769, WS4_PUBLIC_BASE)
     if ((config_path, port, endpoints.public_base) not in allowed
             or config.get('bind', '127.0.0.1') != '127.0.0.1'):

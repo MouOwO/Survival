@@ -7,6 +7,9 @@ from .service import PAYMENT_UPSTREAM, Service, Settings
 
 
 def settings_from_environment(env):
+    access_mode = env.get("PLAYER_WEB_AUTH_ACCESS_MODE", "test")
+    if access_mode not in ("test", "public"):
+        raise ValueError("public_access_mode_invalid")
     progress = env.get("ISOLATED_LOCAL_PROGRESS", "0")
     if progress not in ("0", "1"):
         raise ValueError("isolated_local_progress_invalid")
@@ -29,7 +32,8 @@ def settings_from_environment(env):
         steam_tls_relay=relay == "1",
         payments_enabled=payments == "1",
         payment_upstream=env.get("PLAYER_WEB_AUTH_PAYMENT_UPSTREAM", PAYMENT_UPSTREAM),
-        payment_bearer=env.get("PLAYER_WEB_AUTH_PAYMENT_BEARER", ""))
+        payment_bearer=env.get("PLAYER_WEB_AUTH_PAYMENT_BEARER", ""),
+        public_release=access_mode == "public")
 
 
 def lobby_from_environment(service, env):

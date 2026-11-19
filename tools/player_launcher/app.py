@@ -1,4 +1,4 @@
-"""Portable closed-test player entry, bundled with the exact published helper."""
+"""Portable player entry, bundled with the exact published helper and admission."""
 from __future__ import annotations
 import argparse
 import ctypes
@@ -23,7 +23,7 @@ TITLE = '我在dota2苟发育 · 专用登录器'
 WORKSHOP = '3824360109'
 READY = '[SFB_HELPER] ready; enter the original Workshop game'
 MESSAGES = {
-    'steam_not_found': '未找到 Steam。请先安装 Steam，并登录你的测试账号。',
+    'steam_not_found': '未找到 Steam。请先安装 Steam，并登录你的 Steam 账号。',
     'dota_not_found': '未找到 Dota 2。请先通过 Steam 安装并更新 Dota 2。',
     'existing_client': 'Dota 已在运行。请先正常退出 Dota，再点击“启动游戏”。',
     'entry_already_running': '专用登录器已在运行，请使用已打开的窗口。',
@@ -156,6 +156,8 @@ def session(binding, run, notify):
             sys.stdout = sys.stderr = Output(output, ready)
             sys.argv = ['file_http_bridge', '--game-root', str(game), '--pid', str(pid),
                         '--filetime', str(created), '--state-dir', str(run / 'private_helper'), '--apply']
+            if binding.get('access_mode') == 'public':
+                sys.argv.extend(['--access-mode', 'public'])
             bridge.main()
         if state['phase'] != 'ready':
             raise LaunchError('helper_not_ready')
@@ -183,7 +185,8 @@ def selfcheck(destination):
     root = tkinter.Tk(); root.withdraw(); root.update(); root.destroy()
     result = dict(kind='FROZEN_PLAYER_LAUNCHER_SELFCHECK', frozen=bool(getattr(sys, 'frozen', False)),
                   version=binding['version'], protocol=bridge.PROTOCOL,
-                  admitted_test_accounts=len(bridge.ACCOUNTS), gui_initialized=True,
+                  access_mode=binding.get('access_mode', 'test'),
+                  fallback_test_accounts=len(bridge.ACCOUNTS), gui_initialized=True,
                   external_python_required=not bool(getattr(sys, 'frozen', False)), git_required=False, powershell7_required=False,
                   automatic_game_start=False, http_requests=0, game_files_changed=False)
     write_json(destination, result)
@@ -229,7 +232,7 @@ def gui():
     button = ttk.Button(row, text='启动游戏', command=start); button.pack(side='left', ipadx=24, ipady=8)
     ttk.Button(row, text='游廊页面', command=lambda: webbrowser.open('https://steamcommunity.com/sharedfiles/filedetails/?id=' + WORKSHOP)).pack(side='left', padx=12, ipady=8)
     ttk.Button(row, text='打开诊断目录', command=lambda: os.startfile(str(current_run[0] or base))).pack(side='left', ipady=8)
-    tk.Label(frame, text='内测入口 · 官方 QQ 群 1098603739\n联网期间请保留此窗口，可最小化。Steam 授权请使用本局同一账号。',
+    tk.Label(frame, text='官方 QQ 群 1098603739\n联网期间请保留此窗口，可最小化。Steam 授权请使用本局同一账号。',
              fg='#9eafb8', bg='#142029', font=('Microsoft YaHei UI', 9), justify='left').pack(anchor='w', pady=(18,0))
     tk.Label(frame, text='版本 ' + binding['version'] + ' · Windows 10 / 11 · 64 位', fg='#718892', bg='#142029', font=('Microsoft YaHei UI', 8)).pack(anchor='w', pady=(5,0))
     def drain():

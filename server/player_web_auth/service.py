@@ -103,8 +103,11 @@ class Settings:
     payments_enabled: bool = False
     payment_upstream: str = PAYMENT_UPSTREAM
     payment_bearer: str = field(default="", repr=False)
+    public_release: bool = False
 
     def validate(self):
+        if type(self.public_release) is not bool:
+            raise ValueError("public_access_mode_invalid")
         if type(self.steam_tls_relay) is not bool:
             raise ValueError("steam_tls_relay_invalid")
         if type(self.payments_enabled) is not bool:
@@ -138,6 +141,23 @@ class Settings:
     @property
     def accounts(self):
         return {str(int(steam) - STEAM_BASE): steam for steam in self.steam_ids}
+
+    def permits_account(self, account):
+        if (not isinstance(account, str) or not re.fullmatch(r"[1-9][0-9]{0,9}", account)
+                or int(account) > 0xFFFFFFFF):
+            return False
+        return self.public_release or str(STEAM_BASE + int(account)) in self.steam_ids
+
+    def steam_for_account(self, account):
+        if not self.permits_account(account):
+            raise AuthError("test_account_not_allowed", 403)
+        return str(STEAM_BASE + int(account))
+
+    def permits_steam(self, steam):
+        if (not isinstance(steam, str) or not re.fullmatch(r"[0-9]{17}", steam)
+                or not 0 < int(steam) - STEAM_BASE <= 0xFFFFFFFF):
+            return False
+        return self.public_release or steam in self.steam_ids
 
     @property
     def origin(self):
@@ -325,7 +345,7 @@ class Service:
         if (not isinstance(payload, dict)
                 or set(payload) != {"account_id", "match_session_id", *extra}
                 or not isinstance(payload.get("account_id"), str)
-                or payload["account_id"] not in self.settings.accounts):
+                or not self.settings.permits_account(payload["account_id"])):
             raise AuthError("test_account_not_allowed", 403)
         if not isinstance(payload.get("match_session_id"), str) or not SESSION.fullmatch(payload["match_session_id"]):
             raise AuthError("match_session_invalid")
@@ -489,11 +509,11 @@ class Service:
                 or not fields.get("openid.sig")):
             raise AuthError("steam_assertion_invalid", 403)
         claimed = fields.get("openid.claimed_id", "")
-        match = re.fullmatch(r"https://steamcommunity\.com/openid/id/(7656119\d{10})", claimed)
+        match = re.fullmatch(r"https://steamcommunity\.com/openid/id/([0-9]{17})", claimed)
         if match is None or claimed != fields.get("openid.identity"):
             raise AuthError("steam_identity_invalid", 403)
         steam = match[1]
-        if steam not in self.settings.steam_ids:
+        if not self.settings.permits_steam(steam):
             raise AuthError("test_account_not_allowed", 403)
         nonce = fields.get("openid.response_nonce", "")
         try:
@@ -534,7 +554,7 @@ class Service:
             if not browser["steam"]:
                 raise AuthError("steam_login_required", 403)
             row = self.challenge(payload.get("code"))
-            if browser["steam"] != self.settings.accounts[row["account"]]:
+            if browser["steam"] != self.settings.steam_for_account(row["account"]):
                 raise AuthError("steam_account_mismatch", 403)
             remembered = self.db.execute("SELECT 1 FROM browser_preferences WHERE sid_hash=?",
                                          (digest(sid),)).fetchone() is not None
@@ -654,7 +674,7 @@ class Service:
         row = self.principal(bearer, payload)
         if row["match_id"].startswith("lobby_"):
             raise AuthError("player_route_not_allowed", 403)
-        if row["account"] not in self.settings.accounts:
+        if not self.settings.permits_account(row["account"]):
             raise AuthError("test_account_not_allowed", 403)
         action = path.rsplit("/", 1)[1]
         identity = {"account_id", "match_session_id"}
@@ -749,22 +769,26 @@ class Service:
         sid, browser, fresh = self.browser(sid)
         base = self.settings.public_base
         escape = html.escape
-        text = "<h1>生存守城 · 测试授权</h1><p>登录将前往 Steam 官方页面；本站不收集 Steam 密码。</p>"
+        heading = "我在dota2苟发育 · Steam 授权" if self.settings.public_release else "生存守城 · 测试授权"
+        text = "<h1>" + heading + "</h1><p>登录将前往 Steam 官方页面；本站不收集 Steam 密码。</p>"
         text += "<p>游戏账号尾号：" + escape(row["account"][-4:]) + "</p>"
         text += "<p>授权码：" + escape(code) + "。只有当此码与你正在玩的游戏内显示一致时才继续。</p>"
         if row["match_id"].startswith("lobby_"):
             text += "<p>本次登录仅用于大厅建房、组队和连接测试。对局数据仅留在本局，不读取或写入云存档，不开放商城和支付。</p>"
         elif self.settings.isolated_local_progress:
-            text += "<p>确认后，本次游戏可以读取并保存你的独立测试进度。本地主机进度可能被房主修改，不作为可信战果。</p>"
+            progress = "本账号的云存档" if self.settings.public_release else "独立测试进度"
+            text += "<p>确认后，本次游戏可以读取并保存你的" + progress + "。本地主机进度可能被房主修改，不作为可信战果。</p>"
         else:
-            text += "<p>确认后，本次游戏可以读取你的测试存档和已有权益，不能上传战斗进度。</p>"
+            progress = "存档" if self.settings.public_release else "测试存档"
+            text += "<p>确认后，本次游戏可以读取你的" + progress + "和已有权益，不能上传战斗进度。</p>"
         if self.settings.payments_enabled and not row["match_id"].startswith("lobby_"):
-            text += "<p>本测试不开放正式排行。本次授权允许为本账号、本局查询商城和创建、查询、取消真实支付订单；付款结果以支付服务与云端到账为准。</p>"
+            ranking = "当前未开放正式排行。" if self.settings.public_release else "本测试不开放正式排行。"
+            text += "<p>" + ranking + "本次授权允许为本账号、本局查询商城和创建、查询、取消真实支付订单；付款结果以支付服务与云端到账为准。</p>"
         else:
-            text += "<p>本测试不开放正式排行和真实支付。</p>"
+            text += "<p>" + ("当前未开放正式排行和真实支付。" if self.settings.public_release else "本测试不开放正式排行和真实支付。") + "</p>"
         if browser["steam"]:
             text += "<p>已登录 Steam 尾号：" + escape(browser["steam"][-4:]) + "</p>"
-            if browser["steam"] != self.settings.accounts[row["account"]]:
+            if browser["steam"] != self.settings.steam_for_account(row["account"]):
                 text += "<p>当前 Steam 与游戏账号不一致，不能授权。请切换 Steam 账号后重新登录。</p>"
             else:
                 with self.lock:

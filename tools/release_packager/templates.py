@@ -104,6 +104,98 @@ def extend_business_wire_binding(tree, name):
 def expression(source):
     return ast.parse(source, mode='eval').body
 
+
+def extend_public_admission(tree, name):
+    """New families bind one exact policy extension; frozen families stay intact."""
+    if name == 'package.py':
+        functions = {node.name: node for node in tree.body if isinstance(node, ast.FunctionDef)}
+        adapter = functions['admission_adapter']
+        saved = [node for node in adapter.body if isinstance(node, ast.Assign)
+                 and any(isinstance(t, ast.Name) and t.id == 'saved' for t in node.targets)]
+        if len(saved) != 1 or not isinstance(saved[0].value, ast.DictComp):
+            raise ValueError('exact admission save/restore template changed')
+        names = saved[0].value.generators[0].iter
+        if not isinstance(names, ast.Tuple):
+            raise ValueError('exact admission saved fields tuple changed')
+        names.elts.append(ast.Constant('configured_ids'))
+        inserted = False
+        for block in adapter.body:
+            if isinstance(block, ast.Try):
+                for index, node in enumerate(block.body):
+                    if (isinstance(node, ast.Assign) and len(node.targets) == 1
+                            and isinstance(node.targets[0], ast.Attribute)
+                            and node.targets[0].attr == 'steamids'):
+                        block.body.insert(index + 1, ast.parse('h.configured_ids = lambda candidate: _public_launch_projection.configured_ids(api, candidate, approved)').body[0])
+                        inserted = True
+                        break
+        if not inserted:
+            raise ValueError('exact admission adapter assignment changed')
+        index = next(i for i, node in enumerate(tree.body) if isinstance(node, ast.Assign)
+                     and any(isinstance(t, ast.Name) and t.id == 'TOOL' for t in node.targets))
+        tree.body.insert(index, ast.parse('import public_release_projection as _public_launch_projection').body[0])
+        reports = [node for node in ast.walk(functions['sign_package'])
+                   if isinstance(node, ast.Dict) and any(isinstance(v, ast.Constant)
+                   and v.value == 'SIGNED_COMPLETE_DYNAMIC_CANDIDATE_REQUIRES_NATIVE_AND_PUBLICATION_ADMISSION' for v in node.values)]
+        if len(reports) != 1:
+            raise ValueError('exact signed report public-mode anchor changed')
+        reports[0].keys.extend([ast.Constant('public_admission_enabled'), ast.Constant('fallback_account_count')])
+        reports[0].values.extend([expression('_public_launch_projection.requested(selected_sources)'), ast.Constant(5)])
+        return
+    if name != 'production.py':
+        return
+    helper = 'tools/public_release_projection.py'
+    probe = 'tools/public_launch/production_policy_probe.lua'
+    assignments = {node.targets[0].id: node for node in tree.body
+                   if isinstance(node, ast.Assign) and len(node.targets) == 1
+                   and isinstance(node.targets[0], ast.Name)}
+    tools = assignments['TOOL_INPUTS']
+    if not isinstance(tools.value, ast.Tuple):
+        raise ValueError('production tool tuple template changed')
+    tools.value.elts.extend([ast.Constant(helper), ast.Constant(probe)])
+    position = tree.body.index(assignments['OVERRIDES'])
+    tree.body.insert(position, ast.parse('import public_release_projection as _public_launch_projection').body[0])
+    loaded = assignments['LOADED_OPERATOR_LF_HASHES'].value
+    if not isinstance(loaded, ast.Dict):
+        raise ValueError('production loaded identity template changed')
+    loaded.keys.append(ast.Constant(helper))
+    loaded.values.append(expression('_public_launch_projection.EXECUTED_SOURCE_LF_SHA256'))
+    functions = {node.name: node for node in tree.body if isinstance(node, ast.FunctionDef)}
+    changed = set()
+    for node in ast.walk(functions['transform_overrides']):
+        if not isinstance(node, ast.Call):
+            continue
+        if isinstance(node.func, ast.Name) and node.func.id == 'need' and len(node.args) == 2 and isinstance(node.args[1], ast.Constant):
+            reason = node.args[1].value
+            if reason == 'admission_logic_changed_outside_reviewed_preview_removal':
+                node.args[0] = expression('original == text or _public_launch_projection.validate_admission(source, parent)')
+                changed.add('policy')
+            elif reason == 'approved_account_roster_changed':
+                node.args[0] = expression('lf(source[ACCESS]) == lf(parent[ACCESS]) or _public_launch_projection.validate_roster(source[ACCESS], parent[ACCESS])')
+                changed.add('roster')
+        if (isinstance(node.func, ast.Attribute) and isinstance(node.func.value, ast.Name)
+                and node.func.value.id == 'reviews' and node.func.attr == 'append'
+                and len(node.args) == 1 and isinstance(node.args[0], ast.Call)
+                and any(key.arg == 'removed_dependency' for key in node.args[0].keywords)):
+            node.args[0] = expression('_public_launch_projection.review(source, parent)')
+            changed.add('review')
+    probes = functions['run_probes']
+    for node in ast.walk(probes):
+        if isinstance(node, ast.Constant) and node.value == 'tools/admission_five_20261101/test_projected_policy.lua':
+            # Replace through its containing call argument, without touching the
+            # original constant-policy/client-entry probes below it.
+            for call in ast.walk(probes):
+                if isinstance(call, ast.Call):
+                    for index, argument in enumerate(call.args):
+                        if argument is node:
+                            call.args[index] = expression("_public_launch_projection.probe_path(ctx['source'])")
+                            changed.add('probe')
+        if isinstance(node, ast.Return) and isinstance(node.value, ast.Call):
+            node.value.keywords.append(ast.keyword(arg='public_account_engine_io_simulation',
+                                                   value=expression("_public_launch_projection.requested(ctx['source'])")))
+            changed.add('proof')
+    if changed != {'policy', 'roster', 'review', 'probe', 'proof'}:
+        raise ValueError('exact public admission extension anchors changed: ' + repr(changed))
+
 def set_assignment(tree, name, value):
     for node in tree.body:
         if isinstance(node, ast.Assign):
@@ -193,6 +285,7 @@ def render(project, revision, job, current):
             from release_packager.localization_text_review import extend
             extend(tree, project)
         extend_business_wire_binding(tree, name)
+        extend_public_admission(tree, name)
         ast.fix_missing_locations(tree)
         source = (ast.unparse(tree) + '\n').encode()
         compile(source, name, 'exec')

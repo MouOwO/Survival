@@ -71,6 +71,7 @@ def main():
                    release_sequence=published['release_sequence'],
                    steam_manifest=parent['baseline']['official_parent_manifest'],
                    source_revision=revision, helper_revision=helper_revision,
+                   access_mode='public' if published.get('public_admission_enabled') is True else 'test',
                    helper_sha256=hashlib.sha256(helper).hexdigest(),
                    package_files=published['package_files'])
     write(stage / 'launcher_binding.json', json.dumps(binding, sort_keys=True).encode() + b'\n')

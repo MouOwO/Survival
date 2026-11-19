@@ -29,7 +29,7 @@ local function parse(raw)
     for part in raw:gmatch("[^_]+") do
         local number = tonumber(part)
         if #part > 10 or not part:match("^[1-9][0-9]*$") or not integer(number, 1, 4294967295)
-            or string.format("%.0f", number) ~= part or not WHITELIST[part] or seen[part] then return nil end
+            or string.format("%.0f", number) ~= part or seen[part] then return nil end
         result[#result + 1], seen[part] = part, true
     end
     if #result < 1 or #result > 4 or table.concat(result, "_") ~= raw then return nil end
@@ -102,6 +102,11 @@ local function requirement()
     if not mode_ok or not mode then return {present = true, valid = false, status = "native_roster_context_unavailable"} end
     local access, reason = trusted_environment()
     if not access then return {present = true, valid = false, status = reason} end
+    for _, account in ipairs(expected) do
+        if not WHITELIST[account] and not (access.is_public and access.is_public() == true) then
+            return {present = true, valid = false, status = "native_roster_option_invalid"}
+        end
+    end
     return {present = true, valid = true, status = "waiting_expected_roster", expected_accounts = expected, access = access}
 end
 local function inspect()
@@ -128,7 +133,8 @@ local function inspect()
             if not account_ok or not player_ok or not connection_ok then result.status = "native_roster_player_api_failed"; result.complete = false; result.access = nil; return result end
             if account ~= 0 and not integer(account, 1, 4294967295) then result.status = "native_roster_account_invalid"; result.complete = false; result.access = nil; return result end
             local decimal = account ~= 0 and string.format("%.0f", account) or nil
-            if decimal and (not WHITELIST[decimal] or not expected[decimal]) then
+            if decimal and (not expected[decimal]
+                or not WHITELIST[decimal] and not (result.access.is_public and result.access.is_public() == true)) then
                 result.status = "native_roster_unexpected_account"; result.complete = false; result.access = nil; return result
             end
             if decimal and seen[decimal] then result.status = "native_roster_duplicate_account"; result.complete = false; result.access = nil; return result end

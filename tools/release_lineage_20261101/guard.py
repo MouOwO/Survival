@@ -386,6 +386,8 @@ def release_lease(authority, request, *, preflight=False):
              'next_publication_generation_required')
         need(type(request['release_sequence']) is int and request['release_sequence'] > parent['release_sequence'],
              'strictly_new_release_sequence_required')
+        need(not state.get('last_public_launch_receipt'),
+             'public_item_requires_public_update_recipe_no_unlisted_downgrade')
         validated = _validator(authority).validate_release(copy.deepcopy(request))
         _identity(authority, validated)
         for key in ('release_sequence','generation','parent_journal_sha256','source_revisions',
@@ -625,6 +627,63 @@ def visibility_test_lease(authority, request):
             _ACTIVE.reset(token)
 
 
+class _PublicLaunchLease(_Lease):
+    """One permanent public visibility transition for a verified live release."""
+    visibility_set = False
+
+    def finish_public_launch(self, receipt_path):
+        self.check()
+        receipt, raw = read_json(receipt_path)
+        need(self.submit_started and self.inflight is None
+             and receipt.get('status') == 'PUBLIC_LAUNCH_VERIFIED_OFFICIAL'
+             and receipt.get('request_sha256') == self.validated['request_sha256']
+             and receipt.get('final_visibility') == 0,
+             'verified_permanent_public_launch_required')
+        result = copy.deepcopy(self.state)
+        result.update(generation=self.state['pending']['generation'], pending=None,
+                      last_public_launch_receipt={'path': str(receipt_path), 'sha256': sha(raw)})
+        atomic_json(self.authority.policy['lineage_state'], result)
+        self.completed = True
+
+
+@contextmanager
+def public_launch_lease(authority, request):
+    """The same global lock and native boundary as every package/text upload."""
+    from release_packager.core import baseline
+    from release_public_launch import validate_request
+    need(_ACTIVE.get() is None, 'nested_release_lease_refused')
+    with exclusive_lock(authority.policy['publication_lock']):
+        project = Path(authority.policy['repositories']['game'])
+        current = baseline(project)
+        state, _ = read_json(authority.policy['lineage_state'])
+        parent, raw = read_json(authority.policy['canonical_journal'])
+        _identity(authority, parent)
+        need(state.get('pending') is None and not state.get('last_public_launch_receipt'),
+             'launch_already_pending_or_completed_requires_reconciliation')
+        need(request['parent_journal_sha256'] == sha(raw) == state['head']['canonical_journal_sha256']
+             and request['generation'] == state['generation'] + 1
+             and request['release_sequence'] == state['head']['sequence']
+             and request['baseline_sha256'] == current['cursor']['baseline_sha256']
+             and request['steam_manifest'] == current['baseline']['official_parent_manifest'],
+             'stale_public_launch_parent_cas')
+        need(sha(authority.policy_path.read_bytes()) == authority.digest == request['authority_sha256'],
+             'public_launch_authority_changed')
+        validate_request(authority, request, current)
+        state = {**state, 'pending': dict(kind='PERMANENT_PUBLIC_LAUNCH',
+                 generation=request['generation'], parent_journal_sha256=sha(raw),
+                 request_sha256=request['request_sha256'], final_visibility=0,
+                 status='INTENT_PRESERVED_NO_AUTOMATIC_RESUBMIT')}
+        atomic_json(authority.policy['lineage_state'], state)
+        lease = _PublicLaunchLease(_SEAL, authority, request, state, sha(raw), parent)
+        token = _ACTIVE.set(lease)
+        try:
+            yield lease
+            need(lease.completed, 'public_launch_outcome_unknown_pending_preserved')
+        finally:
+            lease.alive = False
+            _ACTIVE.reset(token)
+
+
 class _Permit:
     def __init__(self, lease, suffix):
         self.lease, self.suffix, self.used = lease, suffix, False
@@ -643,7 +702,7 @@ class _Permit:
             lease.handle = result
         if isinstance(lease, _DescriptionLease) and self.suffix == 'SetItemDescription':
             lease.description_set = True
-        if isinstance(lease, _VisibilityTestLease) and self.suffix == 'SetItemVisibility':
+        if isinstance(lease, (_VisibilityTestLease, _PublicLaunchLease)) and self.suffix == 'SetItemVisibility':
             lease.visibility_set = True
         lease.inflight = None
 
@@ -658,7 +717,7 @@ def require_sdk_mutation(suffix, args, *, authority_sha256):
     need(isinstance(lease, _Lease) and lease.authority.digest == authority_sha256,
          'reviewed_release_lease_required_before_sdk_mutation')
     lease.check()
-    if isinstance(lease, _VisibilityTestLease):
+    if isinstance(lease, (_VisibilityTestLease, _PublicLaunchLease)):
         need(suffix in ('StartItemUpdate', 'SetItemVisibility', 'SubmitItemUpdate'),
              'visibility_only_sdk_setters_required')
         if suffix == 'SetItemVisibility':
@@ -694,7 +753,8 @@ def require_sdk_mutation(suffix, args, *, authority_sha256):
             supplied = args[1].decode('utf8') if isinstance(args[1], bytes) else str(args[1])
             need(Path(supplied).resolve() == Path(lease.validated['package_dir']).resolve(), 'unvalidated_upload_directory')
         if suffix == 'SetItemVisibility':
-            expected = (0 if lease.stage == 'PUBLIC' else 3) if isinstance(lease, _VisibilityTestLease) else 3
+            expected = (0 if isinstance(lease, _PublicLaunchLease) else
+                        (0 if lease.stage == 'PUBLIC' else 3) if isinstance(lease, _VisibilityTestLease) else 3)
             need(len(args) == 2 and type(args[1]) is int and args[1] == expected,
                  'reviewed_unlisted_visibility_required')
         if suffix == 'SubmitItemUpdate':
@@ -719,7 +779,7 @@ def before_journal_write(path, value, *, authority_sha256=None):
         return False
     need(isinstance(lease, _Lease) and lease.authority.digest == authority_sha256,
          'release_lease_required_before_canonical_journal_write')
-    need(not isinstance(lease, (_DescriptionLease, _VisibilityTestLease)), 'metadata_cannot_rewrite_package_journal')
+    need(not isinstance(lease, (_DescriptionLease, _VisibilityTestLease, _PublicLaunchLease)), 'metadata_cannot_rewrite_package_journal')
     lease.check()
     _identity(lease.authority, value)
     need(value.get('release_sequence') in (lease.state['head']['sequence'], lease.validated['release_sequence']),

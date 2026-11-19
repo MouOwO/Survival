@@ -121,7 +121,9 @@ local function roster(access, run)
             else
                 if not integer(account, 1, 4294967295) then return nil, "account_invalid", true end
                 local decimal = string.format("%.0f", account)
-                if not ACCOUNTS[decimal] then return nil, "account_not_allowed", true end
+                if not ACCOUNTS[decimal] and not (access.is_public and access.is_public() == true) then
+                    return nil, "account_not_allowed", true
+                end
                 if seen[decimal] then return nil, "duplicate_account", true end
                 seen[decimal] = true
                 local player_id, player_id_ok = call(player, "GetPlayerID")

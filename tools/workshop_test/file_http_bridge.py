@@ -1,4 +1,4 @@
-"""Closed-test HTTPS transport. Does not grant login or replace backend checks.
+"""Fixed-endpoint HTTPS transport. Backend Steam checks remain authoritative.
 
 No listener, arbitrary URL/console command, request replay, or token persistence.
 The helper must run as the Dota host's Windows user. Importing is side effect free.
@@ -193,7 +193,10 @@ class Deadlines:
 
 
 class Transport:
-    def __init__(self, network=https, clock=time.monotonic):
+    def __init__(self, network=https, clock=time.monotonic, *, access_mode="test"):
+        if access_mode not in ("test", "public"):
+            raise ValueError("access_mode_invalid")
+        self.public_release = access_mode == "public"
         self.network, self.clock = network, clock
         self.vault = Vault(clock)
 
@@ -213,7 +216,10 @@ class Transport:
         if not isinstance(value, dict):
             raise ValueError("body_invalid")
         account, match = value.get("account_id"), value.get("match_session_id")
-        if account not in ACCOUNTS or not isinstance(match, str) or not SESSION.fullmatch(match):
+        valid_account = (isinstance(account, str) and re.fullmatch(r"[1-9][0-9]{0,9}", account)
+                         and int(account) <= 4294967295)
+        if (not valid_account or (not self.public_release and account not in ACCOUNTS)
+                or not isinstance(match, str) or not SESSION.fullmatch(match)):
             raise ValueError("identity_invalid")
         identity = (account, match)
         if job.path == "/v1/player-auth/start":
@@ -531,6 +537,7 @@ def main():
     parser.add_argument("--filetime", type=int, required=True)
     parser.add_argument("--state-dir", type=Path, required=True, help="New private run directory outside the game installation")
     parser.add_argument("--apply", action="store_true")
+    parser.add_argument("--access-mode", choices=("test", "public"), default="test")
     args = parser.parse_args()
     root = args.game_root.resolve(strict=True)
     state_dir = args.state_dir.resolve()
@@ -565,7 +572,7 @@ def main():
             private_acl(log)
             stream.seek(0, 2)
             files = Files(cfg, 'n' + secrets.token_hex(16))
-            engine = Engine(files.nonce, files)
+            engine = Engine(files.nonce, files, transport=Transport(access_mode=args.access_mode))
             partial = b""
             print("[SFB_HELPER] ready; enter the original Workshop game", flush=True)
             while process.alive():

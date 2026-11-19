@@ -169,6 +169,13 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     actions = parser.add_subparsers(dest='command')
     actions.add_parser('status')
+    public = actions.add_parser('public-launch')
+    public.add_argument('action', choices=['plan', 'run'])
+    public.add_argument('--source-revision')
+    public.add_argument('--report', type=Path, required=True)
+    public.add_argument('--request-sha')
+    for name in ('backend', 'launcher-build', 'launcher-acceptance', 'launcher-https'):
+        public.add_argument('--' + name, type=Path)
     visibility = actions.add_parser('visibility-test')
     visibility.add_argument('action', choices=['plan', 'run'])
     visibility.add_argument('--source-revision')
@@ -231,6 +238,19 @@ def main(argv=None):
                 delegated += ['--' + name.replace('_', '-'), str(getattr(args, name))]
         return diagnostics.main(delegated)
     auth = authority()
+    if args.command == 'public-launch':
+        import release_public_launch
+        if args.action == 'plan':
+            proofs = {name: getattr(args, name) for name in ('backend', 'launcher_build',
+                      'launcher_acceptance', 'launcher_https')}
+            guard.need(args.source_revision is not None and all(proofs.values()),
+                       'explicit_public_launch_source_and_proofs_required')
+            result = release_public_launch.plan(auth, args.source_revision, args.report, proofs)
+        else:
+            guard.need(args.request_sha is not None, 'exact_public_launch_request_sha_required')
+            result = release_public_launch.run(auth, args.report, args.request_sha)
+        print(json.dumps(result, ensure_ascii=False), flush=True)
+        return 0
     if args.command == 'visibility-test':
         import release_visibility_test
         if args.action == 'plan':

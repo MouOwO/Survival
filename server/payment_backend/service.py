@@ -102,6 +102,10 @@ class Payments:
     def __init__(self, config, database, wechat, alipay=None):
         self.config, self.db, self.wechat = config, database, wechat
         self.endpoints = PaymentEndpoints(config.get('public_base', ORIGIN))
+        access_mode = config.get('access_mode', 'test')
+        if access_mode not in ('test', 'public') or access_mode == 'public' and not self.endpoints.isolated:
+            raise ValueError('payment_public_access_mode_invalid')
+        self.public_release = access_mode == 'public'
         for gateway in (wechat, alipay):
             if isinstance(gateway, (WeChat, Alipay)) and gateway.endpoints != self.endpoints:
                 raise ValueError('payment_gateway_namespace_mismatch')
@@ -115,11 +119,12 @@ class Payments:
 
     def identity(self, body):
         account, session = body.get('account_id',''), body.get('match_session_id','')
-        if not isinstance(account,str) or not re.fullmatch(r'[1-9][0-9]{0,9}',account):
+        if (not isinstance(account,str) or not re.fullmatch(r'[1-9][0-9]{0,9}',account)
+                or int(account) > 0xFFFFFFFF):
             raise PaymentError('account_id_invalid')
         if not isinstance(session,str) or not re.fullmatch(r'[A-Za-z0-9_.:-]{8,128}',session):
             raise PaymentError('match_session_invalid')
-        if account not in self.config['allowed_accounts']:
+        if not self.public_release and account not in self.config['allowed_accounts']:
             raise PaymentError('test_account_required',403)
         hashed = hmac.new(self.config['pepper'].encode(),account.encode(),hashlib.sha256).hexdigest()
         catalog = self.db.call('catalog',hashed,session)
