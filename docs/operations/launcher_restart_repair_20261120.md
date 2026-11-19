@@ -1,0 +1,25 @@
+# 2026-11-20 正式登录器文件占用及二次启动修复
+
+状态：修复源码和隔离回归已完成，新EXE构建、实际启动、下载发布及授权入局仍待。正式游廊1910保持公开，后台本轮尚未修改，不重复清档。
+
+用户报告“launchur_failed／联网准备未完成”，反复刷新验证码后仍回到原错误。本机新局Dota16996，登录器34712；20261119T230031Z_9fb304ef的failure.json为FileExistsError，helper.log为0字节，尚未ready。旧20261119T133937Z_93b8550b曾正常ready及2091条响应，随后PermissionError；cfg遗留199字节survival_ws4_http_bridge_cursor.sfbtmp。旧write使用固定临时名，os.replace占用失败后不清理这个未登记临时文件，下一次open(xb)直接FileExistsError。旧status仍停在waiting_for_log/ready，进一步误导诊断。
+
+这说明前一轮首次就绪验收未覆盖异常退出后二次启动；本轮补充完整故障链，不把先前授权码当作正式入局通过。原错误记录和残留须私有备份后隔离，不能无条件删整个cfg目录。
+
+## 实现和边界
+
+新增tools/player_launcher/storage.py，仅为EXE装配已发布protocol2 helper的Files存储适配器，退出时恢复原类。发布桥接器的HTTPS路由、Steam校验、令牌范围与Lua协议保持原实现；构建额外绑定storage源SHA，不拿旧EXE验收新版本。现有Steam1910资源无需变化，适配器不进入VPK。
+
+每次原子更新使用唯一临时名，写入内容前设置私有ACL；遇到WinError5/32/33，或Windows CRT仅提供errno13时有限重试，6次退避合计315毫秒。普通写入O(1)，退休/退出只访问owned索引，没有稳定刷新全目录扫描；retire总重试预算1秒，close总预算2秒，持续占用时保留可恢复文件。初始文件指纹读取同样处理共享锁。
+
+启动恢复在已确认Dota退出、单登录器锁持有、版本/后台检查成功后进行：只认固定桥接命名、protocol2结构及普通文件，拒绝未知文件和reparse point；单次O(F+B)，限制4096文件/32MiB/20秒。先备份全部文件并逐份SHA核对，再重验所有源身份/摘要，逐文件移除源及空目录；不使用递归删除。备份在本次私有session/recovered_bridge，任何中断保留原记录与备份。不能确认的目录给出明确错误而非盲删。
+
+失败状态同步写回status.json，并记录异常类型、Win32/errno、原因类型及仅文件名/函数/行号的栈位置，避免打印异常文本中的认证材料。README引导从稳定下载页获取新版。
+
+## 验证
+
+树外工作根D:/Survival_本地工具/runs/launcher_repair_20261120。storage_test_receipt及regression02失败证据均保留；regression03最终13项通过，含真实CreateFileW不允许DELETE共享的锁：原版先PermissionError/WinError5，清理后再启动精确复现FileExistsError。新版瞬时替换锁、独占读取锁、持续锁限时失败、备份写入失败不移除源、未知文件保留、摘要变化拒绝、多个锁下close总预算及适配器还原全部通过。
+
+2500次真实Windows文件更新时显式禁止glob/iterdir，目录扫描0、replace2502次（含初始化2次），未诱发占用时重试0；实际耗时见regression03回执。这是树外文件IO计数，不冒充游戏FPS或长期联网验证。另12项登录器流程、9项既有HTTP桥接合同通过，生产请求/交易/存档写入0。
+
+微软文件共享说明：[CreateFile的FILE_SHARE_DELETE同时影响删除和重命名](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilea)，[共享/访问错误定义](https://learn.microsoft.com/en-us/windows/win32/debug/system-error-codes--0-499-)。历史现场未记录WinError，现场原因以临时文件、异常序列和真实负对照共同定位，不宣称已确认是哪一个外部进程持锁。

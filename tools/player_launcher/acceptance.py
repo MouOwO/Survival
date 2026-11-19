@@ -44,6 +44,9 @@ def verify(build, evidence):
          and evidence.get('authorization_code_visually_observed') is True,
          'honest_authorization_ready_stage_required')
     launch = referenced(evidence['launch_receipt'])
+    if binding.get('storage_sha256'):
+        need(launch.get('storage_source_sha256') == binding['storage_sha256'],
+             'exact_storage_adapter_binding_required')
     trace = referenced(evidence['network_receipt'])
     referenced(evidence['authorization_frame'], binary=True)
     need(launch['version'] == binding['version']

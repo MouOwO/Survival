@@ -15,7 +15,7 @@ import sys
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
-SOURCE = ('app.py', 'windows.py', 'build.py', 'README.txt', 'requirements-build.txt')
+SOURCE = ('app.py', 'windows.py', 'storage.py', 'build.py', 'README.txt', 'requirements-build.txt')
 
 
 def git(*args):
@@ -73,6 +73,7 @@ def main():
                    source_revision=revision, helper_revision=helper_revision,
                    access_mode='public' if published.get('public_admission_enabled') is True else 'test',
                    helper_sha256=hashlib.sha256(helper).hexdigest(),
+                   storage_sha256=hashlib.sha256(sources['storage.py']).hexdigest(),
                    package_files=published['package_files'])
     write(stage / 'launcher_binding.json', json.dumps(binding, sort_keys=True).encode() + b'\n')
     # Version metadata is embedded in the PE as well as the JSON binding.

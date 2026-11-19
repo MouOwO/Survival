@@ -15,8 +15,10 @@ import threading
 import time
 import uuid
 import webbrowser
+import traceback
 
 import file_http_bridge as bridge
+import storage
 from windows import LaunchError, discover, existing_dota, start_client, vdf
 
 TITLE = '我在dota2苟发育 · 专用登录器'
@@ -39,6 +41,9 @@ MESSAGES = {
     'private_acl_failed': '无法保护联网文件。请确认 Dota 安装在可写的 NTFS 磁盘，并使用同一个 Windows 用户运行。',
     'window_events_unavailable': '无法等待 Dota 启动窗口。请使用常规 Windows 桌面运行并联系作者。',
     'helper_stopped_while_game_running': '联网助手已停止。请先正常退出 Dota，再从登录器重开。',
+    'transport_files_busy': '联网文件持续被占用。请正常退出 Dota 后重试；诊断文件已保留。',
+    'bridge_recovery_required': '旧联网目录中存在无法确认的文件。请保留诊断目录并联系官方群。',
+    'bridge_file_changed': '联网文件被其他程序改动。请正常退出 Dota，并保留诊断目录。',
 }
 
 
@@ -111,7 +116,8 @@ class Output:
 def session(binding, run, notify):
     state = dict(kind='PORTABLE_PLAYER_ENTRY', version=binding['version'], phase='checking',
                  release_sequence=binding['release_sequence'], steam_manifest=binding['steam_manifest'],
-                 source_revision=binding['source_revision'], manager_pid=os.getpid())
+                 source_revision=binding['source_revision'], manager_pid=os.getpid(),
+                 storage_source_sha256=binding.get('storage_sha256'))
     process = None
     stdout, stderr, argv = sys.stdout, sys.stderr, sys.argv
     try:
@@ -128,6 +134,7 @@ def session(binding, run, notify):
                 raise ValueError()
         except Exception:
             raise LaunchError('backend_unavailable') from None
+        state['recovery'] = storage.recover(game / 'dota/cfg', run, bridge.private_acl)
         notify('phase', '正在通过 Steam 启动 Dota 2，请稍候')
         pid, created, counts = start_client(steam, game)
         process = bridge.Process(pid, created, game / 'bin/win64/dota2.exe')
@@ -158,7 +165,12 @@ def session(binding, run, notify):
                         '--filetime', str(created), '--state-dir', str(run / 'private_helper'), '--apply']
             if binding.get('access_mode') == 'public':
                 sys.argv.extend(['--access-mode', 'public'])
-            bridge.main()
+            with storage.adapter(bridge) as storage_metrics:
+                try:
+                    bridge.main()
+                finally:
+                    write_json(run / 'storage_receipt.json', dict(storage_metrics,
+                               kind='PLAYER_BRIDGE_STORAGE_COUNTERS', artifact_root=str(run)))
         if state['phase'] != 'ready':
             raise LaunchError('helper_not_ready')
         if process.alive():
@@ -168,9 +180,15 @@ def session(binding, run, notify):
         notify('closed', 'Dota 已退出，联网文件已清理。可再次点击“启动游戏”。')
     except Exception as error:
         code = str(error) if isinstance(error, (LaunchError, ValueError)) and re.fullmatch(r'[a-z_]{3,80}', str(error)) else 'launcher_failed'
-        state.update(phase='failed', code=code, error_type=type(error).__name__)
+        state.update(phase='failed', code=code, error_type=type(error).__name__,
+                     winerror=getattr(error, 'winerror', None), errno=getattr(error, 'errno', None),
+                     cause_type=type(error.__cause__).__name__ if error.__cause__ else None,
+                     cause_winerror=getattr(error.__cause__, 'winerror', None),
+                     frames=[dict(file=Path(frame.filename).name, function=frame.name, line=frame.lineno)
+                             for frame in traceback.extract_tb(error.__traceback__)[-8:]])
         if run.exists():
             write_json(run / 'failure.json', state)
+            write_json(run / 'status.json', state)
         notify('failed', code)
     finally:
         sys.stdout, sys.stderr, sys.argv = stdout, stderr, argv
@@ -186,6 +204,7 @@ def selfcheck(destination):
     result = dict(kind='FROZEN_PLAYER_LAUNCHER_SELFCHECK', frozen=bool(getattr(sys, 'frozen', False)),
                   version=binding['version'], protocol=bridge.PROTOCOL,
                   access_mode=binding.get('access_mode', 'test'),
+                  storage_source_sha256=binding.get('storage_sha256'), startup_recovery_supported=True,
                   fallback_test_accounts=len(bridge.ACCOUNTS), gui_initialized=True,
                   external_python_required=not bool(getattr(sys, 'frozen', False)), git_required=False, powershell7_required=False,
                   automatic_game_start=False, http_requests=0, game_files_changed=False)
