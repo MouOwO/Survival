@@ -22,17 +22,22 @@ function M.current_after_maximum_change(old_current, old_maximum, new_maximum)
     return math.max(1, math.min(maximum, maximum - missing))
 end
 
-local function restore_if_refilled(unit, health, source, phase, full_only)
+local function restore_if_refilled(unit, health, source, phase, deferred)
     if not valid(unit) or not unit.IsAlive or not unit:IsAlive()
         or not unit.GetHealth or not unit.GetMaxHealth or not unit.SetHealth
         or not health or health <= 0 then return false end
     local maximum = math.max(1, tonumber(unit:GetMaxHealth()) or 1)
     local current = math.max(0, tonumber(unit:GetHealth()) or 0)
     local desired = math.max(1, math.min(health, maximum))
-    if current <= desired + 0.5 then return false end
-    -- Deferred checks only undo the reported engine refill-to-full behavior.
-    -- They must not erase normal regeneration or lifesteal that happens later.
-    if full_only and current < maximum - 0.5 then return false end
+    -- Native recalculation can also clamp HP to one on the following tick.
+    -- The caller's generation check proves that no accepted damage or
+    -- intentional healing has occurred since this stat transaction.
+    local clamped_to_one = deferred and current <= 1 and desired > 1.5
+    if not clamped_to_one then
+        if current <= desired + 0.5 then return false end
+        -- Only undo a complete engine refill, preserving partial regeneration.
+        if deferred and current < maximum - 0.5 then return false end
+    end
     print(string.format(
         "[HERO_HEALTH_GUARD] source=%s phase=%s entindex=%s "
             .. "health=%.1f->%.1f max=%.1f",
@@ -74,7 +79,8 @@ end
 
 -- Dota may adjust current health after attributes or health-bonus modifiers are
 -- recalculated, including one engine tick after CalculateStatBonus returns.
--- Never heal here: only lower an unexpected refill back to the captured value.
+-- Deferred restoration is bounded to the latest transaction and invalidated
+-- at the real damage boundary, so later combat HP loss cannot be undone.
 function M.protect_value(unit, health, source)
     if not valid(unit) then return false end
     -- A newer protection supersedes all deferred checks created by an older
@@ -95,6 +101,15 @@ function M.allow_healing(unit)
     return true
 end
 
+-- Called only after the damage filter has accepted a positive native hit.
+-- Unprotected monsters take just one weak-table lookup: no native calls,
+-- registry insertion, timer, health read or scene enumeration per hit.
+function M.allow_damage(unit)
+    if generation_by_unit[unit] == nil then return false end
+    next_generation(unit)
+    return true
+end
+
 function M.preserve_current(unit, callback, source)
     if not valid(unit) or type(callback) ~= "function" then return false end
     local alive = unit.IsAlive and unit:IsAlive()
@@ -104,7 +119,7 @@ function M.preserve_current(unit, callback, source)
         and unit.IsAlive and unit:IsAlive() then
         -- Stat recalculation can clamp current health down while rebuilding
         -- modifiers. Restore only this synchronous transaction's captured HP;
-        -- deferred guards remain downward-only so later damage is preserved.
+        -- later damage invalidates deferred guards before the native hit.
         if unit.GetMaxHealth and unit.GetHealth and unit.SetHealth then
             local maximum = math.max(1, tonumber(unit:GetMaxHealth()) or 1)
             local desired = math.max(1, math.min(health, maximum))

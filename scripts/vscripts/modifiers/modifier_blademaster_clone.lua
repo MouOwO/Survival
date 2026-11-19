@@ -35,6 +35,10 @@ function modifier_blademaster_clone:IsHidden() return true end
 function modifier_blademaster_clone:IsPurgable() return false end
 function modifier_blademaster_clone:RemoveOnDeath() return false end
 
+function modifier_blademaster_clone:CheckState()
+    return { [MODIFIER_STATE_NO_UNIT_COLLISION] = true }
+end
+
 function modifier_blademaster_clone:OnCreated(params)
     self.player_id = tonumber(params and params.player_id)
         or self:GetParent():GetPlayerOwnerID()

@@ -452,6 +452,32 @@ local function sync_clone(current, hero, snapshot)
         applied = {unit = clone}
         current.clone_native_values = applied
     end
+    -- Match the owner's effective range, including live bonuses. Reuse the
+    -- existing range override so native attacks and the selected HUD agree.
+    local attack_range
+    if hero.Script_GetAttackRange then
+        local ok, value = pcall(hero.Script_GetAttackRange, hero)
+        if ok then attack_range = tonumber(value) end
+    end
+    attack_range = attack_range or tonumber(hero.survival_attack_range)
+        or tonumber(stats.attack_range)
+    if attack_range and attack_range == attack_range
+        and attack_range > 0 and attack_range < math.huge then
+        local range_modifier = clone:FindModifierByName("modifier_survival_hero_attack_range")
+        if applied.attack_range ~= attack_range then
+            if clone.Script_SetAttackRange then clone:Script_SetAttackRange(attack_range) end
+            if clone.SetAcquisitionRange then clone:SetAcquisitionRange(attack_range + 200) end
+        end
+        if not range_modifier then
+            range_modifier = clone:AddNewModifier(clone, nil,
+                "modifier_survival_hero_attack_range", {attack_range = attack_range})
+        elseif (applied.attack_range ~= attack_range or applied.range_modifier ~= range_modifier)
+            and range_modifier.SetAttackRange then
+            range_modifier:SetAttackRange(attack_range)
+        end
+        clone.survival_attack_range = attack_range
+        applied.attack_range, applied.range_modifier = attack_range, range_modifier
+    end
     local native_changed = false
     local previous_max = math.max(1, tonumber(clone:GetMaxHealth()) or 1)
     local health_pct = math.max(0, tonumber(clone:GetHealth()) or 0) / previous_max

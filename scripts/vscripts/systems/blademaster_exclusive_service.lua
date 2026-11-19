@@ -828,6 +828,7 @@ create_clone = function(player_id)
     clone.survival_exclusive_summon = true
     clone.survival_hero_id = "hero_blademaster"
     clone.survival_display_name = "剑圣幻象"
+    if clone.SetHullRadius then clone:SetHullRadius(0) end
     prepare_combat_clone(clone, player_id)
     current.clone = clone
     current.owned_clones[clone] = clone:entindex()

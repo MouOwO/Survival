@@ -7,6 +7,7 @@ local armor_balance = require("config/armor_balance")
 local titan_aura_armor = require("systems/commerce_titan_aura_values")
 local rogue_effect_state = require("systems/rogue_effect_state_service")
 local endless_projection = require("combat/endless_stat_projection")
+local hero_health_guard = require("core/hero_health_guard")
 local event_bus = nil
 local events = nil
 local repository = nil
@@ -408,7 +409,9 @@ local function filter(_, keys)
         if CustomNetTables then CustomNetTables:SetTableValue('survival_commerce_wall',tostring(victim:entindex()),
             {player_id=victim.survival_player_id,remaining=s.remaining,expires=s.expires or 0,ready_at=s.ready_at or 0}) end
     end
-    return endless_projection.is_finite(keys.damage) and keys.damage >= 0
+    local accepted = endless_projection.is_finite(keys.damage) and keys.damage >= 0
+    if accepted and keys.damage > 0 then hero_health_guard.allow_damage(victim) end
+    return accepted
 end
 
 function M.init(deps)

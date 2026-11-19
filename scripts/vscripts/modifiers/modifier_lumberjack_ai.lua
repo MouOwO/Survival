@@ -109,6 +109,7 @@ function M:OnDestroy()
 end
 
 function M:OnPlayerOrder(order_type, target)
+    self.harvest_recovery_target, self.harvest_recovery_until = nil, nil
     if not IsServer() then return end
     if tonumber(order_type) == tonumber(DOTA_UNIT_ORDER_ATTACK_TARGET)
         and target and not target:IsNull()
@@ -122,6 +123,9 @@ function M:OnPlayerOrder(order_type, target)
 end
 
 function M:SetTreeEntIndex(entindex)
+    if tonumber(entindex) ~= self.tree_entindex then
+        self.harvest_recovery_target, self.harvest_recovery_until = nil, nil
+    end
     self.tree_entindex = tonumber(entindex) or -1
 end
 
@@ -223,6 +227,12 @@ function M:OnIntervalThink()
         self.manual_control = false
         self.manual_idle_since = nil
     end
+    -- GetAttackTarget may briefly return nil after a landed melee hit while
+    -- the native attack order is cooling down. Do not restart that order or
+    -- its animation every AI tick. A missing-progress timeout still recovers
+    -- genuinely idle workers; player orders and tree replacement cancel it.
+    if native_target == nil and self.harvest_recovery_target == tree
+        and game_time() < (self.harvest_recovery_until or 0) then return end
     issue_tree_attack(parent, tree)
 end
 
@@ -275,6 +285,15 @@ function M:OnHarvestLanded(keys)
     local target = keys.target
     if not target or target:IsNull() then return end
     if not tree_damage_rules.is_tree(target) then return end
+    local interval
+    if parent.GetSecondsPerAttack then
+        local ok, value = pcall(parent.GetSecondsPerAttack, parent, false)
+        if ok then interval = tonumber(value) end
+    end
+    interval = interval or tonumber(parent.survival_attack_interval) or 1.5
+    if interval ~= interval or interval <= 0 or interval == math.huge then interval = 1.5 end
+    self.harvest_recovery_target = target
+    self.harvest_recovery_until = game_time() + interval + THINK_INTERVAL
     if require('systems/commerce_effects').owned(self.player_id,'saw') then
         apply_tree_armor_reduction(parent, target,
             require('config/armor_balance').from_war3_linear(1))
