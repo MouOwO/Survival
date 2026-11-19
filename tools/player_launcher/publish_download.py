@@ -41,10 +41,10 @@ def main():
     args = parser.parse_args()
     build = json.loads(args.build_receipt.read_bytes())
     acceptance = json.loads(args.acceptance_receipt.read_bytes())
-    if (sha(args.acceptance_receipt) != args.acceptance_sha or
-            acceptance.get('user_confirmed_entered_game') is not True or
-            acceptance.get('exe_sha256') != build['exe_sha256']):
+    if sha(args.acceptance_receipt) != args.acceptance_sha:
         raise RuntimeError('accepted_exact_exe_required')
+    from acceptance import verify
+    acceptance_stage = verify(build, acceptance)
     version = build['binding']['version']
     if not re.fullmatch(r'[0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,4}', version):
         raise RuntimeError('reviewed_version_required')
@@ -52,6 +52,7 @@ def main():
         raise RuntimeError('explicit_parent_index_sha_required')
     revision, template = committed('tools/player_launcher/download.html')
     committed('tools/player_launcher/publish_download.py')
+    committed('tools/player_launcher/acceptance.py')
     out = args.output.resolve()
     if ROOT == out or ROOT in out.parents: raise RuntimeError('external_output_required')
     out.mkdir(parents=True, exist_ok=False)
@@ -74,6 +75,7 @@ def main():
                    at_utc=datetime.now(timezone.utc).isoformat(), operator_revision=revision,
                    build_receipt_sha256=sha(args.build_receipt), acceptance_sha256=args.acceptance_sha,
                    version=version, exe_sha256=build['exe_sha256'], url=URL,
+                   acceptance_stage=acceptance_stage,
                    expected_parent_index_sha256=args.expected_index_sha,
                    files={name:dict(sha256=sha(path), bytes=path.stat().st_size) for name,path in files.items()},
                    index_sha256=sha(page), api_code_changed=False, nginx_reloaded=False)

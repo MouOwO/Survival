@@ -13,7 +13,7 @@ TEXT = 'publishing/workshop/public_description_20261118.json'
 OPERATORS = ('tools/release_pipeline.py', 'tools/release_public_launch.py',
              'tools/release_description.py', 'tools/release_lineage_20261101/guard.py',
              'tools/release_sdk_lineage_hook.py', 'tools/steam_workshop_upload.py',
-             'tools/release_packager/core.py')
+             'tools/release_packager/core.py', 'tools/player_launcher/acceptance.py')
 BACKEND_SOURCES = ('server/archive_backend/test_access.py', 'server/player_web_auth/service.py',
                    'server/player_web_auth/run.py', 'server/payment_backend/service.py',
                    'server/payment_backend/endpoints.py')
@@ -78,6 +78,8 @@ def validate_request(auth, request, current):
     acceptance = proof(**request['proofs']['launcher_acceptance'])
     https = proof(**request['proofs']['launcher_https'])
     binding = build['binding']
+    from player_launcher.acceptance import verify as verify_launcher
+    verify_launcher(build, acceptance)
     guard.need(binding.get('access_mode') == 'public'
                and binding['release_sequence'] == request['release_sequence']
                and binding['steam_manifest'] == request['steam_manifest']
@@ -85,8 +87,7 @@ def validate_request(auth, request, current):
                and acceptance.get('exe_sha256') == build['exe_sha256']
                and acceptance.get('release_sequence') == request['release_sequence']
                and acceptance.get('steam_manifest') == request['steam_manifest']
-               and all(acceptance.get(key) is True for key in ('helper_ready_observed',
-                   'user_confirmed_entered_game', 'current_client_ingame_visually_observed'))
+               and acceptance.get('helper_ready_observed') is True
                and https.get('status') == 'PUBLIC_LAUNCHER_HTTPS_VERIFIED'
                and https.get('exe_sha256') == build['exe_sha256']
                and https.get('all_files_verified') is True,

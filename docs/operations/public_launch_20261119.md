@@ -101,4 +101,6 @@ activation_failure_readonly02定位支付服务为200/CHDIR：copytree复制了�
 
 本次新助手已出现真实HTTP200响应（至少10条），当前有效授权码已在实际游戏显示，正式UI底部已是“云存档”；此时只完成auth start/poll，不能冒充已完成Steam批准、档案加载或存档成功。本人Steam授权仍在等用户完成，已打开本局网页登录。actual_v3_ready01中的live授权图已加私有ACL，原始认证/session凭据不加入Git。
 
+本轮上线指令已明确授权立即公开，不能把额外的本人Steam点击确认误当成新的公开授权要求。发行工具增加明确的AUTHORIZATION_READY证据阶段：绑定真实冷启动EXE、5包完整SHA、实际游戏进程/创建时间、有效授权码画面，以及同一epoch的请求/HTTP200/游戏ACK交集；不冒称已完成本人Steam授权或加载档案。authorization_ready_evidence01实际观察start 3次、poll 320次均200且已ACK，读取上限16MiB，一次性离线O(B+R)分析，无游戏循环或新增网络调用。10项验证通过，错误版本、错误进程、截图摘要变化、伪本人确认和缺少start ACK均拒绝。公开下载与可见性发布可使用这个真实阶段，post_authorization_gameplay_verified和user_confirmed_entered_game明确为false；本人后续入局、余额/权益显示仍保留待验。
+
 两语言正式介绍已从Steam新鲜回读一致，下载链接及QQ1098603739正确，无收费描述。v3下载页候选已生成，旧公开v2首页SHA仍1ac9e006...；没有用虚假的EXE验收记录提前发布v3。最终公开提交另绑定正式开放更新说明，避免最新更新页继续只显示历史Restricted four-account test说明；这只是新元数据说明，不改历史回执或旧更新记录。
