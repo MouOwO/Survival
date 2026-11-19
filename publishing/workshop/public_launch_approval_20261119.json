@@ -12,5 +12,6 @@
   "require_paid_preservation_verified": true,
   "require_compatible_verified_launcher": true,
   "keep_steam_verification": true,
-  "qq_group": "1098603739"
+  "qq_group": "1098603739",
+  "change_note": "正式开放：请使用专用登录器进入原游廊，完成同一 Steam 账号授权。首发福利和更新公告见官方 QQ 玩家群：1098603739。"
 }

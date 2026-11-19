@@ -26,6 +26,14 @@ def proof(path, expected):
     return value
 
 
+def change_note(approval):
+    text = validate_text({'schema': 1, 'workshop_id': '3824360109',
+                          'description': approval.get('change_note')}, '3824360109')
+    guard.need(text.startswith('正式开放：') and len(text.encode('utf8')) < 1000,
+               'bounded_committed_public_launch_note_required')
+    return text
+
+
 def backend_source_matches(project, deployed, published):
     """Later compiler/operator commits may retain identical deployed backend bytes."""
     guard.require_ancestor(project, guard.revision(deployed), guard.revision(published))
@@ -48,6 +56,7 @@ def validate_request(auth, request, current):
                and approval['initial_visibility'] == 3 and approval['final_visibility'] == 0
                and approval['keep_steam_verification'] is True,
                'explicit_permanent_public_launch_authorization_required')
+    change_note(approval)
     guard.need(request['operator_files'] == list(OPERATORS), 'complete_public_launch_operator_binding_required')
     guard.need(git(auth.policy['repositories']['content'], 'rev-parse', 'HEAD').decode().strip()
                == request['source_revisions']['content'], 'public_launch_content_source_changed')
@@ -139,7 +148,8 @@ def run(auth, report, request_sha):
             guard.need(steam.ug('SetItemVisibility', C.c_bool, [C.c_uint64, C.c_int], handle, 0),
                        'public_visibility_setter_rejected')
             try:
-                call = steam.ug('SubmitItemUpdate', C.c_uint64, [C.c_uint64, C.c_char_p], handle, b'')
+                call = steam.ug('SubmitItemUpdate', C.c_uint64, [C.c_uint64, C.c_char_p],
+                                 handle, change_note(request['approval']).encode('utf8'))
                 response = steam.wait(call, sdk.Submitted, 3404, timeout=60)
                 callback = dict(result=response.result, item=str(response.item), legal=bool(response.legal))
             except Exception as error:
