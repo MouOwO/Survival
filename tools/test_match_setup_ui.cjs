@@ -1,6 +1,7 @@
 "use strict";
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
+const vm = require("node:vm");
 const {harness, loading, ready, assertHidden, assertShown} = require("./test_startup_loading_ui.js");
 
 const setup = (overrides = {}) => ({mode_selected: false, mode_id: "", selector_player_id: 0,
@@ -25,18 +26,52 @@ function wave(overrides = {}) {
 }
 const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
 
+{
+    const source = fs.readFileSync("panorama/src/scripts/custom_game/ui_bootstrap.js", "utf8");
+    const nativeMenuProfile = source.slice(source.indexOf("    function hudRoot()"),
+        source.indexOf("    function applyDefaultUIProfile()"));
+    const menu = {style: {visibility: "visible"}, hittest: true, hittestchildren: true, IsValid: () => true};
+    const config = {};
+    const root = {FindChildTraverse: name => name === "MenuButtons" ? menu : null};
+    const hideTopLeft = vm.runInNewContext(nativeMenuProfile + "\nhideOfficialTopLeftPanels", {
+        $: {GetContextPanel: () => root}, inputConfig: config
+    });
+    hideTopLeft();
+    assert.equal(menu.style.visibility, "visible", "bootstrap must leave the native return available while waiting");
+    config.SurvivalGameplayVisible = true;
+    hideTopLeft();
+    assert.equal(menu.style.visibility, "collapse");
+    assert.equal(menu.hittest, false);
+    menu.style.visibility = "visible"; // Native HUD refreshed the same panel.
+    hideTopLeft();
+    assert.equal(menu.style.visibility, "collapse");
+    config.SurvivalNativeMatchMenu(false);
+    assert.equal(menu.style.visibility, "visible");
+    assert.equal(menu.hittestchildren, true);
+}
+
 // The setup HUD is initially opaque. Admission, slow saves and choices all
 // share this cover, and a new match cancels any previous fade.
 {
     const pending = loading({admission_complete: false});
     const admitted = ready({admission_complete: true, profiles_ready: false, setup: setup()});
-    const ui = harness({startupState: pending, hud: true, loadSharedUI: true});
+    const menuCalls = [];
+    const shared = {SurvivalNativeMatchMenu: hidden => menuCalls.push(hidden)};
+    const ui = harness({startupState: pending, hud: true, loadSharedUI: true, sharedConfig: shared});
     const cover = ui.nodes.MatchWaitingCover;
     const hudXml = fs.readFileSync("panorama/src/layout/custom_game/survival_hud.xml", "utf8");
     assert(cover.visible && /id="MatchWaitingCover" hittest="true"/.test(hudXml),
         "waiting cover owns the HUD from its first frame");
     ui.setStartup(admitted);
     assert(cover.visible && ui.nodes.DifficultySelectionOverlay.visible, "mode choice renders over the opaque waiting cover");
+    assert(ui.nodes.DifficultySelectionOverlay.BHasClass("MatchSetupOnWaitingCover"), "mode scrim does not darken the waiting illustration twice");
+    assert(!shared.SurvivalMatchWaitingCover, "a newly mounted backdrop has not yet acknowledged artwork");
+    ui.imageLoaded();
+    assert.equal(shared.SurvivalMatchWaitingCover.cover, cover);
+    assert(ui.nodes.MatchWaitingReturn.visible);
+    click(ui.nodes.MatchWaitingReturn);
+    assert(ui.dispatched.some(([name]) => name === "DOTAHUDShowDashboard"));
+    assert.deepEqual(menuCalls, [false], "Valve menu is kept available before gameplay");
     const selected = {...admitted, setup: setup({mode_selected: true, mode_id: "standard", difficulty_selected: true})};
     ui.setStartup(selected);
     assert(cover.visible && ui.nodes.MatchWaitingStatus.text.includes("读取玩家档案"), "choice confirmation does not expose the HUD during cloud loading");
@@ -49,19 +84,38 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
     ui.setStartup({...selected, session_id: "next-match", profiles_ready: true});
     ui.advance(0.21);
     assert(!cover.visible, "the cover is released after the 0.2-second fade");
+    assert(!ui.nodes.MatchWaitingReturn.visible);
+    assert.deepEqual(menuCalls, [false, false, true], "the native menu is hidden only at the final reveal");
 }
 
 // Admission is independent of mode selection and mode-specific profile I/O.
 {
     const config = {};
-    const ui = harness({state: loading({setup: setup(), admission_complete: false}), sharedConfig: config, engineWrapper: true});
+    const ui = harness({state: loading({setup: setup(), admission_complete: false}), sharedConfig: config,
+        engineWrapper: true, loadSharedUI: true});
     ui.imageLoaded();
     assert.equal(ui.nodes.StartupModeOverlay, undefined, "no setup UI is rendered during loading");
     assert.equal(sent(ui, "survival_loading_client_ready").length, 1, "unselected mode does not block admission handshake");
     ui.setState(ready({setup: setup(), admission_complete: false}));
     assertShown(ui, "all_ready is not admission when the server explicitly provides admission_complete");
     ui.setState(ready({setup: setup(), admission_complete: true, profiles_ready: false}));
-    assertHidden(ui, "authentication/resources admit player before mode-specific profile loading");
+    assertShown(ui, "authentication alone cannot retire the opaque loading surface");
+    click(ui.nodes.StartupLoadingReturn);
+    assert(ui.dispatched.some(([name]) => name === "DOTAHUDShowDashboard"));
+    config.SurvivalMatchWaitingCover = {session_id: "other-match", player_id: 0, cover: {IsValid: () => true}};
+    ui.advance(0.5);
+    assertShown(ui, "the previous match's cover cannot release this match");
+    config.SurvivalMatchWaitingCover = {session_id: "match-123", player_id: 0, cover: {IsValid: () => false}};
+    ui.advance(0.5);
+    assertShown(ui, "a destroyed waiting cover cannot release this match");
+    config.SurvivalMatchWaitingCover.cover = {IsValid: () => true};
+    config.SurvivalMatchWaitingCover.player_id = 1;
+    ui.advance(0.5);
+    assertShown(ui, "another local player's cover cannot release this match");
+    config.SurvivalMatchWaitingCover.player_id = 0;
+    ui.advance(0.5);
+    assertHidden(ui, "the mounted waiting cover takes over atomically after artwork is ready");
+    assert.equal(ui.root.__survivalMotion.ticket, null, "the handoff cannot schedule an intermediate fade");
     ui.advance(2);
     const transitions = ui.messages.filter(message => message.startsWith("[STARTUP_VISIBILITY] "))
         .map(message => JSON.parse(message.slice("[STARTUP_VISIBILITY] ".length)));
