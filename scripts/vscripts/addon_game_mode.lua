@@ -1027,7 +1027,6 @@ local function initialize_services()
     grid_system.init()
     resource_system.init()
     player_entitlement_service.init()
-    offline_logic_test.configure()
     local session_test = require("systems/session_multiplayer_test")
     session_test.configure()
     require("systems/player_profile_service").init(
@@ -1097,7 +1096,8 @@ function M.activate()
     if initialized then
         return
     end
-    local access_ready, access_error = test_access_policy.init()
+    offline_logic_test.configure()
+    local access_ready, access_error = offline_logic_test.initialize_test_access(test_access_policy)
     assert(access_ready, "restricted test access unavailable: " .. tostring(access_error))
     initialized = true
     replacing_forced_hero = {}

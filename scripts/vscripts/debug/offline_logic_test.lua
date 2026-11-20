@@ -46,6 +46,19 @@ function M.is_enabled()
     return enabled and tools_allowed()
 end
 
+function M.initialize_test_access(policy)
+    if not M.is_enabled() then return policy.init() end
+    local access = require("config/test_access")
+    if type(access) ~= "table" or access.public_release ~= true then return policy.init() end
+    -- An explicitly offline Tools match uses the retained test roster. The
+    -- policy latches the restricted mode during its synchronous initialization.
+    access.public_release = false
+    local called, ready, reason = pcall(policy.init)
+    access.public_release = true
+    if not called then error(ready, 0) end
+    return ready, reason
+end
+
 function M.is_provider(value) return M.is_enabled() and value == provider end
 
 function M.profile_options()
