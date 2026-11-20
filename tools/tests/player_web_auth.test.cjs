@@ -22,13 +22,14 @@ function fixture(options = {}) {
     }
     const root = new Panel("root");
     nodes.StartupLoadingFooter = new Panel("StartupLoadingFooter");
+    nodes.StartupLoadingMessages = new Panel("StartupLoadingMessages");
     let tableCallback;
     const context = {
         $: {GetContextPanel: () => root, RegisterEventHandler: (name, panel, fn) => {
                 if (options.unsupportedDeleteEvent) throw Error("First argument to RegisterEventHandler is not a valid event type");
                 hooks[name] = fn;
             },
-            CreatePanel: (type, parent, id) => {const node = new Panel(id); if (id) nodes[id] = node; return node;},
+            CreatePanel: (type, parent, id) => {const node = new Panel(id); node.parent = parent; if (id) nodes[id] = node; return node;},
             DispatchEvent: (name, value) => opened.push({name, value})},
         Game: {GetLocalPlayerID: () => localId},
         GameEvents: {Subscribe: (name, callback) => {events[name] = callback; return 12;},
@@ -47,6 +48,7 @@ function fixture(options = {}) {
     };
 }
 const f = fixture();
+assert.equal(f.nodes.PlayerWebAuth.parent, f.nodes.StartupLoadingMessages, "authentication grows inside the slot above the fixed bar");
 assert.strictEqual(f.shown(), false, "no public/loading snapshot can manufacture a private approval state");
 assert.strictEqual(f.requests.length, 1);
 assert.deepStrictEqual(JSON.parse(JSON.stringify(f.requests[0])), {name: "survival_player_web_auth_request", value: {session_id: session1}});

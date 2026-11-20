@@ -6,6 +6,7 @@ const script = fs.readFileSync("panorama/src/scripts/custom_game/startup_loading
 const xml = fs.readFileSync("panorama/src/layout/custom_game/startup_loading.xml", "utf8");
 const loadingXml = fs.readFileSync("panorama/src/layout/custom_game/custom_loading_screen.xml", "utf8");
 const teamSetupXml = fs.readFileSync("panorama/src/layout/custom_game/startup_team_setup_loading.xml", "utf8");
+const progressXml = fs.readFileSync("panorama/src/layout/custom_game/startup_progress.xml", "utf8");
 assert(!/<Panel\b[^>]*\bid=/.test(xml.match(/<Panel\b[^>]*>/)[0]), "Panorama layout root must not declare an id");
 
 function harness(options = {}) {
@@ -51,6 +52,12 @@ function harness(options = {}) {
         GetChildCount() { return this.children.length; }
         GetChild(index) { return this.children[index]; }
         SetAcceptsFocus() {}
+        BLoadLayout(path) {
+            assert.equal(path, "file://{resources}/layout/custom_game/startup_progress.xml");
+            if (!options.sharedProgress) return false;
+            loadPanels(progressXml, this);
+            return true;
+        }
         FindChildTraverse(id) {
             for (const child of this.children) {
                 if (child.id === id) return child;
@@ -87,24 +94,28 @@ function harness(options = {}) {
     }
     // Parse the authored panel tree, including unnamed wrappers. A flat map of
     // IDs misses the engine ContextPanel versus XML root visibility regression.
-    const stack = [];
-    let authoredRoot;
-    let markup = (options.hud ? fs.readFileSync("panorama/src/layout/custom_game/survival_hud.xml", "utf8")
-        : options.authoredXml || (options.teamSetup ? teamSetupXml : options.nativeLoading ? loadingXml : xml)).replace(/<!--[\s\S]*?-->/g, "");
-    if (options.omitRetryButton) markup = markup.replace(/<Button id="StartupLoadingRetry"[\s\S]*?<\/Button>/, "");
-    for (const match of markup.matchAll(/<\/?(Panel|Image|Label|Button)\b[^>]*>/g)) {
-        const tag = match[0];
-        if (tag.startsWith("</")) { assert(stack.length); stack.pop(); continue; }
-        const attributes = {};
-        for (const attribute of tag.matchAll(/([\w-]+)="([^"]*)"/g)) attributes[attribute[1]] = attribute[2];
-        const panel = new Panel(match[1], stack.at(-1) || mount, attributes.id || "");
-        if (!authoredRoot) authoredRoot = panel;
-        (attributes.class || "").split(/\s+/).filter(Boolean).forEach(value => panel.AddClass(value));
-        if (attributes.visible !== undefined) panel.visible = attributes.visible !== "false";
-        if (attributes.text !== undefined) panel.text = attributes.text;
-        if (!tag.endsWith("/>")) stack.push(panel);
+    function loadPanels(markup, parent) {
+        const stack = [];
+        let authored;
+        for (const match of markup.replace(/<!--[\s\S]*?-->/g, "").matchAll(/<\/?(Panel|Image|Label|Button)\b[^>]*>/g)) {
+            const tag = match[0];
+            if (tag.startsWith("</")) { assert(stack.length); stack.pop(); continue; }
+            const attributes = {};
+            for (const attribute of tag.matchAll(/([\w-]+)="([^"]*)"/g)) attributes[attribute[1]] = attribute[2];
+            const panel = new Panel(match[1], stack.at(-1) || parent, attributes.id || "");
+            if (!authored) authored = panel;
+            (attributes.class || "").split(/\s+/).filter(Boolean).forEach(value => panel.AddClass(value));
+            if (attributes.visible !== undefined) panel.visible = attributes.visible !== "false";
+            if (attributes.text !== undefined) panel.text = attributes.text;
+            if (!tag.endsWith("/>")) stack.push(panel);
+        }
+        assert(authored && stack.length === 0, "authored XML panel tree must balance");
+        return authored;
     }
-    assert(authoredRoot && stack.length === 0, "authored XML panel tree must balance");
+    let markup = options.hud ? fs.readFileSync("panorama/src/layout/custom_game/survival_hud.xml", "utf8")
+        : options.authoredXml || (options.teamSetup ? teamSetupXml : options.nativeLoading ? loadingXml : xml);
+    if (options.omitRetryButton) markup = markup.replace(/<Button id="StartupLoadingRetry"[\s\S]*?<\/Button>/, "");
+    const authoredRoot = loadPanels(markup, mount);
     const root = wrapper || authoredRoot;
     if (!options.hud) {
         assert.equal(nodes.StartupLoadingBackground.GetParent(), nodes.StartupLoadingSurface);
@@ -236,6 +247,28 @@ function ready(overrides = {}) { return loading({phase: "ready", progress: 100, 
     config.SurvivalMatchWaitingCover = {session_id: admitted.session_id, player_id: 0, cover: {IsValid: () => true}};
     harness({state: admitted, sharedConfig: config});
     assert.equal(backdrop.IsValid(), false, "the replacement HUD can retire the cover even after its creator is gone");
+}
+{
+    const config = {};
+    const ui = harness({teamSetup: true, gameSetupHost: true, sharedProgress: true, sharedConfig: config,
+        state: loading({phase: "team_setup", admission_complete: false})});
+    const track = config.SurvivalStartupViewportProgress;
+    const nativeFooter = ui.root.FindChildTraverse("StartupLoadingFooter");
+    assert.equal(nativeFooter.FindChildTraverse("StartupLoadingProgressTrack").visible, false, "only the persistent track draws");
+    assert.equal(track.panel.GetParent(), ui.nodes.Hud);
+    assert.equal(track.panel.style.zIndex, "200001");
+    assert.equal(track.percent.text, "0%");
+    ui.setState(loading({admission_complete: false}));
+    assert.equal(track.percent.text, "24%");
+    ui.setState(undefined);
+    assert.equal(config.SurvivalStartupViewportProgress, track, "missing phase state does not recreate the progress bar");
+    assert.equal(track.percent.text, "24%");
+    const admitted = ready({admission_complete: true, setup: {}, profiles_ready: false});
+    config.SurvivalMatchWaitingCover = {session_id: admitted.session_id, player_id: 0, cover: {IsValid: () => true}};
+    ui.setState(admitted);
+    assert.equal(ui.root.IsValid(), false);
+    assert.equal(track.panel.IsValid(), true, "the fixed bar survives authorization and survives deletion of the native layout");
+    assert.equal(track.percent.text, "100%");
 }
 {
     const ui = harness({teamSetup: true, gameSetupHost: true, state: loading({phase: "team_setup"})});

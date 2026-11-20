@@ -70,7 +70,9 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
     const pending = loading({admission_complete: false});
     const admitted = ready({admission_complete: true, profiles_ready: false, setup: setup()});
     const menuCalls = [];
-    const shared = {SurvivalNativeMatchMenu: hidden => menuCalls.push(hidden)};
+    const progressPanel = {visible: true, IsValid: () => true, DeleteAsync() { this.deleted = true; }};
+    const shared = {SurvivalNativeMatchMenu: hidden => menuCalls.push(hidden),
+        SurvivalStartupViewportProgress: {panel: progressPanel, session_id: pending.session_id}};
     const ui = harness({startupState: pending, hud: true, loadSharedUI: true, sharedConfig: shared});
     const cover = ui.nodes.MatchWaitingCover;
     const hudXml = fs.readFileSync("panorama/src/layout/custom_game/survival_hud.xml", "utf8");
@@ -89,13 +91,17 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
     assert(cover.visible && ui.nodes.MatchWaitingStatus.text.includes("读取玩家档案"), "choice confirmation does not expose the HUD during cloud loading");
     ui.setStartup({...selected, profiles_ready: true});
     assert(cover.visible && cover.BHasClass("MatchWaitingClosing"), "only fully ready gameplay begins the fade");
+    assert(progressPanel.visible, "the progress bar persists until the final loading fade ends");
     ui.advance(0.1);
     ui.setStartup({...pending, session_id: "next-match"});
     ui.advance(0.3);
     assert(cover.visible && !cover.BHasClass("MatchWaitingClosing"), "a new match rejects the previous fade completion");
+    assert.equal(progressPanel.deleted, undefined);
+    shared.SurvivalStartupViewportProgress.session_id = "next-match";
     ui.setStartup({...selected, session_id: "next-match", profiles_ready: true});
     ui.advance(0.21);
     assert(!cover.visible, "the cover is released after the 0.2-second fade");
+    assert(progressPanel.deleted && !progressPanel.visible);
     assert.deepEqual(menuCalls, [false, false, true], "the native menu is hidden only at the final reveal");
 }
 
