@@ -31,7 +31,8 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
     const nativeMenuProfile = source.slice(source.indexOf("    function hudRoot()"),
         source.indexOf("    function applyDefaultUIProfile()"));
     const ui = harness({officialMenu: true, hud: true, loadSharedUI: true});
-    const {MenuButtons: menu, DashboardButton: arrow, Hud: hud, NativeMenuParent: nativeParent} = ui.nodes;
+    const {MenuButtons: menu, DashboardButton: arrow, ButtonBar: bar, Hud: hud, NativeMenuParent: nativeParent,
+        SettingsRebornButton: settings, ToggleScoreboardButton: scoreboard} = ui.nodes;
     const config = ui.config;
     const hideTopLeft = vm.runInNewContext(nativeMenuProfile + "\nhideOfficialTopLeftPanels", {
         $: {GetContextPanel: () => ui.root}, inputConfig: config
@@ -40,8 +41,12 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
     assert.equal(menu.style.visibility, "visible");
     assert.equal(menu.style.zIndex, "200002", "team cover and mandatory selection cannot cover the Valve menu");
     assert.equal(menu.GetParent(), hud);
-    assert.equal(arrow.GetParent(), menu, "keep the original DashboardButton and its native parent");
+    assert.equal(arrow.GetParent(), bar, "keep the original DashboardButton and its native parent");
     assert.equal(arrow.hittest, true);
+    for (const button of [settings, scoreboard]) {
+        assert.equal(button.style.visibility, "collapse", "only the dashboard arrow is visible while waiting");
+        assert.equal(button.hittest, false);
+    }
     click(arrow);
     assert.deepEqual(ui.dispatched, [["native_dashboard"]], "do not replace the original action");
     config.SurvivalGameplayVisible = true;
@@ -50,6 +55,7 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
     assert.equal(menu.style.zIndex, "12");
     assert.equal(menu.GetParent(), nativeParent);
     assert.equal(menu.hittest, false);
+    for (const button of [settings, scoreboard]) assert.equal(button.style.visibility, "visible");
     menu.style.visibility = "visible"; // Native HUD refreshed the same panel.
     hideTopLeft();
     assert.equal(menu.style.visibility, "collapse");

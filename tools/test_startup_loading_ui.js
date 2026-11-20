@@ -42,6 +42,7 @@ function harness(options = {}) {
         SetPanelEvent(name, handler) { this.events[name] = handler; }
         SetImage(path) { this.image = path; }
         GetParent() { return this.parent; }
+        Children() { return [...this.children]; }
         SetParent(parent) {
             if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this);
             this.parent = parent;
@@ -67,7 +68,13 @@ function harness(options = {}) {
     if (options.officialMenu) {
         const nativeParent = new Panel("Panel", nativeHud, "NativeMenuParent");
         const menu = new Panel("DOTAHudMenuButtons", nativeParent, "MenuButtons");
-        const arrow = new Panel("Button", menu, "DashboardButton");
+        const bar = new Panel("Panel", menu, "ButtonBar");
+        const arrow = new Panel("Button", bar, "DashboardButton");
+        for (const id of ["SettingsRebornButton", "ToggleScoreboardButton"]) {
+            const sibling = new Panel("Button", bar, id);
+            sibling.style.visibility = "visible";
+            sibling.hittest = true;
+        }
         menu.style.zIndex = "12";
         arrow.events.onactivate = () => dispatched.push(["native_dashboard"]);
     }
