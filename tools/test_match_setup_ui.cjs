@@ -125,7 +125,7 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
     config.SurvivalMatchWaitingCover.player_id = 0;
     ui.advance(0.5);
     assertHidden(ui, "the mounted waiting cover takes over atomically after artwork is ready");
-    assert.equal(ui.root.__survivalMotion.ticket, null, "the handoff cannot schedule an intermediate fade");
+    assert(!ui.root.__survivalMotion || ui.root.__survivalMotion.ticket === null, "the handoff cannot schedule an intermediate fade");
     ui.advance(2);
     const transitions = ui.messages.filter(message => message.startsWith("[STARTUP_VISIBILITY] "))
         .map(message => JSON.parse(message.slice("[STARTUP_VISIBILITY] ".length)));

@@ -60,7 +60,8 @@ function harness(options = {}) {
         }
     }
     const viewport = new Panel("Panel", null, "Viewport");
-    const nativeHud = options.gameSetupHost || options.officialMenu ? new Panel("Panel", viewport, "Hud") : null;
+    const dotaHud = options.gameSetupHost || options.officialMenu ? new Panel("Panel", viewport, "DotaHud") : null;
+    const nativeHud = dotaHud ? new Panel("Panel", dotaHud, "Hud") : null;
     const customRoot = nativeHud ? new Panel("Panel", nativeHud, "CustomUIRoot") : null;
     const setupHost = options.gameSetupHost ? new Panel("Panel", customRoot, "CustomUIContainer_GameSetup") : null;
     const wrapper = options.engineWrapper ? new Panel("Panel", viewport, "CustomLoadingScreenContainer") : null;
@@ -194,7 +195,7 @@ function ready(overrides = {}) { return loading({phase: "ready", progress: 100, 
 {
     const config = {SurvivalStartupCompletion: {session_id: "old-match", player_id: 0, admission_complete: true}};
     const ui = harness({teamSetup: true, gameSetupHost: true, officialMenu: true, sharedConfig: config, loadSharedUI: true});
-    assert.equal(ui.root.GetParent(), ui.nodes.CustomUIRoot, "the cover must span the full HUD");
+    assert.equal(ui.root.GetParent(), ui.nodes.DotaHud, "the cover must outlive both native HUD branches");
     assert.equal(ui.root.style.zIndex, "-1", "loading controls from the next phase can render above the cover");
     assert.equal(ui.root.BHasClass("UIFadeEnter"), false, "the first team-setup frame must never fade in from transparent");
     assert.equal(ui.nodes.MenuButtons.GetParent(), ui.nodes.Hud, "native menu is above team setup before auth");
@@ -204,7 +205,9 @@ function ready(overrides = {}) { return loading({phase: "ready", progress: 100, 
     ui.advance(0.5);
     assert.equal(coverWrites(), initialWrites, "pending team setup does not repaint the cover");
     ui.nodes.CustomUIContainer_GameSetup.visible = false;
-    assertShown(ui, "the old match's completion and closure of native setup must preserve the new cover");
+    ui.nodes.CustomUIRoot.visible = false;
+    ui.nodes.Hud.visible = false;
+    assertShown(ui, "the cover persists even while both native HUD branches are hidden");
     const current = ready({admission_complete: true, setup: {}, profiles_ready: false});
     ui.setState(current);
     assertShown(ui, "hold the detached cover until the gameplay HUD has accepted the handoff");
@@ -212,6 +215,12 @@ function ready(overrides = {}) { return loading({phase: "ready", progress: 100, 
     ui.advance(0.5);
     assert.equal(ui.root.IsValid(), false, "finished team setup removes the detached cover");
     assert.equal(ui.subscriptionCount(), 0, "finished team setup releases the nettable listener");
+}
+{
+    const ui = harness({state: loading(), loadSharedUI: true, engineWrapper: true});
+    assertShown(ui, "the replacement loading layout is opaque from its first frame");
+    assert.equal(ui.root.style.opacity, "1");
+    assert.equal(ui.root.BHasClass("UIFadeEnter"), false);
 }
 {
     const ui = harness({teamSetup: true, gameSetupHost: true, state: loading({phase: "team_setup"})});
