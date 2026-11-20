@@ -10,7 +10,7 @@ assert(!/<Panel\b[^>]*\bid=/.test(xml.match(/<Panel\b[^>]*>/)[0]), "Panorama lay
 
 function harness(options = {}) {
     const nodes = {}, requests = [], scheduled = [], handlers = {}, subscriptions = [], messages = [], visibilityWrites = [], eventHandlers = {}, dispatched = [];
-    const nativeRuleCalls = [], nativePlayerInfoCalls = [];
+    const nativeRuleCalls = [], nativePlayerInfoCalls = [], defaultUICalls = [];
     const config = options.sharedConfig || {};
     let now = 0, state = options.state, startupState = options.startupState, localId = options.localId === undefined ? 0 : options.localId;
     class Panel {
@@ -126,6 +126,10 @@ function harness(options = {}) {
     const env = {$};
     if (!options.noGameApis) {
         if (options.sharedConfig || options.loadSharedUI || options.hud) env.GameUI = {CustomUIConfig: () => config};
+        if (options.nativePregameUI) {
+            env.DotaDefaultUIElement_t = {DOTA_DEFAULT_UI_PREGAME_HERO_SELECTION: 1, DOTA_DEFAULT_UI_PREGAME_STRATEGYUI: 2};
+            env.GameUI.SetDefaultUIEnabled = (element, visible) => defaultUICalls.push([element, visible]);
+        }
         env.Game = {
             GetLocalPlayerID: () => localId,
             GetLocalPlayerInfo: () => { nativePlayerInfoCalls.push("GetLocalPlayerInfo"); throw new Error("native player resource unavailable"); },
@@ -161,7 +165,7 @@ function harness(options = {}) {
     }
     vm.runInContext(options.hud ? fs.readFileSync("panorama/src/scripts/custom_game/survival_ui.js", "utf8") : script, context);
     return {
-        nodes, root, authoredRoot, requests, messages, config, nativeRuleCalls, nativePlayerInfoCalls, dispatched, authoredFirstFrame,
+        nodes, root, authoredRoot, requests, messages, config, nativeRuleCalls, nativePlayerInfoCalls, defaultUICalls, dispatched, authoredFirstFrame,
         subscriptionCount: () => subscriptions.filter(Boolean).length,
         emit: (name, payload) => { if (eventHandlers[name]) eventHandlers[name](payload); },
         visibilityWrites: () => visibilityWrites.slice(initialVisibilityWriteCount),
@@ -194,7 +198,8 @@ function ready(overrides = {}) { return loading({phase: "ready", progress: 100, 
     assets: {total: 10, ready: 10, failed: 0, progress: 100, complete: true}, players: [readyPlayer(0)], ...overrides}); }
 {
     const config = {SurvivalStartupCompletion: {session_id: "old-match", player_id: 0, admission_complete: true}};
-    const ui = harness({teamSetup: true, gameSetupHost: true, officialMenu: true, sharedConfig: config, loadSharedUI: true});
+    const ui = harness({teamSetup: true, gameSetupHost: true, officialMenu: true, nativePregameUI: true, sharedConfig: config, loadSharedUI: true});
+    assert.deepEqual(ui.defaultUICalls, [[1, false], [2, false]], "disable the native opening screens before leaving team setup");
     assert.equal(ui.root.GetParent(), ui.nodes.DotaHud, "the cover must outlive both native HUD branches");
     assert.equal(ui.root.style.zIndex, "-1", "loading controls from the next phase can render above the cover");
     assert.equal(ui.root.BHasClass("UIFadeEnter"), false, "the first team-setup frame must never fade in from transparent");
@@ -217,7 +222,8 @@ function ready(overrides = {}) { return loading({phase: "ready", progress: 100, 
     assert.equal(ui.subscriptionCount(), 0, "finished team setup releases the nettable listener");
 }
 {
-    const ui = harness({state: loading(), loadSharedUI: true, engineWrapper: true});
+    const ui = harness({state: loading(), loadSharedUI: true, engineWrapper: true, nativePregameUI: true});
+    assert.deepEqual(ui.defaultUICalls, [], "later layouts never toggle native pregame UI");
     assertShown(ui, "the replacement loading layout is opaque from its first frame");
     assert.equal(ui.root.style.opacity, "1");
     assert.equal(ui.root.BHasClass("UIFadeEnter"), false);
