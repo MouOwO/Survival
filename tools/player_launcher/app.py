@@ -23,6 +23,7 @@ from windows import LaunchError, discover, existing_dota, start_client, vdf
 
 TITLE = '我在dota2苟发育 · 专用登录器'
 WORKSHOP = '3824360109'
+ICON = Path(__file__).with_name('goufayu.ico')
 READY = '[SFB_HELPER] ready; enter the original Workshop game'
 MESSAGES = {
     'steam_not_found': '未找到 Steam。请先安装 Steam，并登录你的 Steam 账号。',
@@ -200,11 +201,21 @@ def selfcheck(destination):
     binding = bundle()
     import tkinter
     # Instantiates Tcl/Tk: checks bundled DLL/data availability, not just imports.
-    root = tkinter.Tk(); root.withdraw(); root.update(); root.destroy()
+    icon_sha = hashlib.sha256(ICON.read_bytes()).hexdigest()
+    if icon_sha != binding['icon_sha256']:
+        raise LaunchError('launcher_icon_changed')
+    root = tkinter.Tk()
+    try:
+        root.withdraw()
+        root.iconbitmap(default=str(ICON))
+        root.update()
+    finally:
+        root.destroy()
     result = dict(kind='FROZEN_PLAYER_LAUNCHER_SELFCHECK', frozen=bool(getattr(sys, 'frozen', False)),
                   version=binding['version'], protocol=bridge.PROTOCOL,
                   access_mode=binding.get('access_mode', 'test'),
                   storage_source_sha256=binding.get('storage_sha256'), startup_recovery_supported=True,
+                  icon_sha256=icon_sha,
                   fallback_test_accounts=len(bridge.ACCOUNTS), gui_initialized=True,
                   external_python_required=not bool(getattr(sys, 'frozen', False)), git_required=False, powershell7_required=False,
                   automatic_game_start=False, http_requests=0, game_files_changed=False)
@@ -229,6 +240,7 @@ def gui():
         lock.close(); return
     events = queue.Queue(maxsize=256)
     root = tk.Tk(); root.title(TITLE); root.geometry('620x375'); root.resizable(False, False)
+    root.iconbitmap(default=str(ICON))
     root.configure(bg='#142029')
     frame = tk.Frame(root, bg='#142029'); frame.pack(fill='both', expand=True, padx=30, pady=24)
     tk.Label(frame, text='我在dota2苟发育', fg='#f1d490', bg='#142029', font=('Microsoft YaHei UI', 22, 'bold')).pack(anchor='w')

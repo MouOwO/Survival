@@ -15,7 +15,8 @@ import sys
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
-SOURCE = ('app.py', 'windows.py', 'storage.py', 'build.py', 'README.txt', 'requirements-build.txt')
+ICON = 'goufayu.ico'
+SOURCE = ('app.py', 'windows.py', 'storage.py', 'build.py', 'README.txt', 'requirements-build.txt', ICON)
 
 
 def git(*args):
@@ -50,7 +51,8 @@ def main():
         relative = 'tools/player_launcher/' + name
         raw = git('show', revision + ':' + relative)
         physical = (ROOT / relative).read_bytes()
-        if physical.replace(b'\r\n', b'\n') != raw.replace(b'\r\n', b'\n'):
+        same = physical == raw if name == ICON else physical.replace(b'\r\n', b'\n') == raw.replace(b'\r\n', b'\n')
+        if not same:
             raise RuntimeError('uncommitted_launcher_source')
         sources[name] = raw
     sys.path.insert(0, str(ROOT / 'tools'))
@@ -74,6 +76,7 @@ def main():
                    access_mode='public' if published.get('public_admission_enabled') is True else 'test',
                    helper_sha256=hashlib.sha256(helper).hexdigest(),
                    storage_sha256=hashlib.sha256(sources['storage.py']).hexdigest(),
+                   icon_sha256=hashlib.sha256(sources[ICON]).hexdigest(),
                    package_files=published['package_files'])
     write(stage / 'launcher_binding.json', json.dumps(binding, sort_keys=True).encode() + b'\n')
     # Version metadata is embedded in the PE as well as the JSON binding.
@@ -83,6 +86,7 @@ def main():
                '--noconfirm', '--clean', '--onefile', '--windowed', '--noupx',
                '--name', launcher_name, '--distpath', str(target / 'dist'), '--workpath', str(target / 'work'),
                '--specpath', str(target / 'spec'), '--version-file', str(stage / 'version.txt'),
+               '--icon', str(stage / ICON), '--add-data', str(stage / ICON) + ';.',
                '--add-data', str(stage / 'launcher_binding.json') + ';.', str(stage / 'app.py')]
     with (target / 'build.log').open('xb') as output:
         result = subprocess.run(command, cwd=stage, stdout=output, stderr=subprocess.STDOUT, timeout=600)

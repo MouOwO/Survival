@@ -25,6 +25,32 @@ function wave(overrides = {}) {
 }
 const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
 
+// The setup HUD is initially opaque. Admission, slow saves and choices all
+// share this cover, and a new match cancels any previous fade.
+{
+    const pending = loading({admission_complete: false});
+    const admitted = ready({admission_complete: true, profiles_ready: false, setup: setup()});
+    const ui = harness({startupState: pending, hud: true, loadSharedUI: true});
+    const cover = ui.nodes.MatchWaitingCover;
+    const hudXml = fs.readFileSync("panorama/src/layout/custom_game/survival_hud.xml", "utf8");
+    assert(cover.visible && /id="MatchWaitingCover" hittest="true"/.test(hudXml),
+        "waiting cover owns the HUD from its first frame");
+    ui.setStartup(admitted);
+    assert(cover.visible && ui.nodes.DifficultySelectionOverlay.visible, "mode choice renders over the opaque waiting cover");
+    const selected = {...admitted, setup: setup({mode_selected: true, mode_id: "standard", difficulty_selected: true})};
+    ui.setStartup(selected);
+    assert(cover.visible && ui.nodes.MatchWaitingStatus.text.includes("读取玩家档案"), "choice confirmation does not expose the HUD during cloud loading");
+    ui.setStartup({...selected, profiles_ready: true});
+    assert(cover.visible && cover.BHasClass("MatchWaitingClosing"), "only fully ready gameplay begins the fade");
+    ui.advance(0.1);
+    ui.setStartup({...pending, session_id: "next-match"});
+    ui.advance(0.3);
+    assert(cover.visible && !cover.BHasClass("MatchWaitingClosing"), "a new match rejects the previous fade completion");
+    ui.setStartup({...selected, session_id: "next-match", profiles_ready: true});
+    ui.advance(0.21);
+    assert(!cover.visible, "the cover is released after the 0.2-second fade");
+}
+
 // Admission is independent of mode selection and mode-specific profile I/O.
 {
     const config = {};

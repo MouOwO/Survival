@@ -14,6 +14,13 @@ if type(GetMapName) == "function" and GetMapName() == "ws4_entry" then
     local entry = require("systems/native_cloud_handoff")
     function Precache() end
     function Activate()
+        -- This map only waits for the roster and changes level. Do not let
+        -- Valve advance it into a separate hero selection before the handoff.
+        GameRules:SetCustomGameSetupTimeout(-1)
+        GameRules:EnableCustomGameSetupAutoLaunch(false)
+        GameRules:SetHeroSelectionTime(0)
+        GameRules:SetStrategyTime(0)
+        GameRules:SetShowcaseTime(0)
         local ok, reason = entry.activate()
         if not ok then print("[WS4-ENTRY-05] server_unavailable reason=" .. tostring(reason)) end
     end
