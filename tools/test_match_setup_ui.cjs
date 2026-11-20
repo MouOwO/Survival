@@ -30,22 +30,30 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
     const source = fs.readFileSync("panorama/src/scripts/custom_game/ui_bootstrap.js", "utf8");
     const nativeMenuProfile = source.slice(source.indexOf("    function hudRoot()"),
         source.indexOf("    function applyDefaultUIProfile()"));
-    const menu = {style: {visibility: "visible"}, hittest: true, hittestchildren: true, IsValid: () => true};
-    const config = {};
-    const root = {FindChildTraverse: name => name === "MenuButtons" ? menu : null};
+    const ui = harness({officialMenu: true, hud: true, loadSharedUI: true});
+    const {MenuButtons: menu, DashboardButton: arrow, Hud: hud, NativeMenuParent: nativeParent} = ui.nodes;
+    const config = ui.config;
     const hideTopLeft = vm.runInNewContext(nativeMenuProfile + "\nhideOfficialTopLeftPanels", {
-        $: {GetContextPanel: () => root}, inputConfig: config
+        $: {GetContextPanel: () => ui.root}, inputConfig: config
     });
     hideTopLeft();
-    assert.equal(menu.style.visibility, "visible", "bootstrap must leave the native return available while waiting");
+    assert.equal(menu.style.visibility, "visible");
+    assert.equal(menu.style.zIndex, "200002", "team cover and mandatory selection cannot cover the Valve menu");
+    assert.equal(menu.GetParent(), hud);
+    assert.equal(arrow.GetParent(), menu, "keep the original DashboardButton and its native parent");
+    assert.equal(arrow.hittest, true);
+    click(arrow);
+    assert.deepEqual(ui.dispatched, [["native_dashboard"]], "do not replace the original action");
     config.SurvivalGameplayVisible = true;
     hideTopLeft();
     assert.equal(menu.style.visibility, "collapse");
+    assert.equal(menu.style.zIndex, "12");
+    assert.equal(menu.GetParent(), nativeParent);
     assert.equal(menu.hittest, false);
     menu.style.visibility = "visible"; // Native HUD refreshed the same panel.
     hideTopLeft();
     assert.equal(menu.style.visibility, "collapse");
-    config.SurvivalNativeMatchMenu(false);
+    config.SurvivalNativeMatchMenu(false, ui.root);
     assert.equal(menu.style.visibility, "visible");
     assert.equal(menu.hittestchildren, true);
 }
@@ -68,9 +76,7 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
     assert(!shared.SurvivalMatchWaitingCover, "a newly mounted backdrop has not yet acknowledged artwork");
     ui.imageLoaded();
     assert.equal(shared.SurvivalMatchWaitingCover.cover, cover);
-    assert(ui.nodes.MatchWaitingReturn.visible);
-    click(ui.nodes.MatchWaitingReturn);
-    assert(ui.dispatched.some(([name]) => name === "DOTAHUDShowDashboard"));
+    assert(!ui.nodes.MatchWaitingReturn, "waiting HUD must not add a duplicate return button");
     assert.deepEqual(menuCalls, [false], "Valve menu is kept available before gameplay");
     const selected = {...admitted, setup: setup({mode_selected: true, mode_id: "standard", difficulty_selected: true})};
     ui.setStartup(selected);
@@ -84,7 +90,6 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
     ui.setStartup({...selected, session_id: "next-match", profiles_ready: true});
     ui.advance(0.21);
     assert(!cover.visible, "the cover is released after the 0.2-second fade");
-    assert(!ui.nodes.MatchWaitingReturn.visible);
     assert.deepEqual(menuCalls, [false, false, true], "the native menu is hidden only at the final reveal");
 }
 
@@ -100,8 +105,7 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
     assertShown(ui, "all_ready is not admission when the server explicitly provides admission_complete");
     ui.setState(ready({setup: setup(), admission_complete: true, profiles_ready: false}));
     assertShown(ui, "authentication alone cannot retire the opaque loading surface");
-    click(ui.nodes.StartupLoadingReturn);
-    assert(ui.dispatched.some(([name]) => name === "DOTAHUDShowDashboard"));
+    assert(!ui.nodes.StartupLoadingReturn, "authentication must use the existing native arrow");
     config.SurvivalMatchWaitingCover = {session_id: "other-match", player_id: 0, cover: {IsValid: () => true}};
     ui.advance(0.5);
     assertShown(ui, "the previous match's cover cannot release this match");

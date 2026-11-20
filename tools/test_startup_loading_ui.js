@@ -42,6 +42,11 @@ function harness(options = {}) {
         SetPanelEvent(name, handler) { this.events[name] = handler; }
         SetImage(path) { this.image = path; }
         GetParent() { return this.parent; }
+        SetParent(parent) {
+            if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this);
+            this.parent = parent;
+            parent.children.push(this);
+        }
         GetChildCount() { return this.children.length; }
         GetChild(index) { return this.children[index]; }
         SetAcceptsFocus() {}
@@ -54,7 +59,18 @@ function harness(options = {}) {
         }
     }
     const viewport = new Panel("Panel", null, "Viewport");
+    const nativeHud = options.gameSetupHost || options.officialMenu ? new Panel("Panel", viewport, "Hud") : null;
+    const customRoot = nativeHud ? new Panel("Panel", nativeHud, "CustomUIRoot") : null;
+    const setupHost = options.gameSetupHost ? new Panel("Panel", customRoot, "CustomUIContainer_GameSetup") : null;
     const wrapper = options.engineWrapper ? new Panel("Panel", viewport, "CustomLoadingScreenContainer") : null;
+    const mount = setupHost ? new Panel("Panel", setupHost, "CustomUIContainer") : wrapper || customRoot || viewport;
+    if (options.officialMenu) {
+        const nativeParent = new Panel("Panel", nativeHud, "NativeMenuParent");
+        const menu = new Panel("DOTAHudMenuButtons", nativeParent, "MenuButtons");
+        const arrow = new Panel("Button", menu, "DashboardButton");
+        menu.style.zIndex = "12";
+        arrow.events.onactivate = () => dispatched.push(["native_dashboard"]);
+    }
     if (options.nativeSetup) {
         const native = new Panel("Panel", viewport, "TeamSelectContainer");
         new Panel("Panel", native, "TeamsList");
@@ -73,7 +89,7 @@ function harness(options = {}) {
         if (tag.startsWith("</")) { assert(stack.length); stack.pop(); continue; }
         const attributes = {};
         for (const attribute of tag.matchAll(/([\w-]+)="([^"]*)"/g)) attributes[attribute[1]] = attribute[2];
-        const panel = new Panel(match[1], stack.at(-1) || wrapper || viewport, attributes.id || "");
+        const panel = new Panel(match[1], stack.at(-1) || mount, attributes.id || "");
         if (!authoredRoot) authoredRoot = panel;
         (attributes.class || "").split(/\s+/).filter(Boolean).forEach(value => panel.AddClass(value));
         if (attributes.visible !== undefined) panel.visible = attributes.visible !== "false";
@@ -168,6 +184,34 @@ function loading(overrides = {}) {
 function readyPlayer(id) { return {player_id: id, authenticated: true, client_ready: true, ready: true, status: "ready"}; }
 function ready(overrides = {}) { return loading({phase: "ready", progress: 100, all_ready: true,
     assets: {total: 10, ready: 10, failed: 0, progress: 100, complete: true}, players: [readyPlayer(0)], ...overrides}); }
+{
+    const config = {SurvivalStartupCompletion: {session_id: "old-match", player_id: 0, admission_complete: true}};
+    const ui = harness({teamSetup: true, gameSetupHost: true, officialMenu: true, sharedConfig: config, loadSharedUI: true});
+    assert.equal(ui.root.GetParent(), ui.nodes.CustomUIRoot, "the cover must span the full HUD");
+    assert.equal(ui.root.style.zIndex, "-1", "loading controls from the next phase can render above the cover");
+    assert.equal(ui.root.BHasClass("UIFadeEnter"), false, "the first team-setup frame must never fade in from transparent");
+    assert.equal(ui.nodes.MenuButtons.GetParent(), ui.nodes.Hud, "native menu is above team setup before auth");
+    assert.equal(ui.nodes.DashboardButton.hittest, true);
+    const coverWrites = () => ui.visibilityWrites().filter(({panel}) => panel === ui.root || panel === ui.nodes.StartupLoadingSurface).length;
+    const initialWrites = coverWrites();
+    ui.advance(0.5);
+    assert.equal(coverWrites(), initialWrites, "pending team setup does not repaint the cover");
+    ui.nodes.CustomUIContainer_GameSetup.visible = false;
+    assertShown(ui, "the old match's completion and closure of native setup must preserve the new cover");
+    const current = ready({admission_complete: true, setup: {}, profiles_ready: false});
+    ui.setState(current);
+    assertShown(ui, "hold the detached cover until the gameplay HUD has accepted the handoff");
+    config.SurvivalMatchWaitingCover = {session_id: current.session_id, player_id: 0, cover: {IsValid: () => true}};
+    ui.advance(0.5);
+    assert.equal(ui.root.IsValid(), false, "finished team setup removes the detached cover");
+    assert.equal(ui.subscriptionCount(), 0, "finished team setup releases the nettable listener");
+}
+{
+    const ui = harness({teamSetup: true, gameSetupHost: true, state: loading({phase: "team_setup"})});
+    ui.setState(loading({session_id: "new-match", phase: "team_setup"}));
+    assert.equal(ui.root.IsValid(), false, "an old detached cover cannot survive a change of match");
+    assert.equal(ui.subscriptionCount(), 0);
+}
 // LAN may replicate loading state before native PlayerResource. A caught JS
 // exception is not protection against the native null dereference, so count
 // every attempted call, even ones hidden by try/catch.
