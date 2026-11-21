@@ -19,7 +19,7 @@ import traceback
 
 import file_http_bridge as bridge
 import storage
-from windows import LaunchError, discover, existing_dota, start_client, vdf
+from windows import LaunchError, attach_client, discover, existing_dota, start_client, vdf
 
 TITLE = '我在dota2苟发育 · 专用登录器'
 WORKSHOP = '3824360109'
@@ -28,10 +28,11 @@ READY = '[SFB_HELPER] ready; enter the original Workshop game'
 MESSAGES = {
     'steam_not_found': '未找到 Steam。请先安装 Steam，并登录你的 Steam 账号。',
     'dota_not_found': '未找到 Dota 2。请先通过 Steam 安装并更新 Dota 2。',
-    'existing_client': 'Dota 已在运行。请先正常退出 Dota，再点击“启动游戏”。',
+    'existing_client_without_log': '当前 Dota 启动时未开启联网日志。请正常退出后用登录器重开。想以后补开登录器，可先在 Steam 的 Dota 2 启动选项中加入 -consolelog。',
+    'multiple_dota_clients': '检测到多个 Dota 实例。请只保留一个普通 Steam 客户端。',
     'entry_already_running': '专用登录器已在运行，请使用已打开的窗口。',
     'workshop_missing': '尚未下载本游戏。请点击“游廊页面”订阅，并等待 Steam 下载完成。',
-    'workshop_version': '游戏版本与登录器不匹配。请等待 Steam 更新完成；仍有提示时到官方群获取新版登录器。',
+    'workshop_version': '游戏版本与登录器不匹配。请等待 Steam 更新完成，并从官网下载对应版本的登录器。',
     'workshop_files': '游戏文件不完整。请在 Steam 中等待下载完成，或重新订阅本游戏。',
     'backend_unavailable': '暂时无法连接游戏后台。请检查网络，稍后重试。',
     'client_settings_invalid': 'Dota 启动参数不符合联网要求。请退出 Dota，移除 Steam 中的 Tools 或自动进地图参数后重试。',
@@ -124,8 +125,6 @@ def session(binding, run, notify):
     try:
         run.mkdir(parents=True, exist_ok=False); bridge.private_acl(run)
         write_json(run / 'status.json', state)
-        if existing_dota():
-            raise LaunchError('existing_client')
         steam, game, workshop = discover()
         verification = verify_workshop(workshop, binding, notify)
         notify('phase', '正在连接游戏后台')
@@ -135,9 +134,15 @@ def session(binding, run, notify):
                 raise ValueError()
         except Exception:
             raise LaunchError('backend_unavailable') from None
-        state['recovery'] = storage.recover(game / 'dota/cfg', run, bridge.private_acl)
-        notify('phase', '正在通过 Steam 启动 Dota 2，请稍候')
-        pid, created, counts = start_client(steam, game)
+        existing_pid = existing_dota()
+        if existing_pid is None:
+            state['recovery'] = storage.recover(game / 'dota/cfg', run, bridge.private_acl)
+            notify('phase', '正在通过 Steam 启动 Dota 2，请稍候')
+            pid, created, counts = start_client(steam, game)
+        else:
+            notify('phase', '正在连接已打开的 Dota 2')
+            pid, created, counts = attach_client(existing_pid, game)
+        state['entry_mode'] = 'attach' if existing_pid is not None else 'launch'
         process = bridge.Process(pid, created, game / 'bin/win64/dota2.exe')
         state.update(game_pid=pid, game_filetime=str(created), phase='waiting_for_log', **counts)
         write_json(run / 'status.json', state)
@@ -158,8 +163,11 @@ def session(binding, run, notify):
             write_json(run / 'launch_receipt.json', dict(state, artifact_root=str(run),
                        helper_ready_observed=True, workshop_verification=verification,
                        helper_source_sha256=binding['helper_sha256'], installation_changed=False))
-            notify('ready', '联网已准备完成。请在 Dota 游廊进入“我在dota2苟发育”。')
-        notify('phase', '正在准备联网，请先停留在 Dota 主菜单')
+            if existing_pid is not None:
+                notify('ready', '已连接当前 Dota。请进入游廊游戏。如果已停在授权页，请点击“刷新授权状态”。')
+            else:
+                notify('ready', '联网已准备完成。请在 Dota 游廊进入“我在dota2苟发育”。')
+        notify('phase', '正在准备联网，请保持 Dota 和登录器运行')
         with (run / 'helper.log').open('x', encoding='utf-8') as output:
             sys.stdout = sys.stderr = Output(output, ready)
             sys.argv = ['file_http_bridge', '--game-root', str(game), '--pid', str(pid),
@@ -178,7 +186,7 @@ def session(binding, run, notify):
             raise LaunchError('helper_stopped_while_game_running')
         state['phase'] = 'game_exited_helper_cleaned'
         write_json(run / 'status.json', state)
-        notify('closed', 'Dota 已退出，联网文件已清理。可再次点击“启动游戏”。')
+        notify('closed', 'Dota 已退出，联网文件已清理。可再次点击“启动或连接 Dota”。')
     except Exception as error:
         code = str(error) if isinstance(error, (LaunchError, ValueError)) and re.fullmatch(r'[a-z_]{3,80}', str(error)) else 'launcher_failed'
         state.update(phase='failed', code=code, error_type=type(error).__name__,
@@ -260,7 +268,7 @@ def gui():
         active[0] = True; button.configure(state='disabled'); bar.start(20)
         status.set('正在检查 Steam 和游戏文件，请稍候')
         threading.Thread(target=session, args=(binding, current_run[0], notify), daemon=False).start()
-    button = ttk.Button(row, text='启动游戏', command=start); button.pack(side='left', ipadx=24, ipady=8)
+    button = ttk.Button(row, text='启动或连接 Dota', command=start); button.pack(side='left', ipadx=18, ipady=8)
     ttk.Button(row, text='游廊页面', command=lambda: webbrowser.open('https://steamcommunity.com/sharedfiles/filedetails/?id=' + WORKSHOP)).pack(side='left', padx=12, ipady=8)
     ttk.Button(row, text='打开诊断目录', command=lambda: os.startfile(str(current_run[0] or base))).pack(side='left', ipady=8)
     tk.Label(frame, text='官方 QQ 群 1098603739\n联网期间请保留此窗口，可最小化。Steam 授权请使用本局同一账号。',

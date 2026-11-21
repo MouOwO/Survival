@@ -485,6 +485,37 @@ class Backend:
         self.ledger('record_delivery', receipt)
         return {'steam_manifest': read(self.data['official_receipt'])['steam_manifest']}
 
+    def public_launcher(self, result):
+        # Re-read the stable URL on resume; a verified Steam update is not replayed.
+        current = self.job.call('check_launcher_download', 'tools/player_launcher/distribution.py',
+                                '--release-sequence', self.version, '--steam-manifest', result['steam_manifest'])
+        if current['status'] == 'LAUNCHER_SYNCED':
+            result['launcher'] = current
+            return True
+        if current['status'] != 'LAUNCHER_OUT_OF_SYNC':
+            raise ValueError('无法核对官网下载的登录器')
+
+        def build():
+            sequence = str(self.version)
+            version = f'{sequence[:4]}.{int(sequence[4:6])}.{int(sequence[6:8])}.{int(sequence[8:])}'
+            reviewed_toolchain = Path('D:/Survival_本地工具/runs/player_launcher_20261119/buildenv/Scripts/python.exe')
+            python = os.environ.get('SURVIVAL_LAUNCHER_BUILD_PYTHON') or (
+                str(reviewed_toolchain) if reviewed_toolchain.is_file() else sys.executable)
+            destination = self.job.folder / ('launcher_' + uuid.uuid4().hex[:8])
+            candidate = self.job.call('build_launcher', 'tools/player_launcher/build.py', '--python', python,
+                                      '--output', destination, '--version', version,
+                                      '--reviewed-release-sequence', self.version,
+                                      '--reviewed-manifest', result['steam_manifest'])
+            self.ledger('record_launcher_build', candidate['receipt'])
+            return candidate
+
+        candidate = self.job.stage('launcher_build', '生成当前游廊对应的登录器', build)
+        result.update(status='WORKSHOP_SYNCED_LAUNCHER_PENDING', launcher=current, launcher_candidate=candidate,
+                      message='Steam 包已下载核验。登录器候选已生成，待实机验收并更新官网，再继续此任务：'
+                              + candidate['receipt'])
+        return False
+
+
 def run(job):
     backend = Backend(job)
     actual = {r: git(Path(root), 'rev-parse', 'HEAD').decode().strip() for r, root in job.config['source']['roots'].items()}
@@ -495,18 +526,22 @@ def run(job):
         job.stage('source_sync', '核对并同步双仓来源', lambda: backend.sync('source_refresh'))
         job.state.get('stages', {}).pop('reuse', None)
         result = job.stage('reuse', '校验并复用当前包', backend.existing)
-        job.state.update(status='done', result=result)
+        finished = job.config['mode'] != 'publish-public' or backend.public_launcher(result)
+        job.state.update(status='done' if finished else 'launcher_publication_pending', result=result)
         job.save()
         return result
     for name, title, action in [('environment', '检查环境和正式基线', backend.environment), ('bootstrap', '建立不可变构建任务', backend.bootstrap), ('catalog', '收集变更与生成目录', backend.catalog), ('compile', '官方编译变化资源', backend.compile), ('production', '生产转换与数值校验', backend.production), ('item', '验证物品生成来源', backend.item), ('source', '导入编译资源并固定来源', backend.finalize_source), ('review', '审查全部运行和构建输入', backend.review), ('collect', '准备完整运行文件', backend.collect), ('build', '签名和整包校验', backend.build)]:
         job.stage(name, title, action)
     report = read(backend.report / 'package.json')
     result = {'status': 'BUILT', 'version': backend.version, 'package_directory': str(Path(report['output']).parent), 'message': '签名包已生成并核验；没有上传'}
+    finished = True
     if job.config['mode'] in ('publish-test', 'publish-public') or job.state.get('publication_requested'):
         job.stage('publish', '更新原游廊条目', backend.publish)
         job.stage('download', '验证官方完整下载', backend.download)
         check = job.stage('checkpoint', '收口全部待发来源', backend.checkpoint)
         result.update(status='WORKSHOP_SYNCED', steam_manifest=check['steam_manifest'], message='签名包已同步游廊，普通客户端实机验收待测')
-    job.state.update(status='done', result=result)
+        if job.config['mode'] == 'publish-public':
+            finished = backend.public_launcher(result)
+    job.state.update(status='done' if finished else 'launcher_publication_pending', result=result)
     job.save()
     return result

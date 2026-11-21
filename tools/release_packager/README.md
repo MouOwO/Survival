@@ -26,3 +26,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/release_packager.ps1 -
 打包时间由编译、Lua 保护、全量读取校验和 Steam 传输组成。工具省去人工组织步骤和重复构建；变化资源按完整来源清单选择，未变化 VPK 分卷使用正式构建器已有的硬链接复用，完整文件校验保留。源码、运行删除项和历史待发项不能因追求速度而漏入包。
 
 工具窗口不在游戏内执行。初始化按两仓文件索引 O(N) 比较来源，稳定 UI 每次只处理至多 100 条队列事件，空闲不重新扫描仓库；阶段日志最多保留约 2200 行。全包校验 O(B) 读取真实文件字节，界面刷新不会触发全包校验。
+
+## 公开版本的登录器
+
+Steam 完整下载和检查点成功后，打包工具核对官网首页提供的 EXE。版本清单须绑定本次游廊序号、Steam manifest、逐卷摘要和助手源码摘要，并通过 EXE 下载摘要校验。官网仍是旧版时，本任务生成新候选并进入待发布状态。新登录器实机验收和官网发布后点击继续任务，已通过的 Steam 步骤会复用。
+
+构建使用现有 PyInstaller 环境。维护电脑改用其他环境时，可将 SURVIVAL_LAUNCHER_BUILD_PYTHON 指向该环境的 python.exe。通过 tools/player_launcher/publish_download.py 提供确切的构建回执、实机验收回执和官网原首页摘要。仅为当前公开游廊版本更新官网下载。

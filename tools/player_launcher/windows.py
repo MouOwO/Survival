@@ -122,17 +122,20 @@ def existing_dota():
         raise LaunchError('process_check_failed')
     try:
         item = Entry(); item.size = C.sizeof(item)
+        found = None
         ok, count = api.Process32FirstW(handle, C.byref(item)), 0
         while ok:
             if item.exe.lower() == 'dota2.exe':
-                return True
+                if found is not None:
+                    raise LaunchError('multiple_dota_clients')
+                found = item.pid
             count += 1
             if count > 20000:
                 raise LaunchError('process_check_failed')
             ok = api.Process32NextW(handle, C.byref(item))
         if C.get_last_error() not in (0, 18):
             raise LaunchError('process_check_failed')
-        return False
+        return found
     finally:
         api.CloseHandle(handle)
 
@@ -167,9 +170,25 @@ def arguments(pid):
         api.LocalFree(argv)
 
 
-def validate_arguments(args):
-    if '-consolelog' not in args or any(a in args for a in ('-tools', '-dev', '-addon', '+map', '+dota_launch_custom_game')):
+def validate_arguments(args, *, attaching=False):
+    blocked = ('-tools', '-dev', '-addon', '-dedicated', '-insecure', '-con_logfile',
+               '+map', '+dota_launch_custom_game')
+    if any(a.split('=', 1)[0] in blocked for a in args[1:]):
         raise LaunchError('client_settings_invalid')
+    if '-consolelog' not in args[1:] and '-condebug' not in args[1:]:
+        raise LaunchError('existing_client_without_log' if attaching else 'client_settings_invalid')
+
+
+def attach_client(pid, game):
+    expected = game / 'bin/win64/dota2.exe'
+    observed = identity(pid)
+    if observed is None or observed[0] != expected:
+        raise LaunchError('client_identity_unavailable')
+    validate_arguments(arguments(pid), attaching=True)
+    if identity(pid) != observed:
+        raise LaunchError('client_identity_unavailable')
+    return pid, observed[1], dict(window_events=0, pid_identity_reads=2,
+                                  startup_process_snapshots=1)
 
 
 def system_dlls():

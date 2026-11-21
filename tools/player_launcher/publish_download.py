@@ -36,6 +36,8 @@ def main():
     parser.add_argument('--acceptance-receipt', type=Path, required=True)
     parser.add_argument('--acceptance-sha', required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--project', type=Path, default=ROOT,
+                        help='Actual release checkout when publishing from an isolated worktree')
     parser.add_argument('--apply', action='store_true')
     parser.add_argument('--expected-index-sha', help='Exact current index SHA256 required for a later version')
     args = parser.parse_args()
@@ -45,6 +47,15 @@ def main():
         raise RuntimeError('accepted_exact_exe_required')
     from acceptance import verify
     acceptance_stage = verify(build, acceptance)
+    project = args.project.resolve(strict=True)
+    common = ['rev-parse', '--path-format=absolute', '--git-common-dir']
+    if subprocess.check_output(['git', '-C', str(ROOT), *common], timeout=30) != subprocess.check_output(['git', '-C', str(project), *common], timeout=30):
+        raise RuntimeError('release_checkout_must_share_launcher_repository')
+    from distribution import inspect_public, release_identity, verify_binding
+    committed('tools/player_launcher/distribution.py')
+    expected = release_identity(project)
+    if not verify_binding(build['binding'], expected):
+        raise RuntimeError('launcher_must_match_current_official_workshop_download')
     version = build['binding']['version']
     if not re.fullmatch(r'[0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,4}', version):
         raise RuntimeError('reviewed_version_required')
@@ -54,7 +65,9 @@ def main():
     committed('tools/player_launcher/publish_download.py')
     committed('tools/player_launcher/acceptance.py')
     out = args.output.resolve()
-    if ROOT == out or ROOT in out.parents: raise RuntimeError('external_output_required')
+    content = project.parents[2] / 'content/dota_addons/Survival'
+    if any(out == tree or tree in out.parents for tree in (ROOT, project, content)):
+        raise RuntimeError('external_output_required')
     out.mkdir(parents=True, exist_ok=False)
     files = {}
     exe = Path(build['exe']); archive = Path(build['archive'])
@@ -66,7 +79,8 @@ def main():
         files[file.name] = file
     files[archive.name] = archive
     text = template.decode('utf-8')
-    for key, value in {'VERSION':version, 'EXE':exe.name, 'ZIP':archive.name, 'SIZE':f'{exe.stat().st_size/1000000:.1f}',
+    for key, value in {'VERSION':version, 'RELEASE':str(expected['release_sequence']), 'EXE':exe.name,
+                       'ZIP':archive.name, 'SIZE':f'{exe.stat().st_size/1000000:.1f}',
                        'SHA256':build['exe_sha256']}.items():
         text = text.replace('@@' + key + '@@', value)
     if '@@' in text: raise RuntimeError('page_placeholder_unfilled')
@@ -82,7 +96,7 @@ def main():
     (out / 'plan.json').write_text(json.dumps(planned, sort_keys=True)+'\n')
     if not args.apply:
         print(json.dumps(dict(status='STATIC_DOWNLOAD_PLAN_ONLY', plan=str(out/'plan.json')))); return
-    sys.path.insert(0, str(ROOT/'tools/archive_caps_20261020'))
+    sys.path.insert(0, str(project/'tools/archive_caps_20261020'))
     import remote_driver as driver
     # Refuse overwrites. An interrupted publication must be reconciled explicitly.
     payload = dict(root=REMOTE, version=version, files=planned['files'], index_sha256=sha(page),
@@ -126,10 +140,18 @@ with open('/var/lock/goufayu-launcher-publication.lock','a') as lock:
  os.rename(q,p/'index.html')
 print(json.dumps({'all_remote_bytes_verified':True,'index_published':True}))
 '''
+    if release_identity(project) != expected:
+        raise RuntimeError('workshop_release_changed_during_launcher_upload')
     result = json.loads(driver.remote('P='+repr(payload)+'\n'+check))
     receipt = dict(planned, remote_verified=result, status='STATIC_FILES_PUBLISHED_NEEDS_PUBLIC_HTTPS_READBACK')
     (out/'publication_receipt.json').write_text(json.dumps(receipt,sort_keys=True)+'\n')
-    print(json.dumps(dict(status=receipt['status'], url=URL, receipt=str(out/'publication_receipt.json'))))
+    public = inspect_public(expected)
+    if (public['status'] != 'LAUNCHER_SYNCED' or public.get('exe_sha256') != build['exe_sha256']
+            or public['index_sha256'] != planned['index_sha256'] or release_identity(project) != expected):
+        raise RuntimeError('official_launcher_readback_differs_from_build')
+    readback = dict(public, kind='CURRENT_WORKSHOP_LAUNCHER_HTTPS_VERIFIED', artifact_root=str(out))
+    (out/'public_https_receipt.json').write_text(json.dumps(readback,sort_keys=True)+'\n')
+    print(json.dumps(dict(status=public['status'], url=URL, receipt=str(out/'public_https_receipt.json'))))
 
 
 if __name__=='__main__':main()

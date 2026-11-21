@@ -31,6 +31,8 @@ def write(path, data):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--python', type=Path, required=True)
+    parser.add_argument('--project', type=Path, default=ROOT,
+                        help='Actual release checkout when building from an isolated worktree')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--version', required=True)
     parser.add_argument('--reviewed-release-sequence', type=int, required=True)
@@ -42,8 +44,12 @@ def main():
     datetime(*parts[:3])
     launcher_name = f'GoufayuLauncher-{parts[0]:04}{parts[1]:02}{parts[2]:02}.{parts[3]}'
     target = args.output.resolve()
-    content = ROOT.parents[2] / 'content/dota_addons/Survival'
-    if any(target == tree or tree in target.parents for tree in (ROOT, content)):
+    project = args.project.resolve(strict=True)
+    common = ('rev-parse', '--path-format=absolute', '--git-common-dir')
+    if git(*common) != subprocess.check_output(['git', '-C', str(project), *common], timeout=30):
+        raise RuntimeError('release_checkout_must_share_launcher_repository')
+    content = project.parents[2] / 'content/dota_addons/Survival'
+    if any(target == tree or tree in target.parents for tree in (ROOT, project, content)):
         raise RuntimeError('build_must_be_outside_addon_trees')
     revision = git('rev-parse', 'HEAD').decode().strip()
     sources = {}
@@ -57,7 +63,7 @@ def main():
         sources[name] = raw
     sys.path.insert(0, str(ROOT / 'tools'))
     from release_packager.core import baseline
-    parent = baseline(ROOT)
+    parent = baseline(project)
     published = parent['report']
     helper_revision = published['source_revisions']['game']
     helper = git('show', helper_revision + ':tools/workshop_test/file_http_bridge.py')
