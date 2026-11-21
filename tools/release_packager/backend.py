@@ -205,7 +205,8 @@ class Backend:
         if d.package.pack.package_inventory(vpk) != report['package_files'] or d.package.inc.all_files(vpk.parent) != {row['name'] for row in report['package_files']}:
             raise ValueError('当前签包文件集合或字节已改变')
         d.package.pack.inventory_unchanged(view, metadata)
-        return {'status': 'CURRENT_PACKAGE_REUSED', 'version': report['release_sequence'], 'package_directory': str(Path(report['output']).parent), 'message': '无运行改动；完整校验通过，已复用当前签名包，未重新编译或上传'}
+        return {'status': 'CURRENT_PACKAGE_REUSED', 'version': report['release_sequence'],
+                'steam_manifest': receipt['steam_manifest'], 'package_directory': str(Path(report['output']).parent), 'message': '无运行改动；完整校验通过，已复用当前签名包，未重新编译或上传'}
 
     def bootstrap(self):
         self.require_idle()
