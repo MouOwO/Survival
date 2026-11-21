@@ -49,6 +49,19 @@ def extend_native_music_scope(tree):
     function.body.insert(offset, particle)
 
 
+def use_authenticated_scope_manifest(tree):
+    """Historical candidate byte matches do not establish compilation provenance."""
+    review = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'review')
+    scans = [node for node in review.body if isinstance(node, ast.Expr)
+             and ast.unparse(node.value).startswith('paths.extend(sorted(')
+             and 'HISTORICAL.iterdir()' in ast.unparse(node.value)]
+    if len(scans) != 1:
+        raise ValueError('historical manifest enumeration anchor changed')
+    review.body.remove(scans[0])
+    tree.body[0].value = ast.Constant(
+        'Read-only pending scope review over both repositories and the authenticated published manifest.')
+
+
 def extend_business_wire_binding(tree, name):
     """Add one exact generated producer to new families, never frozen source.
 
@@ -367,6 +380,7 @@ def render(project, revision, job, current):
             extend_lottery_csv_review(tree)
         elif name == 'scope_review.py':
             extend_native_music_scope(tree)
+            use_authenticated_scope_manifest(tree)
         elif name == 'compile_scope.py':
             for node in ast.walk(tree):
                 if isinstance(node, ast.Attribute) and node.attr == 'KEEPER_PARTICLES':
