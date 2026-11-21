@@ -530,6 +530,8 @@ def run(job):
         finished = job.config['mode'] != 'publish-public' or backend.public_launcher(result)
         job.state.update(status='done' if finished else 'launcher_publication_pending', result=result)
         job.save()
+        if not finished:
+            raise RuntimeError(result['message'])
         return result
     for name, title, action in [('environment', '检查环境和正式基线', backend.environment), ('bootstrap', '建立不可变构建任务', backend.bootstrap), ('catalog', '收集变更与生成目录', backend.catalog), ('compile', '官方编译变化资源', backend.compile), ('production', '生产转换与数值校验', backend.production), ('item', '验证物品生成来源', backend.item), ('source', '导入编译资源并固定来源', backend.finalize_source), ('review', '审查全部运行和构建输入', backend.review), ('collect', '准备完整运行文件', backend.collect), ('build', '签名和整包校验', backend.build)]:
         job.stage(name, title, action)
@@ -545,4 +547,6 @@ def run(job):
             finished = backend.public_launcher(result)
     job.state.update(status='done' if finished else 'launcher_publication_pending', result=result)
     job.save()
+    if not finished:
+        raise RuntimeError(result['message'])
     return result
