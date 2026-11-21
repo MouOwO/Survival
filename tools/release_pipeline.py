@@ -16,6 +16,7 @@ from types import ModuleType
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import release_sdk_lineage_hook as hook
+from release_public_update import MODE as PUBLIC_UPDATE_MODE
 from release_lineage_20261101 import guard
 MAX_REQUEST = 1024 * 1024
 
@@ -72,7 +73,10 @@ def static_status():
 def _template(auth):
     path, raw = pinned_bytes(auth, 'listing_template', limit=65536)
     value = json.loads(raw)
-    guard.need(isinstance(value, dict) and value.get('visibility_requested') == 'unlisted' and (value.get('workshop_id') == auth.policy['workshop_id']), 'fixed_original_unlisted_listing_required')
+    visibility = auth.policy.get('package_update_visibility', 'unlisted')
+    guard.need(visibility in ('unlisted', 'public') and isinstance(value, dict)
+        and value.get('visibility_requested') == visibility and value.get('workshop_id') == auth.policy['workshop_id'],
+        'original_listing_visibility_must_match_authority')
     cover_name = value.get('cover')
     guard.need(isinstance(cover_name, str) and cover_name, 'reviewed_cover_path_required')
     relative = Path(cover_name)
@@ -84,6 +88,8 @@ def _template(auth):
 def derived_listing(auth, validated):
     template, cover = _template(auth)
     listing = copy.deepcopy(template)
+    guard.need((listing['visibility_requested'] == 'public') == (validated.get('publication_mode') == PUBLIC_UPDATE_MODE),
+               'listing_must_match_validated_publication_mode')
     listing.update(runtime_content_sha256=validated['content_sha256'], release_sequence=validated['release_sequence'])
     return (listing, cover)
 
@@ -128,6 +134,10 @@ def publish(auth, builder, request):
             guard.need(facts['content_sha256'] == validated['content_sha256'] and facts['release_sequence'] == validated['release_sequence'], 'sdk_candidate_differs_from_live_lease')
             lease.check()
             with sdk.Steam() as steam:
+                if validated.get('publication_mode') == PUBLIC_UPDATE_MODE:
+                    from release_description import fresh_item
+                    remote = fresh_item(steam, auth.policy['workshop_id'], sdk)
+                    guard.need(remote['visibility'] == 0, 'public_item_visibility_changed')
                 result = sdk.publish(steam, listing, cover, vpk, facts, Path(auth.policy['canonical_journal']), apply=True, update_existing=True)
             lease.mark_submitted(result)
             return {**result, 'delivery_status': 'UPLOADED_PENDING_DOWNLOAD_VERIFICATION', 'workshop_synchronized': False, 'official_download_required': True}

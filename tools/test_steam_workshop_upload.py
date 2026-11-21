@@ -177,6 +177,41 @@ class UploadGuards(unittest.TestCase):
             api.publish(steam,listing,self.root/'cover.jpg',self.vpk,self.facts,self.state,apply=True)
         self.assertFalse(steam.calls)
 
+    def test_public_update_only_submits_content_to_the_confirmed_public_item(self):
+        from release_public_update import PUBLIC_STATUS, UNLISTED_STATUS
+
+        item = '9876543210'
+        target = self.vpk.with_name(item + '.vpk')
+        self.vpk.rename(target)
+        self.facts['release_sequence'] = 2
+        api.journal(self.state, {'owner': api.OWNER, 'app_id': api.APP, **self.facts,
+                    'workshop_id': item, 'visibility_requested': 3, 'release_sequence': 1,
+                    'vpk_sha256': 'old-vpk', 'uploaded': True, 'status': UNLISTED_STATUS})
+
+        class PublicSteam(FakeSteam):
+            def ug(self, name, result, types, *args):
+                self.calls.append((name, args))
+                return 1
+
+            def wait(self, call, cls, callback_id, **options):
+                assert cls is api.Submitted and callback_id == 3404
+                return api.Submitted(1, False, int(item))
+
+        listing = {'visibility_requested': 'public', 'workshop_id': item}
+        steam = PublicSteam([{'id': item, 'owner': api.OWNER, 'visibility': 3}])
+        with patch.object(api, 'emit'):
+            with self.assertRaisesRegex(ValueError, 'Remote visibility differs'):
+                api.publish(steam, listing, None, target, self.facts, self.state,
+                            apply=True, update_existing=True)
+            self.assertFalse(steam.calls)
+            steam.items[0]['visibility'] = 0
+            result = api.publish(steam, listing, None, target, self.facts, self.state,
+                                 apply=True, update_existing=True)
+        self.assertEqual([name for name, _ in steam.calls],
+                         ['StartItemUpdate', 'SetItemContent', 'SubmitItemUpdate'])
+        self.assertEqual((result['status'], result['visibility_requested']), (PUBLIC_STATUS, 0))
+        self.assertEqual(result['previous_release']['release_sequence'], 1)
+
     def test_update_preparation_archives_old_acceptance_before_any_sdk_failure(self):
         older = {'content_sha256': 'earlier-release', 'native_test': 'EARLIER_PASS'}
         evidence = {'native_test': 'VERIFIED_SINGLE_PLAYER_LOGIN_PROFILE_GAMEPLAY',

@@ -252,7 +252,7 @@ def validate_upload(candidate: Path, vpk: Path, listing_path: Path, build_report
     lobby_map = addon['maps']
     lobby_capacity = int(addon[lobby_map]['maxplayers'])
     validate_payment_declaration(listing, lobby_map, lobby_capacity)
-    if (listing['visibility_requested'] not in ('private', 'unlisted')
+    if (listing['visibility_requested'] not in ('private', 'unlisted', 'public')
             or sorted(listing['tester_steamids64']) != ids or OWNER not in ids
             or listing['map'] != lobby_map or listing['max_players'] != lobby_capacity
             or listing['runtime_content_sha256'] != manifest['content_sha256']
@@ -304,16 +304,21 @@ def archive_release(state):
 
 
 def publish(steam: Steam, listing, cover, vpk, facts, state_path, *, apply=False, update_existing=False):
+    from release_public_update import PUBLIC_STATUS, supported_parent
+    public = listing.get('visibility_requested') == 'public'
     if pack.runtime.within(state_path.resolve(), vpk.parent.resolve()):
         raise ValueError('Recovery journal must stay outside the uploaded content directory')
     owned = steam.owned()
     emit({'status': 'OWNER_ITEMS_VERIFIED', 'owner': steam.owner, 'app_id': APP, 'items': owned})
     state = load(state_path) if state_path.exists() else None
     try:
-        visibility = {'private': 2, 'unlisted': 3}[listing.get('visibility_requested', 'private')]
+        visibility = {'private': 2, 'unlisted': 3, 'public': 0}[listing.get('visibility_requested', 'private')]
     except (KeyError, TypeError):
-        raise ValueError('Only private or explicitly approved unlisted tests are supported') from None
-    if state is not None and state.get('visibility_requested', 2) != visibility:
+        raise ValueError('Unknown Workshop item visibility') from None
+    if public and (not update_existing or state is None or not supported_parent(state)
+                   or state.get('uploaded') is not True or listing.get('workshop_id') != state.get('workshop_id')):
+        raise ValueError('Public content update requires the confirmed existing published item')
+    if not public and state is not None and state.get('visibility_requested', 2) != visibility:
         raise ValueError('Listing/journal visibility differs; perform an explicitly approved visibility change first')
     if visibility == 3 and (state is None or not state.get('workshop_id')
                            or listing.get('workshop_id') != state['workshop_id']):
@@ -360,8 +365,9 @@ def publish(steam: Steam, listing, cover, vpk, facts, state_path, *, apply=False
             archive_release(state)
             state.update(**facts, uploaded=False, package=str(vpk), native_test='NOT_RUN',
                          ordinary_workshop_match='NOT_RUN', ready_for_public_release=False,
-                         status=('PRIVATE_ITEM_UPDATE_PREPARED' if visibility == 2
-                                 else 'UNLISTED_ITEM_UPDATE_PREPARED'))
+                         visibility_requested=visibility,
+                         status=('PUBLIC_CONTENT_UPDATE_PREPARED' if public else
+                                 'PRIVATE_ITEM_UPDATE_PREPARED' if visibility == 2 else 'UNLISTED_ITEM_UPDATE_PREPARED'))
             journal(state_path, state)
         if state.get('status') == 'SUBMIT_REQUEST_PENDING':
             raise ValueError('Prior submit result is unknown; query/download the confirmed item before explicitly retrying')
@@ -393,20 +399,22 @@ def publish(steam: Steam, listing, cover, vpk, facts, state_path, *, apply=False
     def setter(suffix, types, *args):
         if not steam.ug(suffix, C.c_bool, [C.c_uint64, *types], handle, *args):
             raise RuntimeError('Steam rejected ' + suffix)
-    setter('SetItemUpdateLanguage', [C.c_char_p], b'schinese')
-    setter('SetItemTitle', [C.c_char_p], listing['title'].encode('utf8'))
-    setter('SetItemDescription', [C.c_char_p], listing['description'].encode('utf8'))
-    setter('SetItemVisibility', [C.c_int32], visibility)
-    values = (C.c_char_p * 1)(b'Custom Game')
-    tags = Strings(values, 1)
-    setter('SetItemTags', [C.POINTER(Strings), C.c_bool], C.byref(tags), False)
+    if not public:
+        setter('SetItemUpdateLanguage', [C.c_char_p], b'schinese')
+        setter('SetItemTitle', [C.c_char_p], listing['title'].encode('utf8'))
+        setter('SetItemDescription', [C.c_char_p], listing['description'].encode('utf8'))
+        setter('SetItemVisibility', [C.c_int32], visibility)
+        values = (C.c_char_p * 1)(b'Custom Game')
+        tags = Strings(values, 1)
+        setter('SetItemTags', [C.POINTER(Strings), C.c_bool], C.byref(tags), False)
     setter('SetItemContent', [C.c_char_p], str(vpk.parent).encode('utf8'))
-    setter('SetItemPreview', [C.c_char_p], str(cover).encode('utf8'))
+    if not public:
+        setter('SetItemPreview', [C.c_char_p], str(cover).encode('utf8'))
     state.update(status='SUBMIT_REQUEST_PENDING', package=str(vpk), uploaded=False)
     journal(state_path, state)
-    call = steam.ug('SubmitItemUpdate', C.c_uint64, [C.c_uint64, C.c_char_p], handle,
-                    ('Restricted four-account test; signed runtime sequence '
-                     + str(facts['release_sequence']) + '.').encode('ascii'))
+    note = ('开局加载界面优化，进度条固定显示。' if public else
+            'Restricted four-account test; signed runtime sequence ' + str(facts['release_sequence']) + '.')
+    call = steam.ug('SubmitItemUpdate', C.c_uint64, [C.c_uint64, C.c_char_p], handle, note.encode('utf8'))
     def progress():
         done, total = C.c_uint64(), C.c_uint64()
         stage = steam.ug('GetItemUpdateProgress', C.c_int32,
@@ -417,7 +425,7 @@ def publish(steam: Steam, listing, cover, vpk, facts, state_path, *, apply=False
     response = steam.wait(call, Submitted, 3404, timeout=4 * 3600, progress=progress)
     if response.item != item:
         raise RuntimeError('Steam submitted item ID differs from journal')
-    state.update(status=('SUBMITTED_PRIVATE_PENDING_DOWNLOAD_AND_NATIVE_TEST' if visibility == 2
+    state.update(status=(PUBLIC_STATUS if public else 'SUBMITTED_PRIVATE_PENDING_DOWNLOAD_AND_NATIVE_TEST' if visibility == 2
                          else 'SUBMITTED_UNLISTED_PENDING_DOWNLOAD_AND_NATIVE_TEST'), uploaded=True,
                  legal_agreement_required=bool(response.legal), native_test='NOT_RUN',
                  ready_for_public_release=False)

@@ -171,6 +171,10 @@ class Backend:
         current = source_state(self.root, self.current['baseline'])
         if current['dirty_runtime']:
             raise ValueError('存在未提交的运行文件：' + ', '.join(current['dirty_runtime'][:20]))
+        if self.job.config['mode'] in ('publish-test', 'publish-public'):
+            public = bool(self.current['lineage'].get('last_public_launch_receipt'))
+            if public != (self.job.config['mode'] == 'publish-public'):
+                raise ValueError('当前条目可见性与所选发行流程不一致')
         if not Path('D:/Survival_密钥/20261021_release_01/signing-key.pem').is_file():
             raise ValueError('找不到签名密钥，请检查本机签名环境')
         return {'runtime_changes': len(current['pending_sources'])}
@@ -207,7 +211,8 @@ class Backend:
         self.require_idle()
         self.report.mkdir(parents=True, exist_ok=True)
         self.external.mkdir(parents=True, exist_ok=True)
-        info = {'family': self.family, 'report_relative': self.report.relative_to(self.root).as_posix(), 'version': self.version, 'authorization_relative': self.authorization_relative}
+        info = {'family': self.family, 'report_relative': self.report.relative_to(self.root).as_posix(), 'version': self.version,
+                'authorization_relative': self.authorization_relative, 'public_update': self.job.config['mode'] == 'publish-public'}
         outputs = render(self.root, self.job.config['source']['heads']['game'], info, self.current)
         owned = []
         backup = self.job.folder / 'before_bootstrap'
@@ -338,6 +343,12 @@ class Backend:
         if not isinstance(title, str) or not title.strip() or len(title.encode('utf8')) > 128:
             raise ValueError('游廊名称无效')
         listing['title'] = title
+        public_update = self.job.config['mode'] == 'publish-public'
+        listing['visibility_requested'] = 'public' if public_update else 'unlisted'
+        if public_update:
+            auth['package_update_visibility'] = 'public'
+        else:
+            auth.pop('package_update_visibility', None)
         # Keep future package uploads aligned with the reviewed public copy.
         description_path = 'publishing/workshop/public_description_20261118.json'
         available = git(self.root, 'ls-tree', '--name-only', self.data['producer_pins']['game'], description_path)
@@ -418,6 +429,7 @@ class Backend:
         return {'version': self.version, 'package_directory': str(Path(report['output']).parent)}
 
     def publish(self):
+        from release_public_update import AUTHORIZATION_KIND, AUTHORIZATION_TEXT, MODE
         self.require_idle()
         report = read(self.report / 'package.json')
         journal_path = self.root / 'output/four_accounts_20261022/steam_upload_state.json'
@@ -434,11 +446,17 @@ class Backend:
         if digest(journal_path.read_bytes()) != self.job.config['parent_journal_sha256']:
             raise ValueError('正式父版本已改变，请重新打包')
         policy = {'schema': 1, 'kind': 'EXPLICIT_CURRENT_USER_UNLISTED_ONLINE_TEST_AUTHORIZATION', 'user_authorization': PROGRAM_AUTH, 'authorization_scope': 'UPLOAD_THIS_EXACT_SIGNED_PACKAGE_AND_VERIFY_OFFICIAL_DOWNLOAD', 'workshop_id': report['workshop_id'], 'visibility': 'unlisted', 'release_sequence': self.version, 'ordinary_production_acceptance': False, 'native_acceptance_status': 'PENDING_USER_ONLINE_TEST', 'source_revisions': report['source_revisions'], 'signed_manifest_sha256': report['signed_manifest_sha256'], 'content_sha256': report['content_sha256'], 'report_sha256': self.pin(self.report / 'package.json')['sha256'], 'parent_journal_sha256': digest(journal_path.read_bytes()), 'generation': lineage['generation'] + 1}
+        publication_mode = 'EXPLICIT_UNLISTED_ONLINE_TEST_NATIVE_PENDING'
+        if self.job.config['mode'] == 'publish-public':
+            if report.get('public_admission_enabled') is not True:
+                raise ValueError('正式签包缺少公开玩家准入核验')
+            policy.update(kind=AUTHORIZATION_KIND, user_authorization=AUTHORIZATION_TEXT, visibility='public')
+            publication_mode = MODE
         path = self.root / self.authorization_relative
         self.fixed(path, policy)
         pins = self.sync('test_publication_authorization', [self.authorization_relative])
         request = {key: policy[key] for key in ('release_sequence', 'source_revisions', 'signed_manifest_sha256', 'content_sha256', 'report_sha256', 'parent_journal_sha256', 'generation')}
-        request.update(publication_mode='EXPLICIT_UNLISTED_ONLINE_TEST_NATIVE_PENDING', publication_operator_revision=pins['game'], online_test_authorization_sha256=self.pin(path)['sha256'], plan_sha256=report['plan_sha256'])
+        request.update(publication_mode=publication_mode, publication_operator_revision=pins['game'], online_test_authorization_sha256=self.pin(path)['sha256'], plan_sha256=report['plan_sha256'])
         self.fixed(self.report / 'online_test_request.json', request)
         current = source_state(self.root, self.current['baseline'])
         if current['dirty_runtime'] or current['runtime_fingerprint'] != self.job.state.get('runtime_fingerprint'):
@@ -484,11 +502,11 @@ def run(job):
         job.stage(name, title, action)
     report = read(backend.report / 'package.json')
     result = {'status': 'BUILT', 'version': backend.version, 'package_directory': str(Path(report['output']).parent), 'message': '签名包已生成并核验；没有上传'}
-    if job.config['mode'] == 'publish-test' or job.state.get('publication_requested'):
-        job.stage('publish', '上传原游廊测试条目', backend.publish)
+    if job.config['mode'] in ('publish-test', 'publish-public') or job.state.get('publication_requested'):
+        job.stage('publish', '更新原游廊条目', backend.publish)
         job.stage('download', '验证官方完整下载', backend.download)
         check = job.stage('checkpoint', '收口全部待发来源', backend.checkpoint)
-        result.update(status='WORKSHOP_SYNCED', steam_manifest=check['steam_manifest'], message='测试包已同步游廊，实机验收待测')
+        result.update(status='WORKSHOP_SYNCED', steam_manifest=check['steam_manifest'], message='签名包已同步游廊，普通客户端实机验收待测')
     job.state.update(status='done', result=result)
     job.save()
     return result

@@ -20,6 +20,7 @@ import re
 import secrets
 import subprocess
 import sys
+from release_public_update import MODE as PUBLIC_UPDATE_MODE, PUBLIC_STATUS, supported_parent, require_prior_public_launch
 
 sys.dont_write_bytecode = True
 
@@ -342,6 +343,11 @@ class _Lease:
         self.alive, self.completed, self.prepared_write = True, False, None
         self.parent = copy.deepcopy(parent)
         self.failed, self.inflight = False, None
+        self.content_set = False
+
+    @property
+    def public_update(self):
+        return self.validated.get('publication_mode') == PUBLIC_UPDATE_MODE
 
     def check(self):
         need(self.alive and not self.failed and not self.completed and self.pid == os.getpid() and _ACTIVE.get() is self,
@@ -358,7 +364,7 @@ class _Lease:
         state, raw = read_json(self.authority.policy['canonical_journal'])
         _identity(self.authority, state)
         need(receipt == state and state.get('uploaded') is True
-             and state.get('status') == 'SUBMITTED_UNLISTED_PENDING_DOWNLOAD_AND_NATIVE_TEST'
+             and state.get('status') == (PUBLIC_STATUS if self.public_update else 'SUBMITTED_UNLISTED_PENDING_DOWNLOAD_AND_NATIVE_TEST')
              and state.get('release_sequence') == self.validated['release_sequence']
              and state.get('content_sha256') == self.validated['content_sha256'], 'successful_same_candidate_receipt_required')
         result = dict(schema=1,generation=self.state['pending']['generation'],pending=None,
@@ -366,6 +372,8 @@ class _Lease:
                 canonical_journal_sha256=sha(raw),source_revisions=self.validated['source_revisions'],
                 manifest_sha256=self.validated['signed_manifest_sha256'],
                 resource_origins_sha256=self.validated['resource_origins_sha256']))
+        if self.public_update:
+            result['last_public_launch_receipt'] = copy.deepcopy(self.state['last_public_launch_receipt'])
         atomic_json(self.authority.policy['lineage_state'], result)
         self.completed = True
 
@@ -378,7 +386,9 @@ def release_lease(authority, request, *, preflight=False):
         need(state.get('schema') == 1 and state.get('pending') is None, 'pending_publication_requires_separate_reconciliation')
         parent, raw = read_json(authority.policy['canonical_journal'])
         _identity(authority, parent)
-        need(parent.get('uploaded') is True and parent.get('status') == 'SUBMITTED_UNLISTED_PENDING_DOWNLOAD_AND_NATIVE_TEST',
+        public_update = request.get('publication_mode') == PUBLIC_UPDATE_MODE
+        need(parent.get('uploaded') is True and (supported_parent(parent) if public_update
+             else parent.get('status') == 'SUBMITTED_UNLISTED_PENDING_DOWNLOAD_AND_NATIVE_TEST'),
              'unknown_or_pending_canonical_parent_refused')
         need(sha(raw) == state['head']['canonical_journal_sha256'] == request['parent_journal_sha256'],
              'stale_published_parent_cas')
@@ -386,10 +396,17 @@ def release_lease(authority, request, *, preflight=False):
              'next_publication_generation_required')
         need(type(request['release_sequence']) is int and request['release_sequence'] > parent['release_sequence'],
              'strictly_new_release_sequence_required')
-        need(not state.get('last_public_launch_receipt'),
-             'public_item_requires_public_update_recipe_no_unlisted_downgrade')
+        if public_update:
+            need(authority.policy.get('package_update_visibility') == 'public',
+                 'pinned_public_update_recipe_required')
+            require_prior_public_launch(state, parent, authority)
+        else:
+            need(not state.get('last_public_launch_receipt'),
+                 'public_item_requires_public_update_recipe_no_unlisted_downgrade')
         validated = _validator(authority).validate_release(copy.deepcopy(request))
         _identity(authority, validated)
+        need(public_update == (validated.get('publication_mode') == PUBLIC_UPDATE_MODE),
+             'validated_publication_mode_mismatch')
         for key in ('release_sequence','generation','parent_journal_sha256','source_revisions',
                     'signed_manifest_sha256','report_sha256','plan_sha256'):
             need(validated.get(key) == request.get(key), 'trusted_validator_request_binding_mismatch:' + key)
@@ -418,6 +435,8 @@ def release_lease(authority, request, *, preflight=False):
             signed_manifest_sha256=validated['signed_manifest_sha256'],report_sha256=validated['report_sha256'],
             plan_sha256=validated['plan_sha256'],source_revisions=validated['source_revisions'],
             status='INTENT_PRESERVED_UNTIL_SUCCESS_OR_EXPLICIT_RECONCILIATION')
+        if public_update:
+            pending.update(kind='PUBLIC_CONTENT_UPDATE', final_visibility=0)
         state = {**state, 'pending': pending}
         atomic_json(authority.policy['lineage_state'], state)
         lease = _Lease(_SEAL, authority, validated, state, sha(raw), parent)
@@ -700,6 +719,8 @@ class _Permit:
             raise Refused('sdk_mutation_failed_pending_preserved')
         if self.suffix == 'StartItemUpdate':
             lease.handle = result
+        if self.suffix == 'SetItemContent':
+            lease.content_set = True
         if isinstance(lease, _DescriptionLease) and self.suffix == 'SetItemDescription':
             lease.description_set = True
         if isinstance(lease, (_VisibilityTestLease, _PublicLaunchLease)) and self.suffix == 'SetItemVisibility':
@@ -717,6 +738,13 @@ def require_sdk_mutation(suffix, args, *, authority_sha256):
     need(isinstance(lease, _Lease) and lease.authority.digest == authority_sha256,
          'reviewed_release_lease_required_before_sdk_mutation')
     lease.check()
+    if lease.public_update:
+        need(suffix in ('StartItemUpdate', 'SetItemContent', 'SubmitItemUpdate'),
+             'public_content_update_forbids_listing_mutation')
+        if suffix == 'SetItemContent':
+            need(not lease.content_set, 'public_content_already_set')
+        if suffix == 'SubmitItemUpdate':
+            need(lease.content_set, 'public_content_required_before_submit')
     if isinstance(lease, (_VisibilityTestLease, _PublicLaunchLease)):
         need(suffix in ('StartItemUpdate', 'SetItemVisibility', 'SubmitItemUpdate'),
              'visibility_only_sdk_setters_required')
@@ -786,6 +814,9 @@ def before_journal_write(path, value, *, authority_sha256=None):
          'journal_sequence_outside_owned_transition')
     if value.get('release_sequence') == lease.validated['release_sequence']:
         need(value.get('content_sha256') == lease.validated['content_sha256'], 'journal_candidate_content_changed')
+        if lease.public_update:
+            need(type(value.get('visibility_requested')) is int and value['visibility_requested'] == 0,
+                 'public_update_journal_requires_public_visibility')
         expected_history = list(lease.parent.get('release_history', []))
         if lease.parent.get('previous_release') is not None:
             expected_history.append(lease.parent['previous_release'])

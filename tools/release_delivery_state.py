@@ -8,6 +8,7 @@ bytes. Existing publication/download schemas are consumed without rewriting.
 from __future__ import annotations
 
 import re
+from release_public_update import is_public_upload
 
 LOCAL_ONLY = "LOCAL_ONLY"
 UPLOADED_PENDING_DOWNLOAD_VERIFICATION = "UPLOADED_PENDING_DOWNLOAD_VERIFICATION"
@@ -144,7 +145,7 @@ def report(state):
             local_reasons.append("resource_inventory_unavailable")
 
     # The canonical journal's historical entries cannot satisfy this target.
-    if (journal.get("uploaded") is not True or journal.get("status") != UPLOAD_STATUS
+    if (journal.get("uploaded") is not True or (journal.get("status") != UPLOAD_STATUS and not is_public_upload(journal))
             or journal.get("app_id") != 570 or type(journal.get("app_id")) is not int
             or journal.get("legal_agreement_required") is not False):
         upload_reasons.append("successful_current_upload_journal_required")
@@ -208,6 +209,8 @@ def report(state):
             or {k: v for k, v in (pre or {}).items() if k != "observed_utc"}
             != {k: v for k, v in (post or {}).items() if k != "observed_utc"}):
         download_reasons.append("fresh_stable_official_queries_required")
+    elif is_public_upload(journal) and (type(pre.get('visibility')) is not int or pre['visibility'] != 0):
+        download_reasons.append("downloaded_item_must_be_public")
     if changes:
         local_reasons.append("local_resource_changes_not_published")
         uploaded = False

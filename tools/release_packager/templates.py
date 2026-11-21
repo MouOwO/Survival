@@ -241,6 +241,64 @@ def set_assignment(tree, name, value):
                         return
     raise ValueError('打包模板字段缺失：' + name)
 
+
+def extend_published_parent(tree, name):
+    if name != 'pipeline_recipe.py':
+        return
+    function = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'require_parent_journal')
+    check = function.body[0].value.args[0]
+    if not isinstance(check, ast.BoolOp):
+        raise ValueError('exact parent upload validation anchor changed')
+    for index, value in enumerate(check.values):
+        if ast.unparse(value) == "state.get('status') == 'SUBMITTED_UNLISTED_PENDING_DOWNLOAD_AND_NATIVE_TEST'":
+            check.values[index] = expression('supported_parent(state)')
+            break
+    else:
+        raise ValueError('exact parent upload status anchor not found')
+    original = len(check.values)
+    check.values = [value for value in check.values if ast.unparse(value) != "state.get('visibility_requested') == 3"]
+    if len(check.values) != original - 1:
+        raise ValueError('exact parent upload visibility anchor not found')
+    function.body.insert(0, ast.parse('from release_public_update import supported_parent').body[0])
+
+
+def extend_public_update(tree, name):
+    from release_public_update import AUTHORIZATION_KIND, AUTHORIZATION_TEXT, MODE, PUBLIC_STATUS, UNLISTED_STATUS
+
+    if name not in ('publication_validator.py', 'complete_baseline.py', 'verify_download.py'):
+        return
+    replacements = {UNLISTED_STATUS: PUBLIC_STATUS,
+                    'EXPLICIT_UNLISTED_ONLINE_TEST_NATIVE_PENDING': MODE}
+    if name == 'publication_validator.py':
+        replacements.update(EXPLICIT_CURRENT_USER_UNLISTED_ONLINE_TEST_AUTHORIZATION=AUTHORIZATION_KIND)
+        replacements.update({PROGRAM_AUTH: AUTHORIZATION_TEXT, 'unlisted': 'public'})
+        function = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'online_test_admission')
+        function.body.insert(0, ast.parse(
+            "need(report.get('public_admission_enabled') is True, 'signed_public_admission_required')").body[0])
+    if name == 'verify_download.py':
+        function = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'current_upload')
+        matches = [node for node in ast.walk(function) if isinstance(node, ast.Compare)
+                   and ast.unparse(node) == "state.get('visibility_requested') == 3"]
+        if len(matches) != 1:
+            raise ValueError('exact public download visibility anchor changed')
+        matches[0].comparators[0] = ast.Constant(0)
+        protocol = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'protocol')
+        branch = next(node for node in protocol.body if isinstance(node, ast.If))
+        if ast.unparse(branch.body[-1]) != '_protocol = value':
+            raise ValueError('exact public download protocol binding changed')
+        branch.body[-1:-1] = ast.parse(
+            'from release_public_update import bind_public_download, SOURCE, SOURCE_LF_SHA256\n'
+            'bind_public_download(value)\n'
+            '_PROTOCOL_EXECUTED_PINS[SOURCE] = SOURCE_LF_SHA256').body
+
+    class PublicValues(ast.NodeTransformer):
+        def visit_Constant(self, node):
+            if isinstance(node.value, str) and node.value in replacements:
+                return ast.copy_location(ast.Constant(replacements[node.value]), node)
+            return node
+
+    PublicValues().visit(tree)
+
 class Values(ast.NodeTransformer):
 
     def __init__(self, version, parent):
@@ -319,6 +377,9 @@ def render(project, revision, job, current):
         extend_business_wire_binding(tree, name)
         extend_archive_completion(tree, name)
         extend_public_admission(tree, name)
+        extend_published_parent(tree, name)
+        if job.get('public_update'):
+            extend_public_update(tree, name)
         ast.fix_missing_locations(tree)
         source = (ast.unparse(tree) + '\n').encode()
         compile(source, name, 'exec')

@@ -5,7 +5,7 @@ from release_packager.core import DEFAULT_DATA, Job, LocalLock, create_job, insp
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description='孤城逐晓专用打包工具')
-    parser.add_argument('action', choices=['gui', 'inspect', 'build', 'publish-test', 'resume'])
+    parser.add_argument('action', choices=['gui', 'inspect', 'build', 'publish-test', 'publish-public', 'resume'])
     parser.add_argument('--project', type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument('--data-root', type=Path, default=DEFAULT_DATA)
     parser.add_argument('--job', type=Path)

@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('gui','inspect','build','publish-test','resume')]
+    [ValidateSet('gui','inspect','build','publish-test','publish-public','resume')]
     [string]$Action = 'gui',
     [string]$Job,
     [switch]$CheckOnly
